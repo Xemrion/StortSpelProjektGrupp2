@@ -5,4 +5,6 @@ class Graphics {
 	Window* window;
 public:
 	void init(Window* window);
+	void add();
+	void render();
 };

@@ -4,6 +4,7 @@ void Game::init(Window* window)
 {
 	this->window = window;
 	graphics.init(window);
+	
 }
 
 void Game::run()

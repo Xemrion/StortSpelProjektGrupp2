@@ -132,6 +132,8 @@
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="graphics.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Structs.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
