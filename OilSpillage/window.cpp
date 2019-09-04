@@ -45,4 +45,22 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
+bool Window::update()
+{
+	MSG msg = { 0 };
+	while (true)
+	{
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else
+			break;
+		if (msg.message == WM_QUIT)
+			break;
+	}
+	return msg.message != WM_QUIT;
+}
+
 
