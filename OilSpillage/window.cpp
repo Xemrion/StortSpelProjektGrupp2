@@ -2,6 +2,9 @@
 
 bool Window::init(HINSTANCE hInstance, int width, int height) 
 {
+
+	this->width = width;
+	this->height = height;
 	WNDCLASSEX wcex = { 0 };
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -11,7 +14,7 @@ bool Window::init(HINSTANCE hInstance, int width, int height)
 	if (!RegisterClassEx(&wcex))
 		return false;
 
-	RECT rc = { 0, 0, 1280, 720 };
+	RECT rc = { 0, 0, width, height };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
 	handle = CreateWindowEx(

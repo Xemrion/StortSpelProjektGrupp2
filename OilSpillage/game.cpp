@@ -3,7 +3,7 @@
 void Game::init(Window* window)
 {
 	this->window = window;
-	graphics.init(window);
+	graphics.init(window, 90);
 	
 }
 
@@ -13,6 +13,7 @@ void Game::run()
 	{
 		//Game logic
 		//Graphics
+		this->graphics.render();
 	}
 
 }
