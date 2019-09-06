@@ -148,7 +148,7 @@ bool Graphics::init(Window* window, float fov)
 
 	//move to ColorShader
 	this->projection = glm::perspectiveFovLH(this->fieldOfView, (float)window->width, (float)window->height, this->screenNear, this->screenDepth);
-	this->view = glm::lookAtLH(glm::vec3(0.0, 10.0, 0.0), glm::vec3(0.0, 10.0, 0.0) + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	this->view = glm::lookAtLH(glm::vec3(0.0, 10.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
 	this->projection = glm::transpose(projection);
 	this->view = glm::transpose(view);
 
@@ -212,13 +212,17 @@ bool Graphics::init(Window* window, float fov)
 	deviceContext->OMSetBlendState(alphaEnableBlendingState, blendFactor, 0xffffffff);
 
 	this->device->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&debug));
+
+
+	createShaders();
+
 	return true;
 }
 
 void Graphics::render()
 {
 	float color[4] = {
-		1,0,0,1
+		0,0,0,1
 	};
 	deviceContext->ClearRenderTargetView(renderTargetView, color);
 	// Clear the depth buffer.
@@ -226,11 +230,15 @@ void Graphics::render()
 	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0); //1
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	glm::mat4 vp = view * projection;
+	glm::mat4 viewProj= view * projection;
+	//viewProj = glm::transpose(viewProj);
 	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, glm::value_ptr(vp), sizeof(glm::mat4));
+	CopyMemory(mappedResource.pData, glm::value_ptr(viewProj), sizeof(glm::mat4));
 	deviceContext->Unmap(viewProjBuffer, 0);
-	
+	deviceContext->PSSetShader(pxShader, nullptr, 0);
+	deviceContext->VSSetShader(vxShader, nullptr, 0);
+	deviceContext->VSSetConstantBuffers(0, 1, &this->viewProjBuffer);
+
 	for (GameObject* object : drawableObjects)
 	{
 		glm::mat4 transform = glm::transpose(object->getTransform());
@@ -240,11 +248,173 @@ void Graphics::render()
 		CopyMemory(mappedResource.pData, glm::value_ptr(transform), sizeof(glm::mat4));
 		deviceContext->Unmap(worldBuffer, 0);
 
+		UINT stride = sizeof(Vertex3D);
+		UINT offset = 0;
+		deviceContext->VSSetConstantBuffers(1, 1, &this->worldBuffer);
+		deviceContext->IASetInputLayout(this->vertexLayout);
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
 		deviceContext->Draw(object->mesh->vertices.size(), 0);
 	}
 
 	// Present the back buffer to the screen since rendering is complete.
 	swapChain->Present(0, 0);
+}
+
+bool Graphics::createShaders()
+{
+	ID3DBlob* errorBlob = nullptr;
+	HRESULT result;
+	//LPCWSTR  vs = VertexShader.hlsl;
+	ID3DBlob* pVS = nullptr;
+
+	result = D3DCompileFromFile(
+		L"VertexShader.hlsl", // filename vsFilename
+		nullptr,		// optional macros
+		nullptr,		// optional include files
+		"main",		// entry point
+		"vs_5_0",		// shader model (target)
+		D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
+		0,				// IGNORE...DEPRECATED.
+		&pVS,			// double pointer to ID3DBlob		
+		&errorBlob		// pointer for Error Blob messages.
+	);
+
+	// compilation failed?
+	if (FAILED(result))
+	{
+		if (errorBlob)
+		{
+			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
+			// release "reference" to errorBlob interface object
+			errorBlob->Release();
+		}
+		else
+		{
+			//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
+		}
+		if (pVS)
+			pVS->Release();
+		return false;
+	}
+
+	device->CreateVertexShader(
+		pVS->GetBufferPointer(),
+		pVS->GetBufferSize(),
+		nullptr,
+		&vxShader
+	);
+
+	D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
+		{
+			"SV_POSITION",		// "semantic" name in shader
+			0,				// "semantic" index (not used)
+			DXGI_FORMAT_R32G32B32_FLOAT, // size of ONE element (3 floats)
+			0,							 // input slot
+			D3D11_APPEND_ALIGNED_ELEMENT, // offset of first element
+			D3D11_INPUT_PER_VERTEX_DATA, // specify data PER vertex
+			0							 // used for INSTANCING (ignore)
+		},
+		{
+			"TEXCOORD",
+			0,
+			DXGI_FORMAT_R32G32_FLOAT, //2 values
+			0,
+			D3D11_APPEND_ALIGNED_ELEMENT,
+			D3D11_INPUT_PER_VERTEX_DATA,
+			0
+		},
+
+		{
+			"NORMAL",
+			0,				// same slot as previous (same vertexBuffer)
+			DXGI_FORMAT_R32G32B32_FLOAT,
+			0,
+			D3D11_APPEND_ALIGNED_ELEMENT,							// offset of FIRST element (after POSITION)
+			D3D11_INPUT_PER_VERTEX_DATA,
+			0
+			//for normal mapping. tangent binormal
+		}
+		   
+
+
+	};
+	
+	//int lSize = sizeof(inputDesc) / sizeof(inputDesc[0]);
+	result = device->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), pVS->GetBufferPointer(), pVS->GetBufferSize(), &vertexLayout);
+
+	if (FAILED(result))
+	{
+		return false;
+	}
+	// we do not need anymore this COM object, so we release it.
+	pVS->Release();
+	result = D3DCompileFromFile(
+		L"PixelShader.hlsl", // filename vsFilename
+		nullptr,		// optional macros
+		nullptr,		// optional include files
+		"main",		// entry point
+		"ps_5_0",		// shader model (target)
+		D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
+		0,				// IGNORE...DEPRECATED.
+		&pVS,			// double pointer to ID3DBlob		
+		&errorBlob		// pointer for Error Blob messages.
+	);
+
+	// compilation failed?
+	if (FAILED(result))
+	{
+		if (errorBlob)
+		{
+			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
+			// release "reference" to errorBlob interface object
+			errorBlob->Release();
+		}
+		else
+		{
+			//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
+		}
+		if (pVS)
+			pVS->Release();
+		return false;
+	}
+
+	device->CreatePixelShader(
+		pVS->GetBufferPointer(),
+		pVS->GetBufferSize(),
+		nullptr,
+		&pxShader
+	);
+	
+	
+	
+
+
+
+
+
+	D3D11_SAMPLER_DESC samplerDesc;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	// Create the texture sampler state.
+	result = device->CreateSamplerState(&samplerDesc, &sampler);
+	if (FAILED(result))
+	{
+		return false;
+	}
 }
 
 void Graphics::loadMesh(const char* fileName)

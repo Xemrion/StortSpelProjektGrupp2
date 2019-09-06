@@ -26,8 +26,10 @@ class Graphics {
 	ID3D11Buffer* viewProjBuffer;
 	ID3D11Buffer* worldBuffer;
 
-	
-
+	ID3D11PixelShader* pxShader;
+	ID3D11VertexShader* vxShader;
+	ID3D11InputLayout* vertexLayout;
+	ID3D11SamplerState* sampler;
 	std::unordered_map<const char*, Mesh> meshes;
 	std::vector<GameObject*> drawableObjects;
 
@@ -46,4 +48,5 @@ public:
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
 	void render();
+	bool createShaders();
 };
