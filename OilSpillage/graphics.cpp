@@ -1,4 +1,6 @@
 #include "graphics.h"
+#include "glm/glm/ext.hpp"
+#include <algorithm>
 
 Graphics::Graphics()
 {
@@ -24,7 +26,6 @@ Graphics::~Graphics()
 		this->device->Release();
 	if (this->debug)
 		this->debug->Release();
-	//this->debug->ReportLiveDeviceObjects();
 }
 
 bool Graphics::init(Window* window, float fov)
@@ -34,12 +35,10 @@ bool Graphics::init(Window* window, float fov)
 
 	D3D11_BLEND_DESC blendStateDescription;
 
-	//vSync_enabled = vsync;
-
 	DXGI_SWAP_CHAIN_DESC swapchainDesc;
 	ZeroMemory(&swapchainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapchainDesc.BufferDesc.Width = this->window->width;
-	swapchainDesc.BufferDesc.Height = this->window->height; //defualt to window size
+	swapchainDesc.BufferDesc.Height = this->window->height;
 	swapchainDesc.BufferCount = 1;
 	swapchainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -48,11 +47,15 @@ bool Graphics::init(Window* window, float fov)
 	swapchainDesc.Windowed = true;
 	//swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
+	D3D11_CREATE_DEVICE_FLAG deviceFlags = (D3D11_CREATE_DEVICE_FLAG)0;
+#if _DEBUG
+	deviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+#endif
 
 	result = D3D11CreateDeviceAndSwapChain(NULL,
 		D3D_DRIVER_TYPE_HARDWARE,
 		NULL,
-		D3D11_CREATE_DEVICE_DEBUG,
+		deviceFlags,
 		NULL,
 		NULL,
 		D3D11_SDK_VERSION,
@@ -69,7 +72,6 @@ bool Graphics::init(Window* window, float fov)
 		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)& backBufferPtr);
 		if (FAILED(result))
 		{
-			//result = false;
 			MessageBox(this->window->handle, "Could not ID3D11Texture2D* backBufferPtr", "Error", MB_OK); //L"", L"", ;
 			return false;
 		}
@@ -78,7 +80,6 @@ bool Graphics::init(Window* window, float fov)
 		device->CreateRenderTargetView(backBufferPtr, NULL, &renderTargetView);
 		if (FAILED(result))
 		{
-			//result = false;
 			MessageBox(this->window->handle, "Could not ID3D11Texture2D* backBufferPtr", "Error", MB_OK);
 			return false;
 		}
@@ -96,7 +97,7 @@ bool Graphics::init(Window* window, float fov)
 		descDepth.SampleDesc.Count = 1;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
-		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;// | D3D10_BIND_SHADER_RESOURCE;
+		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		descDepth.CPUAccessFlags = 0;
 		descDepth.MiscFlags = 0;
 		result = device->CreateTexture2D(&descDepth, NULL, &depthStencilBuffer);
@@ -104,7 +105,7 @@ bool Graphics::init(Window* window, float fov)
 		{
 			return false;
 		}
-		result = device->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView); // &depthStencilViewDesc was NULL
+		result = device->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView);
 		if (FAILED(result))
 		{
 			// deal with error...
@@ -144,12 +145,31 @@ bool Graphics::init(Window* window, float fov)
 	this->screenNear = 1;
 	this->screenDepth = 1000;
 	this->fieldOfView = fov * (DirectX::XM_PI / 180);
-	float screenAspect = (float)this->window->width / (float)this->window->height;
-
 
 	//move to ColorShader
-	this->projectionM = DirectX::XMMatrixPerspectiveFovLH(this->fieldOfView, screenAspect, this->screenNear, this->screenDepth);
+	this->projection = glm::perspectiveFovLH(this->fieldOfView, (float)window->width, (float)window->height, this->screenNear, this->screenDepth);
+	this->view = glm::lookAtLH(glm::vec3(0.0, 10.0, 0.0), glm::vec3(0.0, 10.0, 0.0) + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	this->projection = glm::transpose(projection);
+	this->view = glm::transpose(view);
 
+
+
+	D3D11_BUFFER_DESC desc = { 0 };
+
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = static_cast<UINT>(sizeof(glm::mat4) + (16 - (sizeof(glm::mat4) % 16)));
+	desc.StructureByteStride = 0;
+
+	HRESULT hr = device->CreateBuffer(&desc, 0, &viewProjBuffer);
+	if (FAILED(hr))
+		return false;
+
+	hr = device->CreateBuffer(&desc, 0, &worldBuffer);
+	if (FAILED(hr))
+		return false;
 
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -205,7 +225,64 @@ void Graphics::render()
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0); //1
 
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	glm::mat4 vp = view * projection;
+	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, glm::value_ptr(vp), sizeof(glm::mat4));
+	deviceContext->Unmap(viewProjBuffer, 0);
+	
+	for (GameObject* object : drawableObjects)
+	{
+		glm::mat4 transform = glm::transpose(object->getTransform());
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = deviceContext->Map(worldBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, glm::value_ptr(transform), sizeof(glm::mat4));
+		deviceContext->Unmap(worldBuffer, 0);
+
+		deviceContext->Draw(object->mesh->vertices.size(), 0);
+	}
+
 	// Present the back buffer to the screen since rendering is complete.
 	swapChain->Present(0, 0);
 }
 
+void Graphics::loadMesh(const char* fileName)
+{
+	Mesh newMesh;
+	meshes[fileName] = newMesh;
+	meshes[fileName].loadMesh(fileName);
+
+	int bufferSize = meshes[fileName].vertices.size() * sizeof(Vertex3D);
+	UINT stride = sizeof(Vertex3D);
+
+	D3D11_BUFFER_DESC vBufferDesc;
+	ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+	vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vBufferDesc.ByteWidth = bufferSize;
+	vBufferDesc.CPUAccessFlags = 0;
+	vBufferDesc.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA subData;
+	ZeroMemory(&subData, sizeof(subData));
+	subData.pSysMem = meshes[fileName].vertices.data();
+
+	HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+}
+
+const Mesh* Graphics::getMeshPointer(const char* fileName)
+{
+	return &meshes[fileName];
+}
+
+void Graphics::addToDraw(GameObject* o)
+{
+	drawableObjects.push_back(o);
+}
+
+void Graphics::removeFromDraw(GameObject* o)
+{
+	std::find(drawableObjects.begin(), drawableObjects.end(), o);
+}

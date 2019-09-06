@@ -42,9 +42,6 @@ public:
 	bool applyChanges(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		//MessageBox(NULL, "error",
-		//	"Error", MB_OK);
-		//when testing the exe it crashes here
 		HRESULT hr = deviceContext->Map(buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
 		if (FAILED(hr))
