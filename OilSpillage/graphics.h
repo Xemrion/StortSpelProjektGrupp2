@@ -9,6 +9,7 @@
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
+#include "Graphic/Shaders.h"
 
 class Graphics {
 	Window* window;
@@ -26,12 +27,15 @@ class Graphics {
 	ID3D11Buffer* viewProjBuffer;
 	ID3D11Buffer* worldBuffer;
 
-	ID3D11PixelShader* pxShader;
-	ID3D11VertexShader* vxShader;
-	ID3D11InputLayout* vertexLayout;
+	//ID3D11PixelShader* pxShader;
+	//ID3D11VertexShader* vxShader;
+	//ID3D11InputLayout* vertexLayout;
 	ID3D11SamplerState* sampler;
 	std::unordered_map<const char*, Mesh> meshes;
 	std::vector<GameObject*> drawableObjects;
+
+	ShaderClass shader_default;
+
 
 	float fieldOfView;
 	float screenNear;

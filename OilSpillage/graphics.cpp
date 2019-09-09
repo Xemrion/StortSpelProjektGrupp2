@@ -235,8 +235,13 @@ void Graphics::render()
 	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, glm::value_ptr(viewProj), sizeof(glm::mat4));
 	deviceContext->Unmap(viewProjBuffer, 0);
-	deviceContext->PSSetShader(pxShader, nullptr, 0);
-	deviceContext->VSSetShader(vxShader, nullptr, 0);
+
+
+	//set up Shaders
+	//deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceContext->IASetInputLayout(this->shader_default.vs.GetInputLayout());
+	deviceContext->PSSetShader(this->shader_default.ps.GetShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->shader_default.vs.GetShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &this->viewProjBuffer);
 
 	for (GameObject* object : drawableObjects)
@@ -251,7 +256,6 @@ void Graphics::render()
 		UINT stride = sizeof(Vertex3D);
 		UINT offset = 0;
 		deviceContext->VSSetConstantBuffers(1, 1, &this->worldBuffer);
-		deviceContext->IASetInputLayout(this->vertexLayout);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
 		deviceContext->Draw(object->mesh->vertices.size(), 0);
@@ -263,130 +267,163 @@ void Graphics::render()
 
 bool Graphics::createShaders()
 {
-	ID3DBlob* errorBlob = nullptr;
-	HRESULT result;
-	//LPCWSTR  vs = VertexShader.hlsl;
-	ID3DBlob* pVS = nullptr;
-
-	result = D3DCompileFromFile(
-		L"VertexShader.hlsl", // filename vsFilename
-		nullptr,		// optional macros
-		nullptr,		// optional include files
-		"main",		// entry point
-		"vs_5_0",		// shader model (target)
-		D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
-		0,				// IGNORE...DEPRECATED.
-		&pVS,			// double pointer to ID3DBlob		
-		&errorBlob		// pointer for Error Blob messages.
-	);
-
-	// compilation failed?
-	if (FAILED(result))
-	{
-		if (errorBlob)
-		{
-			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-			//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
-			// release "reference" to errorBlob interface object
-			errorBlob->Release();
-		}
-		else
-		{
-			//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
-		}
-		if (pVS)
-			pVS->Release();
-		return false;
-	}
-
-	device->CreateVertexShader(
-		pVS->GetBufferPointer(),
-		pVS->GetBufferSize(),
-		nullptr,
-		&vxShader
-	);
-
-	D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
-		{
-			"SV_POSITION",		// "semantic" name in shader
-			0,				// "semantic" index (not used)
-			DXGI_FORMAT_R32G32B32_FLOAT, // size of ONE element (3 floats)
-			0,							 // input slot
-			D3D11_APPEND_ALIGNED_ELEMENT, // offset of first element
-			D3D11_INPUT_PER_VERTEX_DATA, // specify data PER vertex
-			0							 // used for INSTANCING (ignore)
-		},
-		{
-			"TEXCOORD",
-			0,
-			DXGI_FORMAT_R32G32_FLOAT, //2 values
-			0,
-			D3D11_APPEND_ALIGNED_ELEMENT,
-			D3D11_INPUT_PER_VERTEX_DATA,
-			0
-		},
-
-		{
-			"NORMAL",
-			0,				// same slot as previous (same vertexBuffer)
-			DXGI_FORMAT_R32G32B32_FLOAT,
-			0,
-			D3D11_APPEND_ALIGNED_ELEMENT,							// offset of FIRST element (after POSITION)
-			D3D11_INPUT_PER_VERTEX_DATA,
-			0
-			//for normal mapping. tangent binormal
-		}
-		   
-
-
-	};
 	
-	//int lSize = sizeof(inputDesc) / sizeof(inputDesc[0]);
-	result = device->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), pVS->GetBufferPointer(), pVS->GetBufferSize(), &vertexLayout);
-
-	if (FAILED(result))
+	std::wstring shaderfolder = L"";
+#pragma region DetermineShaderPath
+	if (IsDebuggerPresent() == TRUE)
 	{
-		return false;
-	}
-	// we do not need anymore this COM object, so we release it.
-	pVS->Release();
-	result = D3DCompileFromFile(
-		L"PixelShader.hlsl", // filename vsFilename
-		nullptr,		// optional macros
-		nullptr,		// optional include files
-		"main",		// entry point
-		"ps_5_0",		// shader model (target)
-		D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
-		0,				// IGNORE...DEPRECATED.
-		&pVS,			// double pointer to ID3DBlob		
-		&errorBlob		// pointer for Error Blob messages.
-	);
-
-	// compilation failed?
-	if (FAILED(result))
-	{
-		if (errorBlob)
-		{
-			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-			//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
-			// release "reference" to errorBlob interface object
-			errorBlob->Release();
-		}
-		else
-		{
-			//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
-		}
-		if (pVS)
-			pVS->Release();
-		return false;
+#ifdef _DEBUG //Debug Mode
+#ifdef _WIN64 //x64
+		shaderfolder = L"..\\x64\\Debug\\";
+#else  //x86 (Win32)
+		shaderfolder = L"..\\Debug\\";
+#endif
+#else //Release Mode
+#ifdef _WIN64 //x64
+		shaderfolder = L"..\\x64\\Release\\";
+#else  //x86 (Win32)
+		shaderfolder = L"..\\Release\\";
+#endif
+#endif
 	}
 
-	device->CreatePixelShader(
-		pVS->GetBufferPointer(),
-		pVS->GetBufferSize(),
-		nullptr,
-		&pxShader
-	);
+	//2d shaders
+	D3D11_INPUT_ELEMENT_DESC inputDesc[] =
+	{
+		{"SV_POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+	};
+
+
+	UINT numElements = ARRAYSIZE(inputDesc);
+	this->shader_default.createVS(device, shaderfolder + L"VertexShader.cso", inputDesc, numElements);
+	this->shader_default.createPS(device, shaderfolder + L"PixelShader.cso");
+
+
+
+	//ID3DBlob* errorBlob = nullptr;
+	//HRESULT result;
+	////LPCWSTR  vs = VertexShader.hlsl;
+	//ID3DBlob* pVS = nullptr;
+	//result = D3DCompileFromFile(
+	//	L"VertexShader.hlsl", // filename vsFilename
+	//	nullptr,		// optional macros
+	//	nullptr,		// optional include files
+	//	"main",		// entry point
+	//	"vs_5_0",		// shader model (target)
+	//	D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
+	//	0,				// IGNORE...DEPRECATED.
+	//	&pVS,			// double pointer to ID3DBlob		
+	//	&errorBlob		// pointer for Error Blob messages.
+	//);
+	//// compilation failed?
+	//if (FAILED(result))
+	//{
+	//	if (errorBlob)
+	//	{
+	//		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	//		//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
+	//		// release "reference" to errorBlob interface object
+	//		errorBlob->Release();
+	//	}
+	//	else
+	//	{
+	//		//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
+	//	}
+	//	if (pVS)
+	//		pVS->Release();
+	//	return false;
+	//}
+
+	//device->CreateVertexShader(
+	//	pVS->GetBufferPointer(),
+	//	pVS->GetBufferSize(),
+	//	nullptr,
+	//	&vxShader
+	//);
+
+	//D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
+	//	{
+	//		"SV_POSITION",		// "semantic" name in shader
+	//		0,				// "semantic" index (not used)
+	//		DXGI_FORMAT_R32G32B32_FLOAT, // size of ONE element (3 floats)
+	//		0,							 // input slot
+	//		D3D11_APPEND_ALIGNED_ELEMENT, // offset of first element
+	//		D3D11_INPUT_PER_VERTEX_DATA, // specify data PER vertex
+	//		0							 // used for INSTANCING (ignore)
+	//	},
+	//	{
+	//		"TEXCOORD",
+	//		0,
+	//		DXGI_FORMAT_R32G32_FLOAT, //2 values
+	//		0,
+	//		D3D11_APPEND_ALIGNED_ELEMENT,
+	//		D3D11_INPUT_PER_VERTEX_DATA,
+	//		0
+	//	},
+
+	//	{
+	//		"NORMAL",
+	//		0,				// same slot as previous (same vertexBuffer)
+	//		DXGI_FORMAT_R32G32B32_FLOAT,
+	//		0,
+	//		D3D11_APPEND_ALIGNED_ELEMENT,							// offset of FIRST element (after POSITION)
+	//		D3D11_INPUT_PER_VERTEX_DATA,
+	//		0
+	//		//for normal mapping. tangent binormal
+	//	}
+	//	   
+
+
+	//};
+	//
+	////int lSize = sizeof(inputDesc) / sizeof(inputDesc[0]);
+	//result = device->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), pVS->GetBufferPointer(), pVS->GetBufferSize(), &vertexLayout);
+
+	//if (FAILED(result))
+	//{
+	//	return false;
+	//}
+	//// we do not need anymore this COM object, so we release it.
+	//pVS->Release();
+	//result = D3DCompileFromFile(
+	//	L"PixelShader.hlsl", // filename vsFilename
+	//	nullptr,		// optional macros
+	//	nullptr,		// optional include files
+	//	"main",		// entry point
+	//	"ps_5_0",		// shader model (target)
+	//	D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
+	//	0,				// IGNORE...DEPRECATED.
+	//	&pVS,			// double pointer to ID3DBlob		
+	//	&errorBlob		// pointer for Error Blob messages.
+	//);
+
+	//// compilation failed?
+	//if (FAILED(result))
+	//{
+	//	if (errorBlob)
+	//	{
+	//		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	//		//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
+	//		// release "reference" to errorBlob interface object
+	//		errorBlob->Release();
+	//	}
+	//	else
+	//	{
+	//		//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
+	//	}
+	//	if (pVS)
+	//		pVS->Release();
+	//	return false;
+	//}
+
+	//device->CreatePixelShader(
+	//	pVS->GetBufferPointer(),
+	//	pVS->GetBufferSize(),
+	//	nullptr,
+	//	&pxShader
+	//);
 	
 	
 	
@@ -410,7 +447,7 @@ bool Graphics::createShaders()
 	samplerDesc.MinLOD = 0;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	// Create the texture sampler state.
-	result = device->CreateSamplerState(&samplerDesc, &sampler);
+	HRESULT result = device->CreateSamplerState(&samplerDesc, &sampler);
 	if (FAILED(result))
 	{
 		return false;

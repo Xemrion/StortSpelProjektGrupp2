@@ -127,6 +127,7 @@
   <ItemGroup>
     <ClCompile Include="game.cpp" />
     <ClCompile Include="graphics.cpp" />
+    <ClCompile Include="Graphic\Shaders.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
@@ -136,6 +137,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="graphics.h" />
+    <ClInclude Include="Graphic\Shaders.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="VertexBuffer.h" />
