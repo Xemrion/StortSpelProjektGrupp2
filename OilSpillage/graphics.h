@@ -10,7 +10,7 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 #include "Graphic/Shaders.h"
-
+#include "Resources/Debug.h"
 class Graphics {
 	Window* window;
 	IDXGISwapChain* swapChain;
@@ -35,8 +35,8 @@ class Graphics {
 	std::vector<GameObject*> drawableObjects;
 
 	ShaderClass shader_default;
-
-
+	ShaderClass shader_debug;
+	Debug* debuger;
 	float fieldOfView;
 	float screenNear;
 	float screenDepth;

@@ -5,6 +5,7 @@
 Graphics::Graphics()
 {
 	this->window = nullptr;
+
 }
 
 Graphics::~Graphics()
@@ -215,6 +216,7 @@ bool Graphics::init(Window* window, float fov)
 
 
 	createShaders();
+	debuger = new Debug(deviceContext, device);
 
 	return true;
 }
@@ -238,7 +240,6 @@ void Graphics::render()
 
 
 	//set up Shaders
-	//deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	deviceContext->IASetInputLayout(this->shader_default.vs.GetInputLayout());
 	deviceContext->PSSetShader(this->shader_default.ps.GetShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shader_default.vs.GetShader(), nullptr, 0);
@@ -260,6 +261,12 @@ void Graphics::render()
 		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
 		deviceContext->Draw(object->mesh->vertices.size(), 0);
 	}
+
+	deviceContext->IASetInputLayout(this->shader_debug.vs.GetInputLayout());
+	deviceContext->PSSetShader(this->shader_debug.ps.GetShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->shader_debug.vs.GetShader(), nullptr, 0);
+	debuger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(3, 2,0 ), XMFLOAT3(1, 1, 0));
+
 
 	// Present the back buffer to the screen since rendering is complete.
 	swapChain->Present(0, 0);
@@ -300,6 +307,14 @@ bool Graphics::createShaders()
 	this->shader_default.createVS(device, shaderfolder + L"VertexShader.cso", inputDesc, numElements);
 	this->shader_default.createPS(device, shaderfolder + L"PixelShader.cso");
 
+	D3D11_INPUT_ELEMENT_DESC inputDesc2[] =
+	{
+		{"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"COLOR", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },	};
+	
+	UINT numElements2 = ARRAYSIZE(inputDesc2);
+	this->shader_debug.createVS(device, shaderfolder + L"DebugVs.cso", inputDesc2, numElements2);
+	this->shader_debug.createPS(device, shaderfolder + L"DebugPS.cso");
 
 
 	//ID3DBlob* errorBlob = nullptr;

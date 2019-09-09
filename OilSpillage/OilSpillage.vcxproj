@@ -129,6 +129,7 @@
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="Graphic\Shaders.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -139,11 +140,24 @@
     <ClInclude Include="graphics.h" />
     <ClInclude Include="Graphic\Shaders.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="DebugPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="DebugVs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>

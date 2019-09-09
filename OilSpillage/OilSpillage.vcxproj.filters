@@ -33,6 +33,9 @@
     <ClCompile Include="Graphic\Shaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Resources\Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -65,12 +68,21 @@
     <ClInclude Include="Graphic\Shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Resources\Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="PixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="DebugVs.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="DebugPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
