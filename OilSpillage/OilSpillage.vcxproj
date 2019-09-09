@@ -139,6 +139,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="Graphic\Shaders.h" />
+    <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Structs.h" />

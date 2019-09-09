@@ -266,7 +266,7 @@ void Graphics::render()
 	deviceContext->PSSetShader(this->shader_debug.ps.GetShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shader_debug.vs.GetShader(), nullptr, 0);
 	debuger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(3, 2,0 ), XMFLOAT3(1, 1, 0));
-
+	debuger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
 
 	// Present the back buffer to the screen since rendering is complete.
 	swapChain->Present(0, 0);

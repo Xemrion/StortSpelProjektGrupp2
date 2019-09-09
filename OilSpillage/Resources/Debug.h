@@ -1,6 +1,7 @@
 #pragma once
 #include "..//ConstantBuffer.h"
 #include "..//VertexBuffer.h"
+#include "..//IndexBuffer.h"
 #include <DirectXMath.h>
 using namespace DirectX;
 
@@ -27,4 +28,5 @@ private:
 public:
 	Debug(ID3D11DeviceContext* dc, ID3D11Device* d);
 	void DrawLine(XMFLOAT3 p, XMFLOAT3 p2, XMFLOAT3 color);
+	void DrawCube(XMFLOAT3 p, XMFLOAT3 color, float scale = 0.5f);
 };
