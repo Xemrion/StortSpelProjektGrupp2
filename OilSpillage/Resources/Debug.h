@@ -29,4 +29,5 @@ public:
 	Debug(ID3D11DeviceContext* dc, ID3D11Device* d);
 	void DrawLine(XMFLOAT3 p, XMFLOAT3 p2, XMFLOAT3 color);
 	void DrawCube(XMFLOAT3 p, XMFLOAT3 color, float scale = 0.5f);
+	void DrawRectangle(XMFLOAT3 center, XMFLOAT3 color, float scale = 0.5);
 };
