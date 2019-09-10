@@ -28,10 +28,16 @@ public:
 		vertex.position = glm::vec3(1.0, 0.0, -1.0);
 		vertices.push_back(vertex);
 
+		this->vertexCount = vertices.size();
 		
 	};
 	void operator=(const Mesh& rh) { this->vertices = rh.vertices; }
 	std::vector<Vertex3D> vertices;
 	ID3D11Buffer* vertexBuffer;
+	int getVertexCount() const 
+	{
+		return this->vertexCount;
+	};
 private:
+	int vertexCount; 
 };

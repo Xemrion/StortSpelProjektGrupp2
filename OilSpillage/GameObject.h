@@ -2,25 +2,47 @@
 #include "Mesh.h"
 #include "glm/glm/glm.hpp"
 #include "glm/glm/gtc/matrix_transform.hpp"
-
+#include <d3d11.h>
+#include<SimpleMath.h>
+using namespace DirectX::SimpleMath; 
 class GameObject {
-	glm::vec3 position;
-	glm::vec3 scale;
-	glm::vec2 rotation;
+	Vector3 position;
+	Vector3 scale=Vector3(1,1,1);
+	Vector3 rotation;
 public:
 	const Mesh* mesh = nullptr;
-	glm::mat4 getTransform() {
+	Matrix getTransform() {
 		
-		return glm::translate(glm::mat4(1.0), position);
+		Quaternion qt = Quaternion::CreateFromYawPitchRoll(rotation.y,rotation.x,rotation.z);
+		Matrix mtr = Matrix::CreateFromQuaternion(qt);
+		Matrix translate = Matrix::CreateTranslation(position);
+		Matrix scaleM = Matrix::CreateScale(scale);
+		return   mtr * scaleM *translate;
+			
 	};
 
-	void setPosition(glm::vec3 newPos)
+	void setPosition(Vector3 newPos)
 	{
 		this->position = newPos;
 	};
 
-	void move(glm::vec3 addPos)
+	void move(Vector3 addPos)
 	{
 		this->position += addPos;
+	};
+
+	void addRotation(Vector3 addRotaiton)
+	{
+		this->rotation += addRotaiton;
+	};
+
+	void setRotation(Vector3 newRotation)
+	{
+		this->rotation = newRotation;
+	};
+
+	void setScale(Vector3 newScale)
+	{
+		this->scale = newScale;
 	};
 };

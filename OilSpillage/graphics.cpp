@@ -247,19 +247,19 @@ void Graphics::render()
 
 	for (GameObject* object : drawableObjects)
 	{
-		glm::mat4 transform = glm::transpose(object->getTransform());
-
+		SimpleMath::Matrix world = object->getTransform();
+		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		HRESULT hr = deviceContext->Map(worldBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, glm::value_ptr(transform), sizeof(glm::mat4));
+		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
 		deviceContext->Unmap(worldBuffer, 0);
-
+		UINT vertexCount = object->mesh->getVertexCount();
 		UINT stride = sizeof(Vertex3D);
 		UINT offset = 0;
 		deviceContext->VSSetConstantBuffers(1, 1, &this->worldBuffer);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
-		deviceContext->Draw(object->mesh->vertices.size(), 0);
+		deviceContext->Draw(vertexCount, 0);
 	}
 
 	deviceContext->IASetInputLayout(this->shader_debug.vs.GetInputLayout());
@@ -476,7 +476,7 @@ void Graphics::loadMesh(const char* fileName)
 	Mesh newMesh;
 	meshes[fileName] = newMesh;
 	meshes[fileName].loadMesh(fileName);
-
+	
 	int bufferSize = meshes[fileName].vertices.size() * sizeof(Vertex3D);
 	UINT stride = sizeof(Vertex3D);
 
@@ -494,6 +494,7 @@ void Graphics::loadMesh(const char* fileName)
 	subData.pSysMem = meshes[fileName].vertices.data();
 
 	HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+	meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
 }
 
 const Mesh* Graphics::getMeshPointer(const char* fileName)
