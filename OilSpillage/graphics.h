@@ -11,6 +11,13 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #include "Graphic/Shaders.h"
 #include "Resources/Debug.h"
+
+enum Shapes
+{
+	SHAPE_CUBE,
+	SHAPE_SPHERE,
+	SHAPE_TRIANGLE
+};
 class Graphics {
 	Window* window;
 	IDXGISwapChain* swapChain;
@@ -32,6 +39,7 @@ class Graphics {
 	//ID3D11InputLayout* vertexLayout;
 	ID3D11SamplerState* sampler;
 	std::unordered_map<const char*, Mesh> meshes;
+	std::unordered_map<const char*, Texture> textures;
 	std::vector<GameObject*> drawableObjects;
 
 	ShaderClass shader_default;
@@ -48,7 +56,10 @@ public:
 	~Graphics();
 	bool init(Window* window, float fov);
 	void loadMesh(const char* fileName);
+	void loadShape(Shapes shape);
+	void loadTexture(const char* fileName);
 	const Mesh* getMeshPointer(const char* fileName);
+	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
 	void render();

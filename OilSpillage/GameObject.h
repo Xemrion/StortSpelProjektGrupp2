@@ -3,14 +3,17 @@
 #include "glm/glm/glm.hpp"
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include <d3d11.h>
+#include"Texture.h"
 #include<SimpleMath.h>
 using namespace DirectX::SimpleMath; 
 class GameObject {
 	Vector3 position;
 	Vector3 scale=Vector3(1,1,1);
 	Vector3 rotation;
+	Texture* texture = nullptr;
 public:
 	const Mesh* mesh = nullptr;
+	
 	Matrix getTransform() {
 		
 		Quaternion qt = Quaternion::CreateFromYawPitchRoll(rotation.y,rotation.x,rotation.z);
@@ -44,5 +47,15 @@ public:
 	void setScale(Vector3 newScale)
 	{
 		this->scale = newScale;
+	};
+	
+	Texture* getTexture()
+	{
+		return this->texture;
+	};
+
+	void setTexture(Texture* aTexture)
+	{
+		this->texture = aTexture;
 	};
 };

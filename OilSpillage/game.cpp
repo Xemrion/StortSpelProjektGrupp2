@@ -13,12 +13,21 @@ void Game::init(Window* window)
 	this->window = window; 
 	graphics.init(window, 90);
 	graphics.loadMesh("sda");
-	
+	graphics.loadShape(SHAPE_CUBE);
+	graphics.loadTexture("playerRabbit.tga");
 	this->testObject = new GameObject;
-	testObject->mesh = graphics.getMeshPointer("sda");
+	testObject->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject);
-	testObject->setPosition(Vector3(2, 0, 0));
+	testObject->setPosition(Vector3(0, 0, 0));
 	testObject->setScale(Vector3(2, 2, 2));
+	testObject->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
+
+	this->testObject2 = new GameObject;
+	testObject2->mesh = graphics.getMeshPointer("Cube");
+	graphics.addToDraw(testObject2);
+	testObject2->setPosition(Vector3(-7, 0, 0));
+	testObject2->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
+
 }
 
 void Game::run()
@@ -29,7 +38,8 @@ void Game::run()
 		//Graphics
 		
 		this->graphics.render();
-		this->testObject->addRotation(Vector3(0.001, 0.01, 0));
+		this->testObject->addRotation(Vector3(0.001, 0.001, 0.001));
 	}
-
+	delete this->testObject;
+	delete this->testObject2;
 }

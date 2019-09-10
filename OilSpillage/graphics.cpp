@@ -149,7 +149,7 @@ bool Graphics::init(Window* window, float fov)
 
 	//move to ColorShader
 	this->projection = glm::perspectiveFovLH(this->fieldOfView, (float)window->width, (float)window->height, this->screenNear, this->screenDepth);
-	this->view = glm::lookAtLH(glm::vec3(0.0, 10.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+	this->view = glm::lookAtLH(glm::vec3(0.0, 0.0, -10.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	this->projection = glm::transpose(projection);
 	this->view = glm::transpose(view);
 
@@ -244,7 +244,7 @@ void Graphics::render()
 	deviceContext->PSSetShader(this->shader_default.ps.GetShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shader_default.vs.GetShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &this->viewProjBuffer);
-
+	deviceContext->PSSetSamplers(0, 1, &this->sampler);
 	for (GameObject* object : drawableObjects)
 	{
 		SimpleMath::Matrix world = object->getTransform();
@@ -256,9 +256,11 @@ void Graphics::render()
 		UINT vertexCount = object->mesh->getVertexCount();
 		UINT stride = sizeof(Vertex3D);
 		UINT offset = 0;
+		ID3D11ShaderResourceView* shaderResView = object->getTexture()->getShaderResView();
 		deviceContext->VSSetConstantBuffers(1, 1, &this->worldBuffer);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
+		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
 		deviceContext->Draw(vertexCount, 0);
 	}
 
@@ -474,32 +476,278 @@ bool Graphics::createShaders()
 void Graphics::loadMesh(const char* fileName)
 {
 	Mesh newMesh;
-	meshes[fileName] = newMesh;
-	meshes[fileName].loadMesh(fileName);
+	if (textures.find(fileName) == textures.end())
+	{
+		meshes[fileName] = newMesh;
+		meshes[fileName].loadMesh(fileName);
+
+		int bufferSize = meshes[fileName].vertices.size() * sizeof(Vertex3D);
+		UINT stride = sizeof(Vertex3D);
+
+		D3D11_BUFFER_DESC vBufferDesc;
+		ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+		vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vBufferDesc.ByteWidth = bufferSize;
+		vBufferDesc.CPUAccessFlags = 0;
+		vBufferDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA subData;
+		ZeroMemory(&subData, sizeof(subData));
+		subData.pSysMem = meshes[fileName].vertices.data();
+
+		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+		meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+	}
+}
+
+void Graphics::loadShape(Shapes shape)
+{
+	Mesh newMesh;
+	const char* fileName;
+	switch (shape)
+	{
+	case SHAPE_CUBE:
+		fileName = "Cube";
+		if (textures.find(fileName) == textures.end())
+		{
+
+			glm::vec3 c0(1.000000, 1.000000, -1.000000); //0
+			glm::vec3 c1(-1.000000, 1.000000, -1.000000); //1 
+			glm::vec3 c2(-1.000000, 1.000000, 1.000000); //2
+			glm::vec3 c3(1.000000, 1.000000, 1.000000); //3
+			glm::vec3 c4(1.000000, -1.000000, -1.000000); //4
+			glm::vec3 c5(-1.000000, -1.000000, -1.000000); //5
+			glm::vec3 c6(-1.000000, -1.000000, 1.000000); //6
+			glm::vec3 c7(1.000000, -1.000000, 1.000000);//7
+
+			glm::vec2 uv0(0.0, 1.0);
+			glm::vec2 uv1(1.0, 1.0);
+			glm::vec2 uv2(0.0, 1.0);
+			glm::vec2 uv3(1.0, 1.0);
+			glm::vec2 uv4(0.0, 0.0);
+			glm::vec2 uv5(1.0, 0.0);
+			glm::vec2 uv6(0.0, 0.0);
+			glm::vec2 uv7(1.0, 0.0);
+
+
+			meshes[fileName] = newMesh;
+			std::vector<Vertex3D> vecTemp;
+
+			Vertex3D vertex;
+			vertex.position = c0;
+			vertex.uv = uv0;
+			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = c1;
+			vertex.uv = uv1;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c2;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c0;
+			vertex.uv = uv0;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c2;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c3;
+			vertex.uv = uv3;
+			vecTemp.push_back(vertex);
+
+
+
+			vertex.position = c0;
+			vertex.uv = uv0;
+			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = c4;
+			vertex.uv = uv1;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c5;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c0;
+			vertex.uv = uv0;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c5;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c1;
+			vertex.uv = uv3;
+			vecTemp.push_back(vertex);
+
+
+			vertex.position = c1;
+			vertex.uv = uv0;
+			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = c5;
+			vertex.uv = uv1;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c6;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c1;
+			vertex.uv = uv0;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c6;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c2;
+			vertex.uv = uv3;
+			vecTemp.push_back(vertex);
+
+
+			vertex.position = c2;
+			vertex.uv = uv0;
+			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = c6;
+			vertex.uv = uv1;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c7;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c2;
+			vertex.uv = uv0;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c7;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c3;
+			vertex.uv = uv3;
+			vecTemp.push_back(vertex);
+
+
+			vertex.position = c3;
+			vertex.uv = uv0;
+			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = c7;
+			vertex.uv = uv1;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c4;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c3;
+			vertex.uv = uv0;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c4;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c0;
+			vertex.uv = uv3;
+			vecTemp.push_back(vertex);
+
+
+			vertex.position = c4;
+			vertex.uv = uv0;
+			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = c7;
+			vertex.uv = uv1;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c6;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c4;
+			vertex.uv = uv0;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c6;
+			vertex.uv = uv2;
+			vecTemp.push_back(vertex);
+
+			vertex.position = c5;
+			vertex.uv = uv3;
+			vecTemp.push_back(vertex);
+
+			for (int i = 0; i < vecTemp.size(); i++)
+			{
+				vecTemp.at(i).uv.y *= -1;
+			}
+
+
+			meshes[fileName].insertDataToMesh(vecTemp);
+
+			int bufferSize = meshes[fileName].vertices.size() * sizeof(Vertex3D);
+			UINT stride = sizeof(Vertex3D);
+
+			D3D11_BUFFER_DESC vBufferDesc;
+			ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+			vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vBufferDesc.ByteWidth = bufferSize;
+			vBufferDesc.CPUAccessFlags = 0;
+			vBufferDesc.MiscFlags = 0;
+
+			D3D11_SUBRESOURCE_DATA subData;
+			ZeroMemory(&subData, sizeof(subData));
+			subData.pSysMem = meshes[fileName].vertices.data();
+
+			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+			meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+		}
+		break;
+	case SHAPE_SPHERE:
+		break;
+	case SHAPE_TRIANGLE:
+		break;
+	default:
+		break;
+	}
 	
-	int bufferSize = meshes[fileName].vertices.size() * sizeof(Vertex3D);
-	UINT stride = sizeof(Vertex3D);
+}
 
-	D3D11_BUFFER_DESC vBufferDesc;
-	ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
-
-	vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vBufferDesc.ByteWidth = bufferSize;
-	vBufferDesc.CPUAccessFlags = 0;
-	vBufferDesc.MiscFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA subData;
-	ZeroMemory(&subData, sizeof(subData));
-	subData.pSysMem = meshes[fileName].vertices.data();
-
-	HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
-	meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+void Graphics::loadTexture(const char* fileName)
+{
+	Texture newTexture;
+	if (textures.find(fileName) == textures.end())
+	{
+		textures[fileName] = newTexture;
+		textures[fileName].Initialize(device, deviceContext, fileName, -1);
+	}
 }
 
 const Mesh* Graphics::getMeshPointer(const char* fileName)
 {
 	return &meshes[fileName];
+}
+
+Texture* Graphics::getTexturePointer(const char* fileName)
+{
+	return &textures[fileName];
 }
 
 void Graphics::addToDraw(GameObject* o)
