@@ -21,8 +21,8 @@ Graphics::~Graphics()
 		this->swapChain->Release();
 	if (this->deviceContext)
 		this->deviceContext->Release();
-
-	debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY | D3D11_RLDO_DETAIL);
+	if(debug!=nullptr)
+		debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY | D3D11_RLDO_DETAIL);
 	if (this->device)
 		this->device->Release();
 	if (this->debug)
