@@ -1,9 +1,8 @@
 #pragma once
-#include "glm/glm/glm.hpp"
-
+#include<SimpleMath.h>
 struct Vertex3D
 {
-	glm::vec3 position;
-	glm::vec2 uv;
-	glm::vec3 normal;
+	DirectX::SimpleMath::Vector3 position;
+	DirectX::SimpleMath::Vector2 uv;
+	DirectX::SimpleMath::Vector3 normal;
 };

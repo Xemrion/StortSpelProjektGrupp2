@@ -13,5 +13,5 @@ float4 main(VS_OUT input) : SV_Target
 	float3 normal = input.NormalWS.xyz;
 	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
 	//float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
-	return texColor+float4(0.1,0,0,1);
+	return texColor+float4(1.0,0,0,1);
 }

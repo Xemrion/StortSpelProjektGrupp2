@@ -12,6 +12,10 @@ void Game::init(Window* window)
 {
 	this->window = window; 
 	graphics.init(window, 90);
+	
+	this->keyboard = std::make_unique<Keyboard>();
+	this->mouse = std::make_unique<Mouse>();
+	this->mouse->SetWindow(window->handle);
 	graphics.loadMesh("sda");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("playerRabbit.tga");
@@ -36,9 +40,23 @@ void Game::run()
 	{
 		//Game logic
 		//Graphics
-		
+		auto kb = this->keyboard->GetState();
+		if (kb.Escape)
+		{
+			//Exit game
+		}
+		if (kb.A)
+			this->testObject->addRotation(Vector3(0.00, 0.01, 0.00));
+		if(kb.D)
+			this->testObject->addRotation(Vector3(0.00, -0.01, 0.00));
+		if (kb.W)
+			this->testObject->addRotation(Vector3(0.01, 0.00, 0.00));
+		if (kb.S)
+			this->testObject->addRotation(Vector3(-0.01, 0.00, 0.00));
+		auto mouse = this->mouse->GetState();
 		this->graphics.render();
-		this->testObject->addRotation(Vector3(0.001, 0.001, 0.001));
+		
+		
 	}
 	delete this->testObject;
 	delete this->testObject2;

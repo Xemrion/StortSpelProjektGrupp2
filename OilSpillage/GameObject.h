@@ -4,7 +4,6 @@
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include <d3d11.h>
 #include"Texture.h"
-#include<SimpleMath.h>
 using namespace DirectX::SimpleMath; 
 class GameObject {
 	Vector3 position;

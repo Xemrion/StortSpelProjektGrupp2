@@ -476,7 +476,7 @@ bool Graphics::createShaders()
 void Graphics::loadMesh(const char* fileName)
 {
 	Mesh newMesh;
-	if (textures.find(fileName) == textures.end())
+	if (meshes.find(fileName) == meshes.end())
 	{
 		meshes[fileName] = newMesh;
 		meshes[fileName].loadMesh(fileName);
@@ -510,191 +510,60 @@ void Graphics::loadShape(Shapes shape)
 	{
 	case SHAPE_CUBE:
 		fileName = "Cube";
-		if (textures.find(fileName) == textures.end())
+		if (meshes.find(fileName) == meshes.end())
 		{
 
-			glm::vec3 c0(1.000000, 1.000000, -1.000000); //0
-			glm::vec3 c1(-1.000000, 1.000000, -1.000000); //1 
-			glm::vec3 c2(-1.000000, 1.000000, 1.000000); //2
-			glm::vec3 c3(1.000000, 1.000000, 1.000000); //3
-			glm::vec3 c4(1.000000, -1.000000, -1.000000); //4
-			glm::vec3 c5(-1.000000, -1.000000, -1.000000); //5
-			glm::vec3 c6(-1.000000, -1.000000, 1.000000); //6
-			glm::vec3 c7(1.000000, -1.000000, 1.000000);//7
+			
 
-			glm::vec2 uv0(0.0, 1.0);
-			glm::vec2 uv1(1.0, 1.0);
-			glm::vec2 uv2(0.0, 1.0);
-			glm::vec2 uv3(1.0, 1.0);
-			glm::vec2 uv4(0.0, 0.0);
-			glm::vec2 uv5(1.0, 0.0);
-			glm::vec2 uv6(0.0, 0.0);
-			glm::vec2 uv7(1.0, 0.0);
-
-
-			meshes[fileName] = newMesh;
 			std::vector<Vertex3D> vecTemp;
+			meshes[fileName] = newMesh;
+			Vertex3D vec[] = {
+				{Vector3(-1.0,  1.0, -1.0), Vector2(0.0, 0.0), Vector3(0.0,0.0,-1.0)},
+				{Vector3(1.0,1.0,-1.0), Vector2(1.0, 0.0), Vector3(0.0,0.0,-1.0)},
+				{Vector3(-1.0,-1.0,-1.0), Vector2(0.0, 1.0), Vector3(0.0,0.0,-1.0)},
+				{Vector3(-1.0,-1.0,-1.0), Vector2(0.0, 1.0), Vector3(0.0,0.0,-1.0)},
+				{Vector3(1.0,1.0,-1.0), Vector2(1.0,0.0), Vector3(0.0,0.0,-1.0)},
+				{Vector3(1.0,-1.0,-1.0), Vector2(1.0,1.0), Vector3(0.0,0.0,-1.0)},
 
-			Vertex3D vertex;
-			vertex.position = c0;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
+				{Vector3(1.0,1.0,-1.0), Vector2(0.0,0.0), Vector3(1.0,0.0,0.0)},
+				{Vector3(1.0,1.0,1.0), Vector2(1.0,0.0), Vector3(1.0,0.0,0.0)},
+				{Vector3(1.0, -1.0, -1.0) ,Vector2(0.0, 1.0)	,Vector3(1.0,  0.0,  0.0)},
+				{Vector3(1.0, -1.0, -1.0) , Vector2(0.0, 1.0)  ,Vector3(1.0,  0.0,  0.0)},
+				{Vector3(1.0,  1.0,  1.0) , Vector2(1.0, 0.0)  ,Vector3(1.0,  0.0,  0.0)},
+				{Vector3(1.0, -1.0,  1.0), Vector2(1.0, 1.0)	,Vector3(1.0,  0.0,  0.0)},
 
-			vertex.position = c1;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
+				{Vector3(1.0,  1.0,  1.0),Vector2(0.0, 0.0)  ,Vector3(0.0,  0.0,  1.0)},
+				{Vector3(-1.0, 1.0,  1.0),Vector2(1.0, 0.0)  ,Vector3(0.0,  0.0,  1.0)},
+				{Vector3(1.0, -1.0,  1.0),Vector2(0.0, 1.0)  ,Vector3(0.0,  0.0,  1.0)},
+				{Vector3(1.0, -1.0,  1.0),Vector2(0.0, 1.0)  ,Vector3(0.0,  0.0,  1.0)},
+				{Vector3(-1.0, 1.0,  1.0),Vector2(1.0, 0.0)  ,Vector3(0.0,  0.0,  1.0)},
+				{Vector3(-1.0,-1.0,  1.0),Vector2(1.0, 1.0)  ,Vector3(0.0,  0.0,  1.0)},
 
-			vertex.position = c2;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
+				{Vector3(-1.0, 1.0,  1.0),Vector2(0.0, 0.0)	,Vector3(-1.0,  0.0,  0.0)},
+				{Vector3(-1.0, 1.0, -1.0),Vector2(1.0, 0.0)	,Vector3(-1.0,  0.0,  0.0)},
+				{Vector3(-1.0,-1.0,  1.0),Vector2(0.0, 1.0)	,Vector3(-1.0,  0.0,  0.0)},
+				{Vector3(-1.0,-1.0,  1.0),Vector2(0.0, 1.0)	,Vector3(-1.0,  0.0,  0.0)},
+				{Vector3(-1.0, 1.0, -1.0),Vector2(1.0, 0.0)	,Vector3(-1.0,  0.0,  0.0)},
+				{Vector3(-1.0,-1.0, -1.0),Vector2(1.0, 1.0)	,Vector3(-1.0,  0.0,  0.0)},
 
-			vertex.position = c0;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
+				{Vector3(-1.0, 1.0,  1.0),Vector2(0.0, 0.0) ,Vector3(0.0,  1.0  ,0.0)},
+				{Vector3(1.0,  1.0,  1.0),Vector2(1.0, 0.0) ,Vector3(0.0,  1.0  ,0.0)},
+				{Vector3(-1.0, 1.0, -1.0),Vector2(0.0, 1.0)	,Vector3(0.0,  1.0  ,0.0)},
+				{Vector3(-1.0, 1.0, -1.0),Vector2(0.0, 1.0),Vector3(0.0,  1.0  ,0.0)},
+				{Vector3(1.0,  1.0,  1.0),Vector2(1.0, 0.0) ,Vector3(0.0,  1.0  ,0.0)},
+				{Vector3(1.0,  1.0, -1.0),Vector2(1.0, 1.0) ,Vector3(0.0,  1.0  ,0.0)},
 
-			vertex.position = c2;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
+				{Vector3(-1.0, -1.0, -1.0),Vector2(0.0, 0.0),Vector3(0.0, -1.0 , 0.0)},
+				{Vector3(1.0, -1.0,-1.0),Vector2(1.0, 0.0),Vector3(0.0, -1.0 , 0.0)},
+				{Vector3(-1.0, -1.0,  1.0),Vector2(0.0, 1.0),Vector3(0.0, -1.0 , 0.0)},
+				{Vector3(-1.0, -1.0,  1.0),Vector2(0.0, 1.0),Vector3(0.0, -1.0 , 0.0)},
+				{Vector3(1.0, -1.0, -1.0),Vector2(1.0, 0.0),Vector3(0.0, -1.0 , 0.0)},
+				{Vector3(1.0, -1.0,  1.0),Vector2(1.0, 1.0),Vector3(0.0, -1.0 , 0.0)}
+			};
 
-			vertex.position = c3;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-
-
-			vertex.position = c0;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c4;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c5;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c0;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c5;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c1;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-
-			vertex.position = c1;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c5;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c6;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c1;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c6;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c2;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-
-			vertex.position = c2;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c6;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c7;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c2;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c7;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c3;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-
-			vertex.position = c3;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c7;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c4;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c3;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c4;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c0;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-
-			vertex.position = c4;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c7;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c6;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c4;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c6;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c5;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-			for (int i = 0; i < vecTemp.size(); i++)
+			for (int i = 0; i < 36; i++)
 			{
-				vecTemp.at(i).uv.y *= -1;
+				vecTemp.push_back(vec[i]);
 			}
 
 
