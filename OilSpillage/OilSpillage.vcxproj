@@ -133,6 +133,7 @@
     <ClCompile Include="Graphic\Shaders.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
+    <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
@@ -146,6 +147,7 @@
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Resources\Debug.h" />
+    <ClInclude Include="Road Network\RoadNet.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="VertexBuffer.h" />
