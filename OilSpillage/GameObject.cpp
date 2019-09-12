@@ -59,4 +59,17 @@ void GameObject::setColor(Vector4 aColor)
 Vector4 GameObject::getColor()const
 {
 	return this->color;
-};
+}
+Vector3 GameObject::getPosition() const
+{
+	return this->position;
+}
+Vector3 GameObject::getRotation() const
+{
+	return this->rotation;
+}
+Vector3 GameObject::getScale() const
+{
+	return this->scale;
+}
+;
