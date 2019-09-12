@@ -3,6 +3,7 @@
 #include "graphics.h"
 #include"Keyboard.h"
 #include"Mouse.h"
+#include"vehicle.h"
 class Game {
 	Window* window;
 
@@ -18,6 +19,9 @@ class Game {
 	__int64 prevTime = 0;
 	__int64 countsPerSec = 0;
 	float secPerCount = 1.0f / countsPerSec;
+	
+	Vehicle player;
+
 public:
 	void init(Window* window);
 	void run();

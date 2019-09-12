@@ -23,15 +23,18 @@ void Game::init(Window* window)
 	testObject->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject);
 	testObject->setPosition(Vector3(0, 0, 0));
-	testObject->setScale(Vector3(2, 2, 2));
+	testObject->setScale(Vector3(0.2, 0.2, 0.2));
+	testObject->setColor(Vector4(0.5, 0.5, 0.5,1));
 	testObject->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
 
 	this->testObject2 = new GameObject;
 	testObject2->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject2);
 	testObject2->setPosition(Vector3(-7, 0, 0));
+	testObject2->setColor(Vector4(0.5, 0.5, 0.5, 1));
 	testObject2->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
 
+	player.init(this->graphics);
 }
 
 void Game::run()
@@ -60,6 +63,7 @@ void Game::run()
 
 
 		auto kb = this->keyboard->GetState();
+		auto mouse = this->mouse->GetState();
 		if (kb.Escape)
 		{
 			//Exit game
@@ -75,9 +79,10 @@ void Game::run()
 		if (kb.W)
 			this->testObject->addRotation(Vector3(0.01 * deltaTime * 200, 0.00, 0.00));
 		if (kb.S)
-			this->testObject->addRotation(Vector3(-0.01 * deltaTime *200, 0.00, 0.00));
-
-		auto mouse = this->mouse->GetState();
+			this->testObject->addRotation(Vector3(-0.01 * deltaTime * 200, 0.00, 0.00));
+		
+		player.update(deltaTime, this->keyboard);
+		
 		this->graphics.render();
 		
 		//deltaTime reset
