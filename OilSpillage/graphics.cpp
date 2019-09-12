@@ -148,7 +148,7 @@ bool Graphics::init(Window* window, float fov)
 
 	//move to ColorShader
 	this->projection = glm::perspectiveFovLH(this->fieldOfView, (float)window->width, (float)window->height, this->screenNear, this->screenDepth);
-	this->view = glm::lookAtLH(glm::vec3(0.0, 5.0, -1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	this->view = glm::lookAtLH(glm::vec3(0.0, 5.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
 	this->projection = glm::transpose(projection);
 	this->view = glm::transpose(view);
 

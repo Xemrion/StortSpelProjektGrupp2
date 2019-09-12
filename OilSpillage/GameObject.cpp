@@ -1,12 +1,12 @@
 #include"GameObject.h"
+#include"game.h"
 Matrix GameObject::getTransform() {
 
 	Quaternion qt = Quaternion::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
 	Matrix mtr = Matrix::CreateFromQuaternion(qt);
 	Matrix translate = Matrix::CreateTranslation(position);
 	Matrix scaleM = Matrix::CreateScale(scale);
-	return   mtr * scaleM * translate;
-
+	return scaleM * mtr  * translate;
 };
 
 void GameObject::setPosition(Vector3 newPos)

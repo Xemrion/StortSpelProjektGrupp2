@@ -8,7 +8,7 @@ class Game {
 
 	std::unique_ptr<DirectX::Keyboard> keyboard;
 	std::unique_ptr<DirectX::Mouse> mouse;
-	Graphics graphics;
+	static Graphics graphics;
 	GameObject* testObject;
 	GameObject* testObject2;
 	void addQuad(int x);
@@ -21,5 +21,9 @@ class Game {
 public:
 	void init(Window* window);
 	void run();
+	static Graphics& getGraphics()
+	{
+		return graphics;
+	};
 	
 };
