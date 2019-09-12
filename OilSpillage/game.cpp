@@ -36,27 +36,52 @@ void Game::init(Window* window)
 
 void Game::run()
 {
+	//Store counts per second
+	countsPerSec = 0;
+	QueryPerformanceFrequency((LARGE_INTEGER*)& countsPerSec);
+	secPerCount = 1.0f / countsPerSec; //store seconds per count
+
+	//Initial previous time	
+	prevTime = 0;
+	QueryPerformanceCounter((LARGE_INTEGER*)& prevTime);
+
+
 	while (this->window->update())
 	{
 		//Game logic
 		//Graphics
+
+		//deltaTime
+		curTime = 0;
+		QueryPerformanceCounter((LARGE_INTEGER*)& curTime);
+		//Calculate deltaTime
+		deltaTime = (curTime - prevTime) * secPerCount;
+
+
+
 		auto kb = this->keyboard->GetState();
 		if (kb.Escape)
 		{
 			//Exit game
 		}
+		if (kb.E)
+			deltaTime /= 4;
+
+
 		if (kb.A)
-			this->testObject->addRotation(Vector3(0.00, 0.01, 0.00));
+			this->testObject->addRotation(Vector3(0.00, 0.01*deltaTime*200, 0.00));
 		if(kb.D)
-			this->testObject->addRotation(Vector3(0.00, -0.01, 0.00));
+			this->testObject->addRotation(Vector3(0.00, -0.01 * deltaTime * 200, 0.00));
 		if (kb.W)
-			this->testObject->addRotation(Vector3(0.01, 0.00, 0.00));
+			this->testObject->addRotation(Vector3(0.01 * deltaTime * 200, 0.00, 0.00));
 		if (kb.S)
-			this->testObject->addRotation(Vector3(-0.01, 0.00, 0.00));
+			this->testObject->addRotation(Vector3(-0.01 * deltaTime *200, 0.00, 0.00));
+
 		auto mouse = this->mouse->GetState();
 		this->graphics.render();
 		
-		
+		//deltaTime reset
+		prevTime = curTime;
 	}
 	delete this->testObject;
 	delete this->testObject2;

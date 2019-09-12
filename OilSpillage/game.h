@@ -12,6 +12,12 @@ class Game {
 	GameObject* testObject;
 	GameObject* testObject2;
 	void addQuad(int x);
+
+	float deltaTime;
+	__int64 curTime = 0;
+	__int64 prevTime = 0;
+	__int64 countsPerSec = 0;
+	float secPerCount = 1.0f / countsPerSec;
 public:
 	void init(Window* window);
 	void run();
