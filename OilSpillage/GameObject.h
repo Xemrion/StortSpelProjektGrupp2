@@ -26,5 +26,8 @@ public:
 	void setTexture(Texture* aTexture);
 	void setColor(Vector4 aColor);
 	Vector4 getColor()const;
+	Vector3 getPosition()const;
+	Vector3 getRotation()const;
+	Vector3 getScale()const;
 	
 };

@@ -1,4 +1,5 @@
 #include "game.h"
+Graphics Game::graphics = Graphics();
 
 void Game::addQuad(int x)
 {
@@ -26,7 +27,7 @@ void Game::init(Window* window)
 	testObject->setScale(Vector3(0.2, 0.2, 0.2));
 	testObject->setColor(Vector4(0.5, 0.5, 0.5,1));
 	testObject->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
-
+	testObject->setColor(Vector4(1, 1, 1, 1));
 	this->testObject2 = new GameObject;
 	testObject2->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject2);
