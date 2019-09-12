@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="Graphic\Shaders.cpp" />
     <ClCompile Include="main.cpp" />

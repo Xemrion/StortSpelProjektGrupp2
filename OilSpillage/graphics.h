@@ -16,7 +16,8 @@ enum Shapes
 {
 	SHAPE_CUBE,
 	SHAPE_SPHERE,
-	SHAPE_TRIANGLE
+	SHAPE_TRIANGLE,
+	SHAPE_QUAD
 };
 class Graphics {
 	Window* window;
@@ -33,6 +34,8 @@ class Graphics {
 	ID3D11BlendState* alphaEnableBlendingState;
 	ID3D11Buffer* viewProjBuffer;
 	ID3D11Buffer* worldBuffer;
+	ID3D11Buffer* colorBuffer;
+
 
 	//ID3D11PixelShader* pxShader;
 	//ID3D11VertexShader* vxShader;
@@ -56,8 +59,8 @@ public:
 	~Graphics();
 	bool init(Window* window, float fov);
 	void loadMesh(const char* fileName);
-	void loadShape(Shapes shape);
-	void loadTexture(const char* fileName);
+	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
+	bool loadTexture(const char* fileName);
 	const Mesh* getMeshPointer(const char* fileName);
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);

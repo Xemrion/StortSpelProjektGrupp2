@@ -8,6 +8,7 @@ struct VS_IN
 struct VS_OUT
 {
 	float4 Pos : SV_POSITION;
+	float4 wPos: APOS;
 	float2 Tex : TEXCOORD;
 	float4 Normal : NORMAL;
 };
@@ -30,6 +31,7 @@ VS_OUT main(VS_IN input)
 	output.Pos = mul(float4(input.Pos, 1.0f), world);
 	output.Pos = mul(output.Pos, viewProj);
 	//output.WorldPos = mul((float3x3)worldMat, input.Pos.xyz);
+	output.wPos = mul(float4(input.Pos,1.0f),world);
 
 	//output.Color = input.Color;
 	output.Tex = input.Tex;
