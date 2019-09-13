@@ -20,6 +20,7 @@ Texture::Texture(const Texture& other)
 
 Texture::~Texture()
 {
+	this->Shutdown();
 }
 
 bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceContext, const char* filename, int mipLevels)

@@ -11,6 +11,11 @@ Vehicle::Vehicle()
 	this->topSpeed = 0.0f;
 }
 
+Vehicle::~Vehicle()
+{
+	delete this->vehicle;
+}
+
 void Vehicle::init(Graphics& graphics)
 {
 

@@ -43,6 +43,7 @@ public:
 		this->vertexCount = static_cast<int>(vertices.size());
 	};
 	void operator=(const Mesh& rh) { this->vertices = rh.vertices; }
+	virtual ~Mesh() { if (this->vertexBuffer) this->vertexBuffer->Release(); }
 	std::vector<Vertex3D> vertices;
 	ID3D11Buffer* vertexBuffer;
 	int getVertexCount() const 

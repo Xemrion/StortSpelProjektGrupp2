@@ -14,6 +14,8 @@ private:
 	float topSpeed;
 public:
 	Vehicle();
+	virtual ~Vehicle();
+
 	void init(Graphics& graphics);
 	void update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb);
 };

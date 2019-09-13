@@ -43,6 +43,12 @@ Graphics::~Graphics()
 	this->rasterState->Release();
 	this->renderTargetView->Release();
 
+	this->viewProjBuffer->Release();
+	this->worldBuffer->Release();
+	this->colorBuffer->Release();
+
+	this->sampler->Release();
+
 	if (this->swapChain)
 		this->swapChain->Release();
 	if (this->deviceContext)
@@ -53,6 +59,13 @@ Graphics::~Graphics()
 		this->device->Release();
 	if (this->debug)
 		this->debug->Release();
+
+	delete this->debuger;
+
+	for (auto i = textures.begin(); i != textures.end(); i++)
+	{
+		delete i->second;
+	}
 }
 
 bool Graphics::init(Window* window, float fov)
@@ -711,11 +724,13 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 
 bool Graphics::loadTexture(const char* fileName)
 {
-	Texture newTexture;
 	if (textures.find(fileName) == textures.end())
 	{
-		if (!newTexture.Initialize(this->device, this->deviceContext, fileName, -1))
+		Texture* newTexture = new Texture();
+
+		if (!newTexture->Initialize(this->device, this->deviceContext, fileName, -1))
 		{
+			delete newTexture;
 			return false;
 		}
 
@@ -732,7 +747,12 @@ const Mesh* Graphics::getMeshPointer(const char* fileName)
 
 Texture* Graphics::getTexturePointer(const char* fileName)
 {
-	return &textures[fileName];
+	if (textures.find(fileName) == textures.end())
+	{
+		return nullptr;
+	}
+
+	return textures[fileName];
 }
 
 void Graphics::addToDraw(GameObject* o)
