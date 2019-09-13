@@ -12,6 +12,10 @@ private:
 	float targetRotation;
 	int drivingMode;
 	float topSpeed;
+	float counter = 0.0f;
+	float rotateAcceleration = 0.0f;
+	float rotationSmoother = 1.0f;
+	float tempTargetRotation;
 public:
 	Vehicle();
 	void init(Graphics& graphics);
