@@ -42,7 +42,7 @@ class Graphics {
 	//ID3D11InputLayout* vertexLayout;
 	ID3D11SamplerState* sampler;
 	std::unordered_map<const char*, Mesh> meshes;
-	std::unordered_map<const char*, Texture> textures;
+	std::unordered_map<const char*, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
 
 	ShaderClass shader_default;

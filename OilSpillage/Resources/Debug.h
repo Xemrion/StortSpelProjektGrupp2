@@ -14,7 +14,7 @@ private:
 	};
 	struct DebugVertex
 	{
-		DebugVertex() { };
+		DebugVertex() : pos(0.0f, 0.0f, 0.0f), color(0.0f, 0.0f, 0.0f) { };
 		DebugVertex(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3  color)
 			: pos(position), color(color) {}
 

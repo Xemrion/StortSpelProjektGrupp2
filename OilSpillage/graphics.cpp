@@ -5,6 +5,33 @@
 Graphics::Graphics()
 {
 	this->window = nullptr;
+	this->swapChain = nullptr;
+	this->device = nullptr;
+	this->deviceContext = nullptr;
+	this->vp = {};
+
+	this->renderTargetView = nullptr;
+	this->depthStencilBuffer = nullptr;
+	this->depthStencilState = nullptr;
+	this->depthStencilView = nullptr;
+	this->rasterState = nullptr;
+	this->alphaEnableBlendingState = nullptr;
+	this->viewProjBuffer = nullptr;
+	this->worldBuffer = nullptr;
+	this->colorBuffer = nullptr;
+
+	//this->pxShader = nullptr;
+	//this->vxShader = nullptr;
+	//this->vertexLayout = nullptr;
+	this->sampler = nullptr;
+
+	this->debuger = nullptr;
+	this->fieldOfView = 0.0f;
+	this->screenNear = 0.0f;
+	this->screenDepth = 0.0f;
+	this->projection = glm::mat4(0);
+	this->view = glm::mat4(0);
+	this->debug = nullptr;
 }
 
 Graphics::~Graphics()
@@ -16,6 +43,12 @@ Graphics::~Graphics()
 	this->rasterState->Release();
 	this->renderTargetView->Release();
 
+	this->viewProjBuffer->Release();
+	this->worldBuffer->Release();
+	this->colorBuffer->Release();
+
+	this->sampler->Release();
+
 	if (this->swapChain)
 		this->swapChain->Release();
 	if (this->deviceContext)
@@ -26,6 +59,13 @@ Graphics::~Graphics()
 		this->device->Release();
 	if (this->debug)
 		this->debug->Release();
+
+	delete this->debuger;
+
+	for (auto i = textures.begin(); i != textures.end(); i++)
+	{
+		delete i->second;
+	}
 }
 
 bool Graphics::init(Window* window, float fov)
@@ -497,6 +537,8 @@ bool Graphics::createShaders()
 	{
 		return false;
 	}
+
+	return true;
 }
 
 void Graphics::loadMesh(const char* fileName)
@@ -507,7 +549,7 @@ void Graphics::loadMesh(const char* fileName)
 		meshes[fileName] = newMesh;
 		meshes[fileName].loadMesh(fileName);
 
-		int bufferSize = meshes[fileName].vertices.size() * sizeof(Vertex3D);
+		int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
 		UINT stride = sizeof(Vertex3D);
 
 		D3D11_BUFFER_DESC vBufferDesc;
@@ -544,47 +586,47 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 			std::vector<Vertex3D> vecTemp;
 			meshes[fileName] = newMesh;
 			Vertex3D vec[] = {
-				{Vector3(-1.0,  1.0, -1.0), Vector2(0.0, 0.0), Vector3(0.0,0.0,-1.0)},
-				{Vector3(1.0,1.0,-1.0), Vector2(1.0, 0.0), Vector3(0.0,0.0,-1.0)},
-				{Vector3(-1.0,-1.0,-1.0), Vector2(0.0, 1.0), Vector3(0.0,0.0,-1.0)},
-				{Vector3(-1.0,-1.0,-1.0), Vector2(0.0, 1.0), Vector3(0.0,0.0,-1.0)},
-				{Vector3(1.0,1.0,-1.0), Vector2(1.0,0.0), Vector3(0.0,0.0,-1.0)},
-				{Vector3(1.0,-1.0,-1.0), Vector2(1.0,1.0), Vector3(0.0,0.0,-1.0)},
+				{Vector3(-1.0f,  1.0f, -1.0f), Vector2(0.0f, 0.0f), Vector3(0.0f,0.0f,-1.0f)},
+				{Vector3(1.0f,1.0f,-1.0f), Vector2(1.0f, 0.0f), Vector3(0.0f,0.0f,-1.0f)},
+				{Vector3(-1.0f,-1.0f,-1.0f), Vector2(0.0f, 1.0f), Vector3(0.0f,0.0f,-1.0f)},
+				{Vector3(-1.0f,-1.0f,-1.0f), Vector2(0.0f, 1.0f), Vector3(0.0f,0.0f,-1.0f)},
+				{Vector3(1.0f,1.0f,-1.0f), Vector2(1.0f,0.0f), Vector3(0.0f,0.0f,-1.0f)},
+				{Vector3(1.0f,-1.0f,-1.0f), Vector2(1.0f,1.0f), Vector3(0.0f,0.0f,-1.0f)},
 
-				{Vector3(1.0,1.0,-1.0), Vector2(0.0,0.0), Vector3(1.0,0.0,0.0)},
-				{Vector3(1.0,1.0,1.0), Vector2(1.0,0.0), Vector3(1.0,0.0,0.0)},
-				{Vector3(1.0, -1.0, -1.0) ,Vector2(0.0, 1.0)	,Vector3(1.0,  0.0,  0.0)},
-				{Vector3(1.0, -1.0, -1.0) , Vector2(0.0, 1.0)  ,Vector3(1.0,  0.0,  0.0)},
-				{Vector3(1.0,  1.0,  1.0) , Vector2(1.0, 0.0)  ,Vector3(1.0,  0.0,  0.0)},
-				{Vector3(1.0, -1.0,  1.0), Vector2(1.0, 1.0)	,Vector3(1.0,  0.0,  0.0)},
+				{Vector3(1.0f,1.0f,-1.0f), Vector2(0.0f,0.0f), Vector3(1.0f,0.0f,0.0f)},
+				{Vector3(1.0f,1.0f,1.0f), Vector2(1.0f,0.0f), Vector3(1.0f,0.0f,0.0f)},
+				{Vector3(1.0f, -1.0f, -1.0f) ,Vector2(0.0f, 1.0f)	,Vector3(1.0f,  0.0f,  0.0f)},
+				{Vector3(1.0f, -1.0f, -1.0f) , Vector2(0.0f, 1.0f)  ,Vector3(1.0f,  0.0f,  0.0f)},
+				{Vector3(1.0f,  1.0f,  1.0f) , Vector2(1.0f, 0.0f)  ,Vector3(1.0f,  0.0f,  0.0f)},
+				{Vector3(1.0f, -1.0f,  1.0f), Vector2(1.0f, 1.0f)	,Vector3(1.0f,  0.0f,  0.0f)},
 
-				{Vector3(1.0,  1.0,  1.0),Vector2(0.0, 0.0)  ,Vector3(0.0,  0.0,  1.0)},
-				{Vector3(-1.0, 1.0,  1.0),Vector2(1.0, 0.0)  ,Vector3(0.0,  0.0,  1.0)},
-				{Vector3(1.0, -1.0,  1.0),Vector2(0.0, 1.0)  ,Vector3(0.0,  0.0,  1.0)},
-				{Vector3(1.0, -1.0,  1.0),Vector2(0.0, 1.0)  ,Vector3(0.0,  0.0,  1.0)},
-				{Vector3(-1.0, 1.0,  1.0),Vector2(1.0, 0.0)  ,Vector3(0.0,  0.0,  1.0)},
-				{Vector3(-1.0,-1.0,  1.0),Vector2(1.0, 1.0)  ,Vector3(0.0,  0.0,  1.0)},
+				{Vector3(1.0f,  1.0f,  1.0f),Vector2(0.0f, 0.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+				{Vector3(-1.0f, 1.0f,  1.0f),Vector2(1.0f, 0.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+				{Vector3(1.0f, -1.0f,  1.0f),Vector2(0.0f, 1.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+				{Vector3(1.0f, -1.0f,  1.0f),Vector2(0.0f, 1.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+				{Vector3(-1.0f, 1.0f,  1.0f),Vector2(1.0f, 0.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+				{Vector3(-1.0f,-1.0f,  1.0f),Vector2(1.0f, 1.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
 
-				{Vector3(-1.0, 1.0,  1.0),Vector2(0.0, 0.0)	,Vector3(-1.0,  0.0,  0.0)},
-				{Vector3(-1.0, 1.0, -1.0),Vector2(1.0, 0.0)	,Vector3(-1.0,  0.0,  0.0)},
-				{Vector3(-1.0,-1.0,  1.0),Vector2(0.0, 1.0)	,Vector3(-1.0,  0.0,  0.0)},
-				{Vector3(-1.0,-1.0,  1.0),Vector2(0.0, 1.0)	,Vector3(-1.0,  0.0,  0.0)},
-				{Vector3(-1.0, 1.0, -1.0),Vector2(1.0, 0.0)	,Vector3(-1.0,  0.0,  0.0)},
-				{Vector3(-1.0,-1.0, -1.0),Vector2(1.0, 1.0)	,Vector3(-1.0,  0.0,  0.0)},
+				{Vector3(-1.0f, 1.0f,  1.0f),Vector2(0.0f, 0.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+				{Vector3(-1.0f, 1.0f, -1.0f),Vector2(1.0f, 0.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+				{Vector3(-1.0f,-1.0f,  1.0f),Vector2(0.0f, 1.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+				{Vector3(-1.0f,-1.0f,  1.0f),Vector2(0.0f, 1.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+				{Vector3(-1.0f, 1.0f, -1.0f),Vector2(1.0f, 0.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+				{Vector3(-1.0f,-1.0f, -1.0f),Vector2(1.0f, 1.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
 
-				{Vector3(-1.0, 1.0,  1.0),Vector2(0.0, 0.0) ,Vector3(0.0,  1.0  ,0.0)},
-				{Vector3(1.0,  1.0,  1.0),Vector2(1.0, 0.0) ,Vector3(0.0,  1.0  ,0.0)},
-				{Vector3(-1.0, 1.0, -1.0),Vector2(0.0, 1.0)	,Vector3(0.0,  1.0  ,0.0)},
-				{Vector3(-1.0, 1.0, -1.0),Vector2(0.0, 1.0),Vector3(0.0,  1.0  ,0.0)},
-				{Vector3(1.0,  1.0,  1.0),Vector2(1.0, 0.0) ,Vector3(0.0,  1.0  ,0.0)},
-				{Vector3(1.0,  1.0, -1.0),Vector2(1.0, 1.0) ,Vector3(0.0,  1.0  ,0.0)},
+				{Vector3(-1.0f, 1.0f,  1.0f),Vector2(0.0f, 0.0f) ,Vector3(0.0f,  1.0f  ,0.0f)},
+				{Vector3(1.0f,  1.0f,  1.0f),Vector2(1.0f, 0.0f) ,Vector3(0.0f,  1.0f  ,0.0f)},
+				{Vector3(-1.0f, 1.0f, -1.0f),Vector2(0.0f, 1.0f)	,Vector3(0.0f,  1.0f  ,0.0f)},
+				{Vector3(-1.0f, 1.0f, -1.0f),Vector2(0.0f, 1.0f),Vector3(0.0f,  1.0f  ,0.0f)},
+				{Vector3(1.0f,  1.0f,  1.0f),Vector2(1.0f, 0.0f) ,Vector3(0.0f,  1.0f  ,0.0f)},
+				{Vector3(1.0f,  1.0f, -1.0f),Vector2(1.0f, 1.0f) ,Vector3(0.0f,  1.0f  ,0.0f)},
 
-				{Vector3(-1.0, -1.0, -1.0),Vector2(0.0, 0.0),Vector3(0.0, -1.0 , 0.0)},
-				{Vector3(1.0, -1.0,-1.0),Vector2(1.0, 0.0),Vector3(0.0, -1.0 , 0.0)},
-				{Vector3(-1.0, -1.0,  1.0),Vector2(0.0, 1.0),Vector3(0.0, -1.0 , 0.0)},
-				{Vector3(-1.0, -1.0,  1.0),Vector2(0.0, 1.0),Vector3(0.0, -1.0 , 0.0)},
-				{Vector3(1.0, -1.0, -1.0),Vector2(1.0, 0.0),Vector3(0.0, -1.0 , 0.0)},
-				{Vector3(1.0, -1.0,  1.0),Vector2(1.0, 1.0),Vector3(0.0, -1.0 , 0.0)}
+				{Vector3(-1.0f, -1.0f, -1.0f),Vector2(0.0f, 0.0f),Vector3(0.0f, -1.0f , 0.0f)},
+				{Vector3(1.0f, -1.0f,-1.0f),Vector2(1.0f, 0.0f),Vector3(0.0f, -1.0f , 0.0f)},
+				{Vector3(-1.0f, -1.0f,  1.0f),Vector2(0.0f, 1.0f),Vector3(0.0f, -1.0f , 0.0f)},
+				{Vector3(-1.0f, -1.0f,  1.0f),Vector2(0.0f, 1.0f),Vector3(0.0f, -1.0f , 0.0f)},
+				{Vector3(1.0f, -1.0f, -1.0f),Vector2(1.0f, 0.0f),Vector3(0.0f, -1.0f , 0.0f)},
+				{Vector3(1.0f, -1.0f,  1.0f),Vector2(1.0f, 1.0f),Vector3(0.0f, -1.0f , 0.0f)}
 			};
 
 			for (int i = 0; i < 36; i++)
@@ -595,7 +637,7 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 
 			meshes[fileName].insertDataToMesh(vecTemp);
 
-			int bufferSize = meshes[fileName].vertices.size() * sizeof(Vertex3D);
+			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
 			UINT stride = sizeof(Vertex3D);
 
 			D3D11_BUFFER_DESC vBufferDesc;
@@ -653,7 +695,7 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 
 			meshes[fileName].insertDataToMesh(vecTemp);
 
-			int bufferSize = meshes[fileName].vertices.size() * sizeof(Vertex3D);
+			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
 			UINT stride = sizeof(Vertex3D);
 
 			D3D11_BUFFER_DESC vBufferDesc;
@@ -682,16 +724,20 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 
 bool Graphics::loadTexture(const char* fileName)
 {
-	Texture newTexture;
 	if (textures.find(fileName) == textures.end())
 	{
-		if (!newTexture.Initialize(this->device, this->deviceContext, fileName, -1))
+		Texture* newTexture = new Texture();
+
+		if (!newTexture->Initialize(this->device, this->deviceContext, fileName, -1))
 		{
+			delete newTexture;
 			return false;
 		}
 
 		textures[fileName] = newTexture;
 	}
+
+	return true;
 }
 
 const Mesh* Graphics::getMeshPointer(const char* fileName)
@@ -701,7 +747,12 @@ const Mesh* Graphics::getMeshPointer(const char* fileName)
 
 Texture* Graphics::getTexturePointer(const char* fileName)
 {
-	return &textures[fileName];
+	if (textures.find(fileName) == textures.end())
+	{
+		return nullptr;
+	}
+
+	return textures[fileName];
 }
 
 void Graphics::addToDraw(GameObject* o)
