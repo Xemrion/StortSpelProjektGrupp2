@@ -19,23 +19,23 @@ void Game::init(Window* window)
 	this->mouse->SetWindow(window->handle);
 	graphics.loadMesh("sda");
 	graphics.loadShape(SHAPE_CUBE);
-	graphics.loadTexture("playerRabbit.tga");
+	graphics.loadTexture("brickwall.tga");
 	this->testObject = new GameObject;
 	testObject->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject);
 	testObject->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	testObject->setScale(Vector3(0.2f, 0.2f, 0.2f));
-	testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
-	testObject->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
-	testObject->setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+	//testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
+	testObject->setTexture(graphics.getTexturePointer("brickwall.tga"));
+	//testObject->setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 	this->testObject2 = new GameObject;
 	testObject2->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject2);
 	testObject2->setPosition(Vector3(-7.0f, 0.0f, 0.0f));
-	testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
-	testObject2->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
-
-	player.init(this->graphics);
+	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
+	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
+	
+	player.init();
 }
 
 void Game::run()
