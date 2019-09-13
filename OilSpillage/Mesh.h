@@ -33,14 +33,14 @@ public:
 		vertex.uv = Vector2(1.0, 1.0);
 		vertices.push_back(vertex);
 
-		this->vertexCount = vertices.size();
+		this->vertexCount = static_cast<int>(vertices.size());
 		
 	};
 	void insertDataToMesh(std::vector<Vertex3D> vertexData)
 	{
 		this->vertices = vertexData;
 
-		this->vertexCount = vertices.size();
+		this->vertexCount = static_cast<int>(vertices.size());
 	};
 	void operator=(const Mesh& rh) { this->vertices = rh.vertices; }
 	std::vector<Vertex3D> vertices;
@@ -50,5 +50,5 @@ public:
 		return this->vertexCount;
 	};
 private:
-	int vertexCount; 
+	int vertexCount = 0; 
 };

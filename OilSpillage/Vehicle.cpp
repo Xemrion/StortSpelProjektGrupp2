@@ -3,6 +3,12 @@
 
 Vehicle::Vehicle()
 {
+	this->vehicle = nullptr;
+	this->velocity = {};
+
+	this->targetRotation = 0.0f;
+	this->drivingMode = 0;
+	this->topSpeed = 0.0f;
 }
 
 void Vehicle::init(Graphics& graphics)
@@ -28,17 +34,17 @@ void Vehicle::update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb)
 {
 	auto key = kb->GetState();
 
-	float dx = sin((3.14159265359 / 180) /** vehicle->getRotation()*/);
-	float dy = -cos((3.14159265359 / 180)/** vehicle->getRotation()*/);
+	float dx = sin((3.14159265359f / 180) /** vehicle->getRotation()*/);
+	float dy = -cos((3.14159265359f / 180)/** vehicle->getRotation()*/);
 
 	if (key.A)
-		velocity.x -= 0.01;
+		velocity.x -= 0.01f;
 	if (key.D)
-		velocity.x += 0.01;
+		velocity.x += 0.01f;
 	if (key.W)
-		velocity.y += 0.01;
+		velocity.y += 0.01f;
 	if (key.S)
-		velocity.y -= 0.01;
+		velocity.y -= 0.01f;
 	/*if (key.W) {
 		targetRotation = 0;
 	}
@@ -102,5 +108,5 @@ void Vehicle::update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb)
 		}
 	}*/
 
-	this->vehicle->move(Vector3(velocity.x * deltaTime , 0.00, velocity.y * deltaTime ));
+	this->vehicle->move(Vector3(velocity.x * deltaTime , 0.00f, velocity.y * deltaTime ));
 }

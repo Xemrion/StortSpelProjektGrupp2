@@ -5,16 +5,16 @@
 #include"Mouse.h"
 #include"vehicle.h"
 class Game {
-	Window* window;
+	Window* window = nullptr;
 
 	std::unique_ptr<DirectX::Keyboard> keyboard;
 	std::unique_ptr<DirectX::Mouse> mouse;
 	static Graphics graphics;
-	GameObject* testObject;
-	GameObject* testObject2;
+	GameObject* testObject = nullptr;
+	GameObject* testObject2 = nullptr;
 	void addQuad(int x);
 
-	float deltaTime;
+	float deltaTime = 0.0f;
 	__int64 curTime = 0;
 	__int64 prevTime = 0;
 	__int64 countsPerSec = 0;

@@ -6,7 +6,7 @@ void Game::addQuad(int x)
 	GameObject* object2 = new GameObject;
 	object2->mesh = graphics.getMeshPointer("sda");
 	graphics.addToDraw(object2);
-	object2->setPosition(Vector3(x, 0, 0));
+	object2->setPosition(Vector3(static_cast<float>(x), 0.0f, 0.0f));
 }
 
 void Game::init(Window* window)
@@ -23,16 +23,16 @@ void Game::init(Window* window)
 	this->testObject = new GameObject;
 	testObject->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject);
-	testObject->setPosition(Vector3(0, 0, 0));
-	testObject->setScale(Vector3(0.2, 0.2, 0.2));
-	testObject->setColor(Vector4(0.5, 0.5, 0.5,1));
+	testObject->setPosition(Vector3(0.0f, 0.0f, 0.0f));
+	testObject->setScale(Vector3(0.2f, 0.2f, 0.2f));
+	testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
-	testObject->setColor(Vector4(1, 1, 1, 1));
+	testObject->setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 	this->testObject2 = new GameObject;
 	testObject2->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject2);
-	testObject2->setPosition(Vector3(-7, 0, 0));
-	testObject2->setColor(Vector4(0.5, 0.5, 0.5, 1));
+	testObject2->setPosition(Vector3(-7.0f, 0.0f, 0.0f));
+	testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
 
 	player.init(this->graphics);
@@ -74,13 +74,13 @@ void Game::run()
 
 
 		if (kb.A)
-			this->testObject->addRotation(Vector3(0.00, 0.01*deltaTime*200, 0.00));
+			this->testObject->addRotation(Vector3(0.00f, 0.01f * deltaTime * 200, 0.00f));
 		if(kb.D)
-			this->testObject->addRotation(Vector3(0.00, -0.01 * deltaTime * 200, 0.00));
+			this->testObject->addRotation(Vector3(0.00f, -0.01f * deltaTime * 200, 0.00f));
 		if (kb.W)
-			this->testObject->addRotation(Vector3(0.01 * deltaTime * 200, 0.00, 0.00));
+			this->testObject->addRotation(Vector3(0.01f * deltaTime * 200, 0.00f, 0.00f));
 		if (kb.S)
-			this->testObject->addRotation(Vector3(-0.01 * deltaTime * 200, 0.00, 0.00));
+			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
 		player.update(deltaTime, this->keyboard);
 		

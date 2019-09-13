@@ -18,7 +18,7 @@ void Debug::DrawLine(XMFLOAT3 start, XMFLOAT3 end, XMFLOAT3 color)
 		vertices[1] = { end , color };
 	}
 
-	vertexBuffer.initialize(vertices.data(), vertices.size(), device);
+	vertexBuffer.initialize(vertices.data(), static_cast<UINT>(vertices.size()), device);
 	vertexBuffer.applyChanges(device, deviceContext);
 
 	//set world buffer
@@ -60,10 +60,10 @@ void Debug::DrawCube(XMFLOAT3 p, XMFLOAT3 color, float scale)
 		0, 3, 7, 7, 5, 0,
 		1, 4, 2, 2, 4, 6
 	};
-	vertexBuffer.initialize(vertices.data(), vertices.size(), device);
+	vertexBuffer.initialize(vertices.data(), static_cast<UINT>(vertices.size()), device);
 	vertexBuffer.applyChanges(device, deviceContext);
 
-	indicesbuffer.Initialize(device, indexData.data(), indexData.size());
+	indicesbuffer.Initialize(device, indexData.data(), static_cast<UINT>(indexData.size()));
 	//set world buffer
 	XMMATRIX world = XMMatrixIdentity();
 	cb_vs_world.data.wMatrix = world;
@@ -98,9 +98,9 @@ void Debug::DrawRectangle(XMFLOAT3 center, XMFLOAT3 color, float scale)
 		2, 3,
 		3, 0 
 	};
-	vertexBuffer.initialize(vertices.data(), vertices.size(), device);
+	vertexBuffer.initialize(vertices.data(), static_cast<UINT>(vertices.size()), device);
 	vertexBuffer.applyChanges(device, deviceContext);
-	indicesbuffer.Initialize(device, indexData.data(), indexData.size());
+	indicesbuffer.Initialize(device, indexData.data(), static_cast<UINT>(indexData.size()));
 	//set world buffer
 	XMMATRIX world = XMMatrixIdentity();
 	cb_vs_world.data.wMatrix = world;

@@ -1,17 +1,20 @@
 #include "Texture.h"
 Texture::Texture()
 {
-	m_targaData = 0;
-	m_texture = 0;
-	m_textureView = nullptr;
+	this->m_targaData = nullptr;
+	this->m_texture = nullptr;
+	this->m_textureView = nullptr;
 
-	width = 0;
-	height = 0;
+	this->width = 0;
+	this->height = 0;
+
+	this->transparent = false;
 }
 
 
 Texture::Texture(const Texture& other)
 {
+	//TODO: Fix warnings
 }
 
 
@@ -132,10 +135,10 @@ unsigned short Texture::getHeight()
 bool Texture::LoadTarga(const char* filename, int& height, int& width)
 {
 	int error, bpp, imageSize, index, i, j, k;
-	FILE* filePtr;
+	FILE* filePtr = nullptr;
 	unsigned int count;
 	TargaHeader targaFileHeader;
-	unsigned char* targaImage;
+	unsigned char* targaImage = nullptr;
 
 	//SAVE WIDTH HEIGHT
 	//this->width = width;
