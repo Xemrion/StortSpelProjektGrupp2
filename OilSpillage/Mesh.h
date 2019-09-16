@@ -3,53 +3,27 @@
 #include"Structs.h"
 #include<vector>
 using namespace DirectX::SimpleMath;
+struct AABB
+{
+	Vector3 maxPos;
+	Vector3 minPos;
+};
+
 class Mesh
 {
 public:
-	void loadMesh(const char* filename) {
-		Vertex3D vertex;
-		vertex.position = Vector3(-1.0, 0.0 ,- 1.0);
-		vertex.uv = Vector2(0.0, 1.0);
-		vertex.normal = Vector3(0.0, 1.0, 0.0);
-		vertices.push_back(vertex);
-
-		vertex.position = Vector3(-1.0, 0.0, 1.0);
-		vertex.uv = Vector2(0.0, 0.0);
-		vertices.push_back(vertex);
-
-		vertex.position = Vector3(1.0, 0.0, -1.0);
-		vertex.uv = Vector2(1.0, 1.0);
-		vertices.push_back(vertex);
-
-		vertex.position = Vector3(-1.0, 0.0, 1.0);
-		vertex.uv = Vector2(0.0, 0.0);
-		vertices.push_back(vertex);
-
-		vertex.position = Vector3(1.0, 0.0, 1.0);
-		vertex.uv = Vector2(1.0, 0.0);
-		vertices.push_back(vertex);
-
-		vertex.position = Vector3(1.0, 0.0, -1.0);
-		vertex.uv = Vector2(1.0, 1.0);
-		vertices.push_back(vertex);
-
-		this->vertexCount = static_cast<int>(vertices.size());
-		
-	};
-	void insertDataToMesh(std::vector<Vertex3D> vertexData)
-	{
-		this->vertices = vertexData;
-
-		this->vertexCount = static_cast<int>(vertices.size());
-	};
+	Mesh();
+	void loadMesh(const char* filename);
+	void insertDataToMesh(std::vector<Vertex3D>& vertexData);
 	void operator=(const Mesh& rh) { this->vertices = rh.vertices; }
+
 	virtual ~Mesh() { if (this->vertexBuffer) this->vertexBuffer->Release(); }
 	std::vector<Vertex3D> vertices;
 	ID3D11Buffer* vertexBuffer = nullptr;
-	int getVertexCount() const 
-	{
-		return this->vertexCount;
-	};
+	void setAABB(AABB obj);
+	AABB getAABB()const;
+	int getVertexCount()const;
 private:
+	AABB collisionBox;
 	int vertexCount = 0; 
 };

@@ -1,10 +1,9 @@
 #pragma once
 #include "Mesh.h"
-#include "glm/glm/glm.hpp"
-#include "glm/glm/gtc/matrix_transform.hpp"
 #include <d3d11.h>
-#include"Texture.h"
-#include<math.h>
+#include "Texture.h"
+#include <math.h>
+
 using namespace DirectX::SimpleMath; 
 class GameObject {
 	Vector3 position;

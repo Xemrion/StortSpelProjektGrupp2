@@ -3,7 +3,12 @@
 #include "graphics.h"
 #include"Keyboard.h"
 #include"Mouse.h"
+#include"ImGui/imgui.h"
+//#include"ImGui/imgui_impl_win32.h"
+//#include"ImGui/imgui_impl_dx11.h"
 #include"vehicle.h"
+#include"TestAI.h"
+
 class Game {
 	Window* window = nullptr;
 
@@ -11,6 +16,7 @@ class Game {
 	static Graphics graphics;
 	GameObject* testObject = nullptr;
 	GameObject* testObject2 = nullptr;
+	GameObject* AiTestObject = nullptr;
 	void addQuad(int x);
 
 	float deltaTime = 0.0f;
@@ -20,8 +26,12 @@ class Game {
 	float secPerCount = 1.0f / countsPerSec;
 	
 	Vehicle player;
+	Camera camera;
+	TestAI AI;
 
 public:
+	Game();
+	~Game();
 	void init(Window* window);
 	void run();
 	static Graphics& getGraphics()

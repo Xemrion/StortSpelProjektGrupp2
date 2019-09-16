@@ -38,7 +38,7 @@ struct Light {
 	float intensity;
 };
 
-struct Mesh {
+struct FormatMesh {
 	char meshName[100];
 	int vertexCount;
 	char materialName[100];

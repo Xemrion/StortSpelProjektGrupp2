@@ -110,7 +110,7 @@ void Vehicle::update(float deltaTime)
 			}
 			if (velocity.y < -topSpeed * 0.75f && velocity.x < -topSpeed * 0.75f) {
 				velocity.y = -topSpeed * 0.75f;
-				velocity.x < -topSpeed * 0.75f;
+				velocity.x = -topSpeed * 0.75f;
 			}
 
 
