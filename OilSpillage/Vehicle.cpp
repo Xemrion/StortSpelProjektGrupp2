@@ -81,8 +81,8 @@ void Vehicle::update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb)
 	if (drivingMode == 0) {
 	
 		if (key.W || key.A || key.S || key.D) {
-			this->velocity.x += dx * 2;
-			this->velocity.y += dy * 2;
+			this->velocity.x += dx * 2 *deltaTime* 4000;
+			this->velocity.y += dy * 2 * deltaTime * 4000;
 
 			
 
