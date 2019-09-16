@@ -147,7 +147,7 @@ bool Texture::LoadTarga(const char* filename, int& height, int& width)
 
 	// Open the targa file for reading in binary.
 	error = fopen_s(&filePtr, filename, "rb");
-	if (error != 0)
+	if (error != 0 || filePtr == nullptr)
 	{
 		return false;
 	}

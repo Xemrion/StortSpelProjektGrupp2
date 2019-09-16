@@ -45,7 +45,7 @@ public:
 	void operator=(const Mesh& rh) { this->vertices = rh.vertices; }
 	virtual ~Mesh() { if (this->vertexBuffer) this->vertexBuffer->Release(); }
 	std::vector<Vertex3D> vertices;
-	ID3D11Buffer* vertexBuffer;
+	ID3D11Buffer* vertexBuffer = nullptr;
 	int getVertexCount() const 
 	{
 		return this->vertexCount;
