@@ -110,7 +110,7 @@ bool Graphics::init(Window* window, float fov)
 		// get the address of the back buffer
 		ID3D11Texture2D* backBufferPtr = nullptr;
 		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)& backBufferPtr);
-		if (FAILED(result))
+		if (FAILED(result) || backBufferPtr == nullptr)
 		{
 			MessageBox(this->window->handle, "Could not ID3D11Texture2D* backBufferPtr", "Error", MB_OK); //L"", L"", ;
 			return false;
