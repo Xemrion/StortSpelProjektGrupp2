@@ -1,9 +1,11 @@
 #pragma once
 #include "window.h"
 #include "graphics.h"
-#include"Keyboard.h"
-#include"Mouse.h"
-#include"vehicle.h"
+#include "Keyboard.h"
+#include "Mouse.h"
+#include "vehicle.h"
+#include "Camera.h"
+
 class Game {
 	Window* window = nullptr;
 
@@ -21,6 +23,7 @@ class Game {
 	float secPerCount = 1.0f / countsPerSec;
 	
 	Vehicle player;
+	Camera camera;
 
 public:
 	void init(Window* window);

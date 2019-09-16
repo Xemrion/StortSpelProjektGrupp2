@@ -1,6 +1,7 @@
 #pragma once
 #include "window.h"
 #include "GameObject.h"
+#include "Camera.h"
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
@@ -51,8 +52,8 @@ class Graphics {
 	float fieldOfView;
 	float screenNear;
 	float screenDepth;
-	glm::mat4 projection;
-	glm::mat4 view;
+	Matrix projection;
+	Matrix view;
 	ID3D11Debug* debug;
 public:
 	Graphics();
@@ -65,6 +66,7 @@ public:
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
-	void render();
+	void render(Camera camera);
 	bool createShaders();
+	void setViewMatrix(Matrix view);
 };

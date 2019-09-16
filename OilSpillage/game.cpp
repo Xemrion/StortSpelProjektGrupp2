@@ -83,7 +83,7 @@ void Game::run()
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
 		player.update(deltaTime, this->keyboard);
-		
+
 		this->graphics.render();
 		
 		//deltaTime reset

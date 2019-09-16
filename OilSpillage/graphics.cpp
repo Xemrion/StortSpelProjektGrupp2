@@ -1,5 +1,4 @@
 #include "graphics.h"
-#include "glm/glm/ext.hpp"
 #include <algorithm>
 
 Graphics::Graphics()
@@ -20,17 +19,14 @@ Graphics::Graphics()
 	this->worldBuffer = nullptr;
 	this->colorBuffer = nullptr;
 
-	//this->pxShader = nullptr;
-	//this->vxShader = nullptr;
-	//this->vertexLayout = nullptr;
 	this->sampler = nullptr;
 
 	this->debuger = nullptr;
 	this->fieldOfView = 0.0f;
 	this->screenNear = 0.0f;
 	this->screenDepth = 0.0f;
-	this->projection = glm::mat4(0);
-	this->view = glm::mat4(0);
+	this->projection = Matrix();
+	this->view = Matrix();
 	this->debug = nullptr;
 }
 
@@ -172,7 +168,6 @@ bool Graphics::init(Window* window, float fov)
 
 	}
 
-	//void SetViewport()
 	this->vp.Width = (float)this->window->width;
 	this->vp.Height = (float)this->window->height;
 	this->vp.MinDepth = 0.0f;
@@ -185,22 +180,15 @@ bool Graphics::init(Window* window, float fov)
 	this->screenNear = 1;
 	this->screenDepth = 1000;
 	this->fieldOfView = fov * (DirectX::XM_PI / 180);
-
-	//move to ColorShader
-	this->projection = glm::perspectiveFovLH(this->fieldOfView, (float)window->width, (float)window->height, this->screenNear, this->screenDepth);
-	this->view = glm::lookAtLH(glm::vec3(0.0, 5.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-	this->projection = glm::transpose(projection);
-	this->view = glm::transpose(view);
-
-
-
+	this->projection = XMMatrixPerspectiveFovLH(this->fieldOfView, (float)window->width / (float)window->height, this->screenNear, this->screenDepth);
+	this->view = XMMatrixLookAtLH(Vector3(0.0, 5.0, 0.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0));
 	D3D11_BUFFER_DESC desc = { 0 };
 
 	desc.Usage = D3D11_USAGE_DYNAMIC;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>(sizeof(glm::mat4) + (16 - (sizeof(glm::mat4) % 16)));
+	desc.ByteWidth = static_cast<UINT>(sizeof(Matrix) + (16 - (sizeof(Matrix) % 16)));
 	desc.StructureByteStride = 0;
 
 	HRESULT hr = device->CreateBuffer(&desc, 0, &viewProjBuffer);
@@ -272,7 +260,7 @@ bool Graphics::init(Window* window, float fov)
 	return true;
 }
 
-void Graphics::render()
+void Graphics::render(Camera camera)
 {
 	float color[4] = {
 		0,0,0,1
@@ -280,13 +268,12 @@ void Graphics::render()
 	deviceContext->ClearRenderTargetView(renderTargetView, color);
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
-	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0); //1
+	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	glm::mat4 viewProj= view * projection;
-	//viewProj = glm::transpose(viewProj);
+	Matrix viewProj = (camera.getViewMatrix() * projection).Transpose();
 	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, glm::value_ptr(viewProj), sizeof(glm::mat4));
+	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);
 
 
@@ -317,7 +304,6 @@ void Graphics::render()
 
 		
 		Vector4 modColor = object->getColor();
-		//viewProj = glm::transpose(viewProj);
 		hr = deviceContext->Map(colorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
 		deviceContext->Unmap(colorBuffer, 0);
@@ -385,135 +371,6 @@ bool Graphics::createShaders()
 	UINT numElements2 = ARRAYSIZE(inputDesc2);
 	this->shader_debug.createVS(device, shaderfolder + L"DebugVs.cso", inputDesc2, numElements2);
 	this->shader_debug.createPS(device, shaderfolder + L"DebugPS.cso");
-
-
-	//ID3DBlob* errorBlob = nullptr;
-	//HRESULT result;
-	////LPCWSTR  vs = VertexShader.hlsl;
-	//ID3DBlob* pVS = nullptr;
-	//result = D3DCompileFromFile(
-	//	L"VertexShader.hlsl", // filename vsFilename
-	//	nullptr,		// optional macros
-	//	nullptr,		// optional include files
-	//	"main",		// entry point
-	//	"vs_5_0",		// shader model (target)
-	//	D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
-	//	0,				// IGNORE...DEPRECATED.
-	//	&pVS,			// double pointer to ID3DBlob		
-	//	&errorBlob		// pointer for Error Blob messages.
-	//);
-	//// compilation failed?
-	//if (FAILED(result))
-	//{
-	//	if (errorBlob)
-	//	{
-	//		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	//		//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
-	//		// release "reference" to errorBlob interface object
-	//		errorBlob->Release();
-	//	}
-	//	else
-	//	{
-	//		//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
-	//	}
-	//	if (pVS)
-	//		pVS->Release();
-	//	return false;
-	//}
-
-	//device->CreateVertexShader(
-	//	pVS->GetBufferPointer(),
-	//	pVS->GetBufferSize(),
-	//	nullptr,
-	//	&vxShader
-	//);
-
-	//D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
-	//	{
-	//		"SV_POSITION",		// "semantic" name in shader
-	//		0,				// "semantic" index (not used)
-	//		DXGI_FORMAT_R32G32B32_FLOAT, // size of ONE element (3 floats)
-	//		0,							 // input slot
-	//		D3D11_APPEND_ALIGNED_ELEMENT, // offset of first element
-	//		D3D11_INPUT_PER_VERTEX_DATA, // specify data PER vertex
-	//		0							 // used for INSTANCING (ignore)
-	//	},
-	//	{
-	//		"TEXCOORD",
-	//		0,
-	//		DXGI_FORMAT_R32G32_FLOAT, //2 values
-	//		0,
-	//		D3D11_APPEND_ALIGNED_ELEMENT,
-	//		D3D11_INPUT_PER_VERTEX_DATA,
-	//		0
-	//	},
-
-	//	{
-	//		"NORMAL",
-	//		0,				// same slot as previous (same vertexBuffer)
-	//		DXGI_FORMAT_R32G32B32_FLOAT,
-	//		0,
-	//		D3D11_APPEND_ALIGNED_ELEMENT,							// offset of FIRST element (after POSITION)
-	//		D3D11_INPUT_PER_VERTEX_DATA,
-	//		0
-	//		//for normal mapping. tangent binormal
-	//	}
-	//	   
-
-
-	//};
-	//
-	////int lSize = sizeof(inputDesc) / sizeof(inputDesc[0]);
-	//result = device->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), pVS->GetBufferPointer(), pVS->GetBufferSize(), &vertexLayout);
-
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
-	//// we do not need anymore this COM object, so we release it.
-	//pVS->Release();
-	//result = D3DCompileFromFile(
-	//	L"PixelShader.hlsl", // filename vsFilename
-	//	nullptr,		// optional macros
-	//	nullptr,		// optional include files
-	//	"main",		// entry point
-	//	"ps_5_0",		// shader model (target)
-	//	D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
-	//	0,				// IGNORE...DEPRECATED.
-	//	&pVS,			// double pointer to ID3DBlob		
-	//	&errorBlob		// pointer for Error Blob messages.
-	//);
-
-	//// compilation failed?
-	//if (FAILED(result))
-	//{
-	//	if (errorBlob)
-	//	{
-	//		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	//		//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
-	//		// release "reference" to errorBlob interface object
-	//		errorBlob->Release();
-	//	}
-	//	else
-	//	{
-	//		//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
-	//	}
-	//	if (pVS)
-	//		pVS->Release();
-	//	return false;
-	//}
-
-	//device->CreatePixelShader(
-	//	pVS->GetBufferPointer(),
-	//	pVS->GetBufferSize(),
-	//	nullptr,
-	//	&pxShader
-	//);
-	
-	
-	
-
-
 
 
 
@@ -763,4 +620,9 @@ void Graphics::addToDraw(GameObject* o)
 void Graphics::removeFromDraw(GameObject* o)
 {
 	std::find(drawableObjects.begin(), drawableObjects.end(), o);
+}
+
+void Graphics::setViewMatrix(Matrix view)
+{
+	this->view = view;
 }
