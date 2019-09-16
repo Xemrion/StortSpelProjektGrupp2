@@ -6,7 +6,9 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <unordered_map>
-
+#include"ImGui/imgui.h"
+#include"ImGui/imgui_impl_win32.h"
+#include"ImGui/imgui_impl_dx11.h"
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -66,6 +68,7 @@ public:
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
+	void presentScene();
 	void render(Camera camera);
 	bool createShaders();
 	void setViewMatrix(Matrix view);
