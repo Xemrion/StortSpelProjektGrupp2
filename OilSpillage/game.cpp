@@ -4,24 +4,9 @@ Graphics Game::graphics = Graphics();
 void Game::addQuad(int x)
 {
 	GameObject* object2 = new GameObject;
-	object2->mesh = graphics.getMeshPointer("Cube");
-	object2->setColor(Vector4(0, 1, 0, 1));
+	object2->mesh = graphics.getMeshPointer("sda");
 	graphics.addToDraw(object2);
 	object2->setPosition(Vector3(static_cast<float>(x), 0.0f, 0.0f));
-	object2->setTexture(graphics.getTexturePointer("brickwall.tga"));
-
-}
-
-Game::Game()
-{
-
-}
-
-Game::~Game()
-{
-	ImGui_ImplDX11_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
 }
 
 void Game::init(Window* window)
@@ -49,6 +34,14 @@ void Game::init(Window* window)
 	testObject2->setPosition(Vector3(-7.0f, 0.0f, 0.0f));
 	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
+	
+	AiTestObject = new GameObject;
+	AiTestObject->mesh = graphics.getMeshPointer("Cube");
+	AiTestObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
+	AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
+	graphics.addToDraw(AiTestObject);
+
+
 	player.init();
 }
 
@@ -97,33 +90,17 @@ void Game::run()
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
 		player.update(deltaTime, this->keyboard);
-		
+
 		this->graphics.render();
-		
-		std::string textUse;
-
-
-		ImGui_ImplDX11_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
-
-		//imgui button, slider etc
-		ImGui::Begin("Gungame");
-		ImGui::Text("Hold 'V' To move camera with mouse.");
-
-		ImGui::End();
-
-		ImGui::Render();
-
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-		
+		Vector3 tempPos = AiTestObject->getPosition();
+		Vector4 tempColor = AiTestObject->getColor();
+		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);
+		AiTestObject->setPosition(tempPos);
+		AiTestObject->setColor(tempColor);
 		//deltaTime reset
 		prevTime = curTime;
-		
-		this->graphics.presentScene();
-
 	}
 	delete this->testObject;
 	delete this->testObject2;
+	delete this->AiTestObject;
 }

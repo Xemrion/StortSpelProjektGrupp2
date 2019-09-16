@@ -1,6 +1,4 @@
 #include "graphics.h"
-#include"Importer/importerClass.h"
-#include "glm/glm/ext.hpp"
 #include <algorithm>
 
 Graphics::Graphics()
@@ -21,17 +19,14 @@ Graphics::Graphics()
 	this->worldBuffer = nullptr;
 	this->colorBuffer = nullptr;
 
-	//this->pxShader = nullptr;
-	//this->vxShader = nullptr;
-	//this->vertexLayout = nullptr;
 	this->sampler = nullptr;
 
 	this->debuger = nullptr;
 	this->fieldOfView = 0.0f;
 	this->screenNear = 0.0f;
 	this->screenDepth = 0.0f;
-	this->projection = glm::mat4(0);
-	this->view = glm::mat4(0);
+	this->projection = Matrix();
+	this->view = Matrix();
 	this->debug = nullptr;
 }
 
@@ -173,7 +168,6 @@ bool Graphics::init(Window* window, float fov)
 
 	}
 
-	//void SetViewport()
 	this->vp.Width = (float)this->window->width;
 	this->vp.Height = (float)this->window->height;
 	this->vp.MinDepth = 0.0f;
@@ -186,22 +180,15 @@ bool Graphics::init(Window* window, float fov)
 	this->screenNear = 1;
 	this->screenDepth = 1000;
 	this->fieldOfView = fov * (DirectX::XM_PI / 180);
-
-	//move to ColorShader
-	this->projection = glm::perspectiveFovLH(this->fieldOfView, (float)window->width, (float)window->height, this->screenNear, this->screenDepth);
-	this->view = glm::lookAtLH(glm::vec3(0.0, 5.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-	this->projection = glm::transpose(projection);
-	this->view = glm::transpose(view);
-
-
-
+	this->projection = XMMatrixPerspectiveFovLH(this->fieldOfView, (float)window->width / (float)window->height, this->screenNear, this->screenDepth);
+	this->view = XMMatrixLookAtLH(Vector3(0.0, 5.0, 0.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0));
 	D3D11_BUFFER_DESC desc = { 0 };
 
 	desc.Usage = D3D11_USAGE_DYNAMIC;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>(sizeof(glm::mat4) + (16 - (sizeof(glm::mat4) % 16)));
+	desc.ByteWidth = static_cast<UINT>(sizeof(Matrix) + (16 - (sizeof(Matrix) % 16)));
 	desc.StructureByteStride = 0;
 
 	HRESULT hr = device->CreateBuffer(&desc, 0, &viewProjBuffer);
@@ -270,18 +257,10 @@ bool Graphics::init(Window* window, float fov)
 	createShaders();
 	debuger = new Debug(deviceContext, device);
 
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); // (void)io;
-	ImGui_ImplWin32_Init(this->window->handle);
-	ImGui_ImplDX11_Init(this->device, this->deviceContext);
-	ImGui::StyleColorsDark();
-
 	return true;
 }
 
-void Graphics::render()
+void Graphics::render(Camera camera)
 {
 	float color[4] = {
 		0,0,0,1
@@ -289,13 +268,12 @@ void Graphics::render()
 	deviceContext->ClearRenderTargetView(renderTargetView, color);
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
-	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0); //1
+	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	glm::mat4 viewProj= view * projection;
-	//viewProj = glm::transpose(viewProj);
+	Matrix viewProj = (camera.getViewMatrix() * projection).Transpose();
 	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, glm::value_ptr(viewProj), sizeof(glm::mat4));
+	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);
 
 
@@ -326,7 +304,6 @@ void Graphics::render()
 
 		
 		Vector4 modColor = object->getColor();
-		//viewProj = glm::transpose(viewProj);
 		hr = deviceContext->Map(colorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
 		deviceContext->Unmap(colorBuffer, 0);
@@ -348,12 +325,6 @@ void Graphics::render()
 	//debuger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
 	
 	// Present the back buffer to the screen since rendering is complete.
-	
-
-}
-
-void Graphics::presentScene()
-{
 	swapChain->Present(0, 0);
 }
 
@@ -395,13 +366,11 @@ bool Graphics::createShaders()
 	D3D11_INPUT_ELEMENT_DESC inputDesc2[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
-		{"COLOR", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },	
-	};
+		{"COLOR", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },	};
 	
 	UINT numElements2 = ARRAYSIZE(inputDesc2);
 	this->shader_debug.createVS(device, shaderfolder + L"DebugVs.cso", inputDesc2, numElements2);
 	this->shader_debug.createPS(device, shaderfolder + L"DebugPS.cso");
-
 
 
 
@@ -434,50 +403,27 @@ void Graphics::loadMesh(const char* fileName)
 	Mesh newMesh;
 	if (meshes.find(fileName) == meshes.end())
 	{
-		Importer imp;
-		if (imp.loadMesh(fileName))
-		{
-			meshes[fileName] = newMesh;
-			Vertex* vertices = imp.getMesh().vertices;
-			std::vector<Vertex3D> tempVec;
-			Vertex3D vertex;
-			for (int i = 0; i < imp.getMesh().mHeader.vertexCount; i++)
-			{
-				vertex.position.x = vertices[i].x;
-				vertex.position.y = vertices[i].y;
-				vertex.position.z = vertices[i].z;
+		meshes[fileName] = newMesh;
+		meshes[fileName].loadMesh(fileName);
 
-				vertex.normal.x = vertices[i].nx;
-				vertex.normal.y = vertices[i].ny;
-				vertex.normal.z = vertices[i].nz;
+		int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
+		UINT stride = sizeof(Vertex3D);
 
-				vertex.uv.x = vertices[i].u;
-				vertex.uv.y = vertices[i].v;
+		D3D11_BUFFER_DESC vBufferDesc;
+		ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
 
-				tempVec.push_back(vertex);
-			}
+		vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vBufferDesc.ByteWidth = bufferSize;
+		vBufferDesc.CPUAccessFlags = 0;
+		vBufferDesc.MiscFlags = 0;
 
-			meshes[fileName].insertDataToMesh(tempVec);
+		D3D11_SUBRESOURCE_DATA subData;
+		ZeroMemory(&subData, sizeof(subData));
+		subData.pSysMem = meshes[fileName].vertices.data();
 
-			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
-			UINT stride = sizeof(Vertex3D);
-
-			D3D11_BUFFER_DESC vBufferDesc;
-			ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
-
-			vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			vBufferDesc.ByteWidth = bufferSize;
-			vBufferDesc.CPUAccessFlags = 0;
-			vBufferDesc.MiscFlags = 0;
-
-			D3D11_SUBRESOURCE_DATA subData;
-			ZeroMemory(&subData, sizeof(subData));
-			subData.pSysMem = meshes[fileName].vertices.data();
-
-			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
-			meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
-		}
+		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+		meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
 	}
 }
 
@@ -674,4 +620,9 @@ void Graphics::addToDraw(GameObject* o)
 void Graphics::removeFromDraw(GameObject* o)
 {
 	std::find(drawableObjects.begin(), drawableObjects.end(), o);
+}
+
+void Graphics::setViewMatrix(Matrix view)
+{
+	this->view = view;
 }
