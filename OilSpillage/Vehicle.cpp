@@ -120,7 +120,7 @@ void Vehicle::update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb)
 			}
 			if (velocity.y < -topSpeed * 0.75f && velocity.x < -topSpeed * 0.75f) {
 				velocity.y = -topSpeed * 0.75f;
-				velocity.x < -topSpeed * 0.75f;
+				velocity.x = -topSpeed * 0.75f;
 			}
 
 

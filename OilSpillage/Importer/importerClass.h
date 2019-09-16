@@ -27,7 +27,7 @@ struct BlendShape
 
 struct LoadedMesh
 {
-	Mesh mHeader;
+	FormatMesh mHeader;
 	Material material;
 	Vertex* vertices;
 	Joint* skeleton;

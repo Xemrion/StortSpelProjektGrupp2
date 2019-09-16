@@ -1,4 +1,5 @@
 #include "graphics.h"
+#include"Importer/importerClass.h"
 #include "glm/glm/ext.hpp"
 #include <algorithm>
 
@@ -269,6 +270,14 @@ bool Graphics::init(Window* window, float fov)
 	createShaders();
 	debuger = new Debug(deviceContext, device);
 
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); // (void)io;
+	ImGui_ImplWin32_Init(this->window->handle);
+	ImGui_ImplDX11_Init(this->device, this->deviceContext);
+	ImGui::StyleColorsDark();
+
 	return true;
 }
 
@@ -339,6 +348,12 @@ void Graphics::render()
 	//debuger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
 	
 	// Present the back buffer to the screen since rendering is complete.
+	
+
+}
+
+void Graphics::presentScene()
+{
 	swapChain->Present(0, 0);
 }
 
@@ -380,139 +395,12 @@ bool Graphics::createShaders()
 	D3D11_INPUT_ELEMENT_DESC inputDesc2[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
-		{"COLOR", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },	};
+		{"COLOR", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },	
+	};
 	
 	UINT numElements2 = ARRAYSIZE(inputDesc2);
 	this->shader_debug.createVS(device, shaderfolder + L"DebugVs.cso", inputDesc2, numElements2);
 	this->shader_debug.createPS(device, shaderfolder + L"DebugPS.cso");
-
-
-	//ID3DBlob* errorBlob = nullptr;
-	//HRESULT result;
-	////LPCWSTR  vs = VertexShader.hlsl;
-	//ID3DBlob* pVS = nullptr;
-	//result = D3DCompileFromFile(
-	//	L"VertexShader.hlsl", // filename vsFilename
-	//	nullptr,		// optional macros
-	//	nullptr,		// optional include files
-	//	"main",		// entry point
-	//	"vs_5_0",		// shader model (target)
-	//	D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
-	//	0,				// IGNORE...DEPRECATED.
-	//	&pVS,			// double pointer to ID3DBlob		
-	//	&errorBlob		// pointer for Error Blob messages.
-	//);
-	//// compilation failed?
-	//if (FAILED(result))
-	//{
-	//	if (errorBlob)
-	//	{
-	//		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	//		//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
-	//		// release "reference" to errorBlob interface object
-	//		errorBlob->Release();
-	//	}
-	//	else
-	//	{
-	//		//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
-	//	}
-	//	if (pVS)
-	//		pVS->Release();
-	//	return false;
-	//}
-
-	//device->CreateVertexShader(
-	//	pVS->GetBufferPointer(),
-	//	pVS->GetBufferSize(),
-	//	nullptr,
-	//	&vxShader
-	//);
-
-	//D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
-	//	{
-	//		"SV_POSITION",		// "semantic" name in shader
-	//		0,				// "semantic" index (not used)
-	//		DXGI_FORMAT_R32G32B32_FLOAT, // size of ONE element (3 floats)
-	//		0,							 // input slot
-	//		D3D11_APPEND_ALIGNED_ELEMENT, // offset of first element
-	//		D3D11_INPUT_PER_VERTEX_DATA, // specify data PER vertex
-	//		0							 // used for INSTANCING (ignore)
-	//	},
-	//	{
-	//		"TEXCOORD",
-	//		0,
-	//		DXGI_FORMAT_R32G32_FLOAT, //2 values
-	//		0,
-	//		D3D11_APPEND_ALIGNED_ELEMENT,
-	//		D3D11_INPUT_PER_VERTEX_DATA,
-	//		0
-	//	},
-
-	//	{
-	//		"NORMAL",
-	//		0,				// same slot as previous (same vertexBuffer)
-	//		DXGI_FORMAT_R32G32B32_FLOAT,
-	//		0,
-	//		D3D11_APPEND_ALIGNED_ELEMENT,							// offset of FIRST element (after POSITION)
-	//		D3D11_INPUT_PER_VERTEX_DATA,
-	//		0
-	//		//for normal mapping. tangent binormal
-	//	}
-	//	   
-
-
-	//};
-	//
-	////int lSize = sizeof(inputDesc) / sizeof(inputDesc[0]);
-	//result = device->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), pVS->GetBufferPointer(), pVS->GetBufferSize(), &vertexLayout);
-
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
-	//// we do not need anymore this COM object, so we release it.
-	//pVS->Release();
-	//result = D3DCompileFromFile(
-	//	L"PixelShader.hlsl", // filename vsFilename
-	//	nullptr,		// optional macros
-	//	nullptr,		// optional include files
-	//	"main",		// entry point
-	//	"ps_5_0",		// shader model (target)
-	//	D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
-	//	0,				// IGNORE...DEPRECATED.
-	//	&pVS,			// double pointer to ID3DBlob		
-	//	&errorBlob		// pointer for Error Blob messages.
-	//);
-
-	//// compilation failed?
-	//if (FAILED(result))
-	//{
-	//	if (errorBlob)
-	//	{
-	//		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	//		//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
-	//		// release "reference" to errorBlob interface object
-	//		errorBlob->Release();
-	//	}
-	//	else
-	//	{
-	//		//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
-	//	}
-	//	if (pVS)
-	//		pVS->Release();
-	//	return false;
-	//}
-
-	//device->CreatePixelShader(
-	//	pVS->GetBufferPointer(),
-	//	pVS->GetBufferSize(),
-	//	nullptr,
-	//	&pxShader
-	//);
-	
-	
-	
-
 
 
 
@@ -546,27 +434,50 @@ void Graphics::loadMesh(const char* fileName)
 	Mesh newMesh;
 	if (meshes.find(fileName) == meshes.end())
 	{
-		meshes[fileName] = newMesh;
-		meshes[fileName].loadMesh(fileName);
+		Importer imp;
+		if (imp.loadMesh(fileName))
+		{
+			meshes[fileName] = newMesh;
+			Vertex* vertices = imp.getMesh().vertices;
+			std::vector<Vertex3D> tempVec;
+			Vertex3D vertex;
+			for (int i = 0; i < imp.getMesh().mHeader.vertexCount; i++)
+			{
+				vertex.position.x = vertices[i].x;
+				vertex.position.y = vertices[i].y;
+				vertex.position.z = vertices[i].z;
 
-		int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
-		UINT stride = sizeof(Vertex3D);
+				vertex.normal.x = vertices[i].nx;
+				vertex.normal.y = vertices[i].ny;
+				vertex.normal.z = vertices[i].nz;
 
-		D3D11_BUFFER_DESC vBufferDesc;
-		ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+				vertex.uv.x = vertices[i].u;
+				vertex.uv.y = vertices[i].v;
 
-		vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vBufferDesc.ByteWidth = bufferSize;
-		vBufferDesc.CPUAccessFlags = 0;
-		vBufferDesc.MiscFlags = 0;
+				tempVec.push_back(vertex);
+			}
 
-		D3D11_SUBRESOURCE_DATA subData;
-		ZeroMemory(&subData, sizeof(subData));
-		subData.pSysMem = meshes[fileName].vertices.data();
+			meshes[fileName].insertDataToMesh(tempVec);
 
-		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
-		meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
+			UINT stride = sizeof(Vertex3D);
+
+			D3D11_BUFFER_DESC vBufferDesc;
+			ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+			vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vBufferDesc.ByteWidth = bufferSize;
+			vBufferDesc.CPUAccessFlags = 0;
+			vBufferDesc.MiscFlags = 0;
+
+			D3D11_SUBRESOURCE_DATA subData;
+			ZeroMemory(&subData, sizeof(subData));
+			subData.pSysMem = meshes[fileName].vertices.data();
+
+			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+			meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+		}
 	}
 }
 

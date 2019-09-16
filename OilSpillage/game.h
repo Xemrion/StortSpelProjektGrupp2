@@ -3,6 +3,9 @@
 #include "graphics.h"
 #include"Keyboard.h"
 #include"Mouse.h"
+#include"ImGui/imgui.h"
+//#include"ImGui/imgui_impl_win32.h"
+//#include"ImGui/imgui_impl_dx11.h"
 #include"vehicle.h"
 class Game {
 	Window* window = nullptr;
@@ -23,6 +26,8 @@ class Game {
 	Vehicle player;
 
 public:
+	Game();
+	~Game();
 	void init(Window* window);
 	void run();
 	static Graphics& getGraphics()
