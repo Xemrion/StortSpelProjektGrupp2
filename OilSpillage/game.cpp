@@ -1,4 +1,5 @@
 #include "game.h"
+#include "Input.h"
 Graphics Game::graphics = Graphics();
 
 void Game::addQuad(int x)
@@ -14,7 +15,6 @@ void Game::init(Window* window)
 	this->window = window; 
 	graphics.init(window, 90);
 	
-	this->keyboard = std::make_unique<Keyboard>();
 	this->mouse = std::make_unique<Mouse>();
 	this->mouse->SetWindow(window->handle);
 	graphics.loadMesh("sda");
@@ -52,6 +52,7 @@ void Game::run()
 
 	while (this->window->update())
 	{
+		Input::Update();
 		//Game logic
 		//Graphics
 
@@ -63,26 +64,25 @@ void Game::run()
 
 
 
-		auto kb = this->keyboard->GetState();
 		auto mouse = this->mouse->GetState();
-		if (kb.Escape)
+		if (Input::IsKeyDown_DEBUG(Keyboard::Escape))
 		{
 			//Exit game
 		}
-		if (kb.E)
+		if (Input::IsKeyDown_DEBUG(Keyboard::E))
 			deltaTime /= 4;
 
 
-		if (kb.A)
+		if (Input::IsKeyDown_DEBUG(Keyboard::A))
 			this->testObject->addRotation(Vector3(0.00f, 0.01f * deltaTime * 200, 0.00f));
-		if(kb.D)
+		if(Input::IsKeyDown_DEBUG(Keyboard::D))
 			this->testObject->addRotation(Vector3(0.00f, -0.01f * deltaTime * 200, 0.00f));
-		if (kb.W)
+		if (Input::IsKeyDown_DEBUG(Keyboard::W))
 			this->testObject->addRotation(Vector3(0.01f * deltaTime * 200, 0.00f, 0.00f));
-		if (kb.S)
+		if (Input::IsKeyDown_DEBUG(Keyboard::S))
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
-		player.update(deltaTime, this->keyboard);
+		player.update(deltaTime);
 		
 		this->graphics.render();
 		
