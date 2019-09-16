@@ -105,7 +105,7 @@ void Game::run()
 		if (Input::IsKeyDown_DEBUG(Keyboard::S))
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
-		player.update(deltaTime, this->keyboard);
+		player.update(deltaTime);
 		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
 		this->graphics.render(this->camera);
 		
@@ -126,6 +126,8 @@ void Game::run()
 		ImGui::Render();
 
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		
+		player.update(deltaTime);
 		
 		Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();
