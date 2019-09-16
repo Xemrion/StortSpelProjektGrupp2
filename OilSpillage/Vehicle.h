@@ -22,4 +22,5 @@ public:
 
 	void init();
 	void update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb);
+	GameObject* getVehicle() { return this->vehicle; }
 };

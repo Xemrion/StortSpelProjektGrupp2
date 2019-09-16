@@ -4,6 +4,8 @@
 #include"Keyboard.h"
 #include"Mouse.h"
 #include"vehicle.h"
+#include"TestAI.h"
+
 class Game {
 	Window* window = nullptr;
 
@@ -12,6 +14,7 @@ class Game {
 	static Graphics graphics;
 	GameObject* testObject = nullptr;
 	GameObject* testObject2 = nullptr;
+	GameObject* AiTestObject = nullptr;
 	void addQuad(int x);
 
 	float deltaTime = 0.0f;
@@ -21,6 +24,7 @@ class Game {
 	float secPerCount = 1.0f / countsPerSec;
 	
 	Vehicle player;
+	TestAI AI;
 
 public:
 	void init(Window* window);

@@ -134,6 +134,7 @@
     <ClCompile Include="Graphic\Shaders.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
+    <ClCompile Include="TestAI.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Structs.h" />
+    <ClInclude Include="TestAI.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VertexBuffer.h" />
