@@ -12,7 +12,6 @@
 class Game {
 	Window* window = nullptr;
 
-	std::unique_ptr<DirectX::Keyboard> keyboard;
 	std::unique_ptr<DirectX::Mouse> mouse;
 	static Graphics graphics;
 	GameObject* testObject = nullptr;

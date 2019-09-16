@@ -133,6 +133,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="Graphic\Shaders.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="Importer\importerClass.h" />
     <ClInclude Include="Importer\meshFormat.h" />
     <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Structs.h" />

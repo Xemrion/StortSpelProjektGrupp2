@@ -21,6 +21,6 @@ public:
 	virtual ~Vehicle();
 
 	void init();
-	void update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb);
+	void update(float deltaTime);
 	GameObject* getVehicle() { return this->vehicle; }
 };
