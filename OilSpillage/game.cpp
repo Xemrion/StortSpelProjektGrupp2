@@ -2,6 +2,16 @@
 #include "Input.h"
 Graphics Game::graphics = Graphics();
 
+Game::Game()
+{
+
+}
+
+Game::~Game()
+{
+
+}
+
 void Game::addQuad(int x)
 {
 	GameObject* object2 = new GameObject;
@@ -90,8 +100,9 @@ void Game::run()
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
 		player.update(deltaTime);
-		
-		this->graphics.render();
+		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
+		this->graphics.render(camera);
+
 		Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();
 		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);

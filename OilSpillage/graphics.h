@@ -53,7 +53,6 @@ class Graphics {
 	float screenNear;
 	float screenDepth;
 	Matrix projection;
-	Matrix view;
 	ID3D11Debug* debug;
 public:
 	Graphics();
