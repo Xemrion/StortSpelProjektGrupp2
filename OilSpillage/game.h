@@ -1,10 +1,10 @@
 #pragma once
 #include "window.h"
 #include "graphics.h"
-#include "Keyboard.h"
-#include "Mouse.h"
-#include "vehicle.h"
-#include "Camera.h"
+#include"Keyboard.h"
+#include"Mouse.h"
+#include"vehicle.h"
+#include"TestAI.h"
 
 class Game {
 	Window* window = nullptr;
@@ -14,6 +14,7 @@ class Game {
 	static Graphics graphics;
 	GameObject* testObject = nullptr;
 	GameObject* testObject2 = nullptr;
+	GameObject* AiTestObject = nullptr;
 	void addQuad(int x);
 
 	float deltaTime = 0.0f;
@@ -24,6 +25,7 @@ class Game {
 	
 	Vehicle player;
 	Camera camera;
+	TestAI AI;
 
 public:
 	void init(Window* window);

@@ -35,6 +35,13 @@ void Game::init(Window* window)
 	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
 	
+	AiTestObject = new GameObject;
+	AiTestObject->mesh = graphics.getMeshPointer("Cube");
+	AiTestObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
+	AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
+	graphics.addToDraw(AiTestObject);
+
+
 	player.init();
 }
 
@@ -85,10 +92,15 @@ void Game::run()
 		player.update(deltaTime, this->keyboard);
 
 		this->graphics.render();
-		
+		Vector3 tempPos = AiTestObject->getPosition();
+		Vector4 tempColor = AiTestObject->getColor();
+		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);
+		AiTestObject->setPosition(tempPos);
+		AiTestObject->setColor(tempColor);
 		//deltaTime reset
 		prevTime = curTime;
 	}
 	delete this->testObject;
 	delete this->testObject2;
+	delete this->AiTestObject;
 }
