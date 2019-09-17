@@ -133,7 +133,6 @@ void Game::run()
 		
 		player.update(deltaTime);
 		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
-		this->graphics.render(camera);
 
 		/*Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();
