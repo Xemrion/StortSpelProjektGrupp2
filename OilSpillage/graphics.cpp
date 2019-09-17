@@ -26,7 +26,6 @@ Graphics::Graphics()
 	this->screenNear = 0.0f;
 	this->screenDepth = 0.0f;
 	this->projection = Matrix();
-	this->view = Matrix();
 	this->debug = nullptr;
 }
 
@@ -181,6 +180,7 @@ bool Graphics::init(Window* window, float fov)
 	this->screenDepth = 1000;
 	this->fieldOfView = fov * (DirectX::XM_PI / 180);
 	this->projection = XMMatrixPerspectiveFovLH(this->fieldOfView, (float)window->width / (float)window->height, this->screenNear, this->screenDepth);
+
 	D3D11_BUFFER_DESC desc = { 0 };
 
 	desc.Usage = D3D11_USAGE_DYNAMIC;
@@ -632,7 +632,3 @@ void Graphics::presentScene()
 	swapChain->Present(0, 0);
 }
 
-void Graphics::setViewMatrix(Matrix view)
-{
-	this->view = view;
-}

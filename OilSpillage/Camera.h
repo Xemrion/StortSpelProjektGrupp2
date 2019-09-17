@@ -8,10 +8,7 @@ class Camera
 {
 private:
 	Matrix view;
-	Matrix projection;
 	Vector3 pos = Vector3(0.0, 0.0, 0.0);
-	Vector3 orientation = Vector3(0.0, 0.0, 0.0);
-	float speed;
 public:
 	Camera();
 	~Camera();
@@ -19,7 +16,5 @@ public:
 	
 	Vector3 getPos();
 	void setPos(Vector3 pos);
-	float getSpeed();
-	void setSpeed(float speed);
 	Matrix getViewMatrix();
 };
