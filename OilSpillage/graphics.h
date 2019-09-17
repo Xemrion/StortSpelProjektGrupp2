@@ -49,10 +49,6 @@ class Graphics {
 	ShaderClass shader_default;
 	ShaderClass shader_debug;
 	Debug* debuger;
-	float fieldOfView;
-	float screenNear;
-	float screenDepth;
-	Matrix projection;
 	ID3D11Debug* debug;
 public:
 	Graphics();
