@@ -4,6 +4,10 @@
 Vehicle::Vehicle()
 {
 	velocity = Vector2(0.0f, 0.0f);
+	accelerator = Vector3(0.0f, 0.0f, 0.0f);
+	acceleratorTempX = 0;
+	acceleratorTempZ = 0;
+
 	targetRotation = 0;
 	drivingMode = 0;
 	topSpeed = 4700;
@@ -16,6 +20,7 @@ Vehicle::Vehicle()
 Vehicle::~Vehicle()
 {
 	delete vehicle;
+	delete bodyRotation;
 }
 
 void Vehicle::init()
@@ -25,17 +30,27 @@ void Vehicle::init()
 	Game::getGraphics().addToDraw(vehicle);
 	vehicle->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	//vehicle->setColor(Vector4(2,0.3,0.3,1));
-	vehicle->setScale(Vector3(0.5f, 0.5f, 1.0f));
+	vehicle->setScale(Vector3(0.75f, 0.1f, 1.0f));
+	Game::getGraphics().loadTexture("brickwall.tga");
+	vehicle->setTexture(Game::getGraphics().getTexturePointer("brickwall.tga"));
+
+	this->bodyRotation = new GameObject;
+	bodyRotation->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(bodyRotation);
+	bodyRotation->setPosition(Vector3(0.0f, 0.2f, 0.0f));
+	//vehicle->setColor(Vector4(2,0.3,0.3,1));
+	bodyRotation->setScale(Vector3(0.5f, 0.12f, 0.9f));
 	Game::getGraphics().loadTexture("CarTemp.tga");
-	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp.tga"));
-
-
+	bodyRotation->setTexture(Game::getGraphics().getTexturePointer("CarTemp.tga"));
 	
 	
 }
 
 void Vehicle::update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb)
 {
+	
+
+
 	auto key = kb->GetState();
 
 
@@ -202,4 +217,33 @@ void Vehicle::update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb)
 
 
 	this->vehicle->move(Vector3((velocity.x * deltaTime *0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f)));
+
+
+	
+	//bodyRotation
+	if (accelerator.x < vehicle->getPosition().x) {
+		accelerator.x += 1.0f * deltaTime;
+	}
+	else {
+		accelerator.x -= 1.0f * deltaTime;
+	}
+	if (accelerator.z < vehicle->getPosition().z) {
+		accelerator.z += 1.0f * deltaTime;
+	}
+	else {
+		accelerator.z -= 1.0f * deltaTime;
+	}
+
+
+
+	float dx2 = cos((DirectX::XM_PI / 180) * vehicleRotation);
+	float dy2 = sin((DirectX::XM_PI / 180) * vehicleRotation);
+
+	float hypoC2 = sqrt(pow(dx2, 2) + (pow(dy2, 2)));
+	float accelForce2 = velocity.x * (dy2 / hypoC2) + velocity.y * -(dx2 / hypoC2);
+
+	this->bodyRotation->move(Vector3((velocity.x* deltaTime * 0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f)));
+
+	//this->bodyRotation->setPosition(Vector3(accelerator.x, accelerator.y+1, accelerator.z));
+	this->bodyRotation->setRotation(Vector3(vehicle->getRotation().x + accelForce2 * 0.0001, vehicle->getRotation().y , vehicle->getRotation().z + driftForce * 0.0001));
 }
