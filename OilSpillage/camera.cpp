@@ -5,7 +5,7 @@ Camera::Camera()
 {
 	float nearPlane = 1.f;
 	float farPlane = 1000.f;
-	this->fieldOfView = 70 * (DirectX::XM_PI / 180);
+	this->fieldOfView = 90.f * (DirectX::XM_PI / 180);
 	this->projection = DirectX::XMMatrixPerspectiveFovLH(this->fieldOfView, 16.f / 9.f, nearPlane, farPlane);
 }
 

@@ -63,5 +63,4 @@ public:
 	void removeFromDraw(GameObject* o);
 	void render(Camera camera);
 	bool createShaders();
-	void setViewMatrix(Matrix view);
 };

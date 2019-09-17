@@ -22,9 +22,6 @@ Graphics::Graphics()
 	this->sampler = nullptr;
 
 	this->debuger = nullptr;
-	this->fieldOfView = 0.0f;
-	this->screenNear = 0.0f;
-	this->screenDepth = 0.0f;
 	this->debug = nullptr;
 }
 
@@ -264,7 +261,7 @@ void Graphics::render(Camera camera)
 	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	Matrix viewProj = (camera.getViewMatrix() * camera.getProjectionMatrix).Transpose();
+	Matrix viewProj = (camera.getViewMatrix() * camera.getProjectionMatrix()).Transpose();
 	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);
