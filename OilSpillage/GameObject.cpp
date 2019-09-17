@@ -64,6 +64,10 @@ Vector3 GameObject::getPosition() const
 {
 	return this->position;
 }
+Vector3 & GameObject::getPosition()
+{
+	return this->position;
+}
 Vector3 GameObject::getRotation() const
 {
 	return this->rotation;
