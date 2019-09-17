@@ -22,10 +22,6 @@ Graphics::Graphics()
 	this->sampler = nullptr;
 
 	this->debuger = nullptr;
-	this->fieldOfView = 0.0f;
-	this->screenNear = 0.0f;
-	this->screenDepth = 0.0f;
-	this->projection = Matrix();
 	this->debug = nullptr;
 }
 
@@ -176,11 +172,6 @@ bool Graphics::init(Window* window, float fov)
 	deviceContext->RSSetViewports(1, &this->vp);
 
 
-	this->screenNear = 1;
-	this->screenDepth = 1000;
-	this->fieldOfView = fov * (DirectX::XM_PI / 180);
-	this->projection = XMMatrixPerspectiveFovLH(this->fieldOfView, (float)window->width / (float)window->height, this->screenNear, this->screenDepth);
-
 	D3D11_BUFFER_DESC desc = { 0 };
 
 	desc.Usage = D3D11_USAGE_DYNAMIC;
@@ -277,7 +268,7 @@ void Graphics::render(Camera camera)
 	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	Matrix viewProj = (camera.getViewMatrix() * projection).Transpose();
+	Matrix viewProj = (camera.getViewMatrix() * camera.getProjectionMatrix()).Transpose();
 	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);
