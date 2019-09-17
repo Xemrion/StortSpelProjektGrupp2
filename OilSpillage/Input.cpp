@@ -1,14 +1,10 @@
 #include "Input.h"
 
-Input Input::instance = Input();
+Input Input::instance;
 
-Input::Input()
+Input::Input() : keyboardState(), gamePadStates()
 {
 	this->playerKeyboard = -1;
-}
-
-Input::Input(const Input& other)
-{
 }
 
 Input::~Input()
@@ -262,7 +258,7 @@ void Input::Update()
 		instance.keyboardTracker.Reset();
 	}
 
-	for (int i = 0; i < PLAYER_COUNT; i++)
+	for (int i = 0; i < Input::PLAYER_COUNT; i++)
 	{
 		instance.gamePadStates[i] = instance.gamePad.GetState(0);
 
@@ -281,7 +277,7 @@ void Input::Reset()
 {
 	instance.keyboardTracker.Reset();
 
-	for (int i = 0; i < PLAYER_COUNT; i++)
+	for (int i = 0; i < Input::PLAYER_COUNT; i++)
 	{
 		instance.gamePadTrackers[i].Reset();
 	}
@@ -289,40 +285,130 @@ void Input::Reset()
 
 bool Input::CheckButton(Keys key, States state, int player)
 {
-	GamePad::ButtonStateTracker::ButtonState bState = GamePad::ButtonStateTracker::ButtonState::UP;
+	if (player >= Input::PLAYER_COUNT || player < -1) return false;
 
-	switch (state)
+	if (player == instance.playerKeyboard)
 	{
-	case HELD:
-		bState = GamePad::ButtonStateTracker::ButtonState::HELD;
-		break;
-	case PRESSED:
-		bState = GamePad::ButtonStateTracker::ButtonState::PRESSED;
-		break;
-	case RELEASED:
-		bState = GamePad::ButtonStateTracker::ButtonState::RELEASED;
-		break;
+		return CheckButtonKeyboard(key, state);
+	}
+	else if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	{
+		player--;
 	}
 
+	GamePad::ButtonStateTracker::ButtonState bState = static_cast<GamePad::ButtonStateTracker::ButtonState>(state);
 	return CheckButtonGamePad(key, bState, player);
 }
 
 Vector2 Input::GetDirectionL(int player)
 {
-	if (!instance.gamePadStates[player].IsConnected()) return Vector2();
+	Vector2 dir;
 
-	Vector2 dir = Vector2(instance.gamePadStates[player].thumbSticks.leftX, instance.gamePadStates[player].thumbSticks.leftY);
+	if (player >= Input::PLAYER_COUNT || player < -1 || !instance.gamePadStates[player].IsConnected()) return dir;
+
+	if (player == instance.playerKeyboard)
+	{
+		if (CheckButtonKeyboard(L_LEFT, HELD)) dir.x -= 1.0f;
+		if (CheckButtonKeyboard(L_RIGHT, HELD)) dir.x += 1.0f;
+		if (CheckButtonKeyboard(L_UP, HELD)) dir.y += 1.0f;
+		if (CheckButtonKeyboard(L_DOWN, HELD)) dir.y -= 1.0f;
+	}
+	else if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	{
+		player--;
+		dir = Vector2(instance.gamePadStates[player].thumbSticks.leftX, instance.gamePadStates[player].thumbSticks.leftY);
+	}
+
 	dir.Normalize();
-
 	return dir;
+}
+
+float Input::GetStrengthL(int player)
+{
+	float strength = 0.0f;
+
+	if (player >= Input::PLAYER_COUNT || player < -1 || !instance.gamePadStates[player].IsConnected()) return strength;
+
+	if (player == instance.playerKeyboard)
+	{
+		bool left = CheckButtonKeyboard(L_LEFT, HELD);
+		bool right = CheckButtonKeyboard(L_RIGHT, HELD);
+		bool up = CheckButtonKeyboard(L_UP, HELD);
+		bool down = CheckButtonKeyboard(L_DOWN, HELD);
+
+		strength = 1.0f;
+
+		if ((left && right && !up && !down) || (!left && !right && up && down) || (left && right && up && down) || (!left && !right && !up && !down))
+		{
+			strength = 0.0f;
+		}
+	}
+	else if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	{
+		player--;
+		strength = Vector2(instance.gamePadStates[player].thumbSticks.leftX, instance.gamePadStates[player].thumbSticks.leftY).Length();
+		if (strength > 1.0f) strength = 1.0f;
+	}
+
+	return strength;
 }
 
 Vector2 Input::GetDirectionR(int player)
 {
-	if (!instance.gamePadStates[player].IsConnected()) return Vector2();
+	Vector2 dir;
 
-	Vector2 dir = Vector2(instance.gamePadStates[player].thumbSticks.rightX, instance.gamePadStates[player].thumbSticks.rightY);
+	if (player >= Input::PLAYER_COUNT || player < -1 || !instance.gamePadStates[player].IsConnected()) return dir;
+
+	if (player == instance.playerKeyboard)
+	{
+		if (CheckButtonKeyboard(R_LEFT, HELD)) dir.x -= 1.0f;
+		if (CheckButtonKeyboard(R_RIGHT, HELD)) dir.x += 1.0f;
+		if (CheckButtonKeyboard(R_UP, HELD)) dir.y += 1.0f;
+		if (CheckButtonKeyboard(R_DOWN, HELD)) dir.y -= 1.0f;
+	}
+	else if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	{
+		player--;
+		dir = Vector2(instance.gamePadStates[player].thumbSticks.rightX, instance.gamePadStates[player].thumbSticks.rightY);
+	}
+
 	dir.Normalize();
-
 	return dir;
+}
+
+float Input::GetStrengthR(int player)
+{
+	float strength = 0.0f;
+
+	if (player >= Input::PLAYER_COUNT || player < -1 || !instance.gamePadStates[player].IsConnected()) return strength;
+
+	if (player == instance.playerKeyboard)
+	{
+		bool left = CheckButtonKeyboard(R_LEFT, HELD);
+		bool right = CheckButtonKeyboard(R_RIGHT, HELD);
+		bool up = CheckButtonKeyboard(R_UP, HELD);
+		bool down = CheckButtonKeyboard(R_DOWN, HELD);
+
+		strength = 1.0f;
+
+		if ((left && right && !up && !down) || (!left && !right && up && down) || (left && right && up && down) || (!left && !right && !up && !down))
+		{
+			strength = 0.0f;
+		}
+	}
+	else if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	{
+		player--;
+		strength = Vector2(instance.gamePadStates[player].thumbSticks.rightX, instance.gamePadStates[player].thumbSticks.rightY).Length();
+		if (strength > 1.0f) strength = 1.0f;
+	}
+
+	return strength;
+}
+
+void Input::setKeyboardPlayerID(int player)
+{
+	if (player >= Input::PLAYER_COUNT || player < -1) return;
+
+	instance.playerKeyboard = player;
 }
