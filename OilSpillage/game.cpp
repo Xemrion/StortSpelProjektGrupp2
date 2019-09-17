@@ -1,12 +1,28 @@
 #include "game.h"
+#include "Input.h"
 Graphics Game::graphics = Graphics();
 
 void Game::addQuad(int x)
 {
 	GameObject* object2 = new GameObject;
-	object2->mesh = graphics.getMeshPointer("sda");
+	object2->mesh = graphics.getMeshPointer("Cube");
+	object2->setColor(Vector4(0, 1, 0, 1));
 	graphics.addToDraw(object2);
 	object2->setPosition(Vector3(static_cast<float>(x), 0.0f, 0.0f));
+	object2->setTexture(graphics.getTexturePointer("brickwall.tga"));
+
+}
+
+Game::Game()
+{
+
+}
+
+Game::~Game()
+{
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 }
 
 void Game::init(Window* window)
@@ -14,7 +30,6 @@ void Game::init(Window* window)
 	this->window = window; 
 	graphics.init(window, 90);
 	
-	this->keyboard = std::make_unique<Keyboard>();
 	this->mouse = std::make_unique<Mouse>();
 	this->mouse->SetWindow(window->handle);
 	graphics.loadMesh("sda");
@@ -34,7 +49,19 @@ void Game::init(Window* window)
 	testObject2->setPosition(Vector3(-7.0f, 0.0f, 0.0f));
 	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
-	
+
+	aiObject = new AIPlayer();
+	aiObject->mesh = graphics.getMeshPointer("Cube");
+	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
+	graphics.addToDraw(aiObject);
+	//AiTestObject = new GameObject;
+	//AiTestObject->mesh = graphics.getMeshPointer("Cube");
+	//AiTestObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
+	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
+	//graphics.addToDraw(AiTestObject);
+
+
 	player.init();
 }
 
@@ -49,9 +76,10 @@ void Game::run()
 	prevTime = 0;
 	QueryPerformanceCounter((LARGE_INTEGER*)& prevTime);
 
-
+	this->aiObject->SetTarget(&this->player.getVehicle()->getPosition());
 	while (this->window->update())
 	{
+		Input::Update();
 		//Game logic
 		//Graphics
 
@@ -63,32 +91,64 @@ void Game::run()
 
 
 
-		auto kb = this->keyboard->GetState();
 		auto mouse = this->mouse->GetState();
-		if (kb.Escape)
+		if (Input::IsKeyDown_DEBUG(Keyboard::Escape))
 		{
 			//Exit game
 		}
-		if (kb.E)
+		if (Input::IsKeyDown_DEBUG(Keyboard::E))
 			deltaTime /= 4;
 
 
-		if (kb.A)
+		if (Input::IsKeyDown_DEBUG(Keyboard::A))
 			this->testObject->addRotation(Vector3(0.00f, 0.01f * deltaTime * 200, 0.00f));
-		if(kb.D)
+		if(Input::IsKeyDown_DEBUG(Keyboard::D))
 			this->testObject->addRotation(Vector3(0.00f, -0.01f * deltaTime * 200, 0.00f));
-		if (kb.W)
+		if (Input::IsKeyDown_DEBUG(Keyboard::W))
 			this->testObject->addRotation(Vector3(0.01f * deltaTime * 200, 0.00f, 0.00f));
-		if (kb.S)
+		if (Input::IsKeyDown_DEBUG(Keyboard::S))
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
-		player.update(deltaTime, this->keyboard);
+		player.update(deltaTime);
+		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
+		this->graphics.render(this->camera);
 		
-		this->graphics.render();
+		std::string textUse;
+
+
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+
+		//imgui button, slider etc
+		ImGui::Begin("Gungame");
+		ImGui::Text("Hold 'V' To move camera with mouse.");
+
+		ImGui::End();
+
+		ImGui::Render();
+
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		
+		player.update(deltaTime);
+		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
+		this->graphics.render(camera);
+
+		/*Vector3 tempPos = AiTestObject->getPosition();
+		Vector4 tempColor = AiTestObject->getColor();
+		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);
+		AiTestObject->setPosition(tempPos);
+		AiTestObject->setColor(tempColor);*/
+		this->aiObject->Update(deltaTime);
 		//deltaTime reset
 		prevTime = curTime;
+		
+		this->graphics.presentScene();
+
 	}
 	delete this->testObject;
 	delete this->testObject2;
+	//delete this->AiTestObject;
+	delete this->aiObject;
 }

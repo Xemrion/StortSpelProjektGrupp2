@@ -1,6 +1,7 @@
 #include "window.h"
 #include"Mouse.h"
 #include"Keyboard.h"
+#include"ImGui/imgui.h"
 bool Window::init(HINSTANCE hInstance, int width, int height) 
 {
 
@@ -36,9 +37,12 @@ bool Window::init(HINSTANCE hInstance, int width, int height)
 
 	return true;
 }
-
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lParam);
 LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 {
+
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
 	switch (message)
 	{
 	case WM_DESTROY:

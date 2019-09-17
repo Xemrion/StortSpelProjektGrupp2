@@ -1,5 +1,6 @@
 #include "Vehicle.h"
 #include"game.h"
+#include "Input.h"
 
 Vehicle::Vehicle()
 {
@@ -46,19 +47,13 @@ void Vehicle::init()
 	
 }
 
-void Vehicle::update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb)
+void Vehicle::update(float deltaTime)
 {
-	
-
-
-	auto key = kb->GetState();
-
-
 	tempTargetRotation = targetRotation;
 
 
 	//Current rotation of vehicle
-	float vehicleRotation = fmod((vehicle->getRotation().y * (180 / DirectX::XM_PI)), 360);
+	float vehicleRotation = fmod((vehicle->getRotation().y * (180 / DirectX::XM_PI)), 360.0f);
 	if (vehicleRotation < 0)
 		vehicleRotation += 360;
 		
@@ -68,34 +63,34 @@ void Vehicle::update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb)
 	float dy = -cos((DirectX::XM_PI / 180)* vehicleRotation);
 
 
-	if (key.W) {
+	if (Input::IsKeyDown_DEBUG(Keyboard::W)) {
 		targetRotation = 0;
 	}
-	if (key.A) {
+	if (Input::IsKeyDown_DEBUG(Keyboard::A)) {
 		targetRotation = 270;
 	}
-	if (key.S) {
+	if (Input::IsKeyDown_DEBUG(Keyboard::S)) {
 		targetRotation = 180;
 	}
-	if (key.D) {
+	if (Input::IsKeyDown_DEBUG(Keyboard::D)) {
 		targetRotation = 90;
 	}
-	if (key.W && key.A) {
+	if (Input::IsKeyDown_DEBUG(Keyboard::W) && Input::IsKeyDown_DEBUG(Keyboard::A)) {
 		targetRotation = 315;
 	}
-	if (key.A && key.S) {
+	if (Input::IsKeyDown_DEBUG(Keyboard::A) && Input::IsKeyDown_DEBUG(Keyboard::S)) {
 		targetRotation = 225;
 	}
-	if (key.S && key.D) {
+	if (Input::IsKeyDown_DEBUG(Keyboard::S) && Input::IsKeyDown_DEBUG(Keyboard::D)) {
 		targetRotation = 135;
 	}
-	if (key.D && key.W) {
+	if (Input::IsKeyDown_DEBUG(Keyboard::D) && Input::IsKeyDown_DEBUG(Keyboard::W)) {
 		targetRotation = 45;
 	}
 	//Driving mode: Tryck åt det hållet du vill åka, semi-realistic
 	if (drivingMode == 0) {
 	
-		if (key.W || key.A || key.S || key.D) {
+		if (Input::IsKeyDown_DEBUG(Keyboard::W) || Input::IsKeyDown_DEBUG(Keyboard::A) || Input::IsKeyDown_DEBUG(Keyboard::S) || Input::IsKeyDown_DEBUG(Keyboard::D)) {
 			this->velocity.x += dx * 2 *deltaTime* 4000;
 			this->velocity.y += dy * 2 * deltaTime * 4000;
 
@@ -127,7 +122,7 @@ void Vehicle::update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb)
 			}
 			if (velocity.y < -topSpeed * 0.75f && velocity.x < -topSpeed * 0.75f) {
 				velocity.y = -topSpeed * 0.75f;
-				velocity.x < -topSpeed * 0.75f;
+				velocity.x = -topSpeed * 0.75f;
 			}
 
 
@@ -193,7 +188,7 @@ void Vehicle::update(float deltaTime, std::unique_ptr<DirectX::Keyboard> &kb)
 	float hypoC = sqrt(pow(dx, 2) + (pow(dy, 2)));
 	float driftForce = velocity.x * (dy / hypoC) + velocity.y * -(dx / hypoC);
 	if (drivingMode != 2) {
-		if (key.W || key.A || key.S || key.D) {
+		if (Input::IsKeyDown_DEBUG(Keyboard::W) || Input::IsKeyDown_DEBUG(Keyboard::A) || Input::IsKeyDown_DEBUG(Keyboard::S) || Input::IsKeyDown_DEBUG(Keyboard::D)) {
 			if (driftForce < 0) {
 				this->velocity.x -= -((dy / hypoC) * 8000 * deltaTime);
 				this->velocity.y -= -(-((dx / hypoC) * 8000 * deltaTime));
