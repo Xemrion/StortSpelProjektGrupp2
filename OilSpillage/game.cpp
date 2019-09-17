@@ -50,12 +50,16 @@ void Game::init(Window* window)
 	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
 
-	
-	AiTestObject = new GameObject;
-	AiTestObject->mesh = graphics.getMeshPointer("Cube");
-	AiTestObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
-	AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
-	graphics.addToDraw(AiTestObject);
+	aiObject = new AIPlayer();
+	aiObject->mesh = graphics.getMeshPointer("Cube");
+	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
+	graphics.addToDraw(aiObject);
+	//AiTestObject = new GameObject;
+	//AiTestObject->mesh = graphics.getMeshPointer("Cube");
+	//AiTestObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
+	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
+	//graphics.addToDraw(AiTestObject);
 
 
 	player.init();
@@ -72,7 +76,7 @@ void Game::run()
 	prevTime = 0;
 	QueryPerformanceCounter((LARGE_INTEGER*)& prevTime);
 
-
+	this->aiObject->SetTarget(&this->player.getVehicle()->getPosition());
 	while (this->window->update())
 	{
 		Input::Update();
@@ -131,11 +135,12 @@ void Game::run()
 		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
 		this->graphics.render(camera);
 
-		Vector3 tempPos = AiTestObject->getPosition();
+		/*Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();
 		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);
 		AiTestObject->setPosition(tempPos);
-		AiTestObject->setColor(tempColor);
+		AiTestObject->setColor(tempColor);*/
+		this->aiObject->Update(deltaTime);
 		//deltaTime reset
 		prevTime = curTime;
 		
@@ -144,5 +149,6 @@ void Game::run()
 	}
 	delete this->testObject;
 	delete this->testObject2;
-	delete this->AiTestObject;
+	//delete this->AiTestObject;
+	delete this->aiObject;
 }

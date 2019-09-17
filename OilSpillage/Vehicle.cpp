@@ -4,10 +4,11 @@
 
 Vehicle::Vehicle()
 {
-	velocity = Vector2(0.0f, 0.0f);
-	targetRotation = 0;
-	drivingMode = 0;
-	topSpeed = 4700;
+	this->vehicle = nullptr;
+	this->velocity = Vector2(0.0f, 0.0f);
+	this->targetRotation = 0;
+	this->drivingMode = 0;
+	this->topSpeed = 4700;
 	this->counter = 0.0f;
 	this->rotateAcceleration = 0.0f;
 	this->rotationSmoother = 1.0f;
@@ -41,7 +42,7 @@ void Vehicle::update(float deltaTime)
 
 
 	//Current rotation of vehicle
-	float vehicleRotation = fmod((vehicle->getRotation().y * (180 / DirectX::XM_PI)), 360);
+	float vehicleRotation = fmod((vehicle->getRotation().y * (180 / DirectX::XM_PI)), 360.0f);
 	if (vehicleRotation < 0)
 		vehicleRotation += 360;
 		

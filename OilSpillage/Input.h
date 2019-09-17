@@ -35,10 +35,10 @@ enum Keys {
 };
 
 enum States {
-	UP, //Released
-	HELD, //Pressed
-	PRESSED, //Pressed once
-	RELEASED //Released once
+	UP = 0, //Released
+	HELD = 1, //Pressed
+	RELEASED = 2, //Released once
+	PRESSED = 3 //Pressed once
 };
 
 class Input
@@ -56,7 +56,6 @@ private:
 	GamePad::ButtonStateTracker gamePadTrackers[PLAYER_COUNT];
 
 	Input();
-	Input(const Input& other);
 
 	static bool CheckButtonKeyboard(Keys key, States state);
 	static bool CheckButtonGamePad(Keys key, GamePad::ButtonStateTracker::ButtonState state, int playerId);
@@ -71,7 +70,11 @@ public:
 
 	static bool CheckButton(Keys key, States state, int player);
 	static Vector2 GetDirectionL(int player);
+	static float GetStrengthL(int player);
 	static Vector2 GetDirectionR(int player);
+	static float GetStrengthR(int player);
+
+	static void setKeyboardPlayerID(int player);
 };
 
 #endif // !INPUT_H

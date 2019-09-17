@@ -5,7 +5,9 @@
 #include <math.h>
 
 using namespace DirectX::SimpleMath; 
-class GameObject {
+class GameObject 
+{
+protected:
 	Vector3 position;
 	Vector3 scale=Vector3(1,1,1);
 	Vector3 rotation;
@@ -26,6 +28,7 @@ public:
 	void setColor(Vector4 aColor);
 	Vector4 getColor()const;
 	Vector3 getPosition()const;
+	Vector3& getPosition();
 	Vector3 getRotation()const;
 	Vector3 getScale()const;
 	
