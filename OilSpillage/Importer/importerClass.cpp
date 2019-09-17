@@ -233,7 +233,7 @@ bool Importer::loadLights(const char * filename)
 
 		}
 
-		infile.ignore(sizeof(Camera) * h.cameraCount);
+		infile.ignore(sizeof(FormatCamera) * h.cameraCount);
 		infile.read((char*)this->loadedLights, sizeof(Light) * h.lightCount);
 
 		infile.close();
@@ -262,7 +262,7 @@ bool Importer::loadCameras(const char * filename)
 		infile.read((char*)&h, sizeof(MyFormat));
 
 		this->header.cameraCount = h.cameraCount;
-		this->loadedCameras = new Camera[h.cameraCount];
+		this->loadedCameras = new FormatCamera[h.cameraCount];
 
 		for (int i = 0; i < h.meshCount; i++)
 		{
@@ -295,7 +295,7 @@ bool Importer::loadCameras(const char * filename)
 
 		}
 
-		infile.read((char*)loadedCameras, sizeof(Camera) * h.cameraCount);
+		infile.read((char*)loadedCameras, sizeof(FormatCamera) * h.cameraCount);
 
 		infile.close();
 		return true;

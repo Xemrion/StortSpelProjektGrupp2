@@ -8,7 +8,7 @@ struct MyFormat {
 	int groupCount = 0;
 };
 
-struct Camera {
+struct FormatCamera {
 	float x, y, z;
 	float upX, upY, upZ;
 	float lookAtX, lookAtY, lookAtZ;
