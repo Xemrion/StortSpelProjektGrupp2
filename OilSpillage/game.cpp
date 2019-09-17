@@ -2,16 +2,6 @@
 #include "Input.h"
 Graphics Game::graphics = Graphics();
 
-Game::Game()
-{
-
-}
-
-Game::~Game()
-{
-
-}
-
 void Game::addQuad(int x)
 {
 	GameObject* object2 = new GameObject;
