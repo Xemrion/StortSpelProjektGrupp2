@@ -18,10 +18,9 @@
 enum Shapes
 {
 	SHAPE_CUBE,
-	SHAPE_SPHERE,
-	SHAPE_TRIANGLE,
 	SHAPE_QUAD
 };
+
 class Graphics {
 	Window* window;
 	IDXGISwapChain* swapChain;
@@ -39,18 +38,14 @@ class Graphics {
 	ID3D11Buffer* worldBuffer;
 	ID3D11Buffer* colorBuffer;
 
-
-	//ID3D11PixelShader* pxShader;
-	//ID3D11VertexShader* vxShader;
-	//ID3D11InputLayout* vertexLayout;
 	ID3D11SamplerState* sampler;
 	std::unordered_map<const char*, Mesh> meshes;
 	std::unordered_map<const char*, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
 
-	ShaderClass shader_default;
-	ShaderClass shader_debug;
-	Debug* debuger;
+	ShaderClass shaderDefault;
+	ShaderClass shaderDebug;
+	Debug* debugger;
 	ID3D11Debug* debug;
 public:
 	Graphics();
