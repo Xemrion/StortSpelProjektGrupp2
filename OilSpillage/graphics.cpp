@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include <algorithm>
-
+#include"Importer/importerClass.h"
+#include<cstring>
 Graphics::Graphics()
 {
 	this->window = nullptr;
@@ -403,39 +404,69 @@ bool Graphics::createShaders()
 	return true;
 }
 
-void Graphics::loadMesh(const char* fileName)
+void Graphics::loadMesh(std::string fileName)
 {
 	Mesh newMesh;
 	if (meshes.find(fileName) == meshes.end())
 	{
-		meshes[fileName] = newMesh;
-		meshes[fileName].loadMesh(fileName);
+		
+		Importer imp;
+		if (imp.loadMesh(fileName.c_str()))
+		{
+			meshes[fileName] = newMesh;
+			Vertex* vertices = imp.getVertices();
+			std::vector<Vertex3D> tempVec;
+			Vertex3D vertex;
+			for (int i = 0; i < imp.getVertexCount(); i++)
+			{
+				vertex.position.x = vertices[i].x;
+				vertex.position.y = vertices[i].y;
+				vertex.position.z = vertices[i].z;
 
-		int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
-		UINT stride = sizeof(Vertex3D);
+				vertex.normal.x = vertices[i].nx;
+				vertex.normal.y = vertices[i].ny;
+				vertex.normal.z = vertices[i].nz;
 
-		D3D11_BUFFER_DESC vBufferDesc;
-		ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+				vertex.uv.x = vertices[i].u;
+				vertex.uv.y = vertices[i].v;
 
-		vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vBufferDesc.ByteWidth = bufferSize;
-		vBufferDesc.CPUAccessFlags = 0;
-		vBufferDesc.MiscFlags = 0;
+				tempVec.push_back(vertex);
+			}
 
-		D3D11_SUBRESOURCE_DATA subData;
-		ZeroMemory(&subData, sizeof(subData));
-		subData.pSysMem = meshes[fileName].vertices.data();
+			meshes[fileName].insertDataToMesh(tempVec);
 
-		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
-		meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
+			UINT stride = sizeof(Vertex3D);
+
+			D3D11_BUFFER_DESC vBufferDesc;
+			ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+			vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vBufferDesc.ByteWidth = bufferSize;
+			vBufferDesc.CPUAccessFlags = 0;
+			vBufferDesc.MiscFlags = 0;
+
+			D3D11_SUBRESOURCE_DATA subData;
+			ZeroMemory(&subData, sizeof(subData));
+			subData.pSysMem = meshes[fileName].vertices.data();
+
+			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+			//meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+		}
 	}
+}
+
+void Graphics::loadModel(std::string fileName)
+{
+	this->loadMesh(fileName + ".bin");
+	this->loadTexture(fileName + ".tga");
 }
 
 void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 {
 	Mesh newMesh;
-	const char* fileName;
+	std::string fileName;
 	switch (shape)
 	{
 	case SHAPE_CUBE:
@@ -584,13 +615,13 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 	
 }
 
-bool Graphics::loadTexture(const char* fileName)
+bool Graphics::loadTexture(std::string fileName)
 {
 	if (textures.find(fileName) == textures.end())
 	{
 		Texture* newTexture = new Texture();
 
-		if (!newTexture->Initialize(this->device, this->deviceContext, fileName, -1))
+		if (!newTexture->Initialize(this->device, this->deviceContext, fileName.c_str(), -1))
 		{
 			delete newTexture;
 			return false;
@@ -604,6 +635,11 @@ bool Graphics::loadTexture(const char* fileName)
 
 const Mesh* Graphics::getMeshPointer(const char* fileName)
 {
+
+	if (meshes.find(fileName) == meshes.end())
+	{
+		return nullptr;
+	}
 	return &meshes[fileName];
 }
 

@@ -46,7 +46,7 @@ private:
 
 	MyFormat header;
 	LoadedMesh* loadedMeshes;
-	Camera* loadedCameras;
+	FormatCamera* loadedCameras;
 	Light* loadedLights;
 	Group* loadedGroups;
 

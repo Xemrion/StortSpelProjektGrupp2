@@ -14,7 +14,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #include "Graphic/Shaders.h"
 #include "Resources/Debug.h"
-
+#include<string>
 enum Shapes
 {
 	SHAPE_CUBE,
@@ -44,8 +44,8 @@ class Graphics {
 	//ID3D11VertexShader* vxShader;
 	//ID3D11InputLayout* vertexLayout;
 	ID3D11SamplerState* sampler;
-	std::unordered_map<const char*, Mesh> meshes;
-	std::unordered_map<const char*, Texture*> textures;
+	std::unordered_map<std::string, Mesh> meshes;
+	std::unordered_map<std::string, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
 
 	ShaderClass shader_default;
@@ -60,9 +60,10 @@ public:
 	Graphics();
 	~Graphics();
 	bool init(Window* window, float fov);
-	void loadMesh(const char* fileName);
+	void loadMesh(std::string fileName);
+	void loadModel(std::string fileName);
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
-	bool loadTexture(const char* fileName);
+	bool loadTexture(std::string fileName);
 	const Mesh* getMeshPointer(const char* fileName);
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
