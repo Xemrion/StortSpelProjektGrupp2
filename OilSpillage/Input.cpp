@@ -435,7 +435,7 @@ float Input::GetStrengthR(int player)
 	return strength;
 }
 
-void Input::setKeyboardPlayerID(int player)
+void Input::SetKeyboardPlayerID(int player)
 {
 	if (player >= Input::PLAYER_COUNT || player < -1) return;
 
