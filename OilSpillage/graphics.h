@@ -14,6 +14,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #include "Graphic/Shaders.h"
 #include "Resources/Debug.h"
+#include "Lights.h"
 
 enum Shapes
 {
@@ -37,11 +38,15 @@ class Graphics {
 	ID3D11Buffer* viewProjBuffer;
 	ID3D11Buffer* worldBuffer;
 	ID3D11Buffer* colorBuffer;
+	ID3D11Buffer* lightBuffer;
 
 	ID3D11SamplerState* sampler;
 	std::unordered_map<const char*, Mesh> meshes;
 	std::unordered_map<const char*, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
+	std::vector<PointLight> pointLights;
+	size_t maxPointLights = 20;
+	
 
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
@@ -58,6 +63,8 @@ public:
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
+	void addPointLight(PointLight light);
+	void clearPointLights();
 	void presentScene();
 	void render(Camera camera);
 	bool createShaders();

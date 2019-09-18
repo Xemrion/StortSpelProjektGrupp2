@@ -32,7 +32,8 @@ VS_OUT main(VS_IN input)
 	output.Pos = mul(output.Pos, viewProj);
 	output.wPos = mul(float4(input.Pos,1.0f),world);
 	output.Tex = input.Tex;
-	output.Normal = float4(input.Normal, 1.0f);
-
+	output.Normal = mul(float4(input.Normal, 0.0f), world);
+	output.Normal.xyz = normalize(output.Normal.xyz);
+	
 	return output;
 }

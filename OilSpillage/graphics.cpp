@@ -198,6 +198,18 @@ bool Graphics::init(Window* window, float fov)
 	if (FAILED(hr))
 		return false;
 
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = static_cast<UINT>((sizeof(Vector4) * 2) * maxPointLights);
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &lightBuffer);
+	if (FAILED(hr))
+		return false;
+
+
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
 	rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
@@ -270,6 +282,10 @@ void Graphics::render(Camera camera)
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);
 
+	hr = deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	ZeroMemory(mappedResource.pData, sizeof(PointLight) * maxPointLights);
+	CopyMemory(mappedResource.pData, pointLights.data(), min(maxPointLights, pointLights.size()) * sizeof(PointLight));
+	deviceContext->Unmap(lightBuffer, 0);
 
 	//set up Shaders
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.GetInputLayout());
@@ -307,6 +323,7 @@ void Graphics::render(Camera camera)
 		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
 		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
 		deviceContext->PSSetConstantBuffers(0, 1, &this->colorBuffer);
+		deviceContext->PSSetConstantBuffers(2, 1, &this->lightBuffer);
 		deviceContext->Draw(vertexCount, 0);
 	}
 
@@ -346,7 +363,7 @@ bool Graphics::createShaders()
 	{
 		{"SV_POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
 		{"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
-		{"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
 	};
 
 
@@ -602,6 +619,16 @@ void Graphics::addToDraw(GameObject* o)
 void Graphics::removeFromDraw(GameObject* o)
 {
 	std::find(drawableObjects.begin(), drawableObjects.end(), o);
+}
+
+void Graphics::addPointLight(PointLight light)
+{
+	pointLights.push_back(light);
+}
+
+void Graphics::clearPointLights()
+{
+	pointLights.clear();
 }
 
 void Graphics::presentScene()
