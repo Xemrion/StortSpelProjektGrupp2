@@ -26,6 +26,7 @@ VS_OUTPUT main(VS_INPUT input)
 {
 	VS_OUTPUT output;
 	output.outPosition = mul(float4(input.inPos, 1.0f), world);
+	output.outPosition = mul(output.outPosition, viewProj);
 	output.outColor = input.inColor;
 	return output;
 }

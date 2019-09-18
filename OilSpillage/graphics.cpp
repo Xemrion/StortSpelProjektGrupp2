@@ -2,6 +2,7 @@
 #include <algorithm>
 #include"Importer/importerClass.h"
 #include<cstring>
+
 Graphics::Graphics()
 {
 	this->window = nullptr;
@@ -60,7 +61,7 @@ Graphics::~Graphics()
 	}
 }
 
-bool Graphics::init(Window* window, float fov)
+bool Graphics::init(Window* window, float fov, Camera theCamera)
 {
 	this->window = window;
 	HRESULT result;
@@ -255,7 +256,7 @@ bool Graphics::init(Window* window, float fov)
 
 
 	createShaders();
-	debugger = new Debug(deviceContext, device);
+	debuger = new Debug(deviceContext, device, theCamera);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -265,6 +266,11 @@ bool Graphics::init(Window* window, float fov)
 	ImGui::StyleColorsDark();
 
 	return true;
+}
+
+Debug* Graphics::getDebuger()
+{
+	return this->debuger;
 }
 
 void Graphics::render(Camera camera)
@@ -335,9 +341,11 @@ void Graphics::render(Camera camera)
 	deviceContext->PSSetShader(this->shaderDebug.ps.GetShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDebug.vs.GetShader(), nullptr, 0);
 
-	debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(3, 2, 0 ), XMFLOAT3(1, 1, 0));
-	debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
-	//debugger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
+	debuger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
+	debuger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
+	//debuger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
+	
+	// Present the back buffer to the screen since rendering is complete.
 }
 
 bool Graphics::createShaders()
@@ -438,9 +446,12 @@ void Graphics::loadMesh(std::string fileName)
 
 				tempVec.push_back(vertex);
 			}
-
+			
 			meshes[fileName].insertDataToMesh(tempVec);
-
+			AABB aabb;
+			imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z);
+			imp.getMinBBox(aabb.minPos.x, aabb.minPos.y, aabb.minPos.z);
+			meshes[fileName].setAABB(aabb);
 			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
 			UINT stride = sizeof(Vertex3D);
 
