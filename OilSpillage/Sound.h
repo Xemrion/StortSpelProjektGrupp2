@@ -8,7 +8,7 @@ class Sound
 {
 private:
 	static Sound instance;
-	AudioEngine engine;
+	//AudioEngine engine;
 
 	Sound();
 
