@@ -28,4 +28,5 @@ public:
 	void init();
 	void update(float deltaTime);
 	GameObject* getVehicle() { return this->vehicle; }
+	float getAcceleratorX();
 };

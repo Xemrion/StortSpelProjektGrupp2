@@ -216,20 +216,20 @@ void Vehicle::update(float deltaTime)
 
 	
 	//bodyRotation
-	if (accelerator.x < vehicle->getPosition().x) {
-		accelerator.x += 1.0f * deltaTime;
+	if (bodyRotation->getPosition().x < vehicle->getPosition().x) {
+		accelerator.x += 0.01f * deltaTime;
 	}
 	else {
-		accelerator.x -= 1.0f * deltaTime;
+		accelerator.x -= 0.01f * deltaTime;
 	}
-	if (accelerator.z < vehicle->getPosition().z) {
-		accelerator.z += 1.0f * deltaTime;
+	if (bodyRotation->getPosition().z < vehicle->getPosition().z) {
+		accelerator.z += 0.01f * deltaTime;
 	}
 	else {
-		accelerator.z -= 1.0f * deltaTime;
+		accelerator.z -= 0.01f * deltaTime;
 	}
-
-
+	accelerator.x /= (1 + (0.001f * 3000 * deltaTime));
+	accelerator.z /= (1 + (0.001f * 3000 * deltaTime));
 
 	float dx2 = cos((DirectX::XM_PI / 180) * vehicleRotation);
 	float dy2 = sin((DirectX::XM_PI / 180) * vehicleRotation);
@@ -237,8 +237,13 @@ void Vehicle::update(float deltaTime)
 	float hypoC2 = sqrt(pow(dx2, 2) + (pow(dy2, 2)));
 	float accelForce2 = velocity.x * (dy2 / hypoC2) + velocity.y * -(dx2 / hypoC2);
 
+	//this->bodyRotation->move(Vector3(accelerator.x*deltaTime*200, 0.00f, accelerator.z * deltaTime*200));
 	this->bodyRotation->move(Vector3((velocity.x* deltaTime * 0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f)));
-
 	//this->bodyRotation->setPosition(Vector3(accelerator.x, accelerator.y+1, accelerator.z));
-	this->bodyRotation->setRotation(Vector3(vehicle->getRotation().x + accelForce2 * 0.0001, vehicle->getRotation().y , vehicle->getRotation().z + driftForce * 0.0001));
+	this->bodyRotation->setRotation(Vector3(vehicle->getRotation().x, vehicle->getRotation().y , vehicle->getRotation().z + driftForce * 0.0001));
+}
+
+float Vehicle::getAcceleratorX()
+{
+	return accelerator.x;
 }
