@@ -145,6 +145,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="TestAI.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -175,6 +176,7 @@
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Resources\Debug.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="TestAI.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
