@@ -74,7 +74,7 @@ public:
 	static Vector2 GetDirectionR(int player);
 	static float GetStrengthR(int player);
 
-	static void setKeyboardPlayerID(int player);
+	static void SetKeyboardPlayerID(int player);
 };
 
 #endif // !INPUT_H
