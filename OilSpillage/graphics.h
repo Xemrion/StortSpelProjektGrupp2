@@ -14,6 +14,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #include "Graphic/Shaders.h"
 #include "Resources/Debug.h"
+#include "Camera.h"
 #include<string>
 enum Shapes
 {
@@ -55,7 +56,8 @@ class Graphics {
 public:
 	Graphics();
 	~Graphics();
-	bool init(Window* window, float fov);
+	bool init(Window* window, float fov, Camera theCamera);
+	Debug* getDebuger();
 	void loadMesh(std::string fileName);
 	void loadModel(std::string fileName);
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));

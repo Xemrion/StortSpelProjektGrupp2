@@ -7,17 +7,17 @@ Matrix GameObject::getTransform() {
 	Matrix translate = Matrix::CreateTranslation(position);
 	Matrix scaleM = Matrix::CreateScale(scale);
 	return scaleM * mtr  * translate;
-};
+}
 
 void GameObject::setPosition(Vector3 newPos)
 {
 	this->position = newPos;
-};
+}
 
 void GameObject::move(Vector3 addPos)
 {
 	this->position += addPos;
-};
+}
 
 void GameObject::addRotation(Vector3 addRotaiton)
 {
@@ -26,7 +26,7 @@ void GameObject::addRotation(Vector3 addRotaiton)
 	this->rotation.y = fmod(this->rotation.y, 2 * DirectX::XM_PI);
 	this->rotation.z = fmod(this->rotation.z, 2 * DirectX::XM_PI);
 
-};
+}
 
 void GameObject::setRotation(Vector3 newRotation)
 {
@@ -34,27 +34,27 @@ void GameObject::setRotation(Vector3 newRotation)
 	this->rotation.x = fmod(this->rotation.x, 2 * DirectX::XM_PI);
 	this->rotation.y = fmod(this->rotation.y, 2 * DirectX::XM_PI);
 	this->rotation.z = fmod(this->rotation.z, 2 * DirectX::XM_PI);
-};
+}
 
 void GameObject::setScale(Vector3 newScale)
 {
 	this->scale = newScale;
-};
+}
 
 Texture* GameObject::getTexture()
 {
 	return this->texture;
-};
+}
 
 void GameObject::setTexture(Texture* aTexture)
 {
 	this->texture = aTexture;
-};
+}
 
 void GameObject::setColor(Vector4 aColor)
 {
 	this->color = aColor;
-};
+}
 
 Vector4 GameObject::getColor()const
 {
@@ -76,4 +76,7 @@ Vector3 GameObject::getScale() const
 {
 	return this->scale;
 }
-;
+AABB GameObject::getTheAABB() const
+{
+	return this->mesh->getAABB().scale(this->scale);
+}
