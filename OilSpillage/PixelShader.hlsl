@@ -17,8 +17,9 @@ cbuffer CB_COLOR : register(b0)
 	float4 color;
 }
 
-cbuffer PointLights : register(b2)
+cbuffer Lights : register(b2)
 {
+	float4 sunVector;
 	PointLight pointLights[20];
 }
 
@@ -30,8 +31,7 @@ float4 main(VS_OUT input) : SV_Target
 	float3 normal = input.NormalWS.xyz;
 	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
 
-	float3 sunVector = normalize(float3(-0.55, 1.0, -0.725));
-	float ambient = max(dot(input.NormalWS.xyz, sunVector), float3(0.2, 0.2, 0.2));
+	float ambient = max(dot(input.NormalWS.xyz, sunVector.xyz), float3(0.2, 0.2, 0.2));
 
 	float4 diffuse = float4(0.0, 0.0, 0.0, 1.0);
 	for (int i = 0; i < 20; ++i) 
@@ -49,5 +49,7 @@ float4 main(VS_OUT input) : SV_Target
 	}
 
 	float4 outColor = (texColor + color) * (diffuse + ambient);
+
+	return float4(ambient, ambient, ambient, 1.0);
 	return outColor / (outColor + float4(1.0, 1.0, 1.0, 0.0));
 }

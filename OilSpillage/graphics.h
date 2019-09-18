@@ -46,6 +46,7 @@ class Graphics {
 	std::unordered_map<std::string, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
 	std::vector<PointLight> pointLights;
+	Vector4 sunVector = Vector4(0.0, 1.0, 0.0, 0.0);
 	size_t maxPointLights = 20;
 	
 
@@ -67,6 +68,8 @@ public:
 	void removeFromDraw(GameObject* o);
 	void addPointLight(PointLight light);
 	void clearPointLights();
+	void setSunVector(Vector3 vectorToSun);
+	Vector3 getSunVector();
 	void presentScene();
 	void render(Camera camera);
 	bool createShaders();

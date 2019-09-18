@@ -203,7 +203,7 @@ bool Graphics::init(Window* window, float fov)
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>((sizeof(Vector4) * 2) * maxPointLights);
+	desc.ByteWidth = static_cast<UINT>((sizeof(Vector4) * 2) * maxPointLights + sizeof(Vector4));
 	desc.StructureByteStride = 0;
 
 	hr = device->CreateBuffer(&desc, 0, &lightBuffer);
@@ -284,8 +284,11 @@ void Graphics::render(Camera camera)
 	deviceContext->Unmap(viewProjBuffer, 0);
 
 	hr = deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	ZeroMemory(mappedResource.pData, sizeof(PointLight) * maxPointLights);
-	CopyMemory(mappedResource.pData, pointLights.data(), min(maxPointLights, pointLights.size()) * sizeof(PointLight));
+	void* dataPtr = mappedResource.pData;
+	ZeroMemory(dataPtr, sizeof(PointLight) * maxPointLights);
+	CopyMemory(dataPtr, &sunVector, sizeof(Vector4));
+	dataPtr = (void*)((size_t)dataPtr + sizeof(Vector4));
+	CopyMemory(dataPtr, pointLights.data(), min(maxPointLights, pointLights.size()) * sizeof(PointLight));
 	deviceContext->Unmap(lightBuffer, 0);
 
 	//set up Shaders
@@ -665,6 +668,17 @@ void Graphics::addPointLight(PointLight light)
 void Graphics::clearPointLights()
 {
 	pointLights.clear();
+}
+
+void Graphics::setSunVector(Vector3 vectorToSun)
+{
+	vectorToSun.Normalize();
+	sunVector = Vector4(vectorToSun.x, vectorToSun.y, vectorToSun.z, 0.0);
+}
+
+Vector3 Graphics::getSunVector()
+{
+	return Vector3(sunVector);
 }
 
 void Graphics::presentScene()
