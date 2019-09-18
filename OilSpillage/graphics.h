@@ -59,7 +59,7 @@ public:
 	Graphics();
 	~Graphics();
 	bool init(Window* window, float fov, Camera theCamera);
-	Debug* getDebuger();
+	Debug* getdebugger();
 	void loadMesh(std::string fileName);
 	void loadModel(std::string fileName);
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));

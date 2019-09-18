@@ -256,7 +256,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 
 
 	createShaders();
-	debuger = new Debug(deviceContext, device, theCamera);
+	debugger = new Debug(deviceContext, device, theCamera);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -268,9 +268,9 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	return true;
 }
 
-Debug* Graphics::getDebuger()
+Debug* Graphics::getdebugger()
 {
-	return this->debuger;
+	return this->debugger;
 }
 
 void Graphics::render(Camera camera)
@@ -341,9 +341,9 @@ void Graphics::render(Camera camera)
 	deviceContext->PSSetShader(this->shaderDebug.ps.GetShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDebug.vs.GetShader(), nullptr, 0);
 
-	debuger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
-	debuger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
-	//debuger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
+	debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
+	debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
+	//debugger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
 	
 	// Present the back buffer to the screen since rendering is complete.
 }

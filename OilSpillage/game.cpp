@@ -124,7 +124,7 @@ void Game::run()
 		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
 		this->graphics.render(this->camera);
 		
-		this->graphics.getDebuger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
+		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
 		std::string textUse;
 
 
