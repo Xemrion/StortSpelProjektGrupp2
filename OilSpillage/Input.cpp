@@ -285,13 +285,14 @@ void Input::Reset()
 
 bool Input::CheckButton(Keys key, States state, int player)
 {
-	if (player >= Input::PLAYER_COUNT || player < -1) return false;
+	if (player >= Input::PLAYER_COUNT || player < 0) return false;
 
 	if (player == instance.playerKeyboard)
 	{
 		return CheckButtonKeyboard(key, state);
 	}
-	else if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	
+	if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
 	{
 		player--;
 	}
@@ -304,7 +305,7 @@ Vector2 Input::GetDirectionL(int player)
 {
 	Vector2 dir;
 
-	if (player >= Input::PLAYER_COUNT || player < -1 || !instance.gamePadStates[player].IsConnected()) return dir;
+	if (player >= Input::PLAYER_COUNT || player < 0) return dir;
 
 	if (player == instance.playerKeyboard)
 	{
@@ -313,10 +314,17 @@ Vector2 Input::GetDirectionL(int player)
 		if (CheckButtonKeyboard(L_UP, HELD)) dir.y += 1.0f;
 		if (CheckButtonKeyboard(L_DOWN, HELD)) dir.y -= 1.0f;
 	}
-	else if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	else 
 	{
-		player--;
-		dir = Vector2(instance.gamePadStates[player].thumbSticks.leftX, instance.gamePadStates[player].thumbSticks.leftY);
+		if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+		{
+			player--;
+		}
+
+		if (instance.gamePadStates[player].IsConnected())
+		{
+			dir = Vector2(instance.gamePadStates[player].thumbSticks.leftX, instance.gamePadStates[player].thumbSticks.leftY);
+		}
 	}
 
 	dir.Normalize();
@@ -327,7 +335,7 @@ float Input::GetStrengthL(int player)
 {
 	float strength = 0.0f;
 
-	if (player >= Input::PLAYER_COUNT || player < -1 || !instance.gamePadStates[player].IsConnected()) return strength;
+	if (player >= Input::PLAYER_COUNT || player < 0) return strength;
 
 	if (player == instance.playerKeyboard)
 	{
@@ -343,11 +351,18 @@ float Input::GetStrengthL(int player)
 			strength = 0.0f;
 		}
 	}
-	else if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	else
 	{
-		player--;
-		strength = Vector2(instance.gamePadStates[player].thumbSticks.leftX, instance.gamePadStates[player].thumbSticks.leftY).Length();
-		if (strength > 1.0f) strength = 1.0f;
+		if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+		{
+			player--;
+		}
+
+		if (instance.gamePadStates[player].IsConnected())
+		{
+			strength = Vector2(instance.gamePadStates[player].thumbSticks.leftX, instance.gamePadStates[player].thumbSticks.leftY).Length();
+			if (strength > 1.0f) strength = 1.0f;
+		}
 	}
 
 	return strength;
@@ -357,7 +372,7 @@ Vector2 Input::GetDirectionR(int player)
 {
 	Vector2 dir;
 
-	if (player >= Input::PLAYER_COUNT || player < -1 || !instance.gamePadStates[player].IsConnected()) return dir;
+	if (player >= Input::PLAYER_COUNT || player < 0) return dir;
 
 	if (player == instance.playerKeyboard)
 	{
@@ -366,10 +381,17 @@ Vector2 Input::GetDirectionR(int player)
 		if (CheckButtonKeyboard(R_UP, HELD)) dir.y += 1.0f;
 		if (CheckButtonKeyboard(R_DOWN, HELD)) dir.y -= 1.0f;
 	}
-	else if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	else
 	{
-		player--;
-		dir = Vector2(instance.gamePadStates[player].thumbSticks.rightX, instance.gamePadStates[player].thumbSticks.rightY);
+		if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+		{
+			player--;
+		}
+
+		if (instance.gamePadStates[player].IsConnected())
+		{
+			dir = Vector2(instance.gamePadStates[player].thumbSticks.rightX, instance.gamePadStates[player].thumbSticks.rightY);
+		}
 	}
 
 	dir.Normalize();
@@ -380,7 +402,7 @@ float Input::GetStrengthR(int player)
 {
 	float strength = 0.0f;
 
-	if (player >= Input::PLAYER_COUNT || player < -1 || !instance.gamePadStates[player].IsConnected()) return strength;
+	if (player >= Input::PLAYER_COUNT || player < 0) return strength;
 
 	if (player == instance.playerKeyboard)
 	{
@@ -396,11 +418,18 @@ float Input::GetStrengthR(int player)
 			strength = 0.0f;
 		}
 	}
-	else if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	else
 	{
-		player--;
-		strength = Vector2(instance.gamePadStates[player].thumbSticks.rightX, instance.gamePadStates[player].thumbSticks.rightY).Length();
-		if (strength > 1.0f) strength = 1.0f;
+		if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+		{
+			player--;
+		}
+
+		if (instance.gamePadStates[player].IsConnected())
+		{
+			strength = Vector2(instance.gamePadStates[player].thumbSticks.rightX, instance.gamePadStates[player].thumbSticks.rightY).Length();
+			if (strength > 1.0f) strength = 1.0f;
+		}
 	}
 
 	return strength;
