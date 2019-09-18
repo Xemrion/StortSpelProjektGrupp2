@@ -15,13 +15,14 @@
 #include "Graphic/Shaders.h"
 #include "Resources/Debug.h"
 #include<string>
+#include "Lights.h"
+
 enum Shapes
 {
 	SHAPE_CUBE,
-	SHAPE_SPHERE,
-	SHAPE_TRIANGLE,
 	SHAPE_QUAD
 };
+
 class Graphics {
 	Window* window;
 	IDXGISwapChain* swapChain;
@@ -38,19 +39,19 @@ class Graphics {
 	ID3D11Buffer* viewProjBuffer;
 	ID3D11Buffer* worldBuffer;
 	ID3D11Buffer* colorBuffer;
+	ID3D11Buffer* lightBuffer;
 
-
-	//ID3D11PixelShader* pxShader;
-	//ID3D11VertexShader* vxShader;
-	//ID3D11InputLayout* vertexLayout;
 	ID3D11SamplerState* sampler;
 	std::unordered_map<std::string, Mesh> meshes;
 	std::unordered_map<std::string, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
+	std::vector<PointLight> pointLights;
+	size_t maxPointLights = 20;
+	
 
-	ShaderClass shader_default;
-	ShaderClass shader_debug;
-	Debug* debuger;
+	ShaderClass shaderDefault;
+	ShaderClass shaderDebug;
+	Debug* debugger;
 	ID3D11Debug* debug;
 public:
 	Graphics();
@@ -64,6 +65,8 @@ public:
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
+	void addPointLight(PointLight light);
+	void clearPointLights();
 	void presentScene();
 	void render(Camera camera);
 	bool createShaders();

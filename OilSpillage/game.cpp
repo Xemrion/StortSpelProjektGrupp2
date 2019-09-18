@@ -61,7 +61,11 @@ void Game::init(Window* window)
 	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
 	//graphics.addToDraw(AiTestObject);
 
-
+	
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f));
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f),  50.f));
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f),  50.f));
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f));
 	player.init();
 }
 
