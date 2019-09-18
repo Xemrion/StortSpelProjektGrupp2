@@ -7,7 +7,12 @@ class Vehicle
 {
 private:
 	GameObject* vehicle;
+	GameObject* bodyRotation;
 	DirectX::XMFLOAT2 velocity;
+	
+	DirectX::XMFLOAT3 accelerator;
+	float acceleratorTempX;
+	float acceleratorTempZ;
 	
 	float targetRotation;
 	int drivingMode;
@@ -23,4 +28,5 @@ public:
 	void init();
 	void update(float deltaTime);
 	GameObject* getVehicle() { return this->vehicle; }
+	float getAcceleratorX();
 };

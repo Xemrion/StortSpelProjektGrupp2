@@ -63,6 +63,13 @@ void Game::init(Window* window)
 	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
 	//graphics.addToDraw(AiTestObject);
 
+	
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f));
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f),  50.f));
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f),  50.f));
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f));
+
+	graphics.setSunVector(Vector3(0.55, 1.0, 0.725));
 
 	player.init();
 }
@@ -79,6 +86,8 @@ void Game::run()
 	QueryPerformanceCounter((LARGE_INTEGER*)& prevTime);
 
 	this->aiObject->SetTarget(&this->player.getVehicle()->getPosition());
+	Input::SetKeyboardPlayerID(0);
+
 	while (this->window->update())
 	{
 		Input::Update();
@@ -128,6 +137,18 @@ void Game::run()
 		ImGui::Begin("Gungame");
 		ImGui::Text("Hold 'V' To move camera with mouse.");
 
+		Vector2 lDir = Input::GetDirectionL(0);
+		Vector2 rDir = Input::GetDirectionR(0);
+		float lStr = Input::GetStrengthL(0);
+		float rStr = Input::GetStrengthR(0);
+		bool status[4] = { Input::CheckButton(CONFIRM, UP, 0), Input::CheckButton(CONFIRM, HELD, 0), Input::CheckButton(CONFIRM, RELEASED, 0), Input::CheckButton(CONFIRM, PRESSED, 0) };
+
+		ImGui::Text(("\n-- PLAYER 0 --\nConfirm Status - Up: " + std::to_string(status[0]) + " Held: " + std::to_string(status[1]) + " Released: " + std::to_string(status[2]) + " Pressed: " + std::to_string(status[3])).c_str());
+		ImGui::Text(("L Dir: " + std::to_string(lDir.x) + " " + std::to_string(lDir.y)).c_str());
+		ImGui::Text(("L Str: " + std::to_string(lStr)).c_str());
+		ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
+		ImGui::Text(("R Str: " + std::to_string(rStr)).c_str());
+
 		ImGui::End();
 
 		ImGui::Render();
@@ -136,6 +157,10 @@ void Game::run()
 		
 		player.update(deltaTime);
 		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
+		
+		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1), cos(curTime * secPerCount * 0.1), -0.5));
+
+		this->graphics.render(camera);
 
 		/*Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();

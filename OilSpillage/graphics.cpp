@@ -23,7 +23,7 @@ Graphics::Graphics()
 
 	this->sampler = nullptr;
 
-	this->debuger = nullptr;
+	this->debugger = nullptr;
 	this->debug = nullptr;
 }
 
@@ -53,7 +53,7 @@ Graphics::~Graphics()
 	if (this->debug)
 		this->debug->Release();
 
-	delete this->debuger;
+	delete this->debugger;
 
 	for (auto i = textures.begin(); i != textures.end(); i++)
 	{
@@ -78,7 +78,6 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	swapchainDesc.OutputWindow = this->window->handle;
 	swapchainDesc.SampleDesc.Count = 1;
 	swapchainDesc.Windowed = true;
-	//swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	D3D11_CREATE_DEVICE_FLAG deviceFlags = (D3D11_CREATE_DEVICE_FLAG)0;
 #if _DEBUG
@@ -141,7 +140,6 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 		result = device->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView);
 		if (FAILED(result))
 		{
-			// deal with error...
 			return false;
 		}
 		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
@@ -159,7 +157,6 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 		result = device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState);
 		if (FAILED(result))
 		{
-			// deal with error...
 			return false;
 		}
 
@@ -203,6 +200,18 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	if (FAILED(hr))
 		return false;
 
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = static_cast<UINT>((sizeof(Vector4) * 2) * maxPointLights + sizeof(Vector4));
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &lightBuffer);
+	if (FAILED(hr))
+		return false;
+
+
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
 	rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
@@ -210,7 +219,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 
 
 	result = device->CreateRasterizerState(&rasterizerDesc, &rasterState);
-	if (FAILED(result)) //If error occurred
+	if (FAILED(result))
 	{
 		MessageBox(NULL, "Failed to create rasterizer state.",
 			"D3D11 Initialisation Error", MB_OK);
@@ -280,11 +289,18 @@ void Graphics::render(Camera camera)
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);
 
+	hr = deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	void* dataPtr = mappedResource.pData;
+	ZeroMemory(dataPtr, sizeof(PointLight) * maxPointLights);
+	CopyMemory(dataPtr, &sunVector, sizeof(Vector4));
+	dataPtr = (void*)((size_t)dataPtr + sizeof(Vector4));
+	CopyMemory(dataPtr, pointLights.data(), min(maxPointLights, pointLights.size()) * sizeof(PointLight));
+	deviceContext->Unmap(lightBuffer, 0);
 
 	//set up Shaders
-	deviceContext->IASetInputLayout(this->shader_default.vs.GetInputLayout());
-	deviceContext->PSSetShader(this->shader_default.ps.GetShader(), nullptr, 0);
-	deviceContext->VSSetShader(this->shader_default.vs.GetShader(), nullptr, 0);
+	deviceContext->IASetInputLayout(this->shaderDefault.vs.GetInputLayout());
+	deviceContext->PSSetShader(this->shaderDefault.ps.GetShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->shaderDefault.vs.GetShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &this->viewProjBuffer);
 	deviceContext->PSSetSamplers(0, 1, &this->sampler);
 	for (GameObject* object : drawableObjects)
@@ -317,12 +333,13 @@ void Graphics::render(Camera camera)
 		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
 		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
 		deviceContext->PSSetConstantBuffers(0, 1, &this->colorBuffer);
+		deviceContext->PSSetConstantBuffers(2, 1, &this->lightBuffer);
 		deviceContext->Draw(vertexCount, 0);
 	}
 
-	deviceContext->IASetInputLayout(this->shader_debug.vs.GetInputLayout());
-	deviceContext->PSSetShader(this->shader_debug.ps.GetShader(), nullptr, 0);
-	deviceContext->VSSetShader(this->shader_debug.vs.GetShader(), nullptr, 0);
+	deviceContext->IASetInputLayout(this->shaderDebug.vs.GetInputLayout());
+	deviceContext->PSSetShader(this->shaderDebug.ps.GetShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->shaderDebug.vs.GetShader(), nullptr, 0);
 
 	debuger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
 	debuger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
@@ -358,13 +375,13 @@ bool Graphics::createShaders()
 	{
 		{"SV_POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
 		{"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
-		{"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
 	};
 
 
 	UINT numElements = ARRAYSIZE(inputDesc);
-	this->shader_default.createVS(device, shaderfolder + L"VertexShader.cso", inputDesc, numElements);
-	this->shader_default.createPS(device, shaderfolder + L"PixelShader.cso");
+	this->shaderDefault.createVS(device, shaderfolder + L"VertexShader.cso", inputDesc, numElements);
+	this->shaderDefault.createPS(device, shaderfolder + L"PixelShader.cso");
 
 	D3D11_INPUT_ELEMENT_DESC inputDesc2[] =
 	{
@@ -372,8 +389,8 @@ bool Graphics::createShaders()
 		{"COLOR", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },	};
 	
 	UINT numElements2 = ARRAYSIZE(inputDesc2);
-	this->shader_debug.createVS(device, shaderfolder + L"DebugVs.cso", inputDesc2, numElements2);
-	this->shader_debug.createPS(device, shaderfolder + L"DebugPS.cso");
+	this->shaderDebug.createVS(device, shaderfolder + L"DebugVs.cso", inputDesc2, numElements2);
+	this->shaderDebug.createPS(device, shaderfolder + L"DebugPS.cso");
 
 
 
@@ -473,9 +490,6 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 		fileName = "Cube";
 		if (meshes.find(fileName) == meshes.end())
 		{
-
-			
-
 			std::vector<Vertex3D> vecTemp;
 			meshes[fileName] = newMesh;
 			Vertex3D vec[] = {
@@ -547,12 +561,8 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 			subData.pSysMem = meshes[fileName].vertices.data();
 
 			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
-			meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+			meshes[fileName].vertices.clear();
 		}
-		break;
-	case SHAPE_SPHERE:
-		break;
-	case SHAPE_TRIANGLE:
 		break;
 	case SHAPE_QUAD:
 		fileName = "Quad";
@@ -605,14 +615,12 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 			subData.pSysMem = meshes[fileName].vertices.data();
 
 			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
-			meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
-
+			meshes[fileName].vertices.clear();
 		}
 		break;
 	default:
 		break;
 	}
-	
 }
 
 bool Graphics::loadTexture(std::string fileName)
@@ -661,6 +669,27 @@ void Graphics::addToDraw(GameObject* o)
 void Graphics::removeFromDraw(GameObject* o)
 {
 	std::find(drawableObjects.begin(), drawableObjects.end(), o);
+}
+
+void Graphics::addPointLight(PointLight light)
+{
+	pointLights.push_back(light);
+}
+
+void Graphics::clearPointLights()
+{
+	pointLights.clear();
+}
+
+void Graphics::setSunVector(Vector3 vectorToSun)
+{
+	vectorToSun.Normalize();
+	sunVector = Vector4(vectorToSun.x, vectorToSun.y, vectorToSun.z, 0.0);
+}
+
+Vector3 Graphics::getSunVector()
+{
+	return Vector3(sunVector);
 }
 
 void Graphics::presentScene()
