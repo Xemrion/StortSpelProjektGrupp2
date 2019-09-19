@@ -2,21 +2,27 @@
 #define SOUND_H
 
 #include <Audio.h>
+#include <unordered_map>
 using namespace DirectX;
 
 class Sound
 {
 private:
-	static Sound instance;
-	AudioEngine* engine;
+	static std::unique_ptr<Sound> instance;
 
-	Sound();
+	float resetTimer;
+	bool shouldReset;
+	AudioEngine* engine;
+	std::unordered_map<std::wstring, SoundEffect*> soundEffects;
 
 public:
+	Sound();
 	virtual ~Sound();
 
-	static void Update();
-	static void Reset();
+	static void ShouldReset();
+	static void Init();
+	static void Update(float deltaTime);
+	static void PlaySoundEffect(std::wstring fileName);
 };
 
 #endif // !SOUND_H

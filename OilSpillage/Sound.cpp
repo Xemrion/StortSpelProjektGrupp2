@@ -1,9 +1,12 @@
 #include "Sound.h"
 
-Sound Sound::instance;
+std::unique_ptr<Sound> Sound::instance;
 
 Sound::Sound()
 {
+	this->resetTimer = 0.0f;
+	this->shouldReset = false;
+
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
 	#ifdef _DEBUG
 	eflags = eflags | AudioEngine_Debug;
@@ -21,27 +24,65 @@ Sound::Sound()
 
 Sound::~Sound()
 {
+	this->engine->Suspend();
 	delete this->engine;
-}
 
-void Sound::Update()
-{
-	if (!instance.engine)
-		return;
-
-	if (!instance.engine->Update() && instance.engine->IsCriticalError())
+	for (auto i = this->soundEffects.begin(); i != this->soundEffects.end(); i++)
 	{
-		Sound::Reset();
+		delete i->second;
 	}
 }
 
-void Sound::Reset()
+void Sound::ShouldReset()
 {
-	if (!instance.engine)
+	instance->shouldReset = true;
+}
+
+void Sound::Init()
+{
+	instance = std::make_unique<Sound>();
+}
+
+void Sound::Update(float deltaTime)
+{
+	if (!instance->engine)
 		return;
 
-	if (instance.engine->Reset())
+	if (instance->shouldReset)
 	{
-		// TODO: restart any looped sounds here
+		instance->resetTimer += deltaTime;
+
+		if (instance->resetTimer > 3.0f) //3 second wait time until reset.
+		{
+			instance->resetTimer = 0;
+			instance->shouldReset = false;
+
+			if (instance->engine->Reset())
+			{
+				// TODO: restart any looped sounds here
+			}
+		}
 	}
+	else if (!instance->engine->Update() && instance->engine->IsCriticalError())
+	{
+		instance->shouldReset = true;
+	}
+}
+
+void Sound::PlaySoundEffect(std::wstring fileName)
+{
+	if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
+	{
+		try
+		{
+			SoundEffect* effect = new SoundEffect(instance->engine, fileName.c_str());
+			instance->soundEffects[fileName] = effect;
+		}
+		catch (const std::exception&)
+		{
+			return;
+		}
+	}
+
+	instance->soundEffects[fileName]->Play();
 }

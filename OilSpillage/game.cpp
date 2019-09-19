@@ -30,6 +30,7 @@ void Game::init(Window* window)
 {
 	this->window = window; 
 	graphics.init(window, 90,this->camera);
+	Sound::Init();
 	
 	this->mouse = std::make_unique<Mouse>();
 	this->mouse->SetWindow(window->handle);
@@ -92,7 +93,7 @@ void Game::run()
 	while (this->window->update())
 	{
 		Input::Update();
-		Sound::Update();
+		Sound::Update(deltaTime);
 		//Game logic
 		//Graphics
 
@@ -107,6 +108,7 @@ void Game::run()
 		auto mouse = this->mouse->GetState();
 		if (Input::IsKeyDown_DEBUG(Keyboard::Escape))
 		{
+			Sound::PlaySoundEffect(L"test.wav");
 			//Exit game
 		}
 		if (Input::IsKeyDown_DEBUG(Keyboard::E))

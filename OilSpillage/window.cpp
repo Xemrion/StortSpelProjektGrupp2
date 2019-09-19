@@ -110,7 +110,7 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 					if (pInter->dbcc_classguid == KSCATEGORY_AUDIO)
 					{
 						//If new audio device was found try to reset xAudio2.
-						Sound::Reset();
+						Sound::ShouldReset();
 					}
 				}
 			}
