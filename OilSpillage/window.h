@@ -3,10 +3,12 @@
 
 class Window {
 public:
+	HDEVNOTIFY hNewAudio = nullptr;
 	HWND handle;
 	int width;
 	int height;
 	bool init(HINSTANCE hInstance, int width, int height);
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	bool update();
+	void shutdown();
 };

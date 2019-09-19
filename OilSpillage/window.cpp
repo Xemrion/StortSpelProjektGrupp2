@@ -1,7 +1,11 @@
 #include "window.h"
 #include"Mouse.h"
 #include"Keyboard.h"
+#include "Sound.h"
 #include"ImGui/imgui.h"
+#include <Dbt.h>
+#include <Audio.h>
+
 bool Window::init(HINSTANCE hInstance, int width, int height) 
 {
 
@@ -33,7 +37,20 @@ bool Window::init(HINSTANCE hInstance, int width, int height)
 		hInstance,
 		nullptr);
 
-	
+	//Init this for xAudio2 to work.
+	HRESULT result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	if (FAILED(result))
+	{
+		MessageBox(handle, "Could not initialize COINIT_MULTITHREADED.\nAudio will not work for some systems.", "Warning", MB_OK);
+	}
+
+	// Listen for new audio devices
+	DEV_BROADCAST_DEVICEINTERFACE filter = {};
+	filter.dbcc_size = sizeof(filter);
+	filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+	filter.dbcc_classguid = KSCATEGORY_AUDIO;
+
+	hNewAudio = RegisterDeviceNotification(handle, &filter, DEVICE_NOTIFY_WINDOW_HANDLE);
 
 	return true;
 }
@@ -81,6 +98,24 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	case WM_SYSKEYUP:
 		DirectX::Keyboard::ProcessMessage(message, wParam, lParam);
 		break;
+	case WM_DEVICECHANGE:
+		if (wParam == DBT_DEVICEARRIVAL)
+		{
+			auto pDev = reinterpret_cast<PDEV_BROADCAST_HDR>(lParam);
+			if (pDev)
+			{
+				if (pDev->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+				{
+					auto pInter = reinterpret_cast<const PDEV_BROADCAST_DEVICEINTERFACE>(pDev);
+					if (pInter->dbcc_classguid == KSCATEGORY_AUDIO)
+					{
+						//If new audio device was found try to reset xAudio2.
+						Sound::ShouldReset();
+					}
+				}
+			}
+		}
+		break;
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);
@@ -102,6 +137,14 @@ bool Window::update()
 			break;
 	}
 	return msg.message != WM_QUIT;
+}
+
+void Window::shutdown()
+{
+	if (hNewAudio)
+		UnregisterDeviceNotification(hNewAudio);
+
+	CoUninitialize();
 }
 
 

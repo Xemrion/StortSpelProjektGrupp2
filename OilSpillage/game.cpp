@@ -1,5 +1,6 @@
 #include "game.h"
 #include "Input.h"
+#include "Sound.h"
 Graphics Game::graphics = Graphics();
 
 void Game::addQuad(int x)
@@ -28,25 +29,28 @@ Game::~Game()
 void Game::init(Window* window)
 {
 	this->window = window; 
-	graphics.init(window, 90);
+	graphics.init(window, 90,this->camera);
+	Sound::Init();
 	
 	this->mouse = std::make_unique<Mouse>();
 	this->mouse->SetWindow(window->handle);
 	graphics.loadMesh("sda");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall.tga");
+	graphics.loadModel("Dummy_Roller_Melee");
 	this->testObject = new GameObject;
 	testObject->mesh = graphics.getMeshPointer("Cube");
-	graphics.addToDraw(testObject);
+	//graphics.addToDraw(testObject);
 	testObject->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	testObject->setScale(Vector3(0.2f, 0.2f, 0.2f));
 	//testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject->setTexture(graphics.getTexturePointer("brickwall.tga"));
 	//testObject->setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 	this->testObject2 = new GameObject;
-	testObject2->mesh = graphics.getMeshPointer("Cube");
+	testObject2->mesh = graphics.getMeshPointer("Dummy_Roller_Melee.bin");
 	graphics.addToDraw(testObject2);
-	testObject2->setPosition(Vector3(-7.0f, 0.0f, 0.0f));
+	testObject2->setPosition(Vector3(7.0f, 0.0f, 0.0f));
+	testObject2->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
 
@@ -61,6 +65,13 @@ void Game::init(Window* window)
 	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
 	//graphics.addToDraw(AiTestObject);
 
+	
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f));
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f),  50.f));
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f),  50.f));
+	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f));
+
+	graphics.setSunVector(Vector3(0.55f, 1.0f, 0.725f));
 
 	player.init();
 }
@@ -82,6 +93,7 @@ void Game::run()
 	while (this->window->update())
 	{
 		Input::Update();
+		Sound::Update(deltaTime);
 		//Game logic
 		//Graphics
 
@@ -96,6 +108,7 @@ void Game::run()
 		auto mouse = this->mouse->GetState();
 		if (Input::IsKeyDown_DEBUG(Keyboard::Escape))
 		{
+			Sound::PlaySoundEffect(L"test.wav");
 			//Exit game
 		}
 		if (Input::IsKeyDown_DEBUG(Keyboard::E))
@@ -115,6 +128,7 @@ void Game::run()
 		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
 		this->graphics.render(this->camera);
 		
+		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
 		std::string textUse;
 
 
@@ -149,6 +163,10 @@ void Game::run()
 		
 		player.update(deltaTime);
 		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
+		
+		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1f), cos(curTime * secPerCount * 0.1f), -0.5f));
+
+		this->graphics.render(camera);
 
 		/*Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();

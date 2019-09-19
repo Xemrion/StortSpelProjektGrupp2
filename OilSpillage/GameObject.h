@@ -31,5 +31,6 @@ public:
 	Vector3& getPosition();
 	Vector3 getRotation()const;
 	Vector3 getScale()const;
+	AABB getTheAABB()const;
 	
 };
