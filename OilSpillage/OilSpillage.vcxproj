@@ -144,6 +144,7 @@
     <ClCompile Include="Importer\importerClass.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="TestAI.cpp">
@@ -175,6 +176,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Structs.h" />

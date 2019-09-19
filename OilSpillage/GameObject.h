@@ -13,11 +13,12 @@ protected:
 	Vector3 rotation;
 	Vector4 color;
 	Texture* texture = nullptr;
+	bool shouldBeDrawn = true;
 public:
 	const Mesh* mesh = nullptr;
 	
 	Matrix getTransform();
-
+	void setDraw(bool arg);
 	void setPosition(Vector3 newPos);
 	void move(Vector3 addPos);
 	void addRotation(Vector3 addRotaiton);

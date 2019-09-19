@@ -252,7 +252,10 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	// Turn on the alpha blending.
 	deviceContext->OMSetBlendState(alphaEnableBlendingState, blendFactor, 0xffffffff);
 
+#if _DEBUG
 	this->device->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&debug));
+#endif
+	
 
 
 	createShaders();
@@ -305,6 +308,7 @@ void Graphics::render(Camera camera)
 	deviceContext->PSSetSamplers(0, 1, &this->sampler);
 	for (GameObject* object : drawableObjects)
 	{
+
 		SimpleMath::Matrix world = object->getTransform();
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 		D3D11_MAPPED_SUBRESOURCE mappedResource;

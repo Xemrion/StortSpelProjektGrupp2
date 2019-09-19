@@ -34,14 +34,15 @@ void Game::init(Window* window)
 	this->mouse->SetWindow(window->handle);
 	graphics.loadMesh("sda");
 	graphics.loadShape(SHAPE_CUBE);
+	graphics.loadShape(SHAPE_QUAD);
 	graphics.loadTexture("brickwall.tga");
 	graphics.loadModel("Dummy_Roller_Melee");
 	this->testObject = new GameObject;
-	testObject->mesh = graphics.getMeshPointer("Cube");
-	//graphics.addToDraw(testObject);
+	testObject->mesh = graphics.getMeshPointer("Quad");
+	graphics.addToDraw(testObject);
 	testObject->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	testObject->setScale(Vector3(0.2f, 0.2f, 0.2f));
-	//testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
+	testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject->setTexture(graphics.getTexturePointer("brickwall.tga"));
 	//testObject->setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 	this->testObject2 = new GameObject;
@@ -136,7 +137,6 @@ void Game::run()
 		//imgui button, slider etc
 		ImGui::Begin("Gungame");
 		ImGui::Text("Hold 'V' To move camera with mouse.");
-
 		Vector2 lDir = Input::GetDirectionL(0);
 		Vector2 rDir = Input::GetDirectionR(0);
 		float lStr = Input::GetStrengthL(0);
@@ -160,7 +160,6 @@ void Game::run()
 		
 		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1), cos(curTime * secPerCount * 0.1), -0.5));
 
-		this->graphics.render(camera);
 
 		/*Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();
