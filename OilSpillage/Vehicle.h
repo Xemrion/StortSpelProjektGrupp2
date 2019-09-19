@@ -9,6 +9,7 @@ private:
 	GameObject* vehicle;
 	GameObject* bodyRotation;
 	DirectX::XMFLOAT2 velocity;
+	float strength;
 	
 	DirectX::XMFLOAT3 accelerator;
 	float acceleratorTempX;

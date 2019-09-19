@@ -138,6 +138,8 @@ void Game::run()
 		ImGui::Text(("L Str: " + std::to_string(lStr)).c_str());
 		ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
 		ImGui::Text(("R Str: " + std::to_string(rStr)).c_str());
+		ImGui::Text(("Accelerator: " + std::to_string(player.getAcceleratorX())).c_str());
+
 
 		ImGui::End();
 
