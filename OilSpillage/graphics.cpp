@@ -67,7 +67,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	HRESULT result;
 
 	D3D11_BLEND_DESC blendStateDescription;
-
+	
 	DXGI_SWAP_CHAIN_DESC swapchainDesc;
 	ZeroMemory(&swapchainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapchainDesc.BufferDesc.Width = this->window->width;
@@ -76,7 +76,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	swapchainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapchainDesc.OutputWindow = this->window->handle;
-	swapchainDesc.SampleDesc.Count = 1;
+	swapchainDesc.SampleDesc.Count = 4;
 	swapchainDesc.Windowed = true;
 
 	D3D11_CREATE_DEVICE_FLAG deviceFlags = (D3D11_CREATE_DEVICE_FLAG)0;
@@ -126,7 +126,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
 		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; //DXGI_FORMAT_R32_TYPELESS;
-		descDepth.SampleDesc.Count = 1;
+		descDepth.SampleDesc.Count = 4;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
