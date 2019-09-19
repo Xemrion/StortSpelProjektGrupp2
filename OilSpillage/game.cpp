@@ -1,5 +1,6 @@
 #include "game.h"
 #include "Input.h"
+#include "Sound.h"
 Graphics Game::graphics = Graphics();
 
 void Game::addQuad(int x)
@@ -48,7 +49,7 @@ void Game::init(Window* window)
 	testObject2->mesh = graphics.getMeshPointer("Dummy_Roller_Melee.bin");
 	graphics.addToDraw(testObject2);
 	testObject2->setPosition(Vector3(7.0f, 0.0f, 0.0f));
-	testObject2->setScale(Vector3(0.01, 0.01, 0.01));
+	testObject2->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
 
@@ -69,7 +70,7 @@ void Game::init(Window* window)
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f),  50.f));
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f));
 
-	graphics.setSunVector(Vector3(0.55, 1.0, 0.725));
+	graphics.setSunVector(Vector3(0.55f, 1.0f, 0.725f));
 
 	player.init();
 }
@@ -91,6 +92,7 @@ void Game::run()
 	while (this->window->update())
 	{
 		Input::Update();
+		Sound::Update();
 		//Game logic
 		//Graphics
 
@@ -158,7 +160,7 @@ void Game::run()
 		player.update(deltaTime);
 		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
 		
-		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1), cos(curTime * secPerCount * 0.1), -0.5));
+		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1f), cos(curTime * secPerCount * 0.1f), -0.5f));
 
 		this->graphics.render(camera);
 

@@ -8,12 +8,15 @@ class Sound
 {
 private:
 	static Sound instance;
-	//AudioEngine engine;
+	AudioEngine* engine;
 
 	Sound();
 
 public:
 	virtual ~Sound();
+
+	static void Update();
+	static void Reset();
 };
 
 #endif // !SOUND_H

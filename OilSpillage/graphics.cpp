@@ -20,6 +20,7 @@ Graphics::Graphics()
 	this->viewProjBuffer = nullptr;
 	this->worldBuffer = nullptr;
 	this->colorBuffer = nullptr;
+	this->lightBuffer = nullptr;
 
 	this->sampler = nullptr;
 
@@ -39,6 +40,7 @@ Graphics::~Graphics()
 	this->viewProjBuffer->Release();
 	this->worldBuffer->Release();
 	this->colorBuffer->Release();
+	this->lightBuffer->Release();
 
 	this->sampler->Release();
 
@@ -271,6 +273,11 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 Debug* Graphics::getdebugger()
 {
 	return this->debugger;
+}
+
+Window* Graphics::getWindow()
+{
+	return this->window;
 }
 
 void Graphics::render(Camera camera)

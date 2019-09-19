@@ -16,6 +16,9 @@ Vehicle::Vehicle()
 	this->rotateAcceleration = 0.0f;
 	this->rotationSmoother = 1.0f;
 	this->tempTargetRotation = 0.0f;
+
+	this->vehicle = nullptr;
+	this->bodyRotation = nullptr;
 }
 
 Vehicle::~Vehicle()
@@ -240,7 +243,7 @@ void Vehicle::update(float deltaTime)
 	//this->bodyRotation->move(Vector3(accelerator.x*deltaTime*200, 0.00f, accelerator.z * deltaTime*200));
 	this->bodyRotation->move(Vector3((velocity.x* deltaTime * 0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f)));
 	//this->bodyRotation->setPosition(Vector3(accelerator.x, accelerator.y+1, accelerator.z));
-	this->bodyRotation->setRotation(Vector3(vehicle->getRotation().x, vehicle->getRotation().y , vehicle->getRotation().z + driftForce * 0.0001));
+	this->bodyRotation->setRotation(Vector3(vehicle->getRotation().x, vehicle->getRotation().y , vehicle->getRotation().z + driftForce * 0.0001f));
 }
 
 float Vehicle::getAcceleratorX()
