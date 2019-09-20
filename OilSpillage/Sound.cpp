@@ -14,22 +14,18 @@ Sound::Sound()
 
 	try
 	{
-		this->engine = new AudioEngine(eflags);
+		this->engine = std::make_unique<AudioEngine>(eflags);
 	}
-	catch (const std::exception&)
-	{
-		this->engine = nullptr;
-	}
+	catch (const std::exception&) {}
 }
 
 Sound::~Sound()
 {
 	this->engine->Suspend();
-	delete this->engine;
 
 	for (auto i = this->soundEffects.begin(); i != this->soundEffects.end(); i++)
 	{
-		delete i->second;
+		i->second.effectInstance.reset();
 	}
 }
 
@@ -59,7 +55,13 @@ void Sound::Update(float deltaTime)
 
 			if (instance->engine->Reset())
 			{
-				// TODO: restart any looped sounds here
+				for (auto i = instance->soundEffects.begin(); i != instance->soundEffects.end(); i++)
+				{
+					if (i->second.isLooping)
+					{
+						i->second.effectInstance->Play(true);
+					}
+				}
 			}
 		}
 	}
@@ -69,14 +71,19 @@ void Sound::Update(float deltaTime)
 	}
 }
 
+void Sound::Reset()
+{
+	instance->engine->Reset();
+}
+
 void Sound::PlaySoundEffect(std::wstring fileName)
 {
 	if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
 	{
 		try
 		{
-			SoundEffect* effect = new SoundEffect(instance->engine, fileName.c_str());
-			instance->soundEffects[fileName] = effect;
+			instance->soundEffects[fileName].sound = std::make_unique<SoundEffect>(instance->engine.get(), fileName.c_str());
+			instance->soundEffects[fileName].effectInstance = instance->soundEffects[fileName].sound->CreateInstance();
 		}
 		catch (const std::exception&)
 		{
@@ -84,5 +91,47 @@ void Sound::PlaySoundEffect(std::wstring fileName)
 		}
 	}
 
-	instance->soundEffects[fileName]->Play();
+	instance->soundEffects[fileName].sound->Play();
+}
+
+void Sound::PlayLoopingSound(std::wstring fileName)
+{
+	if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
+	{
+		try
+		{
+			instance->soundEffects[fileName].sound = std::make_unique<SoundEffect>(instance->engine.get(), fileName.c_str());
+			instance->soundEffects[fileName].effectInstance = instance->soundEffects[fileName].sound->CreateInstance();
+		}
+		catch (const std::exception&)
+		{
+			return;
+		}
+	}
+
+	instance->soundEffects[fileName].effectInstance->Stop(true);
+	instance->soundEffects[fileName].effectInstance->Play(true);
+	instance->soundEffects[fileName].isLooping = true;
+}
+
+void Sound::StopLoopingSound(std::wstring fileName, bool immediate)
+{
+	if (instance->soundEffects.find(fileName) != instance->soundEffects.end())
+	{
+		instance->soundEffects[fileName].effectInstance->Stop(immediate);
+		instance->soundEffects[fileName].isLooping = false;
+	}
+}
+
+void Sound::StopAllLoops(bool immediate)
+{
+	for (auto i = instance->soundEffects.begin(); i != instance->soundEffects.end(); i++)
+	{
+		i->second.effectInstance->Stop(immediate);
+	}
+}
+
+void Sound::PauseSound(bool isPaused)
+{
+	isPaused ? instance->engine->Suspend() : instance->engine->Resume();
 }
