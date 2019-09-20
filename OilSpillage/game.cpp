@@ -45,18 +45,25 @@ void Game::init(Window* window)
 	testObject->setTexture(graphics.getTexturePointer("brickwall.tga"));
 	//testObject->setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 	this->testObject2 = new GameObject;
-	testObject2->mesh = graphics.getMeshPointer("Dummy_Roller_Melee.bin");
+	testObject2->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject2);
 	testObject2->setPosition(Vector3(7.0f, 0.0f, 0.0f));
-	testObject2->setScale(Vector3(0.01, 0.01, 0.01));
+	testObject2->setScale(Vector3(1.0, 1.0, 1.0));
 	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
+	
+	this->testObject3 = new GameObject;
+	testObject3->mesh = graphics.getMeshPointer("Cube");
+	graphics.addToDraw(testObject3);
+	testObject3->setPosition(Vector3(0.0f, -1.0f, 0.0f));
+	testObject3->setScale(Vector3(20.0, 1.0, 20.0));
+	testObject3->setTexture(graphics.getTexturePointer("brickwall.tga"));
 
 	aiObject = new AIPlayer();
 	aiObject->mesh = graphics.getMeshPointer("Cube");
 	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
-	graphics.addToDraw(aiObject);
+	//graphics.addToDraw(aiObject);
 	//AiTestObject = new GameObject;
 	//AiTestObject->mesh = graphics.getMeshPointer("Cube");
 	//AiTestObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
@@ -68,6 +75,9 @@ void Game::init(Window* window)
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f),  50.f));
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f),  50.f));
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f));
+
+	graphics.addSpotLight(SpotLight(Vector3(-5.f, 4.0f, 0.0f), Vector3(1.0f, 0.3f, 1.0f), 50.f, Vector3(0.0, -1.0, 0.5), 1.0));
+	graphics.addSpotLight(SpotLight(Vector3(-5.f, 4.0f, 0.0f), Vector3(1.0f, 0.3f, 1.0f), 50.f, Vector3(0.0, -1.0, -0.5), 0.4));
 
 	graphics.setSunVector(Vector3(0.55, 1.0, 0.725));
 
@@ -142,7 +152,7 @@ void Game::run()
 		float lStr = Input::GetStrengthL(0);
 		float rStr = Input::GetStrengthR(0);
 		bool status[4] = { Input::CheckButton(CONFIRM, UP, 0), Input::CheckButton(CONFIRM, HELD, 0), Input::CheckButton(CONFIRM, RELEASED, 0), Input::CheckButton(CONFIRM, PRESSED, 0) };
-
+		ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Text(("\n-- PLAYER 0 --\nConfirm Status - Up: " + std::to_string(status[0]) + " Held: " + std::to_string(status[1]) + " Released: " + std::to_string(status[2]) + " Pressed: " + std::to_string(status[3])).c_str());
 		ImGui::Text(("L Dir: " + std::to_string(lDir.x) + " " + std::to_string(lDir.y)).c_str());
 		ImGui::Text(("L Str: " + std::to_string(lStr)).c_str());
@@ -159,8 +169,6 @@ void Game::run()
 		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
 		
 		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1), cos(curTime * secPerCount * 0.1), -0.5));
-
-		this->graphics.render(camera);
 
 		/*Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();

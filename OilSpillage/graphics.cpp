@@ -204,7 +204,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>((sizeof(Vector4) * 2) * maxPointLights + sizeof(Vector4));
+	desc.ByteWidth = static_cast<UINT>((sizeof(Vector4) * 2) * maxPointLights + (sizeof(Vector4) * 3) * maxSpotLights + sizeof(Vector4));
 	desc.StructureByteStride = 0;
 
 	hr = device->CreateBuffer(&desc, 0, &lightBuffer);
@@ -290,11 +290,16 @@ void Graphics::render(Camera camera)
 	deviceContext->Unmap(viewProjBuffer, 0);
 
 	hr = deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	void* dataPtr = mappedResource.pData;
-	ZeroMemory(dataPtr, sizeof(PointLight) * maxPointLights);
-	CopyMemory(dataPtr, &sunVector, sizeof(Vector4));
-	dataPtr = (void*)((size_t)dataPtr + sizeof(Vector4));
-	CopyMemory(dataPtr, pointLights.data(), min(maxPointLights, pointLights.size()) * sizeof(PointLight));
+	struct LightBufferContents {
+		Vector4 sun;
+		PointLight pointLights[20];
+		SpotLight spotLights[20];
+	} lightBufferContents;
+	ZeroMemory(mappedResource.pData, sizeof(LightBufferContents));
+	CopyMemory(&lightBufferContents.sun, &sunVector, sizeof(Vector4));
+	CopyMemory(lightBufferContents.pointLights, pointLights.data(), min(maxPointLights, pointLights.size()) * sizeof(PointLight));
+	CopyMemory(lightBufferContents.spotLights, spotLights.data(), min(maxSpotLights, spotLights.size()) * sizeof(SpotLight));
+	CopyMemory(mappedResource.pData, &lightBufferContents, sizeof(LightBufferContents));
 	deviceContext->Unmap(lightBuffer, 0);
 
 	//set up Shaders
@@ -679,6 +684,16 @@ void Graphics::addPointLight(PointLight light)
 void Graphics::clearPointLights()
 {
 	pointLights.clear();
+}
+
+void Graphics::addSpotLight(SpotLight light)
+{
+	spotLights.push_back(light);
+}
+
+void Graphics::clearSpotLights()
+{
+	spotLights.clear();
 }
 
 void Graphics::setSunVector(Vector3 vectorToSun)
