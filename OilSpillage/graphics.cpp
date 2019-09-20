@@ -480,7 +480,7 @@ void Graphics::loadMesh(std::string fileName)
 
 void Graphics::loadModel(std::string fileName)
 {
-	this->loadMesh(fileName + ".bin");
+	this->loadMesh(fileName + "/fil.bin");
 	this->loadTexture(fileName + ".tga");
 }
 
