@@ -8,6 +8,8 @@ class Vehicle
 private:
 	GameObject* vehicle;
 	GameObject* bodyRotation;
+	GameObject* bodyRotationPoint;
+	Vector3 bodyPivot;
 	DirectX::XMFLOAT2 velocity;
 	float strength;
 	
