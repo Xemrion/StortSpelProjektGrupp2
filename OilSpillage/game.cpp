@@ -106,10 +106,9 @@ void Game::run()
 
 
 		auto mouse = this->mouse->GetState();
-		if (Input::IsKeyDown_DEBUG(Keyboard::Escape))
+		if (Input::CheckButton(Keys::CONFIRM,PRESSED,0))
 		{
 			Sound::PlaySoundEffect(L"test.wav");
-			//Exit game
 		}
 		if (Input::IsKeyDown_DEBUG(Keyboard::E))
 			deltaTime /= 4;

@@ -283,7 +283,7 @@ void Input::Reset()
 	}
 }
 
-void Input::SetRumble(int player, float leftMotor, float rightMotor, float leftTrigger = 0.f, float rightTrigger = 0.f)
+void Input::SetRumble(int player, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
 {
 	if (player >= Input::PLAYER_COUNT || player < 0 || player == instance.playerKeyboard) return;
 

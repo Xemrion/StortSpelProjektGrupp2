@@ -23,6 +23,7 @@ Vehicle::~Vehicle()
 {
 	delete vehicle;
 	delete bodyRotation;
+	delete bodyRotationPoint;
 }
 
 void Vehicle::init()
@@ -45,6 +46,16 @@ void Vehicle::init()
 	Game::getGraphics().loadTexture("CarTemp.tga");
 	bodyRotation->setTexture(Game::getGraphics().getTexturePointer("CarTemp.tga"));
 
+	this->bodyRotationPoint = new GameObject;
+	bodyRotationPoint->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(bodyRotationPoint);
+	bodyRotationPoint->setPosition(Vector3(0.0f, 0.0f, 0.0f));
+	//vehicle->setColor(Vector4(2,0.3,0.3,1));
+	bodyRotationPoint->setScale(Vector3(0.2f, 0.2f, 0.2f));
+	Game::getGraphics().loadTexture("brickwall.tga");
+	bodyRotationPoint->setTexture(Game::getGraphics().getTexturePointer("brickwall.tga"));
+
+	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
 }
 
 void Vehicle::update(float deltaTime)
@@ -224,7 +235,7 @@ void Vehicle::update(float deltaTime)
 
 
 	//Body Rotation
-	Vector2 curPos3 = Vector2(bodyRotation->getPosition().x, bodyRotation->getPosition().z);
+	Vector2 curPos3 = Vector2(bodyPivot.x, bodyPivot.z);
 	Vector2 position3 = Vector2(vehicle->getPosition().x, vehicle->getPosition().z);
 
 	float dx3 = (curPos3.x - position3.x);
@@ -235,23 +246,49 @@ void Vehicle::update(float deltaTime)
 	
 	
 
-	float springValue = 0.02f;
+	float springValue = 8.2f;
 	Vector2 currentToTarget = Vector2(dx3 / hypoC3, dy3 / hypoC3);
 	Vector2 springForce = currentToTarget * springValue;
-	Vector2 dampingForce = Vector2(-(abs(accelerator.x)) * 2 * sqrt(springValue), -(abs(accelerator.z)) * 2 * sqrt(springValue));
+	Vector2 dampingForce = Vector2(((-accelerator.x)) * 0.2 * sqrt(springValue), ((-accelerator.z)) * 0.2 * sqrt(springValue));
 	Vector2 force = springForce + dampingForce;
 
+	/*if (!(dx3 == 0 && hypoC3 == 0) && !(dy3 == 0 && hypoC3 == 0)) {
+		this->accelerator.x += force.x * deltaTime * 2.0f;
+		this->accelerator.z += force.y * deltaTime * 2.0f;
+	}*/
+
+	if ((bodyPivot.x - vehicle->getPosition().x) > 3 && vehicle->getPosition().x < bodyPivot.x) {
+		this->accelerator.x += 10 * deltaTime * 2.0f;
+	}
+	if ((bodyPivot.x - vehicle->getPosition().x) < -3 && vehicle->getPosition().x > bodyPivot.x) {
+		this->accelerator.x -= 10 * deltaTime * 2.0f;
+	}
+	if ((bodyPivot.z - vehicle->getPosition().z) > 3 && vehicle->getPosition().z < bodyPivot.z) {
+		this->accelerator.z += 10 * deltaTime * 2.0f;
+	}
+	if ((bodyPivot.z - vehicle->getPosition().z) < -3 && vehicle->getPosition().z > bodyPivot.z) {
+		this->accelerator.z -= 10 * deltaTime * 2.0f;
+	}
+	
 	if (!(dx3 == 0 && hypoC3 == 0) && !(dy3 == 0 && hypoC3 == 0)) {
 		this->accelerator.x += force.x * deltaTime * 2.0f;
 		this->accelerator.z += force.y * deltaTime * 2.0f;
 	}
 
+	Vector3 rotationVec = vehicle->getPosition() - bodyPivot;
+	//Vector3 rotationRadians = DirectX::XMVector3AngleBetweenVectors(Vector3(0,1,0), rotationVec);
+	//Vector3 rotationRadians = acos(DirectX::XMVector3Dot(DirectX::XMVector3Normalize(Vector3(0, 1, 0)), DirectX::XMVector3Normalize(rotationVec)));
 
 	this->bodyRotation->setPosition(Vector3(vehicle->getPosition().x, vehicle->getPosition().y + 1, vehicle->getPosition().z));
 	//this->bodyRotation->move(Vector3(-accelerator.x*deltaTime, 0.00f * 0.0000f, -accelerator.z* deltaTime));
+	bodyPivot += Vector3(-accelerator.x * deltaTime, 0.00f * 0.0000f, -accelerator.z * deltaTime);
 	//this->bodyRotation->setPosition(Vector3(bodyRotation->getPosition().x, bodyRotation->getPosition().y + 1, bodyRotation->getPosition().z));
 	//this->bodyRotation->move(Vector3((velocity.x* deltaTime * 0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f)));
-	this->bodyRotation->setRotation(Vector3(vehicle->getRotation().x, vehicle->getRotation().y , vehicle->getRotation().z + driftForce * 0.0001));
+	//this->bodyRotation->setRotation(Vector3(vehicle->getRotation().x + rotationRadians.x , vehicle->getRotation().y, vehicle->getRotation().z + rotationRadians.z ));
+	this->bodyRotation->setRotation(Vector3(vehicle->getRotation().x, vehicle->getRotation().y, vehicle->getRotation().z));
+
+
+	bodyRotationPoint->setPosition(Vector3(bodyPivot.x,bodyPivot.y,bodyPivot.z));
 }
 
 float Vehicle::getAcceleratorX()
