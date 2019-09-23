@@ -17,6 +17,7 @@ private:
 public:
 	std::vector<Node*> algorithm(DirectX::SimpleMath::Vector3 startPos, DirectX::SimpleMath::Vector3 endPos);
 	AStar();
+	~AStar();
 	AStar(int gridWidth, int gridHeight);
 
 };
