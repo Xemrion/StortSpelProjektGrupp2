@@ -271,7 +271,7 @@ void Graphics::render()
 	debuger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(3, 2, 0 ), XMFLOAT3(1, 1, 0));
 	debuger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
 	//debuger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
-	
+
 	// Present the back buffer to the screen since rendering is complete.
 	swapChain->Present(0, 0);
 }
@@ -471,6 +471,7 @@ bool Graphics::createShaders()
 	{
 		return false;
 	}
+	return true;
 }
 
 void Graphics::loadMesh(const char* fileName)

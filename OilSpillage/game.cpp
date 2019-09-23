@@ -6,6 +6,7 @@ void Game::addQuad(int x)
 	object2->mesh = graphics.getMeshPointer("sda");
 	graphics.addToDraw(object2);
 	object2->setPosition(Vector3(x, 0, 0));
+	object2->setTexture(graphics.getTexturePointer("fireball.tga"));
 }
 
 void Game::init(Window* window)
@@ -14,20 +15,27 @@ void Game::init(Window* window)
 	graphics.init(window, 90);
 	graphics.loadMesh("sda");
 	graphics.loadShape(SHAPE_CUBE);
-	graphics.loadTexture("playerRabbit.tga");
-	this->testObject = new GameObject;
-	testObject->mesh = graphics.getMeshPointer("Cube");
+	graphics.loadTexture("fireball.tga");
+	this->testObject = new GameObject();
+	this->testObject->mesh = graphics.getMeshPointer("Cube");
+	this->testObject->setTexture(graphics.getTexturePointer("fireball.tga"));
+	this->testObject->setPosition(Vector3(-17, -10, 5));
+
 	graphics.addToDraw(testObject);
-	testObject->setPosition(Vector3(0, 0, 0));
-	testObject->setScale(Vector3(2, 2, 2));
-	testObject->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
 
-	this->testObject2 = new GameObject;
-	testObject2->mesh = graphics.getMeshPointer("Cube");
-	graphics.addToDraw(testObject2);
-	testObject2->setPosition(Vector3(-7, 0, 0));
-	testObject2->setTexture(graphics.getTexturePointer("playerRabbit.tga"));
+	this->testNetwork = new RoadNetwork(8473552, Vector2(64.0f, 64.0f), Vector2(0.0f, 0.0f));
+	this->testNetwork->generateInitialSegments("FFFFFFFFFFFFH-F-FFFHF+FFFF-FFH");
+	this->testNetwork->generateAdditionalSegments("FH+H+F-H-H-FFF", 5);
+	this->testNetwork->saveTestNetwork("test.txt");
+	this->testNetwork->generateAdditionalSegments("FFFF+FFH", 3);
+	this->testNetwork->saveTestNetwork("test2.txt");
+	this->testNetwork->generateAdditionalSegments("HFF-FF-F", 10);
+	this->testNetwork->cleanRoadNetwork();
+	this->testNetwork->saveTestNetwork("test3.txt");
 
+	this->testNetwork->loadTestNetwork("test2.txt");
+	this->testNetwork->saveTestNetwork("test4.txt");
+	
 }
 
 void Game::run()
@@ -36,10 +44,12 @@ void Game::run()
 	{
 		//Game logic
 		//Graphics
-		
+
+
 		this->graphics.render();
 		this->testObject->addRotation(Vector3(0.001, 0.001, 0.001));
 	}
 	delete this->testObject;
 	delete this->testObject2;
+	delete this->testNetwork;
 }
