@@ -3,6 +3,7 @@
 #include "../GameObject.h"
 #include <d3d11.h>
 #include <SimpleMath.h>
+#include "AStar.h"
 using namespace DirectX::SimpleMath;
 
 // https://docs.unrealengine.com/en-US/API/Runtime/AIModule/AAIController/index.html
@@ -24,41 +25,32 @@ private:
 class AIPlayer :public GameObject
 {
 public:
-	void Update(float dt);
-public:
-	// nodes on the grid to walk on
-	struct NodeList
+
+	enum AIState
 	{
-		Vector3 wayPoint;
+		chasing,
+		attacking,
+		wandering
 	};
-	// Set target
-	void SetTarget(Vector3 * target);
+	void Update(float dt);
+	void setPlayerPos(Vector3 playerPos);
 	// Move toward a target
-	void Seek(float dt);
+	void findPath();
 	// Move away from target
-	void Flee();
+	void flee();
 	// Move around randomly
-	void Wander();
+	void wander();
 	//Keep a certain distance from a target
-	void Separate();
-	// Follow along a given path
-	void PathFollowing(float dt);
-	// Set path List
-	void SetPath(std::queue<NodeList> Path);
-	// Set path node
-	void SetWayPoint(NodeList* Path);
-	// Check if player is in line of sight
-	bool LineOfSight(Vector3 &position);
-	// Check if player is in range
-	bool InRangeOf(Vector3 & position);
-
-	//bool isEmpty() { return this->Path.size(); }
-	int GetState();
+	void separate();
+	void followPath(float dt);
+	bool lineOfSight(Vector3& position);
+	AIPlayer();
+	int getState();
 private:
-	bool Inside(Vector3 waypoint);
-
-	std::queue<NodeList*> Path;
+	AStar aStar;
+	std::vector<Node*> path;
 	//use ref to  get currentTarget to use behaviour on
-	Vector3 * currentTarget;
-	int state;
+	Vector3 playerPos;
+	Vector3 targetNode;
+	AIState state;
 };
