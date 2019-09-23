@@ -2,53 +2,33 @@
 #include"VertexBuffer.h"
 #include"Structs.h"
 #include<vector>
+using namespace DirectX::SimpleMath;
+struct AABB
+{
+	Vector3 maxPos;
+	Vector3 minPos;
+	AABB scale(Vector3 scale)
+	{
+		AABB scaledAABB = { maxPos * scale, minPos * scale };
+		return scaledAABB;
+	};
+};
 
 class Mesh
 {
 public:
-	void loadMesh(const char* filename) {
-		Vertex3D vertex;
-		vertex.position = glm::vec3(-1.0, 0.0 ,- 1.0);
-		vertex.uv = glm::vec2(0.0, 1.0);
-		vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-		vertices.push_back(vertex);
-
-		vertex.position = glm::vec3(-1.0, 0.0, 1.0);
-		vertex.uv = glm::vec2(0.0, 0.0);
-		vertices.push_back(vertex);
-
-		vertex.position = glm::vec3(1.0, 0.0, -1.0);
-		vertex.uv = glm::vec2(1.0, 1.0);
-		vertices.push_back(vertex);
-
-		vertex.position = glm::vec3(-1.0, 0.0, 1.0);
-		vertex.uv = glm::vec2(0.0, 0.0);
-		vertices.push_back(vertex);
-
-		vertex.position = glm::vec3(1.0, 0.0, 1.0);
-		vertex.uv = glm::vec2(1.0, 0.0);
-		vertices.push_back(vertex);
-
-		vertex.position = glm::vec3(1.0, 0.0, -1.0);
-		vertex.uv = glm::vec2(1.0, 1.0);
-		vertices.push_back(vertex);
-
-		this->vertexCount = vertices.size();
-		
-	};
-	void insertDataToMesh(std::vector<Vertex3D> vertexData)
-	{
-		this->vertices = vertexData;
-
-		this->vertexCount = vertices.size();
-	};
+	Mesh();
+	void loadMesh(const char* filename);
+	void insertDataToMesh(std::vector<Vertex3D>& vertexData);
 	void operator=(const Mesh& rh) { this->vertices = rh.vertices; }
+
+	virtual ~Mesh() { if (this->vertexBuffer) this->vertexBuffer->Release(); }
 	std::vector<Vertex3D> vertices;
-	ID3D11Buffer* vertexBuffer;
-	int getVertexCount() const 
-	{
-		return this->vertexCount;
-	};
+	ID3D11Buffer* vertexBuffer = nullptr;
+	void setAABB(AABB obj);
+	AABB getAABB()const;
+	int getVertexCount()const;
 private:
-	int vertexCount; 
+	AABB collisionBox;
+	int vertexCount = 0; 
 };

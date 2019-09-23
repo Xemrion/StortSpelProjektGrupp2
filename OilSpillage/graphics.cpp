@@ -1,11 +1,31 @@
 #include "graphics.h"
-#include "glm/glm/ext.hpp"
 #include <algorithm>
+#include"Importer/importerClass.h"
+#include<cstring>
 
 Graphics::Graphics()
 {
 	this->window = nullptr;
+	this->swapChain = nullptr;
+	this->device = nullptr;
+	this->deviceContext = nullptr;
+	this->vp = {};
 
+	this->renderTargetView = nullptr;
+	this->depthStencilBuffer = nullptr;
+	this->depthStencilState = nullptr;
+	this->depthStencilView = nullptr;
+	this->rasterState = nullptr;
+	this->alphaEnableBlendingState = nullptr;
+	this->viewProjBuffer = nullptr;
+	this->worldBuffer = nullptr;
+	this->colorBuffer = nullptr;
+	this->lightBuffer = nullptr;
+
+	this->sampler = nullptr;
+
+	this->debugger = nullptr;
+	this->debug = nullptr;
 }
 
 Graphics::~Graphics()
@@ -17,6 +37,13 @@ Graphics::~Graphics()
 	this->rasterState->Release();
 	this->renderTargetView->Release();
 
+	this->viewProjBuffer->Release();
+	this->worldBuffer->Release();
+	this->colorBuffer->Release();
+	this->lightBuffer->Release();
+
+	this->sampler->Release();
+
 	if (this->swapChain)
 		this->swapChain->Release();
 	if (this->deviceContext)
@@ -27,15 +54,22 @@ Graphics::~Graphics()
 		this->device->Release();
 	if (this->debug)
 		this->debug->Release();
+
+	delete this->debugger;
+
+	for (auto i = textures.begin(); i != textures.end(); i++)
+	{
+		delete i->second;
+	}
 }
 
-bool Graphics::init(Window* window, float fov)
+bool Graphics::init(Window* window, float fov, Camera theCamera)
 {
 	this->window = window;
 	HRESULT result;
 
 	D3D11_BLEND_DESC blendStateDescription;
-
+	
 	DXGI_SWAP_CHAIN_DESC swapchainDesc;
 	ZeroMemory(&swapchainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapchainDesc.BufferDesc.Width = this->window->width;
@@ -44,9 +78,8 @@ bool Graphics::init(Window* window, float fov)
 	swapchainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapchainDesc.OutputWindow = this->window->handle;
-	swapchainDesc.SampleDesc.Count = 1;
+	swapchainDesc.SampleDesc.Count = 4;
 	swapchainDesc.Windowed = true;
-	//swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	D3D11_CREATE_DEVICE_FLAG deviceFlags = (D3D11_CREATE_DEVICE_FLAG)0;
 #if _DEBUG
@@ -71,7 +104,7 @@ bool Graphics::init(Window* window, float fov)
 		// get the address of the back buffer
 		ID3D11Texture2D* backBufferPtr = nullptr;
 		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)& backBufferPtr);
-		if (FAILED(result))
+		if (FAILED(result) || backBufferPtr == nullptr)
 		{
 			MessageBox(this->window->handle, "Could not ID3D11Texture2D* backBufferPtr", "Error", MB_OK); //L"", L"", ;
 			return false;
@@ -95,7 +128,7 @@ bool Graphics::init(Window* window, float fov)
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
 		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; //DXGI_FORMAT_R32_TYPELESS;
-		descDepth.SampleDesc.Count = 1;
+		descDepth.SampleDesc.Count = 4;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -109,7 +142,6 @@ bool Graphics::init(Window* window, float fov)
 		result = device->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView);
 		if (FAILED(result))
 		{
-			// deal with error...
 			return false;
 		}
 		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
@@ -127,13 +159,11 @@ bool Graphics::init(Window* window, float fov)
 		result = device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState);
 		if (FAILED(result))
 		{
-			// deal with error...
 			return false;
 		}
 
 	}
 
-	//void SetViewport()
 	this->vp.Width = (float)this->window->width;
 	this->vp.Height = (float)this->window->height;
 	this->vp.MinDepth = 0.0f;
@@ -143,25 +173,13 @@ bool Graphics::init(Window* window, float fov)
 	deviceContext->RSSetViewports(1, &this->vp);
 
 
-	this->screenNear = 1;
-	this->screenDepth = 1000;
-	this->fieldOfView = fov * (DirectX::XM_PI / 180);
-
-	//move to ColorShader
-	this->projection = glm::perspectiveFovLH(this->fieldOfView, (float)window->width, (float)window->height, this->screenNear, this->screenDepth);
-	this->view = glm::lookAtLH(glm::vec3(0.0, 0.0, -10.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
-	this->projection = glm::transpose(projection);
-	this->view = glm::transpose(view);
-
-
-
 	D3D11_BUFFER_DESC desc = { 0 };
 
 	desc.Usage = D3D11_USAGE_DYNAMIC;
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>(sizeof(glm::mat4) + (16 - (sizeof(glm::mat4) % 16)));
+	desc.ByteWidth = static_cast<UINT>(sizeof(Matrix) + (16 - (sizeof(Matrix) % 16)));
 	desc.StructureByteStride = 0;
 
 	HRESULT hr = device->CreateBuffer(&desc, 0, &viewProjBuffer);
@@ -172,6 +190,30 @@ bool Graphics::init(Window* window, float fov)
 	if (FAILED(hr))
 		return false;
 
+
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = static_cast<UINT>(sizeof(Vector4) + (16 - (sizeof(Vector4) % 16)));
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &colorBuffer);
+	if (FAILED(hr))
+		return false;
+
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = static_cast<UINT>((sizeof(Vector4) * 2) * maxPointLights + sizeof(Vector4));
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &lightBuffer);
+	if (FAILED(hr))
+		return false;
+
+
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
 	rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
@@ -179,7 +221,7 @@ bool Graphics::init(Window* window, float fov)
 
 
 	result = device->CreateRasterizerState(&rasterizerDesc, &rasterState);
-	if (FAILED(result)) //If error occurred
+	if (FAILED(result))
 	{
 		MessageBox(NULL, "Failed to create rasterizer state.",
 			"D3D11 Initialisation Error", MB_OK);
@@ -216,12 +258,29 @@ bool Graphics::init(Window* window, float fov)
 
 
 	createShaders();
-	debuger = new Debug(deviceContext, device);
+	debugger = new Debug(deviceContext, device, theCamera);
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); // (void)io;
+	ImGui_ImplWin32_Init(this->window->handle);
+	ImGui_ImplDX11_Init(this->device, this->deviceContext);
+	ImGui::StyleColorsDark();
 
 	return true;
 }
 
-void Graphics::render()
+Debug* Graphics::getdebugger()
+{
+	return this->debugger;
+}
+
+Window* Graphics::getWindow()
+{
+	return this->window;
+}
+
+void Graphics::render(Camera camera)
 {
 	float color[4] = {
 		0,0,0,1
@@ -229,20 +288,26 @@ void Graphics::render()
 	deviceContext->ClearRenderTargetView(renderTargetView, color);
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
-	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0); //1
+	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	glm::mat4 viewProj= view * projection;
-	//viewProj = glm::transpose(viewProj);
+	Matrix viewProj = (camera.getViewMatrix() * camera.getProjectionMatrix()).Transpose();
 	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, glm::value_ptr(viewProj), sizeof(glm::mat4));
+	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);
 
+	hr = deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	void* dataPtr = mappedResource.pData;
+	ZeroMemory(dataPtr, sizeof(PointLight) * maxPointLights);
+	CopyMemory(dataPtr, &sunVector, sizeof(Vector4));
+	dataPtr = (void*)((size_t)dataPtr + sizeof(Vector4));
+	CopyMemory(dataPtr, pointLights.data(), min(maxPointLights, pointLights.size()) * sizeof(PointLight));
+	deviceContext->Unmap(lightBuffer, 0);
 
 	//set up Shaders
-	deviceContext->IASetInputLayout(this->shader_default.vs.GetInputLayout());
-	deviceContext->PSSetShader(this->shader_default.ps.GetShader(), nullptr, 0);
-	deviceContext->VSSetShader(this->shader_default.vs.GetShader(), nullptr, 0);
+	deviceContext->IASetInputLayout(this->shaderDefault.vs.GetInputLayout());
+	deviceContext->PSSetShader(this->shaderDefault.ps.GetShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->shaderDefault.vs.GetShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &this->viewProjBuffer);
 	deviceContext->PSSetSamplers(0, 1, &this->sampler);
 	for (GameObject* object : drawableObjects)
@@ -256,24 +321,38 @@ void Graphics::render()
 		UINT vertexCount = object->mesh->getVertexCount();
 		UINT stride = sizeof(Vertex3D);
 		UINT offset = 0;
-		ID3D11ShaderResourceView* shaderResView = object->getTexture()->getShaderResView();
+		ID3D11ShaderResourceView* shaderResView;
+		if(object->getTexture()!=nullptr)
+			shaderResView = object->getTexture()->getShaderResView();
+		else
+		{
+			shaderResView = nullptr;
+		}
+
+		
+		Vector4 modColor = object->getColor();
+		hr = deviceContext->Map(colorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
+		deviceContext->Unmap(colorBuffer, 0);
+
 		deviceContext->VSSetConstantBuffers(1, 1, &this->worldBuffer);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
 		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
+		deviceContext->PSSetConstantBuffers(0, 1, &this->colorBuffer);
+		deviceContext->PSSetConstantBuffers(2, 1, &this->lightBuffer);
 		deviceContext->Draw(vertexCount, 0);
 	}
 
-	deviceContext->IASetInputLayout(this->shader_debug.vs.GetInputLayout());
-	deviceContext->PSSetShader(this->shader_debug.ps.GetShader(), nullptr, 0);
-	deviceContext->VSSetShader(this->shader_debug.vs.GetShader(), nullptr, 0);
+	deviceContext->IASetInputLayout(this->shaderDebug.vs.GetInputLayout());
+	deviceContext->PSSetShader(this->shaderDebug.ps.GetShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->shaderDebug.vs.GetShader(), nullptr, 0);
 
-	debuger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(3, 2, 0 ), XMFLOAT3(1, 1, 0));
-	debuger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
-	//debuger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
-
+	debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
+	debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
+	//debugger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
+	
 	// Present the back buffer to the screen since rendering is complete.
-	swapChain->Present(0, 0);
 }
 
 bool Graphics::createShaders()
@@ -303,13 +382,13 @@ bool Graphics::createShaders()
 	{
 		{"SV_POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
 		{"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
-		{"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
 	};
 
 
 	UINT numElements = ARRAYSIZE(inputDesc);
-	this->shader_default.createVS(device, shaderfolder + L"VertexShader.cso", inputDesc, numElements);
-	this->shader_default.createPS(device, shaderfolder + L"PixelShader.cso");
+	this->shaderDefault.createVS(device, shaderfolder + L"VertexShader.cso", inputDesc, numElements);
+	this->shaderDefault.createPS(device, shaderfolder + L"PixelShader.cso");
 
 	D3D11_INPUT_ELEMENT_DESC inputDesc2[] =
 	{
@@ -317,137 +396,8 @@ bool Graphics::createShaders()
 		{"COLOR", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },	};
 	
 	UINT numElements2 = ARRAYSIZE(inputDesc2);
-	this->shader_debug.createVS(device, shaderfolder + L"DebugVs.cso", inputDesc2, numElements2);
-	this->shader_debug.createPS(device, shaderfolder + L"DebugPS.cso");
-
-
-	//ID3DBlob* errorBlob = nullptr;
-	//HRESULT result;
-	////LPCWSTR  vs = VertexShader.hlsl;
-	//ID3DBlob* pVS = nullptr;
-	//result = D3DCompileFromFile(
-	//	L"VertexShader.hlsl", // filename vsFilename
-	//	nullptr,		// optional macros
-	//	nullptr,		// optional include files
-	//	"main",		// entry point
-	//	"vs_5_0",		// shader model (target)
-	//	D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
-	//	0,				// IGNORE...DEPRECATED.
-	//	&pVS,			// double pointer to ID3DBlob		
-	//	&errorBlob		// pointer for Error Blob messages.
-	//);
-	//// compilation failed?
-	//if (FAILED(result))
-	//{
-	//	if (errorBlob)
-	//	{
-	//		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	//		//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
-	//		// release "reference" to errorBlob interface object
-	//		errorBlob->Release();
-	//	}
-	//	else
-	//	{
-	//		//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
-	//	}
-	//	if (pVS)
-	//		pVS->Release();
-	//	return false;
-	//}
-
-	//device->CreateVertexShader(
-	//	pVS->GetBufferPointer(),
-	//	pVS->GetBufferSize(),
-	//	nullptr,
-	//	&vxShader
-	//);
-
-	//D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
-	//	{
-	//		"SV_POSITION",		// "semantic" name in shader
-	//		0,				// "semantic" index (not used)
-	//		DXGI_FORMAT_R32G32B32_FLOAT, // size of ONE element (3 floats)
-	//		0,							 // input slot
-	//		D3D11_APPEND_ALIGNED_ELEMENT, // offset of first element
-	//		D3D11_INPUT_PER_VERTEX_DATA, // specify data PER vertex
-	//		0							 // used for INSTANCING (ignore)
-	//	},
-	//	{
-	//		"TEXCOORD",
-	//		0,
-	//		DXGI_FORMAT_R32G32_FLOAT, //2 values
-	//		0,
-	//		D3D11_APPEND_ALIGNED_ELEMENT,
-	//		D3D11_INPUT_PER_VERTEX_DATA,
-	//		0
-	//	},
-
-	//	{
-	//		"NORMAL",
-	//		0,				// same slot as previous (same vertexBuffer)
-	//		DXGI_FORMAT_R32G32B32_FLOAT,
-	//		0,
-	//		D3D11_APPEND_ALIGNED_ELEMENT,							// offset of FIRST element (after POSITION)
-	//		D3D11_INPUT_PER_VERTEX_DATA,
-	//		0
-	//		//for normal mapping. tangent binormal
-	//	}
-	//	   
-
-
-	//};
-	//
-	////int lSize = sizeof(inputDesc) / sizeof(inputDesc[0]);
-	//result = device->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), pVS->GetBufferPointer(), pVS->GetBufferSize(), &vertexLayout);
-
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
-	//// we do not need anymore this COM object, so we release it.
-	//pVS->Release();
-	//result = D3DCompileFromFile(
-	//	L"PixelShader.hlsl", // filename vsFilename
-	//	nullptr,		// optional macros
-	//	nullptr,		// optional include files
-	//	"main",		// entry point
-	//	"ps_5_0",		// shader model (target)
-	//	D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
-	//	0,				// IGNORE...DEPRECATED.
-	//	&pVS,			// double pointer to ID3DBlob		
-	//	&errorBlob		// pointer for Error Blob messages.
-	//);
-
-	//// compilation failed?
-	//if (FAILED(result))
-	//{
-	//	if (errorBlob)
-	//	{
-	//		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	//		//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
-	//		// release "reference" to errorBlob interface object
-	//		errorBlob->Release();
-	//	}
-	//	else
-	//	{
-	//		//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
-	//	}
-	//	if (pVS)
-	//		pVS->Release();
-	//	return false;
-	//}
-
-	//device->CreatePixelShader(
-	//	pVS->GetBufferPointer(),
-	//	pVS->GetBufferSize(),
-	//	nullptr,
-	//	&pxShader
-	//);
-	
-	
-	
-
-
+	this->shaderDebug.createVS(device, shaderfolder + L"DebugVs.cso", inputDesc2, numElements2);
+	this->shaderDebug.createPS(device, shaderfolder + L"DebugPS.cso");
 
 
 
@@ -471,237 +421,45 @@ bool Graphics::createShaders()
 	{
 		return false;
 	}
+
 	return true;
 }
 
-void Graphics::loadMesh(const char* fileName)
+void Graphics::loadMesh(std::string fileName)
 {
 	Mesh newMesh;
-	if (textures.find(fileName) == textures.end())
+	if (meshes.find(fileName) == meshes.end())
 	{
-		meshes[fileName] = newMesh;
-		meshes[fileName].loadMesh(fileName);
-
-		int bufferSize = meshes[fileName].vertices.size() * sizeof(Vertex3D);
-		UINT stride = sizeof(Vertex3D);
-
-		D3D11_BUFFER_DESC vBufferDesc;
-		ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
-
-		vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vBufferDesc.ByteWidth = bufferSize;
-		vBufferDesc.CPUAccessFlags = 0;
-		vBufferDesc.MiscFlags = 0;
-
-		D3D11_SUBRESOURCE_DATA subData;
-		ZeroMemory(&subData, sizeof(subData));
-		subData.pSysMem = meshes[fileName].vertices.data();
-
-		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
-		meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
-	}
-}
-
-void Graphics::loadShape(Shapes shape)
-{
-	Mesh newMesh;
-	const char* fileName;
-	switch (shape)
-	{
-	case SHAPE_CUBE:
-		fileName = "Cube";
-		if (textures.find(fileName) == textures.end())
+		
+		Importer imp;
+		if (imp.loadMesh(fileName.c_str()))
 		{
-
-			glm::vec3 c0(1.000000, 1.000000, -1.000000); //0
-			glm::vec3 c1(-1.000000, 1.000000, -1.000000); //1 
-			glm::vec3 c2(-1.000000, 1.000000, 1.000000); //2
-			glm::vec3 c3(1.000000, 1.000000, 1.000000); //3
-			glm::vec3 c4(1.000000, -1.000000, -1.000000); //4
-			glm::vec3 c5(-1.000000, -1.000000, -1.000000); //5
-			glm::vec3 c6(-1.000000, -1.000000, 1.000000); //6
-			glm::vec3 c7(1.000000, -1.000000, 1.000000);//7
-
-			glm::vec2 uv0(0.0, 1.0);
-			glm::vec2 uv1(1.0, 1.0);
-			glm::vec2 uv2(0.0, 1.0);
-			glm::vec2 uv3(1.0, 1.0);
-			glm::vec2 uv4(0.0, 0.0);
-			glm::vec2 uv5(1.0, 0.0);
-			glm::vec2 uv6(0.0, 0.0);
-			glm::vec2 uv7(1.0, 0.0);
-
-
 			meshes[fileName] = newMesh;
-			std::vector<Vertex3D> vecTemp;
-
+			Vertex* vertices = imp.getVertices();
+			std::vector<Vertex3D> tempVec;
 			Vertex3D vertex;
-			vertex.position = c0;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c1;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c2;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c0;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c2;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c3;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-
-
-			vertex.position = c0;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c4;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c5;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c0;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c5;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c1;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-
-			vertex.position = c1;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c5;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c6;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c1;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c6;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c2;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-
-			vertex.position = c2;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c6;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c7;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c2;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c7;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c3;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-
-			vertex.position = c3;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c7;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c4;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c3;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c4;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c0;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-
-			vertex.position = c4;
-			vertex.uv = uv0;
-			vertex.normal = glm::vec3(0.0, 1.0, 0.0);
-			vecTemp.push_back(vertex);
-
-			vertex.position = c7;
-			vertex.uv = uv1;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c6;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c4;
-			vertex.uv = uv0;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c6;
-			vertex.uv = uv2;
-			vecTemp.push_back(vertex);
-
-			vertex.position = c5;
-			vertex.uv = uv3;
-			vecTemp.push_back(vertex);
-
-			for (int i = 0; i < vecTemp.size(); i++)
+			for (int i = 0; i < imp.getVertexCount(); i++)
 			{
-				vecTemp.at(i).uv.y *= -1;
+				vertex.position.x = vertices[i].x;
+				vertex.position.y = vertices[i].y;
+				vertex.position.z = vertices[i].z;
+
+				vertex.normal.x = vertices[i].nx;
+				vertex.normal.y = vertices[i].ny;
+				vertex.normal.z = vertices[i].nz;
+
+				vertex.uv.x = vertices[i].u;
+				vertex.uv.y = vertices[i].v;
+
+				tempVec.push_back(vertex);
 			}
-
-
-			meshes[fileName].insertDataToMesh(vecTemp);
-
-			int bufferSize = meshes[fileName].vertices.size() * sizeof(Vertex3D);
+			
+			meshes[fileName].insertDataToMesh(tempVec);
+			AABB aabb;
+			imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z);
+			imp.getMinBBox(aabb.minPos.x, aabb.minPos.y, aabb.minPos.z);
+			meshes[fileName].setAABB(aabb);
+			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
 			UINT stride = sizeof(Vertex3D);
 
 			D3D11_BUFFER_DESC vBufferDesc;
@@ -718,37 +476,196 @@ void Graphics::loadShape(Shapes shape)
 			subData.pSysMem = meshes[fileName].vertices.data();
 
 			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
-			meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+			//meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+		}
+	}
+}
+
+void Graphics::loadModel(std::string fileName)
+{
+	this->loadMesh(fileName + ".bin");
+	this->loadTexture(fileName + ".tga");
+}
+
+void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
+{
+	Mesh newMesh;
+	std::string fileName;
+	switch (shape)
+	{
+	case SHAPE_CUBE:
+		fileName = "Cube";
+		if (meshes.find(fileName) == meshes.end())
+		{
+			std::vector<Vertex3D> vecTemp;
+			meshes[fileName] = newMesh;
+			Vertex3D vec[] = {
+				{Vector3(-1.0f,  1.0f, -1.0f), Vector2(0.0f, 0.0f), Vector3(0.0f,0.0f,-1.0f)},
+				{Vector3(1.0f,1.0f,-1.0f), Vector2(1.0f, 0.0f), Vector3(0.0f,0.0f,-1.0f)},
+				{Vector3(-1.0f,-1.0f,-1.0f), Vector2(0.0f, 1.0f), Vector3(0.0f,0.0f,-1.0f)},
+				{Vector3(-1.0f,-1.0f,-1.0f), Vector2(0.0f, 1.0f), Vector3(0.0f,0.0f,-1.0f)},
+				{Vector3(1.0f,1.0f,-1.0f), Vector2(1.0f,0.0f), Vector3(0.0f,0.0f,-1.0f)},
+				{Vector3(1.0f,-1.0f,-1.0f), Vector2(1.0f,1.0f), Vector3(0.0f,0.0f,-1.0f)},
+
+				{Vector3(1.0f,1.0f,-1.0f), Vector2(0.0f,0.0f), Vector3(1.0f,0.0f,0.0f)},
+				{Vector3(1.0f,1.0f,1.0f), Vector2(1.0f,0.0f), Vector3(1.0f,0.0f,0.0f)},
+				{Vector3(1.0f, -1.0f, -1.0f) ,Vector2(0.0f, 1.0f)	,Vector3(1.0f,  0.0f,  0.0f)},
+				{Vector3(1.0f, -1.0f, -1.0f) , Vector2(0.0f, 1.0f)  ,Vector3(1.0f,  0.0f,  0.0f)},
+				{Vector3(1.0f,  1.0f,  1.0f) , Vector2(1.0f, 0.0f)  ,Vector3(1.0f,  0.0f,  0.0f)},
+				{Vector3(1.0f, -1.0f,  1.0f), Vector2(1.0f, 1.0f)	,Vector3(1.0f,  0.0f,  0.0f)},
+
+				{Vector3(1.0f,  1.0f,  1.0f),Vector2(0.0f, 0.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+				{Vector3(-1.0f, 1.0f,  1.0f),Vector2(1.0f, 0.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+				{Vector3(1.0f, -1.0f,  1.0f),Vector2(0.0f, 1.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+				{Vector3(1.0f, -1.0f,  1.0f),Vector2(0.0f, 1.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+				{Vector3(-1.0f, 1.0f,  1.0f),Vector2(1.0f, 0.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+				{Vector3(-1.0f,-1.0f,  1.0f),Vector2(1.0f, 1.0f)  ,Vector3(0.0f,  0.0f,  1.0f)},
+
+				{Vector3(-1.0f, 1.0f,  1.0f),Vector2(0.0f, 0.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+				{Vector3(-1.0f, 1.0f, -1.0f),Vector2(1.0f, 0.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+				{Vector3(-1.0f,-1.0f,  1.0f),Vector2(0.0f, 1.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+				{Vector3(-1.0f,-1.0f,  1.0f),Vector2(0.0f, 1.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+				{Vector3(-1.0f, 1.0f, -1.0f),Vector2(1.0f, 0.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+				{Vector3(-1.0f,-1.0f, -1.0f),Vector2(1.0f, 1.0f)	,Vector3(-1.0f,  0.0f,  0.0f)},
+
+				{Vector3(-1.0f, 1.0f,  1.0f),Vector2(0.0f, 0.0f) ,Vector3(0.0f,  1.0f  ,0.0f)},
+				{Vector3(1.0f,  1.0f,  1.0f),Vector2(1.0f, 0.0f) ,Vector3(0.0f,  1.0f  ,0.0f)},
+				{Vector3(-1.0f, 1.0f, -1.0f),Vector2(0.0f, 1.0f)	,Vector3(0.0f,  1.0f  ,0.0f)},
+				{Vector3(-1.0f, 1.0f, -1.0f),Vector2(0.0f, 1.0f),Vector3(0.0f,  1.0f  ,0.0f)},
+				{Vector3(1.0f,  1.0f,  1.0f),Vector2(1.0f, 0.0f) ,Vector3(0.0f,  1.0f  ,0.0f)},
+				{Vector3(1.0f,  1.0f, -1.0f),Vector2(1.0f, 1.0f) ,Vector3(0.0f,  1.0f  ,0.0f)},
+
+				{Vector3(-1.0f, -1.0f, -1.0f),Vector2(0.0f, 0.0f),Vector3(0.0f, -1.0f , 0.0f)},
+				{Vector3(1.0f, -1.0f,-1.0f),Vector2(1.0f, 0.0f),Vector3(0.0f, -1.0f , 0.0f)},
+				{Vector3(-1.0f, -1.0f,  1.0f),Vector2(0.0f, 1.0f),Vector3(0.0f, -1.0f , 0.0f)},
+				{Vector3(-1.0f, -1.0f,  1.0f),Vector2(0.0f, 1.0f),Vector3(0.0f, -1.0f , 0.0f)},
+				{Vector3(1.0f, -1.0f, -1.0f),Vector2(1.0f, 0.0f),Vector3(0.0f, -1.0f , 0.0f)},
+				{Vector3(1.0f, -1.0f,  1.0f),Vector2(1.0f, 1.0f),Vector3(0.0f, -1.0f , 0.0f)}
+			};
+
+			for (int i = 0; i < 36; i++)
+			{
+				vecTemp.push_back(vec[i]);
+			}
+
+
+			meshes[fileName].insertDataToMesh(vecTemp);
+
+			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
+			UINT stride = sizeof(Vertex3D);
+
+			D3D11_BUFFER_DESC vBufferDesc;
+			ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+			vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vBufferDesc.ByteWidth = bufferSize;
+			vBufferDesc.CPUAccessFlags = 0;
+			vBufferDesc.MiscFlags = 0;
+
+			D3D11_SUBRESOURCE_DATA subData;
+			ZeroMemory(&subData, sizeof(subData));
+			subData.pSysMem = meshes[fileName].vertices.data();
+
+			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+			meshes[fileName].vertices.clear();
 		}
 		break;
-	case SHAPE_SPHERE:
-		break;
-	case SHAPE_TRIANGLE:
+	case SHAPE_QUAD:
+		fileName = "Quad";
+		if (meshes.find(fileName) == meshes.end())
+		{
+			std::vector<Vertex3D> vecTemp;
+			Vertex3D vertex;
+			meshes[fileName] = newMesh;
+			vertex.position = Vector3(-1.0, 0.0, -1.0);
+			vertex.uv = Vector2(0.0, 1.0);
+			vertex.normal = Vector3(0.0, 1.0, 0.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = Vector3(-1.0, 0.0, 1.0);
+			vertex.uv = Vector2(0.0, 0.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = Vector3(1.0, 0.0, -1.0);
+			vertex.uv = Vector2(1.0, 1.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = Vector3(-1.0, 0.0, 1.0);
+			vertex.uv = Vector2(0.0, 0.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = Vector3(1.0, 0.0, 1.0);
+			vertex.uv = Vector2(1.0, 0.0);
+			vecTemp.push_back(vertex);
+
+			vertex.position = Vector3(1.0, 0.0, -1.0);
+			vertex.uv = Vector2(1.0, 1.0);
+			vecTemp.push_back(vertex);
+
+			meshes[fileName].insertDataToMesh(vecTemp);
+
+			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
+			UINT stride = sizeof(Vertex3D);
+
+			D3D11_BUFFER_DESC vBufferDesc;
+			ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+			vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vBufferDesc.ByteWidth = bufferSize;
+			vBufferDesc.CPUAccessFlags = 0;
+			vBufferDesc.MiscFlags = 0;
+
+			D3D11_SUBRESOURCE_DATA subData;
+			ZeroMemory(&subData, sizeof(subData));
+			subData.pSysMem = meshes[fileName].vertices.data();
+
+			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+			meshes[fileName].vertices.clear();
+		}
 		break;
 	default:
 		break;
 	}
-	
 }
 
-void Graphics::loadTexture(const char* fileName)
+bool Graphics::loadTexture(std::string fileName)
 {
-	Texture newTexture;
 	if (textures.find(fileName) == textures.end())
 	{
+		Texture* newTexture = new Texture();
+
+		if (!newTexture->Initialize(this->device, this->deviceContext, fileName.c_str(), -1))
+		{
+			delete newTexture;
+			return false;
+		}
+
 		textures[fileName] = newTexture;
-		textures[fileName].Initialize(device, deviceContext, fileName, -1);
 	}
+
+	return true;
 }
 
 const Mesh* Graphics::getMeshPointer(const char* fileName)
 {
+
+	if (meshes.find(fileName) == meshes.end())
+	{
+		return nullptr;
+	}
 	return &meshes[fileName];
 }
 
 Texture* Graphics::getTexturePointer(const char* fileName)
 {
-	return &textures[fileName];
+	if (textures.find(fileName) == textures.end())
+	{
+		return nullptr;
+	}
+
+	return textures[fileName];
 }
 
 void Graphics::addToDraw(GameObject* o)
@@ -760,3 +677,30 @@ void Graphics::removeFromDraw(GameObject* o)
 {
 	std::find(drawableObjects.begin(), drawableObjects.end(), o);
 }
+
+void Graphics::addPointLight(PointLight light)
+{
+	pointLights.push_back(light);
+}
+
+void Graphics::clearPointLights()
+{
+	pointLights.clear();
+}
+
+void Graphics::setSunVector(Vector3 vectorToSun)
+{
+	vectorToSun.Normalize();
+	sunVector = Vector4(vectorToSun.x, vectorToSun.y, vectorToSun.z, 0.0);
+}
+
+Vector3 Graphics::getSunVector()
+{
+	return Vector3(sunVector);
+}
+
+void Graphics::presentScene()
+{
+	swapChain->Present(0, 0);
+}
+
