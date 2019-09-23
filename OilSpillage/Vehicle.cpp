@@ -32,7 +32,7 @@ void Vehicle::init()
 	vehicle->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	//vehicle->setColor(Vector4(2,0.3,0.3,1));
 	vehicle->setScale(Vector3(0.75f, 0.1f, 1.0f));
-	Game::getGraphics().loadTexture("brickwall.tga");
+	Game::getGraphics().loadTexture("brickwall.tga","sd");
 	vehicle->setTexture(Game::getGraphics().getTexturePointer("brickwall.tga"));
 
 	this->bodyRotation = new GameObject;
@@ -41,7 +41,7 @@ void Vehicle::init()
 	bodyRotation->setPosition(Vector3(0.0f, 0.2f, 0.0f));
 	//vehicle->setColor(Vector4(2,0.3,0.3,1));
 	bodyRotation->setScale(Vector3(0.5f, 0.12f, 0.9f));
-	Game::getGraphics().loadTexture("CarTemp.tga");
+	Game::getGraphics().loadTexture("CarTemp.tga","sd");
 	bodyRotation->setTexture(Game::getGraphics().getTexturePointer("CarTemp.tga"));
 	
 	

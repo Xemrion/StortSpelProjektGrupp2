@@ -32,14 +32,14 @@ void Game::init(Window* window)
 	
 	this->mouse = std::make_unique<Mouse>();
 	this->mouse->SetWindow(window->handle);
-	graphics.loadMesh("sda");
+	graphics.loadMesh("sda","fds");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadShape(SHAPE_QUAD);
-	graphics.loadTexture("brickwall.tga");
-	graphics.loadModel("Dummy_Roller_Melee");
+	graphics.loadTexture("brickwall.tga", "brickwall.tga");
+	graphics.loadModel("Dummy_Roller_Melee", "Dummy_Player_Car");
 	this->testObject = new GameObject;
 	testObject->mesh = graphics.getMeshPointer("Quad");
-	graphics.addToDraw(testObject);
+	//graphics.addToDraw(testObject);
 	testObject->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	testObject->setScale(Vector3(0.2f, 0.2f, 0.2f));
 	testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
@@ -57,7 +57,7 @@ void Game::init(Window* window)
 	aiObject->mesh = graphics.getMeshPointer("Cube");
 	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
-	graphics.addToDraw(aiObject);
+	//graphics.addToDraw(aiObject);
 	//AiTestObject = new GameObject;
 	//AiTestObject->mesh = graphics.getMeshPointer("Cube");
 	//AiTestObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
@@ -123,8 +123,8 @@ void Game::run()
 		
 		player.update(deltaTime);
 		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
-		this->graphics.render(this->camera);
-		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
+		this->graphics.render(this->camera, deltaTime);
+		//this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
 		std::string textUse;
 
 

@@ -84,6 +84,9 @@
     <ClCompile Include="Sound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Particle\ParticleSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -190,9 +193,9 @@
     <FxCompile Include="DebugPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Particle\ParticleVertexShader.hlsl" />
     <FxCompile Include="Particle\ParticlePS.hlsl" />
     <FxCompile Include="Particle\ParticleGS.hlsl" />
+    <FxCompile Include="Particle\ParticleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

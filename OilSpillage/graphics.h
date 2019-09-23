@@ -17,6 +17,7 @@
 #include "Camera.h"
 #include<string>
 #include "Lights.h"
+#include"Particle/ParticleSystem.h"
 
 enum Shapes
 {
@@ -50,6 +51,7 @@ class Graphics {
 	Vector4 sunVector = Vector4(0.0, 1.0, 0.0, 0.0);
 	size_t maxPointLights = 20;
 	
+	ParticleSystem particleSystem;
 
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
@@ -60,10 +62,11 @@ public:
 	~Graphics();
 	bool init(Window* window, float fov, Camera theCamera);
 	Debug* getdebugger();
-	void loadMesh(std::string fileName);
-	void loadModel(std::string fileName);
+	void loadMesh(std::string fileName, std::string meshName);
+	//Filename is the path and modelname is the stored representation to get the mesh and texture
+	void loadModel(std::string fileName, std::string modelName);
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
-	bool loadTexture(std::string fileName);
+	bool loadTexture(std::string fileName, std::string textureName);
 	const Mesh* getMeshPointer(const char* fileName);
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
@@ -73,6 +76,6 @@ public:
 	void setSunVector(Vector3 vectorToSun);
 	Vector3 getSunVector();
 	void presentScene();
-	void render(Camera camera);
+	void render(Camera camera, float deltaTime);
 	bool createShaders();
 };

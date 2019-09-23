@@ -268,6 +268,8 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	ImGui_ImplDX11_Init(this->device, this->deviceContext);
 	ImGui::StyleColorsDark();
 
+	this->particleSystem.initiateParticles(device, deviceContext);
+	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 0), Vector3(1, 0, 0), Vector4(1, 1, 0, 1),0.1f);
 	return true;
 }
 
@@ -276,7 +278,7 @@ Debug* Graphics::getdebugger()
 	return this->debugger;
 }
 
-void Graphics::render(Camera camera)
+void Graphics::render(Camera camera, float deltaTime)
 {
 	float color[4] = {
 		0,0,0,1
@@ -340,13 +342,17 @@ void Graphics::render(Camera camera)
 		deviceContext->PSSetConstantBuffers(2, 1, &this->lightBuffer);
 		deviceContext->Draw(vertexCount, 0);
 	}
+	this->particleSystem.updateParticles(deltaTime);
+	this->particleSystem.drawAll(camera);
+	
+
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.GetInputLayout());
 	deviceContext->PSSetShader(this->shaderDebug.ps.GetShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDebug.vs.GetShader(), nullptr, 0);
 
-	debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
-	debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
+	/*debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
+	debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));*/
 	//debugger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
 	
 	// Present the back buffer to the screen since rendering is complete.
@@ -422,7 +428,7 @@ bool Graphics::createShaders()
 	return true;
 }
 
-void Graphics::loadMesh(std::string fileName)
+void Graphics::loadMesh(std::string fileName,std::string meshName)
 {
 	Mesh newMesh;
 	if (meshes.find(fileName) == meshes.end())
@@ -432,25 +438,29 @@ void Graphics::loadMesh(std::string fileName)
 		if (imp.loadMesh(fileName.c_str()))
 		{
 			meshes[fileName] = newMesh;
-			Vertex* vertices = imp.getVertices();
+			
 			std::vector<Vertex3D> tempVec;
 			Vertex3D vertex;
-			for (int i = 0; i < imp.getVertexCount(); i++)
+			for (int i = 0; i < imp.getMeshCount(); i++)
 			{
-				vertex.position.x = vertices[i].x;
-				vertex.position.y = vertices[i].y;
-				vertex.position.z = vertices[i].z;
+				Vertex* vertices = imp.getVertices(i);
+				for (int j = 0; j < imp.getVertexCount(i); j++)
+				{
+					vertex.position.x = vertices[j].x;
+					vertex.position.y = vertices[j].y;
+					vertex.position.z = vertices[j].z;
 
-				vertex.normal.x = vertices[i].nx;
-				vertex.normal.y = vertices[i].ny;
-				vertex.normal.z = vertices[i].nz;
+					vertex.normal.x = vertices[j].nx;
+					vertex.normal.y = vertices[j].ny;
+					vertex.normal.z = vertices[j].nz;
 
-				vertex.uv.x = vertices[i].u;
-				vertex.uv.y = vertices[i].v;
+					vertex.uv.x = vertices[j].u;
+					vertex.uv.y = vertices[j].v;
 
-				tempVec.push_back(vertex);
+					tempVec.push_back(vertex);
+				}
 			}
-			
+
 			meshes[fileName].insertDataToMesh(tempVec);
 			AABB aabb;
 			imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z);
@@ -477,11 +487,11 @@ void Graphics::loadMesh(std::string fileName)
 		}
 	}
 }
-
-void Graphics::loadModel(std::string fileName)
+void Graphics::loadModel(std::string fileName,std::string modelName)
 {
-	this->loadMesh(fileName + "/fil.bin");
-	this->loadTexture(fileName + ".tga");
+	//sadasde
+	this->loadMesh(fileName + ".bin","temp");
+	this->loadTexture(fileName + ".tga","temp");
 }
 
 void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
@@ -627,7 +637,7 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 	}
 }
 
-bool Graphics::loadTexture(std::string fileName)
+bool Graphics::loadTexture(std::string fileName, std::string textureName)
 {
 	if (textures.find(fileName) == textures.end())
 	{
