@@ -129,6 +129,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AI\Actor.cpp" />
+    <ClCompile Include="AI\AStar.cpp" />
+    <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -155,6 +157,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
+    <ClInclude Include="AI\AStar.h" />
+    <ClInclude Include="AI\Node.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="game.h" />

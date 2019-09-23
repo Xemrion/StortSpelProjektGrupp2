@@ -57,7 +57,7 @@ void Game::init(Window* window)
 	aiObject = new AIPlayer();
 	aiObject->mesh = graphics.getMeshPointer("Cube");
 	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
-	aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
+	//aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
 	graphics.addToDraw(aiObject);
 	//AiTestObject = new GameObject;
 	//AiTestObject->mesh = graphics.getMeshPointer("Cube");
@@ -87,7 +87,7 @@ void Game::run()
 	prevTime = 0;
 	QueryPerformanceCounter((LARGE_INTEGER*)& prevTime);
 
-	this->aiObject->SetTarget(&this->player.getVehicle()->getPosition());
+	this->aiObject->setTarget(&this->player.getVehicle()->getPosition());
 	Input::SetKeyboardPlayerID(0);
 
 	while (this->window->update())

@@ -12,40 +12,41 @@ Actor::AItype& Actor::GetType()
 
 void AIPlayer::Update(float dt)
 {
-
-	// set target;
-	if (InRangeOf(*currentTarget))
-	{
-		this->Seek(dt);
-	}
-	else
-	{
-
-	}
+	//TODO: Call findPath every X frames
+	//findPath();
+	followPath(dt);
 }
 
-void AIPlayer::SetTarget(Vector3* target)
+void AIPlayer::setTarget(Vector3* target)
 {
-	// Set the current Target
 	this->currentTarget = target;
 }
 
-void AIPlayer::Seek(float dt)
+void AIPlayer::findPath()
 {
-	// to be able to move towards the target we
-	// need to check where he is on the grid. 
-	// take the shortest path towards the target
+	if (currentTarget != nullptr)
 	{
-	// make a dir vector
-		Vector3 dir = *currentTarget - position;
-		dir.Normalize();
-		Vector3 newPosition = position + dir * dt;
-		this->setPosition(newPosition);
+		nodePath = aStar.algorithm(position, *currentTarget);
 	}
 }
 
-void AIPlayer::PathFollowing(float dt)
+void AIPlayer::followPath(float dt)
 {
+	if (nodePath.size() > 0)
+	{
+		targetNode = DirectX::SimpleMath::Vector3(nodePath.at(nodePath.size()-1)->GetXPos(), 0, nodePath.at(nodePath.size()-1)->GetYPos());
+		Vector3 dir = targetNode - position;
+		dir.Normalize();
+		Vector3 newPosition = position + dir * dt;
+
+		if (newPosition.Distance(targetNode, newPosition) < 1)
+		{
+			nodePath.pop_back();
+		}
+
+		this->setPosition(newPosition);
+	}
+
 	////check if we have a path to follow
 	//if (Path.size() > 0)
 	//{
@@ -81,9 +82,17 @@ void AIPlayer::SetWayPoint(NodeList* Path)
 	this->Path.push(Path);
 }
 
-bool AIPlayer::InRangeOf(Vector3& position)
+bool AIPlayer::inRangeOf(Vector3& position)
 {
 	return this->Inside(position);
+}
+
+AIPlayer::AIPlayer()
+{
+	aStar = AStar(10, 7);
+	setPosition(DirectX::SimpleMath::Vector3(5, 0, 6));
+	setTarget(&DirectX::SimpleMath::Vector3());
+	findPath();
 }
 
 bool AIPlayer::Inside(Vector3 waypoint)
