@@ -146,7 +146,7 @@ bool Importer::loadMesh(const char * filename)
 
 		for (int i = 0; i < h.meshCount; i++)
 		{
-			infile.read((char*)&loadedMeshes[i].mHeader, sizeof(Mesh));
+			infile.read((char*)&loadedMeshes[i].mHeader, sizeof(FormatMesh));
 			infile.read((char*)&loadedMeshes[i].material, sizeof(Material));
 			this->loadedMeshes[i].vertices = new Vertex[loadedMeshes[i].mHeader.vertexCount];
 			infile.read((char*)loadedMeshes[i].vertices, sizeof(Vertex) * loadedMeshes[i].mHeader.vertexCount);
@@ -205,7 +205,7 @@ bool Importer::loadLights(const char * filename)
 		for (int i = 0; i < h.meshCount; i++)
 		{
 			LoadedMesh tMesh;
-			infile.read((char*)&tMesh.mHeader, sizeof(Mesh));
+			infile.read((char*)&tMesh.mHeader, sizeof(FormatMesh));
 			infile.ignore(sizeof(Material));
 			infile.ignore(sizeof(Vertex) * tMesh.mHeader.vertexCount);
 			if (tMesh.mHeader.jointCount > 0)
@@ -233,7 +233,7 @@ bool Importer::loadLights(const char * filename)
 
 		}
 
-		infile.ignore(sizeof(Camera) * h.cameraCount);
+		infile.ignore(sizeof(FormatCamera) * h.cameraCount);
 		infile.read((char*)this->loadedLights, sizeof(Light) * h.lightCount);
 
 		infile.close();
@@ -262,12 +262,12 @@ bool Importer::loadCameras(const char * filename)
 		infile.read((char*)&h, sizeof(MyFormat));
 
 		this->header.cameraCount = h.cameraCount;
-		this->loadedCameras = new Camera[h.cameraCount];
+		this->loadedCameras = new FormatCamera[h.cameraCount];
 
 		for (int i = 0; i < h.meshCount; i++)
 		{
 			LoadedMesh tMesh;
-			infile.read((char*)&tMesh.mHeader, sizeof(Mesh));
+			infile.read((char*)&tMesh.mHeader, sizeof(FormatMesh));
 			infile.ignore(sizeof(Material));
 			infile.ignore(sizeof(Vertex) * tMesh.mHeader.vertexCount);
 			if (tMesh.mHeader.jointCount > 0)
@@ -295,7 +295,7 @@ bool Importer::loadCameras(const char * filename)
 
 		}
 
-		infile.read((char*)loadedCameras, sizeof(Camera) * h.cameraCount);
+		infile.read((char*)loadedCameras, sizeof(FormatCamera) * h.cameraCount);
 
 		infile.close();
 		return true;

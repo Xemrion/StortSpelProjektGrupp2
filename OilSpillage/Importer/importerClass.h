@@ -27,7 +27,7 @@ struct BlendShape
 
 struct LoadedMesh
 {
-	Mesh mHeader;
+	FormatMesh mHeader;
 	Material material;
 	Vertex* vertices;
 	Joint* skeleton;
@@ -46,7 +46,7 @@ private:
 
 	MyFormat header;
 	LoadedMesh* loadedMeshes;
-	Camera* loadedCameras;
+	FormatCamera* loadedCameras;
 	Light* loadedLights;
 	Group* loadedGroups;
 

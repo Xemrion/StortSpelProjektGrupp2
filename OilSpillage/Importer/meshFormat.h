@@ -8,7 +8,7 @@ struct MyFormat {
 	int groupCount = 0;
 };
 
-struct Camera {
+struct FormatCamera {
 	float x, y, z;
 	float upX, upY, upZ;
 	float lookAtX, lookAtY, lookAtZ;
@@ -38,7 +38,7 @@ struct Light {
 	float intensity;
 };
 
-struct Mesh {
+struct FormatMesh {
 	char meshName[100];
 	int vertexCount;
 	char materialName[100];
