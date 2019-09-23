@@ -45,6 +45,7 @@ private:
 	Vector2 roadNetworkMax, roadNetworkMin;
 	float rotationAngle, forwardDistance;
 	std::vector<Segment> roadNetwork;
+	std::vector<std::string> roadFiles;
 	char forwardSymbol, turnLeftSymbol, turnRightSymbol, halfSymbol;
 
 	bool segmentIntersection(Segment& first, Segment& second);

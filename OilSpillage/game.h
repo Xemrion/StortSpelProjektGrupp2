@@ -19,6 +19,7 @@ class Game {
 	GameObject* testObject2 = nullptr;
 	//GameObject* AiTestObject = nullptr;
 	AIPlayer * aiObject = nullptr;
+	RoadNetwork* testNetwork = nullptr;
 
 	void addQuad(int x);
 

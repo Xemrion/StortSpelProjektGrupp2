@@ -61,10 +61,9 @@ RoadNetwork::RoadNetwork(int randNr, Vector2 max, Vector2 min, float rotation)
 RoadNetwork::~RoadNetwork()
 {
 	clearSegments();
-	remove("Road Network\\test.txt");
-	remove("Road Network\\test2.txt");
-	remove("Road Network\\test3.txt");
-	remove("Road Network\\test4.txt");
+	for (int i = 0; i < this->roadFiles.size(); i++) {
+		remove(roadFiles[i].c_str());
+	}
 }
 
 void RoadNetwork::setLetters(char forward, char left, char right, char half)
@@ -300,6 +299,7 @@ bool RoadNetwork::saveTestNetwork(std::string filename)
 			", " + std::to_string(this->roadNetwork[i].secondPoint.z) + ")\n";
 		testSave << toSave;
 	}
+	this->roadFiles.push_back(filePath + filename);
 
 	testSave.close();
 
