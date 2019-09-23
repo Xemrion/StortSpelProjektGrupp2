@@ -87,7 +87,7 @@ void Game::run()
 	prevTime = 0;
 	QueryPerformanceCounter((LARGE_INTEGER*)& prevTime);
 
-	this->aiObject->setPlayerPos(&this->player.getVehicle()->getPosition());
+	this->aiObject->setPlayerPos(this->player.getVehicle()->getPosition());
 	Input::SetKeyboardPlayerID(0);
 
 	while (this->window->update())

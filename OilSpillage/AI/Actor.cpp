@@ -24,7 +24,7 @@ void AIPlayer::setPlayerPos(Vector3 playerPos)
 
 void AIPlayer::findPath()
 {
-	if (AIState::chasing)
+	if (state == AIState::chasing)
 	{
 		path = aStar.algorithm(position, playerPos);
 	}
@@ -52,6 +52,6 @@ AIPlayer::AIPlayer()
 	aStar = AStar(10, 7);
 	setPosition(DirectX::SimpleMath::Vector3(5, 0, 6));
 	setPlayerPos(DirectX::SimpleMath::Vector3());
+	state = AIState::chasing;
 	findPath();
-	state = AIState::wandering;
 }
