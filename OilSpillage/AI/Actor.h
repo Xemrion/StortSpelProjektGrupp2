@@ -25,7 +25,13 @@ private:
 class AIPlayer :public GameObject
 {
 public:
-	 
+
+	enum AIState
+	{
+		chasing,
+		attacking,
+		wandering
+	};
 	void Update(float dt);
 	void setPlayerPos(Vector3 playerPos);
 	// Move toward a target
@@ -37,7 +43,7 @@ public:
 	//Keep a certain distance from a target
 	void separate();
 	void followPath(float dt);
-	bool lineOfSight(Vector3 &position);
+	bool lineOfSight(Vector3& position);
 	AIPlayer();
 	int getState();
 private:
@@ -46,5 +52,5 @@ private:
 	//use ref to  get currentTarget to use behaviour on
 	Vector3 playerPos;
 	Vector3 targetNode;
-	int state;
+	AIState state;
 };
