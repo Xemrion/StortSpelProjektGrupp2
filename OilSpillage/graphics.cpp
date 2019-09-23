@@ -20,6 +20,7 @@ Graphics::Graphics()
 	this->viewProjBuffer = nullptr;
 	this->worldBuffer = nullptr;
 	this->colorBuffer = nullptr;
+	this->lightBuffer = nullptr;
 
 	this->sampler = nullptr;
 
@@ -39,6 +40,7 @@ Graphics::~Graphics()
 	this->viewProjBuffer->Release();
 	this->worldBuffer->Release();
 	this->colorBuffer->Release();
+	this->lightBuffer->Release();
 
 	this->sampler->Release();
 
@@ -204,7 +206,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>((sizeof(Vector4) * 2) * maxPointLights + (sizeof(Vector4) * 3) * maxSpotLights + sizeof(Vector4));
+	desc.ByteWidth = static_cast<UINT>((sizeof(Vector4) * 2) * LightList::size + (sizeof(Vector4) * 3) * LightList::size + sizeof(Vector4));
 	desc.StructureByteStride = 0;
 
 	hr = device->CreateBuffer(&desc, 0, &lightBuffer);
@@ -289,16 +291,17 @@ void Graphics::render(Camera camera)
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);
 
-	hr = deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	struct LightBufferContents {
 		Vector4 sun;
-		PointLight pointLights[20];
-		SpotLight spotLights[20];
+		PointLight pointLights[LightList::size];
+		SpotLight spotLights[LightList::size];
 	} lightBufferContents;
+
+	hr = deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	ZeroMemory(mappedResource.pData, sizeof(LightBufferContents));
 	CopyMemory(&lightBufferContents.sun, &sunVector, sizeof(Vector4));
-	CopyMemory(lightBufferContents.pointLights, pointLights.data(), min(maxPointLights, pointLights.size()) * sizeof(PointLight));
-	CopyMemory(lightBufferContents.spotLights, spotLights.data(), min(maxSpotLights, spotLights.size()) * sizeof(SpotLight));
+	CopyMemory(lightBufferContents.pointLights, &*lightList->pointLights.begin(), LightList::size * sizeof(PointLight));
+	CopyMemory(lightBufferContents.spotLights, &*lightList->spotLights.begin(), LightList::size * sizeof(SpotLight));
 	CopyMemory(mappedResource.pData, &lightBufferContents, sizeof(LightBufferContents));
 	deviceContext->Unmap(lightBuffer, 0);
 
@@ -676,24 +679,9 @@ void Graphics::removeFromDraw(GameObject* o)
 	std::find(drawableObjects.begin(), drawableObjects.end(), o);
 }
 
-void Graphics::addPointLight(PointLight light)
+void Graphics::setLightList(LightList* lightList)
 {
-	pointLights.push_back(light);
-}
-
-void Graphics::clearPointLights()
-{
-	pointLights.clear();
-}
-
-void Graphics::addSpotLight(SpotLight light)
-{
-	spotLights.push_back(light);
-}
-
-void Graphics::clearSpotLights()
-{
-	spotLights.clear();
+	this->lightList = lightList;
 }
 
 void Graphics::setSunVector(Vector3 vectorToSun)

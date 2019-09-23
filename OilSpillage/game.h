@@ -8,6 +8,8 @@
 //#include"ImGui/imgui_impl_dx11.h"
 #include"vehicle.h"
 #include "AI/Actor.h"
+#include <array>
+
 class Game {
 	Window* window = nullptr;
 
@@ -18,7 +20,8 @@ class Game {
 	GameObject* testObject3 = nullptr;
 	//GameObject* AiTestObject = nullptr;
 	AIPlayer * aiObject = nullptr;
-
+	LightList lightList;
+	std::array<SpotLight, LightList::size>::iterator testLight;
 	void addQuad(int x);
 
 	float deltaTime = 0.0f;

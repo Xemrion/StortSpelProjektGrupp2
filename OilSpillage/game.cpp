@@ -56,7 +56,7 @@ void Game::init(Window* window)
 	testObject3->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject3);
 	testObject3->setPosition(Vector3(0.0f, -1.0f, 0.0f));
-	testObject3->setScale(Vector3(20.0, 1.0, 20.0));
+	testObject3->setScale(Vector3(50.0, 1.0, 50.0));
 	testObject3->setTexture(graphics.getTexturePointer("brickwall.tga"));
 
 	aiObject = new AIPlayer();
@@ -70,16 +70,20 @@ void Game::init(Window* window)
 	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
 	//graphics.addToDraw(AiTestObject);
 
-	
-	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f));
-	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f),  50.f));
-	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f),  50.f));
-	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f));
+	// light tests
+#if _DEBUG
+	lightList.addLight(PointLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f));
+	lightList.addLight(PointLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f),  50.f));
+	lightList.addLight(PointLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f),  50.f));
+	lightList.addLight(PointLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f));
 
-	graphics.addSpotLight(SpotLight(Vector3(-5.f, 4.0f, 0.0f), Vector3(1.0f, 0.3f, 1.0f), 50.f, Vector3(0.0, -1.0, 0.5), 1.0));
-	graphics.addSpotLight(SpotLight(Vector3(-5.f, 4.0f, 0.0f), Vector3(1.0f, 0.3f, 1.0f), 50.f, Vector3(0.0, -1.0, -0.5), 0.4));
+	testLight = lightList.addLight(SpotLight(Vector3(-25.f, 4.0f, 2.0f), Vector3(1.0f, 0.3f, 1.0f), 50.f, Vector3(0.0f, -1.0f, 0.5f), 1.0f));
+	lightList.removeLight(lightList.addLight(SpotLight(Vector3(-25.f, 4.0f, -2.0f), Vector3(1.0f, 0.3f, 1.0f), 50.f, Vector3(0.0f, -1.0f, -0.5f), 0.4f)));
+	testLight->setColor(Vector3(0.0f, 1.0f, 0.0f));
+#endif
 
 	graphics.setSunVector(Vector3(0.55, 1.0, 0.725));
+	graphics.setLightList(&lightList);
 
 	player.init();
 }
@@ -132,6 +136,7 @@ void Game::run()
 		
 		player.update(deltaTime);
 		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
+		testLight->setDirection(Vector3(sin(float(curTime) * secPerCount), 0.0, cos(float(curTime) * secPerCount)));
 		this->graphics.render(this->camera);
 		
 		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
@@ -165,11 +170,6 @@ void Game::run()
 
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		
-		player.update(deltaTime);
-		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
-		
-		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1), cos(curTime * secPerCount * 0.1), -0.5));
-
 		/*Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();
 		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);

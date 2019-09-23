@@ -1,12 +1,14 @@
 #pragma once
+#include <d3d11.h>
 #include <SimpleMath.h>
+#include <array>
 
 using namespace DirectX::SimpleMath;
 
 class PointLight
 {
-	Vector4 pos; // empty w component
-	Vector4 color; // w component is luminance
+	Vector4 pos = Vector4(0.0, 0.0, 0.0, 0.0); // empty w component
+	Vector4 color = Vector4(0.0, 0.0, 0.0, 0.0); // w component is luminance
 public:
 	PointLight() { pos = Vector4(); color = Vector4(); }
 	PointLight(Vector3 pos, Vector3 color, float luminance) {
@@ -45,7 +47,7 @@ public:
 		this->color.w = luminance;
 		direction.Normalize();
 		this->directionWidth = Vector4(direction);
-		conePercentOpen = min(max(0.0, conePercentOpen), 1.0);
+		conePercentOpen = min(max(0.0f, conePercentOpen), 1.0f);
 		this->directionWidth.w = conePercentOpen * DirectX::XM_PIDIV2;
 	}
 	~SpotLight() {}
@@ -68,5 +70,30 @@ public:
 	}
 	Vector3 getDirection() const { return Vector3(directionWidth); }
 	
-	void setConeWidth(float percentOpen) { percentOpen = min(max(0.0, percentOpen), 1.0); directionWidth.w = DirectX::XM_PIDIV2 * percentOpen; }
+	void setConeWidth(float percentOpen) { percentOpen = min(max(0.0f, percentOpen), 1.0f); directionWidth.w = DirectX::XM_PIDIV2 * percentOpen; }
+};
+
+class LightList {
+public:
+	//remember to change values in shaders if you change this
+	static const size_t size = 30;
+
+	LightList();
+	~LightList();
+
+	std::array<PointLight, size>::iterator addLight(PointLight& light);
+	std::array<PointLight, size>::iterator addLight(PointLight&& light);
+	std::array<SpotLight, size>::iterator addLight(SpotLight& light);
+	std::array<SpotLight, size>::iterator addLight(SpotLight&& light);
+	void removeLight(std::array<PointLight, size>::iterator);
+	void removeLight(std::array<SpotLight, size>::iterator);
+private:
+	friend class Graphics;
+	std::array<PointLight, size> pointLights;
+	std::array<PointLight, size>::iterator firstEmptySpacePointLights = pointLights.begin();
+	std::array<SpotLight, size> spotLights;
+	std::array<SpotLight, size>::iterator firstEmptySpaceSpotLights = spotLights.begin();
+
+	std::array<PointLight, size>::iterator findNextEmptySpace(std::array<PointLight, size>::iterator start);
+	std::array<SpotLight, size>::iterator findNextEmptySpace(std::array<SpotLight, size>::iterator start);
 };

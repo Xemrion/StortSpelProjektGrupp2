@@ -17,6 +17,8 @@
 #include "Camera.h"
 #include<string>
 #include "Lights.h"
+#include <memory.h>
+#include <array>
 
 enum Shapes
 {
@@ -46,12 +48,9 @@ class Graphics {
 	std::unordered_map<std::string, Mesh> meshes;
 	std::unordered_map<std::string, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
-	std::vector<PointLight> pointLights;
-	std::vector<SpotLight> spotLights;
-	Vector4 sunVector = Vector4(0.0, 1.0, 0.0, 0.0);
-	size_t maxPointLights = 20;
-	size_t maxSpotLights = 20;
+	LightList* lightList;
 	
+	Vector4 sunVector = Vector4(0.0, 1.0, 0.0, 0.0);
 
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
@@ -70,10 +69,7 @@ public:
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
-	void addPointLight(PointLight light);
-	void clearPointLights();
-	void addSpotLight(SpotLight light);
-	void clearSpotLights();
+	void setLightList(LightList* lightList);
 	void setSunVector(Vector3 vectorToSun);
 	Vector3 getSunVector();
 	void presentScene();
