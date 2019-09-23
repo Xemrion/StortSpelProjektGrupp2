@@ -68,6 +68,8 @@ public:
 	static void Update();
 	static void Reset();
 
+	static void SetRumble(int player, float leftMotor, float rightMotor, float leftTrigger = 0.f, float rightTrigger = 0.f);
+	static void ResetRumble(int player);
 	static bool CheckButton(Keys key, States state, int player);
 	static Vector2 GetDirectionL(int player);
 	static float GetStrengthL(int player);
