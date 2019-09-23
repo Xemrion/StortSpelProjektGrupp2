@@ -283,6 +283,30 @@ void Input::Reset()
 	}
 }
 
+void Input::SetRumble(int player, float leftMotor, float rightMotor, float leftTrigger = 0.f, float rightTrigger = 0.f)
+{
+	if (player >= Input::PLAYER_COUNT || player < 0 || player == instance.playerKeyboard) return;
+
+	if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	{
+		player--;
+	}
+
+	instance.gamePad.SetVibration(player, leftMotor, rightMotor, leftTrigger, rightTrigger);
+}
+
+void Input::ResetRumble(int player)
+{
+	if (player >= Input::PLAYER_COUNT || player < 0 || player == instance.playerKeyboard) return;
+
+	if (instance.playerKeyboard != -1 && player > instance.playerKeyboard)
+	{
+		player--;
+	}
+
+	instance.gamePad.SetVibration(0, 0.0f, 0.0f);
+}
+
 bool Input::CheckButton(Keys key, States state, int player)
 {
 	if (player >= Input::PLAYER_COUNT || player < 0) return false;
