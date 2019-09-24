@@ -25,7 +25,6 @@ void GameObject::addRotation(Vector3 addRotaiton)
 	this->rotation.x = fmod(this->rotation.x, 2 * DirectX::XM_PI);
 	this->rotation.y = fmod(this->rotation.y, 2 * DirectX::XM_PI);
 	this->rotation.z = fmod(this->rotation.z, 2 * DirectX::XM_PI);
-
 }
 
 void GameObject::setRotation(Vector3 newRotation)
