@@ -45,9 +45,10 @@ public:
 	void followPath(float dt);
 	bool lineOfSight(Vector3& position);
 	AIPlayer();
+	~AIPlayer();
 	int getState();
 private:
-	AStar aStar;
+	AStar* aStar;
 	std::vector<Node*> path;
 	//use ref to  get currentTarget to use behaviour on
 	Vector3 playerPos;

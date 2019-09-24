@@ -12,11 +12,11 @@ std::vector<Node*> AStar::algorithm(DirectX::SimpleMath::Vector3 startPos, Direc
 	Node* neighbour;
 	while (!open.empty())
 	{
-		//PrintNodes();
 		current = open.at(open.size() - 1);
 		if (current == goal)
+		{
 			return reconstructPath(goal);
-
+		}
 		open.pop_back();
 		closed.push_back(current);
 		for (int i = 0; i < current->GetNeighbours().size(); i++)
@@ -51,7 +51,7 @@ Node* AStar::getNode(DirectX::SimpleMath::Vector3 position)
 {
 	for (int i = 0; i < gridHeight * gridWidth; i++)
 	{
-		if (nodes.at(i)->GetXPos() + nodes.at(i)->nodeWidth >= position.x && 
+		if (nodes.at(i)->GetXPos() + nodes.at(i)->nodeWidth >= position.x &&
 			nodes.at(i)->GetXPos() - nodes.at(i)->nodeWidth <= position.x &&
 			nodes.at(i)->GetYPos() + nodes.at(i)->nodeWidth >= position.z &&
 			nodes.at(i)->GetYPos() - nodes.at(i)->nodeWidth <= position.z)
@@ -64,6 +64,15 @@ Node* AStar::getNode(DirectX::SimpleMath::Vector3 position)
 
 AStar::AStar()
 {
+}
+AStar::~AStar()
+{
+	for (int i = 0; i < nodes.size(); i++)
+	{
+		delete nodes.at(i);
+	}
+	nodes.clear();
+
 }
 AStar::AStar(int gridWidth, int gridHeight)
 {
@@ -142,7 +151,7 @@ std::vector<Node*> AStar::reconstructPath(Node* goal)
 	std::vector<Node*> path;
 	Node* current;
 	current = goal;
-	while (current->GetPreviousNode() != nullptr)
+	while (current->GetPreviousNode() == nullptr)
 	{
 		path.push_back(current);
 		current = current->GetPreviousNode();
