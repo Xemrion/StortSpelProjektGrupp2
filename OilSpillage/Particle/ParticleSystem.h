@@ -6,16 +6,20 @@
 using namespace DirectX::SimpleMath;
 struct Particle
 {
-	Vector4 pos;
-	Vector4 color;
-	Vector4 config;//x = size, y = angle, z = weight, w = life
-	Vector4 speed;
+	Vector3 position;
+	Vector3 direction;
+	float time;
 };
 struct CameraInfo
 {
 	Matrix viewProj;
 	Vector4 camPos;
 	Vector3 upp;
+};
+struct ParticleParams
+{
+	Vector4 emitterLocation;
+	Vector4 randomVector;
 };
 class ParticleSystem
 {
@@ -32,9 +36,10 @@ private:
 	ID3D11DeviceContext* deviceContext;
 	int nrOfParticles = 0;
 	int lastUsedParticle;
-	Particle* particles;
-	ID3D11Buffer* particleBuffer;
-	ID3D11Buffer* viewProjBuffer;
+	//Particle* particles;
+	//ID3D11Buffer* particleBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
@@ -49,6 +54,16 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11ComputeShader> computeShader;
 	Microsoft::WRL::ComPtr<ID3D10Blob> computeShaderBlob;
+
+	Microsoft::WRL::ComPtr<ID3D11ComputeShader> createComputeShader;
+	Microsoft::WRL::ComPtr<ID3D10Blob> createComputeShaderBlob;
+
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer> particlesBuffer;//one will be the updated
+	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particlesUAV;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> particlesBuffer2;//one will be the current
+	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particlesUAV2;
+
 
 	int findUnused();
 };

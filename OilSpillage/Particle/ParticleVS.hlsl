@@ -1,23 +1,27 @@
-struct VS_IN
+struct Particle
 {
-	float4 Pos : SV_POSITION;// pos=xyz, size=w
-	float4 color: COLOR;
-	float4 config: CONFIG;
-	float4 speed: SPEED;
+	float3 position;
+	float3 direction;
+	float time;
+};
 
+StructuredBuffer<Particle> SimulationState;
+
+struct VS_INPUT
+{
+	uint vertexid : SV_VertexID;
 };
 
 struct VS_OUT
 {
-	float4 Pos : SV_POSITION;
-	float4 color: COLOR;
+	float3 pos : POSITION;
 };
 
-VS_OUT main(VS_IN input)
+VS_OUT main(in VS_INPUT input)
 {
 	VS_OUT output = (VS_OUT)0;
-	output.Pos = input.Pos;
-	output.color = input.color;
+	
+	output.pos.xyz = SimulationState[input.vertexid].position;
 
 	return output;
 }

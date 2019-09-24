@@ -196,6 +196,7 @@
     <FxCompile Include="Particle\ParticlePS.hlsl" />
     <FxCompile Include="Particle\ParticleGS.hlsl" />
     <FxCompile Include="Particle\ParticleVS.hlsl" />
+    <FxCompile Include="Particle\ParticleCreateCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
