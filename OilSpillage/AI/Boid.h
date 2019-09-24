@@ -1,5 +1,6 @@
 #pragma once
-#include "GameObject.h"
+//#include "GameObject.h"
+#include "..//GameObject.h"
 #include <vector>
 
 using namespace std;
