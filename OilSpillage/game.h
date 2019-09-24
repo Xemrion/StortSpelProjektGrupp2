@@ -8,6 +8,7 @@
 //#include"ImGui/imgui_impl_dx11.h"
 #include"vehicle.h"
 #include "AI/Actor.h"
+#include "Boid.h"
 class Game {
 	Window* window = nullptr;
 
@@ -28,6 +29,7 @@ class Game {
 	
 	Vehicle player;
 	Camera camera;
+	vector<Boid*> boids;
 	//TestAI AI;
 
 public:

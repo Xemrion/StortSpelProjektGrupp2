@@ -131,6 +131,7 @@
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Node.cpp" />
+    <ClCompile Include="Boid.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="Boid.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="game.h" />

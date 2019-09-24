@@ -74,6 +74,29 @@ void Game::init(Window* window)
 	graphics.setSunVector(Vector3(0.55f, 1.0f, 0.725f));
 
 	player.init();
+
+	for(int i = 0; i < 3; i++)
+	{
+		for(int j = 0; j < 4; j++)
+		{
+			boids.push_back(new Boid(i, j));
+		}
+		
+	}
+	for(int i = 0; i < boids.size(); i++)
+	{
+		boids.at(i)->mesh = graphics.getMeshPointer("Cube");
+		graphics.addToDraw(boids.at(i));
+		boids.at(i)->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+		boids.at(i)->setPosition(Vector3(boids.at(i)->getLocation()));
+		boids.at(i)->setScale(Vector3(0.5f, 0.5f, 0.5f));
+	}
+}
+
+template <typename T>
+void delete_pointed_to(T* const ptr)
+{
+	delete ptr;
 }
 
 void Game::run()
@@ -161,6 +184,10 @@ void Game::run()
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		
 		player.update(deltaTime);
+		for(int i = 0; i < boids.size(); i++)
+		{
+			boids.at(i)->run(boids, deltaTime);
+		}
 		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
 		
 		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1f), cos(curTime * secPerCount * 0.1f), -0.5f));
@@ -183,4 +210,5 @@ void Game::run()
 	delete this->testObject2;
 	//delete this->AiTestObject;
 	delete this->aiObject;
+	for_each(boids.begin(), boids.end(), delete_pointed_to<Boid>);
 }
