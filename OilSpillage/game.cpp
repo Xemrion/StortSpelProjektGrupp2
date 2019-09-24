@@ -184,7 +184,8 @@ void Game::run()
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		
 		player.update(deltaTime);
-		for(int i = 0; i < boids.size(); i++)
+
+		for(int i = 0; i < boids.size(); i++) //Updating Boids
 		{
 			boids.at(i)->run(boids, deltaTime);
 		}

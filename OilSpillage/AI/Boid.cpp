@@ -8,7 +8,7 @@ Boid::Boid(float x, float z)
 	maxSpeed = 3.5;
 	maxForce = 0.5;
 
-	desiredPosition = Vector3(100.0f, 0.0f, 100.0f);
+	targetPosition = Vector3(20.0f, 0.0f, 20.0f);
 }
 
 void Boid::applyForce(Vector3 force)
@@ -16,35 +16,40 @@ void Boid::applyForce(Vector3 force)
 	acceleration += force;
 }
 
-Vector3 Boid::Separation(vector<Boid*> Boids)
+Vector3 Boid::separation(vector<Boid*> boids)
 {
 	// Distance of field of vision for separation between boids
-	float desiredseparationDistance = 3;
+	float desiredSeparationDistance = 1.5;
 	Vector3 direction(0.0f);
-	int count = 0;
+	int nrInProximity = 0;
 	// For every boid in the system, check if it's too close
-	for (int i = 0; i < Boids.size(); i++) {
+	for (int i = 0; i < boids.size(); i++) 
+	{
 		// Calculate distance from current boid to boid we're looking at
-		float distance = (location - Boids.at(i)->location).Length();
+		float distance = (location - boids.at(i)->location).Length();
 		// If this is a fellow boid and it's too close, move away from it
-		if ((distance > 0) && (distance < desiredseparationDistance)) {
+		if ((distance > 0) && (distance < desiredSeparationDistance)) 
+		{
 			Vector3 difference(0.0f);
-			difference = location - Boids.at(i)->location;
+			difference = location - boids.at(i)->location;
 			difference.Normalize();
 			difference /= distance;      // Weight by distance
 			direction += difference;
-			count++;
+			nrInProximity++;
 		}
 	}
 	// Adds average difference of location to acceleration
-	if (count > 0)
-		direction /= (float)count;
-	if (direction.Length() > 0) {
+	if (nrInProximity > 0)
+	{
+		direction /= (float)nrInProximity;
+	}
+	if (direction.Length() > 0) 
+	{
 		// Steering = Desired - Velocity
 		direction.Normalize();
 		direction *= maxSpeed;
 		direction -= velocity;
-		if (direction.Length() > maxForce) 
+		if (direction.Length() > maxForce)
 		{
 			direction /= direction.Length();
 		}
@@ -53,22 +58,24 @@ Vector3 Boid::Separation(vector<Boid*> Boids)
 	return direction;
 }
 
-Vector3 Boid::Alignment(vector<Boid*> Boids)
+Vector3 Boid::alignment(vector<Boid*> boids)
 {
-	float neighbordistance = 10; // Field of vision
-	Vector3 desiredposition = Vector3(10.0f, 0.0f,0.0f);
+	float neighborDistance = 5; // Field of vision
 	Vector3 sum(0.0f);
-	int count = 0;
-	for (int i = 0; i < Boids.size(); i++) {
-		float distance = (location - Boids.at(i)->location).Length();
-		if ((distance > 0) && (distance < neighbordistance)) { // 0 < d < 50
-			sum += Boids.at(i)->velocity;
-			count++;
+	int nrInProximity = 0;
+	for (int i = 0; i < boids.size(); i++) 
+	{
+		float distance = (location - boids.at(i)->location).Length();
+		if ((distance > 0) && (distance < neighborDistance)) 
+		{
+			sum += boids.at(i)->velocity;
+			nrInProximity++;
 		}
 	}
 	// If there are boids close enough for alignment...
-	if (count > 0) {
-		sum /= (float)count;// Divide sum by the number of close boids (average of velocity)
+	if (nrInProximity > 0) 
+	{
+		sum /= (float)nrInProximity;// Divide sum by the number of close boids (average of velocity)
 		sum.Normalize();            // Turn sum into a unit vector, and
 		sum *= maxSpeed;    // Multiply by maxSpeed
 		// Steer = Desired - Velocity
@@ -80,29 +87,34 @@ Vector3 Boid::Alignment(vector<Boid*> Boids)
 		}
 		return direction;
 	}
-	else {
+	else 
+	{
 		Vector3 temp(0.0f);
 		return temp;
 	}
 }
 
-Vector3 Boid::Cohesion(vector<Boid*> Boids)
+Vector3 Boid::cohesion(vector<Boid*> boids)
 {
-	float neighbordistance = 3;
+	float neighborDistance = 2;
 	Vector3 sum(0.0f);
-	int count = 0;
-	for (int i = 0; i < Boids.size(); i++) {
-		float distance = (location - Boids.at(i)->location).Length();
-		if ((distance > 0) && (distance < neighbordistance)) {
-			sum += Boids.at(i)->location;
-			count++;
+	int nrInProximity = 0;
+	for (int i = 0; i < boids.size(); i++) 
+	{
+		float distance = (location - boids.at(i)->location).Length();
+		if ((distance > 0) && (distance < neighborDistance)) 
+		{
+			sum += boids.at(i)->location;
+			nrInProximity++;
 		}
 	}
-	if (count > 0) {
-		sum /= count;
+	if (nrInProximity > 0) 
+	{
+		sum /= nrInProximity;
 		return seek(sum);
 	}
-	else {
+	else 
+	{
 		Vector3 temp(0.0f);
 		return temp;
 	}
@@ -110,12 +122,11 @@ Vector3 Boid::Cohesion(vector<Boid*> Boids)
 
 Vector3 Boid::seek(Vector3 target)
 {
-	Vector3 desired;
-	desired -= location - desiredPosition;
-	desired -= target;
-	desired *= maxSpeed;
+	Vector3 desiredDirection;
+	desiredDirection -= location - targetPosition;
+	//desired *= maxSpeed;
 
-	acceleration = desired - velocity;
+	acceleration = desiredDirection - velocity;
 	if (acceleration.Length() > maxForce)
 	{
 		acceleration /= acceleration.Length();
@@ -123,9 +134,9 @@ Vector3 Boid::seek(Vector3 target)
 	return acceleration;
 }
 
-void Boid::run(vector<Boid*> Boids, float deltaTime)
+void Boid::run(vector<Boid*> boids, float deltaTime)
 {
-	flock(Boids);
+	flock(boids);
 	update(deltaTime);
 }
 
@@ -146,15 +157,15 @@ void Boid::update(float deltaTime)
 	acceleration *= 0;
 }
 
-void Boid::flock(vector<Boid*> Boids)
+void Boid::flock(vector<Boid*> boids)
 {
-	Vector3 seperationForce = Separation(Boids);
-	Vector3 alignmentForce = Alignment(Boids);
-	Vector3 cohesionForce = Cohesion(Boids);
+	Vector3 seperationForce = separation(boids);
+	Vector3 alignmentForce = alignment(boids);
+	Vector3 cohesionForce = cohesion(boids);
 	// Arbitrarily weight these forces
-	seperationForce *= 1.2;
-	alignmentForce *= 2.0; // Might need to alter weights for different characteristics
-	cohesionForce *= 2.0;
+	seperationForce *= 1.0;
+	alignmentForce *= 1.0; // Might need to alter weights for different characteristics
+	cohesionForce *= 1.2;
 
 	// Add the force vectors to acceleration
 	applyForce(seperationForce);
@@ -165,7 +176,7 @@ void Boid::flock(vector<Boid*> Boids)
 float Boid::angle(Vector3 target)
 {
 	// From the definition of the dot product
-	float angle = 0;//(float)(atan2(v.x, -v.y) * 180 / PI);
+	float angle = (float)(atan2(target.x, -target.z) * 180 / 3.14);
 	return angle;
 }
 
