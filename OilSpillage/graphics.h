@@ -14,7 +14,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #include "Graphic/Shaders.h"
 #include "Resources/Debug.h"
-#include "Camera.h"
+#include "DynamicCamera.h"
 #include<string>
 #include "Lights.h"
 
@@ -58,7 +58,7 @@ class Graphics {
 public:
 	Graphics();
 	~Graphics();
-	bool init(Window* window, float fov, Camera theCamera);
+	bool init(Window* window);
 	Debug* getdebugger();
 	Window* getWindow();
 	void loadMesh(std::string fileName);
@@ -74,6 +74,6 @@ public:
 	void setSunVector(Vector3 vectorToSun);
 	Vector3 getSunVector();
 	void presentScene();
-	void render(Camera camera);
+	void render(DynamicCamera* camera);
 	bool createShaders();
 };

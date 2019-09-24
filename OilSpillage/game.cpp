@@ -29,7 +29,7 @@ Game::~Game()
 void Game::init(Window* window)
 {
 	this->window = window; 
-	graphics.init(window, 90,this->camera);
+	graphics.init(window);
 	Sound::Init();
 	
 	this->mouse = std::make_unique<Mouse>();
@@ -87,6 +87,12 @@ void Game::run()
 	prevTime = 0;
 	QueryPerformanceCounter((LARGE_INTEGER*)& prevTime);
 
+	std::vector<CinematicPos> points = {
+		{ Vector3(10.0f, 10.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f },
+		{ Vector3(0.0f, 5.0f, 0.0f), Vector3(0.0f, 0.0f, XM_PIDIV2), 3.0f }
+	};
+	this->camera.startCinematic(&points, false);
+
 	this->aiObject->setPlayerPos(this->player.getVehicle()->getPosition());
 	Input::SetKeyboardPlayerID(0);
 
@@ -123,14 +129,15 @@ void Game::run()
 		if (Input::IsKeyDown_DEBUG(Keyboard::S))
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
-		player.update(deltaTime);
-		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
-		this->graphics.render(this->camera);
+		this->player.update(deltaTime);
+		this->aiObject->Update(deltaTime);
+		this->camera.update(deltaTime);
+		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
+		this->graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1f), cos(curTime * secPerCount * 0.1f), -0.5f));
+
+		this->graphics.render(&this->camera);
+		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos, this->testObject2->getPosition(), Vector3(0, 1, 0));
 		
-		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
-		std::string textUse;
-
-
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
@@ -140,12 +147,15 @@ void Game::run()
 		ImGui::Begin("Gungame");
 		ImGui::Text("Hold 'V' To move camera with mouse.");
 
+		Vector3 camPos = camera.getPosition();
+		Vector3 camRot = camera.getRotation();
 		Vector2 lDir = Input::GetDirectionL(0);
 		Vector2 rDir = Input::GetDirectionR(0);
 		float lStr = Input::GetStrengthL(0);
 		float rStr = Input::GetStrengthR(0);
 		bool status[4] = { Input::CheckButton(CONFIRM, UP, 0), Input::CheckButton(CONFIRM, HELD, 0), Input::CheckButton(CONFIRM, RELEASED, 0), Input::CheckButton(CONFIRM, PRESSED, 0) };
-
+		ImGui::Text(("\nCam Pos: " + std::to_string(camPos.x) + " " + std::to_string(camPos.y) + " " + std::to_string(camPos.z)).c_str());
+		ImGui::Text(("\nCam Rot: " + std::to_string(camRot.x) + " " + std::to_string(camRot.y) + " " + std::to_string(camRot.z)).c_str());
 		ImGui::Text(("\n-- PLAYER 0 --\nConfirm Status - Up: " + std::to_string(status[0]) + " Held: " + std::to_string(status[1]) + " Released: " + std::to_string(status[2]) + " Pressed: " + std::to_string(status[3])).c_str());
 		ImGui::Text(("L Dir: " + std::to_string(lDir.x) + " " + std::to_string(lDir.y)).c_str());
 		ImGui::Text(("L Str: " + std::to_string(lStr)).c_str());
@@ -153,34 +163,22 @@ void Game::run()
 		ImGui::Text(("R Str: " + std::to_string(rStr)).c_str());
 		ImGui::Text(("Accelerator: " + std::to_string(player.getAcceleratorX())).c_str());
 
+		//static int rotation[3] = { 0, 0, 0 };
+		//ImGui::SliderInt3("Cam Rotation", rotation, -360, 360);
 
 		ImGui::End();
-
 		ImGui::Render();
-
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-		
-		player.update(deltaTime);
-		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
-		
-		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1f), cos(curTime * secPerCount * 0.1f), -0.5f));
 
-		this->graphics.render(camera);
+		//this->camera.setRotation(Vector3(rotation[0] * (DirectX::XM_PI / 180), rotation[1] * (DirectX::XM_PI / 180), rotation[2] * (DirectX::XM_PI / 180)));
 
-		/*Vector3 tempPos = AiTestObject->getPosition();
-		Vector4 tempColor = AiTestObject->getColor();
-		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);
-		AiTestObject->setPosition(tempPos);
-		AiTestObject->setColor(tempColor);*/
-		this->aiObject->Update(deltaTime);
 		//deltaTime reset
 		prevTime = curTime;
 		
 		this->graphics.presentScene();
-
 	}
+
 	delete this->testObject;
 	delete this->testObject2;
-	//delete this->AiTestObject;
 	delete this->aiObject;
 }

@@ -132,6 +132,7 @@
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="graphics.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="DynamicCamera.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="graphics.h" />

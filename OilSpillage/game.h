@@ -8,6 +8,8 @@
 //#include"ImGui/imgui_impl_dx11.h"
 #include"vehicle.h"
 #include "AI/Actor.h"
+#include "DynamicCamera.h"
+
 class Game {
 	Window* window = nullptr;
 
@@ -27,7 +29,7 @@ class Game {
 	float secPerCount = 1.0f / countsPerSec;
 	
 	Vehicle player;
-	Camera camera;
+	DynamicCamera camera;
 	//TestAI AI;
 
 public:

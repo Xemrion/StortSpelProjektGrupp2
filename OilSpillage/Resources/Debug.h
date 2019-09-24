@@ -32,9 +32,8 @@ private:
 	ID3D11DeviceContext* deviceContext;
 	ID3D11Device* device;
 	ID3D11Buffer* viewProjBuffer;
-	Camera *camera;
 public:
-	Debug(ID3D11DeviceContext* dc, ID3D11Device* d, Camera camera);
+	Debug(ID3D11DeviceContext* dc, ID3D11Device* d);
 	void DrawCube(DirectX::SimpleMath::Vector3 maxPos, DirectX::SimpleMath::Vector3 minPos,DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 color);
 	void DrawLine(XMFLOAT3 p, XMFLOAT3 p2, XMFLOAT3 color);
 	void DrawCube(XMFLOAT3 p, XMFLOAT3 color, float scale = 0.5f);

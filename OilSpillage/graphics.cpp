@@ -63,7 +63,7 @@ Graphics::~Graphics()
 	}
 }
 
-bool Graphics::init(Window* window, float fov, Camera theCamera)
+bool Graphics::init(Window* window)
 {
 	this->window = window;
 	HRESULT result;
@@ -258,7 +258,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 
 
 	createShaders();
-	debugger = new Debug(deviceContext, device, theCamera);
+	debugger = new Debug(deviceContext, device);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -280,7 +280,7 @@ Window* Graphics::getWindow()
 	return this->window;
 }
 
-void Graphics::render(Camera camera)
+void Graphics::render(DynamicCamera* camera)
 {
 	float color[4] = {
 		0,0,0,1
@@ -291,7 +291,7 @@ void Graphics::render(Camera camera)
 	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	Matrix viewProj = (camera.getViewMatrix() * camera.getProjectionMatrix()).Transpose();
+	Matrix viewProj = (camera->getViewMatrix() * camera->getProjectionMatrix()).Transpose();
 	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);

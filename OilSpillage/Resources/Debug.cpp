@@ -1,23 +1,9 @@
 #include "Debug.h"
-Debug::Debug(ID3D11DeviceContext* dc, ID3D11Device *d, Camera camera)
+Debug::Debug(ID3D11DeviceContext* dc, ID3D11Device *d)
 {
-	
-
-	this->camera = &camera;
 	this->deviceContext = dc;
 	this->device = d;
 	this->cb_vs_world.initialize(device);
-	//initilizelie the buffer
-	D3D11_BUFFER_DESC desc = { 0 };
-
-	desc.Usage = D3D11_USAGE_DYNAMIC;
-	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>(sizeof(Matrix) + (16 - (sizeof(Matrix) % 16)));
-	desc.StructureByteStride = 0;
-
-	HRESULT hr = device->CreateBuffer(&desc, 0, &viewProjBuffer);
 }
 
 void Debug::DrawCube(DirectX::SimpleMath::Vector3 maxPos, DirectX::SimpleMath::Vector3 minPos,DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 color)
@@ -65,11 +51,6 @@ void Debug::DrawCube(DirectX::SimpleMath::Vector3 maxPos, DirectX::SimpleMath::V
 	cb_vs_world.data.wMatrix = world;
 	cb_vs_world.applyChanges(device, deviceContext);
 	deviceContext->VSSetConstantBuffers(1, 1, this->cb_vs_world.getAddressOfBuffer());
-	/*D3D11_MAPPED_SUBRESOURCE mappedResource;
-	Matrix viewProj = (this->camera->getViewMatrix() * this->camera->getProjectionMatrix()).Transpose();
-	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
-	deviceContext->Unmap(viewProjBuffer, 0);*/
 	//draw
 	UINT stride = sizeof(DebugVertex);
 	UINT offset = 0;
