@@ -12,6 +12,7 @@ private:
 	Vector3 bodyPivot;
 	DirectX::XMFLOAT2 velocity;
 	float strength;
+	float add;
 	
 	DirectX::XMFLOAT3 accelerator;
 	float acceleratorTempX;
@@ -24,6 +25,7 @@ private:
 	float rotateAcceleration = 0.0f;
 	float rotationSmoother = 1.0f;
 	float tempTargetRotation;
+	bool rotationDirection;
 public:
 	Vehicle();
 	virtual ~Vehicle();

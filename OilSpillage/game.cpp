@@ -118,7 +118,16 @@ void Game::run()
 		}
 		if (Input::IsKeyDown_DEBUG(Keyboard::E))
 			deltaTime /= 4;
-
+		if (Input::CheckButton(Keys::L_TRIGGER, PRESSED, 0))
+		{
+			Sound::PlaySoundEffect(L"test2.wav");
+			Input::SetRumble(0,0.5f,0.0f);
+		}
+		if (Input::CheckButton(Keys::L_TRIGGER, RELEASED, 0))
+		{
+			Sound::PlaySoundEffect(L"test2.wav");
+			Input::ResetRumble(0);
+		}
 
 		if (Input::IsKeyDown_DEBUG(Keyboard::A))
 			this->testObject->addRotation(Vector3(0.00f, 0.01f * deltaTime * 200, 0.00f));
