@@ -92,7 +92,7 @@ void RoadNetwork::clearSegments()
 }
 
 bool RoadNetwork::generateInitialSegments(const char* seed)
-{
+{ //'F' to move forward a segment, '+' or '-' to turn but doesn't move 'H' to move half a length for a segment
 	bool success = false;
 	int counter = 0;
 	Vector4 currentForward = this->forward;
@@ -162,7 +162,7 @@ bool RoadNetwork::generateInitialSegments(const char* seed)
 }
 
 bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment) //Turtle walk from existing segments
-{
+{ //'F' to move forward a segment, '+' or '-' to turn but doesn't move 'H' to move half a length for a segment
 	bool success = false;
 	int counter = 0;
 	Vector4 currentForward = this->forward;
