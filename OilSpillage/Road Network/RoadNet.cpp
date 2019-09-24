@@ -76,7 +76,7 @@ void RoadNetwork::setLetters(char forward, char left, char right, char half)
 
 void RoadNetwork::setAngle(float angle)
 {
-	this->rotationAngle = (angle) * ((22/7)/180);
+	this->rotationAngle = (angle) * ((PI)/180.0L);
 }
 
 float RoadNetwork::getAngle() const
@@ -96,6 +96,7 @@ bool RoadNetwork::generateInitialSegments(const char* seed)
 	bool success = false;
 	int counter = 0;
 	Vector4 currentForward = this->forward;
+	float nextX, nextZ;
 	while (seed[counter]) {
 
 		if (seed[counter] == forwardSymbol) {
@@ -119,20 +120,23 @@ bool RoadNetwork::generateInitialSegments(const char* seed)
 			success = true;
 		}
 
-		if (seed[counter] == turnLeftSymbol) { //Mainline turtle walk
-			
-			currentForward.x = (currentForward.x * cos(rotationAngle)) - (currentForward.z * (sin(rotationAngle)));
-			currentForward.z = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+		else if (seed[counter] == turnLeftSymbol) { //Mainline turtle walk
+			nextX = (currentForward.x * cos(rotationAngle)) - (currentForward.z * sin(rotationAngle));
+			nextZ = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+			currentForward.x = nextX;
+			currentForward.z = nextZ;
 			success = true;
 		}
 
-		if (seed[counter] == turnRightSymbol) {
-			currentForward.x = (currentForward.x * cos(rotationAngle)) + (currentForward.z * (sin(rotationAngle)));
-			currentForward.z = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+		else if (seed[counter] == turnRightSymbol) {
+			nextX = (currentForward.x * (cos(rotationAngle))) + (currentForward.z * sin(rotationAngle));
+			nextZ = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+			currentForward.x = nextX;
+			currentForward.z = nextZ;
 			success = true;
 		}
 
-		if (seed[counter] == halfSymbol) {
+		else if (seed[counter] == halfSymbol) {
 			Segment temp;
 			temp.firstPoint = this->roadNetwork.at(this->roadNetwork.size() - 1).secondPoint;
 			temp.secondPoint = temp.firstPoint + (currentForward * 0.5f);
@@ -162,6 +166,7 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment) //Tu
 	bool success = false;
 	int counter = 0;
 	Vector4 currentForward = this->forward;
+	float nextX, nextZ;
 	int check = roadNetwork.size();
 
 	if (segment > 0 && segment < roadNetwork.size()) {
@@ -173,12 +178,16 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment) //Tu
 					temp.firstPoint = this->roadNetwork.at(segment).firstPoint;
 					if (temp.firstPoint + currentForward == this->roadNetwork.at(segment).secondPoint) {
 						if (segment % 2 == 0) { //Even: turn left
-							currentForward.x = (currentForward.x * cos(rotationAngle)) - (currentForward.z * (sin(rotationAngle)));
-							currentForward.z = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+							nextX = (currentForward.x * cos(rotationAngle)) - (currentForward.z * sin(rotationAngle));
+							nextZ = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+							currentForward.x = nextX;
+							currentForward.z = nextZ;
 						}
 						else if (segment % 2 == 1) { //Odd: turn right
-							currentForward.x = (currentForward.x * cos(rotationAngle)) + (currentForward.z * (sin(rotationAngle)));
-							currentForward.z = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+							nextX = (currentForward.x * cos(rotationAngle)) + (currentForward.z * sin(rotationAngle));
+							nextZ = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+							currentForward.x = nextX;
+							currentForward.z = nextZ;
 						}
 					}
 					temp.secondPoint = temp.firstPoint + currentForward;
@@ -204,19 +213,23 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment) //Tu
 				success = true;
 			}
 
-			if (seed[counter] == turnLeftSymbol) {
-				currentForward.x = (currentForward.x * cos(rotationAngle)) - (currentForward.z * (sin(rotationAngle)));
-				currentForward.z = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+			else if (seed[counter] == turnLeftSymbol) {
+				nextX = (currentForward.x * cos(rotationAngle)) - (currentForward.z * sin(rotationAngle));
+				nextZ = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+				currentForward.x = nextX;
+				currentForward.z = nextZ;
 				success = true;
 			}
 
-			if (seed[counter] == turnRightSymbol) {
-				currentForward.x = (currentForward.x * cos(rotationAngle)) + (currentForward.z * (sin(rotationAngle)));
-				currentForward.z = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+			else if (seed[counter] == turnRightSymbol) {
+				nextX = (currentForward.x * cos(rotationAngle)) + (currentForward.z * sin(rotationAngle));
+				nextZ = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+				currentForward.x = nextX;
+				currentForward.z = nextZ;
 				success = true;
 			}
 
-			if (seed[counter] == halfSymbol) {
+			else if (seed[counter] == halfSymbol) {
 				Segment temp;
 				if (check == roadNetwork.size()) {
 					temp.firstPoint = this->roadNetwork.at(segment).firstPoint;

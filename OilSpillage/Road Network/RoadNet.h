@@ -6,6 +6,7 @@
 #include<d3d11.h>
 #include<DirectXMath.h>
 #include<SimpleMath.h>
+#include<math.h>
 using namespace DirectX::SimpleMath;
 
 struct Segment {
@@ -33,6 +34,7 @@ public:
 	void setAngle(float angle);
 	float getAngle() const;
 	void clearSegments();
+	//bool generateRoadNetwork();
 	bool generateInitialSegments(const char* seed);
 	bool generateAdditionalSegments(const char* seed, int segment);
 	void cleanRoadNetwork();
@@ -43,7 +45,9 @@ private:
 	Vector4 startPoint, endPoint;
 	Vector4 forward;
 	Vector2 roadNetworkMax, roadNetworkMin;
-	float rotationAngle, forwardDistance;
+	float forwardDistance;
+	const long double PI = 3.141592653589793L;
+	long double rotationAngle;
 	std::vector<Segment> roadNetwork;
 	std::vector<std::string> roadFiles;
 	char forwardSymbol, turnLeftSymbol, turnRightSymbol, halfSymbol;

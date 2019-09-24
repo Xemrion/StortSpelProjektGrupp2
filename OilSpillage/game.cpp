@@ -65,6 +65,14 @@ void Game::init(Window* window)
 	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
 	//graphics.addToDraw(AiTestObject);
 
+	//Road network
+	this->testNetwork = new RoadNetwork(6243573, Vector2(64, 64), Vector2(0, 0));
+	this->testNetwork->generateInitialSegments("FFFFFFH-H+FFFFFFFFF+FFFFF-FFF+FFFFFH-H-HF");
+	this->testNetwork->generateAdditionalSegments("FFH-FFFH+FH", 4);
+	this->testNetwork->generateAdditionalSegments("HF-FFF-FFFFF+FH", 15);
+	this->testNetwork->saveTestNetwork("test-net.txt");
+	this->testNetwork->cleanRoadNetwork();
+	this->testNetwork->saveTestNetwork("test-net-cleaned.txt");
 	
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f));
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f),  50.f));
