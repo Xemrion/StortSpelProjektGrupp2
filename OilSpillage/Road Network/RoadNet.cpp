@@ -235,12 +235,16 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment) //Tu
 					temp.firstPoint = this->roadNetwork.at(segment).firstPoint;
 					if (temp.firstPoint + currentForward == this->roadNetwork.at(segment).secondPoint) {
 						if (segment % 2 == 0) { //Even: turn left
-							currentForward.x = (currentForward.x * cos(rotationAngle)) - (currentForward.z * (sin(rotationAngle)));
-							currentForward.z = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+							nextX = (currentForward.x * cos(rotationAngle)) - (currentForward.z * sin(rotationAngle));
+							nextZ = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+							currentForward.x = nextX;
+							currentForward.z = nextZ;
 						}
 						else if (segment % 2 == 1) { //Odd: turn right
-							currentForward.x = (currentForward.x * cos(rotationAngle)) + (currentForward.z * (sin(rotationAngle)));
-							currentForward.z = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+							nextX = (currentForward.x * cos(rotationAngle)) + (currentForward.z * sin(rotationAngle));
+							nextZ = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+							currentForward.x = nextX;
+							currentForward.z = nextZ;
 						}
 					}
 					temp.secondPoint = temp.firstPoint + (currentForward * 0.5f);
