@@ -22,10 +22,20 @@ Vehicle::Vehicle()
 	this->vehicle = nullptr;
 	this->bodyRotation = nullptr;
 	this->bodyRotationPoint = nullptr;
+
+	this->leftoverTime = 0.0f;
+	this->bulletSpeed = 4.f;
+	this->bulletLifetime = 2.0f;
+	this->fireSpeed = 0.5f;
 }
 
 Vehicle::~Vehicle()
 {
+	for (int i = 0; i < Vehicle::bulletCount; i++)
+	{
+		delete this->bullets[i].obj;
+	}
+
 	delete vehicle;
 	delete bodyRotation;
 	delete bodyRotationPoint;
@@ -61,10 +71,76 @@ void Vehicle::init()
 	bodyRotationPoint->setTexture(Game::getGraphics().getTexturePointer("brickwall.tga"));
 
 	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
+
+	for (int i = 0; i < 16; i++)
+	{
+		this->bullets[i].obj = new GameObject;
+		this->bullets[i].obj->mesh = Game::getGraphics().getMeshPointer("Cube");
+		this->bullets[i].obj->setScale(Vector3(0.25f, 0.25f, 0.25f));
+		this->bullets[i].obj->setColor(Vector4(1, 1, 0, 1));
+	}
 }
 
 void Vehicle::update(float deltaTime)
 {
+	if (Input::CheckButton(CONFIRM, HELD, 0))
+	{
+		float tempDelta = deltaTime + this->leftoverTime;
+
+		if (tempDelta <= fireSpeed)
+		{
+			this->leftoverTime = tempDelta;
+		}
+
+		while (tempDelta > fireSpeed)
+		{
+			tempDelta -= fireSpeed;
+			int freeToUse = 0;
+
+			while (freeToUse < Vehicle::bulletCount && this->bullets[freeToUse].timeLeft > 0.0f)
+			{
+				freeToUse++;
+			}
+
+			if (freeToUse < Vehicle::bulletCount)
+			{
+				Vector2 dir = Input::GetDirectionR(0);
+				this->bullets[freeToUse].dir = Vector3(dir.x, 0, dir.y);
+				this->bullets[freeToUse].dir.Normalize();
+				this->bullets[freeToUse].timeLeft = this->bulletLifetime;
+				this->bullets[freeToUse].speed = this->bulletSpeed;
+				this->bullets[freeToUse].obj->setPosition(this->vehicle->getPosition() + Vector3(0, 2, 0));
+				this->bullets[freeToUse].obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->bullets[freeToUse].dir)) * Vector3(0, 1, 0));
+			}
+			else
+			{
+				this->leftoverTime = 0.0f;
+				break;
+			}
+
+			if (tempDelta <= fireSpeed)
+			{
+				this->leftoverTime = tempDelta;
+			}
+		}
+	}
+	else
+	{
+		this->leftoverTime = 0.0f;
+	}
+
+	for (int i = 0; i < Vehicle::bulletCount; i++)
+	{
+		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
+
+		if (this->bullets[i].timeLeft > 0.0f)
+		{
+			this->bullets[i].timeLeft -= deltaTime;
+			this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
+			Game::getGraphics().addToDraw(this->bullets[i].obj);
+		}
+	}
+
 	tempTargetRotation = targetRotation;
 
 

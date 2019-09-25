@@ -675,7 +675,12 @@ void Graphics::addToDraw(GameObject* o)
 
 void Graphics::removeFromDraw(GameObject* o)
 {
-	std::find(drawableObjects.begin(), drawableObjects.end(), o);
+	auto obj = std::find(drawableObjects.begin(), drawableObjects.end(), o);
+
+	if (obj != drawableObjects.end())
+	{
+		drawableObjects.erase(obj);
+	}
 }
 
 void Graphics::addPointLight(PointLight light)
