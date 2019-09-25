@@ -102,6 +102,9 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	desc.ByteWidth= static_cast<UINT>(sizeof(ParticleParams) + (16 - (sizeof(ParticleParams) % 16)));
 	hr = device->CreateBuffer(&desc, 0, particleParamCB.GetAddressOf());
 
+	desc.ByteWidth = static_cast<UINT>(sizeof(ParticleRenderParams) + (16 - (sizeof(ParticleRenderParams) % 16)));
+	hr = device->CreateBuffer(&desc, 0, particleParamRenderCB.GetAddressOf());
+
 	//Creating two buffers for the particles
 	desc.ByteWidth = capParticle * sizeof(Particle);
 	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
@@ -131,6 +134,19 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	hr = device->CreateUnorderedAccessView(this->particlesBuffer.Get(), &uavDesc, &this->particlesUAV);
 	hr = device->CreateUnorderedAccessView(this->particlesBuffer2.Get(), &uavDesc, &this->particlesUAV2);
 
+
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+	//ZeroMemory(&shaderResourceViewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+	shaderResourceViewDesc.Format = DXGI_FORMAT_UNKNOWN;
+	shaderResourceViewDesc.Buffer.FirstElement = 0;
+	shaderResourceViewDesc.Buffer.NumElements = capParticle;
+
+	hr = device->CreateShaderResourceView(particlesBuffer.Get(), &shaderResourceViewDesc, particlesSRV.GetAddressOf());
+
+
+
 }
 
 bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vector3 initialDirection, Vector4 color, float size)
@@ -138,7 +154,7 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	
 	UINT initialCount = 0;
 
-	ParticleParams pParams;
+	
 	pParams.emitterLocation = Vector4(position.x,position.y,position.z, 1.0f);
 	pParams.randomVector = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f);
 
@@ -146,12 +162,13 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &pParams, sizeof(ParticleParams));
 	deviceContext->Unmap(particleParamCB.Get(), 0);
-
+	ID3D11UnorderedAccessView* n = nullptr;
 	//run create particle compute shader here
 	deviceContext->CSSetConstantBuffers(0, 1, this->particleParamCB.GetAddressOf());
 	deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
 	deviceContext->CSSetShader(this->createComputeShader.Get(), 0, 0);
 	deviceContext->Dispatch(1, 1, 1);
+	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
 
 	return true;
 }
@@ -181,17 +198,28 @@ void ParticleSystem::drawAll(Camera camera)
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
 
 
-	UINT stride = sizeof(Particle);
+	ParticleRenderParams prp;
+	prp.consumerLocation = Vector4(0, 0, 0, 0);
+	prp.emitterLocation = pParams.emitterLocation;
+	D3D11_MAPPED_SUBRESOURCE mappedResource2;
+	hr = deviceContext->Map(particleParamRenderCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource2);
+	CopyMemory(mappedResource2.pData, &info, sizeof(ParticleRenderParams));
+	deviceContext->Unmap(particleParamRenderCB.Get(), 0);
+
 	UINT offset = 0;
+	ID3D11ShaderResourceView* n = nullptr;
 
 	this->deviceContext->PSSetShader(this->pixelShader.Get(), 0, 0);
 	this->deviceContext->VSSetShader(this->vertexShader.Get(), 0, 0);
 	this->deviceContext->GSSetShader(this->geometryShader.Get(), 0, 0);
-	this->deviceContext->GSSetConstantBuffers(0, 1, &this->viewProjBuffer);
+	this->deviceContext->GSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
+	this->deviceContext->GSSetConstantBuffers(1, 1, this->particleParamRenderCB.GetAddressOf());
+	this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 	deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV.Get());
 	this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
 	this->deviceContext->GSSetShader(nullptr, 0, 0);
+	this->deviceContext->VSSetShaderResources(0, 1, &n);
 
 }
 

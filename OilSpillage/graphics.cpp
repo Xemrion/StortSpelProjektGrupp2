@@ -270,6 +270,9 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 
 	this->particleSystem.initiateParticles(device, deviceContext);
 	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 0), Vector3(1, 0, 0), Vector4(1, 1, 0, 1),0.1f);
+	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 0), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 0), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+
 	return true;
 }
 

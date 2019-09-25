@@ -21,6 +21,11 @@ struct ParticleParams
 	Vector4 emitterLocation;
 	Vector4 randomVector;
 };
+struct ParticleRenderParams
+{
+	Vector4 emitterLocation;
+	Vector4 consumerLocation;
+};
 class ParticleSystem
 {
 public:
@@ -38,7 +43,9 @@ private:
 	int lastUsedParticle;
 	//Particle* particles;
 	//ID3D11Buffer* particleBuffer;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
+	ParticleParams pParams;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 
 
@@ -61,6 +68,8 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particlesBuffer;//one will be the updated
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particlesUAV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particlesSRV;
+
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particlesBuffer2;//one will be the current
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particlesUAV2;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indArgsBuffer;//one will be the current
