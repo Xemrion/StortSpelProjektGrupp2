@@ -63,7 +63,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particlesUAV;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particlesBuffer2;//one will be the current
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particlesUAV2;
-
+	Microsoft::WRL::ComPtr<ID3D11Buffer> indArgsBuffer;//one will be the current
 
 	int findUnused();
 };

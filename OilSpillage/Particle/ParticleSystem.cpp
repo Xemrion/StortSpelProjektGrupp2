@@ -79,13 +79,13 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	D3D11_BUFFER_DESC vBufferDesc;
 	ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
 
-	vBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vBufferDesc.ByteWidth = bufferSize;
-	vBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	vBufferDesc.MiscFlags = 0;
+	vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vBufferDesc.BindFlags = 0;
+	vBufferDesc.ByteWidth = capParticle*sizeof(UINT);
+	vBufferDesc.CPUAccessFlags = 0;
+	vBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
 
-	//hr = device->CreateBuffer(&vBufferDesc, nullptr, &particleBuffer);
+	hr = device->CreateBuffer(&vBufferDesc, nullptr, indArgsBuffer.GetAddressOf());
 
 
 	D3D11_BUFFER_DESC desc = { 0 };
@@ -170,7 +170,7 @@ void ParticleSystem::updateParticles(float delta)
 void ParticleSystem::drawAll(Camera camera)
 {
 
-	/*CameraInfo info;
+	CameraInfo info;
 	info.viewProj= (camera.getViewMatrix() * camera.getProjectionMatrix()).Transpose();
 	info.upp = Vector3(0.0, 0.0, 1.0);
 	info.camPos = Vector4(camera.getPos().x, camera.getPos().y, camera.getPos().z, 0.0f);
@@ -184,15 +184,14 @@ void ParticleSystem::drawAll(Camera camera)
 	UINT stride = sizeof(Particle);
 	UINT offset = 0;
 
-
 	this->deviceContext->PSSetShader(this->pixelShader.Get(), 0, 0);
 	this->deviceContext->VSSetShader(this->vertexShader.Get(), 0, 0);
 	this->deviceContext->GSSetShader(this->geometryShader.Get(), 0, 0);
 	this->deviceContext->GSSetConstantBuffers(0, 1, &this->viewProjBuffer);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	deviceContext->IASetInputLayout(this->inputLayout.Get());
-	this->deviceContext->Draw(nrOfParticles, 0);
-	this->deviceContext->GSSetShader(nullptr, 0, 0);*/
+	deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV.Get());
+	this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
+	this->deviceContext->GSSetShader(nullptr, 0, 0);
 
 }
 
