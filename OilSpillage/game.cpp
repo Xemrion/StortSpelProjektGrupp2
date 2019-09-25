@@ -154,7 +154,7 @@ void Game::run()
 
 		//imgui button, slider etc
 		ImGui::Begin("OilSpillage");
-
+		ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		Vector3 camPos = camera.getPosition();
 		Vector3 camRot = camera.getRotation();
 		Vector2 lDir = Input::GetDirectionL(0);
@@ -179,10 +179,10 @@ void Game::run()
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-		//deltaTime reset
-		prevTime = curTime;
 		
 		this->graphics.presentScene();
+		//deltaTime reset
+		prevTime = curTime;
 	}
 
 	delete this->testObject;
