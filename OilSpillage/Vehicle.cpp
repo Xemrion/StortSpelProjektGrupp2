@@ -11,7 +11,7 @@ Vehicle::Vehicle()
 	strength = 0;
 
 	targetRotation = 0;
-	drivingMode = 1;
+	drivingMode = 0;
 	topSpeed = 4700;
 	this->counter = 0.0f;
 	this->rotateAcceleration = 0.0f;
