@@ -175,12 +175,15 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 
 void ParticleSystem::updateParticles(float delta)
 {
+	ID3D11UnorderedAccessView* n = nullptr;
+
 	//run update computeshader here
 		//deviceContext->CopyStructureCount(this->particl)
 	UINT initialCount = -1;
 	deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
 
 	this->deviceContext->Dispatch(1, 1, 1);
+	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
 
 }
 
@@ -215,6 +218,11 @@ void ParticleSystem::drawAll(Camera camera)
 	this->deviceContext->GSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
 	this->deviceContext->GSSetConstantBuffers(1, 1, this->particleParamRenderCB.GetAddressOf());
 	this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV.GetAddressOf());
+
+	ID3D11Buffer* nil = nullptr;
+	
+	this->deviceContext->IASetVertexBuffers(0, 1, &nil, &offset, &offset);
+	this->deviceContext->IASetInputLayout(nullptr);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 	deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV.Get());
 	this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
