@@ -3,8 +3,8 @@
 
 inline void DynamicCamera::updateRotationMatrix()
 {
-	this->rotationRes  = Matrix::CreateRotationX(this->rotation.x); //Roll
-	this->rotationRes *= Matrix::CreateRotationZ(this->rotation.z); //Pitch
+	this->rotationRes  = Matrix::CreateRotationZ(this->rotation.z); //Pitch
+	this->rotationRes *= Matrix::CreateRotationX(this->rotation.x); //Roll
 	this->rotationRes *= Matrix::CreateRotationY(this->rotation.y); //Yaw
 }
 
@@ -12,7 +12,7 @@ inline void DynamicCamera::updateViewMatrix()
 {
 	this->view = Matrix::CreateLookAt(
 		this->position, //Position in world
-		this->position + Vector3::Transform(Vector3(1.0f, 0.0f, 0.0f), this->rotationRes), //Front
+		this->position + Vector3::Transform(Vector3(0.0f, 0.0f, -1.0f), this->rotationRes), //Front
 		Vector3::Transform(Vector3(0.0f, 1.0f, 0.0f), this->rotationRes) //Up
 	);
 }
