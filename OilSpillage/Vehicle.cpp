@@ -11,13 +11,17 @@ Vehicle::Vehicle()
 	strength = 0;
 
 	targetRotation = 0;
-	drivingMode = 1;
+	drivingMode = 0;
 	topSpeed = 4700;
+	this->add = 0.0f;
 	this->counter = 0.0f;
 	this->rotateAcceleration = 0.0f;
 	this->rotationSmoother = 1.0f;
 	this->tempTargetRotation = 0.0f;
 	this->rotationDirection = true;
+	this->vehicle = nullptr;
+	this->bodyRotation = nullptr;
+	this->bodyRotationPoint = nullptr;
 }
 
 Vehicle::~Vehicle()
@@ -82,14 +86,14 @@ void Vehicle::update(float deltaTime)
 	if (drivingMode == 0) {
 	
 		if (Input::GetStrengthL(0) > 0) {
-			this->velocity.x += dx * 0.2 *deltaTime* 4000 * Input::GetStrengthL(0);
-			this->velocity.y += dy * 0.2 * deltaTime * 4000 * Input::GetStrengthL(0);
+			this->velocity.x += dx * 0.2f *deltaTime* 4000 * Input::GetStrengthL(0);
+			this->velocity.y += dy * 0.2f * deltaTime * 4000 * Input::GetStrengthL(0);
 
 			if (strength < Input::GetStrengthL(0)) {
 				strength = Input::GetStrengthL(0);
 			}
 			else {
-				strength -= 0.01 * deltaTime;
+				strength -= 0.01f * deltaTime;
 			}
 
 			if (velocity.x > topSpeed*strength) {
@@ -173,8 +177,8 @@ void Vehicle::update(float deltaTime)
 	//Driving mode: Throttle and turning, realistic
 	else if (drivingMode == 1) {
 		if (Input::CheckButton(Keys::R_TRIGGER, HELD, 0) || Input::IsKeyDown_DEBUG(Keyboard::W)) {
-			this->velocity.x += dx * 0.2 * deltaTime * 4000 /** Input::GetStrengthL(0)*/;
-			this->velocity.y += dy * 0.2 * deltaTime * 4000 /** Input::GetStrengthL(0)*/;
+			this->velocity.x += dx * 0.2f * deltaTime * 4000 /** Input::GetStrengthL(0)*/;
+			this->velocity.y += dy * 0.2f * deltaTime * 4000 /** Input::GetStrengthL(0)*/;
 		}
 		if (Input::GetDirectionL(0).x > 0) {
 			if (rotationDirection == true) {
@@ -237,8 +241,8 @@ void Vehicle::update(float deltaTime)
 
 		}
 		if (Input::CheckButton(Keys::L_TRIGGER, HELD, 0) || Input::IsKeyDown_DEBUG(Keyboard::S)) {
-			this->velocity.x -= dx * 0.2 * deltaTime * 4000 *0.7 /** Input::GetStrengthL(0)*/;
-			this->velocity.y -= dy * 0.2 * deltaTime * 4000 *0.7/** Input::GetStrengthL(0)*/;
+			this->velocity.x -= dx * 0.2f * deltaTime * 4000 * 0.7f /*Input::GetStrengthL(0)*/;
+			this->velocity.y -= dy * 0.2f * deltaTime * 4000 * 0.7f /*Input::GetStrengthL(0)*/;
 		}
 		if (!Input::CheckButton(Keys::R_TRIGGER, HELD, 0) && !Input::IsKeyDown_DEBUG(Keyboard::S) && !Input::CheckButton(Keys::L_TRIGGER, HELD, 0) && !Input::IsKeyDown_DEBUG(Keyboard::W)) {
 		
@@ -302,7 +306,7 @@ void Vehicle::update(float deltaTime)
 	float springValue = 8.2f;
 	Vector2 currentToTarget = Vector2(dx3 / hypoC3, dy3 / hypoC3);
 	Vector2 springForce = currentToTarget * springValue;
-	Vector2 dampingForce = Vector2(((-accelerator.x)) * 0.2 * sqrt(springValue), ((-accelerator.z)) * 0.2 * sqrt(springValue));
+	Vector2 dampingForce = Vector2(((-accelerator.x)) * 0.2f * sqrt(springValue), ((-accelerator.z)) * 0.2f * sqrt(springValue));
 	Vector2 force = springForce + dampingForce;
 
 	/*if (!(dx3 == 0 && hypoC3 == 0) && !(dy3 == 0 && hypoC3 == 0)) {
@@ -343,7 +347,7 @@ void Vehicle::update(float deltaTime)
 	bodyPivot += Vector3(-accelerator.x * deltaTime, 0.00f * 0.0000f, -accelerator.z * deltaTime);
 	//this->bodyRotation->setPosition(Vector3(bodyRotation->getPosition().x, bodyRotation->getPosition().y + 1, bodyRotation->getPosition().z));
 	//this->bodyRotation->move(Vector3((velocity.x* deltaTime * 0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f)));
-	add += 0.2 * deltaTime;
+	add += 0.2f * deltaTime;
 	//this->bodyRotation->setRotation(-Vector3(rotationVec.x *0.2, -vehicle->getRotation().y, rotationVec.z * 0.2));
 	this->bodyRotation->setRotation(-Vector3(0, -vehicle->getRotation().y, 0));
 	

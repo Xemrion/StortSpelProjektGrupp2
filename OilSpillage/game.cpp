@@ -88,8 +88,8 @@ void Game::run()
 	QueryPerformanceCounter((LARGE_INTEGER*)& prevTime);
 
 	std::vector<CinematicPos> points = {
-		{ Vector3(10.0f, 10.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f },
-		{ Vector3(0.0f, 5.0f, 0.0f), Vector3(0.0f, 0.0f, XM_PIDIV2), 3.0f }
+		{ Vector3(0.0f, 10.0f, -10.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f },
+		{ Vector3(0.0f, 5.0f, 0.0f), Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	this->camera.startCinematic(&points, false);
 
@@ -153,8 +153,7 @@ void Game::run()
 
 
 		//imgui button, slider etc
-		ImGui::Begin("Gungame");
-		ImGui::Text("Hold 'V' To move camera with mouse.");
+		ImGui::Begin("OilSpillage");
 
 		Vector3 camPos = camera.getPosition();
 		Vector3 camRot = camera.getRotation();
@@ -163,8 +162,8 @@ void Game::run()
 		float lStr = Input::GetStrengthL(0);
 		float rStr = Input::GetStrengthR(0);
 		bool status[4] = { Input::CheckButton(CONFIRM, UP, 0), Input::CheckButton(CONFIRM, HELD, 0), Input::CheckButton(CONFIRM, RELEASED, 0), Input::CheckButton(CONFIRM, PRESSED, 0) };
-		ImGui::Text(("\nCam Pos: " + std::to_string(camPos.x) + " " + std::to_string(camPos.y) + " " + std::to_string(camPos.z)).c_str());
-		ImGui::Text(("\nCam Rot: " + std::to_string(camRot.x) + " " + std::to_string(camRot.y) + " " + std::to_string(camRot.z)).c_str());
+		ImGui::Text(("Cam Pos: " + std::to_string(camPos.x) + " " + std::to_string(camPos.y) + " " + std::to_string(camPos.z)).c_str());
+		ImGui::Text(("Cam Rot: " + std::to_string(camRot.x) + " " + std::to_string(camRot.y) + " " + std::to_string(camRot.z)).c_str());
 		ImGui::Text(("\n-- PLAYER 0 --\nConfirm Status - Up: " + std::to_string(status[0]) + " Held: " + std::to_string(status[1]) + " Released: " + std::to_string(status[2]) + " Pressed: " + std::to_string(status[3])).c_str());
 		ImGui::Text(("L Dir: " + std::to_string(lDir.x) + " " + std::to_string(lDir.y)).c_str());
 		ImGui::Text(("L Str: " + std::to_string(lStr)).c_str());
@@ -174,12 +173,11 @@ void Game::run()
 
 		//static int rotation[3] = { 0, 0, 0 };
 		//ImGui::SliderInt3("Cam Rotation", rotation, -360, 360);
+		//this->camera.setRotation(Vector3(rotation[0] * (DirectX::XM_PI / 180), rotation[1] * (DirectX::XM_PI / 180), rotation[2] * (DirectX::XM_PI / 180)));
 
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-		//this->camera.setRotation(Vector3(rotation[0] * (DirectX::XM_PI / 180), rotation[1] * (DirectX::XM_PI / 180), rotation[2] * (DirectX::XM_PI / 180)));
 
 		//deltaTime reset
 		prevTime = curTime;
