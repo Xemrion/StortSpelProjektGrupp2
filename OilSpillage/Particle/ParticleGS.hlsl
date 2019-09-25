@@ -50,10 +50,10 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	//vert[2] = input[0].Pos - right *1 + up * 1; // Top left
 	//vert[3] = input[0].Pos + right *1 + up * 1; // Top right 
 	
-	vert[0] = input[0].pos - right * 1 + up * 1; // Top middle
-	vert[1] = input[0].pos + right * 1 + up * 1; // Top right
-	vert[3] = input[0].pos + right * 1 - up * 1; // Bottom right
-	vert[2] = input[0].pos - right * 1 - up * 1; // Top right 
+	vert[0] = input[0].pos - right * 0.1 + up * 0.1; // Top middle
+	vert[1] = input[0].pos + right * 0.1 + up * 0.1; // Top right
+	vert[3] = input[0].pos + right * 0.1 - up * 0.1; // Bottom right
+	vert[2] = input[0].pos - right * 0.1 - up * 0.1; // Top right 
 	
 	float2 texCoord[4];
 	texCoord[2] = float2(0, 1);//2

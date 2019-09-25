@@ -26,6 +26,13 @@ struct ParticleRenderParams
 	Vector4 emitterLocation;
 	Vector4 consumerLocation;
 };
+struct IndirDraw
+{
+	UINT vertexCount;//particle count
+	UINT instanceCount;//1
+	UINT vertexStartLoc;
+	UINT instanceStartLoc;
+};
 class ParticleSystem
 {
 public:
@@ -41,6 +48,8 @@ private:
 	ID3D11DeviceContext* deviceContext;
 	int nrOfParticles = 0;
 	int lastUsedParticle;
+	int firstAdd = 0;
+	IndirDraw indDraw;
 	//Particle* particles;
 	//ID3D11Buffer* particleBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader

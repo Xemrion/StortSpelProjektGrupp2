@@ -9,7 +9,7 @@ StructuredBuffer<Particle> SimulationState;
 
 struct VS_INPUT
 {
-	uint vertexid : SV_VertexID;
+	uint vertexId  : SV_VertexID;
 };
 
 struct VS_OUT
@@ -21,7 +21,7 @@ VS_OUT main(in VS_INPUT input)
 {
 	VS_OUT output = (VS_OUT)0;
 	
-	output.pos.xyz = SimulationState[input.vertexid].position;
+	output.pos.xyz = SimulationState[input.vertexId].position;
 
 	return output;
 }

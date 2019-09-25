@@ -270,8 +270,9 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 
 	this->particleSystem.initiateParticles(device, deviceContext);
 	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 0), Vector3(1, 0, 0), Vector4(1, 1, 0, 1),0.1f);
-	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 0), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
-	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 0), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+	this->particleSystem.addParticle(1, 10, Vector3(2, 2, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+	this->particleSystem.addParticle(1, 10, Vector3(10, 0, 0), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
 
 	return true;
 }
@@ -345,7 +346,7 @@ void Graphics::render(Camera camera, float deltaTime)
 		deviceContext->PSSetConstantBuffers(2, 1, &this->lightBuffer);
 		deviceContext->Draw(vertexCount, 0);
 	}
-	this->particleSystem.updateParticles(deltaTime);
+	//this->particleSystem.updateParticles(deltaTime);
 	this->particleSystem.drawAll(camera);
 	
 

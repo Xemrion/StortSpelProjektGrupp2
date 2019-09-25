@@ -29,7 +29,7 @@ void main( uint3 GroupThreadID : SV_GroupThreadID )
 {
 	Particle p;
 
-	p.position = emitterLocation.xyz;
+	p.position = emitterLocation.xyz+ float3(GroupThreadID.x+1,0,0);
 
 	p.direction = reflect(direction[GroupThreadID.x], randomVector.xyz) * 5.0f;
 
