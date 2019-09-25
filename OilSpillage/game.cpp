@@ -65,6 +65,19 @@ void Game::init(Window* window)
 	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
 	//graphics.addToDraw(AiTestObject);
 
+	parentTest = new GameObject;
+	parentTest->mesh = graphics.getMeshPointer("Cube");
+	parentTest->setPosition(Vector3(-3.0f, 0.0f, 0.0f));
+	parentTest->setScale(Vector3(0.5f, 0.5f, 0.5f));
+	parentTest->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	graphics.addToDraw(parentTest);
+
+	childTest = new GameObject;
+	childTest->mesh = graphics.getMeshPointer("Cube");
+	childTest->setPosition(Vector3(-3.0f, 0.0f, 0.0f));
+	childTest->setColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+	childTest->parent = parentTest;
+	graphics.addToDraw(childTest);
 	
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f));
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f),  50.f));
@@ -144,6 +157,8 @@ void Game::run()
 		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
 		this->graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1f), cos(curTime * secPerCount * 0.1f), -0.5f));
 
+		this->parentTest->setRotation(Vector3(0.0f, cos(curTime * secPerCount) * 2.0f, 0.0f));
+
 		this->graphics.render(&this->camera);
 		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos, this->testObject2->getPosition(), Vector3(0, 1, 0));
 		
@@ -188,4 +203,6 @@ void Game::run()
 	delete this->testObject;
 	delete this->testObject2;
 	delete this->aiObject;
+	delete this->parentTest;
+	delete this->childTest;
 }

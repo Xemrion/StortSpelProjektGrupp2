@@ -17,7 +17,8 @@ class Game {
 	static Graphics graphics;
 	GameObject* testObject = nullptr;
 	GameObject* testObject2 = nullptr;
-	//GameObject* AiTestObject = nullptr;
+	GameObject* parentTest = nullptr;
+	GameObject* childTest = nullptr;
 	AIPlayer * aiObject = nullptr;
 
 	void addQuad(int x);

@@ -3,8 +3,8 @@
 
 inline void DynamicCamera::updateRotationMatrix()
 {
-	this->rotationRes  = Matrix::CreateRotationZ(this->rotation.z); //Pitch
-	this->rotationRes *= Matrix::CreateRotationX(this->rotation.x); //Roll
+	this->rotationRes  = Matrix::CreateRotationZ(this->rotation.z); //Roll
+	this->rotationRes *= Matrix::CreateRotationX(this->rotation.x); //Pitch
 	this->rotationRes *= Matrix::CreateRotationY(this->rotation.y); //Yaw
 }
 

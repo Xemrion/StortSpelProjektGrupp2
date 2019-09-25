@@ -2,11 +2,16 @@
 #include"game.h"
 Matrix GameObject::getTransform() {
 
-	Quaternion qt = Quaternion::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
-	Matrix mtr = Matrix::CreateFromQuaternion(qt);
-	Matrix translate = Matrix::CreateTranslation(position);
-	Matrix scaleM = Matrix::CreateScale(scale);
-	return scaleM * mtr  * translate;
+	Matrix transform(Matrix::CreateScale(scale));
+	transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
+	transform *= Matrix::CreateTranslation(position);
+
+	if (this->parent != nullptr)
+	{
+		transform *= this->parent->getTransform();
+	}
+
+	return transform;
 }
 
 void GameObject::setPosition(Vector3 newPos)
