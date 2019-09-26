@@ -53,7 +53,7 @@ void Game::generateMap() {
 		graphics.addToDraw(&tile);
 		tile.setColor({ 0.6f, 0.6f, 0.6f, 1.0f });
 		//tile.setTexture(graphics.getTexturePointer("brickwall.tga"));
-		tile.setScale(Vector3{ 0.001f,  0.0005f, 0.001f });
+		tile.setScale(Vector3{ 0.01f,  0.005f, 0.01f });
 	}
 }
 

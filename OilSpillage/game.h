@@ -9,7 +9,8 @@
 #include"vehicle.h"
 #include "AI/Actor.h"
 #include "DynamicCamera.h"
-
+#include "PG/Map.hpp"
+#include "PG/defs.hpp"
 #include <array>
 
 class Game {
@@ -24,6 +25,7 @@ class Game {
 	GameObject* childTest = nullptr;
 	AIPlayer * aiObject = nullptr;
 	LightList lightList;
+	Vec<GameObject> tiles;
 	void addQuad(int x);
 
 	float deltaTime = 0.0f;
@@ -38,6 +40,8 @@ class Game {
 
 	int RadioButtonValue;
 	std::array<SpotLight, LightList::maxSize>::iterator playerLight;
+
+	void generateMap();
 
 public:
 	Game();

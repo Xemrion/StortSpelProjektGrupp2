@@ -65,7 +65,7 @@ public:
 			+ (neighbour_is_road(Dir::west,  x, y) ? cPow(2, 3) : 0);
 	}
 
-	static F32 constexpr SIDE_LENGTH = 2.0f;
+	static F32 constexpr SIDE_LENGTH = 20.0f;
 	Vec<GameObject> load_as_models(Graphics& graphics) const;
 
 	// NOTE! pretends that all out-of-bounds tiles are roads
