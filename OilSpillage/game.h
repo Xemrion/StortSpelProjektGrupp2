@@ -10,6 +10,8 @@
 #include "AI/Actor.h"
 #include "DynamicCamera.h"
 
+#include <array>
+
 class Game {
 	Window* window = nullptr;
 
@@ -17,10 +19,11 @@ class Game {
 	static Graphics graphics;
 	GameObject* testObject = nullptr;
 	GameObject* testObject2 = nullptr;
+	GameObject* testObject3 = nullptr;
 	GameObject* parentTest = nullptr;
 	GameObject* childTest = nullptr;
 	AIPlayer * aiObject = nullptr;
-
+	LightList lightList;
 	void addQuad(int x);
 
 	float deltaTime = 0.0f;

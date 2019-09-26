@@ -8,6 +8,15 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+struct Frustum {
+	Vector4 nearPlane;
+	Vector4 farPlane;
+	Vector4 leftPlane;
+	Vector4 rightPlane;
+	Vector4 topPlane;
+	Vector4 bottomPlane;
+};
+
 class DynamicCamera
 {
 private:
@@ -25,6 +34,14 @@ private:
 	bool cinematicActive;
 	float currentSubTime;
 
+	float fieldOfView;
+	float nearDist;
+	float farDist;
+	float nearHeight;
+	float nearWidth;
+	float farHeight;
+	float farWidth;
+
 	void updateRotationMatrix();
 	void updateViewMatrix();
 
@@ -38,15 +55,16 @@ public:
 	void stopCinematic();
 	bool isCinematicDone();
 
-	Vector3 getPosition();
+	Vector3 getPosition() const;
 	const Vector3& getPositionRef();
 	void setPosition(Vector3 position);
-	Vector3 getRotation();
+	Vector3 getRotation() const;
 	const Vector3& getRotationRef();
 	void setRotation(Vector3 rotation);
 
 	Matrix getViewMatrix();
-	Matrix getProjectionMatrix();
+	Matrix getProjectionMatrix() const;
+	Frustum getFrustum();
 };
 
 #endif // !DYNAMIC_CAMERA_H

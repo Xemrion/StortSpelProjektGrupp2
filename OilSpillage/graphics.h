@@ -17,6 +17,8 @@
 #include "DynamicCamera.h"
 #include<string>
 #include "Lights.h"
+#include <memory.h>
+#include <array>
 
 enum Shapes
 {
@@ -40,21 +42,32 @@ class Graphics {
 	ID3D11Buffer* viewProjBuffer;
 	ID3D11Buffer* worldBuffer;
 	ID3D11Buffer* colorBuffer;
+	ID3D11Buffer* sunBuffer;
 	ID3D11Buffer* lightBuffer;
+	ID3D11Buffer* frustumBuffer;
+	ID3D11Buffer* culledLightBuffer;
+	ID3D11UnorderedAccessView* lightAppendBufferView;
+	ID3D11ShaderResourceView* culledLightBufferView;
 
 	ID3D11SamplerState* sampler;
 	std::unordered_map<std::string, Mesh> meshes;
 	std::unordered_map<std::string, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
-	std::vector<PointLight> pointLights;
-	Vector4 sunVector = Vector4(0.0, 1.0, 0.0, 0.0);
-	size_t maxPointLights = 20;
+	LightList* lightList;
 	
+	Vector4 sunVector = Vector4(0.0, 1.0, 0.0, 0.0);
+	struct LightBufferContents {
+		PointLight lights[MAX_LIGHTS_TOTAL];
+	};
+	LightBufferContents* lightBufferContents = nullptr;
 
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
+	ComputeShader lightCullingShader;
 	Debug* debugger;
 	ID3D11Debug* debug;
+
+	void fillLightBuffers(Frustum&& frustum);
 public:
 	Graphics();
 	~Graphics();
@@ -69,10 +82,7 @@ public:
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
-	void addPointLight(PointLight light);
-	void clearPointLights();
-	void setSunVector(Vector3 vectorToSun);
-	Vector3 getSunVector();
+	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera);
 	bool createShaders();
