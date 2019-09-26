@@ -40,3 +40,14 @@ public:
 	bool createVS(ID3D11Device* device, std::wstring shaderpath, D3D11_INPUT_ELEMENT_DESC* layoutDesc, UINT numElements);
 
 };
+
+class ComputeShader
+{
+public:
+	bool initialize(ID3D11Device* device, std::wstring shaderPath);
+	ID3D11ComputeShader* getShader();
+	ID3DBlob* getBuffer();
+private:
+	Microsoft::WRL::ComPtr<ID3D11ComputeShader> shader;
+	Microsoft::WRL::ComPtr<ID3DBlob> shaderBuffer;
+};

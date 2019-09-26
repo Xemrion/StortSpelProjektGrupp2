@@ -1,26 +1,19 @@
 #include "Debug.h"
-Debug::Debug(ID3D11DeviceContext* dc, ID3D11Device *d, Camera camera)
-{
-	
 
-	this->camera = &camera;
+Debug::Debug(ID3D11DeviceContext* dc, ID3D11Device *d)
+{
 	this->deviceContext = dc;
 	this->device = d;
 	this->cb_vs_world.initialize(device);
-	//initilizelie the buffer
-	D3D11_BUFFER_DESC desc = { 0 };
-
-	desc.Usage = D3D11_USAGE_DYNAMIC;
-	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>(sizeof(Matrix) + (16 - (sizeof(Matrix) % 16)));
-	desc.StructureByteStride = 0;
-
-	HRESULT hr = device->CreateBuffer(&desc, 0, &viewProjBuffer);
 }
 
-void Debug::DrawCube(DirectX::SimpleMath::Vector3 maxPos, DirectX::SimpleMath::Vector3 minPos,DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 color)
+inline void Debug::DrawAABB(GameObject* obj, Vector3 color)
+{
+	AABB collisionBox = obj->getTheAABB();
+	Debug::DrawCube(collisionBox.maxPos, collisionBox.minPos, obj->getPosition(), color);
+}
+
+void Debug::DrawCube(Vector3 maxPos, Vector3 minPos, Vector3 pos, Vector3 color)
 {
 
 	DirectX::SimpleMath::Vector3 middle = (maxPos + minPos) / 2;
@@ -31,13 +24,13 @@ void Debug::DrawCube(DirectX::SimpleMath::Vector3 maxPos, DirectX::SimpleMath::V
 	IndexBuffer indicesbuffer;																			  
 	vertices.resize(8);																					  
 	{																									  
-		vertices[0] = { XMFLOAT3(-scale.x	+ middle.x+pos.x,  scale.y + middle.y+pos.y, -scale.z + middle.z+pos.z), color };  
+		vertices[0] = { XMFLOAT3(-scale.x	+ middle.x+pos.x,  scale.y + middle.y+pos.y, -scale.z + middle.z+pos.z),	color };  
 		vertices[1] = { XMFLOAT3(-scale.x	+ middle.x+pos.x, -scale.y + middle.y+pos.y, -scale.z + middle.z+pos.z),	color };  
 		vertices[2] = { XMFLOAT3(scale.x	+ middle.x+pos.x, -scale.y + middle.y+pos.y, -scale.z + middle.z+pos.z),	color };  
 		vertices[3] = { XMFLOAT3(scale.x	+ middle.x+pos.x,  scale.y + middle.y+pos.y, -scale.z + middle.z+pos.z),	color };  
 		vertices[4] = { XMFLOAT3(-scale.x	+ middle.x+pos.x, -scale.y + middle.y+pos.y,  scale.z + middle.z+pos.z),	color };  
 		vertices[5] = { XMFLOAT3(-scale.x	+ middle.x+pos.x,  scale.y + middle.y+pos.y,  scale.z + middle.z+pos.z),	color };  
-		vertices[6] = { XMFLOAT3(scale.x	+ middle.x+pos.x, -scale.y + middle.y+pos.y,  scale.z + middle.z+pos.z),  color };	  
+		vertices[6] = { XMFLOAT3(scale.x	+ middle.x+pos.x, -scale.y + middle.y+pos.y,  scale.z + middle.z+pos.z),	color };	  
 		vertices[7] = { XMFLOAT3(scale.x	+ middle.x+pos.x,  scale.y + middle.y+pos.y,  scale.z + middle.z+pos.z),	color };  
 	}																									  
 	std::vector<DWORD> indexData =
@@ -65,11 +58,6 @@ void Debug::DrawCube(DirectX::SimpleMath::Vector3 maxPos, DirectX::SimpleMath::V
 	cb_vs_world.data.wMatrix = world;
 	cb_vs_world.applyChanges(device, deviceContext);
 	deviceContext->VSSetConstantBuffers(1, 1, this->cb_vs_world.getAddressOfBuffer());
-	/*D3D11_MAPPED_SUBRESOURCE mappedResource;
-	Matrix viewProj = (this->camera->getViewMatrix() * this->camera->getProjectionMatrix()).Transpose();
-	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
-	deviceContext->Unmap(viewProjBuffer, 0);*/
 	//draw
 	UINT stride = sizeof(DebugVertex);
 	UINT offset = 0;
@@ -81,7 +69,7 @@ void Debug::DrawCube(DirectX::SimpleMath::Vector3 maxPos, DirectX::SimpleMath::V
 	deviceContext->DrawIndexed(indicesbuffer.IndexCount(), 0, 0);
 }
 
-void Debug::DrawLine(XMFLOAT3 start, XMFLOAT3 end, XMFLOAT3 color)
+void Debug::DrawLine(Vector3 start, Vector3 end, Vector3 color)
 {
 	std::vector<DebugVertex> vertices;
 	VertexBuffer<DebugVertex>vertexBuffer;
@@ -108,7 +96,7 @@ void Debug::DrawLine(XMFLOAT3 start, XMFLOAT3 end, XMFLOAT3 color)
 
 }
 
-void Debug::DrawCube(XMFLOAT3 p, XMFLOAT3 color, float scale)
+void Debug::DrawCube(Vector3 p, Vector3 color, float scale)
 {
 	std::vector<DebugVertex> vertices;
 	VertexBuffer<DebugVertex>vertexBuffer;
@@ -159,7 +147,7 @@ void Debug::DrawCube(XMFLOAT3 p, XMFLOAT3 color, float scale)
 	deviceContext->DrawIndexed(indicesbuffer.IndexCount(), 0, 0);
 }
 
-void Debug::DrawRectangle(XMFLOAT3 center, XMFLOAT3 color, float scale)
+void Debug::DrawRectangle(Vector3 center, Vector3 color, float scale)
 {std::vector<DebugVertex> vertices;
 	VertexBuffer<DebugVertex>vertexBuffer;
 	IndexBuffer indicesbuffer;

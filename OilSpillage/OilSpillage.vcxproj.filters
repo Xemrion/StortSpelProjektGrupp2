@@ -90,6 +90,12 @@
     <ClCompile Include="AI\Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DynamicCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="PG\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -212,6 +218,9 @@
     <ClInclude Include="PG\Walker.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DynamicCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
@@ -226,9 +235,11 @@
     <FxCompile Include="DebugPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="ComputeLightCulling.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="ShaderDefines.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="brickwall.tga" />

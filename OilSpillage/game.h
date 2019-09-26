@@ -11,6 +11,10 @@
 #include <memory>
 #include "PG/defs.hpp"
 
+#include "DynamicCamera.h"
+
+#include <array>
+
 class Game {
 	Window* window = nullptr;
 
@@ -21,8 +25,11 @@ class Game {
 	Vec<GameObject> tiles;
 	
 	//GameObject* AiTestObject = nullptr;
+	GameObject* testObject3 = nullptr;
+	GameObject* parentTest = nullptr;
+	GameObject* childTest = nullptr;
 	AIPlayer * aiObject = nullptr;
-
+	LightList lightList;
 	void addQuad(int x);
 
 	float deltaTime = 0.0f;
@@ -32,10 +39,13 @@ class Game {
 	float secPerCount = 1.0f / countsPerSec;
 	
 	Vehicle player;
-	Camera camera;
+	DynamicCamera camera;
 	//TestAI AI;
 
 	void generateMap();
+
+	int RadioButtonValue;
+	std::array<SpotLight, LightList::maxSize>::iterator playerLight;
 
 public:
 	Game();
