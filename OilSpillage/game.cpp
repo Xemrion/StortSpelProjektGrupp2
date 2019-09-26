@@ -36,6 +36,7 @@ void Game::init(Window* window)
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall.tga");
 	graphics.loadModel("Dummy_Roller_Melee");
+
 	this->testObject = new GameObject;
 	testObject->mesh = graphics.getMeshPointer("Cube");
 	//graphics.addToDraw(testObject);
@@ -70,19 +71,31 @@ void Game::init(Window* window)
 	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
 	//graphics.addToDraw(AiTestObject);
 
-	// light tests
 #if _DEBUG
-	lightList.addLight(PointLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f));
-	lightList.addLight(PointLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f),  50.f));
-	lightList.addLight(PointLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f),  50.f));
-	lightList.addLight(PointLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f));
+	// light tests
+	lightList.addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
+	lightList.addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 50.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
+	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 50.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
+	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
-	testLight = lightList.addLight(SpotLight(Vector3(-25.f, 4.0f, 2.0f), Vector3(1.0f, 0.3f, 1.0f), 50.f, Vector3(0.0f, -1.0f, 0.5f), 1.0f));
-	lightList.removeLight(lightList.addLight(SpotLight(Vector3(-25.f, 4.0f, -2.0f), Vector3(1.0f, 0.3f, 1.0f), 50.f, Vector3(0.0f, -1.0f, -0.5f), 0.4f)));
-	testLight->setColor(Vector3(0.0f, 1.0f, 0.0f));
+	testLight = lightList.addLight(PointLight(Vector3(0.f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f), 50.f));
+	lightList.removeLight(lightList.addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
+	testLight->setColor(Vector3(1.0f, 0.3f, 0.6f));
+	
+	for (int i = 0; i < 350; ++i)
+	{
+		Vector3 randPos = Vector3(rand() % 101 - 50, 0.01, rand() % 101 - 50);
+		Vector3 randColor = Vector3(rand(), rand(), rand()) / RAND_MAX;
+		randColor.Clamp(Vector3(0.2, 0.2, 0.2), Vector3(1.0, 1.0, 1.0));
+
+		lightList.addLight(
+			PointLight(
+				randPos,
+				randColor,
+				5.0f));
+	}
 #endif
-
-	graphics.setSunVector(Vector3(0.55, 1.0, 0.725));
+	lightList.setSun(Sun(Vector3(0.0, -1.0, 1.0), Vector3(1.0, 0.8, 0.6)));
 	graphics.setLightList(&lightList);
 
 	player.init();
@@ -136,7 +149,6 @@ void Game::run()
 		
 		player.update(deltaTime);
 		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
-		testLight->setDirection(Vector3(sin(float(curTime) * secPerCount), 0.0, cos(float(curTime) * secPerCount)));
 		this->graphics.render(this->camera);
 		
 		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));

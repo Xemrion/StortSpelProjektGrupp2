@@ -2,6 +2,7 @@
 #include <algorithm>
 #include"Importer/importerClass.h"
 #include<cstring>
+#include "ShaderDefines.hlsli"
 
 Graphics::Graphics()
 {
@@ -21,11 +22,17 @@ Graphics::Graphics()
 	this->worldBuffer = nullptr;
 	this->colorBuffer = nullptr;
 	this->lightBuffer = nullptr;
+	this->frustumBuffer = nullptr;
+	this->culledLightBuffer = nullptr;
+	this->lightAppendBufferView = nullptr;
+	this->culledLightBufferView = nullptr;
 
 	this->sampler = nullptr;
 
 	this->debugger = nullptr;
 	this->debug = nullptr;
+
+	lightBufferContents = new LightBufferContents;
 }
 
 Graphics::~Graphics()
@@ -41,6 +48,11 @@ Graphics::~Graphics()
 	this->worldBuffer->Release();
 	this->colorBuffer->Release();
 	this->lightBuffer->Release();
+	this->frustumBuffer->Release();
+	this->culledLightBuffer->Release();
+
+	this->lightAppendBufferView->Release();
+	this->culledLightBufferView->Release();
 
 	this->sampler->Release();
 
@@ -61,6 +73,8 @@ Graphics::~Graphics()
 	{
 		delete i->second;
 	}
+
+	delete lightBufferContents;
 }
 
 bool Graphics::init(Window* window, float fov, Camera theCamera)
@@ -206,13 +220,64 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>((sizeof(Vector4) * 2) * LightList::size + (sizeof(Vector4) * 3) * LightList::size + sizeof(Vector4));
+	desc.ByteWidth = static_cast<UINT>(sizeof(Vector4) * 2);
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &sunBuffer);
+	if (FAILED(hr))
+		return false;
+
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = static_cast<UINT>(sizeof(LightBufferContents));
 	desc.StructureByteStride = 0;
 
 	hr = device->CreateBuffer(&desc, 0, &lightBuffer);
 	if (FAILED(hr))
 		return false;
 
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = static_cast<UINT>(sizeof(Frustum));
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &frustumBuffer);
+	if (FAILED(hr))
+		return false;
+
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+	desc.ByteWidth = static_cast<UINT>(sizeof(SpotLight) * (MAX_LIGHTS_ON_SCREEN));
+	desc.StructureByteStride = static_cast<UINT>(sizeof(SpotLight));
+
+	hr = device->CreateBuffer(&desc, 0, &culledLightBuffer);
+	if (FAILED(hr))
+		return false;
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+	uavDesc.Buffer.FirstElement = 0;
+	uavDesc.Buffer.NumElements = MAX_LIGHTS_ON_SCREEN;
+	uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_APPEND;
+	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+
+	device->CreateUnorderedAccessView(culledLightBuffer, &uavDesc, &lightAppendBufferView);
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+	srvDesc.Buffer.FirstElement = 0;
+	srvDesc.Buffer.NumElements = (UINT)MAX_LIGHTS_ON_SCREEN;
+
+	hr = device->CreateShaderResourceView(culledLightBuffer, &srvDesc, &culledLightBufferView);
+	if (FAILED(hr))
+		return false;
 
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -291,19 +356,7 @@ void Graphics::render(Camera camera)
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);
 
-	struct LightBufferContents {
-		Vector4 sun;
-		PointLight pointLights[LightList::size];
-		SpotLight spotLights[LightList::size];
-	} lightBufferContents;
-
-	hr = deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	ZeroMemory(mappedResource.pData, sizeof(LightBufferContents));
-	CopyMemory(&lightBufferContents.sun, &sunVector, sizeof(Vector4));
-	CopyMemory(lightBufferContents.pointLights, &*lightList->pointLights.begin(), LightList::size * sizeof(PointLight));
-	CopyMemory(lightBufferContents.spotLights, &*lightList->spotLights.begin(), LightList::size * sizeof(SpotLight));
-	CopyMemory(mappedResource.pData, &lightBufferContents, sizeof(LightBufferContents));
-	deviceContext->Unmap(lightBuffer, 0);
+	fillLightBuffers(camera.getFrustum());
 
 	//set up Shaders
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.GetInputLayout());
@@ -311,6 +364,9 @@ void Graphics::render(Camera camera)
 	deviceContext->VSSetShader(this->shaderDefault.vs.GetShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &this->viewProjBuffer);
 	deviceContext->PSSetSamplers(0, 1, &this->sampler);
+	deviceContext->PSSetShaderResources(1, 1, &this->culledLightBufferView);
+	deviceContext->PSSetConstantBuffers(2, 1, &this->sunBuffer);
+
 	for (GameObject* object : drawableObjects)
 	{
 		SimpleMath::Matrix world = object->getTransform();
@@ -341,7 +397,7 @@ void Graphics::render(Camera camera)
 		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
 		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
 		deviceContext->PSSetConstantBuffers(0, 1, &this->colorBuffer);
-		deviceContext->PSSetConstantBuffers(2, 1, &this->lightBuffer);
+
 		deviceContext->Draw(vertexCount, 0);
 	}
 
@@ -353,6 +409,7 @@ void Graphics::render(Camera camera)
 	debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
 	//debugger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
 	
+
 	// Present the back buffer to the screen since rendering is complete.
 }
 
@@ -422,6 +479,8 @@ bool Graphics::createShaders()
 	{
 		return false;
 	}
+
+	this->lightCullingShader.initialize(device, shaderfolder + L"ComputeLightCulling.cso");
 
 	return true;
 }
@@ -684,19 +743,58 @@ void Graphics::setLightList(LightList* lightList)
 	this->lightList = lightList;
 }
 
-void Graphics::setSunVector(Vector3 vectorToSun)
-{
-	vectorToSun.Normalize();
-	sunVector = Vector4(vectorToSun.x, vectorToSun.y, vectorToSun.z, 0.0);
-}
-
-Vector3 Graphics::getSunVector()
-{
-	return Vector3(sunVector);
-}
-
 void Graphics::presentScene()
 {
 	swapChain->Present(0, 0);
 }
 
+void Graphics::fillLightBuffers(Frustum&& frustum)
+{
+	// fill light list
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	ZeroMemory(mappedResource.pData, sizeof(LightBufferContents));
+
+	int lightBufferCopyIndex = 0;
+	for (int i = 0; i < LightList::maxSize && lightBufferCopyIndex < MAX_LIGHTS_TOTAL; ++i)
+	{
+		if (lightList->spotLights[i].color.w > 0.0)
+		{
+			CopyMemory(&lightBufferContents->lights[lightBufferCopyIndex++], &lightList->spotLights[i], sizeof(SpotLight));
+		}
+	}
+
+	for (int i = 0; i < LightList::maxSize && lightBufferCopyIndex < MAX_LIGHTS_TOTAL; ++i)
+	{
+		if (lightList->pointLights[i].color.w > 0.0)
+		{
+			CopyMemory(&lightBufferContents->lights[lightBufferCopyIndex++], &lightList->pointLights[i], sizeof(PointLight));
+		}
+	}
+
+	CopyMemory(mappedResource.pData, lightBufferContents, sizeof(LightBufferContents));
+	deviceContext->Unmap(lightBuffer, 0);
+
+	hr = deviceContext->Map(frustumBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &frustum, sizeof(Frustum));
+	deviceContext->Unmap(frustumBuffer, 0);
+
+	deviceContext->CSSetShader(lightCullingShader.getShader(), NULL, 0);
+
+	ID3D11ShaderResourceView* nullSRV = NULL;
+	deviceContext->PSSetShaderResources(1, 1, &nullSRV);
+	deviceContext->CSSetConstantBuffers(0, 1, &lightBuffer);
+	deviceContext->CSSetConstantBuffers(1, 1, &frustumBuffer);
+	const UINT uavCounter = 0;
+	deviceContext->CSSetUnorderedAccessViews(0, 1, &lightAppendBufferView, &uavCounter);
+
+	deviceContext->Dispatch(MAX_LIGHTS_TOTAL, 1, 1);
+
+	// fill sun buffer
+	hr = deviceContext->Map(sunBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &lightList->sun, sizeof(Sun));
+	deviceContext->Unmap(sunBuffer, 0);
+
+	ID3D11UnorderedAccessView* nullUAV = NULL;
+	deviceContext->CSSetUnorderedAccessViews(0, 1, &nullUAV, 0);
+}

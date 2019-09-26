@@ -21,7 +21,6 @@ class Game {
 	//GameObject* AiTestObject = nullptr;
 	AIPlayer * aiObject = nullptr;
 	LightList lightList;
-	std::array<SpotLight, LightList::size>::iterator testLight;
 	void addQuad(int x);
 
 	float deltaTime = 0.0f;

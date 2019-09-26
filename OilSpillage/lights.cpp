@@ -10,7 +10,7 @@ LightList::~LightList()
 
 }
 
-std::array<PointLight, LightList::size>::iterator LightList::addLight(PointLight& light)
+std::array<PointLight, LightList::maxSize>::iterator LightList::addLight(PointLight& light)
 {
 	auto returnIterator = firstEmptySpacePointLights;
 	*firstEmptySpacePointLights = std::move(light);
@@ -18,7 +18,7 @@ std::array<PointLight, LightList::size>::iterator LightList::addLight(PointLight
 	return returnIterator;
 }
 
-std::array<PointLight, LightList::size>::iterator LightList::addLight(PointLight&& light)
+std::array<PointLight, LightList::maxSize>::iterator LightList::addLight(PointLight&& light)
 {
 	auto returnIterator = firstEmptySpacePointLights;
 	*firstEmptySpacePointLights = std::move(light);
@@ -26,7 +26,7 @@ std::array<PointLight, LightList::size>::iterator LightList::addLight(PointLight
 	return returnIterator;
 }
 
-std::array<SpotLight, LightList::size>::iterator LightList::addLight(SpotLight& light)
+std::array<SpotLight, LightList::maxSize>::iterator LightList::addLight(SpotLight& light)
 {
 	auto returnIterator = firstEmptySpaceSpotLights;
 	*firstEmptySpaceSpotLights = std::move(light);
@@ -34,7 +34,7 @@ std::array<SpotLight, LightList::size>::iterator LightList::addLight(SpotLight& 
 	return returnIterator;
 }
 
-std::array<SpotLight, LightList::size>::iterator LightList::addLight(SpotLight&& light)
+std::array<SpotLight, LightList::maxSize>::iterator LightList::addLight(SpotLight&& light)
 {
 	auto returnIterator = firstEmptySpaceSpotLights;
 	*firstEmptySpaceSpotLights = std::move(light);
@@ -42,7 +42,7 @@ std::array<SpotLight, LightList::size>::iterator LightList::addLight(SpotLight&&
 	return returnIterator;
 }
 
-std::array<PointLight, LightList::size>::iterator LightList::findNextEmptySpace(std::array<PointLight, size>::iterator start)
+std::array<PointLight, LightList::maxSize>::iterator LightList::findNextEmptySpace(std::array<PointLight, maxSize>::iterator start)
 {
 	auto it = firstEmptySpacePointLights;
 	for (; it != pointLights.end(); ++it)
@@ -56,7 +56,7 @@ std::array<PointLight, LightList::size>::iterator LightList::findNextEmptySpace(
 	return it;
 }
 
-std::array<SpotLight, LightList::size>::iterator LightList::findNextEmptySpace(std::array<SpotLight, size>::iterator start)
+std::array<SpotLight, LightList::maxSize>::iterator LightList::findNextEmptySpace(std::array<SpotLight, maxSize>::iterator start)
 {
 	auto it = firstEmptySpaceSpotLights;
 	for (; it != spotLights.end(); ++it)
@@ -70,7 +70,7 @@ std::array<SpotLight, LightList::size>::iterator LightList::findNextEmptySpace(s
 	return it;
 }
 
-void LightList::removeLight(std::array<PointLight, size>::iterator lightIter)
+void LightList::removeLight(std::array<PointLight, maxSize>::iterator lightIter)
 {
 	*lightIter = PointLight();
 	if (lightIter < firstEmptySpacePointLights)
@@ -79,11 +79,16 @@ void LightList::removeLight(std::array<PointLight, size>::iterator lightIter)
 	}
 }
 
-void LightList::removeLight(std::array<SpotLight, size>::iterator lightIter)
+void LightList::removeLight(std::array<SpotLight, maxSize>::iterator lightIter)
 {
 	*lightIter = SpotLight();
 	if (lightIter < firstEmptySpaceSpotLights)
 	{
 		firstEmptySpaceSpotLights = lightIter;
 	}
+}
+
+void LightList::setSun(Sun sun)
+{
+	this->sun = sun;
 }
