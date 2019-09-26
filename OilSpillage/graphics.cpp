@@ -755,7 +755,7 @@ void Graphics::setLightList(LightList* lightList)
 
 void Graphics::presentScene()
 {
-	swapChain->Present(0, 0);
+	swapChain->Present(1, 0);
 }
 
 void Graphics::fillLightBuffers(Frustum&& frustum)

@@ -93,6 +93,8 @@ void Game::init(Window* window)
 	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 50.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
 	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
+	
+
 	lightList.removeLight(lightList.addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 	
 	for (int i = 0; i < 50; ++i)
@@ -112,6 +114,8 @@ void Game::init(Window* window)
 	graphics.setLightList(&lightList);
 
 	player.init();
+
+	playerLight = lightList.addLight(SpotLight(player.getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	RadioButtonValue = 0;
 }
@@ -133,6 +137,8 @@ void Game::run()
 	};
 	this->camera.startCinematic(&points, false);
 
+	
+
 	this->aiObject->setPlayerPos(this->player.getVehicle()->getPosition());
 	Input::SetKeyboardPlayerID(0);
 
@@ -149,7 +155,12 @@ void Game::run()
 		//Calculate deltaTime
 		deltaTime = (curTime - prevTime) * secPerCount;
 
-
+		Vector3 spotlightDir = Vector3((sin(player.getVehicle()->getRotation().y)), 0, (cos(player.getVehicle()->getRotation().y)));
+		Vector3 spotlightPos = Vector3(player.getVehicle()->getPosition().x, player.getVehicle()->getPosition().y + 1, player.getVehicle()->getPosition().z);
+		spotlightPos += spotlightDir * 1;
+		playerLight->setDirection(spotlightDir);
+		playerLight->setPos(spotlightPos);
+		
 
 		auto mouse = this->mouse->GetState();
 		if (Input::CheckButton(Keys::CONFIRM,PRESSED,0))

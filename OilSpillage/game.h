@@ -37,6 +37,7 @@ class Game {
 	//TestAI AI;
 
 	int RadioButtonValue;
+	std::array<SpotLight, LightList::maxSize>::iterator playerLight;
 
 public:
 	Game();
