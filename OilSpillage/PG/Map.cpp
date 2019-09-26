@@ -29,6 +29,8 @@ bool Map::walk(U16& x, U16& y, Dir d, Tile tile) {
 
 Vec<GameObject> Map::load_as_models(Graphics& graphics) const {
 	auto const to_reserve = width * height;
+	auto const x_offset   = width  / 2.0f * SIDE_LENGTH,
+		       y_offset   = height / 2.0f * SIDE_LENGTH;
 	Vec<GameObject> tiles( to_reserve );
 	for (U16 y = 0; y < height; ++y) {
 		for (U16 x = 0; x < width; ++x) {
@@ -39,7 +41,7 @@ Vec<GameObject> Map::load_as_models(Graphics& graphics) const {
 			tile.mesh = graphics.getMeshPointer(filename.c_str());
 			if (rotation != 0)
 				tile.setRotation({ 0.0f, float(rotation) * 3.1415926535f/180.0f, 0.0f });
-			tile.setPosition({ x * SIDE_LENGTH, 0.0f, y * SIDE_LENGTH });
+			tile.setPosition({ x * SIDE_LENGTH - x_offset, -0.1f, y * -SIDE_LENGTH + y_offset });
 		}
 	}
 	return tiles; // RVO/Copy Elision
@@ -82,23 +84,24 @@ std::ostream& operator<< (std::ostream& out, Map const& map) {
 	return out;
 }
 
+// TODO: rotate bend mesh 180 degrees and update values in table to their proper value
 Vec<Map::TileEntry> const Map::gfx_tbl = {
 	// idx   WSEN      filename          rot      type                  rotation
 	/*   0   0000 */  {"Road_pavement.bin",    0}, // no road,                 0 deg
-	/*   1   0001 */  {"Road_deadend.bin",   180}, // deadend (south),         0 deg
+	/*   1   0001 */  {"Road_deadend.bin",     0}, // deadend (south),         0 deg
 	/*   2   0010 */  {"Road_deadend.bin",    90}, // deadend (west),         90 deg
-	/*   3   0011 */  {"Road_bend.bin",      270}, // turn,                    0 deg
-	/*   4   0100 */  {"Road_deadend.bin",     0}, // deadend (north),       180 deg
+	/*   3   0011 */  {"Road_bend.bin",      180}, // turn,                    0 deg
+	/*   4   0100 */  {"Road_deadend.bin",   180}, // deadend (north),       180 deg
 	/*   5   0101 */  {"Road_straight.bin",    0}, // straight vertical,       0 deg
-	/*   6   0110 */  {"Road_bend.bin",      180}, // turn,                   90 deg
+	/*   6   0110 */  {"Road_bend.bin",      270}, // turn,                   90 deg
 	/*   7   0111 */  {"Road_3way.bin",       90}, // 3-way intersection,     90 deg
 	/*   8   1000 */  {"Road_deadend.bin",   270}, // deadend (east),        270 deg
-	/*   9   1001 */  {"Road_bend.bin",        0}, // turn,                  270 deg
+	/*   9   1001 */  {"Road_bend.bin",       90}, // turn,                  270 deg
 	/*  10   1010 */  {"Road_straight.bin",   90}, // straight horizontal,    90 deg
-	/*  11   1011 */  {"Road_3way.bin",      180}, // 3-way intersection,      0 deg
-	/*  12   1100 */  {"Road_bend.bin",      270}, // turn,                  180 deg
+	/*  11   1011 */  {"Road_3way.bin",        0}, // 3-way intersection,      0 deg
+	/*  12   1100 */  {"Road_bend.bin",        0}, // turn,                  180 deg
 	/*  13   1101 */  {"Road_3way.bin",      270}, // 3-way intersection,    270 deg
-	/*  14   1110 */  {"Road_3way.bin",        0}, // 3-way intersection,    180 deg
+	/*  14   1110 */  {"Road_3way.bin",      180}, // 3-way intersection,    180 deg
 	/*  15   1111 */  {"Road_4way.bin",        0}, // 4-way intersection,      0 deg
 };
 

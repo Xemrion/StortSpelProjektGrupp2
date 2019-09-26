@@ -18,7 +18,7 @@ void Game::addQuad(int x)
 }
 void Game::generateMap() {
 	// TODO: init models
-	static Map map(20, 21);
+	static Map map(40, 40);
 #define NO_TERMINAL_COLORS
 
 	std::ofstream f1("road_gen_debug_output_pregen.txt");
@@ -28,16 +28,16 @@ void Game::generateMap() {
 	}
 
 	Walker generator {
-		map,   // the map to work on (mutate)
-		4,     // depth
-		20,    // min length
-		20,    // max length
-		0.8f,  // child length factor
-		10.0f, // turn probability
-		1.5f,  // child turn probability factor
-		10.0f, // branch probability
-		1.8f,  // child branch probability factor
-		699    // seed
+		map,    // the map to work on (mutate)
+		4,      // depth
+		80,    // min length
+	    120,    // max length
+		0.5f,   // child length factor
+		5.0f,  // turn probability
+		2.f,   // child turn probability factor
+		12.0f,   // branch probability
+		0.75f,  // child branch probability factor
+		42069     // seed
 	};
 
 	generator.generate();
@@ -87,7 +87,7 @@ void Game::init(Window* window)
 	this->testObject = new GameObject;
 	testObject->mesh = graphics.getMeshPointer("Cube");
 	//graphics.addToDraw(testObject);
-	testObject->setPosition(Vector3(0.0f, 0.0f, 0.0f));
+	testObject->setPosition(Vector3(7770.0f, 0.0f, 0.0f)); // moved away to "disable"
 	testObject->setScale(Vector3(0.2f, 0.2f, 0.2f));
 	//testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject->setTexture(graphics.getTexturePointer("brickwall.tga"));
@@ -95,7 +95,7 @@ void Game::init(Window* window)
 	this->testObject2 = new GameObject;
 	testObject2->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject2);
-	testObject2->setPosition(Vector3(7.0f, 0.0f, 0.0f));
+	testObject2->setPosition(Vector3(7777.0f, 0.0f, 0.0f)); // moved away to "disable"
 	testObject2->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
@@ -103,7 +103,7 @@ void Game::init(Window* window)
 	this->testObject3 = new GameObject;
 	testObject3->mesh = graphics.getMeshPointer("Cube");
 	graphics.addToDraw(testObject3);
-	testObject3->setPosition(Vector3(0.0f, -1.0f, 0.0f));
+	testObject3->setPosition(Vector3(7770.0f, -1.0f, 0.0f)); // moved away to "disable"
 	testObject3->setScale(Vector3(50.0, 1.0, 50.0));
 	testObject3->setTexture(graphics.getTexturePointer("brickwall.tga"));
 	testObject3->setColor(Vector4(2.0, 2.0, 2.0, 1.0));
@@ -188,8 +188,8 @@ void Game::run()
 	QueryPerformanceCounter((LARGE_INTEGER*)& prevTime);
 
 	std::vector<CinematicPos> points = {
-		{ Vector3(0.0f, 10.0f, -10.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f },
-		{ Vector3(0.0f, 5.0f, 0.0f), Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
+		{ Vector3(0.0f, 30.0f, -10.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f },
+		{ Vector3(0.0f, 15.0f, 0.0f), Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	this->camera.startCinematic(&points, false);
 
@@ -248,7 +248,7 @@ void Game::run()
 
 		this->aiObject->Update(deltaTime);
 		this->camera.update(deltaTime);
-		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
+		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 15, 0));
 		
 		this->parentTest->setRotation(Vector3(0.0f, cos(curTime * secPerCount) * 2.0f, 0.0f));
 
