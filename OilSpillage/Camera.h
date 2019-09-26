@@ -4,15 +4,6 @@
 
 using namespace DirectX::SimpleMath;
 
-struct Frustum {
-	Vector4 nearPlane;
-	Vector4 farPlane;
-	Vector4 leftPlane;
-	Vector4 rightPlane;
-	Vector4 topPlane;
-	Vector4 bottomPlane;
-};
-
 class Camera
 {
 private:
@@ -37,5 +28,4 @@ public:
 	void setPos(Vector3 pos);
 	Matrix getViewMatrix() const;
 	Matrix getProjectionMatrix() const;
-	Frustum getFrustum() const;
 };

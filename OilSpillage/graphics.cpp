@@ -74,7 +74,7 @@ Graphics::~Graphics()
 		delete i->second;
 	}
 
-	delete lightBufferContents;
+	delete this->lightBufferContents;
 }
 
 bool Graphics::init(Window* window)
@@ -361,7 +361,7 @@ void Graphics::render(DynamicCamera* camera)
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer, 0);
 
-	fillLightBuffers(camera.getFrustum());
+	fillLightBuffers(camera->getFrustum());
 
 	//set up Shaders
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.GetInputLayout());

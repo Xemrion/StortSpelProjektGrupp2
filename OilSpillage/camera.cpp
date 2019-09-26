@@ -66,35 +66,3 @@ Matrix Camera::getProjectionMatrix() const
 {
 	return projection;
 }
-
-Frustum Camera::getFrustum() const
-{
-	Frustum frustum;
-	Matrix invView = this->getViewMatrix().Invert();
-	Vector4 viewDir = DirectX::XMVector4Transform(Vector4(0.0, 0.0, 1.0, 0.0), invView);
-	Vector4 viewUp = DirectX::XMVector4Transform(Vector4(0.0, 1.0, 0.0, 0.0), invView);
-	Vector4 viewRight = DirectX::XMVector4Transform(Vector4(1.0, 0.0, 0.0, 0.0), invView);
-	Vector4 cameraPlane = DirectX::XMPlaneFromPointNormal(pos, viewDir);
-	frustum.nearPlane = DirectX::XMPlaneFromPointNormal(pos + viewDir * this->nearDist, -viewDir);
-	frustum.farPlane = DirectX::XMPlaneFromPointNormal(pos + viewDir * this->farDist, viewDir);
-
-	Vector3 nearCenter = pos + viewDir * nearDist;
-	Vector3 farCenter = pos + viewDir * farDist;
-
-	Vector3 nearTopLeft = nearCenter + Vector3(viewUp) * nearHeight - Vector3(viewRight) * nearWidth;
-	Vector3 nearTopRight = nearCenter + Vector3(viewUp) * nearHeight + Vector3(viewRight) * nearWidth;
-	Vector3 nearBottomLeft = nearCenter - Vector3(viewUp) * nearHeight - Vector3(viewRight) * nearWidth;
-	Vector3 nearBottomRight = nearCenter - Vector3(viewUp) * nearHeight + Vector3(viewRight) * nearWidth;
-
-	Vector3 farTopLeft     = farCenter + Vector3(viewUp) * farHeight - Vector3(viewRight) * farWidth;
-	Vector3 farTopRight    = farCenter + Vector3(viewUp) * farHeight + Vector3(viewRight) * farWidth;
-	Vector3 farBottomLeft  = farCenter - Vector3(viewUp) * farHeight - Vector3(viewRight) * farWidth;
-	Vector3 farBottomRight = farCenter - Vector3(viewUp) * farHeight + Vector3(viewRight) * farWidth;
-
-	frustum.topPlane = DirectX::XMPlaneFromPoints(nearTopRight, nearTopLeft, farTopLeft);
-	frustum.bottomPlane = DirectX::XMPlaneFromPoints(nearBottomLeft, nearBottomRight, farBottomRight);
-	frustum.leftPlane = DirectX::XMPlaneFromPoints(nearTopLeft, nearBottomLeft, farBottomLeft);
-	frustum.rightPlane = DirectX::XMPlaneFromPoints(nearBottomRight, nearTopRight, farBottomRight);
-
-	return frustum;
-}

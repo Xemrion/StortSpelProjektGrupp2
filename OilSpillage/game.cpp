@@ -93,11 +93,9 @@ void Game::init(Window* window)
 	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 50.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
 	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
-	testLight = lightList.addLight(PointLight(Vector3(0.f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f), 50.f));
 	lightList.removeLight(lightList.addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
-	testLight->setColor(Vector3(1.0f, 0.3f, 0.6f));
 	
-	for (int i = 0; i < 350; ++i)
+	for (int i = 0; i < 50; ++i)
 	{
 		Vector3 randPos = Vector3(rand() % 101 - 50, 0.01, rand() % 101 - 50);
 		Vector3 randColor = Vector3(rand(), rand(), rand()) / RAND_MAX;
@@ -107,7 +105,7 @@ void Game::init(Window* window)
 			PointLight(
 				randPos,
 				randColor,
-				5.0f));
+				15.0f));
 	}
 #endif
 	lightList.setSun(Sun(Vector3(0.0, -1.0, 1.0), Vector3(1.0, 0.8, 0.6)));
@@ -182,8 +180,7 @@ void Game::run()
 		this->aiObject->Update(deltaTime);
 		this->camera.update(deltaTime);
 		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
-		this->graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1f), cos(curTime * secPerCount * 0.1f), -0.5f));
-
+		
 		this->parentTest->setRotation(Vector3(0.0f, cos(curTime * secPerCount) * 2.0f, 0.0f));
 
 		this->graphics.render(&this->camera);
@@ -230,6 +227,7 @@ void Game::run()
 
 	delete this->testObject;
 	delete this->testObject2;
+	delete this->testObject3;
 	delete this->aiObject;
 	delete this->parentTest;
 	delete this->childTest;
