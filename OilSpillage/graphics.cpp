@@ -26,6 +26,7 @@ Graphics::Graphics()
 	this->culledLightBuffer = nullptr;
 	this->lightAppendBufferView = nullptr;
 	this->culledLightBufferView = nullptr;
+	this->lightCountBuffer = nullptr;
 
 	this->sampler = nullptr;
 
@@ -50,6 +51,7 @@ Graphics::~Graphics()
 	this->lightBuffer->Release();
 	this->frustumBuffer->Release();
 	this->culledLightBuffer->Release();
+	this->lightCountBuffer->Release();
 
 	this->lightAppendBufferView->Release();
 	this->culledLightBufferView->Release();
@@ -260,6 +262,17 @@ bool Graphics::init(Window* window)
 	if (FAILED(hr))
 		return false;
 
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = 16;
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &lightCountBuffer);
+	if (FAILED(hr))
+		return false;
+
 	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
 	uavDesc.Buffer.FirstElement = 0;
 	uavDesc.Buffer.NumElements = MAX_LIGHTS_ON_SCREEN;
@@ -371,6 +384,7 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->PSSetSamplers(0, 1, &this->sampler);
 	deviceContext->PSSetShaderResources(1, 1, &this->culledLightBufferView);
 	deviceContext->PSSetConstantBuffers(2, 1, &this->sunBuffer);
+	deviceContext->PSSetConstantBuffers(3, 1, &this->lightCountBuffer);
 
 	for (GameObject* object : drawableObjects)
 	{
@@ -799,12 +813,15 @@ void Graphics::fillLightBuffers(Frustum&& frustum)
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &lightAppendBufferView, &uavCounter);
 
 	deviceContext->Dispatch(MAX_LIGHTS_TOTAL, 1, 1);
+	deviceContext->CopyStructureCount(lightCountBuffer, 0, lightAppendBufferView);
 
 	// fill sun buffer
 	hr = deviceContext->Map(sunBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &lightList->sun, sizeof(Sun));
 	deviceContext->Unmap(sunBuffer, 0);
 
+
 	ID3D11UnorderedAccessView* nullUAV = NULL;
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &nullUAV, 0);
+	
 }

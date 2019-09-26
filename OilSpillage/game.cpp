@@ -61,6 +61,7 @@ void Game::init(Window* window)
 	testObject3->setPosition(Vector3(0.0f, -1.0f, 0.0f));
 	testObject3->setScale(Vector3(50.0, 1.0, 50.0));
 	testObject3->setTexture(graphics.getTexturePointer("brickwall.tga"));
+	testObject3->setColor(Vector4(2.0, 2.0, 2.0, 1.0));
 
 	aiObject = new AIPlayer();
 	aiObject->mesh = graphics.getMeshPointer("Cube");
@@ -154,12 +155,6 @@ void Game::run()
 		QueryPerformanceCounter((LARGE_INTEGER*)& curTime);
 		//Calculate deltaTime
 		deltaTime = (curTime - prevTime) * secPerCount;
-
-		Vector3 spotlightDir = Vector3((sin(player.getVehicle()->getRotation().y)), 0, (cos(player.getVehicle()->getRotation().y)));
-		Vector3 spotlightPos = Vector3(player.getVehicle()->getPosition().x, player.getVehicle()->getPosition().y + 1, player.getVehicle()->getPosition().z);
-		spotlightPos += spotlightDir * 1;
-		playerLight->setDirection(spotlightDir);
-		playerLight->setPos(spotlightPos);
 		
 
 		auto mouse = this->mouse->GetState();
@@ -190,6 +185,12 @@ void Game::run()
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
 		this->player.update(deltaTime);
+		Vector3 spotlightDir = Vector3((sin(player.getVehicle()->getRotation().y)), 0, (cos(player.getVehicle()->getRotation().y)));
+		Vector3 spotlightPos = Vector3(player.getVehicle()->getPosition().x, player.getVehicle()->getPosition().y + 1, player.getVehicle()->getPosition().z);
+		spotlightPos += spotlightDir * 1;
+		playerLight->setDirection(spotlightDir);
+		playerLight->setPos(spotlightPos);
+
 		this->aiObject->Update(deltaTime);
 		this->camera.update(deltaTime);
 		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));

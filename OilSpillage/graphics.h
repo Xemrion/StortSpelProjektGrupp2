@@ -46,6 +46,7 @@ class Graphics {
 	ID3D11Buffer* lightBuffer;
 	ID3D11Buffer* frustumBuffer;
 	ID3D11Buffer* culledLightBuffer;
+	ID3D11Buffer* lightCountBuffer;
 	ID3D11UnorderedAccessView* lightAppendBufferView;
 	ID3D11ShaderResourceView* culledLightBufferView;
 

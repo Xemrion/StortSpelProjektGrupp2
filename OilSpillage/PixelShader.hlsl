@@ -18,6 +18,10 @@ cbuffer SunInfo : register(b2) {
 	float4 sunDir;
 };
 
+cbuffer LightInfo : register(b3) {
+	uint lightCount;
+}
+
 struct Light
 {
 	float4 pos;
@@ -37,7 +41,7 @@ float4 main(VS_OUT input) : SV_Target
 	float4 ambient = max(-dot(sunDir, normal), float4(0.2, 0.2, 0.2, 1.0)) * sunColor;
 
 	float4 diffuse = float4(0.0, 0.0, 0.0, 1.0);
-	for (int i = 0; i < MAX_LIGHTS_ON_SCREEN; ++i) 
+	for (int i = 0; i < lightCount; ++i) 
 	{
 		float3 lightVector = lights[i].pos.xyz - input.wPos.xyz;
 		float attenuation = lights[i].color.w / dot(lightVector, lightVector);
