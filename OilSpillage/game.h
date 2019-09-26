@@ -8,9 +8,6 @@
 //#include"ImGui/imgui_impl_dx11.h"
 #include"vehicle.h"
 #include "AI/Actor.h"
-#include <memory>
-#include "PG/defs.hpp"
-
 #include "DynamicCamera.h"
 
 #include <array>
@@ -22,9 +19,6 @@ class Game {
 	static Graphics graphics;
 	GameObject* testObject = nullptr;
 	GameObject* testObject2 = nullptr;
-	Vec<GameObject> tiles;
-	
-	//GameObject* AiTestObject = nullptr;
 	GameObject* testObject3 = nullptr;
 	GameObject* parentTest = nullptr;
 	GameObject* childTest = nullptr;
@@ -41,8 +35,6 @@ class Game {
 	Vehicle player;
 	DynamicCamera camera;
 	//TestAI AI;
-
-	void generateMap();
 
 	int RadioButtonValue;
 	std::array<SpotLight, LightList::maxSize>::iterator playerLight;
