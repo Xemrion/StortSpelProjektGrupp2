@@ -48,4 +48,7 @@ public:
 	void update(float deltaTime);
 	GameObject* getVehicle() { return this->vehicle; }
 	float getAcceleratorX();
+
+	void setDrivingMode(int i);
+	bool getDrivingMode();
 };

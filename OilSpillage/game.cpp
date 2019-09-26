@@ -87,6 +87,8 @@ void Game::init(Window* window)
 	graphics.setSunVector(Vector3(0.55f, 1.0f, 0.725f));
 
 	player.init();
+
+	RadioButtonValue = 0;
 }
 
 void Game::run()
@@ -170,6 +172,15 @@ void Game::run()
 		//imgui button, slider etc
 		ImGui::Begin("OilSpillage");
 		ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Text("Driving Mode:");
+		ImGui::RadioButton("Directional Semi-Realistic", &RadioButtonValue, 0);
+		ImGui::RadioButton("Realistic", &RadioButtonValue, 1);
+		if (RadioButtonValue == 0 && player.getDrivingMode() == 1) {
+			player.setDrivingMode(0);
+		}
+		if (RadioButtonValue == 1 && player.getDrivingMode() == 0) {
+			player.setDrivingMode(1);
+		}
 		Vector3 camPos = camera.getPosition();
 		Vector3 camRot = camera.getRotation();
 		Vector2 lDir = Input::GetDirectionL(0);

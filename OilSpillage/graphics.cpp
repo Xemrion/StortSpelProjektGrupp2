@@ -706,6 +706,6 @@ Vector3 Graphics::getSunVector()
 
 void Graphics::presentScene()
 {
-	swapChain->Present(0, 0);
+	swapChain->Present(1, 0);
 }
 

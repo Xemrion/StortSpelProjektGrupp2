@@ -33,6 +33,8 @@ class Game {
 	DynamicCamera camera;
 	//TestAI AI;
 
+	int RadioButtonValue;
+
 public:
 	Game();
 	~Game();
