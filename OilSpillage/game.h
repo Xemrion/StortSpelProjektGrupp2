@@ -8,6 +8,9 @@
 //#include"ImGui/imgui_impl_dx11.h"
 #include"vehicle.h"
 #include "AI/Actor.h"
+#include <memory>
+#include "PG/defs.hpp"
+
 class Game {
 	Window* window = nullptr;
 
@@ -15,6 +18,8 @@ class Game {
 	static Graphics graphics;
 	GameObject* testObject = nullptr;
 	GameObject* testObject2 = nullptr;
+	Vec<GameObject> tiles;
+	
 	//GameObject* AiTestObject = nullptr;
 	AIPlayer * aiObject = nullptr;
 
@@ -29,6 +34,8 @@ class Game {
 	Vehicle player;
 	Camera camera;
 	//TestAI AI;
+
+	void generateMap();
 
 public:
 	Game();

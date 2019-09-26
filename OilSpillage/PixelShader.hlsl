@@ -31,7 +31,7 @@ float4 main(VS_OUT input) : SV_Target
 	float3 normal = input.NormalWS.xyz;
 	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
 
-	float ambient = max(dot(input.NormalWS.xyz, sunVector.xyz), float3(0.2, 0.2, 0.2));
+	float ambient = max(dot(input.NormalWS.xyz, sunVector.xyz), float3(0.4, 0.4, 0.4));
 
 	float4 diffuse = float4(0.0, 0.0, 0.0, 1.0);
 	for (int i = 0; i < 20; ++i) 
