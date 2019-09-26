@@ -269,11 +269,17 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	ImGui::StyleColorsDark();
 
 	this->particleSystem.initiateParticles(device, deviceContext);
-	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 0), Vector3(1, 0, 0), Vector4(1, 1, 0, 1),0.1f);
+	/*for (int i = 0; i < 150; i++)
+	{
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+	}*/
 	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
-	this->particleSystem.addParticle(1, 10, Vector3(2, 2, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
-	this->particleSystem.addParticle(1, 10, Vector3(10, 0, 0), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+	
 
+	
 	return true;
 }
 
@@ -346,8 +352,9 @@ void Graphics::render(Camera camera, float deltaTime)
 		deviceContext->PSSetConstantBuffers(2, 1, &this->lightBuffer);
 		deviceContext->Draw(vertexCount, 0);
 	}
-	//this->particleSystem.updateParticles(deltaTime);
+	this->particleSystem.updateParticles(deltaTime);
 	this->particleSystem.drawAll(camera);
+	this->particleSystem.addParticle(1, 10, Vector3(float(rand()), float(rand()), float(rand()))/RAND_MAX, Vector3(float(rand()), float(rand()), float(rand()))/RAND_MAX, Vector4(float(rand())/RAND_MAX, float(rand())/RAND_MAX, 0.0f,0.5f), 0.1f);
 	
 
 
@@ -430,6 +437,11 @@ bool Graphics::createShaders()
 	}
 
 	return true;
+}
+
+void Graphics::addParticle(Vector3 pos)
+{
+
 }
 
 void Graphics::loadMesh(std::string fileName,std::string meshName)
@@ -712,6 +724,6 @@ Vector3 Graphics::getSunVector()
 
 void Graphics::presentScene()
 {
-	swapChain->Present(0, 0);
+	swapChain->Present(1, 0);
 }
 

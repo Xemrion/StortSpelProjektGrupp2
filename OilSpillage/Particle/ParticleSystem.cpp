@@ -65,6 +65,10 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	hr = D3DReadFileToBlob(filePath.c_str(), this->createComputeShaderBlob.GetAddressOf());
 	hr = device->CreateComputeShader(this->createComputeShaderBlob->GetBufferPointer(), this->createComputeShaderBlob->GetBufferSize(), NULL, this->createComputeShader.GetAddressOf());
 
+	filePath = shaderfolder + L"ParticleUpdateCS.cso";
+	hr = D3DReadFileToBlob(filePath.c_str(), this->computeShaderBlob.GetAddressOf());
+	hr = device->CreateComputeShader(this->computeShaderBlob->GetBufferPointer(), this->computeShaderBlob->GetBufferSize(), NULL, this->computeShader.GetAddressOf());
+
 	this->device = device;
 	this->deviceContext = deviceContext;
 	int bufferSize = static_cast<int>(capParticle) * sizeof(Particle);
@@ -89,6 +93,7 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 
 	hr = device->CreateBuffer(&vBufferDesc, &subData, indArgsBuffer.GetAddressOf());
 
+	
 
 	D3D11_BUFFER_DESC desc = { 0 };
 
@@ -106,6 +111,12 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 
 	desc.ByteWidth = static_cast<UINT>(sizeof(ParticleRenderParams) + (16 - (sizeof(ParticleRenderParams) % 16)));
 	hr = device->CreateBuffer(&desc, 0, particleParamRenderCB.GetAddressOf());
+	
+	desc.ByteWidth= sizeof(IndirDraw);//4 UINTs
+	hr = device->CreateBuffer(&desc, 0, nrOfParticlesCB.GetAddressOf());
+
+	desc.ByteWidth = sizeof(SimulationParams);
+	hr = device->CreateBuffer(&desc, 0, simParams.GetAddressOf());
 
 	//Creating two buffers for the particles
 	desc.ByteWidth = capParticle * sizeof(Particle);
@@ -146,6 +157,7 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	shaderResourceViewDesc.Buffer.NumElements = capParticle;
 
 	hr = device->CreateShaderResourceView(particlesBuffer.Get(), &shaderResourceViewDesc, particlesSRV.GetAddressOf());
+	hr = device->CreateShaderResourceView(particlesBuffer2.Get(), &shaderResourceViewDesc, particlesSRV2.GetAddressOf());
 
 
 
@@ -166,7 +178,7 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	
 	pParams.emitterLocation = Vector4(position.x,position.y,position.z, 1.0f);
 	pParams.randomVector = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f);
-
+	pParams.color = color;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &pParams, sizeof(ParticleParams));
@@ -176,7 +188,7 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	deviceContext->CSSetConstantBuffers(0, 1, this->particleParamCB.GetAddressOf());
 	deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
 	deviceContext->CSSetShader(this->createComputeShader.Get(), 0, 0);
-	deviceContext->Dispatch(1, 1, 1);
+	deviceContext->Dispatch(2, 1, 1);
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
 
 	return true;
@@ -185,23 +197,52 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 void ParticleSystem::updateParticles(float delta)
 {
 	ID3D11UnorderedAccessView* n = nullptr;
+	ID3D11Buffer* nB = nullptr;
 
+	UINT offset = 0;
+	SimulationParams sP;
+	sP.emitterLocation = pParams.emitterLocation;
+	sP.consumerLocation = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+	sP.timeFactors = Vector4(delta, 0.0f, 0.0f, 0.0f);
 	//run update computeshader here
 		//deviceContext->CopyStructureCount(this->particl)
-	UINT initialCount = -1;
-	deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
 
-	this->deviceContext->Dispatch(1, 1, 1);
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(simParams.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &sP, sizeof(ParticleParams));
+	deviceContext->Unmap(simParams.Get(), 0);
+	UINT initialCount = -1;
+	if (otherFrame == 1.0f)
+	{
+		deviceContext->CopyStructureCount(this->nrOfParticlesCB.Get(), offset, this->particlesUAV.Get());
+		deviceContext->CSSetUnorderedAccessViews(1, 1, this->particlesUAV.GetAddressOf(), &initialCount);
+		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
+
+	}
+	else
+	{
+		deviceContext->CopyStructureCount(this->nrOfParticlesCB.Get(), offset, this->particlesUAV2.Get());
+		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
+		deviceContext->CSSetUnorderedAccessViews(1, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
+	}
+	this->deviceContext->CSSetConstantBuffers(1, 1, this->nrOfParticlesCB.GetAddressOf());
+	this->deviceContext->CSSetConstantBuffers(0, 1, this->simParams.GetAddressOf());
+	this->deviceContext->CSSetShader(this->computeShader.Get(), nullptr, 0);
+	this->deviceContext->Dispatch(10, 1, 1);
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
+	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
+	this->deviceContext->CSSetConstantBuffers(1, 1, &nB);
+	this->deviceContext->CSSetConstantBuffers(0, 1, &nB);
 
 }
 
 void ParticleSystem::drawAll(Camera camera)
 {
 
+
 	CameraInfo info;
 	info.viewProj= (camera.getViewMatrix() * camera.getProjectionMatrix()).Transpose();
-	info.upp = Vector3(0.0, 0.0, 1.0);
+	info.upp = Vector4(0.0, 0.0, 1.0,otherFrame);
 	info.camPos = Vector4(camera.getPos().x, camera.getPos().y, camera.getPos().z, 0.0f);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -227,20 +268,36 @@ void ParticleSystem::drawAll(Camera camera)
 	this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
 	this->deviceContext->GSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
 	this->deviceContext->GSSetConstantBuffers(1, 1, this->particleParamRenderCB.GetAddressOf());
-	this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV.GetAddressOf());
 
 	ID3D11Buffer* nil = nullptr;
 	
 	this->deviceContext->IASetVertexBuffers(0, 1, &nil, &stride, &offset);
 	this->deviceContext->IASetInputLayout(NULL);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV.Get());
+	if (otherFrame == 1.0f)
+	{
+
+		this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV2.GetAddressOf());
+		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV2.Get());
+	}
+	else
+	{
+		this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV.GetAddressOf());
+		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV.Get());
+	}
 	//deviceContext->IASetInputLayout(this->inputLayout.Get());
 	//this->deviceContext->DrawInstanced(16, 1, 0, 0);
 	this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
 	this->deviceContext->GSSetShader(nullptr, 0, 0);
 	this->deviceContext->VSSetShaderResources(0, 1, &n);
-
+	if (otherFrame > 0.9f)
+	{
+		otherFrame = 0.0f;
+	}
+	else
+	{
+		otherFrame = 1.0f;
+	}
 }
 
 int ParticleSystem::findUnused()

@@ -78,4 +78,5 @@ public:
 	void presentScene();
 	void render(Camera camera, float deltaTime);
 	bool createShaders();
+	void addParticle(Vector3 pos);
 };

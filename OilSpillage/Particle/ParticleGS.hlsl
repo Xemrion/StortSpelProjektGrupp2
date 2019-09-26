@@ -2,7 +2,7 @@ cbuffer CB_PER_FRAME : register(b0)
 {
 	float4x4 viewProj;
 	float4 camPos;
-	float3 upp;
+	float4 upp;//.w is 0 or 1
 }
 
 cbuffer ParticleRenderParams : register(b1)
@@ -21,6 +21,9 @@ static const float4 position[4] =
 struct GSInput
 {
 	float3 pos : POSITION;
+	float time : TIME;
+	float4 color : COLOR;
+	uint ind : VAR;
 };
 struct GSOutput
 {
@@ -28,7 +31,7 @@ struct GSOutput
 	float4 color : COLOR;
 	float2 uv : UV;
 };
-[maxvertexcount(4)]
+[maxvertexcount(3)]
 void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 {
 	GSOutput output;
@@ -38,22 +41,44 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	float4 color = float4(0.2f, 0.2f, 1.0f, 0.0f) * (dist)
 		+float4(1.0f, 0.2f, 0.2f, 0.0f) * (1.0f - dist);
 
-	float3 planeNormal = input[0].pos - camPos.xyz;
+	float3 toCamera =  normalize(camPos.xyz - input[0].pos);
 	//planeNormal.y = 0.0f;
-	planeNormal = normalize(planeNormal);
-	float3 right = normalize(cross(planeNormal, upp));
+	//planeNormal = normalize(planeNormal);
+	float3 right = cross(toCamera, upp);
 	
-	float3 up = /*normalize(upp);*/normalize(cross(planeNormal, right));
+	float3 up = /*normalize(upp);*/normalize(cross(right, toCamera));
 	float3 vert[4];
 	//vert[0] = input[0].Pos - right *1 - up * 1; // Bottom left
 	//vert[1] = input[0].Pos + right *1 - up * 1; // Bottom right
 	//vert[2] = input[0].Pos - right *1 + up * 1; // Top left
 	//vert[3] = input[0].Pos + right *1 + up * 1; // Top right 
+	float size = 0.2f;
 	
-	vert[0] = input[0].pos - right * 0.1 + up * 0.1; // Top middle
-	vert[1] = input[0].pos + right * 0.1 + up * 0.1; // Top right
-	vert[3] = input[0].pos + right * 0.1 - up * 0.1; // Bottom right
-	vert[2] = input[0].pos - right * 0.1 - up * 0.1; // Top right 
+	size -= input[0].time * 0.1f;
+	
+	if (size <= 0)
+	{
+		size = 0.0f;
+	}
+	//vert[0] = input[0].pos - right *size + up * size; // Top middle
+	//vert[1] = input[0].pos + right *size + up * size; // Top right
+	//vert[3] = input[0].pos + right *size - up * size; // Bottom right
+	//vert[2] = input[0].pos - right *size - up * size; // Top right 
+	if (upp.w>0.9f)
+	{
+		vert[0] = input[0].pos + up * size; // Top middle
+		vert[1] = input[0].pos + right * size - up * size; // Top right
+		vert[2] = input[0].pos - right * size - up * size; // Top right 
+	}
+	else
+	{
+		vert[0] = input[0].pos - right * size + up * 0.50f * size; // Top middle
+		//vert[0].y = vert[0].y * 0.75;
+		vert[1] = input[0].pos + right * size + up * size*0.50f; // Top right
+		//vert[1].y = vert[1].y * 0.75;
+		vert[2] = input[0].pos - up * 1.50f *size; // Top right 
+		//vert[2].y = vert[2].y * 1.25;
+	}
 	
 	float2 texCoord[4];
 	texCoord[2] = float2(0, 1);//2
@@ -61,11 +86,11 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	texCoord[0] = float2(0, 0);//0
 	texCoord[1] = float2(1, 0);//1
 	
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		output.pos = mul(float4(vert[i], 1.0f), viewProj);
 		output.uv = texCoord[i];
-		output.color = color;
+		output.color = input[0].color;
 		theOutput.Append(output);
 	}
 }

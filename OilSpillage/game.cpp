@@ -49,7 +49,7 @@ void Game::init(Window* window)
 	testObject2->mesh = graphics.getMeshPointer("Dummy_Roller_Melee.bin");
 	graphics.addToDraw(testObject2);
 	testObject2->setPosition(Vector3(7.0f, 0.0f, 0.0f));
-	testObject2->setScale(Vector3(0.01, 0.01, 0.01));
+	testObject2->setScale(Vector3(0.01, 0.01, 0.01f));
 	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
 
@@ -70,7 +70,7 @@ void Game::init(Window* window)
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f),  50.f));
 	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f));
 
-	graphics.setSunVector(Vector3(0.55, 1.0, 0.725));
+	graphics.setSunVector(Vector3(0.55f, 1.0f, 0.725f));
 
 	player.init();
 }
@@ -122,7 +122,7 @@ void Game::run()
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
 		player.update(deltaTime);
-		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
+		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 10, 0));
 		this->graphics.render(this->camera, deltaTime);
 		//this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
 		std::string textUse;
@@ -135,6 +135,7 @@ void Game::run()
 
 		//imgui button, slider etc
 		ImGui::Begin("Gungame");
+		ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Text("Hold 'V' To move camera with mouse.");
 		Vector2 lDir = Input::GetDirectionL(0);
 		Vector2 rDir = Input::GetDirectionR(0);
@@ -155,7 +156,7 @@ void Game::run()
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		
 		player.update(deltaTime);
-		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
+		//camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 500.0f, 0.0));
 		
 		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1), cos(curTime * secPerCount * 0.1), -0.5));
 

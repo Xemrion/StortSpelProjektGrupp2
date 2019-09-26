@@ -8,21 +8,29 @@ struct Particle
 {
 	Vector3 position;
 	Vector3 direction;
+	Vector4 color;
 	float time;
 };
 struct CameraInfo
 {
 	Matrix viewProj;
 	Vector4 camPos;
-	Vector3 upp;
+	Vector4 upp;
 };
 struct ParticleParams
 {
 	Vector4 emitterLocation;
 	Vector4 randomVector;
+	Vector4 color;
 };
 struct ParticleRenderParams
 {
+	Vector4 emitterLocation;
+	Vector4 consumerLocation;
+};
+struct SimulationParams
+{
+	Vector4 timeFactors;
 	Vector4 emitterLocation;
 	Vector4 consumerLocation;
 };
@@ -47,6 +55,7 @@ private:
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
 	int nrOfParticles = 0;
+	float otherFrame = 1.0f;
 	int lastUsedParticle;
 	int firstAdd = 0;
 	IndirDraw indDraw;
@@ -56,6 +65,9 @@ private:
 	ParticleParams pParams;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> nrOfParticlesCB;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> simParams;//for update
+
 
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
@@ -81,6 +93,8 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particlesBuffer2;//one will be the current
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particlesUAV2;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particlesSRV2;
+
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indArgsBuffer;//one will be the current
 
 	int findUnused();
