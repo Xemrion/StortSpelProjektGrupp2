@@ -65,11 +65,14 @@ void Game::init(Window* window)
 	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
 	//graphics.addToDraw(AiTestObject);
 
-	//Road network
-	this->testNetwork = new RoadNetwork(6243573, Vector2(64, 64), Vector2(0, 0));
-	this->testNetwork->generateInitialSegments("FFFFFFH-H+FFFFFFFFF+FFFFF-FFF+FFFFFH-H-HF");
-	this->testNetwork->generateAdditionalSegments("FFH-FFFH+FH", 4);
-	this->testNetwork->generateAdditionalSegments("HF-FFF-FFFFF+FH", 15);
+	//Road network F: Forward, -: Turn Left, +: Turn Right, H: Half Forward
+	this->testNetwork = new RoadNetwork(6243, Vector2(2, 2), Vector2(-2, -2), 15);
+	this->testNetwork->generateInitialSegments("FFFFFFH-FFFF-FFFFF+FFFFF-FFF+F-F-F-F-F-H-H-HF-FF-F-FF-FF-FF-F-FFF-FFF-FFH-FF++F+FF+F");
+	this->testNetwork->setAngle(90);
+	this->testNetwork->generateAdditionalSegments("FFH-FFF+FFFH+FH", 4, true);
+	this->testNetwork->generateAdditionalSegments("HF+FFF-FFFFF+FH", 15, false);
+	this->testNetwork->setAngle(25);
+	this->testNetwork->generateAdditionalSegments("FFF+F-F-F-F-F-F-F-F-F-FFH+F+F+F+F+H+F+F+H++H++H++H++H++H++H++H", 20, false);
 	this->testNetwork->saveTestNetwork("test-net.txt");
 	this->testNetwork->cleanRoadNetwork();
 	this->testNetwork->saveTestNetwork("test-net-cleaned.txt");
@@ -135,8 +138,7 @@ void Game::run()
 		player.update(deltaTime);
 		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
 		this->graphics.render(this->camera);
-		
-		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
+		//this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
 		std::string textUse;
 
 
@@ -176,6 +178,7 @@ void Game::run()
 
 		this->graphics.render(camera);
 
+		this->testNetwork->drawRoadNetwork(&this->graphics);
 		/*Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();
 		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);

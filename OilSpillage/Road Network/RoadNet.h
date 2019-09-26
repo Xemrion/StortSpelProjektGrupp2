@@ -7,6 +7,7 @@
 #include<DirectXMath.h>
 #include<SimpleMath.h>
 #include<math.h>
+#include"..//graphics.h"
 using namespace DirectX::SimpleMath;
 
 struct Segment {
@@ -36,8 +37,9 @@ public:
 	void clearSegments();
 	//bool generateRoadNetwork();
 	bool generateInitialSegments(const char* seed);
-	bool generateAdditionalSegments(const char* seed, int segment);
+	bool generateAdditionalSegments(const char* seed, int segment, bool right);
 	void cleanRoadNetwork();
+	void drawRoadNetwork(Graphics* graph);
 	
 	bool saveTestNetwork(std::string filename);
 	bool loadTestNetwork(std::string filename);

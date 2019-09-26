@@ -20,13 +20,13 @@ RoadNetwork::RoadNetwork(int randNr, Vector2 max, Vector2 min, float rotation)
 	int rand = randNr % 1000 + 1;
 	int xOrZ = rand % 2;
 	bool toMin;
-	if (rand > 500) {
+	if (rand % 10 > 5) {
 		toMin = false;
 	}
 	else {
 		toMin = true;
 	}
-	Vector2 possibleStart = Vector2( floor(partway.x * rand), floor(partway.y * rand));
+	Vector2 possibleStart = roadNetworkMin + (partway * rand);
 	if (xOrZ == 0) { //move start to x value
 		if (toMin) {
 			possibleStart.x = this->roadNetworkMin.x;
@@ -161,7 +161,7 @@ bool RoadNetwork::generateInitialSegments(const char* seed)
 	return success;
 }
 
-bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment) //Turtle walk from existing segments
+bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment, bool right) //Turtle walk from existing segments
 { //'F' to move forward a segment, '+' or '-' to turn but doesn't move 'H' to move half a length for a segment
 	bool success = false;
 	int counter = 0;
@@ -177,13 +177,13 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment) //Tu
 				if (check == roadNetwork.size()) {
 					temp.firstPoint = this->roadNetwork.at(segment).firstPoint;
 					if (temp.firstPoint + currentForward == this->roadNetwork.at(segment).secondPoint) {
-						if (segment % 2 == 0) { //Even: turn left
+						if (!right) { // turn left
 							nextX = (currentForward.x * cos(rotationAngle)) - (currentForward.z * sin(rotationAngle));
 							nextZ = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
 							currentForward.x = nextX;
 							currentForward.z = nextZ;
 						}
-						else if (segment % 2 == 1) { //Odd: turn right
+						else { // turn right
 							nextX = (currentForward.x * cos(rotationAngle)) + (currentForward.z * sin(rotationAngle));
 							nextZ = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
 							currentForward.x = nextX;
@@ -234,13 +234,13 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment) //Tu
 				if (check == roadNetwork.size()) {
 					temp.firstPoint = this->roadNetwork.at(segment).firstPoint;
 					if (temp.firstPoint + currentForward == this->roadNetwork.at(segment).secondPoint) {
-						if (segment % 2 == 0) { //Even: turn left
+						if (!right) { // turn left
 							nextX = (currentForward.x * cos(rotationAngle)) - (currentForward.z * sin(rotationAngle));
 							nextZ = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
 							currentForward.x = nextX;
 							currentForward.z = nextZ;
 						}
-						else if (segment % 2 == 1) { //Odd: turn right
+						else { // turn right
 							nextX = (currentForward.x * cos(rotationAngle)) + (currentForward.z * sin(rotationAngle));
 							nextZ = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
 							currentForward.x = nextX;
@@ -294,6 +294,20 @@ void RoadNetwork::cleanRoadNetwork()
 				}
 			}
 		}
+	}
+}
+
+void RoadNetwork::drawRoadNetwork(Graphics* graph)
+{
+	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMin.x, 1.0f, this->roadNetworkMin.y), XMFLOAT3(this->roadNetworkMin.x, 1.0f, this->roadNetworkMax.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMin.x, 1.0f, this->roadNetworkMin.y), XMFLOAT3(this->roadNetworkMax.x, 1.0f, this->roadNetworkMin.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMin.x, 1.0f, this->roadNetworkMax.y), XMFLOAT3(this->roadNetworkMax.x, 1.0f, this->roadNetworkMax.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMax.x, 1.0f, this->roadNetworkMin.y), XMFLOAT3(this->roadNetworkMax.x, 1.0f, this->roadNetworkMax.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	
+	for (int i = 0; i < this->roadNetwork.size(); i++) {
+		graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetwork[i].firstPoint.x, 1.0f, this->roadNetwork[i].firstPoint.z),
+			XMFLOAT3(this->roadNetwork[i].secondPoint.x, 1.0f, this->roadNetwork[i].secondPoint.z),
+			XMFLOAT3(1.0f, 0.0f, 1.0f));
 	}
 }
 
