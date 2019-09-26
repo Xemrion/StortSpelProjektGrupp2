@@ -14,10 +14,10 @@ RoadNetwork::RoadNetwork(int randNr, Vector2 max, Vector2 min, float rotation)
 	//Calculate startpoint
 	Vector2 fromMinToMaxDir = (roadNetworkMax - roadNetworkMin);
 	Vector2 partway;
-	partway.x = fromMinToMaxDir.x / 1000;
-	partway.y = fromMinToMaxDir.y / 1000;
+	partway.x = fromMinToMaxDir.x / 1024;
+	partway.y = fromMinToMaxDir.y / 1024;
 	
-	int rand = randNr % 1000 + 1;
+	int rand = randNr % 1024 + 1;
 	int xOrZ = rand % 2;
 	bool toMin;
 	if (rand % 10 > 5) {
@@ -315,8 +315,10 @@ bool RoadNetwork::saveTestNetwork(std::string filename)
 {
 	std::ofstream testSave;
 	std::string toSave;
-	std::string filePath = "Road Network\\";
-	testSave.open(filePath + filename);
+	std::string filePath = "Road Network\\Generated Road Networks\\";
+	std::string fileEnd = ".RoadNet";
+	std::string file = filePath + filename + fileEnd;
+	testSave.open(file);
 
 	if (!testSave.is_open()) {
 		return false;
@@ -330,7 +332,7 @@ bool RoadNetwork::saveTestNetwork(std::string filename)
 			", " + std::to_string(this->roadNetwork[i].secondPoint.z) + ")\n";
 		testSave << toSave;
 	}
-	this->roadFiles.push_back(filePath + filename);
+	this->roadFiles.push_back(file);
 
 	testSave.close();
 
@@ -342,32 +344,38 @@ bool RoadNetwork::loadTestNetwork(std::string filename)
 	std::ifstream testLoad;
 	std::string loaded;
 	int nrOfSegments;
-	std::string filePath = "Road Network\\";
-	testLoad.open(filePath + filename);
+	std::string filePath = "Road Network\\Generated Road Networks\\";
+	std::string fileEnd = ".RoadNet";
+	std::string file = filePath + filename + fileEnd;
+	testLoad.open(file);
 	if (!testLoad.is_open()) {
 		return false;
 	}
 	clearSegments();
 	this->roadNetwork.erase(this->roadNetwork.begin());
 
-	testLoad >> loaded;
-	nrOfSegments = std::stoi(loaded);
+	if (testLoad >> loaded) {
+		nrOfSegments = std::stoi(loaded);
 
-	while (nrOfSegments != this->roadNetwork.size()) {
-		Segment temp;
-		testLoad >> loaded;
-		temp.firstPoint.x = std::stof(loaded.substr(1, loaded.find_first_of(',') - 1));
-		testLoad >> loaded;
-		temp.firstPoint.z = std::stof(loaded.substr(0, loaded.find_first_of(')') - 1));
-		testLoad >> loaded;
+		while (nrOfSegments != this->roadNetwork.size()) {
+			Segment temp;
+			if (testLoad >> loaded) {
+				temp.firstPoint.x = std::stof(loaded.substr(1, loaded.find_first_of(',') - 1));
 
-		testLoad >> loaded;
-		temp.secondPoint.x = std::stof(loaded.substr(1, loaded.find_first_of(',') - 1));
-		testLoad >> loaded;
-		temp.secondPoint.z = std::stof(loaded.substr(0, loaded.find_first_of(')') - 1));
-		this->roadNetwork.push_back(temp);
+				if (testLoad >> loaded) {
+					temp.firstPoint.z = std::stof(loaded.substr(0, loaded.find_first_of(')') - 1));
+				}
+				testLoad >> loaded;
+			}
+			if (testLoad >> loaded) {
+				temp.secondPoint.x = std::stof(loaded.substr(1, loaded.find_first_of(',') - 1));
+				if (testLoad >> loaded) {
+					temp.secondPoint.z = std::stof(loaded.substr(0, loaded.find_first_of(')') - 1));
+					this->roadNetwork.push_back(temp);
+				}
+			}
+		}
 	}
-
 
 	testLoad.close();
 	return true;
