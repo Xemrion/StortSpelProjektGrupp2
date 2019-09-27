@@ -1,5 +1,5 @@
 #include "Actor.h"
-
+#include "..//game.h"
 void Actor::SetType(AItype type)
 {
 	this->type = type;
@@ -13,20 +13,25 @@ Actor::AItype& Actor::GetType()
 void AIPlayer::Update(float dt)
 {
 	//TODO: Call findPath every X frames
-	//findPath();
+	nrOfFrames++;
+	if (nrOfFrames % 100 == 0)
+	{
+		//findPath();
+		nrOfFrames = 0;
+	}
 	followPath(dt);
 }
 
-void AIPlayer::setPlayerPos(Vector3 playerPos)
+void AIPlayer::setTargetPos(Vector3 targetPos)
 {
-	this->playerPos = playerPos;
+	this->targetPos = targetPos;
 }
 
 void AIPlayer::findPath()
 {
 	if (state == AIState::chasing)
 	{
-		path = aStar->algorithm(position, playerPos);
+		path = aStar->algorithm(position, targetPos);
 	}
 }
 
@@ -38,6 +43,11 @@ void AIPlayer::followPath(float dt)
 		Vector3 dir = targetNode - position;
 		dir.Normalize();
 		Vector3 newPosition = position + dir * dt;
+		for (int i = 0; i < boids.size(); i++) //Updating Boids
+		{
+			boids.at(i)->setDestination(targetNode);
+			boids.at(i)->run(boids, dt);
+		}
 
 		if (newPosition.Distance(targetNode, newPosition) < 1)
 		{
@@ -45,18 +55,41 @@ void AIPlayer::followPath(float dt)
 		}
 
 		this->setPosition(newPosition);
+
 	}
 }
 AIPlayer::AIPlayer()
 {
 	aStar = new AStar(10, 7);
 	setPosition(DirectX::SimpleMath::Vector3(5, 0, 6));
-	setPlayerPos(DirectX::SimpleMath::Vector3());
+	setTargetPos(DirectX::SimpleMath::Vector3());
 	state = AIState::chasing;
 	findPath();
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			boids.push_back(new Boid(i, j));
+		}
+
+	}
+	for (int i = 0; i < boids.size(); i++)
+	{
+		boids.at(i)->mesh = Game::getGraphics().getMeshPointer("Cube");
+		Game::getGraphics().addToDraw(boids.at(i));
+		boids.at(i)->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+		boids.at(i)->setPosition(Vector3(boids.at(i)->getLocation()));
+		boids.at(i)->setScale(Vector3(0.5f, 0.5f, 0.5f));
+	}
+
 }
 
 AIPlayer::~AIPlayer()
 {
 	delete aStar;
+	for (int i = 0; i < boids.size(); i++)
+	{
+		delete boids.at(i);
+	}
+	boids.clear();
 }

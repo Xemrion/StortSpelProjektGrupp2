@@ -21,6 +21,9 @@ class Game {
 	GameObject* testObject  = nullptr;
 	GameObject* testObject2 = nullptr;
 	GameObject* testObject3 = nullptr;
+	GameObject* parentTest = nullptr;
+	GameObject* childTest = nullptr;
+	AIPlayer* aiObject = nullptr;
 	GameObject* parentTest  = nullptr;
 	GameObject* childTest   = nullptr;
 	AIPlayer * aiObject     = nullptr;

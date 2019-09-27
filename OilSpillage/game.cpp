@@ -249,7 +249,7 @@ void Game::run()
 
 	
 
-	this->aiObject->setPlayerPos(this->player.getVehicle()->getPosition());
+	this->aiObject->setTargetPos(this->player.getVehicle()->getPosition());
 	Input::SetKeyboardPlayerID(0);
 
 	while (this->window->update())
@@ -356,6 +356,12 @@ void Game::run()
 		
 		player.update(deltaTime);
 
+		/*Vector3 tempPos = AiTestObject->getPosition();
+		Vector4 tempColor = AiTestObject->getColor();
+		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);
+		AiTestObject->setPosition(tempPos);
+		AiTestObject->setColor(tempColor);*/
+		this->aiObject->Update(deltaTime);
 		//deltaTime reset
 		prevTime = curTime;
 	}
