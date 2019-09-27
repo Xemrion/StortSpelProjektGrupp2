@@ -176,6 +176,12 @@ void Game::init(Window* window)
 	RadioButtonValue = 0;
 }
 
+template <typename T>
+void delete_pointed_to(T* const ptr)
+{
+	delete ptr;
+}
+
 void Game::run()
 {
 	//Store counts per second
@@ -299,6 +305,29 @@ void Game::run()
 
 		
 		this->graphics.presentScene();
+		
+		player.update(deltaTime);
+
+		for(int i = 0; i < boids.size(); i++) //Updating Boids
+		{
+			boids.at(i)->run(boids, deltaTime);
+			if((boids.at(i)->getLocation()-boids.at(i)->getDestination()).Length() < 2)
+			{
+				boids.at(i)->setDestination(Vector3(-20.0f, 0.0f, 40.0f));
+			}
+		}
+		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
+		
+		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1f), cos(curTime * secPerCount * 0.1f), -0.5f));
+
+		this->graphics.render(camera);
+
+		/*Vector3 tempPos = AiTestObject->getPosition();
+		Vector4 tempColor = AiTestObject->getColor();
+		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);
+		AiTestObject->setPosition(tempPos);
+		AiTestObject->setColor(tempColor);*/
+		this->aiObject->Update(deltaTime);
 		//deltaTime reset
 		prevTime = curTime;
 	}
