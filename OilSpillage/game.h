@@ -12,9 +12,11 @@
 #include "PG/Map.hpp"
 #include "PG/defs.hpp"
 #include <array>
+#include "UI/UIMainMenu.h"
 
 class Game {
 	Window* window = nullptr;
+	UIMainMenu menu;
 
 	std::unique_ptr<DirectX::Mouse> mouse;
 	static Graphics graphics;

@@ -133,8 +133,11 @@
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Boid.cpp" />
     <ClCompile Include="AI\Node.cpp" />
-    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="camera.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="DynamicCamera.cpp" />
+    <ClCompile Include="UI\Element.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="graphics.cpp" />
@@ -157,6 +160,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UI\UIMainMenu.cpp" />
+    <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
@@ -165,9 +170,12 @@
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Boid.h" />
     <ClInclude Include="AI\Node.h" />
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Camera.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DynamicCamera.h" />
+    <ClInclude Include="UI\Element.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="graphics.h" />
@@ -200,6 +208,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="UI\UIMainMenu.h" />
+    <ClInclude Include="UI\UserInterface.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />
     <ClInclude Include="VertexBuffer.h" />

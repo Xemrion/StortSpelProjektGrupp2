@@ -3,6 +3,7 @@
 #include"Importer/importerClass.h"
 #include<cstring>
 #include "ShaderDefines.hlsli"
+#include "UI/UserInterface.h"
 
 Graphics::Graphics()
 {
@@ -502,6 +503,11 @@ bool Graphics::createShaders()
 	this->lightCullingShader.initialize(device, shaderfolder + L"ComputeLightCulling.cso");
 
 	return true;
+}
+
+ID3D11DeviceContext* Graphics::getDeviceContext()
+{
+	return this->deviceContext;
 }
 
 void Graphics::loadMesh(std::string fileName)

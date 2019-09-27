@@ -85,7 +85,8 @@ void Game::init(Window* window)
 	this->window = window; 
 	graphics.init(window);
 	Sound::Init();
-
+	UserInterface::initSpriteBatch();
+	this->menu.init();
 
 	this->mouse = std::make_unique<Mouse>();
 	this->mouse->SetWindow( window->handle );
@@ -216,17 +217,15 @@ void Game::run()
 
 	while (this->window->update())
 	{
-		Input::Update();
-		Sound::Update(deltaTime);
-		//Game logic
-		//Graphics
-
 		//deltaTime
 		curTime = 0;
 		QueryPerformanceCounter((LARGE_INTEGER*)& curTime);
 		//Calculate deltaTime
 		deltaTime = (curTime - prevTime) * secPerCount;
-		
+
+		Input::Update();
+		Sound::Update(deltaTime);
+		this->menu.update(deltaTime);
 
 		auto mouse = this->mouse->GetState();
 		if (Input::CheckButton(Keys::CONFIRM,PRESSED,0))
