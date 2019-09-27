@@ -14,7 +14,7 @@ private:
 	float maxSpeed;
 	float maxForce;
 
-	Vector3 targetPosition;
+	Vector3 destination;
 
 public:
 	Boid() {}
@@ -24,12 +24,14 @@ public:
 	Vector3 separation(vector<Boid*> boids);
 	Vector3 alignment(vector<Boid*> boids);
 	Vector3 cohesion(vector<Boid*> boids);
-	//Functions involving SFML and visualisation linking
+	// Other function for moving and interacting
 	Vector3 seek(Vector3 target);
 	void run(vector<Boid*> boids, float deltaTime);
 	void update(float deltaTime);
 	void flock(vector<Boid*> boids);
 	float angle(Vector3 target);
 	Vector3 getLocation();
+	Vector3 getDestination();
+	void setDestination(Vector3 destination);
 };
 

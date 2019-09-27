@@ -8,7 +8,7 @@ Boid::Boid(float x, float z)
 	maxSpeed = 3.5;
 	maxForce = 0.5;
 
-	targetPosition = Vector3(20.0f, 0.0f, 20.0f);
+	destination = Vector3(20.0f, 0.0f, 20.0f);
 }
 
 void Boid::applyForce(Vector3 force)
@@ -60,7 +60,7 @@ Vector3 Boid::separation(vector<Boid*> boids)
 
 Vector3 Boid::alignment(vector<Boid*> boids)
 {
-	float neighborDistance = 5; // Field of vision
+	float neighborDistance = 20; // Field of vision
 	Vector3 sum(0.0f);
 	int nrInProximity = 0;
 	for (int i = 0; i < boids.size(); i++) 
@@ -123,7 +123,7 @@ Vector3 Boid::cohesion(vector<Boid*> boids)
 Vector3 Boid::seek(Vector3 target)
 {
 	Vector3 desiredDirection;
-	desiredDirection -= location - targetPosition;
+	desiredDirection -= location - destination;
 	//desired *= maxSpeed;
 
 	acceleration = desiredDirection - velocity;
@@ -163,8 +163,8 @@ void Boid::flock(vector<Boid*> boids)
 	Vector3 alignmentForce = alignment(boids);
 	Vector3 cohesionForce = cohesion(boids);
 	// Arbitrarily weight these forces
-	seperationForce *= 1.0;
-	alignmentForce *= 1.0; // Might need to alter weights for different characteristics
+	seperationForce *= 3.0;
+	alignmentForce *= 1.4; // Might need to alter weights for different characteristics
 	cohesionForce *= 1.2;
 
 	// Add the force vectors to acceleration
@@ -183,4 +183,14 @@ float Boid::angle(Vector3 target)
 Vector3 Boid::getLocation()
 {
 	return this->location;
+}
+
+Vector3 Boid::getDestination()
+{
+	return destination;
+}
+
+void Boid::setDestination(Vector3 destination)
+{
+	this->destination = destination;
 }

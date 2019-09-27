@@ -188,6 +188,10 @@ void Game::run()
 		for(int i = 0; i < boids.size(); i++) //Updating Boids
 		{
 			boids.at(i)->run(boids, deltaTime);
+			if((boids.at(i)->getLocation()-boids.at(i)->getDestination()).Length() < 2)
+			{
+				boids.at(i)->setDestination(Vector3(-20.0f, 0.0f, 40.0f));
+			}
 		}
 		camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 5.0, 0.0));
 		
