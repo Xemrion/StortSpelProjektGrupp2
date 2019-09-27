@@ -29,8 +29,6 @@ bool Map::walk(U16& x, U16& y, Dir d, Tile tile) {
 
 Vec<GameObject> Map::load_as_models(Graphics& graphics) const {
 	auto const to_reserve = width * height;
-	auto const x_offset   = width  / 2.0f * SIDE_LENGTH,
-		       y_offset   = height / 2.0f * SIDE_LENGTH;
 	Vec<GameObject> tiles( to_reserve );
 	for (U16 y = 0; y < height; ++y) {
 		for (U16 x = 0; x < width; ++x) {
@@ -41,7 +39,7 @@ Vec<GameObject> Map::load_as_models(Graphics& graphics) const {
 			tile.mesh = graphics.getMeshPointer(filename.c_str());
 			if (rotation != 0)
 				tile.setRotation({ 0.0f, float(rotation) * 3.1415926535f/180.0f, 0.0f });
-			tile.setPosition({ x * SIDE_LENGTH - x_offset, -0.1f, y * -SIDE_LENGTH + y_offset });
+			tile.setPosition(tile_xy_to_world_pos(x,y));
 		}
 	}
 	return tiles; // RVO/Copy Elision

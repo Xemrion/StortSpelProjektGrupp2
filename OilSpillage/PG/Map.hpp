@@ -13,7 +13,7 @@
 class Map {
 public:
 	U16 const  width, height;
-	Vec<Tile> data; // replace with RAII (vector)
+	Vec<Tile>  data;
 
 	Map(U16 width, U16 height) :
 		width  (width),
@@ -65,7 +65,7 @@ public:
 			+ (neighbour_is_road(Dir::west,  x, y) ? cPow(2, 3) : 0);
 	}
 
-	static F32 constexpr SIDE_LENGTH = 20.0f;
+	static F32 constexpr SIDE_LENGTH = 20.0f; // TODO refactor
 	Vec<GameObject> load_as_models(Graphics& graphics) const;
 
 	// NOTE! pretends that all out-of-bounds tiles are roads
@@ -81,6 +81,12 @@ public:
 	// returns true if the x,y coordinate is in-bounds
 	inline Bool in_bounds(U16 x, U16 y) const noexcept {
 		return x < width and y < height;
+	}
+
+	inline Vector3 tile_xy_to_world_pos(U16 const x, U16 const y) const {
+		static auto const x_offset = width  / 2.0f * SIDE_LENGTH,
+			              y_offset = height / 2.0f * SIDE_LENGTH;
+		return { x * SIDE_LENGTH - x_offset,  .0f,  y * -SIDE_LENGTH + y_offset };
 	}
 };
 

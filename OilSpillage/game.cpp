@@ -17,46 +17,94 @@ void Game::addQuad(int x)
 
 }
 void Game::generateMap() {
-	// TODO: init models
-	static Map map(40, 40);
-#define NO_TERMINAL_COLORS
+	// create blank map
+	map = std::make_unique<Map>(40, 40);
 
+	// debug output
+#define NO_TERMINAL_COLORS // TODO: remove?
+#ifdef _DEBUG
 	std::ofstream f1("road_gen_debug_output_pregen.txt");
 	if (f1.is_open()) {
 		f1 << map;
 		f1.close();
 	}
+#endif
 
 	Walker generator {
-		map,    // the map to work on (mutate)
-		4,      // depth
-		80,    // min length
-	    120,    // max length
-		0.5f,   // child length factor
-		5.0f,  // turn probability
-		2.f,   // child turn probability factor
-		12.0f,   // branch probability
-		0.75f,  // child branch probability factor
-		42069     // seed
+		*map,                 // the map to work on (mutate)
+		4,                    // depth
+		80,                   // min length
+	    120,                  // max length
+		0.5f,                 // child length factor
+		5.0f,                 // turn probability
+		2.f,                  // child turn probability factor
+		12.0f,                // branch probability
+		0.75f,                // child branch probability factor
+		42069                 // seed
 	};
 
 	generator.generate();
 
+	// TODO: give map.height & map.width to A*
+
+	// graph conversion:
+	/*
+	for (int y = 0; y < map.height; ++y) {
+		for (int x = 0; x < map.width; ++x) {
+			if (map.is_building((x, y)) {
+				; // is_traversible = false
+			}
+			else {
+				Node n;
+				n.SetXPos(x);
+				n.SetYPos(y);
+				if (map.neighbour_is_road(Dir::north, x, y)) {
+					n
+					// connect Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y)}
+					// to Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y-1)}
+				}
+				if (map.neighbour_is_road(Dir::east, x, y)) {
+					// connect Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y)}
+					// to Node @ {tile_x_to_world_pos(x+1), tile_y_to_world_pos(y)}
+				}
+				if (map.neighbour_is_road(Dir::south, x, y)) {
+					// connect Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y)}
+					// to Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y+1)}
+				}
+				if (map.neighbour_is_road(Dir::west, x, y)) {
+					// connect Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y)}
+					// to Node @ {tile_x_to_world_pos(x-1), tile_y_to_world_pos(y)}
+				}
+			}
+	
+			Map.data = > Vector<Tile> // size = width * height
+				Map.data[ map.index(x, y) ];
+		}*/
+
+	// TODO: ge map till aStar via någon privat funktion
+
+	// debug output
+#ifdef _DEBUG
 	std::ofstream f2("road_gen_debug_output.txt");
 	if (f2.is_open()) {
 		f2 << map;
 		f2.close();
 	}
+#endif
 
-	tiles = map.load_as_models(graphics); // TODO: RAII!
+	// game object instantiation
+	tiles = map->load_as_models(graphics); // TODO: RAII!
 	for (auto& tile : tiles) {
 		graphics.addToDraw(&tile);
 		tile.setColor({ 0.6f, 0.6f, 0.6f, 1.0f });
-		//tile.setTexture(graphics.getTexturePointer("brickwall.tga"));
+		//tile.setTexture(graphics.getTexturePointer("brickwall.tga")); // TODO remove
 		tile.setScale(Vector3{ 0.01f,  0.005f, 0.01f });
 	}
 }
 
+void Game::initiateAStar() {
+	// aStar.setMap(*map); // TODO
+}
 
 Game::Game()
 {

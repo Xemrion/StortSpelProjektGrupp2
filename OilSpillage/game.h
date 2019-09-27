@@ -18,13 +18,15 @@ class Game {
 
 	std::unique_ptr<DirectX::Mouse> mouse;
 	static Graphics graphics;
-	GameObject* testObject = nullptr;
+	GameObject* testObject  = nullptr;
 	GameObject* testObject2 = nullptr;
 	GameObject* testObject3 = nullptr;
-	GameObject* parentTest = nullptr;
-	GameObject* childTest = nullptr;
-	AIPlayer * aiObject = nullptr;
+	GameObject* parentTest  = nullptr;
+	GameObject* childTest   = nullptr;
+	AIPlayer * aiObject     = nullptr;
 	LightList lightList;
+	// AStar aStar; TODO
+	UPtr<Map> map;
 	Vec<GameObject> tiles;
 	void addQuad(int x);
 
@@ -42,6 +44,7 @@ class Game {
 	std::array<SpotLight, LightList::maxSize>::iterator playerLight;
 
 	void generateMap();
+	void initiateAStar();
 
 public:
 	Game();
