@@ -4,6 +4,9 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include "AStar.h"
+#include "Boid.h"
+
+
 using namespace DirectX::SimpleMath;
 
 // https://docs.unrealengine.com/en-US/API/Runtime/AIModule/AAIController/index.html
@@ -22,10 +25,10 @@ private:
 };
 
 
-class AIPlayer :public GameObject
+class AIPlayer : public GameObject
 {
 public:
-
+	int nrOfFrames = 0;
 	enum AIState
 	{
 		chasing,
@@ -33,7 +36,7 @@ public:
 		wandering
 	};
 	void Update(float dt);
-	void setPlayerPos(Vector3 playerPos);
+	void setTargetPos(Vector3 targetPos);
 	// Move toward a target
 	void findPath();
 	// Move away from target
@@ -50,8 +53,8 @@ public:
 private:
 	AStar* aStar;
 	std::vector<Node*> path;
-	//use ref to  get currentTarget to use behaviour on
-	Vector3 playerPos;
+	std::vector<Boid*> boids;
+	Vector3 targetPos;
 	Vector3 targetNode;
 	AIState state;
 };

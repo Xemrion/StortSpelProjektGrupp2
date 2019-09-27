@@ -176,6 +176,12 @@ void Game::init(Window* window)
 	RadioButtonValue = 0;
 }
 
+template <typename T>
+void delete_pointed_to(T* const ptr)
+{
+	delete ptr;
+}
+
 void Game::run()
 {
 	//Store counts per second
@@ -195,7 +201,7 @@ void Game::run()
 
 	
 
-	this->aiObject->setPlayerPos(this->player.getVehicle()->getPosition());
+	this->aiObject->setTargetPos(this->player.getVehicle()->getPosition());
 	Input::SetKeyboardPlayerID(0);
 
 	while (this->window->update())
@@ -299,6 +305,15 @@ void Game::run()
 
 		
 		this->graphics.presentScene();
+		
+		player.update(deltaTime);
+
+		/*Vector3 tempPos = AiTestObject->getPosition();
+		Vector4 tempColor = AiTestObject->getColor();
+		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);
+		AiTestObject->setPosition(tempPos);
+		AiTestObject->setColor(tempColor);*/
+		this->aiObject->Update(deltaTime);
 		//deltaTime reset
 		prevTime = curTime;
 	}

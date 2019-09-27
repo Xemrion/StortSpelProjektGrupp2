@@ -115,6 +115,8 @@ AStar::AStar(int gridWidth, int gridHeight)
 		}
 
 	}
+
+	
 }
 int AStar::getDistance(DirectX::SimpleMath::Vector2 pos1, DirectX::SimpleMath::Vector2 pos2)
 {
@@ -151,7 +153,7 @@ std::vector<Node*> AStar::reconstructPath(Node* goal)
 	std::vector<Node*> path;
 	Node* current;
 	current = goal;
-	while (current->GetPreviousNode() == nullptr)
+	while (current->GetPreviousNode() != nullptr)
 	{
 		path.push_back(current);
 		current = current->GetPreviousNode();

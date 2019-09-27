@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
+    <ClCompile Include="AI\Boid.cpp" />
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
@@ -162,6 +163,7 @@
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\AStar.h" />
+    <ClInclude Include="AI\Boid.h" />
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />

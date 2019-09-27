@@ -59,7 +59,9 @@ Bool Map::neighbour_is_road(Dir dir, U16 x, U16 y) const noexcept {
 	return !in_bounds(x, y) or (data[index(x, y)] != Tile::ground);
 }
 
-
+Bool Map::is_road(U16 x, U16 y) const noexcept {
+	return data[index(x, y)] != Tile::ground;
+}
 
 // road generator stream outputter implementation
 std::ostream& operator<< (std::ostream& out, Map const& map) {
