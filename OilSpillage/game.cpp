@@ -302,7 +302,7 @@ void Game::run()
 
 		this->aiObject->Update(deltaTime);
 		this->camera.update(deltaTime);
-		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 15, 0));
+		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
 		
 		this->parentTest->setRotation(Vector3(0.0f, cos(curTime * secPerCount) * 2.0f, 0.0f));
 
