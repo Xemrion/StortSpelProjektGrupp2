@@ -176,6 +176,12 @@ void Game::init(Window* window)
 	RadioButtonValue = 0;
 }
 
+template <typename T>
+void delete_pointed_to(T* const ptr)
+{
+	delete ptr;
+}
+
 void Game::run()
 {
 	//Store counts per second
@@ -299,6 +305,9 @@ void Game::run()
 
 		
 		this->graphics.presentScene();
+		
+		player.update(deltaTime);
+
 		//deltaTime reset
 		prevTime = curTime;
 	}

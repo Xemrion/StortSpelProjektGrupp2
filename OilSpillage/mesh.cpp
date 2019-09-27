@@ -51,5 +51,6 @@ AABB Mesh::getAABB()const
 }
 int Mesh::getVertexCount() const
 {
+
 	return this->vertexCount;
 };
