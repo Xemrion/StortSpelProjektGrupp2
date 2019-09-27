@@ -195,7 +195,7 @@ void Game::run()
 
 	
 
-	this->aiObject->setPlayerPos(this->player.getVehicle()->getPosition());
+	this->aiObject->setTargetPos(this->player.getVehicle()->getPosition());
 	Input::SetKeyboardPlayerID(0);
 
 	while (this->window->update())

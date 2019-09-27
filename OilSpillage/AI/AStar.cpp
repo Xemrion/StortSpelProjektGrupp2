@@ -115,6 +115,8 @@ AStar::AStar(int gridWidth, int gridHeight)
 		}
 
 	}
+
+	
 }
 int AStar::getDistance(DirectX::SimpleMath::Vector2 pos1, DirectX::SimpleMath::Vector2 pos2)
 {

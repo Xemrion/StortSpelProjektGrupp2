@@ -17,16 +17,16 @@ void AIPlayer::Update(float dt)
 	followPath(dt);
 }
 
-void AIPlayer::setPlayerPos(Vector3 playerPos)
+void AIPlayer::setTargetPos(Vector3 targetPos)
 {
-	this->playerPos = playerPos;
+	this->targetPos = targetPos;
 }
 
 void AIPlayer::findPath()
 {
 	if (state == AIState::chasing)
 	{
-		path = aStar->algorithm(position, playerPos);
+		path = aStar->algorithm(position, targetPos);
 	}
 }
 
@@ -51,7 +51,7 @@ AIPlayer::AIPlayer()
 {
 	aStar = new AStar(10, 7);
 	setPosition(DirectX::SimpleMath::Vector3(5, 0, 6));
-	setPlayerPos(DirectX::SimpleMath::Vector3());
+	setTargetPos(DirectX::SimpleMath::Vector3());
 	state = AIState::chasing;
 	findPath();
 }

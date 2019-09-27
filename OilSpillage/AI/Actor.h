@@ -33,7 +33,7 @@ public:
 		wandering
 	};
 	void Update(float dt);
-	void setPlayerPos(Vector3 playerPos);
+	void setTargetPos(Vector3 targetPos);
 	// Move toward a target
 	void findPath();
 	// Move away from target
@@ -50,8 +50,7 @@ public:
 private:
 	AStar* aStar;
 	std::vector<Node*> path;
-	//use ref to  get currentTarget to use behaviour on
-	Vector3 playerPos;
+	Vector3 targetPos;
 	Vector3 targetNode;
 	AIState state;
 };
