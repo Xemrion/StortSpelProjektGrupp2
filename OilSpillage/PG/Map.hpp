@@ -71,6 +71,8 @@ public:
 	// NOTE! pretends that all out-of-bounds tiles are roads
 	Bool neighbour_is_road(Dir dir, U16 x, U16 y) const noexcept;
 
+	Bool is_road(U16 x, U16 y) const noexcept;
+
 	// convert an in-bounds 2D coordinate index (x,y) into an 1D index (i)
 	inline Size index(U16 x, U16 y) const noexcept {
 		return Size(y) * width + Size(x);
