@@ -25,7 +25,7 @@ class Game {
 	__int64 prevTime = 0;
 	__int64 countsPerSec = 0;
 	float secPerCount = 1.0f / countsPerSec;
-	
+	float timerForParticle;
 	Vehicle player;
 	Camera camera;
 	//TestAI AI;

@@ -123,6 +123,12 @@ void Game::run()
 		
 		player.update(deltaTime);
 		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 10, 0));
+		timerForParticle += 100 * deltaTime;
+		if (timerForParticle > 1)
+		{
+			this->graphics.addParticle(this->player.getVehicle()->getPosition());
+			timerForParticle = 0;
+		}
 		this->graphics.render(this->camera, deltaTime);
 		//this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos,this->testObject2->getPosition(), Vector3(0, 1, 0));
 		std::string textUse;

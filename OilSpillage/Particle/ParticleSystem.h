@@ -51,7 +51,7 @@ public:
 	void updateParticles(float delta);
 	void drawAll(Camera camera);
 private:
-	const int capParticle = 10000;
+	const int capParticle = 50000;
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
 	int nrOfParticles = 0;

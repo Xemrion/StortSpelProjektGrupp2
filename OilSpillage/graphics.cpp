@@ -354,7 +354,7 @@ void Graphics::render(Camera camera, float deltaTime)
 	}
 	this->particleSystem.updateParticles(deltaTime);
 	this->particleSystem.drawAll(camera);
-	this->particleSystem.addParticle(1, 10, Vector3(float(rand()), float(rand()), float(rand()))/RAND_MAX, Vector3(float(rand()), float(rand()), float(rand()))/RAND_MAX, Vector4(float(rand())/RAND_MAX, float(rand())/RAND_MAX, 0.0f,0.5f), 0.1f);
+	//this->particleSystem.addParticle(1, 10, Vector3(float(rand()), float(rand()), float(rand()))/RAND_MAX, Vector3(float(rand()), float(rand()), float(rand()))/RAND_MAX, Vector4(float(rand())/RAND_MAX, float(rand())/RAND_MAX, 0.0f,0.5f), 0.1f);
 	
 
 
@@ -441,7 +441,12 @@ bool Graphics::createShaders()
 
 void Graphics::addParticle(Vector3 pos)
 {
-
+	Vector3 randomPos = 0.1f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	randomPos += pos;
+	Vector4 color;
+	float grey = float(rand()) / RAND_MAX;
+	color = Vector4(grey,grey,grey, 0.5f);
+	this->particleSystem.addParticle(1, 10, randomPos, Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX, color, 0.1f);
 }
 
 void Graphics::loadMesh(std::string fileName,std::string meshName)
@@ -724,6 +729,6 @@ Vector3 Graphics::getSunVector()
 
 void Graphics::presentScene()
 {
-	swapChain->Present(1, 0);
+	swapChain->Present(0, 0);
 }
 

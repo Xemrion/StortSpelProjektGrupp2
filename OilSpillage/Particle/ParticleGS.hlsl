@@ -52,7 +52,7 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	//vert[1] = input[0].Pos + right *1 - up * 1; // Bottom right
 	//vert[2] = input[0].Pos - right *1 + up * 1; // Top left
 	//vert[3] = input[0].Pos + right *1 + up * 1; // Top right 
-	float size = 0.2f;
+	float size = 0.05f;
 	
 	size -= input[0].time * 0.1f;
 	

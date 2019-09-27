@@ -21,7 +21,7 @@ cbuffer ParticleCount : register(b1)
 };
 
 static const float G = 9.82f;
-static const float m1 = 1.0f;
+static const float m1 = 0.1f;
 static const float m2 = 10.0f;
 static const float m1m2 = m1 * m2;
 static const float eventHorizon = 1.0f;
@@ -29,7 +29,7 @@ static const float eventHorizon = 1.0f;
 
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-	uint myID = DTid.x + DTid.y * 512 + DTid.z * 512 * 512;
+	uint myID = DTid.x + DTid.y * 1024 + DTid.z * 1024 * 1024;
 
 	if (myID < NumParticles.x)
 	{
@@ -46,9 +46,9 @@ void main( uint3 DTid : SV_DispatchThreadID )
 
 		p.time = p.time + TimeFactors.x;*/
 
-		p.velocity = p.velocity + G * m1 * TimeFactors.x * float3(0,-1,0);
+		p.velocity = p.velocity + G*0.05f * m1 * TimeFactors.x * float3(0,1,0);
 		p.position = p.position + p.velocity * TimeFactors.x;
-		p.time = p.time + TimeFactors.x; 
+		p.time = p.time + TimeFactors.x;
 		if (p.time < 10.0f)
 		{
 			NewSimulationState.Append(p);
