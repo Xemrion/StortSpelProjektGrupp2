@@ -51,9 +51,9 @@ Bool Map::neighbour_is_road(Dir dir, U16 x, U16 y) const noexcept {
 	assert(dir == Dir::north or dir == Dir::east
 		or dir == Dir::south or dir == Dir::west);
 
-	if (dir == Dir::north)    y--;
-	else if (dir == Dir::east)    x++;
-	else if (dir == Dir::south)    y++;
+	if      (dir == Dir::north)      y--;
+	else if (dir == Dir::east)       x++;
+	else if (dir == Dir::south)      y++;
 	else /* ( dir == Dir::west  ) */ x--;
 
 	return !in_bounds(x, y) or (data[index(x, y)] != Tile::ground);
