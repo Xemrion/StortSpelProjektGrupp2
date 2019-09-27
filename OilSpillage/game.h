@@ -23,7 +23,7 @@ class Game {
 	GameObject* testObject3 = nullptr;
 	GameObject* parentTest = nullptr;
 	GameObject* childTest = nullptr;
-	AIPlayer * aiObject = nullptr;
+	AIPlayer* aiObject = nullptr;
 	LightList lightList;
 	Vec<GameObject> tiles;
 	void addQuad(int x);
