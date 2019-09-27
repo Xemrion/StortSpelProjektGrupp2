@@ -45,44 +45,6 @@ void Game::generateMap() {
 
 	generator.generate();
 
-	// TODO: give map.height & map.width to A*
-
-	// graph conversion:
-	/*
-	for (int y = 0; y < map.height; ++y) {
-		for (int x = 0; x < map.width; ++x) {
-			if (map.is_building((x, y)) {
-				; // is_traversible = false
-			}
-			else {
-				Node n;
-				n.SetXPos(x);
-				n.SetYPos(y);
-				if (map.neighbour_is_road(Dir::north, x, y)) {
-					n
-					// connect Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y)}
-					// to Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y-1)}
-				}
-				if (map.neighbour_is_road(Dir::east, x, y)) {
-					// connect Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y)}
-					// to Node @ {tile_x_to_world_pos(x+1), tile_y_to_world_pos(y)}
-				}
-				if (map.neighbour_is_road(Dir::south, x, y)) {
-					// connect Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y)}
-					// to Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y+1)}
-				}
-				if (map.neighbour_is_road(Dir::west, x, y)) {
-					// connect Node @ {tile_x_to_world_pos(x), tile_y_to_world_pos(y)}
-					// to Node @ {tile_x_to_world_pos(x-1), tile_y_to_world_pos(y)}
-				}
-			}
-	
-			Map.data = > Vector<Tile> // size = width * height
-				Map.data[ map.index(x, y) ];
-		}*/
-
-	// TODO: ge map till aStar via någon privat funktion
-
 	// debug output
 #ifdef _DEBUG
 	std::ofstream f2("road_gen_debug_output.txt");
@@ -293,7 +255,6 @@ void Game::run()
 		if (Input::IsKeyDown_DEBUG(Keyboard::S))
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
 		
-		this->player.update(deltaTime);
 		Vector3 spotlightDir = Vector3((sin(player.getVehicle()->getRotation().y)), 0, (cos(player.getVehicle()->getRotation().y)));
 		Vector3 spotlightPos = Vector3(player.getVehicle()->getPosition().x, player.getVehicle()->getPosition().y + 1, player.getVehicle()->getPosition().z);
 		spotlightPos += spotlightDir * 1;
@@ -302,7 +263,7 @@ void Game::run()
 
 		this->aiObject->Update(deltaTime);
 		this->camera.update(deltaTime);
-		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
+		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 25, 0));
 		
 		this->parentTest->setRotation(Vector3(0.0f, cos(curTime * secPerCount) * 2.0f, 0.0f));
 

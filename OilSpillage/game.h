@@ -24,9 +24,6 @@ class Game {
 	GameObject* parentTest = nullptr;
 	GameObject* childTest = nullptr;
 	AIPlayer* aiObject = nullptr;
-	GameObject* parentTest  = nullptr;
-	GameObject* childTest   = nullptr;
-	AIPlayer * aiObject     = nullptr;
 	LightList lightList;
 	// AStar aStar; TODO
 	UPtr<Map> map;
