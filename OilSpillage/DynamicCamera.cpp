@@ -130,7 +130,7 @@ void DynamicCamera::stopCinematic()
 	this->cinematicActive = false;
 }
 
-bool DynamicCamera::isCinematicDone()
+bool DynamicCamera::isCinematicDone() const
 {
 	return this->cinematicActive;
 }
@@ -140,7 +140,7 @@ Vector3 DynamicCamera::getPosition() const
 	return this->position;
 }
 
-const Vector3& DynamicCamera::getPositionRef()
+const Vector3& DynamicCamera::getPositionRef() const
 {
 	return this->position;
 }
@@ -159,7 +159,7 @@ Vector3 DynamicCamera::getRotation() const
 	return this->rotation;
 }
 
-const Vector3& DynamicCamera::getRotationRef()
+const Vector3& DynamicCamera::getRotationRef() const
 {
 	return this->rotation;
 }
