@@ -126,7 +126,7 @@ void Game::run()
 		timerForParticle += 100 * deltaTime;
 		if (timerForParticle > 1)
 		{
-			this->graphics.addParticle(this->player.getVehicle()->getPosition());
+			this->graphics.addParticle(this->player.getVehicle()->getPosition()+Vector3(0,3,0));
 			timerForParticle = 0;
 		}
 		this->graphics.render(this->camera, deltaTime);

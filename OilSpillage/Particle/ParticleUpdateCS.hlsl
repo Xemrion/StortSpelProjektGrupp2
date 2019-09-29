@@ -21,7 +21,7 @@ cbuffer ParticleCount : register(b1)
 };
 
 static const float G = 9.82f;
-static const float m1 = 0.1f;
+static const float m1 = 0.01f;
 static const float m2 = 10.0f;
 static const float m1m2 = m1 * m2;
 static const float eventHorizon = 1.0f;
@@ -45,11 +45,19 @@ void main( uint3 DTid : SV_DispatchThreadID )
 		p.position += p.velocity * TimeFactors.x;
 
 		p.time = p.time + TimeFactors.x;*/
-
-		p.velocity = p.velocity + G*0.05f * m1 * TimeFactors.x * float3(0,1,0);
-		p.position = p.position + p.velocity * TimeFactors.x;
+		float4 color1 = float4(1.0f, 1.0f, 1.0f, 1.0f);//red
+		float4 color2 = float4(0.9f, 0.9f, 0.9f, 0.5f);//blue
+		float4 color3 = float4(0.0f, 0.0f, 1.0f, 1.0f);
+		float4 deltaColor = (color2 - color1) / 10.0f;
+		float4 particleColor = float4(deltaColor*TimeFactors.x);
+		if (p.position.y >= 0)
+		{
+			p.velocity = p.velocity + G  * m1 * TimeFactors.x * float3(0, -1, 0);
+			p.position = p.position + p.velocity * TimeFactors.x;
+		}
 		p.time = p.time + TimeFactors.x;
-		if (p.time < 10.0f)
+		p.color += particleColor;
+		if (p.time < 15.0f)
 		{
 			NewSimulationState.Append(p);
 		}

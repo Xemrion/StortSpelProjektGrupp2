@@ -54,8 +54,14 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	//vert[3] = input[0].Pos + right *1 + up * 1; // Top right 
 	float size = 0.05f;
 	
-	size -= input[0].time * 0.1f;
-	
+	//size -= input[0].time * 0.01f;
+	//float3 color1 =float3(1.0f,0.0f,0.0f);//red
+	//float3 color2=float3(0.0f, 0.0f, 1.0f);//blue
+	//float3 color3 = float3(0.0f, 1.0f, 0.0f);
+	//float3 deltaColor = (color2 - color1) / 10.0f;
+	//float3 particleColor = deltaColor*
+	//float timeLeft = 10.0f - input[0].time;
+	//float3 fadedColor = (color1 * (timeLeft / 10)) + (color2 * (input[0].time / 10)) + (color3 * (timeLeft / 10));
 	if (size <= 0)
 	{
 		size = 0.0f;
