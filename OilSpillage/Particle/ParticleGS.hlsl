@@ -7,8 +7,8 @@ cbuffer CB_PER_FRAME : register(b0)
 
 cbuffer ParticleRenderParams : register(b1)
 {
-	float4 emitterLocation;
-	float4 consumerLocation;
+	float4 emitterLocation;//.w = lifeTime
+	float4 consumerLocation;//.x = deltaTime
 };
 
 static const float4 position[4] =
@@ -20,7 +20,7 @@ static const float4 position[4] =
 };
 struct GSInput
 {
-	float3 pos : POSITION;
+	float4 pos : POSITION;
 	float time : TIME;
 	float4 color : COLOR;
 	uint ind : VAR;
@@ -42,34 +42,26 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 		+float4(1.0f, 0.2f, 0.2f, 0.0f) * (1.0f - dist);
 
 	float3 toCamera =  normalize(camPos.xyz - input[0].pos);
-	//planeNormal.y = 0.0f;
-	//planeNormal = normalize(planeNormal);
+
 	float3 right = cross(toCamera, upp);
 	
-	float3 up = /*normalize(upp);*/normalize(cross(right, toCamera));
+	float3 up = normalize(cross(right, toCamera));
 	float3 vert[4];
-	//vert[0] = input[0].Pos - right *1 - up * 1; // Bottom left
-	//vert[1] = input[0].Pos + right *1 - up * 1; // Bottom right
-	//vert[2] = input[0].Pos - right *1 + up * 1; // Top left
-	//vert[3] = input[0].Pos + right *1 + up * 1; // Top right 
-	float size = 0.05f;
-	
-	//size -= input[0].time * 0.01f;
-	//float3 color1 =float3(1.0f,0.0f,0.0f);//red
+
+	float size = input[0].pos.w;
 	//float3 color2=float3(0.0f, 0.0f, 1.0f);//blue
 	//float3 color3 = float3(0.0f, 1.0f, 0.0f);
 	//float3 deltaColor = (color2 - color1) / 10.0f;
 	//float3 particleColor = deltaColor*
 	//float timeLeft = 10.0f - input[0].time;
 	//float3 fadedColor = (color1 * (timeLeft / 10)) + (color2 * (input[0].time / 10)) + (color3 * (timeLeft / 10));
-	if (size <= 0)
-	{
-		size = 0.0f;
-	}
+	
 	//vert[0] = input[0].pos - right *size + up * size; // Top middle
 	//vert[1] = input[0].pos + right *size + up * size; // Top right
 	//vert[3] = input[0].pos + right *size - up * size; // Bottom right
 	//vert[2] = input[0].pos - right *size - up * size; // Top right 
+
+	//Change every frame between up-pointy triangle and down-pointy triangle
 	if (upp.w>0.9f)
 	{
 		vert[0] = input[0].pos + up * size; // Top middle
@@ -79,11 +71,8 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	else
 	{
 		vert[0] = input[0].pos - right * size + up * 0.50f * size; // Top middle
-		//vert[0].y = vert[0].y * 0.75;
 		vert[1] = input[0].pos + right * size + up * size*0.50f; // Top right
-		//vert[1].y = vert[1].y * 0.75;
 		vert[2] = input[0].pos - up * 1.50f *size; // Top right 
-		//vert[2].y = vert[2].y * 1.25;
 	}
 	
 	float2 texCoord[4];

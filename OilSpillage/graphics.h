@@ -36,6 +36,7 @@ class Graphics {
 	ID3D11Texture2D* depthStencilBuffer;
 	ID3D11DepthStencilState* depthStencilState;
 	ID3D11DepthStencilView* depthStencilView;
+	ID3D11ShaderResourceView* depthSRV;
 	ID3D11RasterizerState* rasterState;
 	ID3D11BlendState* alphaEnableBlendingState;
 	ID3D11Buffer* viewProjBuffer;
@@ -69,6 +70,7 @@ public:
 	bool loadTexture(std::string fileName, std::string textureName);
 	const Mesh* getMeshPointer(const char* fileName);
 	Texture* getTexturePointer(const char* fileName);
+	ID3D11ShaderResourceView* getDepthSRV();
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
 	void addPointLight(PointLight light);
@@ -78,5 +80,5 @@ public:
 	void presentScene();
 	void render(Camera camera, float deltaTime);
 	bool createShaders();
-	void addParticle(Vector3 pos);
+	void addParticle(Vector3 pos, Vector3 initialDirection);
 };

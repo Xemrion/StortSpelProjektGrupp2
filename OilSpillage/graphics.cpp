@@ -125,25 +125,37 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 		descDepth.Height = (UINT)this->window->height;
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
-		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; //DXGI_FORMAT_R32_TYPELESS;
+		descDepth.Format = DXGI_FORMAT_R32_TYPELESS;//DXGI_FORMAT_D24_UNORM_S8_UINT; //DXGI_FORMAT_R32_TYPELESS;
 		descDepth.SampleDesc.Count = 4;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
-		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 		descDepth.CPUAccessFlags = 0;
 		descDepth.MiscFlags = 0;
+
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC dsv_desc;
+		dsv_desc.Flags = 0;
+		dsv_desc.Format = DXGI_FORMAT_D32_FLOAT;
+		dsv_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+		dsv_desc.Texture2D.MipSlice = 0;
+		D3D11_SHADER_RESOURCE_VIEW_DESC sr_desc;
+		sr_desc.Format = DXGI_FORMAT_R32_FLOAT;
+		sr_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+		sr_desc.Texture2D.MostDetailedMip = 0;
+		sr_desc.Texture2D.MipLevels = 1;
 		result = device->CreateTexture2D(&descDepth, NULL, &depthStencilBuffer);
 		if (FAILED(result))
 		{
 			return false;
 		}
-		result = device->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView);
+		result = device->CreateDepthStencilView(depthStencilBuffer, &dsv_desc, &depthStencilView);
 		if (FAILED(result))
 		{
 			return false;
 		}
 		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-
+		result = device->CreateShaderResourceView(depthStencilBuffer, &sr_desc, &this->depthSRV);
 		//the depth Stencil State
 		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 
@@ -268,7 +280,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	ImGui_ImplDX11_Init(this->device, this->deviceContext);
 	ImGui::StyleColorsDark();
 
-	this->particleSystem.initiateParticles(device, deviceContext);
+	this->particleSystem.initiateParticles(device, deviceContext,this->depthSRV);
 	/*for (int i = 0; i < 150; i++)
 	{
 		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
@@ -291,7 +303,7 @@ Debug* Graphics::getdebugger()
 void Graphics::render(Camera camera, float deltaTime)
 {
 	float color[4] = {
-		0,0,0,1
+		0.5,0.5,0.0,1
 	};
 	deviceContext->ClearRenderTargetView(renderTargetView, color);
 	// Clear the depth buffer.
@@ -352,7 +364,12 @@ void Graphics::render(Camera camera, float deltaTime)
 		deviceContext->PSSetConstantBuffers(2, 1, &this->lightBuffer);
 		deviceContext->Draw(vertexCount, 0);
 	}
-	this->particleSystem.updateParticles(deltaTime);
+	ID3D11DepthStencilView* nDPV = nullptr;
+	deviceContext->OMSetRenderTargets(1, &renderTargetView, nDPV);
+
+	this->particleSystem.updateParticles(deltaTime,viewProj);
+	deviceContext->OMSetRenderTargets(1, &renderTargetView, this->depthStencilView);
+
 	this->particleSystem.drawAll(camera);
 	//this->particleSystem.addParticle(1, 10, Vector3(float(rand()), float(rand()), float(rand()))/RAND_MAX, Vector3(float(rand()), float(rand()), float(rand()))/RAND_MAX, Vector4(float(rand())/RAND_MAX, float(rand())/RAND_MAX, 0.0f,0.5f), 0.1f);
 	
@@ -439,14 +456,14 @@ bool Graphics::createShaders()
 	return true;
 }
 
-void Graphics::addParticle(Vector3 pos)
+void Graphics::addParticle(Vector3 pos, Vector3 initialDirection)
 {
-	Vector3 randomPos = 0.1f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos = 0.05f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
 	randomPos += pos;
 	Vector4 color;
 	float grey = float(rand()) / RAND_MAX;
-	color = Vector4(grey,grey,grey, 0.5f);
-	this->particleSystem.addParticle(1, 10, randomPos, Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX, color, 0.1f);
+	color = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, 1.0f);
+	this->particleSystem.addParticle(1, 2, randomPos, initialDirection, color, 0.1f);
 }
 
 void Graphics::loadMesh(std::string fileName,std::string meshName)
@@ -694,6 +711,11 @@ Texture* Graphics::getTexturePointer(const char* fileName)
 	}
 
 	return textures[fileName];
+}
+
+ID3D11ShaderResourceView* Graphics::getDepthSRV()
+{
+	return this->depthSRV;
 }
 
 void Graphics::addToDraw(GameObject* o)

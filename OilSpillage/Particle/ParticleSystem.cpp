@@ -15,9 +15,9 @@ ParticleSystem::~ParticleSystem()
 	
 }
 
-void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
+void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* depthSRV)
 {
-
+	this->depthSRV = depthSRV;
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] =
 	{
 		{"SV_VertexID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  }
@@ -118,6 +118,8 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	desc.ByteWidth = sizeof(SimulationParams);
 	hr = device->CreateBuffer(&desc, 0, simParams.GetAddressOf());
 
+	desc.ByteWidth = sizeof(Matrix);
+	hr = device->CreateBuffer(&desc, 0, this->collisionViewProj.GetAddressOf());
 	//Creating two buffers for the particles
 	desc.ByteWidth = capParticle * sizeof(Particle);
 	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
@@ -159,7 +161,25 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	hr = device->CreateShaderResourceView(particlesBuffer.Get(), &shaderResourceViewDesc, particlesSRV.GetAddressOf());
 	hr = device->CreateShaderResourceView(particlesBuffer2.Get(), &shaderResourceViewDesc, particlesSRV2.GetAddressOf());
 
-
+	D3D11_SAMPLER_DESC samplerDesc;
+	float bColor[4] = {
+		1.0f, 1.0f, 1.0f, 1.0f
+	};
+	ZeroMemory(&desc, sizeof(desc));
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = bColor[0];
+	samplerDesc.BorderColor[1] = bColor[1];
+	samplerDesc.BorderColor[2] = bColor[2];
+	samplerDesc.BorderColor[3] = bColor[3];
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = 1;
+	samplerDesc.MipLODBias = 0;
+	samplerDesc.MaxAnisotropy = 0;
+	hr = device->CreateSamplerState(&samplerDesc, this->sampler.GetAddressOf());
 
 }
 
@@ -175,9 +195,9 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	{
 		initialCount = -1;
 	}
-	
-	pParams.emitterLocation = Vector4(position.x,position.y,position.z, 1.0f);
-	pParams.randomVector = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f);
+	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f);
+	pParams.emitterLocation = Vector4(position.x,position.y,position.z, lifeTime);
+	pParams.randomVector = 0.5f*Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX,1.0f);
 	pParams.color = color;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -186,7 +206,7 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	ID3D11UnorderedAccessView* n = nullptr;
 	//run create particle compute shader here
 	deviceContext->CSSetConstantBuffers(0, 1, this->particleParamCB.GetAddressOf());
-	if (true)
+	if (otherFrame==1)
 	{
 		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
 	}
@@ -195,17 +215,26 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
 	}
 	deviceContext->CSSetShader(this->createComputeShader.Get(), 0, 0);
-	deviceContext->Dispatch(2, 1, 1);
+	if (nrOf <= 0)
+	{
+		deviceContext->Dispatch(1, 1, 1);
+	}
+	else
+	{
+		deviceContext->Dispatch(nrOf, 1, 1);
+	}
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
 
 	return true;
 }
 
-void ParticleSystem::updateParticles(float delta)
+void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 {
+
 	ID3D11UnorderedAccessView* n = nullptr;
 	ID3D11Buffer* nB = nullptr;
-
+	ID3D11ShaderResourceView* nSRV = nullptr;
+	this->deltaTime = delta;
 	UINT offset = 0;
 	SimulationParams sP;
 	sP.emitterLocation = pParams.emitterLocation;
@@ -218,6 +247,11 @@ void ParticleSystem::updateParticles(float delta)
 	HRESULT hr = deviceContext->Map(simParams.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &sP, sizeof(ParticleParams));
 	deviceContext->Unmap(simParams.Get(), 0);
+
+	Matrix viewProjTemp = viewProj;
+	hr = deviceContext->Map(this->collisionViewProj.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &viewProjTemp, sizeof(Matrix));
+	deviceContext->Unmap(this->collisionViewProj.Get(), 0);
 	UINT initialCount = -1;
 	if (otherFrame == 1.0f)
 	{
@@ -231,14 +265,21 @@ void ParticleSystem::updateParticles(float delta)
 		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
 		deviceContext->CSSetUnorderedAccessViews(1, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
 	}
+	this->deviceContext->CSSetSamplers(0, 1, this->sampler.GetAddressOf());
+	this->deviceContext->CSSetShaderResources(0, 1, &this->depthSRV);
+	this->deviceContext->CSSetConstantBuffers(2, 1, this->collisionViewProj.GetAddressOf());
 	this->deviceContext->CSSetConstantBuffers(1, 1, this->nrOfParticlesCB.GetAddressOf());
 	this->deviceContext->CSSetConstantBuffers(0, 1, this->simParams.GetAddressOf());
 	this->deviceContext->CSSetShader(this->computeShader.Get(), nullptr, 0);
 	this->deviceContext->Dispatch(50, 1, 1);
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
 	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
+	this->deviceContext->CSSetShaderResources(0, 1, &nSRV);
+
+	this->deviceContext->CSSetConstantBuffers(2, 1, &nB);
 	this->deviceContext->CSSetConstantBuffers(1, 1, &nB);
 	this->deviceContext->CSSetConstantBuffers(0, 1, &nB);
+
 
 }
 
@@ -258,7 +299,7 @@ void ParticleSystem::drawAll(Camera camera)
 
 
 	ParticleRenderParams prp;
-	prp.consumerLocation = Vector4(0, 0, 0, 0);
+	prp.consumerLocation = Vector4(this->deltaTime, 0, 0, 0);
 	prp.emitterLocation = pParams.emitterLocation;
 	D3D11_MAPPED_SUBRESOURCE mappedResource2;
 	hr = deviceContext->Map(particleParamRenderCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource2);

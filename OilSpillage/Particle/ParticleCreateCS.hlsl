@@ -1,17 +1,18 @@
 struct Particle
 {
 	float3 position;
-	float3 direction;
+	float4 direction;
 	float4 color;
-	float time;
+	float2 time;
 };
 
 AppendStructuredBuffer<Particle> NewSimulationState : register(u0);
 
 cbuffer ParticleParameters : register(b0)
 {
-	float4 emitterLocation;
+	float4 emitterLocation;//w = totalTime
 	float4 randomVector;
+	float4 initialDirection;
 	float4 color;
 };
 
@@ -43,9 +44,10 @@ void main( uint3 DispatchThreadID : SV_DispatchThreadID )
 
 	p.position = emitterLocation.xyz;/*+sin(GroupThreadID.x*10)+cos(GroupThreadID.x*6)+ direction[GroupThreadID.x];*/
 
-	p.direction = reflect(direction[DispatchThreadID.x], hash(randomVector.xyz+float3(DispatchThreadID.x*2.3f, DispatchThreadID.x, DispatchThreadID.x*4.3))) * 1.f;
-	p.color = float4(1.0f, 1.0f, 1.0f, 1.0f);//red;
-	p.time = 0.0f;
-
+	p.direction = float4(reflect(direction[DispatchThreadID.x], hash(randomVector.xyz + float3(DispatchThreadID.x * 2.3f, DispatchThreadID.x * 1.4, DispatchThreadID.x * 4.3))) * 1.f, 0.0f);
+	p.direction += float4(initialDirection.xyz, 0.0f);
+	p.color = float4(1.0f, 0.2f, 0.2f, 1.0f);//red;
+	p.time.x = 0.0f;
+	p.time.y = emitterLocation.w;
 	NewSimulationState.Append(p);
 }

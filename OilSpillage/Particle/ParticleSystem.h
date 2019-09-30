@@ -7,9 +7,9 @@ using namespace DirectX::SimpleMath;
 struct Particle
 {
 	Vector3 position;
-	Vector3 direction;
+	Vector4 direction;
 	Vector4 color;
-	float time;
+	Vector2 time;//time and totalTime
 };
 struct CameraInfo
 {
@@ -21,6 +21,7 @@ struct ParticleParams
 {
 	Vector4 emitterLocation;
 	Vector4 randomVector;
+	Vector4 initialDirection;
 	Vector4 color;
 };
 struct ParticleRenderParams
@@ -46,9 +47,9 @@ class ParticleSystem
 public:
 	ParticleSystem();
 	~ParticleSystem();
-	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
+	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* depthSRV);
 	bool addParticle(int nrOf, int lifeTime, Vector3 position, Vector3 initialDirection, Vector4 color, float size);
-	void updateParticles(float delta);
+	void updateParticles(float delta, Matrix viewProj);
 	void drawAll(Camera camera);
 private:
 	const int capParticle = 50000;
@@ -58,6 +59,7 @@ private:
 	float otherFrame = 1.0f;
 	int lastUsedParticle;
 	int firstAdd = 0;
+	float deltaTime = 0.0f;
 	IndirDraw indDraw;
 	//Particle* particles;
 	//ID3D11Buffer* particleBuffer;
@@ -67,8 +69,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> nrOfParticlesCB;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> simParams;//for update
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;//for update
 
-
+	ID3D11ShaderResourceView* depthSRV;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> collisionViewProj;
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
 	Microsoft::WRL::ComPtr<ID3D10Blob> vertexShaderBlob;
