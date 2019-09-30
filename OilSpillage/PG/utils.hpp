@@ -1,5 +1,8 @@
 #pragma once
 
+// author: Victor Falkengaard Itzel
+// copyright September 2019
+
 #include <type_traits>
 
 // constexpr integral power function for computing
