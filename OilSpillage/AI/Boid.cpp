@@ -1,14 +1,25 @@
 #include "Boid.h"
 
+Boid::Boid()
+{
+	this->acceleration = Vector3(0.0f);
+	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
+	this->position = Vector3(0, 0, 0);
+	this->maxSpeed = 3.5;
+	this->maxForce = 0.5;
+
+	this->destination = Vector3(0.0f, 0.0f, 0.0f);
+}
+
 Boid::Boid(float x, float z)
 {
-	acceleration = Vector3(0.0f);
-	velocity = Vector3(10.0f, 0.0f, 10.0f);
-	position = Vector3(x, 0, z);
-	maxSpeed = 3.5;
-	maxForce = 0.5;
+	this->acceleration = Vector3(0.0f);
+	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
+	this->position = Vector3(x, 0, z);
+	this->maxSpeed = 3.5;
+	this->maxForce = 0.5;
 
-	destination = Vector3(20.0f, 0.0f, 20.0f);
+	this->destination = Vector3(20.0f, 0.0f, 20.0f);
 }
 
 void Boid::applyForce(Vector3 force)
@@ -110,7 +121,7 @@ Vector3 Boid::cohesion(vector<Boid*> boids)
 	}
 	if (nrInProximity > 0) 
 	{
-		sum /= nrInProximity;
+		sum /= float(nrInProximity);
 		return seek(sum);
 	}
 	else 
@@ -163,9 +174,9 @@ void Boid::flock(vector<Boid*> boids)
 	Vector3 alignmentForce = alignment(boids);
 	Vector3 cohesionForce = cohesion(boids);
 	// Arbitrarily weight these forces
-	seperationForce *= 3.0;
-	alignmentForce *= 1.4; // Might need to alter weights for different characteristics
-	cohesionForce *= 1.2;
+	seperationForce *= 3.0f;
+	alignmentForce *= 1.4f; // Might need to alter weights for different characteristics
+	cohesionForce *= 1.2f;
 
 	// Add the force vectors to acceleration
 	applyForce(seperationForce);

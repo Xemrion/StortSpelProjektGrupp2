@@ -16,7 +16,7 @@ private:
 	Vector3 destination;
 
 public:
-	Boid() {}
+	Boid();
 	Boid(float x, float z);
 	void applyForce(Vector3 force);
 	// Three Laws that boids follow
