@@ -30,8 +30,8 @@ Vec<V2i> Voronoi::generate_noise( RNG &rng ) const noexcept {
    auto      noise = I32_Dist { 0, CELL_SIZE };
    Vec<V2i>  uniform_noise;
    uniform_noise.reserve( WIDTH*HEIGHT );
-   for ( Size x=0;  x<WIDTH;  ++x )
-      for ( Size y=0;  y<HEIGHT;  ++y )
+   for ( int x=0;  x<WIDTH;  ++x )
+      for ( int y=0;  y<HEIGHT;  ++y )
    	   uniform_noise[noise_index(x,y)] = { noise(rng)+x, noise(rng)+y };
    return uniform_noise;
 }
