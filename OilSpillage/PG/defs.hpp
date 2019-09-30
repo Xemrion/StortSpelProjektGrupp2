@@ -23,20 +23,20 @@ template <typename T> using SPtr = std::shared_ptr<T>;
 using Str      = std::basic_string<char>;
 
 // primitives
-using U8       = std::uint_fast8_t;
-using U16      = std::uint_fast16_t;
-using U32      = std::uint_fast32_t;
-using U64      = std::uint_fast64_t;
-using I8       = std::int_fast8_t;
-using I16      = std::int_fast16_t;
-using I32      = std::int_fast32_t;
-using I64      = std::int_fast64_t;
-using F32      = float;
-using F64      = double;
-using Char     = char;
-using Bool     = bool;
-using Size     = size_t;
-using Void     = void;
+using U8   = std::uint_fast8_t;
+using U16  = std::uint_fast16_t;
+using U32  = std::uint_fast32_t;
+using U64  = std::uint_fast64_t;
+using I8   = std::int_fast8_t;
+using I16  = std::int_fast16_t;
+using I32  = std::int_fast32_t;
+using I64  = std::int_fast64_t;
+using F32  = float;
+using F64  = double;
+using Char = char;
+using Bool = bool;
+using Size = size_t;
+using Void = void;
 
 // vectors (TODO: padding alignment if sizeof(T)%4!=0?)
 template <typename T> union V2 {

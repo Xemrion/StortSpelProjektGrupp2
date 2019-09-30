@@ -1,8 +1,10 @@
 #include "game.h"
 #include "Input.h"
 #include "Sound.h"
+#include "PG/utils.hpp"
 #include "PG/Map.hpp"
 #include "PG/Walker.hpp"
+#include "PG/Voronoi.hpp"
 
 Graphics Game::graphics = Graphics();
 
@@ -18,7 +20,7 @@ void Game::addQuad(int x)
 }
 void Game::generateMap() {
 	// create blank map
-	map = std::make_unique<Map>(40, 40);
+	map = std::make_unique<Map>(64, 64);
 
 	// debug output
 #define NO_TERMINAL_COLORS // TODO: remove?
@@ -34,13 +36,13 @@ void Game::generateMap() {
 		*map,                 // the map to work on (mutate)
 		4,                    // depth
 		80,                   // min length
-	    120,                  // max length
+	   120,                  // max length
 		0.5f,                 // child length factor
 		5.0f,                 // turn probability
 		2.f,                  // child turn probability factor
 		12.0f,                // branch probability
 		0.75f,                // child branch probability factor
-		42069                 // seed
+		420697                 // seed
 	};
 
 	generator.generate();
@@ -52,15 +54,82 @@ void Game::generateMap() {
 		f2 << map;
 		f2.close();
 	}
+
+   // TODO: remove when no longer needing for bugging
+   Vec<Vector4>  rgba_tbl {
+      { 0.0f, 0.0f, 0.0f, 1.0f },
+      { 0.0f, 0.0f, 0.5f, 1.0f },
+      { 0.0f, 0.0f, 1.0f, 1.0f },
+
+      { 0.0f, 0.5f, 0.0f, 1.0f },
+      { 0.0f, 0.5f, 0.5f, 1.0f },
+      { 0.0f, 0.5f, 1.0f, 1.0f },
+
+      { 0.0f, 1.0f, 0.0f, 1.0f },
+      { 0.0f, 1.0f, 0.5f, 1.0f },
+      { 0.0f, 1.0f, 1.0f, 1.0f },
+
+      { 0.5f, 0.0f, 0.0f, 1.0f },
+      { 0.5f, 0.0f, 0.5f, 1.0f },
+      { 0.5f, 0.0f, 1.0f, 1.0f },
+
+      { 0.5f, 0.5f, 0.0f, 1.0f },
+      { 0.5f, 0.5f, 0.5f, 1.0f },
+      { 0.5f, 0.5f, 1.0f, 1.0f },
+
+      { 0.5f, 1.0f, 0.0f, 1.0f },
+      { 0.5f, 1.0f, 0.5f, 1.0f },
+      { 0.5f, 1.0f, 1.0f, 1.0f },
+
+      { 1.0f, 0.0f, 0.0f, 1.0f },
+      { 1.0f, 0.0f, 0.5f, 1.0f },
+      { 1.0f, 0.0f, 1.0f, 1.0f },
+
+      { 1.0f, 0.5f, 0.0f, 1.0f },
+      { 1.0f, 0.5f, 0.5f, 1.0f },
+      { 1.0f, 0.5f, 1.0f, 1.0f },
+
+      { 1.0f, 1.0f, 0.0f, 1.0f },
+      { 1.0f, 1.0f, 0.5f, 1.0f },
+      { 1.0f, 1.0f, 1.0f, 1.0f }
+   };
+      for ( auto &rgba : rgba_tbl )
+         rgba = blend( rgba, Vector4{1.0f}, 0.5f );
 #endif
 
 	// game object instantiation
 	tiles = map->load_as_models(graphics); // TODO: RAII!
-	for (auto& tile : tiles) {
-		graphics.addToDraw(&tile);
-		tile.setColor({ 0.6f, 0.6f, 0.6f, 1.0f });
-		//tile.setTexture(graphics.getTexturePointer("brickwall.tga")); // TODO remove
-		tile.setScale(Vector3{ 0.01f,  0.005f, 0.01f });
+
+   RD  rd;
+   RNG rng( rd() );
+   rng.seed(420690);
+   auto const CELL_SIZE = 32;
+   auto voronoi = Voronoi(rng, CELL_SIZE, map->height/CELL_SIZE, map->width/CELL_SIZE, Voronoi::ManhattanDistanceTag{} );
+
+#ifdef _DEBUG
+   // display noise centers:
+   for ( auto const &cell_center : voronoi.noise ) {
+      GameObject *cell_center_marker = new GameObject;
+      cell_center_marker->mesh = graphics.getMeshPointer("Cube");
+      cell_center_marker->setColor({1, 0, 0, 1});
+      cell_center_marker->setScale({.2f, 4, .2f});
+	   graphics.addToDraw(cell_center_marker);
+      cell_center_marker->setPosition({ map->tile_xy_to_world_pos(U16(cell_center.x), U16(cell_center.y))});
+   }
+#endif
+
+
+   for ( U16 x=0;  x < map->width;  ++x ) {
+      for ( U16 y=0;  y < map->height;  ++y ) {
+         auto &tile = tiles[map->index(x,y)];
+		   graphics.addToDraw(&tile);
+#ifdef _DEBUG
+         // colour code tiles depending on cell index:
+		   tile.setColor( rgba_tbl[voronoi.diagram[map->index(x,y)] % rgba_tbl.size()] );
+#endif
+		   //tile.setTexture(graphics.getTexturePointer("brickwall.tga")); // TODO remove
+		   tile.setScale(Vector3{ 0.01f,  0.01f, 0.01f }); // TODO: scale models instead
+      }
 	}
 }
 
@@ -158,8 +227,6 @@ void Game::init(Window* window)
 	lightList.addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 50.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
 	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 50.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
 	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
-
-	
 
 	lightList.removeLight(lightList.addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 	
