@@ -78,7 +78,6 @@ AIPlayer::AIPlayer()
 		boids.at(i)->mesh = Game::getGraphics().getMeshPointer("Cube");
 		Game::getGraphics().addToDraw(boids.at(i));
 		boids.at(i)->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
-		boids.at(i)->setPosition(Vector3(boids.at(i)->getLocation()));
 		boids.at(i)->setScale(Vector3(0.5f, 0.5f, 0.5f));
 	}
 

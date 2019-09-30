@@ -4,7 +4,7 @@ Boid::Boid(float x, float z)
 {
 	acceleration = Vector3(0.0f);
 	velocity = Vector3(10.0f, 0.0f, 10.0f);
-	location = Vector3(x, 0, z);
+	position = Vector3(x, 0, z);
 	maxSpeed = 3.5;
 	maxForce = 0.5;
 
@@ -26,12 +26,12 @@ Vector3 Boid::separation(vector<Boid*> boids)
 	for (int i = 0; i < boids.size(); i++) 
 	{
 		// Calculate distance from current boid to boid we're looking at
-		float distance = (location - boids.at(i)->location).Length();
+		float distance = (position - boids.at(i)->position).Length();
 		// If this is a fellow boid and it's too close, move away from it
 		if ((distance > 0) && (distance < desiredSeparationDistance)) 
 		{
 			Vector3 difference(0.0f);
-			difference = location - boids.at(i)->location;
+			difference = position - boids.at(i)->position;
 			difference.Normalize();
 			difference /= distance;      // Weight by distance
 			direction += difference;
@@ -65,7 +65,7 @@ Vector3 Boid::alignment(vector<Boid*> boids)
 	int nrInProximity = 0;
 	for (int i = 0; i < boids.size(); i++) 
 	{
-		float distance = (location - boids.at(i)->location).Length();
+		float distance = (position - boids.at(i)->position).Length();
 		if ((distance > 0) && (distance < neighborDistance)) 
 		{
 			sum += boids.at(i)->velocity;
@@ -101,10 +101,10 @@ Vector3 Boid::cohesion(vector<Boid*> boids)
 	int nrInProximity = 0;
 	for (int i = 0; i < boids.size(); i++) 
 	{
-		float distance = (location - boids.at(i)->location).Length();
+		float distance = (position - boids.at(i)->position).Length();
 		if ((distance > 0) && (distance < neighborDistance)) 
 		{
-			sum += boids.at(i)->location;
+			sum += boids.at(i)->position;
 			nrInProximity++;
 		}
 	}
@@ -123,7 +123,7 @@ Vector3 Boid::cohesion(vector<Boid*> boids)
 Vector3 Boid::seek(Vector3 target)
 {
 	Vector3 desiredDirection;
-	desiredDirection -= location - destination;
+	desiredDirection -= position - destination;
 	//desired *= maxSpeed;
 
 	acceleration = desiredDirection - velocity;
@@ -151,7 +151,7 @@ void Boid::update(float deltaTime)
 	{
 		velocity /= velocity.Length();
 	}
-	location += Vector3(velocity.x * deltaTime, 0.0f, velocity.z* deltaTime);
+	position += Vector3(velocity.x * deltaTime, 0.0f, velocity.z* deltaTime);
 	this->move(Vector3(velocity.x * deltaTime, 0.0f, velocity.z*deltaTime));
 	// Reset accelertion to 0 each cycle
 	acceleration *= 0;
@@ -178,11 +178,6 @@ float Boid::angle(Vector3 target)
 	// From the definition of the dot product
 	float angle = (float)(atan2(target.x, -target.z) * 180 / 3.14);
 	return angle;
-}
-
-Vector3 Boid::getLocation()
-{
-	return this->location;
 }
 
 Vector3 Boid::getDestination()
