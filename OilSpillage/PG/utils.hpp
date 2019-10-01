@@ -1,5 +1,8 @@
 #pragma once
 
+// author: Victor Falkengaard Itzel
+// copyright September 2019
+
 #include <type_traits>
 
 // constexpr integral power function for computing
@@ -12,3 +15,9 @@ inline Integer constexpr cPow(Integer base, Integer exp) noexcept {
 		retval *= base;
 	return retval;
 }
+
+template <typename T_Vector>
+T_Vector blend( T_Vector const &a, T_Vector const &b, F32 factor ) {
+   // TODO: clamp factor?
+   return   a * factor   +   b * (1.0f-factor);
+};

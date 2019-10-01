@@ -1,8 +1,12 @@
 #pragma once
 
+// author: Victor Falkengaard Itzel
+// copyright September 2019
+
 #include <functional>
 #include <cassert>
 #include "defs.hpp"
+#include "config.hpp"
 #include "utils.hpp"
 #include "Map.hpp"
 #include "Tile.hpp"
@@ -88,8 +92,7 @@ public:
       while ( (tiles_walked != tiles_to_walk) and (steps-->0) ) {
          // potential branch:
          Bool  is_branch_eligible = ( args.cur_depth < args.max_depth-1 )
-            and ( tiles_since_last_branch >= MIN_TILES_BEFORE_BRANCH );
-            ;
+            and ( tiles_since_last_branch >= config::MIN_TILES_BEFORE_BRANCH );
          if ( is_branch_eligible and gen_selection(args.rng) > args.branch_prob ) {
             // TODO: delay by putting params in a vector and doing the branches after the main loop
             Dir branch_direction = gen_selection(args.rng) < 50 ?
@@ -100,7 +103,7 @@ public:
          else ++tiles_since_last_branch;
 
          // potential turn:
-         Bool  is_turn_eligible = tiles_since_last_turn > 1; // TODO: magic5
+         Bool  is_turn_eligible = tiles_since_last_turn >= config::MIN_TILES_BEFORE_TURN;
          if ( is_turn_eligible and gen_selection(args.rng) > args.turn_prob ) {
             dir = gen_selection(args.rng) < 50 ?
                         turn_left(dir) : turn_right(dir);
@@ -142,8 +145,6 @@ public:
    }
 
 private:
-// constants:
-   static U16 constexpr MIN_TILES_BEFORE_BRANCH = 4; // TODO: extract
 // data member variables:
    WalkerGenArgs  args;
    // status flag:
@@ -252,7 +253,6 @@ public:
    }
 
 
-   // TODO: magic1
    // generates the tree, one depth at a time, one tile per branch at a time
    Void generate() {
 #ifdef _DEBUG_W_TERM
@@ -264,7 +264,7 @@ public:
             all_done = true;
             for ( auto  &branch : branch_tree[depth] ) {
                if ( !branch.is_done() ) {
-                  branch.walk( STEP_SIZE );
+                  branch.walk( config::STEP_SIZE );
                }
                all_done &= branch.is_done();
             }
@@ -292,7 +292,6 @@ public:
    }
 
 private:
-   static U16 constexpr STEP_SIZE = 1; // TODO: magic1
    U8                max_depth;
    Map const        &map;
    RD                rd;

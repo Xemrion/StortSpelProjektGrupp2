@@ -1,4 +1,7 @@
-﻿#include "Map.hpp"
+﻿// author: Victor Falkengaard Itzel
+// copyright September 2019
+
+#include "Map.hpp"
 
 // x = current X (may be mutated if successful)
 // y = current Y (may be mutated if successful)

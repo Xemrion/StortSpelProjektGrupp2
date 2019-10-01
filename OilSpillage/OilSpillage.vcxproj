@@ -156,11 +156,13 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="PG\Map.cpp" />
+    <ClCompile Include="PG\Voronoi.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="TestAI.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UI\Slider.cpp" />
     <ClCompile Include="UI\UIMainMenu.cpp" />
@@ -199,15 +201,18 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="PG\config.hpp" />
     <ClInclude Include="PG\defs.hpp" />
     <ClInclude Include="PG\Direction.hpp" />
     <ClInclude Include="PG\Map.hpp" />
     <ClInclude Include="PG\RandomSegments.hpp" />
     <ClInclude Include="PG\Tile.hpp" />
     <ClInclude Include="PG\utils.hpp" />
+    <ClInclude Include="PG\Voronoi.hpp" />
     <ClInclude Include="PG\Walker.hpp" />
     <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Sound.h" />
+    <ClInclude Include="Road Network\RoadNet.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="TestAI.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

@@ -39,7 +39,9 @@ void AIPlayer::followPath(float dt)
 {
 	if (path.size() > 0)
 	{
-		targetNode = DirectX::SimpleMath::Vector3(path.at(path.size() - 1)->GetXPos(), 0, path.at(path.size() - 1)->GetYPos());
+		targetNode = DirectX::SimpleMath::Vector3( float(path.at(path.size() - 1)->GetXPos()),
+                                                 .0f,
+                                                 float(path.at(path.size() - 1)->GetYPos()) );
 		Vector3 dir = targetNode - position;
 		dir.Normalize();
 		Vector3 newPosition = position + dir * dt;
@@ -67,9 +69,8 @@ AIPlayer::AIPlayer()
 	findPath();
 	for (int i = 0; i < 3; i++)
 	{
-		for (int j = 0; j < 4; j++)
-		{
-			boids.push_back(new Boid(i, j));
+		for (int j = 0; j < 4; j++) {
+			boids.push_back(new Boid(float(i), float(j)));
 		}
 
 	}
@@ -78,7 +79,6 @@ AIPlayer::AIPlayer()
 		boids.at(i)->mesh = Game::getGraphics().getMeshPointer("Cube");
 		Game::getGraphics().addToDraw(boids.at(i));
 		boids.at(i)->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
-		boids.at(i)->setPosition(Vector3(boids.at(i)->getLocation()));
 		boids.at(i)->setScale(Vector3(0.5f, 0.5f, 0.5f));
 	}
 

@@ -120,6 +120,12 @@
     <ClCompile Include="UI\Slider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PG\Voronoi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Road Network\RoadNet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -261,6 +267,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\Slider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\Voronoi.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Road Network\RoadNet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

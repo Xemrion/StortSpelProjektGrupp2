@@ -1,5 +1,8 @@
 #pragma once
 
+// author: Victor Falkengaard Itzel
+// copyright September 2019
+
 #include <random>
 #include <string>
 #include <vector>
@@ -20,20 +23,48 @@ template <typename T> using SPtr = std::shared_ptr<T>;
 using Str      = std::basic_string<char>;
 
 // primitives
-using U8       = std::uint_fast8_t;
-using U16      = std::uint_fast16_t;
-using U32      = std::uint_fast32_t;
-using U64      = std::uint_fast64_t;
-using I8       = std::uint_fast8_t;
-using I16      = std::uint_fast16_t;
-using I32      = std::uint_fast32_t;
-using I64      = std::uint_fast64_t;
-using F32      = float;
-using F64      = double;
-using Char     = char;
-using Bool     = bool;
-using Size     = size_t;
-using Void     = void;
+using U8   = std::uint_fast8_t;
+using U16  = std::uint_fast16_t;
+using U32  = std::uint_fast32_t;
+using U64  = std::uint_fast64_t;
+using I8   = std::int_fast8_t;
+using I16  = std::int_fast16_t;
+using I32  = std::int_fast32_t;
+using I64  = std::int_fast64_t;
+using F32  = float;
+using F64  = double;
+using Char = char;
+using Bool = bool;
+using Size = size_t;
+using Void = void;
+
+// vectors (TODO: padding alignment if sizeof(T)%4!=0?)
+template <typename T> union V2 {
+	T  data[2];
+	struct { T  x, y; }; // anon
+	struct { T  r, g; }; // anon
+};
+using V2f = V2<F32>;
+using V2u = V2<U32>;
+using V2i = V2<I32>;
+
+template <typename T> union V3 {
+	T  data[3];
+	struct { T  x, y, z; }; // anon
+	struct { T  r, g, b; }; // anon
+};
+using V3f = V3<F32>;
+using V3u = V3<U32>;
+using V3i = V3<I32>;
+
+template <typename T> union V4 {
+	T  data[4];
+	struct { T  x, y, z, w; }; // anon
+	struct { T  r, g, b, a; }; // anon
+};
+using V4f = V4<F32>;
+using V4u = V4<U32>;
+using V4i = V4<I32>;
 
 // random number generation
 using RD       = std::random_device;
