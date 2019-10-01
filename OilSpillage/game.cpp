@@ -25,9 +25,11 @@ void Game::generateMap() {
 	// debug output
 #define NO_TERMINAL_COLORS // TODO: remove?
 #ifdef _DEBUG
-	std::ofstream f1("road_gen_debug_output_pregen.txt");
+	std::ofstream f1("PG/Logs/road_gen_debug_output_pregen.txt");
 	if (f1.is_open()) {
-		f1 << *map;
+		if (!(f1 << *map)) {
+			f1 << "Failed to save map to file!";
+		}
 		f1.close();
 	}
    else {
@@ -52,9 +54,11 @@ void Game::generateMap() {
 
 	// debug output
 #ifdef _DEBUG
-	std::ofstream f2("road_gen_debug_output.txt");
+	std::ofstream f2("PG/Logs/road_gen_debug_output.txt");
 	if (f2.is_open()) {
-		f2 << *map;
+		if (!(f2 << *map)) {
+			f2 << "Failed to save map to file!";
+		}
 		f2.close();
 	}
    else {
@@ -237,6 +241,19 @@ void Game::init(Window* window)
 
 	lightList.removeLight(lightList.addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 	
+	//Road network F: Forward, -: Turn Left, +: Turn Right, H: Half Forward
+	this->testNetwork = new RoadNetwork(654, Vector2(512, 512), Vector2(-512, -512), 15);
+	this->testNetwork->generateInitialSegments("FFF+FF+FF+FF-FF-FF-FF-FF-FFF-FFFF-FF-FF-FFF+FF+FF+FF+FF+FF+FFF");
+	this->testNetwork->setAngle(90);
+	for (int i = 0; i < 11; i++) {
+		this->testNetwork->generateAdditionalSegments("FFF", (i + 2) * 2, false);
+		this->testNetwork->generateAdditionalSegments("FFF", (i + 3) * 3, false);
+		this->testNetwork->generateAdditionalSegments("FF-F+H+FF+H+F", (i + 3) * 3, true);
+	}
+	this->testNetwork->saveTestNetwork("test-net");
+	this->testNetwork->cleanRoadNetwork();
+	this->testNetwork->saveTestNetwork("test-net-cleaned");
+	
 	for (int i = 0; i < 50; ++i)
 	{
 		Vector3 randPos = Vector3(rand() % 101 - 50, 0.01, rand() % 101 - 50);
@@ -343,7 +360,10 @@ void Game::run()
 
 		this->graphics.render(&this->camera);
 		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos, this->testObject2->getPosition(), Vector3(0, 1, 0));
-		
+
+		//Draw test roadnetwork
+		this->testNetwork->drawRoadNetwork(&this->graphics);
+
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
@@ -391,6 +411,8 @@ void Game::run()
 		
 		player.update(deltaTime);
 
+
+
 		/*Vector3 tempPos = AiTestObject->getPosition();
 		Vector4 tempColor = AiTestObject->getColor();
 		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);
@@ -400,4 +422,12 @@ void Game::run()
 		//deltaTime reset
 		prevTime = curTime;
 	}
+	// TODO: RAII
+	delete this->testObject;
+	delete this->testObject2;
+	delete this->testObject3;
+	delete this->aiObject;
+	delete this->testNetwork;
+	delete this->parentTest;
+	delete this->childTest;
 }

@@ -8,6 +8,8 @@
 //#include"ImGui/imgui_impl_dx11.h"
 #include"vehicle.h"
 #include "AI/Actor.h"
+#include "Road Network/RoadNet.h"
+
 #include "DynamicCamera.h"
 #include "PG/Map.hpp"
 #include "PG/defs.hpp"
@@ -29,6 +31,10 @@ class Game {
 	UPtr<Map> map;
    Vec<GameObject> markers;
    Vec<GameObject> tiles;
+	Vec<GameObject> tiles;
+	//GameObject* AiTestObject = nullptr;
+	RoadNetwork* testNetwork = nullptr;
+
 	void addQuad(int x);
 
 	float deltaTime = 0.0f;
