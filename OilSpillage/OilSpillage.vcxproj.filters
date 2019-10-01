@@ -236,6 +236,9 @@
     <ClInclude Include="PG\Voronoi.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PG\config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Road Network\RoadNet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
