@@ -242,10 +242,10 @@ void Game::init(Window* window)
 	lightList.removeLight(lightList.addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 	
 	for (int i = 0; i < 50; ++i)
-	{
-		Vector3 randPos = Vector3(rand() % 101 - 50, 0.01, rand() % 101 - 50);
-		Vector3 randColor = Vector3(rand(), rand(), rand()) / RAND_MAX;
-		randColor.Clamp(Vector3(0.2, 0.2, 0.2), Vector3(1.0, 1.0, 1.0));
+	{ // TODO: använd <random> istället för rand
+		Vector3 randPos   = Vector3( float(rand() % 101 - 50), .01f, float(rand() % 101 - 50) );
+		Vector3 randColor = Vector3( float(rand()), float(rand()), float(rand() / RAND_MAX) );
+		randColor.Clamp(Vector3(.2f, .2f, .2f), Vector3(1.0f, 1.0f, 1.0f));
 
 		lightList.addLight(
 			PointLight(
@@ -254,7 +254,7 @@ void Game::init(Window* window)
 				15.0f));
 	}
 #endif
-	lightList.setSun(Sun(Vector3(0.0, -1.0, 1.0), Vector3(1.0, 0.8, 0.6)));
+	lightList.setSun(Sun(Vector3(.0f, -1.0f, 1.0f), Vector3(1.0f, .8f, .6f)));
 	graphics.setLightList(&lightList);
 
 	player.init();

@@ -2,64 +2,64 @@
 
 void Node::SetGCost(int gCost)
 {
-	this->g_cost = gCost;
+	g_cost = gCost;
 }
 
 void Node::SetHCost(int hCost)
 {
-	this->h_cost = hCost;
+	h_cost = hCost;
 }
 
 void Node::SetFCost(int fCost)
 {
-	this->f_cost = fCost;
+	f_cost = fCost;
 }
 
 void Node::SetXPos(int xPos)
 {
-	this->Pos.x = xPos;
+	Pos.x = float( xPos );
 }
 
 void Node::SetYPos(int yPos)
 {
-	this->Pos.y = yPos;
+	Pos.y = float( yPos );
 }
 
 int Node::GetGCost()
 {
-	return this->g_cost;
+	return g_cost;
 }
 
 int Node::GetHCost()
 {
-	return this->h_cost;
+	return h_cost;
 }
 
 int Node::GetFCost()
 {
-	return this->f_cost;
+	return f_cost;
 }
 
 DirectX::SimpleMath::Vector2 Node::GetPos()
 {
-	return this->Pos;
+	return Pos;
 }
 
 
 
 int Node::GetXPos()
 {
-	return this->Pos.x;
+	return int( Pos.x );
 }
 
 int Node::GetYPos()
 {
-	return this->Pos.y;
+	return int( Pos.y );
 }
 
 int Node::GetID()
 {
-	return this->ID;
+	return ID;
 }
 
 void Node::SetID(int ID)
@@ -74,38 +74,38 @@ bool Node::IsTraversable()
 
 void Node::SetTraversable(bool isTraversable)
 {
-	this->traversable = isTraversable;
+	traversable = isTraversable;
 }
 
 void Node::AddNeighbour(Node* neighbour)
 {
-	this->neighbours.push_back(neighbour);
+	neighbours.push_back(neighbour);
 }
 
 std::vector<Node*> Node::GetNeighbours()
 {
-	return this->neighbours;
+	return neighbours;
 }
 
 Node* Node::GetPreviousNode()
 {
-	return this->previousNode;
+	return previousNode;
 }
 
 void Node::SetPreviousNode(Node* node)
 {
-	this->previousNode = node;
+	previousNode = node;
 }
 
 Node::Node()
 {
-	this->ID = 0;
-	this->g_cost = 0;
-	this->h_cost = 0;
-	this->f_cost = 0;
-	this->Pos = DirectX::SimpleMath::Vector2(0, 0);
-	this->previousNode = nullptr;
-	this->traversable = true;
+	ID           = 0;
+	g_cost       = 0;
+	h_cost       = 0;
+	f_cost       = 0;
+	Pos          = DirectX::SimpleMath::Vector2(0, 0);
+	previousNode = nullptr;
+	traversable  = true;
 }
 
 bool operator==(const Node* left, Node& right)

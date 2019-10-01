@@ -120,9 +120,9 @@ AStar::AStar(int gridWidth, int gridHeight)
 }
 int AStar::getDistance(DirectX::SimpleMath::Vector2 pos1, DirectX::SimpleMath::Vector2 pos2)
 {
-	int x1 = pos1.x - pos2.x;
-	int y1 = pos1.y - pos2.y;
-	return sqrt(pow(x1, 2) + pow(y1, 2)) * 10;
+	int x1 = int( pos1.x - pos2.x );
+	int y1 = int( pos1.y - pos2.y );
+	return int( sqrt(pow(x1, 2) + pow(y1, 2)) * 10 );
 }
 
 void AStar::addToVector(std::vector<Node*>& nodes, Node* nodeToAdd)
