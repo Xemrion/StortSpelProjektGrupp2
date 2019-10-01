@@ -1,6 +1,8 @@
 #include "game.h"
 #include "Input.h"
 #include "Sound.h"
+#include "PG/config.hpp"
+#include "PG/Voronoi.hpp"
 #include "PG/Map.hpp"
 #include "PG/Walker.hpp"
 
@@ -243,8 +245,8 @@ void Game::init(Window* window)
 	
 	for (int i = 0; i < 50; ++i)
 	{
-		Vector3 randPos = Vector3(rand() % 101 - 50, 0.01f, rand() % 101 - 50);
-		Vector3 randColor = Vector3(rand(), rand(), rand()) / RAND_MAX;
+		Vector3 randPos   = Vector3( float(rand() % 101 - 50), .01f, float(rand() % 101 - 50));
+		Vector3 randColor = Vector3( float(rand()), float(rand()), float(rand() / RAND_MAX) );
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
 		lightList.addLight(
