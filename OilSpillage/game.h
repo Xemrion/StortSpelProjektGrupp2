@@ -9,12 +9,16 @@
 //#include"ImGui/imgui_impl_dx11.h"
 #include "vehicle.h"
 #include "AI/Actor.h"
+#include "Road Network/RoadNet.h"
+
 #include "DynamicCamera.h"
 #include "PG/Map.hpp"
 #include "PG/defs.hpp"
 #include <array>
+#include "UI/UIMainMenu.h"
 
 class Game {
+	UIMainMenu menu;
 	Window*              window = nullptr;
 	UPtr<DirectX::Mouse> mouse;
 	static Graphics      graphics;
@@ -35,12 +39,15 @@ class Game {
 	I64                  prevTime      = 0;
 	I64                  countsPerSec  = 0;
 	F32                  secPerCount   = 1.0f / countsPerSec;
-	I32                  RadioButtonValue;
+	I32                  RadioButtonValue = 0;
 	Arr<SpotLight, LightList::maxSize>::iterator playerLight;
    // AStar aStar; TODO
 	// TestAI AI;
 
    void addQuad(int x);
+
+   RoadNetwork* testNetwork = nullptr;
+
 	void generateMap();
 	void initiateAStar();
 

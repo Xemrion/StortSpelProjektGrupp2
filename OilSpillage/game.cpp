@@ -1,11 +1,8 @@
 #include "game.h"
 #include "Input.h"
 #include "Sound.h"
-#include "PG/config.hpp"
-#include "PG/utils.hpp"
 #include "PG/Map.hpp"
 #include "PG/Walker.hpp"
-#include "PG/Voronoi.hpp"
 
 Graphics Game::graphics = Graphics();
 
@@ -165,7 +162,8 @@ void Game::init(Window* window)
 	this->window = window; 
 	graphics.init(window);
 	Sound::Init();
-
+	UserInterface::init();
+	this->menu.initUI();
 
 	this->mouse = std::make_unique<Mouse>();
 	this->mouse->SetWindow( window->handle );
@@ -239,13 +237,15 @@ void Game::init(Window* window)
 	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 50.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
 	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
+	
+
 	lightList.removeLight(lightList.addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 	
 	for (int i = 0; i < 50; ++i)
-	{ // TODO: använd <random> istället för rand
-		Vector3 randPos   = Vector3( float(rand() % 101 - 50), .01f, float(rand() % 101 - 50) );
-		Vector3 randColor = Vector3( float(rand()), float(rand()), float(rand() / RAND_MAX) );
-		randColor.Clamp(Vector3(.2f, .2f, .2f), Vector3(1.0f, 1.0f, 1.0f));
+	{
+		Vector3 randPos = Vector3(rand() % 101 - 50, 0.01f, rand() % 101 - 50);
+		Vector3 randColor = Vector3(rand(), rand(), rand()) / RAND_MAX;
+		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
 		lightList.addLight(
 			PointLight(
@@ -254,7 +254,7 @@ void Game::init(Window* window)
 				15.0f));
 	}
 #endif
-	lightList.setSun(Sun(Vector3(.0f, -1.0f, 1.0f), Vector3(1.0f, .8f, .6f)));
+	lightList.setSun(Sun(Vector3(0.0f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
 	graphics.setLightList(&lightList);
 
 	player.init();
@@ -294,17 +294,14 @@ void Game::run()
 
 	while (this->window->update())
 	{
-		Input::Update();
-		Sound::Update(deltaTime);
-		//Game logic
-		//Graphics
-
 		//deltaTime
 		curTime = 0;
 		QueryPerformanceCounter((LARGE_INTEGER*)& curTime);
 		//Calculate deltaTime
 		deltaTime = (curTime - prevTime) * secPerCount;
-		
+
+		Input::Update();
+		Sound::Update(deltaTime);
 
 		auto mouse = this->mouse->GetState();
 		if (Input::CheckButton(Keys::CONFIRM,PRESSED,0))
@@ -347,6 +344,7 @@ void Game::run()
 
 		this->graphics.render(&this->camera);
 		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos, this->testObject2->getPosition(), Vector3(0, 1, 0));
+		//this->menu.update(deltaTime);
 		
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
@@ -390,7 +388,6 @@ void Game::run()
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-		
 		this->graphics.presentScene();
 		
 		player.update(deltaTime);
@@ -404,4 +401,6 @@ void Game::run()
 		//deltaTime reset
 		prevTime = curTime;
 	}
+	// TODO: RAII
+	delete this->testNetwork;
 }
