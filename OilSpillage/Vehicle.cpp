@@ -344,21 +344,21 @@ void Vehicle::update(float deltaTime)
 	float driftForce = velocity.x * (dy / hypoC) + velocity.y * -(dx / hypoC);
 	if (drivingMode != 2) {
 		if (Input::GetStrengthL(0) > 0) {
-			if (driftForce < -100) {
+			if (driftForce < -150) {
 				this->velocity.x -= -((dy / hypoC) * 4000 * deltaTime);
 				this->velocity.y -= -(-((dx / hypoC) * 4000 * deltaTime));
 			}
-			else if (driftForce > 100) {
+			else if (driftForce > 150) {
 				this->velocity.x += -((dy / hypoC) * 4000 * deltaTime);
 				this->velocity.y += -(-((dx / hypoC) * 4000 * deltaTime));
 			}
 		}
 		else {
-			if (driftForce < -100) {
+			if (driftForce < -150) {
 				this->velocity.x -= -((dy / hypoC) * 4000 * deltaTime);
 				this->velocity.y -= -(-((dx / hypoC) * 4000 * deltaTime));
 			}
-			else if (driftForce > 100) {
+			else if (driftForce > 150) {
 				this->velocity.x += -((dy / hypoC) * 4000 * deltaTime);
 				this->velocity.y += -(-((dx / hypoC) * 4000 * deltaTime));
 			}
