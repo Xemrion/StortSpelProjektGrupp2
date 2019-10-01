@@ -39,7 +39,7 @@ class Game {
 	I64                  prevTime      = 0;
 	I64                  countsPerSec  = 0;
 	F32                  secPerCount   = 1.0f / countsPerSec;
-	I32                  RadioButtonValue;
+	I32                  RadioButtonValue = 0;
 	Arr<SpotLight, LightList::maxSize>::iterator playerLight;
    // AStar aStar; TODO
 	// TestAI AI;

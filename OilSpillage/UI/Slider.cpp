@@ -18,8 +18,8 @@ Slider::~Slider()
 
 void Slider::draw(bool selected)
 {
-	RECT bgDest = SimpleMath::Rectangle(this->position.x + 8, this->position.y + 8, this->textureFG->getWidth() - 16, this->textureBG->getHeight());
-	RECT amountDest = SimpleMath::Rectangle(this->position.x + 8, this->position.y + 8, (this->textureFG->getWidth() - 16) * this->amount, this->textureBG->getHeight());
+	RECT bgDest = SimpleMath::Rectangle(static_cast<long>(this->position.x + 8), static_cast<long>(this->position.y + 8), static_cast<long>(this->textureFG->getWidth() - 16), static_cast<long>(this->textureBG->getHeight()));
+	RECT amountDest = SimpleMath::Rectangle(static_cast<long>(this->position.x + 8), static_cast<long>(this->position.y + 8), static_cast<long>((this->textureFG->getWidth() - 16) * this->amount), static_cast<long>(this->textureBG->getHeight()));
 
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), bgDest, selected ? Colors::Gray : Colors::White);
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), amountDest, selected ? Colors::DarkGreen : Colors::Green);

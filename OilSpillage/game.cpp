@@ -95,7 +95,7 @@ void Game::init(Window* window)
 	graphics.loadTexture("brickwall.tga");
 	graphics.loadModel("Dummy_Roller_Melee");
 
-	this->testObject = new GameObject;
+	testObject = std::make_unique<GameObject>();
 	testObject->mesh = graphics.getMeshPointer("Cube");
 	//graphics.addToDraw(testObject);
 	testObject->setPosition(Vector3(7770.0f, 0.0f, 0.0f)); // moved away to "disable"
@@ -103,46 +103,46 @@ void Game::init(Window* window)
 	//testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject->setTexture(graphics.getTexturePointer("brickwall.tga"));
 	//testObject->setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-	this->testObject2 = new GameObject;
+	testObject2 = std::make_unique<GameObject>();
 	testObject2->mesh = graphics.getMeshPointer("Cube");
-	graphics.addToDraw(testObject2);
+	graphics.addToDraw(testObject2.get());
 	testObject2->setPosition(Vector3(7777.0f, 0.0f, 0.0f)); // moved away to "disable"
 	testObject2->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
 	
-	this->testObject3 = new GameObject;
+	testObject3 = std::make_unique<GameObject>();
 	testObject3->mesh = graphics.getMeshPointer("Cube");
-	graphics.addToDraw(testObject3);
+	graphics.addToDraw(testObject3.get());
 	testObject3->setPosition(Vector3(7770.0f, -1.0f, 0.0f)); // moved away to "disable"
 	testObject3->setScale(Vector3(50.0, 1.0, 50.0));
 	testObject3->setTexture(graphics.getTexturePointer("brickwall.tga"));
 	testObject3->setColor(Vector4(2.0, 2.0, 2.0, 1.0));
 
-	aiObject = new AIPlayer();
+	aiObject = std::make_unique<AIPlayer>();
 	aiObject->mesh = graphics.getMeshPointer("Cube");
 	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	//aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
-	graphics.addToDraw(aiObject);
+	graphics.addToDraw(aiObject.get());
 	//AiTestObject = new GameObject;
 	//AiTestObject->mesh = graphics.getMeshPointer("Cube");
 	//AiTestObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
 	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
 	//graphics.addToDraw(AiTestObject);
 
-	parentTest = new GameObject;
+	parentTest = std::make_unique<GameObject>();
 	parentTest->mesh = graphics.getMeshPointer("Cube");
 	parentTest->setPosition(Vector3(-3.0f, 0.0f, 0.0f));
 	parentTest->setScale(Vector3(0.5f, 0.5f, 0.5f));
 	parentTest->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
-	graphics.addToDraw(parentTest);
+	graphics.addToDraw(parentTest.get());
 
-	childTest = new GameObject;
+	childTest = std::make_unique<GameObject>();
 	childTest->mesh = graphics.getMeshPointer("Cube");
 	childTest->setPosition(Vector3(-3.0f, 0.0f, 0.0f));
 	childTest->setColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));
-	childTest->parent = parentTest;
-	graphics.addToDraw(childTest);
+	childTest->parent = parentTest.get();
+	graphics.addToDraw(childTest.get());
 
 	// TODO reafctor out
 	graphics.loadModel("Road_pavement");
@@ -166,9 +166,9 @@ void Game::init(Window* window)
 	
 	for (int i = 0; i < 50; ++i)
 	{
-		Vector3 randPos = Vector3(rand() % 101 - 50, 0.01, rand() % 101 - 50);
+		Vector3 randPos = Vector3(rand() % 101 - 50, 0.01f, rand() % 101 - 50);
 		Vector3 randColor = Vector3(rand(), rand(), rand()) / RAND_MAX;
-		randColor.Clamp(Vector3(0.2, 0.2, 0.2), Vector3(1.0, 1.0, 1.0));
+		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
 		lightList.addLight(
 			PointLight(
@@ -177,7 +177,7 @@ void Game::init(Window* window)
 				15.0f));
 	}
 #endif
-	lightList.setSun(Sun(Vector3(0.0, -1.0, 1.0), Vector3(1.0, 0.8, 0.6)));
+	lightList.setSun(Sun(Vector3(0.0f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
 	graphics.setLightList(&lightList);
 
 	player.init();
@@ -325,10 +325,5 @@ void Game::run()
 		prevTime = curTime;
 	}
 	// TODO: RAII
-	delete this->testObject;
-	delete this->testObject2;
-	delete this->testObject3;
-	delete this->aiObject;
-	delete this->parentTest;
-	delete this->childTest;
+	delete this->testNetwork;
 }
