@@ -2,29 +2,32 @@
 #define USER_INTERFACE_H
 
 #include <SpriteBatch.h>
+#include <SpriteFont.h>
+#include <CommonStates.h>
 #include "Element.h"
 
 class UserInterface
 {
-protected:
-	static SpriteBatch* getSpriteBatch();
 private:
+	static std::unique_ptr<CommonStates> commonStates;
 	static std::unique_ptr<SpriteBatch> spriteBatch;
+	static std::unique_ptr<SpriteFont> fontArial;
 public:
-	static void initSpriteBatch();
+	static CommonStates* getCommonStates();
+	static SpriteBatch* getSpriteBatch();
+	static SpriteFont* getFontArial();
+	static void init();
 
 protected:
-	void setElements(Element** elements, int nrOfElements);
+	virtual void updateUI(float deltaTime) = 0;
+	virtual void drawUI() = 0;
 private:
 	void resetShaders();
-
-	Element** elements;
-	int nrOfElements;
 public:
 	UserInterface();
 	virtual ~UserInterface();
 
-	virtual void init() = 0;
+	virtual void initUI() = 0;
 	void update(float deltaTime);
 };
 

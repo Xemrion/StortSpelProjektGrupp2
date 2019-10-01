@@ -510,6 +510,11 @@ ID3D11DeviceContext* Graphics::getDeviceContext()
 	return this->deviceContext;
 }
 
+ID3D11Device* Graphics::getDevice()
+{
+	return this->device;
+}
+
 void Graphics::loadMesh(std::string fileName)
 {
 	Mesh newMesh;

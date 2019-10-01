@@ -9,16 +9,15 @@ using namespace DirectX::SimpleMath;
 
 class Element
 {
-private:
+protected:
 	Vector2 position;
-	Vector2 rotation;
+	float rotation;
 
 public:
-	Element(Vector2 position = Vector2(), Vector2 rotation = Vector2());
+	Element(Vector2 position = Vector2(), float rotation = 0.0f);
 	virtual ~Element();
 
-	virtual void update(float deltaTime);
-	virtual void draw();
+	virtual void draw() = 0;
 };
 
 #endif // !ELEMENT_H

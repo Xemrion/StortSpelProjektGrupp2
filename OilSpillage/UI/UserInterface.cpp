@@ -1,17 +1,30 @@
 #include "UserInterface.h"
 #include "..//game.h"
 
+std::unique_ptr<CommonStates> UserInterface::commonStates;
 std::unique_ptr<SpriteBatch> UserInterface::spriteBatch;
+std::unique_ptr<SpriteFont> UserInterface::fontArial;
 
-void UserInterface::initSpriteBatch()
+CommonStates* UserInterface::getCommonStates()
 {
-	UserInterface::spriteBatch = std::make_unique<SpriteBatch>(Game::getGraphics().getDeviceContext());
+	return UserInterface::commonStates.get();
 }
 
-void UserInterface::setElements(Element** elements, int nrOfElements)
+SpriteBatch* UserInterface::getSpriteBatch()
 {
-	this->elements = elements;
-	this->nrOfElements = nrOfElements;
+	return UserInterface::spriteBatch.get();
+}
+
+SpriteFont* UserInterface::getFontArial()
+{
+	return UserInterface::fontArial.get();
+}
+
+void UserInterface::init()
+{
+	UserInterface::commonStates = std::make_unique<CommonStates>(Game::getGraphics().getDevice());
+	UserInterface::spriteBatch = std::make_unique<SpriteBatch>(Game::getGraphics().getDeviceContext());
+	UserInterface::fontArial = std::make_unique<SpriteFont>(Game::getGraphics().getDevice(), L"arial.spritefont");
 }
 
 void UserInterface::resetShaders()
@@ -25,15 +38,8 @@ void UserInterface::resetShaders()
 	deviceContext->IASetInputLayout(nullptr);
 }
 
-SpriteBatch* UserInterface::getSpriteBatch()
-{
-	return UserInterface::spriteBatch.get();
-}
-
 UserInterface::UserInterface()
 {
-	this->elements = nullptr;
-	this->nrOfElements = 0;
 }
 
 UserInterface::~UserInterface()
@@ -42,21 +48,8 @@ UserInterface::~UserInterface()
 
 void UserInterface::update(float deltaTime)
 {
-	if (this->elements != nullptr)
-	{
-		for (int i = 0; i < this->nrOfElements; i++)
-		{
-			this->elements[i]->update(deltaTime);
-		}
+	this->updateUI(deltaTime);
 
-		this->resetShaders();
-		UserInterface::spriteBatch->Begin();
-
-		for (int i = 0; i < this->nrOfElements; i++)
-		{
-			this->elements[i]->draw();
-		}
-
-		UserInterface::spriteBatch->End();
-	}
+	//this->resetShaders();
+	this->drawUI();
 }

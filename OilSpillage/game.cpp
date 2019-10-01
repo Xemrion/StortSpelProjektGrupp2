@@ -85,8 +85,8 @@ void Game::init(Window* window)
 	this->window = window; 
 	graphics.init(window);
 	Sound::Init();
-	UserInterface::initSpriteBatch();
-	this->menu.init();
+	UserInterface::init();
+	this->menu.initUI();
 
 	this->mouse = std::make_unique<Mouse>();
 	this->mouse->SetWindow( window->handle );
@@ -225,7 +225,6 @@ void Game::run()
 
 		Input::Update();
 		Sound::Update(deltaTime);
-		this->menu.update(deltaTime);
 
 		auto mouse = this->mouse->GetState();
 		if (Input::CheckButton(Keys::CONFIRM,PRESSED,0))
@@ -268,6 +267,7 @@ void Game::run()
 
 		this->graphics.render(&this->camera);
 		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos, this->testObject2->getPosition(), Vector3(0, 1, 0));
+		this->menu.update(deltaTime);
 		
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
@@ -311,7 +311,6 @@ void Game::run()
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-		
 		this->graphics.presentScene();
 		
 		player.update(deltaTime);
