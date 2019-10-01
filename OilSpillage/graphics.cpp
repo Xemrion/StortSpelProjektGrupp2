@@ -348,8 +348,8 @@ void Graphics::render(Camera camera)
 	deviceContext->PSSetShader(this->shaderDebug.ps.GetShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDebug.vs.GetShader(), nullptr, 0);
 
-	debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
-	debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
+	//debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
+	//debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
 	//debugger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
 	
 	// Present the back buffer to the screen since rendering is complete.

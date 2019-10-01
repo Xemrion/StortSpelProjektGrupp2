@@ -66,13 +66,14 @@ void Game::init(Window* window)
 	//graphics.addToDraw(AiTestObject);
 
 	//Road network F: Forward, -: Turn Left, +: Turn Right, H: Half Forward
-	this->testNetwork = new RoadNetwork(654, Vector2(2, 2), Vector2(-2, -2), 15);
-	this->testNetwork->generateInitialSegments("FFFFFFH-FFFF-FFFFF+FFFFF-FFF+F-F-F-F-F-H-H-HF-FF-F-FF-FF-FF-F-FFF-FFF-FFH-FF++F+FF+F");
+	this->testNetwork = new RoadNetwork(654, Vector2(512, 512), Vector2(-512, -512), 15);
+	this->testNetwork->generateInitialSegments("FFF+FF+FF+FF-FF-FF-FF-FF-FFF-FFFF-FF-FF-FFF+FF+FF+FF+FF+FF+FFF");
 	this->testNetwork->setAngle(90);
-	this->testNetwork->generateAdditionalSegments("FFH-FFF+FFFH+FH", 4, true);
-	this->testNetwork->generateAdditionalSegments("HF+FFF-FFFFF+FH", 15, false);
-	this->testNetwork->setAngle(25);
-	this->testNetwork->generateAdditionalSegments("FFF+F-F-F-F-F-F-F-F-F-FFH+F+F+F+F+H+F+F+H++H++H++H++H++H++H++H", 20, false);
+	for (int i = 0; i < 11; i++) {
+		this->testNetwork->generateAdditionalSegments("FFF", (i + 2) * 2, false);
+		this->testNetwork->generateAdditionalSegments("FFF", (i + 3) * 3, false);
+		this->testNetwork->generateAdditionalSegments("FF-F+H+FF+H+F", (i + 3) * 3, true);
+	}
 	this->testNetwork->saveTestNetwork("test-net");
 	this->testNetwork->cleanRoadNetwork();
 	this->testNetwork->saveTestNetwork("test-net-cleaned");
