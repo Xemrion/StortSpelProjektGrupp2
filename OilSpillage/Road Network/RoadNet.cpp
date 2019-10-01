@@ -297,14 +297,14 @@ void RoadNetwork::cleanRoadNetwork()
 
 void RoadNetwork::drawRoadNetwork(Graphics* graph)
 {
-	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMin.x, 1.0f, this->roadNetworkMin.y), XMFLOAT3(this->roadNetworkMin.x, 1.0f, this->roadNetworkMax.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
-	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMin.x, 1.0f, this->roadNetworkMin.y), XMFLOAT3(this->roadNetworkMax.x, 1.0f, this->roadNetworkMin.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
-	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMin.x, 1.0f, this->roadNetworkMax.y), XMFLOAT3(this->roadNetworkMax.x, 1.0f, this->roadNetworkMax.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
-	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMax.x, 1.0f, this->roadNetworkMin.y), XMFLOAT3(this->roadNetworkMax.x, 1.0f, this->roadNetworkMax.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMin.x, 2.0f, this->roadNetworkMin.y), XMFLOAT3(this->roadNetworkMin.x, 2.0f, this->roadNetworkMax.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMin.x, 2.0f, this->roadNetworkMin.y), XMFLOAT3(this->roadNetworkMax.x, 2.0f, this->roadNetworkMin.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMin.x, 2.0f, this->roadNetworkMax.y), XMFLOAT3(this->roadNetworkMax.x, 2.0f, this->roadNetworkMax.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetworkMax.x, 2.0f, this->roadNetworkMin.y), XMFLOAT3(this->roadNetworkMax.x, 2.0f, this->roadNetworkMax.y), XMFLOAT3(0.0f, 1.0f, 0.0f));
 	
 	for (int i = 0; i < this->roadNetwork.size(); i++) {
-		graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetwork[i].firstPoint.x, 1.0f, this->roadNetwork[i].firstPoint.z),
-			XMFLOAT3(this->roadNetwork[i].secondPoint.x, 1.0f, this->roadNetwork[i].secondPoint.z),
+		graph->getdebugger()->DrawLine(XMFLOAT3(this->roadNetwork[i].firstPoint.x, 2.0f, this->roadNetwork[i].firstPoint.z),
+			XMFLOAT3(this->roadNetwork[i].secondPoint.x, 2.0f, this->roadNetwork[i].secondPoint.z),
 			XMFLOAT3(1.0f, 0.0f, 1.0f));
 	}
 }
