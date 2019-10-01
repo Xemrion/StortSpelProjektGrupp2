@@ -89,7 +89,7 @@ public:
 
    Void walk( U16 steps ) {
    // main loop:
-      while ( (tiles_walked != tiles_to_walk) and (steps-->0) ) {
+      while ( (tiles_walked != tiles_to_walk) and ( steps --> 0 ) ) {
          // potential branch:
          Bool  is_branch_eligible = ( args.cur_depth < args.max_depth-1 )
             and ( tiles_since_last_branch >= config::MIN_TILES_BEFORE_BRANCH );

@@ -31,21 +31,18 @@ void Game::generateMap() {
 		f1 << *map;
 		f1.close();
 	}
-   else {
-      assert(false);
-   }
 #endif
 
 	Walker generator {
 	  *map,      // the map to work on (mutate)
-		4,        // depth (max 4 for now; number of generations)
-		80,       // min length of a branch
-	   120,      // max length of a branch
-		0.5f,     // child length factor (e.g. 0.5 => the length will halve per generation)
-		4.0f,     // turn probability    (e.g. 0.75 = 0.75%)
-		2.f,      // child turn probability factor
-		12.0f,    // branch probability  (e.g. 0.75 = 0.75%)
-		0.75f,    // child branch probability factor
+		4,        // depth; number of generations     (max 4 for now)
+		80,       // min length of a branch           (number of tiles)
+	   120,      // max length of a branch           (number of tiles)
+		0.5f,     // child length factor              (e.g. 0.5 => the length will halve per generation)
+		4.0f,     // turn probability                 (e.g. 0.75 = 0.75%)
+		2.f,      // child turn probability factor    (multiplicative)
+		12.0f,    // branch probability               (e.g. 0.75 = 0.75%)
+		0.75f,    // child branch probability factor  (multiplicative)
 		420691    // seed
 	};
 
@@ -58,10 +55,7 @@ void Game::generateMap() {
 		f2 << *map;
 		f2.close();
 	}
-   else {
-      assert(false);
-   }
-   // TODO: remove when no longer needing for bugging
+   // TODO: remove when no longer needed for debugging
    Vec<Vector4>  rgba_tbl {
       { 0.0f, 0.0f, 0.0f, 1.0f },
       { 0.0f, 0.0f, 0.5f, 1.0f },
@@ -111,8 +105,8 @@ void Game::generateMap() {
    rng.seed(420690);
    auto voronoi = Voronoi( rng,
                            config::CELL_SIZE,
-                           map->height / config::CELL_SIZE,
                            map->width  / config::CELL_SIZE,
+                           map->height / config::CELL_SIZE,
                            Voronoi::ManhattanDistanceTag{} );
 
 #ifdef _DEBUG
@@ -130,16 +124,22 @@ void Game::generateMap() {
 #endif
 
 
-   for ( U16 x=0;  x < map->width;  ++x ) {
-      for ( U16 y=0;  y < map->height;  ++y ) {
+   for ( U16 y=0;  y < map->height;  ++y ) {
+      for ( U16 x=0;  x < map->width;  ++x ) {
          auto &tile = tiles[map->index(x,y)];
 		   graphics.addToDraw(&tile);
 #ifdef _DEBUG
          // colour code tiles depending on cell index:
-		   tile.setColor( rgba_tbl[voronoi.diagram[map->index(x,y)] % rgba_tbl.size()] );
+         assert( map->data.size() == voronoi.diagram.size() && "BUG!" );
+         auto        cell_idx = voronoi.diagram_index(x,y);
+         auto        cell_id  = voronoi.diagram[cell_idx];
+         auto const &color    = rgba_tbl[ cell_id % rgba_tbl.size()];
+		   tile.setColor( color );
 #endif
 		   //tile.setTexture(graphics.getTexturePointer("brickwall.tga")); // TODO remove
-		   tile.setScale(Vector3{ 0.01f,  0.01f, 0.01f }); // TODO: scale models instead
+		   tile.setScale( Vector3{ 0.0005f * config::TILE_SIDE_LENGTH,
+                                 0.0001f * config::TILE_SIDE_LENGTH,
+                                 0.0005f * config::TILE_SIDE_LENGTH }); // TODO: scale models instead
       }
 	}
 }

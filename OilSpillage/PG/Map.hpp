@@ -87,9 +87,9 @@ public:
 	}
 
 	inline Vector3 tile_xy_to_world_pos(U16 const x, U16 const y) const {
-		static auto const x_offset = width  / 2.0f * config::SIDE_LENGTH,
-			               y_offset = height / 2.0f * config::SIDE_LENGTH;
-		return { x * config::SIDE_LENGTH - x_offset,  .0f,  y * -config::SIDE_LENGTH + y_offset };
+		static auto const x_offset = width  / 2.0f * config::TILE_SIDE_LENGTH,
+			               y_offset = height / 2.0f * config::TILE_SIDE_LENGTH;
+		return { x * config::TILE_SIDE_LENGTH - x_offset,  .0f,  y * -config::TILE_SIDE_LENGTH + y_offset };
 	}
 };
 
