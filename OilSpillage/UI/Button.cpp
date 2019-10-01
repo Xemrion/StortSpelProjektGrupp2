@@ -2,7 +2,7 @@
 #include "UserInterface.h"
 #include "..//game.h"
 
-Vector2 Button::size = Vector2(512, 128);
+Vector2 Button::size = Vector2(256, 64);
 
 Button::Button(Text text, Vector2 position) : Element(position, 0.0f), text(text)
 {
@@ -14,9 +14,9 @@ Button::~Button()
 {
 }
 
-void Button::draw()
+void Button::draw(bool selected)
 {
-	UserInterface::getSpriteBatch()->Draw(this->texture->getShaderResView(), this->position, nullptr, DirectX::Colors::White, this->rotation);
+	UserInterface::getSpriteBatch()->Draw(this->texture->getShaderResView(), this->position, nullptr, selected ? Colors::Gray : Colors::White);
 
 	Vector2 textSize(UserInterface::getFontArial()->MeasureString(this->text.text.c_str()) * 0.4f);
 	Vector2 pos(this->position);

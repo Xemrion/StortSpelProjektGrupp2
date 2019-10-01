@@ -13,11 +13,22 @@ protected:
 	Vector2 position;
 	float rotation;
 
+	Element* left;
+	Element* right;
+	Element* up;
+	Element* down;
 public:
 	Element(Vector2 position = Vector2(), float rotation = 0.0f);
 	virtual ~Element();
 
-	virtual void draw() = 0;
+	virtual void draw(bool selected) = 0;
+
+	void setNeighbours(Element* left, Element* right, Element* up, Element* down);
+
+	Element* getLeft() const;
+	Element* getRight() const;
+	Element* getUp() const;
+	Element* getDown() const;
 };
 
 #endif // !ELEMENT_H

@@ -1,6 +1,9 @@
 #ifndef USER_INTERFACE_H
 #define USER_INTERFACE_H
 
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
+
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
 #include <CommonStates.h>
@@ -19,10 +22,11 @@ public:
 	static void init();
 
 protected:
+	Element* changeSelected(Element* selected) const;
 	virtual void updateUI(float deltaTime) = 0;
 	virtual void drawUI() = 0;
 private:
-	void resetShaders();
+	void resetShaders() const;
 public:
 	UserInterface();
 	virtual ~UserInterface();

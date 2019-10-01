@@ -29,16 +29,15 @@ struct Text
 class Button : public Element
 {
 private:
-	static Vector2 size;
 	Texture* texture;
-
 	Text text;
-
 public:
+	static Vector2 size;
+
 	Button(Text text, Vector2 position = Vector2());
 	virtual ~Button();
 
-	virtual void draw();
+	virtual void draw(bool selected);
 };
 
 #endif // !BUTTON_H

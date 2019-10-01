@@ -1,5 +1,6 @@
 #include "UserInterface.h"
 #include "..//game.h"
+#include "..//Input.h"
 
 std::unique_ptr<CommonStates> UserInterface::commonStates;
 std::unique_ptr<SpriteBatch> UserInterface::spriteBatch;
@@ -27,7 +28,44 @@ void UserInterface::init()
 	UserInterface::fontArial = std::make_unique<SpriteFont>(Game::getGraphics().getDevice(), L"arial.spritefont");
 }
 
-void UserInterface::resetShaders()
+Element* UserInterface::changeSelected(Element* selected) const
+{
+	if (Input::CheckButton(L_DOWN, PRESSED, 0))
+	{
+		if (selected->getDown() != nullptr)
+		{
+			selected = selected->getDown();
+		}
+	}
+
+	if (Input::CheckButton(L_UP, PRESSED, 0))
+	{
+		if (selected->getUp() != nullptr)
+		{
+			selected = selected->getUp();
+		}
+	}
+
+	if (Input::CheckButton(L_LEFT, PRESSED, 0))
+	{
+		if (selected->getLeft() != nullptr)
+		{
+			selected = selected->getLeft();
+		}
+	}
+
+	if (Input::CheckButton(L_RIGHT, PRESSED, 0))
+	{
+		if (selected->getRight() != nullptr)
+		{
+			selected = selected->getRight();
+		}
+	}
+
+	return selected;
+}
+
+void UserInterface::resetShaders() const
 {
 	ID3D11DeviceContext* deviceContext = Game::getGraphics().getDeviceContext();
 	deviceContext->VSSetShader(nullptr, nullptr, 0);
