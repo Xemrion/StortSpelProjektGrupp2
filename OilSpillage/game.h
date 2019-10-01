@@ -31,9 +31,8 @@ class Game {
 	UPtr<Map> map;
    Vec<GameObject> markers;
    Vec<GameObject> tiles;
-	Vec<GameObject> tiles;
 	//GameObject* AiTestObject = nullptr;
-	RoadNetwork* testNetwork = nullptr;
+   RoadNetwork* testNetwork = nullptr;
 
 	void addQuad(int x);
 

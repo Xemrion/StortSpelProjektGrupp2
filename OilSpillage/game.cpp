@@ -423,11 +423,5 @@ void Game::run()
 		prevTime = curTime;
 	}
 	// TODO: RAII
-	delete this->testObject;
-	delete this->testObject2;
-	delete this->testObject3;
-	delete this->aiObject;
 	delete this->testNetwork;
-	delete this->parentTest;
-	delete this->childTest;
 }
