@@ -1,12 +1,13 @@
 #pragma once
+
 #include "window.h"
 #include "graphics.h"
-#include"Keyboard.h"
-#include"Mouse.h"
-#include"ImGui/imgui.h"
+#include "Keyboard.h"
+#include "Mouse.h"
+#include "ImGui/imgui.h"
 //#include"ImGui/imgui_impl_win32.h"
 //#include"ImGui/imgui_impl_dx11.h"
-#include"vehicle.h"
+#include "vehicle.h"
 #include "AI/Actor.h"
 #include "DynamicCamera.h"
 #include "PG/Map.hpp"
@@ -14,47 +15,39 @@
 #include <array>
 
 class Game {
-	Window* window = nullptr;
-
+	Window*              window = nullptr;
 	UPtr<DirectX::Mouse> mouse;
-	static Graphics graphics;
-	UPtr<GameObject> testObject;
-	UPtr<GameObject> testObject2;
-	UPtr<GameObject> testObject3;
-	UPtr<GameObject> parentTest;
-	UPtr<GameObject> childTest;
-	UPtr<AIPlayer>   aiObject;
-	LightList lightList;
-	// AStar aStar; TODO
-	UPtr<Map> map;
-   Vec<GameObject> markers;
-   Vec<GameObject> tiles;
-	void addQuad(int x);
+	static Graphics      graphics;
+   UPtr<Map>            map;
+	UPtr<GameObject>     testObject;
+	UPtr<GameObject>     testObject2;
+	UPtr<GameObject>     testObject3;
+	UPtr<GameObject>     parentTest;
+	UPtr<GameObject>     childTest;
+	UPtr<AIPlayer>       aiObject;
+   Vec<GameObject>      markers;
+   Vec<GameObject>      tiles;
+   LightList            lightList;
+   Vehicle              player;
+	DynamicCamera        camera;
+	F32                  deltaTime     = 0.0f;
+	I64                  curTime       = 0;
+	I64                  prevTime      = 0;
+	I64                  countsPerSec  = 0;
+	F32                  secPerCount   = 1.0f / countsPerSec;
+	I32                  RadioButtonValue;
+	Arr<SpotLight, LightList::maxSize>::iterator playerLight;
+   // AStar aStar; TODO
+	// TestAI AI;
 
-	float deltaTime = 0.0f;
-	__int64 curTime = 0;
-	__int64 prevTime = 0;
-	__int64 countsPerSec = 0;
-	float secPerCount = 1.0f / countsPerSec;
-	
-	Vehicle player;
-	DynamicCamera camera;
-	//TestAI AI;
-
-	int RadioButtonValue;
-	std::array<SpotLight, LightList::maxSize>::iterator playerLight;
-
+   void addQuad(int x);
 	void generateMap();
 	void initiateAStar();
 
 public:
 	Game();
 	~Game();
-	void init(Window* window);
+	void init(Window*);
 	void run();
-	static Graphics& getGraphics()
-	{
-		return graphics;
-	};
-	
+	inline static Graphics& getGraphics() noexcept { return graphics; };
 };
