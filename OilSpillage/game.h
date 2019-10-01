@@ -43,35 +43,8 @@ class Game {
 	// TestAI AI;
 
    void addQuad(int x);
-	static Graphics graphics;
-	UPtr<GameObject> testObject;
-	UPtr<GameObject> testObject2;
-	UPtr<GameObject> testObject3;
-	UPtr<GameObject> parentTest;
-	UPtr<GameObject> childTest;
-	UPtr<AIPlayer>   aiObject;
-	LightList lightList;
-	// AStar aStar; TODO
-	UPtr<Map> map;
-   Vec<GameObject> markers;
-   Vec<GameObject> tiles;
-	//GameObject* AiTestObject = nullptr;
+
    RoadNetwork* testNetwork = nullptr;
-
-	void addQuad(int x);
-
-	float deltaTime = 0.0f;
-	__int64 curTime = 0;
-	__int64 prevTime = 0;
-	__int64 countsPerSec = 0;
-	float secPerCount = 1.0f / countsPerSec;
-	
-	Vehicle player;
-	DynamicCamera camera;
-	//TestAI AI;
-
-	int RadioButtonValue;
-	std::array<SpotLight, LightList::maxSize>::iterator playerLight;
 
 	void generateMap();
 	void initiateAStar();
