@@ -92,6 +92,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -129,7 +130,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AI\Actor.cpp" />
+    <ClCompile Include="AI\AStar.cpp" />
+    <ClCompile Include="AI\Boid.cpp" />
+    <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="graphics.cpp" />
@@ -142,8 +147,11 @@
     <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="Importer\importerClass.cpp" />
+    <ClCompile Include="lights.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="PG\Map.cpp" />
+    <ClCompile Include="PG\Voronoi.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="TestAI.cpp">
@@ -156,8 +164,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
+    <ClInclude Include="AI\AStar.h" />
+    <ClInclude Include="AI\Boid.h" />
+    <ClInclude Include="AI\Node.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="DynamicCamera.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="graphics.h" />
@@ -176,6 +188,14 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="PG\defs.hpp" />
+    <ClInclude Include="PG\Direction.hpp" />
+    <ClInclude Include="PG\Map.hpp" />
+    <ClInclude Include="PG\RandomSegments.hpp" />
+    <ClInclude Include="PG\Tile.hpp" />
+    <ClInclude Include="PG\utils.hpp" />
+    <ClInclude Include="PG\Voronoi.hpp" />
+    <ClInclude Include="PG\Walker.hpp" />
     <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Road Network\RoadNet.h" />
@@ -185,10 +205,21 @@
     </ClInclude>
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vehicle.h" />
+    <ClInclude Include="VehicleStats.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="ComputeLightCulling.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="DebugPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -207,6 +238,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="VertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
@@ -214,10 +246,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="ShaderDefines.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="brickwall.tga" />

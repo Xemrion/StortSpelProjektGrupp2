@@ -10,13 +10,26 @@
 #include "AI/Actor.h"
 #include "Road Network/RoadNet.h"
 
+#include "DynamicCamera.h"
+#include "PG/Map.hpp"
+#include "PG/defs.hpp"
+#include <array>
+
 class Game {
 	Window* window = nullptr;
 
 	std::unique_ptr<DirectX::Mouse> mouse;
 	static Graphics graphics;
-	GameObject* testObject = nullptr;
+	GameObject* testObject  = nullptr;
 	GameObject* testObject2 = nullptr;
+	GameObject* testObject3 = nullptr;
+	GameObject* parentTest = nullptr;
+	GameObject* childTest = nullptr;
+	AIPlayer* aiObject = nullptr;
+	LightList lightList;
+	// AStar aStar; TODO
+	UPtr<Map> map;
+	Vec<GameObject> tiles;
 	//GameObject* AiTestObject = nullptr;
 	AIPlayer * aiObject = nullptr;
 	RoadNetwork* testNetwork = nullptr;
@@ -30,8 +43,14 @@ class Game {
 	float secPerCount = 1.0f / countsPerSec;
 	
 	Vehicle player;
-	Camera camera;
+	DynamicCamera camera;
 	//TestAI AI;
+
+	int RadioButtonValue;
+	std::array<SpotLight, LightList::maxSize>::iterator playerLight;
+
+	void generateMap();
+	void initiateAStar();
 
 public:
 	Game();
