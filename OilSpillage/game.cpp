@@ -24,7 +24,7 @@ void Game::generateMap() {
 
 	// debug output
 #define NO_TERMINAL_COLORS // TODO: remove?
-#ifdef _DEBUG //Doff
+#ifdef _DEBUG 
 	std::ofstream f1("road_gen_debug_output_pregen.txt");
 	if (f1.is_open()) {
 		f1 << *map;
