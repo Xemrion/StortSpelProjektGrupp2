@@ -125,7 +125,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 		descDepth.Height = (UINT)this->window->height;
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
-		descDepth.Format = DXGI_FORMAT_R32_TYPELESS;//DXGI_FORMAT_D24_UNORM_S8_UINT; //DXGI_FORMAT_R32_TYPELESS;
+		descDepth.Format = DXGI_FORMAT_R24G8_TYPELESS;
 		descDepth.SampleDesc.Count = 4;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
@@ -136,11 +136,11 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC dsv_desc;
 		dsv_desc.Flags = 0;
-		dsv_desc.Format = DXGI_FORMAT_D32_FLOAT;
+		dsv_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		dsv_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
 		dsv_desc.Texture2D.MipSlice = 0;
 		D3D11_SHADER_RESOURCE_VIEW_DESC sr_desc;
-		sr_desc.Format = DXGI_FORMAT_R32_FLOAT;
+		sr_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
 		sr_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
 		sr_desc.Texture2D.MostDetailedMip = 0;
 		sr_desc.Texture2D.MipLevels = 1;
@@ -288,7 +288,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
 		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
 	}*/
-	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
 
 	
@@ -458,12 +458,20 @@ bool Graphics::createShaders()
 
 void Graphics::addParticle(Vector3 pos, Vector3 initialDirection)
 {
-	Vector3 randomPos = 0.05f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos = 0.005f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
 	randomPos += pos;
 	Vector4 color;
 	float grey = float(rand()) / RAND_MAX;
 	color = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, 1.0f);
-	this->particleSystem.addParticle(1, 2, randomPos, initialDirection, color, 0.1f);
+	this->particleSystem.addParticle(2, 1, randomPos, initialDirection);
+}
+
+void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
+{
+	if (nrOfColors < 5)
+	{
+		this->particleSystem.changeColornSize(colors, nrOfColors, startSize, endSize);
+	}
 }
 
 void Graphics::loadMesh(std::string fileName,std::string meshName)
@@ -751,6 +759,6 @@ Vector3 Graphics::getSunVector()
 
 void Graphics::presentScene()
 {
-	swapChain->Present(0, 0);
+	swapChain->Present(1, 0);
 }
 

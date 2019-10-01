@@ -81,4 +81,5 @@ public:
 	void render(Camera camera, float deltaTime);
 	bool createShaders();
 	void addParticle(Vector3 pos, Vector3 initialDirection);
+	void setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 };

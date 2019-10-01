@@ -7,8 +7,8 @@ cbuffer CB_PER_FRAME : register(b0)
 
 cbuffer ParticleRenderParams : register(b1)
 {
-	float4 emitterLocation;//.w = lifeTime
-	float4 consumerLocation;//.x = deltaTime
+	float4 colors[4];
+	float4 config; //.x = nrOfColors, .y = startSize .z = endSize
 };
 
 static const float4 position[4] =
@@ -21,7 +21,7 @@ static const float4 position[4] =
 struct GSInput
 {
 	float4 pos : POSITION;
-	float time : TIME;
+	float2 time : TIME;
 	float4 color : COLOR;
 	uint ind : VAR;
 };
@@ -31,48 +31,70 @@ struct GSOutput
 	float4 color : COLOR;
 	float2 uv : UV;
 };
+float4 fadeOverTime(float4 startColor, float4 endColor, float time, float totTime)
+{
+	float4 fadedColor;
+	fadedColor.x = lerp(startColor.x, endColor.x, time / totTime);
+	fadedColor.y = lerp(startColor.y, endColor.y, time / totTime);
+	fadedColor.z = lerp(startColor.z, endColor.z, time / totTime);
+	fadedColor.w = lerp(startColor.w, endColor.w, time / totTime);
+	return fadedColor;
+
+};
 [maxvertexcount(3)]
 void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 {
 	GSOutput output;
 
-	float dist = saturate(length(input[0].pos - consumerLocation.xyz) / 100.0f);
+	float3 toCamera =  normalize(camPos.xyz - input[0].pos.xyz);
 
-	float4 color = float4(0.2f, 0.2f, 1.0f, 0.0f) * (dist)
-		+float4(1.0f, 0.2f, 0.2f, 0.0f) * (1.0f - dist);
-
-	float3 toCamera =  normalize(camPos.xyz - input[0].pos);
-
-	float3 right = cross(toCamera, upp);
+	float3 right = cross(toCamera, upp.xyz);
 	
 	float3 up = normalize(cross(right, toCamera));
 	float3 vert[4];
-
-	float size = input[0].pos.w;
-	//float3 color2=float3(0.0f, 0.0f, 1.0f);//blue
-	//float3 color3 = float3(0.0f, 1.0f, 0.0f);
-	//float3 deltaColor = (color2 - color1) / 10.0f;
-	//float3 particleColor = deltaColor*
-	//float timeLeft = 10.0f - input[0].time;
-	//float3 fadedColor = (color1 * (timeLeft / 10)) + (color2 * (input[0].time / 10)) + (color3 * (timeLeft / 10));
+	float2 timeC = input[0].time;
+	float size;
+	size = lerp(config.y, config.z, timeC.x / (timeC.y));
+	float tempSize = lerp(config.y, config.z, (timeC.y * 0.7f) / timeC.y);
+	if (timeC.x >= timeC.y * 0.5f)
+	{
+		size = lerp(tempSize, 0.0f, timeC.x / (timeC.y));
+	}
+	
+	float nrOfColors = config.x;
+	float4 testColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
+	float halfTime = timeC.y / (nrOfColors-1);
+	if (timeC.x < halfTime)
+	{
+		testColor = fadeOverTime(colors[0], colors[1], timeC.x, halfTime);
+	}
+	else if (timeC.x < halfTime * 2)
+	{
+		testColor = fadeOverTime(colors[1], colors[2], timeC.x % halfTime, halfTime);
+	}
+	else if(timeC.x  < halfTime * 3)
+	{
+		testColor = fadeOverTime(colors[2], colors[3], timeC.x % halfTime, halfTime);
+	}
 	
 	//vert[0] = input[0].pos - right *size + up * size; // Top middle
 	//vert[1] = input[0].pos + right *size + up * size; // Top right
 	//vert[3] = input[0].pos + right *size - up * size; // Bottom right
 	//vert[2] = input[0].pos - right *size - up * size; // Top right 
-
+	float3 testUp = up;//float3(0, 0, 1);
+	float3 testRight = right;//float3(1, 0, 0);
 	//Change every frame between up-pointy triangle and down-pointy triangle
 	if (upp.w>0.9f)
 	{
-		vert[0] = input[0].pos + up * size; // Top middle
-		vert[1] = input[0].pos + right * size - up * size; // Top right
-		vert[2] = input[0].pos - right * size - up * size; // Top right 
-	}
-	else
-	{
-		vert[0] = input[0].pos - right * size + up * 0.50f * size; // Top middle
-		vert[1] = input[0].pos + right * size + up * size*0.50f; // Top right
-		vert[2] = input[0].pos - up * 1.50f *size; // Top right 
+		vert[0] = input[0].pos.xyz + testUp * size; // Top middle
+		vert[1] = input[0].pos.xyz + testRight * size - testUp * size; // Top right
+		vert[2] = input[0].pos.xyz - testRight * size - testUp * size; // Top right 
+	}						  
+	else					  
+	{						 
+		vert[0] = input[0].pos.xyz - testRight * size + testUp * 0.50f * size; // Top middle
+		vert[1] = input[0].pos.xyz + testRight * size + testUp * size*0.50f; // Top right
+		vert[2] = input[0].pos.xyz - testUp * 1.50f *size; // Top right 
 	}
 	
 	float2 texCoord[4];
@@ -85,7 +107,7 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	{
 		output.pos = mul(float4(vert[i], 1.0f), viewProj);
 		output.uv = texCoord[i];
-		output.color = input[0].color;
+		output.color = testColor;
 		theOutput.Append(output);
 	}
 }

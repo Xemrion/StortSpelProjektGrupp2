@@ -7,6 +7,9 @@ ParticleSystem::ParticleSystem()
 	this->geometryShader = nullptr;
 	this->pixelShader = nullptr;
 	this->vertexShader = nullptr;
+	//default
+	colorNSize.colors[0] = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	colorNSize.config = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
 }
 
@@ -183,7 +186,7 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 
 }
 
-bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vector3 initialDirection, Vector4 color, float size)
+bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vector3 initialDirection)
 {
 	UINT initialCount;
 	if (firstAdd == 0)
@@ -197,8 +200,8 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	}
 	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f);
 	pParams.emitterLocation = Vector4(position.x,position.y,position.z, lifeTime);
-	pParams.randomVector = 0.5f*Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX,1.0f);
-	pParams.color = color;
+	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX,1.0f);
+	pParams.color = Vector4(1, 1, 1, 1);
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &pParams, sizeof(ParticleParams));
@@ -266,7 +269,6 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 		deviceContext->CSSetUnorderedAccessViews(1, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
 	}
 	this->deviceContext->CSSetSamplers(0, 1, this->sampler.GetAddressOf());
-	this->deviceContext->CSSetShaderResources(0, 1, &this->depthSRV);
 	this->deviceContext->CSSetConstantBuffers(2, 1, this->collisionViewProj.GetAddressOf());
 	this->deviceContext->CSSetConstantBuffers(1, 1, this->nrOfParticlesCB.GetAddressOf());
 	this->deviceContext->CSSetConstantBuffers(0, 1, this->simParams.GetAddressOf());
@@ -274,13 +276,23 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 	this->deviceContext->Dispatch(50, 1, 1);
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
 	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
-	this->deviceContext->CSSetShaderResources(0, 1, &nSRV);
 
 	this->deviceContext->CSSetConstantBuffers(2, 1, &nB);
 	this->deviceContext->CSSetConstantBuffers(1, 1, &nB);
 	this->deviceContext->CSSetConstantBuffers(0, 1, &nB);
 
 
+}
+
+void ParticleSystem::changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		colorNSize.colors[i] = colors[i];
+	}
+	colorNSize.config.x = float(nrOfColors);
+	colorNSize.config.y = startSize;
+	colorNSize.config.z = endSize;
 }
 
 void ParticleSystem::drawAll(Camera camera)
@@ -298,12 +310,10 @@ void ParticleSystem::drawAll(Camera camera)
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
 
 
-	ParticleRenderParams prp;
-	prp.consumerLocation = Vector4(this->deltaTime, 0, 0, 0);
-	prp.emitterLocation = pParams.emitterLocation;
+	
 	D3D11_MAPPED_SUBRESOURCE mappedResource2;
 	hr = deviceContext->Map(particleParamRenderCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource2);
-	CopyMemory(mappedResource2.pData, &info, sizeof(ParticleRenderParams));
+	CopyMemory(mappedResource2.pData, &colorNSize, sizeof(ParticleRenderParams));
 	deviceContext->Unmap(particleParamRenderCB.Get(), 0);
 
 	UINT offset = 0;
@@ -346,7 +356,3 @@ void ParticleSystem::drawAll(Camera camera)
 	}
 }
 
-int ParticleSystem::findUnused()
-{
-	return 0;
-}

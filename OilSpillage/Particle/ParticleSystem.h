@@ -6,7 +6,7 @@
 using namespace DirectX::SimpleMath;
 struct Particle
 {
-	Vector3 position;
+	Vector4 position;
 	Vector4 direction;
 	Vector4 color;
 	Vector2 time;//time and totalTime
@@ -26,8 +26,8 @@ struct ParticleParams
 };
 struct ParticleRenderParams
 {
-	Vector4 emitterLocation;
-	Vector4 consumerLocation;
+	Vector4 colors[4];
+	Vector4 config;
 };
 struct SimulationParams
 {
@@ -48,8 +48,9 @@ public:
 	ParticleSystem();
 	~ParticleSystem();
 	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* depthSRV);
-	bool addParticle(int nrOf, int lifeTime, Vector3 position, Vector3 initialDirection, Vector4 color, float size);
+	bool addParticle(int nrOf, int lifeTime, Vector3 position, Vector3 initialDirection);
 	void updateParticles(float delta, Matrix viewProj);
+	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void drawAll(Camera camera);
 private:
 	const int capParticle = 50000;
@@ -61,6 +62,7 @@ private:
 	int firstAdd = 0;
 	float deltaTime = 0.0f;
 	IndirDraw indDraw;
+	ParticleRenderParams colorNSize;
 	//Particle* particles;
 	//ID3D11Buffer* particleBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
@@ -101,5 +103,4 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indArgsBuffer;//one will be the current
 
-	int findUnused();
 };

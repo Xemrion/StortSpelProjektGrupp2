@@ -1,6 +1,6 @@
 struct Particle
 {
-	float3 position;
+	float4 position;//.w = initialSize
 	float4 direction;//.w=size
 	float4 color;
 	float2 time;
@@ -16,7 +16,7 @@ struct VS_INPUT
 struct VS_OUT
 {
 	float4 pos : POSITION;
-	float time : TIME;
+	float2 time : TIME;
 	float4 color : COLOR;
 	uint ind : VAR;
 };

@@ -39,9 +39,9 @@ void Game::init(Window* window)
 	graphics.loadModel("Dummy_Roller_Melee", "Dummy_Player_Car");
 	this->testObject = new GameObject;
 	testObject->mesh = graphics.getMeshPointer("Quad");
-	//graphics.addToDraw(testObject);
+	graphics.addToDraw(testObject);
 	testObject->setPosition(Vector3(0.0f, 0.0f, 0.0f));
-	testObject->setScale(Vector3(0.2f, 0.2f, 0.2f));
+	testObject->setScale(Vector3(100.0f, 0.0f, 100.0f));
 	testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
 	testObject->setTexture(graphics.getTexturePointer("brickwall.tga"));
 	//testObject->setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -57,7 +57,7 @@ void Game::init(Window* window)
 	aiObject->mesh = graphics.getMeshPointer("Cube");
 	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
-	//graphics.addToDraw(aiObject);
+	graphics.addToDraw(aiObject);
 	//AiTestObject = new GameObject;
 	//AiTestObject->mesh = graphics.getMeshPointer("Cube");
 	//AiTestObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
@@ -73,6 +73,14 @@ void Game::init(Window* window)
 	graphics.setSunVector(Vector3(0.55f, 1.0f, 0.725f));
 
 	player.init();
+	Vector4 colorsP[4] =
+	{
+		Vector4(1.0f,1.0f,0.0f,1.0f),
+		Vector4(1.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.1f,0.1f,0.1f,0.5f)
+	};
+	this->graphics.setParticleColorNSize(colorsP, 4, 0.05f, 0.12f);
 }
 
 void Game::run()
@@ -112,14 +120,14 @@ void Game::run()
 			deltaTime /= 4;
 
 
-		if (Input::IsKeyDown_DEBUG(Keyboard::A))
+		/*if (Input::IsKeyDown_DEBUG(Keyboard::A))
 			this->testObject->addRotation(Vector3(0.00f, 0.01f * deltaTime * 200, 0.00f));
 		if(Input::IsKeyDown_DEBUG(Keyboard::D))
 			this->testObject->addRotation(Vector3(0.00f, -0.01f * deltaTime * 200, 0.00f));
 		if (Input::IsKeyDown_DEBUG(Keyboard::W))
 			this->testObject->addRotation(Vector3(0.01f * deltaTime * 200, 0.00f, 0.00f));
 		if (Input::IsKeyDown_DEBUG(Keyboard::S))
-			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
+			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));*/
 		
 		player.update(deltaTime);
 		this->camera.setPos(this->player.getVehicle()->getPosition() + Vector3(0, 10, 0));
@@ -129,8 +137,11 @@ void Game::run()
 		{
 			if (Input::IsKeyDown_DEBUG(Keyboard::C))
 			{
-				this->graphics.addParticle(this->player.getVehicle()->getPosition() + Vector3(0, 3, 0.5f), Vector3(0.0f, 0.0f, 1.0f));
+				this->graphics.addParticle(this->player.getVehicle()->getPosition() + Vector3(0, 1, 0.5f), Vector3(0.0f, 0.0f, 5.0f));
+				this->graphics.addParticle(this->player.getVehicle()->getPosition() + Vector3(0, 1, 0.3f), Vector3(0.0f, 0.0f, 7.0f));
 			}
+			this->graphics.addParticle(this->aiObject->getPosition() + Vector3(0, 1, 0.5f), Vector3(0.0f, 0.0f, 0.0f));
+
 			timerForParticle = 0;
 		}
 		this->graphics.render(this->camera, deltaTime);
