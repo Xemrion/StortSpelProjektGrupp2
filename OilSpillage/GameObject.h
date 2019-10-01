@@ -15,6 +15,7 @@ protected:
 	Texture* texture = nullptr;
 public:
 	const Mesh* mesh = nullptr;
+	GameObject* parent = nullptr;
 	
 	Matrix getTransform();
 
