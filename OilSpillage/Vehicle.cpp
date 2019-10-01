@@ -203,14 +203,14 @@ void Vehicle::update(float deltaTime)
 			}
 
 
-			if (vehicleRotation < targetRotation && !((abs(vehicleRotation - targetRotation)) < 0.2f)) {
+			if (vehicleRotation < targetRotation && !((abs(vehicleRotation - targetRotation)) < 0.3f)) {
 				if (abs(vehicleRotation - targetRotation) < 180) {
 					rotateAcceleration += 0.01f * 100 * deltaTime*5 * rotationSmoother;
 					if (rotateAcceleration > 1.9f * 200 * 0.04f * (rotationSmoother * 2)) {
 						rotateAcceleration = 1.9f * 200 * 0.04f * (rotationSmoother * 2);
 						
 					}
-					vehicle->addRotation(Vector3(0, (((/*(1.9f * 2 * 0.002f) +*/ rotateAcceleration * 1) / 1) * DirectX::XM_PI / 180)*deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+					vehicle->addRotation(Vector3(0, ((((1.9f * 2 * 0.02f) + rotateAcceleration * 1) / 2) * DirectX::XM_PI / 180)*deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
 				}
 				else {
 					rotateAcceleration += -0.01f * 100 * deltaTime*5 * rotationSmoother;
@@ -218,18 +218,18 @@ void Vehicle::update(float deltaTime)
 						rotateAcceleration = -1.9f * 200 * 0.04f * (rotationSmoother * 2);
 						
 					}
-					vehicle->addRotation(Vector3(0, (((/*(-1.9f * 2 * 0.002f) +*/ rotateAcceleration * 1 ) / 1)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+					vehicle->addRotation(Vector3(0, ((((-1.9f * 2 * 0.02f) + rotateAcceleration * 1 ) / 2)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
 				}
 			}
 
-			else if(!((abs(vehicleRotation - targetRotation)) < 0.2f)) {
+			else if(!((abs(vehicleRotation - targetRotation)) < 0.3f)) {
 				if (abs(vehicleRotation - targetRotation) < 180) {
 					rotateAcceleration += -0.01f * 100 * deltaTime*5 * rotationSmoother;
 					if (rotateAcceleration < -1.9f * 200 * 0.04f * (rotationSmoother * 2)) {
 						rotateAcceleration = -1.9f * 200 * 0.04f * (rotationSmoother * 2);
 						
 					}
-					vehicle->addRotation(Vector3(0, (((/*(-1.9f * 2 * 0.002f) +*/ rotateAcceleration * 1) / 1)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+					vehicle->addRotation(Vector3(0, ((((-1.9f * 2 * 0.02f) + rotateAcceleration * 1) / 2)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
 				}
 				else {
 					rotateAcceleration += 0.01f * 100 * deltaTime*5 * rotationSmoother;
@@ -237,7 +237,7 @@ void Vehicle::update(float deltaTime)
 						rotateAcceleration = 1.9f * 200 * 0.04f * (rotationSmoother * 2);
 						
 					}
-					vehicle->addRotation(Vector3(0, (((/*(1.9f * 2* 0.002f) +*/ rotateAcceleration * 1) / 1)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+					vehicle->addRotation(Vector3(0, ((((1.9f * 2* 0.02f) + rotateAcceleration * 1) / 2)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
 				}
 			}
 		}
