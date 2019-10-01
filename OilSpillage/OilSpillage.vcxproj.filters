@@ -233,6 +233,9 @@
     <ClInclude Include="PG\Voronoi.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PG\config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

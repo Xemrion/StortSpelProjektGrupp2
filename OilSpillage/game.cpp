@@ -1,6 +1,7 @@
 #include "game.h"
 #include "Input.h"
 #include "Sound.h"
+#include "PG/config.hpp"
 #include "PG/utils.hpp"
 #include "PG/Map.hpp"
 #include "PG/Walker.hpp"
@@ -36,16 +37,16 @@ void Game::generateMap() {
 #endif
 
 	Walker generator {
-		*map,                 // the map to work on (mutate)
-		4,                    // depth
-		80,                   // min length
-	   120,                  // max length
-		0.5f,                 // child length factor
-		5.0f,                 // turn probability
-		2.f,                  // child turn probability factor
-		12.0f,                // branch probability
-		0.75f,                // child branch probability factor
-		420697                // seed
+	  *map,      // the map to work on (mutate)
+		4,        // depth (max 4 for now; number of generations)
+		80,       // min length of a branch
+	   120,      // max length of a branch
+		0.5f,     // child length factor (e.g. 0.5 => the length will halve per generation)
+		4.0f,     // turn probability    (e.g. 0.75 = 0.75%)
+		2.f,      // child turn probability factor
+		12.0f,    // branch probability  (e.g. 0.75 = 0.75%)
+		0.75f,    // child branch probability factor
+		420691    // seed
 	};
 
 	generator.generate();
@@ -108,8 +109,11 @@ void Game::generateMap() {
    RD  rd;
    RNG rng( rd() );
    rng.seed(420690);
-   auto const CELL_SIZE = 32;
-   auto voronoi = Voronoi(rng, CELL_SIZE, map->height/CELL_SIZE, map->width/CELL_SIZE, Voronoi::ManhattanDistanceTag{} );
+   auto voronoi = Voronoi( rng,
+                           config::CELL_SIZE,
+                           map->height / config::CELL_SIZE,
+                           map->width  / config::CELL_SIZE,
+                           Voronoi::ManhattanDistanceTag{} );
 
 #ifdef _DEBUG
    // display noise centers:

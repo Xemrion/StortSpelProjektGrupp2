@@ -187,6 +187,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="PG\config.hpp" />
     <ClInclude Include="PG\defs.hpp" />
     <ClInclude Include="PG\Direction.hpp" />
     <ClInclude Include="PG\Map.hpp" />
