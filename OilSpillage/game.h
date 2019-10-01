@@ -16,18 +16,19 @@
 class Game {
 	Window* window = nullptr;
 
-	std::unique_ptr<DirectX::Mouse> mouse;
+	UPtr<DirectX::Mouse> mouse;
 	static Graphics graphics;
-	GameObject* testObject  = nullptr;
-	GameObject* testObject2 = nullptr;
-	GameObject* testObject3 = nullptr;
-	GameObject* parentTest = nullptr;
-	GameObject* childTest = nullptr;
-	AIPlayer* aiObject = nullptr;
+	UPtr<GameObject> testObject;
+	UPtr<GameObject> testObject2;
+	UPtr<GameObject> testObject3;
+	UPtr<GameObject> parentTest;
+	UPtr<GameObject> childTest;
+	UPtr<AIPlayer>   aiObject;
 	LightList lightList;
 	// AStar aStar; TODO
 	UPtr<Map> map;
-	Vec<GameObject> tiles;
+   Vec<GameObject> markers;
+   Vec<GameObject> tiles;
 	void addQuad(int x);
 
 	float deltaTime = 0.0f;
