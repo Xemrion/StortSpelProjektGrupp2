@@ -62,8 +62,8 @@ void AIPlayer::followPath(float dt)
 }
 AIPlayer::AIPlayer()
 {
-	aStar = new AStar(10, 7);
-	setPosition(DirectX::SimpleMath::Vector3(5, 0, 6));
+	aStar = new AStar(10, 7,DirectX::SimpleMath::Vector2(0,0));
+	setPosition(DirectX::SimpleMath::Vector3(5, 0, -6));
 	setTargetPos(DirectX::SimpleMath::Vector3());
 	state = AIState::chasing;
 	findPath();
