@@ -45,7 +45,7 @@ UIMainMenu::~UIMainMenu()
 {
 }
 
-void UIMainMenu::initUI()
+void UIMainMenu::init()
 {
 	this->buttonPlay = std::make_unique<Button>(Text("Play", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2.75f));
 	this->buttonOptions = std::make_unique<Button>(Text("Options", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 1.25f));

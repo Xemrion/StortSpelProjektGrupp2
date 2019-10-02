@@ -1,6 +1,7 @@
 #include "game.h"
 #include "Input.h"
 #include "Sound.h"
+#include "UI/UserInterface.h"
 #include "PG/config.hpp"
 #include "PG/Voronoi.hpp"
 #include "PG/Map.hpp"
@@ -164,8 +165,7 @@ void Game::init(Window* window)
 	this->window = window; 
 	graphics.init(window);
 	Sound::Init();
-	UserInterface::init();
-	this->menu.initUI();
+	UserInterface::initStaticVariables();
 
 	this->mouse = std::make_unique<Mouse>();
 	this->mouse->SetWindow( window->handle );
@@ -245,8 +245,8 @@ void Game::init(Window* window)
 	
 	for (int i = 0; i < 50; ++i)
 	{
-		Vector3 randPos   = Vector3( float(rand() % 101 - 50), .01f, float(rand() % 101 - 50));
-		Vector3 randColor = Vector3( float(rand()), float(rand()), float(rand() / RAND_MAX) );
+		Vector3 randPos   = Vector3(static_cast<float>(rand() % 101 - 50), .01f, static_cast<float>(rand() % 101 - 50));
+		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand() / RAND_MAX) );
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
 		lightList.addLight(
@@ -346,7 +346,6 @@ void Game::run()
 
 		this->graphics.render(&this->camera);
 		this->graphics.getdebugger()->DrawCube(this->testObject2->getTheAABB().maxPos, this->testObject2->getTheAABB().minPos, this->testObject2->getPosition(), Vector3(0, 1, 0));
-		//this->menu.update(deltaTime);
 		
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();

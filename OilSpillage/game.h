@@ -15,10 +15,8 @@
 #include "PG/Map.hpp"
 #include "PG/defs.hpp"
 #include <array>
-#include "UI/UIMainMenu.h"
 
 class Game {
-	UIMainMenu menu;
 	Window*              window = nullptr;
 	UPtr<DirectX::Mouse> mouse;
 	static Graphics      graphics;

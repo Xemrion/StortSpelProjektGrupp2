@@ -137,6 +137,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="DynamicCamera.cpp" />
+    <ClCompile Include="States\MenuGameState.cpp" />
+    <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="UI\Button.cpp" />
     <ClCompile Include="UI\CheckBox.cpp" />
     <ClCompile Include="UI\Element.cpp" />
@@ -175,6 +177,9 @@
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Boid.h" />
     <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="States\GameState.h" />
+    <ClInclude Include="States\MenuGameState.h" />
+    <ClInclude Include="States\PlayingGameState.h" />
     <ClInclude Include="UI\Button.h" />
     <ClInclude Include="Camera.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
