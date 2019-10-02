@@ -1,5 +1,7 @@
 #include "UIMainMenu.h"
 #include "..//Input.h"
+#include "..//game.h"
+#include "..//States/MenuGameState.h"
 
 void UIMainMenu::updateUI(float deltaTime)
 {
@@ -7,7 +9,15 @@ void UIMainMenu::updateUI(float deltaTime)
 
 	if (Input::CheckButton(CONFIRM, PRESSED, 0))
 	{
-		if (this->selected == this->checkBoxTest.get())
+		if (this->selected == this->buttonPlay.get())
+		{
+			Game::setState(State::STATE_PLAYING);
+		}
+		else if (this->selected == this->buttonOptions.get())
+		{
+			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(Menu::MENU_OPTIONS);
+		}
+		else if (this->selected == this->checkBoxTest.get())
 		{
 			this->checkBoxTest->setActivated(!this->checkBoxTest->isActivated());
 		}
@@ -45,7 +55,7 @@ UIMainMenu::~UIMainMenu()
 {
 }
 
-void UIMainMenu::initUI()
+void UIMainMenu::init()
 {
 	this->buttonPlay = std::make_unique<Button>(Text("Play", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2.75f));
 	this->buttonOptions = std::make_unique<Button>(Text("Options", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 1.25f));
