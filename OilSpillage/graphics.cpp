@@ -3,6 +3,7 @@
 #include"Importer/importerClass.h"
 #include<cstring>
 #include "ShaderDefines.hlsli"
+#include "UI/UserInterface.h"
 
 Graphics::Graphics()
 {
@@ -424,8 +425,8 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->PSSetShader(this->shaderDebug.ps.GetShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDebug.vs.GetShader(), nullptr, 0);
 
-	debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
-	debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
+	//debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
+	//debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
 	//debugger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
 	
 
@@ -502,6 +503,16 @@ bool Graphics::createShaders()
 	this->lightCullingShader.initialize(device, shaderfolder + L"ComputeLightCulling.cso");
 
 	return true;
+}
+
+ID3D11DeviceContext* Graphics::getDeviceContext()
+{
+	return this->deviceContext;
+}
+
+ID3D11Device* Graphics::getDevice()
+{
+	return this->device;
 }
 
 void Graphics::loadMesh(std::string fileName)

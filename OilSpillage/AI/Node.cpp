@@ -1,18 +1,26 @@
 #include "Node.h"
 
+void Node::reset()
+{
+	this->gCost = 0;
+	this->hCost = 0;
+	this->fCost = 0;
+	this->previousNode = nullptr;
+}
+
 void Node::SetGCost(int gCost)
 {
-	this->g_cost = gCost;
+	this->gCost = gCost;
 }
 
 void Node::SetHCost(int hCost)
 {
-	this->h_cost = hCost;
+	this->hCost = hCost;
 }
 
 void Node::SetFCost(int fCost)
 {
-	this->f_cost = fCost;
+	this->fCost = fCost;
 }
 
 void Node::SetXPos(int xPos)
@@ -27,17 +35,17 @@ void Node::SetYPos(int yPos)
 
 int Node::GetGCost()
 {
-	return this->g_cost;
+	return this->gCost;
 }
 
 int Node::GetHCost()
 {
-	return this->h_cost;
+	return this->hCost;
 }
 
 int Node::GetFCost()
 {
-	return this->f_cost;
+	return this->fCost;
 }
 
 DirectX::SimpleMath::Vector2 Node::GetPos()
@@ -47,14 +55,14 @@ DirectX::SimpleMath::Vector2 Node::GetPos()
 
 
 
-int Node::GetXPos()
+float Node::GetXPos()
 {
-	return this->Pos.x;
+	return float(this->Pos.x);
 }
 
-int Node::GetYPos()
+float Node::GetYPos()
 {
-	return this->Pos.y;
+	return float(this->Pos.y);
 }
 
 int Node::GetID()
@@ -100,9 +108,9 @@ void Node::SetPreviousNode(Node* node)
 Node::Node()
 {
 	this->ID = 0;
-	this->g_cost = 0;
-	this->h_cost = 0;
-	this->f_cost = 0;
+	this->gCost = 0;
+	this->hCost = 0;
+	this->fCost = 0;
 	this->Pos = DirectX::SimpleMath::Vector2(0, 0);
 	this->previousNode = nullptr;
 	this->traversable = true;

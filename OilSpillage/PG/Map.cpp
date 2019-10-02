@@ -36,13 +36,13 @@ Vec<GameObject> Map::load_as_models(Graphics& graphics) const {
 	for (U16 y = 0; y < height; ++y) {
 		for (U16 x = 0; x < width; ++x) {
 			auto const  tile_i = index(x, y);
-			auto       &tile = tiles[tile_i];
-			auto const  gfx_i = gfx_tbl_idx(x, y);
+			auto       &tile   = tiles[tile_i];
+			auto const  gfx_i  = gfx_tbl_idx(x, y);
 			auto const &[filename, rotation] = gfx_tbl[gfx_i];
-			tile.mesh = graphics.getMeshPointer(filename.c_str());
-			if (rotation != 0)
+			tile.mesh = graphics.getMeshPointer( filename.c_str() );
+			if ( rotation != 0 )
 				tile.setRotation({ 0.0f, float(rotation) * 3.1415926535f/180.0f, 0.0f });
-			tile.setPosition(tile_xy_to_world_pos(x,y));
+			tile.setPosition( tile_xy_to_world_pos(x,y) );
 		}
 	}
 	return tiles; // RVO/Copy Elision

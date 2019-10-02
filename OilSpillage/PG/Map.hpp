@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cassert>
 #include "defs.hpp"
+#include "config.hpp"
 #include "utils.hpp"
 #include "Tile.hpp"
 #include "Direction.hpp"
@@ -41,10 +42,10 @@ public:
 	// returns the proper look-up index for the tile @ x,y in the graphics table
 	inline Size gfx_tbl_idx(U16 x, U16 y) const noexcept {
 		return data[index(x, y)] == Tile::ground ? 0 : // else:
-		    ( (neighbour_is_road(Dir::north, x, y) ? cPow(2, 0) : 0)
-			+ (neighbour_is_road(Dir::east,  x, y) ? cPow(2, 1) : 0)
-			+ (neighbour_is_road(Dir::south, x, y) ? cPow(2, 2) : 0)
-			+ (neighbour_is_road(Dir::west,  x, y) ? cPow(2, 3) : 0) );
+		    ( (neighbour_is_road(Dir::north, x, y) ? cPow(2,0) : 0)
+			 + (neighbour_is_road(Dir::east,  x, y) ? cPow(2,1) : 0)
+			 + (neighbour_is_road(Dir::south, x, y) ? cPow(2,2) : 0)
+			 + (neighbour_is_road(Dir::west,  x, y) ? cPow(2,3) : 0) );
 	}
 
 	// Used with a cellular automata to beautify the terminal output.
@@ -62,13 +63,12 @@ public:
 	// returns the proper look-up index for the tile @ x,y in the graphics table
 	inline Size term_gfx_tbl_idx(U16 x, U16 y) const noexcept {
 		return data[index(x, y)] == Tile::ground ? 0 : // else:
-			  (neighbour_is_road(Dir::north, x, y) ? cPow(2, 0) : 0)
-			+ (neighbour_is_road(Dir::east,  x, y) ? cPow(2, 1) : 0)
-			+ (neighbour_is_road(Dir::south, x, y) ? cPow(2, 2) : 0)
-			+ (neighbour_is_road(Dir::west,  x, y) ? cPow(2, 3) : 0);
+			  (neighbour_is_road(Dir::north, x, y) ? cPow(2,0) : 0)
+			+ (neighbour_is_road(Dir::east,  x, y) ? cPow(2,1) : 0)
+			+ (neighbour_is_road(Dir::south, x, y) ? cPow(2,2) : 0)
+			+ (neighbour_is_road(Dir::west,  x, y) ? cPow(2,3) : 0);
 	}
 
-	static F32 constexpr SIDE_LENGTH = 20.0f; // TODO refactor
 	Vec<GameObject> load_as_models(Graphics& graphics) const;
 
 	// NOTE! pretends that all out-of-bounds tiles are roads
@@ -87,9 +87,9 @@ public:
 	}
 
 	inline Vector3 tile_xy_to_world_pos(U16 const x, U16 const y) const {
-		static auto const x_offset = width  / 2.0f * SIDE_LENGTH,
-			              y_offset = height / 2.0f * SIDE_LENGTH;
-		return { x * SIDE_LENGTH - x_offset,  .0f,  y * -SIDE_LENGTH + y_offset };
+		static auto const x_offset = width  / 2.0f * config::TILE_SIDE_LENGTH,
+			               y_offset = height / 2.0f * config::TILE_SIDE_LENGTH;
+		return { x * config::TILE_SIDE_LENGTH - x_offset,  .0f,  y * -config::TILE_SIDE_LENGTH + y_offset };
 	}
 };
 

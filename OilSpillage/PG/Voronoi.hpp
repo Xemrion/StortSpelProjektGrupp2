@@ -20,9 +20,16 @@ public:
 // Voronoi noise data member diagram
    Vec<Size>      diagram;
    Vec<V2f> const noise;
-private:
 	inline Size noise_index(   U16 x, U16 y ) const noexcept { return Size(y) * WIDTH + x; }
-   inline Size diagram_index( U16 x, U16 y ) const noexcept { return Size(y) * CELL_SIZE * WIDTH + x; }
-   Vec<V2f>    generate_noise( RNG &rng )    const noexcept;
+   inline Size diagram_index( U16 x, U16 y ) const noexcept { return Size(y) * WIDTH * U16(CELL_SIZE) + x; }
+ private:
+   Vec<V2f>    generate_noise( RNG &rng ) const noexcept;
    Void        generate_diagram( RNG &rng, std::function<F32(V2f const&, V2f const&)> const &distance_f ) noexcept;
 };
+
+
+// noise.size()    = WIDTH*HEIGHT
+// diagram.size()  = WIDTH*CELL_SIZE * HEIGHT*CELL_SIZE
+
+// noise[i]   // i = y * WIDTH + x;
+// diagram[i] // i = y * WIDTH*CELL_SIZE + x;
