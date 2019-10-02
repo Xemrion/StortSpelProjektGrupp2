@@ -8,16 +8,18 @@ class AStar
 private:
 	int getDistance(DirectX::SimpleMath::Vector2 pos1, DirectX::SimpleMath::Vector2 pos2);
 	void addToVector(std::vector<Node*>& nodes, Node* nodeToAdd);
-	bool isInVector(std::vector<Node*> closed, Node* node);
+	bool isInVector(std::vector<Node*> vector, Node* node);
+	void debugNodes(std::vector<Node*> nodes);
 	Node* getNode(DirectX::SimpleMath::Vector3 position);
 	std::vector<Node*> reconstructPath(Node* goal);
 	std::vector<Node*> nodes;
 	int gridWidth;
 	int gridHeight;
 public:
+	void resetNodes();
 	std::vector<Node*> algorithm(DirectX::SimpleMath::Vector3 startPos, DirectX::SimpleMath::Vector3 endPos);
 	AStar();
 	~AStar();
-	AStar(int gridWidth, int gridHeight);
+	AStar(int gridWidth, int gridHeight, DirectX::SimpleMath::Vector2 topLeftCoord);
 
 };

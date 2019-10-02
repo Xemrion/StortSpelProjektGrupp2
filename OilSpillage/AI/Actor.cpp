@@ -20,6 +20,24 @@ void AIPlayer::Update(float dt)
 		nrOfFrames = 0;
 	}
 	followPath(dt);
+	if (path.size() == 0)
+	{
+		if (counter == 0)
+		{
+			setTargetPos(Vector3(9, 0, -9));
+		}
+		if (counter == 1)
+		{
+			setTargetPos(Vector3(-9, 0, -9));
+		}
+		if (counter == 2)
+		{
+			setTargetPos(Vector3(0, 0, 0));
+		}
+		findPath();
+		counter++;
+
+	}
 }
 
 void AIPlayer::setTargetPos(Vector3 targetPos)
@@ -60,16 +78,16 @@ void AIPlayer::followPath(float dt)
 }
 AIPlayer::AIPlayer()
 {
-	aStar = new AStar(10, 7);
-	setPosition(DirectX::SimpleMath::Vector3(5, 0, 6));
-	setTargetPos(DirectX::SimpleMath::Vector3());
+	aStar = new AStar(20, 20,DirectX::SimpleMath::Vector2(-10,10));
+	setPosition(DirectX::SimpleMath::Vector3(-10, 0, 10));
+	setTargetPos(DirectX::SimpleMath::Vector3(9,0,9));
 	state = AIState::chasing;
 	findPath();
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			boids.push_back(new Boid(i, j));
+			//boids.push_back(new Boid(i, j));
 		}
 
 	}

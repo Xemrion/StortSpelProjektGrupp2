@@ -1,8 +1,17 @@
 #include "AStar.h"
 
 
+void AStar::resetNodes()
+{
+	for (int i = 0; i < nodes.size(); i++)
+	{
+		nodes.at(i)->reset();
+	}
+}
+
 std::vector<Node*> AStar::algorithm(DirectX::SimpleMath::Vector3 startPos, DirectX::SimpleMath::Vector3 endPos)
 {
+	resetNodes();
 	Node* start = getNode(startPos);
 	Node* goal = getNode(endPos);
 	std::vector<Node*> open;
@@ -26,17 +35,21 @@ std::vector<Node*> AStar::algorithm(DirectX::SimpleMath::Vector3 startPos, Direc
 			if (neighbour->IsTraversable() && !isInVector(closed, neighbour))
 			{
 				//Calculate new path
-				int newFCost = getDistance(neighbour->GetPos(), goal->GetPos()) + getDistance(neighbour->GetPos(), start->GetPos());
+				int newGCost = current->GetGCost() + getDistance(neighbour->GetPos(), current->GetPos());
+				int newHCost = getDistance(neighbour->GetPos(), goal->GetPos());
+				int newFCost = newHCost + newGCost;
 
 				if (!isInVector(open, neighbour) || newFCost < neighbour->GetFCost())
 				{
 					//G and H For debugging
-					neighbour->SetGCost(getDistance(neighbour->GetPos(), start->GetPos()));
-					neighbour->SetHCost(getDistance(neighbour->GetPos(), goal->GetPos()));
-					neighbour->SetFCost(neighbour->GetGCost() + neighbour->GetHCost());
+					neighbour->SetGCost(newGCost);
+					neighbour->SetHCost(newHCost);
+					neighbour->SetFCost(newFCost);
 					neighbour->SetPreviousNode(current);
 					if (!isInVector(open, neighbour))
+					{
 						addToVector(open, neighbour);
+					}
 
 				}
 			}
@@ -74,7 +87,7 @@ AStar::~AStar()
 	nodes.clear();
 
 }
-AStar::AStar(int gridWidth, int gridHeight)
+AStar::AStar(int gridWidth, int gridHeight, DirectX::SimpleMath::Vector2 topLeftCoord)
 {
 	//Create grid
 	this->gridWidth = gridWidth;
@@ -83,8 +96,8 @@ AStar::AStar(int gridWidth, int gridHeight)
 	{
 		Node* temp = new Node();
 		temp->SetID(i);
-		temp->SetXPos(i % gridWidth);
-		temp->SetYPos(i / gridWidth);
+		temp->SetXPos(topLeftCoord.x + i % gridWidth);
+		temp->SetYPos(topLeftCoord.y - i / gridWidth);
 		nodes.push_back(temp);
 	}
 	for (int i = 0; i < gridWidth * gridHeight; i++)
@@ -98,7 +111,7 @@ AStar::AStar(int gridWidth, int gridHeight)
 			if (i - gridWidth > 0)
 				nodes.at(i)->AddNeighbour(nodes.at(i - gridWidth - 1)); //Upper left
 		}
-		if (i - gridWidth > 0)
+		if (i - gridWidth >= 0)
 		{
 			nodes.at(i)->AddNeighbour(nodes.at(i - gridWidth)); //Upper mid
 			if (i % gridWidth != gridWidth - 1)
@@ -110,13 +123,16 @@ AStar::AStar(int gridWidth, int gridHeight)
 			if (i + gridWidth < gridWidth * gridHeight)
 			{
 				nodes.at(i)->AddNeighbour(nodes.at(i + gridWidth + 1)); //Lower right
-				nodes.at(i)->AddNeighbour(nodes.at(i + gridWidth)); //Lower mid
 			}
+		}
+		if (i + gridWidth < gridWidth * gridHeight)
+		{
+			nodes.at(i)->AddNeighbour(nodes.at(i + gridWidth)); //Lower mid
 		}
 
 	}
+	debugNodes(nodes);
 
-	
 }
 int AStar::getDistance(DirectX::SimpleMath::Vector2 pos1, DirectX::SimpleMath::Vector2 pos2)
 {
@@ -146,6 +162,17 @@ bool AStar::isInVector(std::vector<Node*> vector, Node* node)
 			return true;
 	}
 	return false;
+}
+
+void AStar::debugNodes(std::vector<Node*> nodes)
+{
+	for (int i = 0; i < nodes.size(); i++)
+	{
+		if (nodes.at(i)->GetNeighbours().size() > 8 || nodes.at(i)->GetNeighbours().size() < 3)
+		{
+			int aa = 0;
+		}
+	}
 }
 
 std::vector<Node*> AStar::reconstructPath(Node* goal)
