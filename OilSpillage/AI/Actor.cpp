@@ -107,6 +107,7 @@ AIPlayer::AIPlayer()
 
 AIPlayer::~AIPlayer()
 {
+	delete aStar;
 	for (int i = 0; i < boids.size(); i++)
 	{
 		delete boids.at(i);
