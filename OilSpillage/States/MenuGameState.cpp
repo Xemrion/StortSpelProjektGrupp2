@@ -1,6 +1,6 @@
 #include "MenuGameState.h"
 
-MenuGameState::MenuGameState()
+MenuGameState::MenuGameState() : graphics(Game::getGraphics())
 {
 }
 
@@ -16,10 +16,11 @@ void MenuGameState::init()
 
 void MenuGameState::cleanUp()
 {
-	this->mainMenu.release();
+	this->mainMenu.reset();
 }
 
 void MenuGameState::update(float deltaTime)
 {
 	this->mainMenu->update(deltaTime);
+	this->graphics.presentScene();
 }

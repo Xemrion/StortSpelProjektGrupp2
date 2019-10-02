@@ -9,7 +9,6 @@
 #include "../Road Network/RoadNet.h"
 #include "../DynamicCamera.h"
 #include "../PG/Map.hpp"
-#include "../PG/defs.hpp"
 #include <array>
 
 class PlayingGameState : public GameState

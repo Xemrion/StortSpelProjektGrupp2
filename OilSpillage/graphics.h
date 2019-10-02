@@ -83,6 +83,7 @@ public:
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
+	void clearDraw();
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera);

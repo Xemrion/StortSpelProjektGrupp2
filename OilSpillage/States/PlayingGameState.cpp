@@ -146,6 +146,11 @@ PlayingGameState::~PlayingGameState()
 
 void PlayingGameState::init()
 {
+	this->lightList = std::make_unique<LightList>();
+	this->player = std::make_unique<Vehicle>();
+	this->camera = std::make_unique<DynamicCamera>();
+	//this->testNetwork = std::make_unique<RoadNetwork>();
+
 	this->graphics.loadMesh("sda");
 	this->graphics.loadShape(SHAPE_CUBE);
 	this->graphics.loadTexture("brickwall.tga");
@@ -207,17 +212,23 @@ void PlayingGameState::init()
 	Input::SetKeyboardPlayerID(0);
 }
 
+template <typename T>
+void delete_pointed_to(T* const ptr)
+{
+	delete ptr;
+}
+
 void PlayingGameState::cleanUp()
 {
-	this->map.release();
-	this->aiObject.release();
+	this->map.reset();
+	this->aiObject.reset();
 	this->markers.clear();
 	this->tiles.clear();
-	this->lightList.release();
-	this->player.release();
-	this->camera.release();
+	this->lightList.reset();
+	this->player.reset();
+	this->camera.reset();
 	this->points.clear();
-	this->testNetwork.release();
+	this->testNetwork.reset();
 }
 
 void PlayingGameState::update(float deltaTime)

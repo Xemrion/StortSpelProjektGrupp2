@@ -773,6 +773,11 @@ void Graphics::removeFromDraw(GameObject* o)
 	}
 }
 
+void Graphics::clearDraw()
+{
+	drawableObjects.clear();
+}
+
 void Graphics::setLightList(LightList* lightList)
 {
 	this->lightList = lightList;

@@ -1,5 +1,6 @@
 #include "UIMainMenu.h"
 #include "..//Input.h"
+#include "..//game.h"
 
 void UIMainMenu::updateUI(float deltaTime)
 {
@@ -7,7 +8,11 @@ void UIMainMenu::updateUI(float deltaTime)
 
 	if (Input::CheckButton(CONFIRM, PRESSED, 0))
 	{
-		if (this->selected == this->checkBoxTest.get())
+		if (this->selected == this->buttonPlay.get())
+		{
+			Game::setState(State::STATE_PLAYING);
+		}
+		else if (this->selected == this->checkBoxTest.get())
 		{
 			this->checkBoxTest->setActivated(!this->checkBoxTest->isActivated());
 		}
