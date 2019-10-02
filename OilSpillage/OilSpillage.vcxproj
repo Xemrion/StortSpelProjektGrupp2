@@ -191,6 +191,8 @@
     <ClInclude Include="PG\Direction.hpp" />
     <ClInclude Include="PG\Map.hpp" />
     <ClInclude Include="PG\RandomSegments.hpp" />
+    <ClInclude Include="PG\Skyscraper.h" />
+    <ClInclude Include="PG\SkyscraperFloor.h" />
     <ClInclude Include="PG\Tile.hpp" />
     <ClInclude Include="PG\utils.hpp" />
     <ClInclude Include="PG\Voronoi.hpp" />
