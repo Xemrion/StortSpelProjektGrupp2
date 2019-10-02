@@ -26,7 +26,7 @@ RoadNetwork::RoadNetwork(int randNr, Vector2 max, Vector2 min, float rotation)
 	else {
 		toMin = true;
 	}
-	Vector2 possibleStart = roadNetworkMin + (partway * rand);
+	Vector2 possibleStart = roadNetworkMin + (partway * float(rand));
 	if (xOrZ == 0) { //move start to x value
 		if (toMin) {
 			possibleStart.x = this->roadNetworkMin.x;
@@ -81,7 +81,7 @@ void RoadNetwork::setAngle(float angle)
 
 float RoadNetwork::getAngle() const
 {
-	return (this->rotationAngle)/(180/(22/7));
+	return float(rotationAngle) / 180.0f / float(PI);
 }
 
 void RoadNetwork::clearSegments()
@@ -121,16 +121,16 @@ bool RoadNetwork::generateInitialSegments(const char* seed)
 		}
 
 		else if (seed[counter] == turnLeftSymbol) { //Mainline turtle walk
-			nextX = (currentForward.x * cos(rotationAngle)) - (currentForward.z * sin(rotationAngle));
-			nextZ = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+			nextX = (currentForward.x * float(cos(rotationAngle))) - (currentForward.z * float(sin(rotationAngle)));
+			nextZ = (currentForward.x * float(sin(rotationAngle))) + (currentForward.z * float(cos(rotationAngle)));
 			currentForward.x = nextX;
 			currentForward.z = nextZ;
 			success = true;
 		}
 
 		else if (seed[counter] == turnRightSymbol) {
-			nextX = (currentForward.x * (cos(rotationAngle))) + (currentForward.z * sin(rotationAngle));
-			nextZ = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+			nextX = (currentForward.x * float((cos(rotationAngle)))) + (currentForward.z * float(sin(rotationAngle)));
+			nextZ = (currentForward.z * float(cos(rotationAngle))) - (currentForward.x * float(sin(rotationAngle)));
 			currentForward.x = nextX;
 			currentForward.z = nextZ;
 			success = true;
@@ -167,7 +167,7 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment, bool
 	int counter = 0;
 	Vector4 currentForward = this->forward;
 	float nextX, nextZ;
-	int check = roadNetwork.size();
+	auto  check = roadNetwork.size();
 
 	if (segment > 0 && segment < roadNetwork.size()) {
 		while (seed[counter]) {
@@ -178,14 +178,14 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment, bool
 					temp.firstPoint = this->roadNetwork.at(segment).firstPoint;
 					currentForward = this->roadNetwork.at(segment).secondPoint - temp.firstPoint;
 					if (!right) { // turn left
-						nextX = (currentForward.x * cos(rotationAngle)) - (currentForward.z * sin(rotationAngle));
-						nextZ = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+						nextX = (currentForward.x * float(cos(rotationAngle))) - (currentForward.z * float(sin(rotationAngle)));
+						nextZ = (currentForward.x * float(sin(rotationAngle))) + (currentForward.z * float(cos(rotationAngle)));
 						currentForward.x = nextX;
 						currentForward.z = nextZ;
 					}
 					else { // turn right
-						nextX = (currentForward.x * cos(rotationAngle)) + (currentForward.z * sin(rotationAngle));
-						nextZ = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+						nextX = (currentForward.x * float(cos(rotationAngle))) + (currentForward.z * float(sin(rotationAngle)));
+						nextZ = (currentForward.z * float(cos(rotationAngle))) - (currentForward.x * float(sin(rotationAngle)));
 						currentForward.x = nextX;
 						currentForward.z = nextZ;
 					}
@@ -213,16 +213,16 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment, bool
 			}
 
 			else if (seed[counter] == turnLeftSymbol) {
-				nextX = (currentForward.x * cos(rotationAngle)) - (currentForward.z * sin(rotationAngle));
-				nextZ = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+				nextX = (currentForward.x * float(cos(rotationAngle))) - (currentForward.z * float(sin(rotationAngle))) ;
+				nextZ = (currentForward.x * float(sin(rotationAngle))) + (currentForward.z * float(cos(rotationAngle))) ;
 				currentForward.x = nextX;
 				currentForward.z = nextZ;
 				success = true;
 			}
 
 			else if (seed[counter] == turnRightSymbol) {
-				nextX = (currentForward.x * cos(rotationAngle)) + (currentForward.z * sin(rotationAngle));
-				nextZ = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+				nextX = (currentForward.x * float(cos(rotationAngle))) + (currentForward.z * float(sin(rotationAngle)));
+				nextZ = (currentForward.z * float(cos(rotationAngle))) - (currentForward.x * float(sin(rotationAngle)));
 				currentForward.x = nextX;
 				currentForward.z = nextZ;
 				success = true;
@@ -234,18 +234,18 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment, bool
 					temp.firstPoint = this->roadNetwork.at(segment).firstPoint;
 					currentForward = this->roadNetwork.at(segment).secondPoint - temp.firstPoint;
 					if (!right) { // turn left
-						nextX = (currentForward.x * cos(rotationAngle)) - (currentForward.z * sin(rotationAngle));
-						nextZ = (currentForward.x * sin(rotationAngle)) + (currentForward.z * cos(rotationAngle));
+						nextX = (currentForward.x * float(cos(rotationAngle))) - (currentForward.z * float(sin(rotationAngle)));
+						nextZ = (currentForward.x * float(sin(rotationAngle))) + (currentForward.z * float(cos(rotationAngle)));
 						currentForward.x = nextX;
 						currentForward.z = nextZ;
 					}
 					else { // turn right
-						nextX = (currentForward.x * cos(rotationAngle)) + (currentForward.z * sin(rotationAngle));
-						nextZ = (currentForward.z * cos(rotationAngle)) - (currentForward.x * sin(rotationAngle));
+						nextX = (currentForward.x * float(cos(rotationAngle))) + (currentForward.z * float(sin(rotationAngle)));
+						nextZ = (currentForward.z * float(cos(rotationAngle))) - (currentForward.x * float(sin(rotationAngle)));
 						currentForward.x = nextX;
 						currentForward.z = nextZ;
-					}
 					temp.secondPoint = temp.firstPoint + (currentForward * 0.5f);
+					}
 				}
 				else if (check < roadNetwork.size()) {
 					temp.firstPoint = this->roadNetwork.at(this->roadNetwork.size() - 1).secondPoint;
