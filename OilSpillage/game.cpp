@@ -75,12 +75,12 @@ void Game::init(Window* window)
 	player.init();
 	Vector4 colorsP[4] =
 	{
-		Vector4(1.0f,1.0f,0.0f,1.0f),
-		Vector4(1.0f,0.0f,0.0f,1.0f),
-		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(1.0f,1.0f,0.0f,0.5f),
+		Vector4(1.0f,0.0f,0.0f,0.5f),
+		Vector4(0.0f,0.0f,0.0f,0.5f),
 		Vector4(0.1f,0.1f,0.1f,0.5f)
 	};
-	this->graphics.setParticleColorNSize(colorsP, 4, 0.05f, 0.12f);
+	this->graphics.setParticleColorNSize(colorsP, 4, 0.05f, 0.10f);
 }
 
 void Game::run()

@@ -248,7 +248,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 	blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 	blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendStateDescription.RenderTarget[0].RenderTargetWriteMask = 0x0f;
 
@@ -458,12 +458,12 @@ bool Graphics::createShaders()
 
 void Graphics::addParticle(Vector3 pos, Vector3 initialDirection)
 {
-	Vector3 randomPos = 0.005f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos;// = 0.005f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
 	randomPos += pos;
 	Vector4 color;
 	float grey = float(rand()) / RAND_MAX;
 	color = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, 1.0f);
-	this->particleSystem.addParticle(2, 1, randomPos, initialDirection);
+	this->particleSystem.addParticle(2, 2, randomPos, initialDirection);
 }
 
 void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
