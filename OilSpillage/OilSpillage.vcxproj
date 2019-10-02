@@ -167,6 +167,7 @@
     <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UI\Slider.cpp" />
+    <ClCompile Include="UI\UICredits.cpp" />
     <ClCompile Include="UI\UIMainMenu.cpp" />
     <ClCompile Include="UI\UIOptions.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
@@ -225,6 +226,7 @@
     </ClInclude>
     <ClInclude Include="Texture.h" />
     <ClInclude Include="UI\Slider.h" />
+    <ClInclude Include="UI\UICredits.h" />
     <ClInclude Include="UI\UIMainMenu.h" />
     <ClInclude Include="UI\UIOptions.h" />
     <ClInclude Include="UI\UserInterface.h" />

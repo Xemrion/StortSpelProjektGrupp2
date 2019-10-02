@@ -1,6 +1,7 @@
 #include "MenuGameState.h"
 #include "../UI/UIMainMenu.h"
 #include "../UI/UIOptions.h"
+#include "../UI/UICredits.h"
 
 MenuGameState::MenuGameState() : graphics(Game::getGraphics())
 {
@@ -17,6 +18,8 @@ void MenuGameState::init()
 	this->menues[MENU_MAIN]->init();
 	this->menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	this->menues[MENU_OPTIONS]->init();
+	this->menues[MENU_CREDITS] = std::make_unique<UICredits>();
+	this->menues[MENU_CREDITS]->init();
 
 	this->currentMenu = MENU_MAIN;
 }

@@ -17,6 +17,10 @@ void UIMainMenu::updateUI(float deltaTime)
 		{
 			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(Menu::MENU_OPTIONS);
 		}
+		else if (this->selected == this->buttonCredits.get())
+		{
+			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(Menu::MENU_CREDITS);
+		}
 		else if (this->selected == this->checkBoxTest.get())
 		{
 			this->checkBoxTest->setActivated(!this->checkBoxTest->isActivated());
