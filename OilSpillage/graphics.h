@@ -87,4 +87,6 @@ public:
 	void presentScene();
 	void render(DynamicCamera* camera);
 	bool createShaders();
+	ID3D11DeviceContext* getDeviceContext();
+	ID3D11Device* getDevice();
 };

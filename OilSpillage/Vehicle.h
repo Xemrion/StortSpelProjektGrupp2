@@ -51,4 +51,6 @@ public:
 
 	void setDrivingMode(int i);
 	bool getDrivingMode();
+	Vector3 getVelocity();
+
 };

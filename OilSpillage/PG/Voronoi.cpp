@@ -4,12 +4,11 @@
 #include <cmath>
 #include "Voronoi.hpp"
 
-
 Voronoi::Voronoi( RNG &rng, U8 cell_size, U16 width, U16 height, EuclideanDistanceTag ):
    CELL_SIZE(cell_size),
    WIDTH(width),
    HEIGHT(height),
-   diagram(Size(WIDTH)*HEIGHT*CELL_SIZE*CELL_SIZE),
+   diagram( Size(WIDTH)*HEIGHT*CELL_SIZE*CELL_SIZE ),
    noise(generate_noise(rng))
 {  // distance function (NOTE! the result is squared but this isn't an issue!)
    auto euclidean_distance = []( V2f const &a, V2f const &b ) -> F32 {
@@ -36,9 +35,9 @@ Voronoi::Voronoi( RNG &rng, U8 cell_size, U16 width, U16 height, ManhattanDistan
 Vec<V2f> Voronoi::generate_noise( RNG &rng ) const noexcept {
    F32_Dist  noise( .0f, CELL_SIZE );
    Vec<V2f>  uniform_noise( Size(WIDTH)*HEIGHT );
-   for ( I32  x = 0;  x < I32(WIDTH);  ++x )
-      for ( I32  y = 0;  y < I32(HEIGHT);  ++y )
-         uniform_noise[noise_index(x,y)] = { noise(rng)+(x*CELL_SIZE), noise(rng)+(y*CELL_SIZE) }; // { x*CELL_SIZE, y*CELL_SIZE }; (DEBUG: TODO, remove!)
+   for ( I32  y = 0;  y < I32(HEIGHT);  ++y )
+      for ( I32  x = 0;  x < I32(WIDTH);  ++x )
+         uniform_noise[noise_index(x,y)] = { noise(rng)+(x*CELL_SIZE), noise(rng)+(y*CELL_SIZE) };
    return uniform_noise;
 }
 

@@ -5,8 +5,8 @@ Boid::Boid()
 	this->acceleration = Vector3(0.0f);
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(0.0f);
-	this->maxSpeed = 3.5;
-	this->maxForce = 0.5;
+	this->maxSpeed = 3.5f;
+	this->maxForce = 0.5f;
 	this->destination = Vector3(0.0f);
 }
 
@@ -15,8 +15,8 @@ Boid::Boid(float x, float z)
 	this->acceleration = Vector3(0.0f);
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, 0.0f, z);
-	this->maxSpeed = 3.5;
-	this->maxForce = 0.5;
+	this->maxSpeed = 3.5f;
+	this->maxForce = 0.5f;
 
 	this->destination = Vector3(20.0f, 0.0f, 20.0f);
 }
@@ -29,9 +29,9 @@ void Boid::applyForce(Vector3 force)
 Vector3 Boid::separation(vector<Boid*> boids)
 {
 	// Distance of field of vision for separation between boids
-	float desiredSeparationDistance = 1.5;
+	float desiredSeparationDistance = 1.5f;
 	Vector3 direction(0.0f);
-	float nrInProximity = 0;
+	float nrInProximity = 0.0f;
 	// For every boid in the system, check if it's too close
 	for (int i = 0; i < boids.size(); i++) 
 	{
@@ -53,7 +53,7 @@ Vector3 Boid::separation(vector<Boid*> boids)
 	{
 		direction /= nrInProximity;
 	}
-	if (direction.Length() > 0) 
+	if (direction.Length() > 0.0f) 
 	{
 		// Steering = Desired - Velocity
 		direction.Normalize();
@@ -70,20 +70,20 @@ Vector3 Boid::separation(vector<Boid*> boids)
 
 Vector3 Boid::alignment(vector<Boid*> boids)
 {
-	float neighborDistance = 20; // Field of vision
+	float neighborDistance = 20.0f; // Field of vision
 	Vector3 sum(0.0f);
-	float nrInProximity = 0;
+	float nrInProximity = 0.0f;
 	for (int i = 0; i < boids.size(); i++) 
 	{
 		float distance = (position - boids.at(i)->position).Length();
-		if ((distance > 0) && (distance < neighborDistance)) 
+		if ((distance > 0.0f) && (distance < neighborDistance)) 
 		{
 			sum += boids.at(i)->velocity;
 			nrInProximity++;
 		}
 	}
 	// If there are boids close enough for alignment...
-	if (nrInProximity > 0) 
+	if (nrInProximity > 0.0f) 
 	{
 		sum /= nrInProximity;// Divide sum by the number of close boids (average of velocity)
 		sum.Normalize();            // Turn sum into a unit vector, and
@@ -106,19 +106,19 @@ Vector3 Boid::alignment(vector<Boid*> boids)
 
 Vector3 Boid::cohesion(vector<Boid*> boids)
 {
-	float neighborDistance = 2;
+	float neighborDistance = 2.0f;
 	Vector3 sum(0.0f);
-	float nrInProximity = 0;
+	float nrInProximity = 0.0f;
 	for (int i = 0; i < boids.size(); i++) 
 	{
 		float distance = (position - boids.at(i)->position).Length();
-		if ((distance > 0) && (distance < neighborDistance)) 
+		if ((distance > 0.0f) && (distance < neighborDistance)) 
 		{
 			sum += boids.at(i)->position;
 			nrInProximity++;
 		}
 	}
-	if (nrInProximity > 0) 
+	if (nrInProximity > 0.0f) 
 	{
 		sum /= nrInProximity;
 		return seek(sum);
