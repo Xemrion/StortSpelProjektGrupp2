@@ -61,6 +61,7 @@ private:
 	int lastUsedParticle;
 	int firstAdd = 0;
 	float deltaTime = 0.0f;
+	float sinMovement = 0.0f;
 	IndirDraw indDraw;
 	ParticleRenderParams colorNSize;
 	//Particle* particles;

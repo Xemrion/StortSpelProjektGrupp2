@@ -80,6 +80,6 @@ public:
 	void presentScene();
 	void render(Camera camera, float deltaTime);
 	bool createShaders();
-	void addParticle(Vector3 pos, Vector3 initialDirection);
+	void addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, int lifeTime = 2);
 	void setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 };

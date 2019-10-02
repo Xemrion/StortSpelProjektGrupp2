@@ -33,7 +33,7 @@ float3 hash(float3 p)
 	return 1.0 - 2.0 * frac(sin(p) * 9528);
 }
 static const float G = 9.82f;
-static const float m1 = 0.1f;
+static const float m1 = 0.5f;
 static const float m2 = 10.0f;
 static const float m1m2 = m1 * m2;
 static const float eventHorizon = 1.0f;
@@ -72,10 +72,12 @@ void main( uint3 DTid : SV_DispatchThreadID )
 		float friction = 0.05f;
 		float3 wind = float3(1.0f, 0.0f, 0.5f);
 		float3 random = hash(float3(43.5, 12.322, 21.5));
-		float windPower = 1.0f;
-		wind = wind * windPower + random * 0.5f;
-		float3 acceleration = G * m1 * float3(0, -1, 0) * TimeFactors.x;
-		acceleration += (wind / m1) * TimeFactors.x;
+		float windPower = 0.02f;
+		wind = wind * windPower + random * 0.0f;
+		float3 acceleration = 1.0f*G * m1 * float3(0, -1, 0) * TimeFactors.x;
+		//acceleration += (wind / m1) * TimeFactors.x;
+		float moveSine = EmitterLocation.x;
+		acceleration += 9.55f*(float3(sin((0.7f * p.position.x)-(moveSine*1.2f)),sin((0.6f * p.position.y) - (moveSine*0.7f)), sin(0.8f * p.position.z - (moveSine*1.7f)))) * TimeFactors.x;
 		if (p.position.y > depth)
 		{
 			p.velocity.xyz = p.velocity.xyz + acceleration;

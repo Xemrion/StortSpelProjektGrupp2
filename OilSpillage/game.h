@@ -30,6 +30,15 @@ class Game {
 	Camera camera;
 	//TestAI AI;
 
+	//Particles
+	float colors[4] = { 1.0f,1.0f,1.0f,1.0f };
+	float colors2[4] = { 1.0f,1.0f,1.0f,1.0f };
+	float colors3[4] = { 1.0f,1.0f,1.0f,1.0f };
+	float colors4[4] = { 1.0f,1.0f,1.0f,1.0f };
+	float size1 = 1.0f;
+	float size2 = 1.0f;
+	int addNrOfParticles = 1.0f;
+	int lifeTime = 1.0f;
 public:
 	Game();
 	~Game();

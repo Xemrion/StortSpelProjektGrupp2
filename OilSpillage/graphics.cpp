@@ -97,8 +97,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 		NULL,
 		&deviceContext);
 
-	if (SUCCEEDED(result))
-	{
+
 		// get the address of the back buffer
 		ID3D11Texture2D* backBufferPtr = nullptr;
 		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)& backBufferPtr);
@@ -172,7 +171,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 			return false;
 		}
 
-	}
+	
 
 	this->vp.Width = (float)this->window->width;
 	this->vp.Height = (float)this->window->height;
@@ -288,7 +287,7 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
 		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
 	}*/
-	this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
 
 	
@@ -407,6 +406,10 @@ bool Graphics::createShaders()
 #endif
 #endif
 	}
+	else
+	{
+		shaderfolder = L"..\\x64\\Debug\\";
+	}
 
 	//2d shaders
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] =
@@ -456,14 +459,12 @@ bool Graphics::createShaders()
 	return true;
 }
 
-void Graphics::addParticle(Vector3 pos, Vector3 initialDirection)
+void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles,  int lifeTime)
 {
-	Vector3 randomPos;// = 0.005f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos = 0.005f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
 	randomPos += pos;
-	Vector4 color;
 	float grey = float(rand()) / RAND_MAX;
-	color = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, 1.0f);
-	this->particleSystem.addParticle(2, 2, randomPos, initialDirection);
+	this->particleSystem.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
 }
 
 void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)

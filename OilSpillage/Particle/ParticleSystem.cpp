@@ -240,7 +240,12 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 	this->deltaTime = delta;
 	UINT offset = 0;
 	SimulationParams sP;
-	sP.emitterLocation = pParams.emitterLocation;
+	this->sinMovement += 0.7f * delta;
+	if (this->sinMovement > (26 * XM_PI) / 9)
+	{
+		this->sinMovement = 0.0f;
+	}
+	sP.emitterLocation = Vector4(sinMovement, 0.0f, 0.0f, 0.0f);
 	sP.consumerLocation = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 	sP.timeFactors = Vector4(delta, 0.0f, 0.0f, 0.0f);
 	//run update computeshader here

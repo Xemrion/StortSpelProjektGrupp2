@@ -55,8 +55,8 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	float2 timeC = input[0].time;
 	float size;
 	size = lerp(config.y, config.z, timeC.x / (timeC.y));
-	float tempSize = lerp(config.y, config.z, (timeC.y * 0.6f) / timeC.y);
-	if (timeC.x >= timeC.y * 0.6f)
+	float tempSize = lerp(config.y, config.z, (timeC.y * 0.45f) / timeC.y);
+	if (timeC.x >= timeC.y * 0.7f)
 	{
 		size = lerp(tempSize, 0.0f, timeC.x / (timeC.y));
 	}
