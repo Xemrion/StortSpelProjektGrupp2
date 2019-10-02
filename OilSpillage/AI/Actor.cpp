@@ -23,19 +23,19 @@ void AIPlayer::Update(float dt)
 	{
 		if (counter % 4 == 0)
 		{
-			setTargetPos(DirectX::SimpleMath::Vector3(9, 0, -9));
+			setTargetPos(Vector3(9, 0, -9));
 		}
 		else if (counter % 4 == 1)
 		{
-			setTargetPos(DirectX::SimpleMath::Vector3(-9, 0, -9));
+			setTargetPos(Vector3(-9, 0, -9));
 		}
 		else if (counter % 4 == 2)
 		{
-			setTargetPos(DirectX::SimpleMath::Vector3(-9, 0, 9));
+			setTargetPos(Vector3(-9, 0, 9));
 		}
 		else if (counter % 4 == 3)
 		{
-			setTargetPos(DirectX::SimpleMath::Vector3(9, 0, 9));
+			setTargetPos(Vector3(9, 0, 9));
 		}
 		counter++;
 		findPath();
@@ -60,9 +60,9 @@ void AIPlayer::followPath(float dt)
 {
 	if (path.size() > 0)
 	{
-		targetNode = DirectX::SimpleMath::Vector3(path.at(path.size() - 1)->GetXPos(),
-			.0f,
-			path.at(path.size() - 1)->GetYPos());
+		targetNode = Vector3(path.at(path.size() - 1)->getXPos(),
+							.0f,
+							path.at(path.size() - 1)->getYPos());
 		Vector3 dir = targetNode - position;
 		dir.Normalize();
 		Vector3 newPosition = position + dir * dt;
@@ -78,14 +78,13 @@ void AIPlayer::followPath(float dt)
 		}
 
 		this->setPosition(newPosition);
-
 	}
 }
 AIPlayer::AIPlayer()
 {
-	aStar = new AStar(20, 20, DirectX::SimpleMath::Vector2(-10, 10));
-	setPosition(DirectX::SimpleMath::Vector3(-9, 0, 9));
-	setTargetPos(DirectX::SimpleMath::Vector3(9,0,9));
+	aStar = new AStar(20, 20, Vector2(-10, 10));
+	setPosition(Vector3(-9, 0, 9));
+	setTargetPos(Vector3(9,0,9));
 	state = AIState::chasing;
 	findPath();
 	for (float i = 0; i < 3; i++)
@@ -108,7 +107,6 @@ AIPlayer::AIPlayer()
 
 AIPlayer::~AIPlayer()
 {
-	delete aStar;
 	for (int i = 0; i < boids.size(); i++)
 	{
 		delete boids.at(i);
