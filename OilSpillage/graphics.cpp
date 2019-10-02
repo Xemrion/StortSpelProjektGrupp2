@@ -505,6 +505,13 @@ bool Graphics::createShaders()
 	return true;
 }
 
+void Graphics::clearScreen()
+{
+	float color[4] = { 0,0,0,1 };
+	deviceContext->ClearRenderTargetView(renderTargetView, color);
+	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
+}
+
 ID3D11DeviceContext* Graphics::getDeviceContext()
 {
 	return this->deviceContext;

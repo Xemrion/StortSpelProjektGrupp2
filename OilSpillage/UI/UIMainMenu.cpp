@@ -1,6 +1,7 @@
 #include "UIMainMenu.h"
 #include "..//Input.h"
 #include "..//game.h"
+#include "..//States/MenuGameState.h"
 
 void UIMainMenu::updateUI(float deltaTime)
 {
@@ -11,6 +12,10 @@ void UIMainMenu::updateUI(float deltaTime)
 		if (this->selected == this->buttonPlay.get())
 		{
 			Game::setState(State::STATE_PLAYING);
+		}
+		else if (this->selected == this->buttonOptions.get())
+		{
+			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(Menu::MENU_OPTIONS);
 		}
 		else if (this->selected == this->checkBoxTest.get())
 		{

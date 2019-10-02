@@ -168,6 +168,7 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UI\Slider.cpp" />
     <ClCompile Include="UI\UIMainMenu.cpp" />
+    <ClCompile Include="UI\UIOptions.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="UI\Slider.h" />
     <ClInclude Include="UI\UIMainMenu.h" />
+    <ClInclude Include="UI\UIOptions.h" />
     <ClInclude Include="UI\UserInterface.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />

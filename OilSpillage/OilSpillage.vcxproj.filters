@@ -132,6 +132,9 @@
     <ClCompile Include="States\PlayingGameState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI\UIOptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -291,6 +294,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="States\PlayingGameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIOptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
