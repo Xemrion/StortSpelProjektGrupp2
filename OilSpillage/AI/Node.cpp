@@ -55,14 +55,14 @@ DirectX::SimpleMath::Vector2 Node::GetPos()
 
 
 
-int Node::GetXPos()
+float Node::GetXPos()
 {
-	return this->Pos.x;
+	return float(this->Pos.x);
 }
 
-int Node::GetYPos()
+float Node::GetYPos()
 {
-	return this->Pos.y;
+	return float(this->Pos.y);
 }
 
 int Node::GetID()
@@ -119,11 +119,9 @@ Node::Node()
 bool operator==(const Node* left, Node& right)
 {
 	return left->Pos.x == right.Pos.x && left->Pos.y == right.Pos.y;
-	//return left->ID == right.ID;
 }
 
 bool operator==(const Node& left, Node& right)
 {
 	return left.Pos.x == right.Pos.x && left.Pos.y == right.Pos.y;
-	//return left.ID == right.ID;
 }

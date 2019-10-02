@@ -27,8 +27,8 @@ public:
 	DirectX::SimpleMath::Vector2 GetPos();
 	friend bool operator==(const Node* left, Node& right);
 	friend bool operator==(const Node& left, Node& right);
-	int GetXPos();
-	int GetYPos();
+	float GetXPos();
+	float GetYPos();
 	int GetID();
 	void SetID(int ID);
 	bool IsTraversable();

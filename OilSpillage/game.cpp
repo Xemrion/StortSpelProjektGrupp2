@@ -287,7 +287,7 @@ void Game::run()
 		{ Vector3(0.0f, 30.0f, -10.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f },
 		{ Vector3(0.0f, 15.0f, 0.0f), Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
-	this->camera.startCinematic(&points, false);
+	this->camera.startCinematic(&points, true);
 
 	
 
