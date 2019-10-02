@@ -1,65 +1,73 @@
 #include "Node.h"
 
+void Node::reset()
+{
+	this->gCost = 0;
+	this->hCost = 0;
+	this->fCost = 0;
+	this->previousNode = nullptr;
+}
+
 void Node::SetGCost(int gCost)
 {
-	g_cost = gCost;
+	this->gCost = gCost;
 }
 
 void Node::SetHCost(int hCost)
 {
-	h_cost = hCost;
+	this->hCost = hCost;
 }
 
 void Node::SetFCost(int fCost)
 {
-	f_cost = fCost;
+	this->fCost = fCost;
 }
 
 void Node::SetXPos(int xPos)
 {
-	Pos.x = float( xPos );
+	this->Pos.x = xPos;
 }
 
 void Node::SetYPos(int yPos)
 {
-	Pos.y = float( yPos );
+	this->Pos.y = yPos;
 }
 
 int Node::GetGCost()
 {
-	return g_cost;
+	return this->gCost;
 }
 
 int Node::GetHCost()
 {
-	return h_cost;
+	return this->hCost;
 }
 
 int Node::GetFCost()
 {
-	return f_cost;
+	return this->fCost;
 }
 
 DirectX::SimpleMath::Vector2 Node::GetPos()
 {
-	return Pos;
+	return this->Pos;
 }
 
 
 
-int Node::GetXPos()
+float Node::GetXPos()
 {
-	return int( Pos.x );
+	return float(this->Pos.x);
 }
 
-int Node::GetYPos()
+float Node::GetYPos()
 {
-	return int( Pos.y );
+	return float(this->Pos.y);
 }
 
 int Node::GetID()
 {
-	return ID;
+	return this->ID;
 }
 
 void Node::SetID(int ID)
@@ -74,38 +82,38 @@ bool Node::IsTraversable()
 
 void Node::SetTraversable(bool isTraversable)
 {
-	traversable = isTraversable;
+	this->traversable = isTraversable;
 }
 
 void Node::AddNeighbour(Node* neighbour)
 {
-	neighbours.push_back(neighbour);
+	this->neighbours.push_back(neighbour);
 }
 
 std::vector<Node*> Node::GetNeighbours()
 {
-	return neighbours;
+	return this->neighbours;
 }
 
 Node* Node::GetPreviousNode()
 {
-	return previousNode;
+	return this->previousNode;
 }
 
 void Node::SetPreviousNode(Node* node)
 {
-	previousNode = node;
+	this->previousNode = node;
 }
 
 Node::Node()
 {
-	ID           = 0;
-	g_cost       = 0;
-	h_cost       = 0;
-	f_cost       = 0;
-	Pos          = DirectX::SimpleMath::Vector2(0, 0);
-	previousNode = nullptr;
-	traversable  = true;
+	this->ID = 0;
+	this->gCost = 0;
+	this->hCost = 0;
+	this->fCost = 0;
+	this->Pos = DirectX::SimpleMath::Vector2(0, 0);
+	this->previousNode = nullptr;
+	this->traversable = true;
 }
 
 bool operator==(const Node* left, Node& right)

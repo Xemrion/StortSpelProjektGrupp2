@@ -28,6 +28,7 @@ private:
 class AIPlayer : public GameObject
 {
 public:
+	int counter = 0;
 	int nrOfFrames = 0;
 	enum AIState
 	{
