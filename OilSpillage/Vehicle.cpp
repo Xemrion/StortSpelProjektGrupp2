@@ -81,7 +81,7 @@ void Vehicle::init()
 	}
 }
 
-void Vehicle::update(float deltaTime)
+void Vehicle::update(float deltaTime, Vector2 collisionDir)
 {
 	deltaTime *= 2;
 	if (Input::CheckButton(CONFIRM, HELD, 0))
@@ -365,6 +365,27 @@ void Vehicle::update(float deltaTime)
 		}
 	}
 
+	//Collision
+	if(collisionDir.x == 1){
+		if (velocity.x < 0) {
+			velocity.x = 0;
+		}
+	}
+	if (collisionDir.x == -1){
+		if (velocity.x > 0) {
+			velocity.x = 0;
+		}
+	}
+	if (collisionDir.y == 1){
+		if (velocity.y > 0) {
+			velocity.y = 0;
+		}
+	}
+	if (collisionDir.y == -1){
+		if (velocity.y < 0) {
+			velocity.y = 0;
+		}
+	}
 
 	this->vehicle->move(Vector3((velocity.x * deltaTime *0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f)));
 

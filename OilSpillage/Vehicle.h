@@ -45,12 +45,13 @@ public:
 	virtual ~Vehicle();
 
 	void init();
-	void update(float deltaTime);
+	void update(float deltaTime, Vector2 collisionDir);
 	GameObject* getVehicle() { return this->vehicle; }
 	float getAcceleratorX();
 
 	void setDrivingMode(int i);
 	bool getDrivingMode();
 	Vector3 getVelocity();
+	//void onCollision(Vector2 direction);
 
 };
