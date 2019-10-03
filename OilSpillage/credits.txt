@@ -3,20 +3,20 @@ O i l S p i l l a g e
 Engine Programmer
 Filip
 Ludvig
-Emil
+Emil Lindholm
 
 General Programmer
 Viktor B
 Daniel
 
 Procedural Generation Programmer
-Victor F-I
-Marco
+Victor Falkengaard Itzel
+Marco Tabell Johnsson
 
 Artificial Intelligence Programmer
 Oscar
 David
-Ala
+Ala "Olle" Jafar
 
 Graphics Design
 Eric
