@@ -24,9 +24,8 @@ Vehicle::Vehicle()
 	this->bodyRotationPoint = nullptr;
 
 	this->leftoverTime = 0.0f;
-	this->bulletSpeed = 4.f;
-	this->bulletLifetime = 2.0f;
-	this->fireSpeed = 0.5f;
+	this->weapon = VehicleWeapon::defaultWeapon;
+	this->stats = VehicleStats::defaultStats;
 }
 
 Vehicle::~Vehicle()
@@ -72,6 +71,9 @@ void Vehicle::init()
 
 	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
 
+	this->weapon = VehicleWeapon::laser;
+	this->stats = VehicleStats::defaultStats;
+
 	for (int i = 0; i < 16; i++)
 	{
 		this->bullets[i].obj = new GameObject;
@@ -88,14 +90,14 @@ void Vehicle::update(float deltaTime, Vector2 collisionDir)
 	{
 		float tempDelta = deltaTime + this->leftoverTime;
 
-		if (tempDelta <= fireSpeed)
+		if (tempDelta <= this->weapon.fireSpeed)
 		{
 			this->leftoverTime = tempDelta;
 		}
 
-		while (tempDelta > fireSpeed)
+		while (tempDelta > this->weapon.fireSpeed)
 		{
-			tempDelta -= fireSpeed;
+			tempDelta -= this->weapon.fireSpeed;
 			int freeToUse = 0;
 
 			while (freeToUse < Vehicle::bulletCount && this->bullets[freeToUse].timeLeft > 0.0f)
@@ -108,8 +110,8 @@ void Vehicle::update(float deltaTime, Vector2 collisionDir)
 				Vector2 dir = Input::GetDirectionR(0);
 				this->bullets[freeToUse].dir = Vector3(dir.x, 0, dir.y);
 				this->bullets[freeToUse].dir.Normalize();
-				this->bullets[freeToUse].timeLeft = this->bulletLifetime;
-				this->bullets[freeToUse].speed = this->bulletSpeed;
+				this->bullets[freeToUse].timeLeft = this->weapon.bulletLifetime;
+				this->bullets[freeToUse].speed = this->weapon.bulletSpeed;
 				this->bullets[freeToUse].obj->setPosition(this->vehicle->getPosition() + Vector3(0, 2, 0));
 				this->bullets[freeToUse].obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->bullets[freeToUse].dir)) * Vector3(0, 1, 0));
 			}
@@ -119,7 +121,7 @@ void Vehicle::update(float deltaTime, Vector2 collisionDir)
 				break;
 			}
 
-			if (tempDelta <= fireSpeed)
+			if (tempDelta <= this->weapon.fireSpeed)
 			{
 				this->leftoverTime = tempDelta;
 			}

@@ -305,6 +305,9 @@
     <ClInclude Include="UI\UICredits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VehicleWeapon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

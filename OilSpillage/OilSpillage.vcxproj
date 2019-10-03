@@ -233,6 +233,7 @@
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />
     <ClInclude Include="VertexBuffer.h" />
+    <ClInclude Include="VehicleWeapon.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>
