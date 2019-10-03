@@ -126,6 +126,9 @@
     <ClCompile Include="Road Network\RoadNet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PG\SkyscraperFloor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">

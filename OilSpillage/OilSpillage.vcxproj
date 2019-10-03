@@ -137,6 +137,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="DynamicCamera.cpp" />
+    <ClCompile Include="PG\SkyscraperFloor.cpp" />
     <ClCompile Include="UI\Button.cpp" />
     <ClCompile Include="UI\CheckBox.cpp" />
     <ClCompile Include="UI\Element.cpp" />
