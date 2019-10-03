@@ -2,7 +2,6 @@ struct Particle
 {
 	float4 position;
 	float4 velocity;
-	float4 color;
 	float2 time;//.x = time, .y = totalTime
 };
 AppendStructuredBuffer<Particle> NewSimulationState : register(u0);
@@ -49,9 +48,6 @@ float noise(float2 pos)
 }
 static const float G = 9.82f;
 static const float m1 = 0.5f;
-static const float m2 = 10.0f;
-static const float m1m2 = m1 * m2;
-static const float eventHorizon = 1.0f;
 
 [numthreads(1024, 1, 1)]
 
@@ -62,26 +58,6 @@ void main( uint3 DTid : SV_DispatchThreadID )
 	if (myID < NumParticles.x && NumParticles.x > 0)
 	{
 		Particle p = CurrentSimulationState.Consume();
-
-		//either bigger and then smaller or start size and decrease over time
-		float size1 = p.position.w;
-		float size2 = 0.0f;
-		float halfTime = p.time.y / 3.0f;
-
-		float deltaSize = (size2 - size1) / (p.time.y);
-		if (p.time.x < halfTime)
-		{
-			p.velocity.w += deltaSize * TimeFactors.x;
-		}
-		/*else
-		{
-			p.velocity.w -= deltaSize * TimeFactors.x;
-		}*/
-		if (p.velocity.w <= 0)
-		{
-			p.velocity.w = 0;
-		}
-		
 		
 		float depth = 0.0f;
 		float friction = 0.05f;
@@ -91,25 +67,21 @@ void main( uint3 DTid : SV_DispatchThreadID )
 		wind = wind * windPower + random * 0.0f;
 		float3 acceleration = 1.0f*G * m1 * float3(0, -1, 0) * TimeFactors.x;
 		//acceleration += (wind / m1) * TimeFactors.x;
-		float moveSine = EmitterLocation.x;
-		//acceleration += 9.55f*(float3(sin((0.7f * p.position.x)-(moveSine*1.2f)),sin((0.6f * p.position.y) - (moveSine*0.7f)), sin(0.8f * p.position.z - (moveSine*1.7f)))) * TimeFactors.x;
-
+		float moveSine = EmitterLocation.x;//increases every frame to move the sine
+		acceleration += 0.75f*normalize(float3(sin((0.7f * p.position.x)-(moveSine*1.2f)),sin((0.6f * p.position.y) - (moveSine*0.7f)), sin(0.8f * p.position.z - (moveSine*1.7f)))) * TimeFactors.x;
+		acceleration += 0.00005f*float3(noise(p.position.x), noise(p.position.y), noise(p.position.z));
 		if (p.position.y > depth)
 		{
 			p.velocity.xyz = p.velocity.xyz + acceleration;
-			//p.velocity.xyz+= (hash(p.position.xxz) * 0.5f) + hash(p.position.xzz);
-			p.position.xyz = p.position.xyz + p.velocity.xyz * TimeFactors.x;
 		}
 		else
 		{
+			//On zero or lower apply friction and set velocity.y to 0 for no movement in y 
 			p.velocity.xyz = (p.velocity.xyz + TimeFactors.x * float3(0, -1, 0))/(1 + (friction* TimeFactors.x));
-			//p.velocity.xyz += (hash(p.position.xxz) * 0.5f) + hash(p.position.xzz);
 			p.velocity.y = 0;
-			p.position.xyz = p.position.xyz + p.velocity.xyz * TimeFactors.x;
 		}
-		p.velocity.w = lerp(0.5f, 0.0f, p.time.x / (p.time.y+20));
+		p.position.xyz = p.position.xyz + p.velocity.xyz * TimeFactors.x;
 		p.time.x = p.time.x + TimeFactors.x;
-		p.color = float4(1.0f,1.0f,1.0f,1.0f);
 		if (p.time.x < p.time.y)
 		{
 			NewSimulationState.Append(p);

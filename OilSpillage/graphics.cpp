@@ -461,7 +461,7 @@ bool Graphics::createShaders()
 
 void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles,  int lifeTime)
 {
-	Vector3 randomPos = 0.005f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos = 0.5f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
 	randomPos += pos;
 	float grey = float(rand()) / RAND_MAX;
 	this->particleSystem.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);

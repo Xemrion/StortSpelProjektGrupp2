@@ -35,8 +35,8 @@ class Game {
 	float colors2[4] = { 1.0f,1.0f,1.0f,1.0f };
 	float colors3[4] = { 1.0f,1.0f,1.0f,1.0f };
 	float colors4[4] = { 1.0f,1.0f,1.0f,1.0f };
-	float size1 = 1.0f;
-	float size2 = 1.0f;
+	float size1 = 0.02f;
+	float size2 = 0.03f;
 	int addNrOfParticles = 1.0f;
 	int lifeTime = 1.0f;
 public:

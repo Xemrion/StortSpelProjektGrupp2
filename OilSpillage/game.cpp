@@ -139,8 +139,8 @@ void Game::run()
 			if (Input::IsKeyDown_DEBUG(Keyboard::C))
 			{
 				Vector2 dir = Input::GetDirectionR(0);
-				this->graphics.addParticle(this->player.getVehicle()->getPosition() + Vector3(0, 1, 0.5f), Vector3(5 * dir.x, 0.0f, dir.y * 5));
-				this->graphics.addParticle(this->player.getVehicle()->getPosition() + Vector3(0, 1, 0.3f), Vector3(5 * dir.x, 0.0f, dir.y * 5));
+				//this->graphics.addParticle(this->player.getVehicle()->getPosition() + Vector3(0, 1, 0.5f), Vector3(8 * dir.x, 0.0f, dir.y * 8), addNrOfParticles, lifeTime);
+				this->graphics.addParticle(this->player.getVehicle()->getPosition() + Vector3(0, 1, 0.3f), Vector3(15 * dir.x, 0.0f, dir.y * 15), addNrOfParticles, lifeTime);
 			}
 			if (mouse.leftButton)
 			{

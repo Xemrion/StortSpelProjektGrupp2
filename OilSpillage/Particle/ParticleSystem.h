@@ -8,7 +8,6 @@ struct Particle
 {
 	Vector4 position;
 	Vector4 direction;
-	Vector4 color;
 	Vector2 time;//time and totalTime
 };
 struct CameraInfo
@@ -22,7 +21,6 @@ struct ParticleParams
 	Vector4 emitterLocation;
 	Vector4 randomVector;
 	Vector4 initialDirection;
-	Vector4 color;
 };
 struct ParticleRenderParams
 {

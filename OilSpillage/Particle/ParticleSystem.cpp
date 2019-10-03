@@ -201,7 +201,6 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f);
 	pParams.emitterLocation = Vector4(position.x,position.y,position.z, lifeTime);
 	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX,1.0f);
-	pParams.color = Vector4(1, 1, 1, 1);
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &pParams, sizeof(ParticleParams));

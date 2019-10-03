@@ -2,7 +2,6 @@ struct Particle
 {
 	float4 position;//.w = initialSize
 	float4 direction;//.w=size
-	float4 color;
 	float2 time;
 };
 
@@ -17,7 +16,6 @@ struct VS_OUT
 {
 	float4 pos : POSITION;
 	float2 time : TIME;
-	float4 color : COLOR;
 	uint ind : VAR;
 };
 
@@ -29,8 +27,6 @@ VS_OUT main(in VS_INPUT input)
 	output.pos.w = SimulationState[input.vertexId].direction.w;
 	output.ind = input.vertexId;
 	output.time = SimulationState[input.vertexId].time;
-	output.color = SimulationState[input.vertexId].color;
-
 
 	return output;
 }

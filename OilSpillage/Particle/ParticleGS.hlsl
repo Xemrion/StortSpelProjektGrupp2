@@ -22,7 +22,6 @@ struct GSInput
 {
 	float4 pos : POSITION;
 	float2 time : TIME;
-	float4 color : COLOR;
 	uint ind : VAR;
 };
 struct GSOutput
@@ -54,7 +53,10 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	float3 vert[4];
 	float2 timeC = input[0].time;
 	float size;
-
+	/*
+	Config.x is nrOfColors. Max 4
+	Config.y is the start color and config.z is the end color.
+	*/
 	size = lerp(config.y, config.z, smoothstep(0.0, timeC.y - 1.0f, timeC.x)) * (1.0 - smoothstep(timeC.y - 1.0f, timeC.y, timeC.x));
 
 	
