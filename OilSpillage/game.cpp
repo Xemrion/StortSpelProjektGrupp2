@@ -146,7 +146,7 @@ void Game::run()
 			{
 				this->graphics.addParticle(Vector3(mousePos.x, 4, mousePos.y), 2 * Vector3(1.0f, 0.0f, 0.0f), addNrOfParticles, lifeTime);
 			}
-			this->graphics.addParticle(Vector3(0, 4, 0.0f), Vector3(0.0f, 0.0f, 0.0f));
+			this->graphics.addParticle(Vector3(0, 4, 0.0f), Vector3(0.0f, 7.5f, 0.0f), addNrOfParticles, lifeTime);
 
 			timerForParticle = 0;
 		}
@@ -179,7 +179,7 @@ void Game::run()
 		ImGui::ColorPicker4("Color Slider", colors);
 		ImGui::ColorPicker4("Color 1 Slider", colors2);
 		ImGui::ColorPicker4("Color 2 Slider", colors3);
-		ImGui::ColorPicker4("Color 3 Slider", colors3);
+		ImGui::ColorPicker4("Color 3 Slider", colors4);
 		ImGui::SliderFloat("First size", &size1, 0.0f, 1.0f);
 		ImGui::SliderFloat("Second size", &size2, 0.0f, 1.0f);
 		ImGui::SliderInt("Nr of particles times 8", &addNrOfParticles, 1, 10);

@@ -54,12 +54,9 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	float3 vert[4];
 	float2 timeC = input[0].time;
 	float size;
-	size = lerp(config.y, config.z, timeC.x / (timeC.y));
-	float tempSize = lerp(config.y, config.z, (timeC.y * 0.45f) / timeC.y);
-	if (timeC.x >= timeC.y * 0.7f)
-	{
-		size = lerp(tempSize, 0.0f, timeC.x / (timeC.y));
-	}
+
+	size = lerp(config.y, config.z, smoothstep(0.0, timeC.y - 1.0f, timeC.x)) * (1.0 - smoothstep(timeC.y - 1.0f, timeC.y, timeC.x));
+
 	
 	float nrOfColors = config.x;
 	float4 testColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
