@@ -11,7 +11,7 @@ SamplerState Sampler: register(s0);
 cbuffer SimulationParams : register(b0)
 {
 	float4 TimeFactors;
-	float4 EmitterLocation;
+	float4 EmitterLocation;//.x = moveSine, .y = vectorFieldPower
 	float4 ConsumerLocation;
 };
 cbuffer ParticleCount : register(b1)
@@ -66,10 +66,15 @@ void main( uint3 DTid : SV_DispatchThreadID )
 		float windPower = 0.2f;
 		wind = wind * windPower + random * 0.0f;
 		float3 acceleration = 1.0f*G * m1 * float3(0, -1, 0) * TimeFactors.x;
-		//acceleration += (wind / m1) * TimeFactors.x;
+		acceleration += (wind / m1) * TimeFactors.x;
 		float moveSine = EmitterLocation.x;//increases every frame to move the sine
-		acceleration += 0.75f*normalize(float3(sin((0.7f * p.position.x)-(moveSine*1.2f)),sin((0.6f * p.position.y) - (moveSine*0.7f)), sin(0.8f * p.position.z - (moveSine*1.7f)))) * TimeFactors.x;
-		acceleration += 0.00005f*float3(noise(p.position.x), noise(p.position.y), noise(p.position.z));
+		float fieldSize = 1.0f;//for the vectorField
+		float fieldPower = 2.0f;//for the vectorField
+		float xSin = sin((sin(-5.8f * moveSine - 1) + p.position.x) * fieldSize - (moveSine * 8.2f));
+		float ySin = sin((sin(-7.8f * moveSine + 1) + p.position.y) * fieldSize - (moveSine * 0.7f));
+		float zSin = sin((sin(-4.8f * moveSine - 2) + p.position.z) * fieldSize - (moveSine * 7.7f));
+		acceleration += 2.85f * fieldPower * normalize(float3(xSin, ySin, zSin)) * TimeFactors.x;
+		acceleration += 0.0005f*float3(noise(p.position.x), noise(p.position.y), noise(p.position.z));
 		if (p.position.y > depth)
 		{
 			p.velocity.xyz = p.velocity.xyz + acceleration;

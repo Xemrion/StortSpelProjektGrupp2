@@ -279,7 +279,9 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 	ImGui_ImplDX11_Init(this->device, this->deviceContext);
 	ImGui::StyleColorsDark();
 
-	this->particleSystem.initiateParticles(device, deviceContext,this->depthSRV);
+	this->particleSystem.initiateParticles(device, deviceContext, this->depthSRV, L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
+	this->particleSystem2.initiateParticles(device, deviceContext, this->depthSRV, L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
+
 	/*for (int i = 0; i < 150; i++)
 	{
 		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
@@ -288,7 +290,8 @@ bool Graphics::init(Window* window, float fov, Camera theCamera)
 		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
 	}*/
 	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	
+	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+
 
 	
 	return true;
@@ -322,6 +325,16 @@ void Graphics::render(Camera camera, float deltaTime)
 	dataPtr = (void*)((size_t)dataPtr + sizeof(Vector4));
 	CopyMemory(dataPtr, pointLights.data(), min(maxPointLights, pointLights.size()) * sizeof(PointLight));
 	deviceContext->Unmap(lightBuffer, 0);
+
+	this->particleSystem.updateParticles(deltaTime, viewProj);
+
+	//deviceContext->OMSetRenderTargets(1, &renderTargetView, this->depthStencilView);
+
+	this->particleSystem.drawAll(camera);
+
+	this->particleSystem2.updateParticles(deltaTime, viewProj);
+
+	this->particleSystem2.drawAll(camera);
 
 	//set up Shaders
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.GetInputLayout());
@@ -364,12 +377,10 @@ void Graphics::render(Camera camera, float deltaTime)
 		deviceContext->Draw(vertexCount, 0);
 	}
 	ID3D11DepthStencilView* nDPV = nullptr;
-	deviceContext->OMSetRenderTargets(1, &renderTargetView, nDPV);
+	//deviceContext->OMSetRenderTargets(1, &renderTargetView, nDPV);
 
-	this->particleSystem.updateParticles(deltaTime,viewProj);
-	deviceContext->OMSetRenderTargets(1, &renderTargetView, this->depthStencilView);
+	
 
-	this->particleSystem.drawAll(camera);
 	//this->particleSystem.addParticle(1, 10, Vector3(float(rand()), float(rand()), float(rand()))/RAND_MAX, Vector3(float(rand()), float(rand()), float(rand()))/RAND_MAX, Vector4(float(rand())/RAND_MAX, float(rand())/RAND_MAX, 0.0f,0.5f), 0.1f);
 	
 
@@ -467,11 +478,27 @@ void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfPartic
 	this->particleSystem.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
 }
 
+void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, int lifeTime)
+{
+	Vector3 randomPos = 0.5f * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	randomPos += pos;
+	float grey = float(rand()) / RAND_MAX;
+	this->particleSystem2.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+}
+
 void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
 {
 	if (nrOfColors < 5)
 	{
 		this->particleSystem.changeColornSize(colors, nrOfColors, startSize, endSize);
+	}
+}
+
+void Graphics::setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
+{
+	if (nrOfColors < 5)
+	{
+		this->particleSystem2.changeColornSize(colors, nrOfColors, startSize, endSize);
 	}
 }
 

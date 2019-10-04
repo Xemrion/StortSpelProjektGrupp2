@@ -53,7 +53,7 @@ class Graphics {
 	size_t maxPointLights = 20;
 	
 	ParticleSystem particleSystem;
-
+	ParticleSystem particleSystem2;
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
 	Debug* debugger;
@@ -81,5 +81,8 @@ public:
 	void render(Camera camera, float deltaTime);
 	bool createShaders();
 	void addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, int lifeTime = 2);
+	void addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, int lifeTime = 2);
 	void setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
+	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
+
 };

@@ -75,10 +75,10 @@ void Game::init(Window* window)
 	player.init();
 	Vector4 colorsP[4] =
 	{
-		Vector4(1.0f,1.0f,0.0f,0.5f),
-		Vector4(1.0f,0.0f,0.0f,0.5f),
-		Vector4(0.0f,0.0f,0.0f,0.5f),
-		Vector4(0.1f,0.1f,0.1f,0.5f)
+		Vector4(1.0f,1.0f,0.0f,1.0f),
+		Vector4(1.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f)
 	};
 	this->graphics.setParticleColorNSize(colorsP, 4, 0.05f, 0.10f);
 }
@@ -140,13 +140,13 @@ void Game::run()
 			{
 				Vector2 dir = Input::GetDirectionR(0);
 				//this->graphics.addParticle(this->player.getVehicle()->getPosition() + Vector3(0, 1, 0.5f), Vector3(8 * dir.x, 0.0f, dir.y * 8), addNrOfParticles, lifeTime);
-				this->graphics.addParticle(this->player.getVehicle()->getPosition() + Vector3(0, 1, 0.3f), Vector3(15 * dir.x, 0.0f, dir.y * 15), addNrOfParticles, lifeTime);
+				this->graphics.addParticle(this->player.getVehicle()->getPosition() + Vector3(0, 1, 0.3f), Vector3(6 * dir.x, 0.0f, dir.y * 6));
 			}
 			if (mouse.leftButton)
 			{
 				this->graphics.addParticle(Vector3(mousePos.x, 4, mousePos.y), 2 * Vector3(1.0f, 0.0f, 0.0f), addNrOfParticles, lifeTime);
 			}
-			this->graphics.addParticle(Vector3(0, 4, 0.0f), Vector3(0.0f, 7.5f, 0.0f), addNrOfParticles, lifeTime);
+			this->graphics.addParticle2(Vector3(0, 4, 0.0f), Vector3(0.0f, 6.5f, 0.0f), addNrOfParticles, lifeTime);
 
 			timerForParticle = 0;
 		}
@@ -189,7 +189,7 @@ void Game::run()
 		colorsP[2] = Vector4(colors3);
 		colorsP[3] = Vector4(colors4);
 
-		this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+		this->graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
 		ImGui::End();
 
 		Vector2 lDir = Input::GetDirectionL(0);

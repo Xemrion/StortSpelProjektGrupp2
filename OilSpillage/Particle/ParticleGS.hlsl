@@ -51,29 +51,32 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	
 	float3 up = normalize(cross(right, toCamera));
 	float3 vert[4];
-	float2 timeC = input[0].time;
+	float time = input[0].time.x;
+	float totalLifeTime = input[0].time.y;
 	float size;
 	/*
 	Config.x is nrOfColors. Max 4
-	Config.y is the start color and config.z is the end color.
+	Config.y is the startsize and config.z is the end size.
 	*/
-	size = lerp(config.y, config.z, smoothstep(0.0, timeC.y - 1.0f, timeC.x)) * (1.0 - smoothstep(timeC.y - 1.0f, timeC.y, timeC.x));
+	float startSize = config.y;
+	float endSize = config.z;
+	size = lerp(startSize, endSize, smoothstep(0.0, totalLifeTime - 1.0f, time)) * (1.0 - smoothstep(totalLifeTime - 1.0f, totalLifeTime, time));
 
 	
 	float nrOfColors = config.x;
 	float4 testColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
-	float halfTime = timeC.y / (nrOfColors-1);
-	if (timeC.x < halfTime)
+	float halfTime = totalLifeTime / (nrOfColors-1);
+	if (time < halfTime)
 	{
-		testColor = fadeOverTime(colors[0], colors[1], timeC.x, halfTime);
+		testColor = fadeOverTime(colors[0], colors[1], time, halfTime);
 	}
-	else if (timeC.x < halfTime * 2)
+	else if (time < halfTime * 2)
 	{
-		testColor = fadeOverTime(colors[1], colors[2], timeC.x % halfTime, halfTime);
+		testColor = fadeOverTime(colors[1], colors[2], time % halfTime, halfTime);
 	}
-	else if(timeC.x  < halfTime * 3)
+	else if(time  < halfTime * 3)
 	{
-		testColor = fadeOverTime(colors[2], colors[3], timeC.x % halfTime, halfTime);
+		testColor = fadeOverTime(colors[2], colors[3], time % halfTime, halfTime);
 	}
 	
 	//vert[0] = input[0].pos - right *size + up * size; // Top middle

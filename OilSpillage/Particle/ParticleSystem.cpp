@@ -18,7 +18,7 @@ ParticleSystem::~ParticleSystem()
 	
 }
 
-void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* depthSRV)
+void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* depthSRV, const wchar_t * csUpdate, const wchar_t* csCreate, const wchar_t* gs)
 {
 	this->depthSRV = depthSRV;
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] =
@@ -64,11 +64,11 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	hr = D3DReadFileToBlob(filePath.c_str(), this->pixelShaderBlob.GetAddressOf());
 	hr = device->CreatePixelShader(this->pixelShaderBlob->GetBufferPointer(), this->pixelShaderBlob->GetBufferSize(), NULL, this->pixelShader.GetAddressOf());
 
-	filePath = shaderfolder + L"ParticleCreateCS.cso";
+	filePath = shaderfolder + csCreate;
 	hr = D3DReadFileToBlob(filePath.c_str(), this->createComputeShaderBlob.GetAddressOf());
 	hr = device->CreateComputeShader(this->createComputeShaderBlob->GetBufferPointer(), this->createComputeShaderBlob->GetBufferSize(), NULL, this->createComputeShader.GetAddressOf());
 
-	filePath = shaderfolder + L"ParticleUpdateCS.cso";
+	filePath = shaderfolder + csUpdate;
 	hr = D3DReadFileToBlob(filePath.c_str(), this->computeShaderBlob.GetAddressOf());
 	hr = device->CreateComputeShader(this->computeShaderBlob->GetBufferPointer(), this->computeShaderBlob->GetBufferSize(), NULL, this->computeShader.GetAddressOf());
 

@@ -45,7 +45,7 @@ class ParticleSystem
 public:
 	ParticleSystem();
 	~ParticleSystem();
-	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* depthSRV);
+	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* depthSRV, const wchar_t* csUpdate, const wchar_t* csCreate, const wchar_t* gs);
 	bool addParticle(int nrOf, int lifeTime, Vector3 position, Vector3 initialDirection);
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
@@ -62,10 +62,11 @@ private:
 	float sinMovement = 0.0f;
 	IndirDraw indDraw;
 	ParticleRenderParams colorNSize;
+	ParticleParams pParams;
+
 	//Particle* particles;
 	//ID3D11Buffer* particleBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
-	ParticleParams pParams;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> nrOfParticlesCB;
