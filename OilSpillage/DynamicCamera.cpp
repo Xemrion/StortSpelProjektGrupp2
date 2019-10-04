@@ -174,6 +174,36 @@ void DynamicCamera::setRotation(Vector3 rotation)
 	}
 }
 
+float DynamicCamera::getNearDistance()
+{
+	return nearDist;
+}
+
+float DynamicCamera::getFarDistance()
+{
+	return farDist;
+}
+
+float DynamicCamera::getNearHeight()
+{
+	return nearHeight;
+}
+
+float DynamicCamera::getNearWidth()
+{
+	return nearWidth;
+}
+
+float DynamicCamera::getFarHeight()
+{
+	return farHeight;
+}
+
+float DynamicCamera::getFarWidth()
+{
+	return farWidth;
+}
+
 Matrix DynamicCamera::getViewMatrix()
 {
 	if (this->updateRotation) this->updateRotationMatrix();

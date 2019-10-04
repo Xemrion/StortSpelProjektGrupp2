@@ -29,7 +29,7 @@ Game::~Game()
 void Game::init(Window* window)
 {
 	this->window = window; 
-	graphics.init(window);
+	graphics.init(window, &camera);
 	Sound::Init();
 	
 	this->mouse = std::make_unique<Mouse>();
@@ -61,7 +61,7 @@ void Game::init(Window* window)
 	testObject3->setPosition(Vector3(0.0f, -1.0f, 0.0f));
 	testObject3->setScale(Vector3(50.0, 1.0, 50.0));
 	testObject3->setTexture(graphics.getTexturePointer("brickwall.tga"));
-	testObject3->setColor(Vector4(2.0, 2.0, 2.0, 1.0));
+	testObject3->setColor(Vector4(1.0, 1.0, 1.0, 1.0));
 
 	aiObject = new AIPlayer();
 	aiObject->mesh = graphics.getMeshPointer("Cube");
@@ -87,36 +87,39 @@ void Game::init(Window* window)
 	childTest->setColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));
 	childTest->parent = parentTest;
 	graphics.addToDraw(childTest);
+
 #if _DEBUG
 	// light tests
-	lightList.addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
-	lightList.addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 50.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
-	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 50.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
-	lightList.addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
-
-	
+	//lightList.addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1000.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
+	//lightList.addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 100.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
+	//lightList.addLight(SpotLight(Vector3(0.f, 2.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
+	//lightList.addLight(SpotLight(Vector3(0.f, 2.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 0.1f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	lightList.removeLight(lightList.addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 	
 	for (int i = 0; i < 50; ++i)
 	{
-		Vector3 randPos = Vector3(rand() % 101 - 50, 0.01, rand() % 101 - 50);
+		Vector3 randPos = Vector3(rand() % 101 - 50, float(rand() % 5 + 2), rand() % 101 - 50);
+		//randPos.x = i * 5.0 - 50.0;
+		//randPos.y = i + 1;
+		//randPos.z = i * 5.0 - 50.0;
 		Vector3 randColor = Vector3(rand(), rand(), rand()) / RAND_MAX;
-		randColor.Clamp(Vector3(0.2, 0.2, 0.2), Vector3(1.0, 1.0, 1.0));
+		//randColor = Vector3(0.5, 0.5, 0.5);
+		//randColor.Clamp(Vector3(0.1f, 0.1f, 0.1f), Vector3(0.5f, 0.5f, 0.5f));
 
 		lightList.addLight(
 			PointLight(
 				randPos,
 				randColor,
-				15.0f));
+				2.0));
 	}
 #endif
-	lightList.setSun(Sun(Vector3(0.0, -1.0, 1.0), Vector3(1.0, 0.8, 0.6)));
+	lightList.setSun(Sun(Vector3(0.0, -1.0, 1.0), Vector3(1.0, 0.95, 0.8) * 0.1));
 	graphics.setLightList(&lightList);
 
 	player.init();
 
-	playerLight = lightList.addLight(SpotLight(player.getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	playerLight = lightList.addLight(SpotLight(player.getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	RadioButtonValue = 0;
 }
@@ -136,7 +139,7 @@ void Game::run()
 		{ Vector3(0.0f, 10.0f, -10.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f },
 		{ Vector3(0.0f, 5.0f, 0.0f), Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
-	this->camera.startCinematic(&points, false);
+	this->camera.startCinematic(&points, true);
 
 	
 
@@ -174,6 +177,7 @@ void Game::run()
 			Sound::PlaySoundEffect(L"test2.wav");
 			Input::ResetRumble(0);
 		}
+		Vector3 cameraOffset = Vector3(0.0, 30.0, 0.0);
 
 		if (Input::IsKeyDown_DEBUG(Keyboard::A))
 			this->testObject->addRotation(Vector3(0.00f, 0.01f * deltaTime * 200, 0.00f));
@@ -183,7 +187,8 @@ void Game::run()
 			this->testObject->addRotation(Vector3(0.01f * deltaTime * 200, 0.00f, 0.00f));
 		if (Input::IsKeyDown_DEBUG(Keyboard::S))
 			this->testObject->addRotation(Vector3(-0.01f * deltaTime * 200, 0.00f, 0.00f));
-		
+
+			
 		this->player.update(deltaTime);
 		Vector3 spotlightDir = Vector3((sin(player.getVehicle()->getRotation().y)), 0, (cos(player.getVehicle()->getRotation().y)));
 		Vector3 spotlightPos = Vector3(player.getVehicle()->getPosition().x, player.getVehicle()->getPosition().y + 1, player.getVehicle()->getPosition().z);
@@ -193,7 +198,7 @@ void Game::run()
 
 		this->aiObject->Update(deltaTime);
 		this->camera.update(deltaTime);
-		this->camera.setPosition(this->player.getVehicle()->getPosition() + Vector3(0, 5, 0));
+		this->camera.setPosition(this->player.getVehicle()->getPosition() + cameraOffset);
 		
 		this->parentTest->setRotation(Vector3(0.0f, cos(curTime * secPerCount) * 2.0f, 0.0f));
 

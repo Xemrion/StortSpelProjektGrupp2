@@ -44,9 +44,8 @@ private:
 
 	void updateRotationMatrix();
 	void updateViewMatrix();
-
 public:
-	DynamicCamera(float fovDegrees = 90.0f, float nearPlane = 1.0f, float farPlane = 1000.0f);
+	DynamicCamera(float fovDegrees = 50.0f, float nearPlane = 1.0f, float farPlane = 1000.0f);
 	DynamicCamera(Vector3 position, Vector3 rotation = Vector3(), float fovDegrees = 90.0f, float nearPlane = 1.0f, float farPlane = 1000.0f);
 	~DynamicCamera();
 
@@ -61,6 +60,12 @@ public:
 	Vector3 getRotation() const;
 	const Vector3& getRotationRef();
 	void setRotation(Vector3 rotation);
+	float getNearDistance();
+	float getFarDistance();
+	float getNearHeight();
+	float getNearWidth();
+	float getFarHeight();
+	float getFarWidth();
 
 	Matrix getViewMatrix();
 	Matrix getProjectionMatrix() const;
