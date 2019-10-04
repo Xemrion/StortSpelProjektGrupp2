@@ -162,6 +162,7 @@ void PlayingGameState::init()
 	//aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
 	this->graphics.addToDraw(aiObject.get());
 
+
 	// TODO reafctor out
 	this->graphics.loadModel("Road_pavement");
 	this->graphics.loadModel("Road_deadend");
@@ -180,12 +181,13 @@ void PlayingGameState::init()
 
 	//Road Network Turtlewalker
 	this->testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-	this->testNetwork.get()->setAngle(90);
+	this->testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+	this->testNetwork.get()->setAngle(45);
 	for (int i = 0; i < 5; i++) {
 		this->testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
 		this->testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
 	}
-	//this->testNetwork.get()->cleanRoadNetwork();
+	this->testNetwork.get()->cleanRoadNetwork();
 	this->testNetwork.get()->saveTestNetwork("test-network");
 
 	this->lightList->removeLight(this->lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
