@@ -371,6 +371,9 @@ void delete_pointed_to(T* const ptr)
 void PlayingGameState::update(float deltaTime)
 {
 	/*-------------------------UPDATING-------------------------*/
+	if (Input::IsKeyDown_DEBUG(Keyboard::E)) {
+		deltaTime /= 4;
+	}
 	player->update(deltaTime);
 
 	Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
@@ -401,13 +404,19 @@ void PlayingGameState::update(float deltaTime)
 	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
 	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
 	ImGui::RadioButton("Directional Smooth", &radioButtonValue, 2);
-
-	if (radioButtonValue == 0 && player->getDrivingMode() == 1)
+	ImGui::RadioButton("Old Directional Semi-Realistic", &radioButtonValue, 3);
+	if (radioButtonValue == 0) {
 		player->setDrivingMode(0);
-	if (radioButtonValue == 1 && player->getDrivingMode() == 0)
-		player->setDrivingMode(1);
-	if (radioButtonValue == 2 && player->getDrivingMode() == 2)
-		player->setDrivingMode(2);
+	}
+	if (radioButtonValue == 1) {
+		this->player->setDrivingMode(1);
+	}
+	if (radioButtonValue == 2) {
+		this->player->setDrivingMode(2);
+	}
+	if (radioButtonValue == 3) {
+		this->player->setDrivingMode(3);
+	}
 
 	Vector3 camPos = camera->getPosition();
 	Vector3 camRot = camera->getRotation();

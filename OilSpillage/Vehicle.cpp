@@ -180,7 +180,7 @@ void Vehicle::update(float deltaTime)
 
 			if ((targetDir - this->currentDir).Length() > 0.01f)
 			{
-				this->currentDir = Vector2::SmoothStep(this->currentDir, targetDir, deltaTime * min(4* min(velocitySpeed*0.0003f,1),2));
+				this->currentDir = Vector2::Lerp(this->currentDir, targetDir, deltaTime * min(4* min(velocitySpeed*0.0003f,1),2));
 				this->currentDir.Normalize();
 			}
 			else
@@ -345,7 +345,7 @@ void Vehicle::update(float deltaTime)
 
 
 
-			if (vehicleRotation < targetRotation && !((abs(vehicleRotation - targetRotation)) < 0.3f)) {
+			if (vehicleRotation < targetRotation) {
 				if (abs(vehicleRotation - targetRotation) < 180) {
 					rotateAcceleration += 0.01f * 100 * deltaTime*5 * rotationSmoother;
 					if (rotateAcceleration > 1.9f * 200 * 0.04f * (rotationSmoother * 2)) {
@@ -364,7 +364,7 @@ void Vehicle::update(float deltaTime)
 				}
 			}
 
-			else if(!((abs(vehicleRotation - targetRotation)) < 0.3f)) {
+			else {
 				if (abs(vehicleRotation - targetRotation) < 180) {
 					rotateAcceleration += -0.01f * 100 * deltaTime*5 * rotationSmoother;
 					if (rotateAcceleration < -1.9f * 200 * 0.04f * (rotationSmoother * 2)) {
