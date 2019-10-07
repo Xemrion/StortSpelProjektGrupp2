@@ -318,7 +318,9 @@ bool Graphics::init(Window* window)
 
 
 	createShaders();
+#ifdef _DEBUG
 	debugger = new Debug(deviceContext, device);
+#endif
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
