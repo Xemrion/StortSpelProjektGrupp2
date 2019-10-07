@@ -27,10 +27,6 @@ private:
 		GameObject* obj = nullptr;
 	} bullets[bulletCount];
 
-	Vector2 currentDir;
-	float velocitySimple;
-	//float accelerationSimple;
-
 	Vector3 bodyPivot;
 	DirectX::XMFLOAT2 velocity;
 	float strength;
@@ -48,6 +44,10 @@ private:
 	float rotationSmoother = 1.0f;
 	float tempTargetRotation;
 	bool rotationDirection;
+
+
+	Vector2 currentDir;
+	float velocitySimple;
 public:
 	Vehicle();
 	virtual ~Vehicle();

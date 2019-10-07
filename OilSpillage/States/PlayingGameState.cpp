@@ -283,7 +283,7 @@ void PlayingGameState::update(float deltaTime)
 	if (radioButtonValue == 1 && this->player->getDrivingMode() == 0) {
 		this->player->setDrivingMode(1);
 	}
-	if (radioButtonValue == 2 && this->player->getDrivingMode() == 2) {
+	if (radioButtonValue == 2) {
 		this->player->setDrivingMode(2);
 	}
 	Vector3 camPos = this->camera->getPosition();
