@@ -1,13 +1,15 @@
 #pragma once
 
-// author: Victor Falkengaard Itzel
-// copyright September 2019
-
 #include "defs.hpp"
 
 namespace config
 {
-   F32  constexpr  TILE_SIDE_LENGTH         =  30.0f; // rec: 20
+   // TODO: refactor
+   U32  constexpr  map_width                =    96;
+   U32  constexpr  map_height               =    96;
+   F32  constexpr  TILE_SIDE_LENGTH         = 20.0f; // rec: 20
+   F32  constexpr  TILE_HEIGHT              = TILE_SIDE_LENGTH * 0.2f;
+   I32  constexpr  START_SEED               = 42069;
    U8   constexpr  CELL_SIZE                =    16;
    U8   constexpr  MIN_TILES_BEFORE_TURN    =     3;
    U8   constexpr  MIN_TILES_BEFORE_BRANCH  =     3;

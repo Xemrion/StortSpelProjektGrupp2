@@ -4,6 +4,7 @@
 #include<cstring>
 #include "ShaderDefines.hlsli"
 #include "UI/UserInterface.h"
+#include <cassert>
 
 Graphics::Graphics()
 {
@@ -317,7 +318,9 @@ bool Graphics::init(Window* window)
 
 
 	createShaders();
+#ifdef _DEBUG
 	debugger = new Debug(deviceContext, device);
+#endif
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -577,10 +580,13 @@ void Graphics::loadMesh(std::string fileName)
 	}
 }
 
-void Graphics::loadModel(std::string fileName)
+void Graphics::loadModel(std::string path)
 {
-	this->loadMesh(fileName + ".bin");
-	this->loadTexture(fileName + ".tga");
+   std::string modelDir {MODEL_ROOT_DIR};
+               modelDir += path;
+	loadMesh( modelDir+"/mesh.bin" );
+	loadTexture( modelDir+"/_diffuse.tga", true );
+   // TODO: load other texture channels
 }
 
 void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
@@ -734,46 +740,60 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 	}
 }
 
-bool Graphics::loadTexture(std::string fileName)
+bool Graphics::loadTexture(std::string path, bool overridePath )
 {
-	if (textures.find(fileName) == textures.end())
-	{
+   std::string texturePath;
+   if (!overridePath) {
+      texturePath += TEXTURE_ROOT_DIR;
+      texturePath += path;
+      texturePath += ".tga";
+   } else texturePath = path;
+
+	if (textures.find(texturePath) == textures.end()) {
 		Texture* newTexture = new Texture();
 
-		if (!newTexture->Initialize(this->device, this->deviceContext, fileName.c_str(), -1))
-		{
+		if (!newTexture->Initialize(this->device, this->deviceContext, texturePath.c_str(), -1)) {
 			delete newTexture;
 			return false;
 		}
-
-		textures[fileName] = newTexture;
+		textures[texturePath] = newTexture;
 	}
-
 	return true;
 }
 
-const Mesh* Graphics::getMeshPointer(const char* fileName)
-{
+const Mesh* Graphics::getMeshPointer(const char* localPath)
+{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
+   std::string meshPath;
+   if ( localPath != "Cube" ) {
+      meshPath = MODEL_ROOT_DIR;
+      meshPath += localPath;
+      meshPath += "/mesh.bin";
+   }
+   else meshPath = std::string(localPath);
 
-	if (meshes.find(fileName) == meshes.end())
-	{
-		return nullptr;
-	}
-	return &meshes[fileName];
+	if ( meshes.find(meshPath) == meshes.end() ) return nullptr;
+	else return &meshes[meshPath];
 }
 
-Texture* Graphics::getTexturePointer(const char* fileName)
-{
-	if (textures.find(fileName) == textures.end())
-	{
-		return nullptr;
-	}
+Texture* Graphics::getTexturePointer(const char* path, bool isModel )
+{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
+   std::string texturePath;
+   if (!isModel) {
+      texturePath += TEXTURE_ROOT_DIR;
+      texturePath += path;
+      texturePath += ".tga";
+   } else texturePath = MODEL_ROOT_DIR + std::string(path) + "/_diffuse.tga";
 
-	return textures[fileName];
+	if (textures.find(texturePath) == textures.end()) {
+      assert(false && "Failed to load texture!" );
+		return nullptr;
+   }
+	else return textures[texturePath];
 }
 
 void Graphics::addToDraw(GameObject* o)
 {
+   assert( o != nullptr );
 	drawableObjects.push_back(o);
 }
 

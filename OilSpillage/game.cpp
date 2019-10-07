@@ -87,4 +87,4 @@ void Game::run()
 		//deltaTime reset
 		this->prevTime = this->curTime;
 	}
-}
+}  

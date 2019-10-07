@@ -48,8 +48,8 @@ void Vehicle::init()
 	vehicle->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	//vehicle->setColor(Vector4(2,0.3,0.3,1));
 	vehicle->setScale(Vector3(0.75f, 0.2f, 0.8f));
-	Game::getGraphics().loadTexture("brickwall.tga");
-	vehicle->setTexture(Game::getGraphics().getTexturePointer("brickwall.tga"));
+	Game::getGraphics().loadTexture("brickwall");
+	vehicle->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
 
 	this->bodyRotation = new GameObject;
 	bodyRotation->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -57,8 +57,8 @@ void Vehicle::init()
 	bodyRotation->setPosition(Vector3(0.0f, 0.2f, 0.0f));
 	//vehicle->setColor(Vector4(2,0.3,0.3,1));
 	bodyRotation->setScale(Vector3(0.5f, 0.12f, 0.9f));
-	Game::getGraphics().loadTexture("CarTemp.tga");
-	bodyRotation->setTexture(Game::getGraphics().getTexturePointer("CarTemp.tga"));
+	Game::getGraphics().loadTexture("CarTemp");
+	bodyRotation->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 
 	this->bodyRotationPoint = new GameObject;
 	bodyRotationPoint->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -66,8 +66,8 @@ void Vehicle::init()
 	bodyRotationPoint->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	//vehicle->setColor(Vector4(2,0.3,0.3,1));
 	bodyRotationPoint->setScale(Vector3(0.2f, 0.2f, 0.2f));
-	Game::getGraphics().loadTexture("brickwall.tga");
-	bodyRotationPoint->setTexture(Game::getGraphics().getTexturePointer("brickwall.tga"));
+	Game::getGraphics().loadTexture("brickwall");
+	bodyRotationPoint->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
 
 	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
 
