@@ -388,7 +388,7 @@ void Graphics::render(DynamicCamera* camera)
 			boundingBox.maxPos += object->getPosition();
 			boundingBox.minPos += object->getPosition();
 
-			if (frustum.intersect(boundingBox, 15.0)) {
+			if (frustum.intersect(boundingBox, 2.0)) {
 				SimpleMath::Matrix world = object->getTransform();
 				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
