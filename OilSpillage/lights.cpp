@@ -2,7 +2,7 @@
 
 LightList::LightList()
 {
-
+	firstEmptySpace = 0;
 }
 
 LightList::~LightList()
@@ -10,81 +10,69 @@ LightList::~LightList()
 
 }
 
-std::array<PointLight, LightList::maxSize>::iterator LightList::addLight(PointLight& light)
+PointLight* LightList::addLight(PointLight& light)
 {
-	auto returnIterator = firstEmptySpacePointLights;
-	*firstEmptySpacePointLights = std::move(light);
-	firstEmptySpacePointLights = findNextEmptySpace(firstEmptySpacePointLights);
-	return returnIterator;
+	auto returnIterator = firstEmptySpace;
+	lights[firstEmptySpace] = std::move(light);
+	firstEmptySpace = findNextEmptySpace(firstEmptySpace);
+	return (PointLight*)&lights[returnIterator];
 }
 
-std::array<PointLight, LightList::maxSize>::iterator LightList::addLight(PointLight&& light)
+PointLight* LightList::addLight(PointLight&& light)
 {
-	auto returnIterator = firstEmptySpacePointLights;
-	*firstEmptySpacePointLights = std::move(light);
-	firstEmptySpacePointLights = findNextEmptySpace(firstEmptySpacePointLights);
-	return returnIterator;
+	auto returnIterator = firstEmptySpace;
+	lights[firstEmptySpace] = std::move(light);
+	firstEmptySpace = findNextEmptySpace(firstEmptySpace);
+	return (PointLight*)&lights[returnIterator];
 }
 
-std::array<SpotLight, LightList::maxSize>::iterator LightList::addLight(SpotLight& light)
+SpotLight* LightList::addLight(SpotLight& light)
 {
-	auto returnIterator = firstEmptySpaceSpotLights;
-	*firstEmptySpaceSpotLights = std::move(light);
-	firstEmptySpaceSpotLights = findNextEmptySpace(firstEmptySpaceSpotLights);
-	return returnIterator;
+	auto returnIterator = firstEmptySpace;
+	lights[firstEmptySpace] = std::move(light);
+	firstEmptySpace = findNextEmptySpace(firstEmptySpace);
+	return (SpotLight*)&lights[returnIterator];
 }
 
-std::array<SpotLight, LightList::maxSize>::iterator LightList::addLight(SpotLight&& light)
+SpotLight* LightList::addLight(SpotLight&& light)
 {
-	auto returnIterator = firstEmptySpaceSpotLights;
-	*firstEmptySpaceSpotLights = std::move(light);
-	firstEmptySpaceSpotLights = findNextEmptySpace(firstEmptySpaceSpotLights);
-	return returnIterator;
+	auto returnIterator = firstEmptySpace;
+	lights[firstEmptySpace] = std::move(light);
+	firstEmptySpace = findNextEmptySpace(firstEmptySpace);
+	return (SpotLight*)&lights[returnIterator];
 }
 
-std::array<PointLight, LightList::maxSize>::iterator LightList::findNextEmptySpace(std::array<PointLight, maxSize>::iterator start)
+UINT LightList::findNextEmptySpace(UINT start)
 {
-	auto it = firstEmptySpacePointLights;
-	for (; it != pointLights.end(); ++it)
+	UINT nextEmptySpace = start;
+	for (; nextEmptySpace < maxSize; ++nextEmptySpace)
 	{
-		if (it->getLuminance() == 0.0) 
+		if (lights[nextEmptySpace].getLuminance() == 0.0)
 		{
 			break;
 		}
 	}
 
-	return it;
+	return nextEmptySpace;
 }
 
-std::array<SpotLight, LightList::maxSize>::iterator LightList::findNextEmptySpace(std::array<SpotLight, maxSize>::iterator start)
+void LightList::removeLight(PointLight* lightPtr)
 {
-	auto it = firstEmptySpaceSpotLights;
-	for (; it != spotLights.end(); ++it)
+	*lightPtr = PointLight();
+	if (lightPtr < lights.data() + sizeof(Light) * firstEmptySpace)
 	{
-		if (it->getLuminance() == 0.0)
-		{
-			break;
-		}
-	}
-
-	return it;
-}
-
-void LightList::removeLight(std::array<PointLight, maxSize>::iterator lightIter)
-{
-	*lightIter = PointLight();
-	if (lightIter < firstEmptySpacePointLights)
-	{
-		firstEmptySpacePointLights = lightIter;
+		Light* lightsStartPtr = lights.data();
+		firstEmptySpace = ((UINT)lightPtr - (UINT)lightsStartPtr) / sizeof(Light);
 	}
 }
 
-void LightList::removeLight(std::array<SpotLight, maxSize>::iterator lightIter)
+void LightList::removeLight(SpotLight* lightPtr)
 {
-	*lightIter = SpotLight();
-	if (lightIter < firstEmptySpaceSpotLights)
+	*lightPtr = SpotLight();
+	if (lightPtr < lights.data() + sizeof(Light) * firstEmptySpace)
 	{
-		firstEmptySpaceSpotLights = lightIter;
+		Light* lightsStartPtr = lights.data();
+		firstEmptySpace = ((UINT)lightPtr - (UINT)lightsStartPtr) / sizeof(Light);
 	}
 }
 

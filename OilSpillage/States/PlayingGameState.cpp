@@ -150,6 +150,7 @@ void PlayingGameState::init()
 	this->player = std::make_unique<Vehicle>();
 	this->camera = std::make_unique<DynamicCamera>();
 	this->testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
+	this->graphics.createFrustumBuffer(camera.get());
 
 	this->graphics.loadMesh("sda");
 	this->graphics.loadShape(SHAPE_CUBE);
@@ -174,10 +175,10 @@ void PlayingGameState::init()
 
 #if _DEBUG
 	// light tests
-	this->lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
-	this->lightList->addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 50.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
-	this->lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 50.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
-	this->lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	this->lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
+	this->lightList->addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
+	this->lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
+	this->lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	//Road Network Turtlewalker
 	this->testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
@@ -194,7 +195,7 @@ void PlayingGameState::init()
 
 	for (int i = 0; i < 50; ++i)
 	{
-		Vector3 randPos = Vector3(static_cast<float>(rand() % 101 - 50), .01f, static_cast<float>(rand() % 101 - 50));
+		Vector3 randPos = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand() / RAND_MAX));
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
@@ -202,7 +203,7 @@ void PlayingGameState::init()
 			PointLight(
 				randPos,
 				randColor,
-				15.0f));
+				1.0f));
 	}
 #endif
 	this->lightList->setSun(Sun(Vector3(0.0f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
@@ -210,7 +211,7 @@ void PlayingGameState::init()
 
 	this->player->init();
 
-	this->playerLight = this->lightList->addLight(SpotLight(this->player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	this->playerLight = this->lightList->addLight(SpotLight(this->player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	this->points = {
 		{ Vector3(0.0f, 30.0f, -10.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f },
