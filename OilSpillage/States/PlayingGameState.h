@@ -29,8 +29,6 @@ private:
 
 	void generateMap();
 	void initiateAStar();
-	UPtr<GameObject>     testObject4;
-	Vector2 collisionDir;
 public:
 	PlayingGameState();
 	virtual ~PlayingGameState();

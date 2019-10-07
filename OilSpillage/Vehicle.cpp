@@ -71,7 +71,7 @@ void Vehicle::init()
 
 	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
 
-	this->weapon = VehicleWeapon::laser;
+	this->weapon = VehicleWeapon::missileLauncher;
 	this->stats = VehicleStats::defaultStats;
 
 	for (int i = 0; i < 16; i++)
@@ -83,7 +83,7 @@ void Vehicle::init()
 	}
 }
 
-void Vehicle::update(float deltaTime, Vector2 collisionDir)
+void Vehicle::update(float deltaTime)
 {
 	deltaTime *= 2;
 	if (Input::CheckButton(CONFIRM, HELD, 0))
@@ -111,7 +111,7 @@ void Vehicle::update(float deltaTime, Vector2 collisionDir)
 				this->bullets[freeToUse].dir = Vector3(dir.x, 0, dir.y);
 				this->bullets[freeToUse].dir.Normalize();
 				this->bullets[freeToUse].timeLeft = this->weapon.bulletLifetime;
-				this->bullets[freeToUse].speed = this->weapon.bulletSpeed;
+				this->bullets[freeToUse].speed = this->weapon.bulletSpeed + max(abs(velocity.x) , abs(velocity.y));
 				this->bullets[freeToUse].obj->setPosition(this->vehicle->getPosition() + Vector3(0, 2, 0));
 				this->bullets[freeToUse].obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->bullets[freeToUse].dir)) * Vector3(0, 1, 0));
 			}
@@ -267,25 +267,25 @@ void Vehicle::update(float deltaTime, Vector2 collisionDir)
 				rotateAcceleration = 0;
 			}
 			if (velocity.x * dx > 0.0f || velocity.y * dy > 0.0f) {
-				rotateAcceleration += 0.01f * 200 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
-				if (rotateAcceleration > 1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
-					rotateAcceleration = 1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
+				rotateAcceleration += 0.01f * 100 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
+				if (rotateAcceleration > 1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
+					rotateAcceleration = 1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
 				}
 				if (rotateAcceleration > 2.6f * Input::GetStrengthL(0)) {
 					rotateAcceleration = 2.6f * Input::GetStrengthL(0);
 				}
-				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((1.9f * 200 * 0.002f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((1.9f * 100 * 0.001f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
 				rotationDirection = false;
 			}
 			else {
-				rotateAcceleration -= 0.01f * 200 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
-				if (rotateAcceleration < -1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
-					rotateAcceleration = -1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
+				rotateAcceleration -= 0.01f * 100 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
+				if (rotateAcceleration < -1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
+					rotateAcceleration = -1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
 				}
 				if (rotateAcceleration < -2.6f * Input::GetStrengthL(0)) {
 					rotateAcceleration = -2.6f * Input::GetStrengthL(0);
 				}
-				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((-1.9f * 200 * 0.002f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((-1.9f * 100 * 0.001f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
 				rotationDirection = false;
 			}
 		}
@@ -294,25 +294,25 @@ void Vehicle::update(float deltaTime, Vector2 collisionDir)
 				rotateAcceleration = 0;
 			}
 			if (velocity.y * dy > 0.0f || velocity.x * dx > 0.0f) {
-				rotateAcceleration -= 0.01f * 200 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
-				if (rotateAcceleration < -1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
-					rotateAcceleration = -1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
+				rotateAcceleration -= 0.01f * 100 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
+				if (rotateAcceleration < -1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
+					rotateAcceleration = -1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
 				}
 				if (rotateAcceleration < -2.6f * Input::GetStrengthL(0)) {
 					rotateAcceleration = -2.6f * Input::GetStrengthL(0);
 				}
-				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((-1.9f * 200 * 0.002f) + rotateAcceleration * 2) / 3) * DirectX::XM_PI / 180) * deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((-1.9f * 100 * 0.001f) + rotateAcceleration * 2) / 3) * DirectX::XM_PI / 180) * deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
 				rotationDirection = true;
 			}
 			else {
-				rotateAcceleration += 0.01f * 200 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
-				if (rotateAcceleration > 1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
-					rotateAcceleration = 1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
+				rotateAcceleration += 0.01f * 100 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
+				if (rotateAcceleration > 1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
+					rotateAcceleration = 1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
 				}
 				if (rotateAcceleration > 2.6f * Input::GetStrengthL(0)) {
 					rotateAcceleration = 2.6f * Input::GetStrengthL(0);
 				}
-				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((1.9f * 200 * 0.002f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((1.9f * 100 * 0.001f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
 				rotationDirection = true;
 			}
 		}
@@ -325,6 +325,10 @@ void Vehicle::update(float deltaTime, Vector2 collisionDir)
 		if (Input::CheckButton(Keys::L_TRIGGER, HELD, 0) || Input::IsKeyDown_DEBUG(Keyboard::S)) {
 			this->velocity.x -= dx * 0.2f * deltaTime * 4000 * 0.7f /*Input::GetStrengthL(0)*/;
 			this->velocity.y -= dy * 0.2f * deltaTime * 4000 * 0.7f /*Input::GetStrengthL(0)*/;
+			if (velocity.y * dy > 0.0f || velocity.x * dx > 0.0f) {
+				this->velocity.x = (velocity.x / (1 + (0.003f * 300 * deltaTime)));
+				this->velocity.y = (velocity.y / (1 + (0.003f * 300 * deltaTime)));
+			}
 		}
 		if (!Input::CheckButton(Keys::R_TRIGGER, HELD, 0) && !Input::IsKeyDown_DEBUG(Keyboard::S) && !Input::CheckButton(Keys::L_TRIGGER, HELD, 0) && !Input::IsKeyDown_DEBUG(Keyboard::W)) {
 		
@@ -337,7 +341,34 @@ void Vehicle::update(float deltaTime, Vector2 collisionDir)
 	//	//rotationSmoother = 1;
 	//	rotateAcceleration = 0;
 	//}
-
+	if (velocity.x > topSpeed * strength) {
+		velocity.x = topSpeed * strength;
+	}
+	if (velocity.x < -topSpeed * strength) {
+		velocity.x = -topSpeed * strength;
+	}
+	if (velocity.y > topSpeed * strength) {
+		velocity.y = topSpeed * strength;
+	}
+	if (velocity.y < -topSpeed * strength) {
+		velocity.y = -topSpeed * strength;
+	}
+	if (velocity.x > topSpeed * strength * 0.75f && velocity.y < -topSpeed * strength * 0.75f) {
+		velocity.x = topSpeed * strength * 0.75f;
+		velocity.y = -topSpeed * strength * 0.75f;
+	}
+	if (velocity.x < -topSpeed * strength * 0.75f && velocity.y > topSpeed * strength * 0.75f) {
+		velocity.x = -topSpeed * strength * 0.75f;
+		velocity.y = topSpeed * strength * 0.75f;
+	}
+	if (velocity.y > topSpeed * strength * 0.75f && velocity.x > topSpeed * strength * 0.75f) {
+		velocity.y = topSpeed * strength * 0.75f;
+		velocity.x = topSpeed * strength * 0.75f;
+	}
+	if (velocity.y < -topSpeed * strength * 0.75f && velocity.x < -topSpeed * strength * 0.75f) {
+		velocity.y = -topSpeed * strength * 0.75f;
+		velocity.x = -topSpeed * strength * 0.75f;
+	}
 
 
 
@@ -346,46 +377,24 @@ void Vehicle::update(float deltaTime, Vector2 collisionDir)
 	float driftForce = velocity.x * (dy / hypoC) + velocity.y * -(dx / hypoC);
 	if (drivingMode != 2) {
 		if (Input::GetStrengthL(0) > 0) {
-			if (driftForce < -350) {
+			if (driftForce < -250) {
 				this->velocity.x -= -((dy / hypoC) * 4000 * deltaTime);
 				this->velocity.y -= -(-((dx / hypoC) * 4000 * deltaTime));
 			}
-			else if (driftForce > 350) {
+			else if (driftForce > 250) {
 				this->velocity.x += -((dy / hypoC) * 4000 * deltaTime);
 				this->velocity.y += -(-((dx / hypoC) * 4000 * deltaTime));
 			}
 		}
 		else {
-			if (driftForce < -350) {
+			if (driftForce < -250) {
 				this->velocity.x -= -((dy / hypoC) * 4000 * deltaTime);
 				this->velocity.y -= -(-((dx / hypoC) * 4000 * deltaTime));
 			}
-			else if (driftForce > 350) {
+			else if (driftForce > 250) {
 				this->velocity.x += -((dy / hypoC) * 4000 * deltaTime);
 				this->velocity.y += -(-((dx / hypoC) * 4000 * deltaTime));
 			}
-		}
-	}
-
-	//Collision
-	if(collisionDir.x == 1){
-		if (velocity.x < 0) {
-			velocity.x = 0;
-		}
-	}
-	if (collisionDir.x == -1){
-		if (velocity.x > 0) {
-			velocity.x = 0;
-		}
-	}
-	if (collisionDir.y == 1){
-		if (velocity.y > 0) {
-			velocity.y = 0;
-		}
-	}
-	if (collisionDir.y == -1){
-		if (velocity.y < 0) {
-			velocity.y = 0;
 		}
 	}
 

@@ -162,13 +162,6 @@ void PlayingGameState::init()
 	//aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
 	this->graphics.addToDraw(aiObject.get());
 
-	this->testObject4 = std::make_unique<GameObject>();
-	this->testObject4->mesh = this->graphics.getMeshPointer("Cube");
-	this->testObject4->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
-	this->testObject4->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
-	this->testObject4->setScale(Vector3(7.0f, 20.0f, 7.0f));
-	this->graphics.addToDraw(testObject4.get());
-
 	// TODO reafctor out
 	this->graphics.loadModel("Road_pavement");
 	this->graphics.loadModel("Road_deadend");
@@ -236,37 +229,16 @@ void PlayingGameState::cleanUp()
 	this->camera.reset();
 	this->points.clear();
 	this->testNetwork.reset();
-	this->testObject4.reset();
 }
 
 void PlayingGameState::update(float deltaTime)
 {
 	/*-------------------------UPDATING-------------------------*/
-	//Collision
-	if ((testObject4->getPosition().x + (testObject4->getScale().x) > player->getVehicle()->getPosition().x
-		&& (testObject4->getPosition().x - (testObject4->getScale().x)) < player->getVehicle()->getPosition().x
-		&& player->getVehicle()->getPosition().z < (testObject4->getPosition().z + (testObject4->getScale().z))
-		&& player->getVehicle()->getPosition().z >(testObject4->getPosition().z - (testObject4->getScale().z))))
-	{
-		//Collision X
-		if (player->getVehicle()->getPosition().x > testObject4->getPosition().x) {
-			collisionDir = Vector2(1, 0);
-		}
-		else if (player->getVehicle()->getPosition().x < testObject4->getPosition().x) {
-			collisionDir = Vector2(-1, 0);
-		}
-		//Collision Y
-		if (player->getVehicle()->getPosition().z > testObject4->getPosition().z) {
-			collisionDir += Vector2(0, 1);
-		}
-		else if (player->getVehicle()->getPosition().z < testObject4->getPosition().z) {
-			collisionDir += Vector2(0, -1);
-		}
+	
+	if(Input::IsKeyDown_DEBUG(Keyboard::E)) {
+		deltaTime /= 4;
 	}
-	else {
-		collisionDir = Vector2(0, 0);
-	}
-	this->player->update(deltaTime, collisionDir);
+	this->player->update(deltaTime);
 	Vector3 spotlightDir = Vector3((sin(this->player->getVehicle()->getRotation().y)), 0, (cos(this->player->getVehicle()->getRotation().y)));
 	Vector3 spotlightPos = Vector3(this->player->getVehicle()->getPosition().x, this->player->getVehicle()->getPosition().y + 1, this->player->getVehicle()->getPosition().z);
 	spotlightPos += spotlightDir * 1;

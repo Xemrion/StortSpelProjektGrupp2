@@ -1,6 +1,7 @@
 #pragma once
 #include "Mesh.h"
 #include <d3d11.h>
+#include <SimpleMath.h>
 #include "Texture.h"
 #include <math.h>
 
@@ -13,10 +14,11 @@ protected:
 	Vector3 rotation;
 	Vector4 color;
 	Texture* texture = nullptr;
+	DirectX::SimpleMath::Rectangle hitBox;
 public:
 	const Mesh* mesh = nullptr;
 	GameObject* parent = nullptr;
-	
+
 	Matrix getTransform();
 
 	void setPosition(Vector3 newPos);

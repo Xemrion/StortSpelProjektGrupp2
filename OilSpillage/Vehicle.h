@@ -49,7 +49,7 @@ public:
 	virtual ~Vehicle();
 
 	void init();
-	void update(float deltaTime, Vector2 collisionDir);
+	void update(float deltaTime);
 	GameObject* getVehicle() { return this->vehicle; }
 	float getAcceleratorX();
 
