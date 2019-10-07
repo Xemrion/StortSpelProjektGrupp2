@@ -126,6 +126,9 @@
     <ClCompile Include="Road Network\RoadNet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PG\District.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -276,6 +279,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Road Network\RoadNet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\District.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

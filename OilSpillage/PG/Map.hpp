@@ -91,6 +91,8 @@ public:
 			               y_offset = height / 2.0f * config::TILE_SIDE_LENGTH;
 		return { x * config::TILE_SIDE_LENGTH - x_offset,  .0f,  y * -config::TILE_SIDE_LENGTH + y_offset };
 	}
+
+   Vec<V2u> get_neighbour_tile_coords( V2u cell_coord ) const noexcept;
 };
 
 
