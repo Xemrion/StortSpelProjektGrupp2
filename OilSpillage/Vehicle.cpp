@@ -344,7 +344,7 @@ void Vehicle::update(float deltaTime)
 
 			if ((targetDir - this->currentDir).Length() > 0.01f)
 			{
-				this->currentDir = Vector2::Lerp(this->currentDir, targetDir, deltaTime);
+				this->currentDir = Vector2::Lerp(this->currentDir, targetDir, deltaTime*2);
 				this->currentDir.Normalize();
 			}
 			else

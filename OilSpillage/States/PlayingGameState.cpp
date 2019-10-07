@@ -277,10 +277,10 @@ void PlayingGameState::update(float deltaTime)
 	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
 	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
 	ImGui::RadioButton("Directional Smooth", &radioButtonValue, 2);
-	if (radioButtonValue == 0 && this->player->getDrivingMode() == 1) {
+	if (radioButtonValue == 0) {
 		player->setDrivingMode(0);
 	}
-	if (radioButtonValue == 1 && this->player->getDrivingMode() == 0) {
+	if (radioButtonValue == 1) {
 		this->player->setDrivingMode(1);
 	}
 	if (radioButtonValue == 2) {
