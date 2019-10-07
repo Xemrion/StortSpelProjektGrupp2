@@ -80,7 +80,7 @@ Vector3 GameObject::getScale() const
 {
 	return this->scale;
 }
-AABB GameObject::getTheAABB() const
+AABB GameObject::getAABB() const
 {
 	return this->mesh->getAABB().scale(this->scale);
 }

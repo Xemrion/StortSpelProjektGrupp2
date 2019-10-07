@@ -4,6 +4,7 @@
 #include<cstring>
 #include "ShaderDefines.hlsli"
 #include "UI/UserInterface.h"
+#include <cassert>
 
 Graphics::Graphics()
 {
@@ -317,7 +318,9 @@ bool Graphics::init(Window* window)
 
 
 	createShaders();
+#ifdef _DEBUG
 	debugger = new Debug(deviceContext, device);
+#endif
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -374,38 +377,50 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->PSSetConstantBuffers(2, 1, &this->sunBuffer);
 	deviceContext->PSSetConstantBuffers(1, 1, &this->lightBuffer);
 
+	Frustum frustum = camera->getFrustum();
+
 	for (GameObject* object : drawableObjects)
 	{
-		SimpleMath::Matrix world = object->getTransform();
-		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		HRESULT hr = deviceContext->Map(worldBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
-		deviceContext->Unmap(worldBuffer, 0);
-		UINT vertexCount = object->mesh->getVertexCount();
-		UINT stride = sizeof(Vertex3D);
-		UINT offset = 0;
-		ID3D11ShaderResourceView* shaderResView;
-		if(object->getTexture()!=nullptr)
-			shaderResView = object->getTexture()->getShaderResView();
-		else
+		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
 		{
-			shaderResView = nullptr;
+			AABB boundingBox = object->getAABB();
+			boundingBox = boundingBox.scale(object->getScale());
+			boundingBox.maxPos += object->getPosition();
+			boundingBox.minPos += object->getPosition();
+
+			if (frustum.intersect(boundingBox, 2.0)) {
+				SimpleMath::Matrix world = object->getTransform();
+				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+				D3D11_MAPPED_SUBRESOURCE mappedResource;
+				HRESULT hr = deviceContext->Map(worldBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
+				deviceContext->Unmap(worldBuffer, 0);
+				UINT vertexCount = object->mesh->getVertexCount();
+				UINT stride = sizeof(Vertex3D);
+				UINT offset = 0;
+				ID3D11ShaderResourceView* shaderResView;
+				if (object->getTexture() != nullptr)
+					shaderResView = object->getTexture()->getShaderResView();
+				else
+				{
+					shaderResView = nullptr;
+				}
+
+
+				Vector4 modColor = object->getColor();
+				hr = deviceContext->Map(colorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
+				deviceContext->Unmap(colorBuffer, 0);
+
+				deviceContext->VSSetConstantBuffers(1, 1, &this->worldBuffer);
+				deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
+				deviceContext->PSSetShaderResources(0, 1, &shaderResView);
+				deviceContext->PSSetConstantBuffers(0, 1, &this->colorBuffer);
+
+				deviceContext->Draw(vertexCount, 0);
+			}
 		}
-
-		
-		Vector4 modColor = object->getColor();
-		hr = deviceContext->Map(colorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
-		deviceContext->Unmap(colorBuffer, 0);
-
-		deviceContext->VSSetConstantBuffers(1, 1, &this->worldBuffer);
-		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
-		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
-		deviceContext->PSSetConstantBuffers(0, 1, &this->colorBuffer);
-
-		deviceContext->Draw(vertexCount, 0);
 	}
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.GetInputLayout());
@@ -565,10 +580,13 @@ void Graphics::loadMesh(std::string fileName)
 	}
 }
 
-void Graphics::loadModel(std::string fileName)
+void Graphics::loadModel(std::string path)
 {
-	this->loadMesh(fileName + ".bin");
-	this->loadTexture(fileName + ".tga");
+   std::string modelDir {MODEL_ROOT_DIR};
+               modelDir += path;
+	loadMesh( modelDir+"/mesh.bin" );
+	loadTexture( modelDir+"/_diffuse.tga", true );
+   // TODO: load other texture channels
 }
 
 void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
@@ -634,6 +652,10 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 
 
 			meshes[fileName].insertDataToMesh(vecTemp);
+			AABB boundingBox;
+			boundingBox.minPos = Vector3(-1.0, -1.0, -1.0);
+			boundingBox.maxPos = Vector3(1.0, 1.0, 1.0);
+			meshes[fileName].setAABB(boundingBox);
 
 			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
 			UINT stride = sizeof(Vertex3D);
@@ -688,6 +710,10 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 			vecTemp.push_back(vertex);
 
 			meshes[fileName].insertDataToMesh(vecTemp);
+			AABB boundingBox;
+			boundingBox.minPos = Vector3(-1.0, -0.01, -1.0);
+			boundingBox.maxPos = Vector3(1.0, 0.01, 1.0);
+			meshes[fileName].setAABB(boundingBox);
 
 			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
 			UINT stride = sizeof(Vertex3D);
@@ -714,46 +740,60 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 	}
 }
 
-bool Graphics::loadTexture(std::string fileName)
+bool Graphics::loadTexture(std::string path, bool overridePath )
 {
-	if (textures.find(fileName) == textures.end())
-	{
+   std::string texturePath;
+   if (!overridePath) {
+      texturePath += TEXTURE_ROOT_DIR;
+      texturePath += path;
+      texturePath += ".tga";
+   } else texturePath = path;
+
+	if (textures.find(texturePath) == textures.end()) {
 		Texture* newTexture = new Texture();
 
-		if (!newTexture->Initialize(this->device, this->deviceContext, fileName.c_str(), -1))
-		{
+		if (!newTexture->Initialize(this->device, this->deviceContext, texturePath.c_str(), -1)) {
 			delete newTexture;
 			return false;
 		}
-
-		textures[fileName] = newTexture;
+		textures[texturePath] = newTexture;
 	}
-
 	return true;
 }
 
-const Mesh* Graphics::getMeshPointer(const char* fileName)
-{
+const Mesh* Graphics::getMeshPointer(const char* localPath)
+{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
+   std::string meshPath;
+   if ( localPath != "Cube" ) {
+      meshPath = MODEL_ROOT_DIR;
+      meshPath += localPath;
+      meshPath += "/mesh.bin";
+   }
+   else meshPath = std::string(localPath);
 
-	if (meshes.find(fileName) == meshes.end())
-	{
-		return nullptr;
-	}
-	return &meshes[fileName];
+	if ( meshes.find(meshPath) == meshes.end() ) return nullptr;
+	else return &meshes[meshPath];
 }
 
-Texture* Graphics::getTexturePointer(const char* fileName)
-{
-	if (textures.find(fileName) == textures.end())
-	{
-		return nullptr;
-	}
+Texture* Graphics::getTexturePointer(const char* path, bool isModel )
+{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
+   std::string texturePath;
+   if (!isModel) {
+      texturePath += TEXTURE_ROOT_DIR;
+      texturePath += path;
+      texturePath += ".tga";
+   } else texturePath = MODEL_ROOT_DIR + std::string(path) + "/_diffuse.tga";
 
-	return textures[fileName];
+	if (textures.find(texturePath) == textures.end()) {
+      assert(false && "Failed to load texture!" );
+		return nullptr;
+   }
+	else return textures[texturePath];
 }
 
 void Graphics::addToDraw(GameObject* o)
 {
+   assert( o != nullptr );
 	drawableObjects.push_back(o);
 }
 
@@ -867,10 +907,10 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 			Vector3 viewBottomLeft  = Vector3(screenToView(screenBottomLeft));
 			Vector3 viewBottomRight = Vector3(screenToView(screenBottomRight));
 
-			frustum.left   = DirectX::XMPlaneFromPoints(eye, viewBottomLeft, viewTopLeft);
-			frustum.right  = DirectX::XMPlaneFromPoints(eye, viewTopRight, viewBottomRight);
 			frustum.top    = DirectX::XMPlaneFromPoints(eye, viewTopLeft, viewTopRight);
 			frustum.bottom = DirectX::XMPlaneFromPoints(eye, viewBottomRight, viewBottomLeft);
+			frustum.left   = DirectX::XMPlaneFromPoints(eye, viewBottomLeft, viewTopLeft);
+			frustum.right  = DirectX::XMPlaneFromPoints(eye, viewTopRight, viewBottomRight);
 
 			frustumTiles[y * 80 + x] = frustum;
 		}
@@ -891,4 +931,14 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 	hr = device->CreateShaderResourceView(frustumBuffer, &srvDesc, &frustumBufferSRV);
 
 	return hr;
+}
+
+void Graphics::setCullingDistance(float dist)
+{
+	cullingDistance = dist;
+}
+
+float Graphics::getCullingDistance()
+{
+	return cullingDistance;
 }

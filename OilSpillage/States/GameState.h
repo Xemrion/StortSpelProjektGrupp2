@@ -1,5 +1,4 @@
-#ifndef GAME_STATE_H
-#define GAME_STATE_H
+#pragma once
 
 class GameState
 {
@@ -11,5 +10,3 @@ public:
 	virtual void cleanUp() = 0;
 	virtual void update(float deltaTime) = 0;
 };
-
-#endif // !GAME_STATE_H

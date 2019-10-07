@@ -241,10 +241,10 @@ Frustum DynamicCamera::getFrustum()
 	Vector3 farBottomLeft = farCenter - Vector3(viewUp) * farHeight - Vector3(viewRight) * farWidth;
 	Vector3 farBottomRight = farCenter - Vector3(viewUp) * farHeight + Vector3(viewRight) * farWidth;
 
-	frustum.topPlane = DirectX::XMPlaneFromPoints(nearTopRight, nearTopLeft, farTopLeft);
-	frustum.bottomPlane = DirectX::XMPlaneFromPoints(nearBottomLeft, nearBottomRight, farBottomRight);
-	frustum.leftPlane = DirectX::XMPlaneFromPoints(nearTopLeft, nearBottomLeft, farBottomLeft);
-	frustum.rightPlane = DirectX::XMPlaneFromPoints(nearBottomRight, nearTopRight, farBottomRight);
+	frustum.topPlane = DirectX::XMPlaneFromPoints(position, farTopLeft, farTopRight);
+	frustum.bottomPlane = DirectX::XMPlaneFromPoints(position, farBottomRight, farBottomLeft);
+	frustum.leftPlane = DirectX::XMPlaneFromPoints(position, farBottomLeft, farTopLeft);
+	frustum.rightPlane = DirectX::XMPlaneFromPoints(position, farTopRight, farBottomRight);
 
 	return frustum;
 }

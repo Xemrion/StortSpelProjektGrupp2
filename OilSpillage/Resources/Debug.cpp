@@ -9,7 +9,7 @@ Debug::Debug(ID3D11DeviceContext* dc, ID3D11Device *d)
 
 inline void Debug::DrawAABB(GameObject* obj, Vector3 color)
 {
-	AABB collisionBox = obj->getTheAABB();
+	AABB collisionBox = obj->getAABB();
 	Debug::DrawCube(collisionBox.maxPos, collisionBox.minPos, obj->getPosition(), color);
 }
 

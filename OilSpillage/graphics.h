@@ -1,4 +1,5 @@
 #pragma once
+
 #include "window.h"
 #include "GameObject.h"
 #include "Camera.h"
@@ -19,6 +20,9 @@
 #include "Lights.h"
 #include <memory.h>
 #include <array>
+
+char const MODEL_ROOT_DIR[]   { "data/models/" };
+char const TEXTURE_ROOT_DIR[] { "data/textures/" };
 
 enum Shapes
 {
@@ -55,6 +59,7 @@ class Graphics {
 	std::unordered_map<std::string, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
 	LightList* lightList;
+	float cullingDistance = 150.f;
 	
 	Vector4 sunVector = Vector4(0.0, 1.0, 0.0, 0.0);
 	struct LightBufferContents {
@@ -68,7 +73,6 @@ class Graphics {
 	Debug* debugger;
 	ID3D11Debug* debug;
 
-	void fillLightBuffers();
 	void cullLights();
 public:
 	Graphics();
@@ -77,12 +81,12 @@ public:
 	HRESULT createFrustumBuffer(DynamicCamera* camera);
 	Debug* getdebugger();
 	Window* getWindow();
-	void loadMesh(std::string fileName);
-	void loadModel(std::string fileName);
+	void loadMesh(std::string path);
+	void loadModel(std::string path);
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
-	bool loadTexture(std::string fileName);
-	const Mesh* getMeshPointer(const char* fileName);
-	Texture* getTexturePointer(const char* fileName);
+	bool loadTexture(std::string fileName, bool overridePath=false);
+	const Mesh* getMeshPointer(const char *path);
+	Texture* getTexturePointer(const char *path, bool isModel=false);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
@@ -90,7 +94,11 @@ public:
 	void presentScene();
 	void render(DynamicCamera* camera);
 	bool createShaders();
+	void fillLightBuffers();
 	void clearScreen();
 	ID3D11DeviceContext* getDeviceContext();
 	ID3D11Device* getDevice();
+	//culling by distance from camera
+	void setCullingDistance(float dist);
+	float getCullingDistance();
 };
