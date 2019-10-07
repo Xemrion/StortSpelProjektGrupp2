@@ -6,75 +6,64 @@
 
 using namespace DirectX::SimpleMath;
 
-class PointLight
-{
+class Light {
 	friend class Graphics;
-	Vector4 pos; // empty w component
-	Vector4 color; // w component is luminance
-	Vector4 padding = Vector4(0.0, 0.0, 0.0, 0.0);
+protected:
+	Vector4 pos;
+	Vector3 color;
+	float luminance;
+	Vector3 direction;
+	float coneWidth;
 public:
-	PointLight() { pos = Vector4(); color = Vector4(); }
-	PointLight(Vector3 pos, Vector3 color, float luminance) {
-		this->pos = Vector4(pos);
-		color.Clamp(Vector3(0.0), Vector3(1.0));
-		this->color = Vector4(color);
-		assert(luminance > 0.0f);
-		this->color.w = luminance;
-	}
-	~PointLight() {}
-
-	void setPos(Vector3 pos) { this->pos = Vector4(pos); }
+	Light() : pos(0.0, 0.0, 0.0, 1.0), color(0.0, 0.0, 0.0), luminance(0.0), direction(0.0, 0.0, 0.0), coneWidth(0.0) {};
+	void setPos(Vector3 pos) { this->pos = Vector4(pos); this->pos.w = 1.0; }
 	Vector3 getPos() const { return Vector3(pos); }
 	void setColor(Vector3 color) {
 		color.Clamp(Vector3(0.0), Vector3(1.0));
-		this->color.x = color.x;
-		this->color.y = color.y;
-		this->color.z = color.z;
+		this->color = color;
 	}
 	Vector3 getColor() const { return Vector3(color); }
-	void setLuminance(float luminance) { this->color.w = luminance; };
-	float getLuminance() const { return this->color.w; }
+	void setLuminance(float luminance) { this->luminance = luminance; };
+	float getLuminance() const { return this->luminance; }
 };
 
-class SpotLight
+class PointLight : public Light
 {
 	friend class Graphics;
-	Vector4 pos; // empty w component
-	Vector4 color; // w component is luminance
-	Vector4 directionWidth; //xyz direction, w width
 public:
-	SpotLight() { pos = Vector4(); color = Vector4(); directionWidth = Vector4(); }
+	PointLight() {};
+	PointLight(Vector3 pos, Vector3 color, float luminance) {
+		this->pos = Vector4(pos);
+		this->pos.w = 1.0;
+		color.Clamp(Vector3(0.0), Vector3(1.0));
+		this->color = color;
+		this->luminance = luminance;
+	}
+	~PointLight() {}
+};
+
+class SpotLight : public Light
+{
+	friend class Graphics;
+public:
+	SpotLight() {};
 	SpotLight(Vector3 pos, Vector3 color, float luminance, Vector3 direction, float conePercentOpen) {
 		this->pos = Vector4(pos);
+		this->pos.w = 1.0;
 		color.Clamp(Vector3(0.0), Vector3(1.0));
-		this->color = Vector4(color);
-		this->color.w = luminance;
+		this->color = color;
+		this->luminance = luminance;
 		direction.Normalize();
-		this->directionWidth = Vector4(direction);
-		conePercentOpen = min(max(0.0f, conePercentOpen), 1.0f);
-		this->directionWidth.w = conePercentOpen * DirectX::XM_PIDIV2;
+		this->direction = direction;
+		this->coneWidth = min(max(0.0f, conePercentOpen), 1.0f) * DirectX::XM_PIDIV2;
 	}
 	~SpotLight() {}
 
-	void setPos(Vector3 pos) { this->pos = Vector4(pos); }
-	Vector3 getPos() const { return Vector3(pos); }
-	void setColor(Vector3 color) {
-		color.Clamp(Vector3(0.0), Vector3(1.0));
-		this->color.x = color.x;
-		this->color.y = color.y;
-		this->color.z = color.z;
-	}
-	Vector3 getColor() const { return Vector3(color); }
-	void setLuminance(float luminance) { this->color.w = luminance; };
-	float getLuminance() const { return this->color.w; }
 	void setDirection(Vector3 dir) { 
-		this->directionWidth.x = dir.x;
-		this->directionWidth.y = dir.y;
-		this->directionWidth.z = dir.z;
+		this->direction = dir;
 	}
-	Vector3 getDirection() const { return Vector3(directionWidth); }
-	
-	void setConeWidth(float percentOpen) { percentOpen = min(max(0.0f, percentOpen), 1.0f); directionWidth.w = DirectX::XM_PIDIV2 * percentOpen; }
+	Vector3 getDirection() const { return direction; }
+	void setConeWidth(float percentOpen) { coneWidth = min(max(0.0f, percentOpen), 1.0f) * DirectX::XM_PIDIV2; }
 };
 
 class Sun {
@@ -108,22 +97,18 @@ public:
 	LightList();
 	~LightList();
 
-	std::array<PointLight, maxSize>::iterator addLight(PointLight& light);
-	std::array<PointLight, maxSize>::iterator addLight(PointLight&& light);
-	std::array<SpotLight, maxSize>::iterator addLight(SpotLight& light);
-	std::array<SpotLight, maxSize>::iterator addLight(SpotLight&& light);
-	void removeLight(std::array<PointLight, maxSize>::iterator);
-	void removeLight(std::array<SpotLight, maxSize>::iterator);
+	PointLight* addLight(PointLight& light);
+	PointLight* addLight(PointLight&& light);
+	SpotLight* addLight(SpotLight& light);
+	SpotLight* addLight(SpotLight&& light);
+	void removeLight(PointLight* light);
+	void removeLight(SpotLight* light);
 	void setSun(Sun sun);
 private:
 	friend class Graphics;
-	std::array<PointLight, maxSize> pointLights;
-	std::array<PointLight, maxSize>::iterator firstEmptySpacePointLights = pointLights.begin();
-	std::array<SpotLight, maxSize> spotLights;
-	std::array<SpotLight, maxSize>::iterator firstEmptySpaceSpotLights = spotLights.begin();
-
-	std::array<PointLight, maxSize>::iterator findNextEmptySpace(std::array<PointLight, maxSize>::iterator start);
-	std::array<SpotLight, maxSize>::iterator findNextEmptySpace(std::array<SpotLight, maxSize>::iterator start);
+	std::array<Light, maxSize> lights;
+	UINT firstEmptySpace;
+	UINT findNextEmptySpace(UINT start);
 
 	Sun sun;
 };

@@ -14,6 +14,8 @@
 class PlayingGameState : public GameState
 {
 private:
+	friend class Game;
+
 	Graphics& graphics;
 	std::unique_ptr<Map> map;
 	std::unique_ptr<AIPlayer> aiObject;
@@ -23,7 +25,7 @@ private:
 	std::unique_ptr<Vehicle> player;
 	std::unique_ptr<DynamicCamera> camera;
 	std::vector<CinematicPos> points;
-	std::array<SpotLight, LightList::maxSize>::iterator playerLight;
+	SpotLight* playerLight = nullptr;
 	std::unique_ptr<RoadNetwork> testNetwork;
 	//AStar aStar; TODO
 
