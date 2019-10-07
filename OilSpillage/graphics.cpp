@@ -81,7 +81,7 @@ Graphics::~Graphics()
 	delete this->lightBufferContents;
 }
 
-bool Graphics::init(Window* window, DynamicCamera* camera)
+bool Graphics::init(Window* window)
 {
 	this->window = window;
 	HRESULT result;
@@ -241,10 +241,6 @@ bool Graphics::init(Window* window, DynamicCamera* camera)
 	hr = device->CreateBuffer(&desc, 0, &lightBuffer);
 	if (FAILED(hr))
 		return false;
-
-	hr = createFrustumBuffer(camera);
-	if (FAILED(hr))
-		return false;
 	
 
 	desc.Usage = D3D11_USAGE_DEFAULT;
@@ -274,10 +270,6 @@ bool Graphics::init(Window* window, DynamicCamera* camera)
 	srvDesc.Buffer.NumElements = 80 * 45;
 
 	hr = device->CreateShaderResourceView(culledLightBuffer, &srvDesc, &culledLightBufferSRV);
-	if (FAILED(hr))
-		return false;
-	
-	hr = device->CreateShaderResourceView(frustumBuffer, &srvDesc, &frustumBufferSRV);
 	if (FAILED(hr))
 		return false;
 
@@ -419,7 +411,7 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.GetInputLayout());
 	deviceContext->PSSetShader(this->shaderDebug.ps.GetShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDebug.vs.GetShader(), nullptr, 0);
-
+#if _DEBUG
 	//debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
 	//debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
 	//debugger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
@@ -865,10 +857,10 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 	{
 		for (int x = 0; x < 80; ++x)
 		{
-			Vector4 screenTopLeft     =	Vector4(x * 16, y * 16, 1.0f, 1.0f);
-			Vector4 screenTopRight    =	Vector4((x + 1) * 16, y * 16, 1.0f, 1.0f);
-			Vector4 screenBottomLeft  =	Vector4(x * 16, (y + 1) * 16, 1.0f, 1.0f);
-			Vector4 screenBottomRight = Vector4((x + 1) * 16, (y + 1) * 16, 1.0f, 1.0f);
+			Vector4 screenTopLeft     =	Vector4(x * 16.f, y * 16.f, 1.0f, 1.0f);
+			Vector4 screenTopRight    =	Vector4((x + 1) * 16.f, y * 16.f, 1.0f, 1.0f);
+			Vector4 screenBottomLeft  =	Vector4(x * 16.f, (y + 1) * 16.f, 1.0f, 1.0f);
+			Vector4 screenBottomRight = Vector4((x + 1) * 16.f, (y + 1) * 16.f, 1.0f, 1.0f);
 
 			Vector3 viewTopLeft     = Vector3(screenToView(screenTopLeft));
 			Vector3 viewTopRight    = Vector3(screenToView(screenTopRight));
@@ -886,5 +878,17 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 
 	HRESULT hr = device->CreateBuffer(&desc, &data, &frustumBuffer);
 	delete[] frustumTiles;
+	
+	if (FAILED(hr))
+		return hr;
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+	srvDesc.Buffer.FirstElement = 0;
+	srvDesc.Buffer.NumElements = 80 * 45;
+
+	hr = device->CreateShaderResourceView(frustumBuffer, &srvDesc, &frustumBufferSRV);
+
 	return hr;
 }

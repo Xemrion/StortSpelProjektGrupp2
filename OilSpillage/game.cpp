@@ -44,7 +44,6 @@ void Game::init(Window* window)
 {
 	this->window = window; 
 	graphics.init(window);
-
 	Input::Init();
 	Sound::Init();
 	UserInterface::initStaticVariables();

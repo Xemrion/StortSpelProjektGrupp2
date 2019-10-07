@@ -70,11 +70,11 @@ class Graphics {
 
 	void fillLightBuffers();
 	void cullLights();
-	HRESULT createFrustumBuffer(DynamicCamera* camera);
 public:
 	Graphics();
 	~Graphics();
-	bool init(Window* window, DynamicCamera* camera);
+	bool init(Window* window);
+	HRESULT createFrustumBuffer(DynamicCamera* camera);
 	Debug* getdebugger();
 	Window* getWindow();
 	void loadMesh(std::string fileName);
