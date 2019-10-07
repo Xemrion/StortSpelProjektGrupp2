@@ -374,38 +374,50 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->PSSetConstantBuffers(2, 1, &this->sunBuffer);
 	deviceContext->PSSetConstantBuffers(1, 1, &this->lightBuffer);
 
+	Frustum frustum = camera->getFrustum();
+
 	for (GameObject* object : drawableObjects)
 	{
-		SimpleMath::Matrix world = object->getTransform();
-		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		HRESULT hr = deviceContext->Map(worldBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
-		deviceContext->Unmap(worldBuffer, 0);
-		UINT vertexCount = object->mesh->getVertexCount();
-		UINT stride = sizeof(Vertex3D);
-		UINT offset = 0;
-		ID3D11ShaderResourceView* shaderResView;
-		if(object->getTexture()!=nullptr)
-			shaderResView = object->getTexture()->getShaderResView();
-		else
+		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
 		{
-			shaderResView = nullptr;
+			AABB boundingBox = object->getAABB();
+			boundingBox = boundingBox.scale(object->getScale());
+			boundingBox.maxPos += object->getPosition();
+			boundingBox.minPos += object->getPosition();
+
+			if (frustum.intersect(boundingBox, 15.0)) {
+				SimpleMath::Matrix world = object->getTransform();
+				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+				D3D11_MAPPED_SUBRESOURCE mappedResource;
+				HRESULT hr = deviceContext->Map(worldBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
+				deviceContext->Unmap(worldBuffer, 0);
+				UINT vertexCount = object->mesh->getVertexCount();
+				UINT stride = sizeof(Vertex3D);
+				UINT offset = 0;
+				ID3D11ShaderResourceView* shaderResView;
+				if (object->getTexture() != nullptr)
+					shaderResView = object->getTexture()->getShaderResView();
+				else
+				{
+					shaderResView = nullptr;
+				}
+
+
+				Vector4 modColor = object->getColor();
+				hr = deviceContext->Map(colorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
+				deviceContext->Unmap(colorBuffer, 0);
+
+				deviceContext->VSSetConstantBuffers(1, 1, &this->worldBuffer);
+				deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
+				deviceContext->PSSetShaderResources(0, 1, &shaderResView);
+				deviceContext->PSSetConstantBuffers(0, 1, &this->colorBuffer);
+
+				deviceContext->Draw(vertexCount, 0);
+			}
 		}
-
-		
-		Vector4 modColor = object->getColor();
-		hr = deviceContext->Map(colorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
-		deviceContext->Unmap(colorBuffer, 0);
-
-		deviceContext->VSSetConstantBuffers(1, 1, &this->worldBuffer);
-		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
-		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
-		deviceContext->PSSetConstantBuffers(0, 1, &this->colorBuffer);
-
-		deviceContext->Draw(vertexCount, 0);
 	}
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.GetInputLayout());
@@ -634,6 +646,10 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 
 
 			meshes[fileName].insertDataToMesh(vecTemp);
+			AABB boundingBox;
+			boundingBox.minPos = Vector3(-1.0, -1.0, -1.0);
+			boundingBox.maxPos = Vector3(1.0, 1.0, 1.0);
+			meshes[fileName].setAABB(boundingBox);
 
 			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
 			UINT stride = sizeof(Vertex3D);
@@ -688,6 +704,10 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 			vecTemp.push_back(vertex);
 
 			meshes[fileName].insertDataToMesh(vecTemp);
+			AABB boundingBox;
+			boundingBox.minPos = Vector3(-1.0, -0.01, -1.0);
+			boundingBox.maxPos = Vector3(1.0, 0.01, 1.0);
+			meshes[fileName].setAABB(boundingBox);
 
 			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
 			UINT stride = sizeof(Vertex3D);
@@ -867,10 +887,10 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 			Vector3 viewBottomLeft  = Vector3(screenToView(screenBottomLeft));
 			Vector3 viewBottomRight = Vector3(screenToView(screenBottomRight));
 
-			frustum.left   = DirectX::XMPlaneFromPoints(eye, viewBottomLeft, viewTopLeft);
-			frustum.right  = DirectX::XMPlaneFromPoints(eye, viewTopRight, viewBottomRight);
 			frustum.top    = DirectX::XMPlaneFromPoints(eye, viewTopLeft, viewTopRight);
 			frustum.bottom = DirectX::XMPlaneFromPoints(eye, viewBottomRight, viewBottomLeft);
+			frustum.left   = DirectX::XMPlaneFromPoints(eye, viewBottomLeft, viewTopLeft);
+			frustum.right  = DirectX::XMPlaneFromPoints(eye, viewTopRight, viewBottomRight);
 
 			frustumTiles[y * 80 + x] = frustum;
 		}
@@ -891,4 +911,14 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 	hr = device->CreateShaderResourceView(frustumBuffer, &srvDesc, &frustumBufferSRV);
 
 	return hr;
+}
+
+void Graphics::setCullingDistance(float dist)
+{
+	cullingDistance = dist;
+}
+
+float Graphics::getCullingDistance()
+{
+	return cullingDistance;
 }

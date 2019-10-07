@@ -55,6 +55,7 @@ class Graphics {
 	std::unordered_map<std::string, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
 	LightList* lightList;
+	float cullingDistance = 150.f;
 	
 	Vector4 sunVector = Vector4(0.0, 1.0, 0.0, 0.0);
 	struct LightBufferContents {
@@ -68,7 +69,6 @@ class Graphics {
 	Debug* debugger;
 	ID3D11Debug* debug;
 
-	void fillLightBuffers();
 	void cullLights();
 public:
 	Graphics();
@@ -90,7 +90,11 @@ public:
 	void presentScene();
 	void render(DynamicCamera* camera);
 	bool createShaders();
+	void fillLightBuffers();
 	void clearScreen();
 	ID3D11DeviceContext* getDeviceContext();
 	ID3D11Device* getDevice();
+	//culling by distance from camera
+	void setCullingDistance(float dist);
+	float getCullingDistance();
 };
