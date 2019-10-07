@@ -207,6 +207,13 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	deviceContext->Unmap(particleParamCB.Get(), 0);
 	ID3D11UnorderedAccessView* n = nullptr;
 	//run create particle compute shader here
+	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
+	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
+	ID3D11Buffer* nB = nullptr;
+
+	this->deviceContext->CSSetConstantBuffers(2, 1, &nB);
+	this->deviceContext->CSSetConstantBuffers(1, 1, &nB);
+	this->deviceContext->CSSetConstantBuffers(0, 1, &nB);
 	deviceContext->CSSetConstantBuffers(0, 1, this->particleParamCB.GetAddressOf());
 	if (otherFrame==1)
 	{
@@ -277,15 +284,7 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 	this->deviceContext->CSSetConstantBuffers(1, 1, this->nrOfParticlesCB.GetAddressOf());
 	this->deviceContext->CSSetConstantBuffers(0, 1, this->simParams.GetAddressOf());
 	this->deviceContext->CSSetShader(this->computeShader.Get(), nullptr, 0);
-	this->deviceContext->Dispatch(50, 1, 1);
-	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
-	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
-
-	this->deviceContext->CSSetConstantBuffers(2, 1, &nB);
-	this->deviceContext->CSSetConstantBuffers(1, 1, &nB);
-	this->deviceContext->CSSetConstantBuffers(0, 1, &nB);
-
-
+	this->deviceContext->Dispatch(100, 1, 1);
 }
 
 void ParticleSystem::changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
@@ -335,6 +334,10 @@ void ParticleSystem::drawAll(Camera camera)
 	this->deviceContext->IASetVertexBuffers(0, 1, &nil, &stride, &offset);
 	this->deviceContext->IASetInputLayout(NULL);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	ID3D11UnorderedAccessView* nU = nullptr;
+	//run create particle compute shader here
+	deviceContext->CSSetUnorderedAccessViews(0, 1, &nU, 0);
+	deviceContext->CSSetUnorderedAccessViews(1, 1, &nU, 0);
 	if (otherFrame == 1.0f)
 	{
 		this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV2.GetAddressOf());

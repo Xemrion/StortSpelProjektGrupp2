@@ -51,7 +51,7 @@ public:
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void drawAll(Camera camera);
 private:
-	const int capParticle = 50000;
+	const int capParticle = 51200;//100*512
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
 	int nrOfParticles = 0;

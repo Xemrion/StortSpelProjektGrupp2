@@ -49,12 +49,11 @@ float noise(float2 pos)
 static const float G = 9.82f;
 static const float m1 = 0.5f;
 
-[numthreads(1024, 1, 1)]
+[numthreads(512, 1, 1)]
 
-void main( uint3 DTid : SV_DispatchThreadID )
+void main( uint3 DTid : SV_DispatchThreadID)
 {
-	uint myID = DTid.x + DTid.y * 1024 + DTid.z * 1024 * 1024;
-	
+	uint myID = DTid.x + DTid.y * 512 + DTid.z * 512 * 512;
 	if (myID < NumParticles.x && NumParticles.x > 0)
 	{
 		Particle p = CurrentSimulationState.Consume();
