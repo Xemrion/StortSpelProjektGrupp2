@@ -8,6 +8,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include <optional>
 #include <cstdint>
 // using aliases
 
@@ -18,6 +19,10 @@ template <typename T, size_t N> using Arr = std::array<T,N>;
 // smart pointers
 template <typename T> using UPtr = std::unique_ptr<T>;
 template <typename T> using SPtr = std::shared_ptr<T>;
+
+// optional
+template <typename T> using Opt = std::optional<T>;
+
 
 // string
 using Str      = std::basic_string<char>;
@@ -43,15 +48,55 @@ template <typename T> union V2 {
 	T  data[2];
 	struct { T  x, y; }; // anon
 	struct { T  r, g; }; // anon
+
+   V2(                      ): x(T()), y(T())         {}
+   V2( T const x, T const y ): x(x), y(y)             {}
+   V2( V2<T> const  &other  ): x(other.x), y(other.y) {}
+   //V2( V2<T>       &&other  ) = delete;
+
+   inline Bool operator==( V2<T> const &other ) const noexcept {
+      return (x == other.x) && (y == other.y);
+   }
+
+   inline V2<T> &operator=( V2<T> const &other ) noexcept {
+      if ( &other != this ) {
+         x = other.x;
+         y = other.y;
+      }
+      return *this;
+   }
+
+   //void operator=( V2<T> && ) = delete;
 };
 using V2f = V2<F32>;
 using V2u = V2<U32>;
 using V2i = V2<I32>;
 
+
 template <typename T> union V3 {
-	T  data[3];
-	struct { T  x, y, z; }; // anon
-	struct { T  r, g, b; }; // anon
+   T  data[3] { T() };
+	struct     { T  x, y, z; }; // anon
+	struct     { T  r, g, b; }; // anon
+
+   V3(                                 ): x(T()), y(T()), z(T())             {}
+   V3( T const x, T const y, T const z ): x(x), y(y), z(z)                   {}
+   V3( V3<T> const  &other             ): x(other.x), y(other.y), z(other.z) {}
+   //V3( V3<T>       &&other             ) = delete;
+
+   inline Bool operator==( V3<T> const &other ) const noexcept {
+      return (x == other.x) && (y == other.y) && (z == other.z);
+   }
+
+   inline V3<T> &operator=( V3<T> const &other ) noexcept {
+      if ( &other != this ) {
+         x = other.x;
+         y = other.y;
+         z = other.z;
+      }
+      return *this;
+   }
+
+   //void operator=( V3<T> && ) = delete;
 };
 using V3f = V3<F32>;
 using V3u = V3<U32>;
@@ -61,10 +106,32 @@ template <typename T> union V4 {
 	T  data[4];
 	struct { T  x, y, z, w; }; // anon
 	struct { T  r, g, b, a; }; // anon
+
+   V4(                                            ): x(T()), y(T()), z(T()), w(T())                 {}
+   V4( T const x, T const y, T const z, T const w ): x(x), y(y), z(z), w(w)                         {}
+   V4( V4<T> const  &other                        ): x(other.x), y(other.y), z(other.z), w(other.w) {}
+   //V4( V4<T>       &&other                        ) = delete;
+
+   inline Bool operator==( V4<T> const &other ) const noexcept {
+      return (x == other.x) && (y == other.y) && (z == other.z) && (w == other.w);
+   }
+
+   inline V4<T> &operator=( V4<T> const &other ) noexcept {
+      if ( &other != this ) {
+         x = other.x;
+         y = other.y;
+         z = other.z;
+         w = other.w;
+      }
+      return *this;
+   }
+
+   //void operator=( V4<T> && ) = delete;
 };
 using V4f = V4<F32>;
 using V4u = V4<U32>;
 using V4i = V4<I32>;
+
 
 // random number generation
 using RD       = std::random_device;
