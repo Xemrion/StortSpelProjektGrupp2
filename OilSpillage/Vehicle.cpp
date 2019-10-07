@@ -336,6 +336,46 @@ void Vehicle::update(float deltaTime)
 			this->velocity.y = (velocity.y / (1 + (0.001f * 300 * deltaTime)));
 		}
 	}
+	else if (drivingMode == 2)
+	{
+		if (Input::GetDirectionL(0) != Vector2())
+		{
+			Vector2 targetDir(Input::GetDirectionL(0));
+
+			if ((targetDir - this->currentDir).Length() > 0.01f)
+			{
+				this->currentDir = Vector2::Lerp(this->currentDir, targetDir, deltaTime);
+				this->currentDir.Normalize();
+			}
+			else
+			{
+				this->currentDir = targetDir;
+			}
+
+			float newRot = atan2(this->currentDir.x, this->currentDir.y);
+			this->vehicle->setRotation(Vector3(0, newRot, 0));
+
+			//v = v0 + a * t
+			this->velocitySimple = this->velocitySimple + 1.2f/*accelerationSimple*/ * deltaTime;
+		}
+		else
+		{
+			if (this->velocitySimple < 0.05f)
+			{
+				this->velocitySimple = 0;
+			}
+			else
+			{
+				this->velocitySimple /= 1 + (1.0f * deltaTime);
+			}
+		}
+
+		//OutputDebugStringA((std::to_string(this->velocitySimple) + "\n").c_str());
+
+		Vector3 direction(this->currentDir.x, 0, this->currentDir.y);
+		//s = s0 + v * t
+		this->vehicle->move(direction* this->velocitySimple* deltaTime);
+	}
 	
 	//if ((tempTargetRotation != targetRotation) && (drivingMode == 0)) {
 	//	//rotationSmoother = 1;

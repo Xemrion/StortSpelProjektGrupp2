@@ -13,31 +13,31 @@ void PlayingGameState::generateMap() {
 	// debug output
 #define NO_TERMINAL_COLORS // TODO: remove?
 #ifdef _DEBUG
-	std::ofstream f1("road_gen_debug_output_pregen.txt");
+	std::ofstream f1("PG/Logs/road_gen_debug_output_pregen.txt");
 	if (f1.is_open()) {
 		f1 << *this->map;
 		f1.close();
 	}
 #endif
-
+	int aSeed = 607023;
 	Walker generator{
 	  *this->map,      // the map to work on (mutate)
-		4,        // depth; number of generations     (max 4 for now)
+		3,        // depth; number of generations     (max 4 for now)
 		80,       // min length of a branch           (number of tiles)
 	   120,      // max length of a branch           (number of tiles)
-		0.5f,     // child length factor              (e.g. 0.5 => the length will halve per generation)
-		4.0f,     // turn probability                 (e.g. 0.75 = 0.75%)
-		2.f,      // child turn probability factor    (multiplicative)
-		12.0f,    // branch probability               (e.g. 0.75 = 0.75%)
-		0.75f,    // child branch probability factor  (multiplicative)
-		420691    // seed
+		0.9f,     // child length factor              (e.g. 0.5 => the length will halve per generation)
+		0.5f,     // turn probability                 (e.g. 0.75 = 0.75%)
+		1.0f,      // child turn probability factor    (multiplicative)
+		5.0f,    // branch probability               (e.g. 0.75 = 0.75%)
+		0.5f,    // child branch probability factor  (multiplicative)
+		aSeed   // seed
 	};
 
 	generator.generate();
 
 	// debug output
 #ifdef _DEBUG
-	std::ofstream f2("road_gen_debug_output.txt");
+	std::ofstream f2("PG/Logs/road_gen_debug_output_seed_" + std::to_string(aSeed) + ".txt");
 	if (f2.is_open()) {
 		f2 << *this->map;
 		f2.close();
@@ -89,7 +89,7 @@ void PlayingGameState::generateMap() {
 
 	RD  rd;
 	RNG rng(rd());
-	rng.seed(420690);
+	rng.seed(952895);
 	auto voronoi = Voronoi(rng,
 		config::CELL_SIZE,
 		this->map->width / config::CELL_SIZE,
@@ -149,7 +149,7 @@ void PlayingGameState::init()
 	this->lightList = std::make_unique<LightList>();
 	this->player = std::make_unique<Vehicle>();
 	this->camera = std::make_unique<DynamicCamera>();
-	//this->testNetwork = std::make_unique<RoadNetwork>();
+	this->testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 
 	this->graphics.loadMesh("sda");
 	this->graphics.loadShape(SHAPE_CUBE);
@@ -161,6 +161,7 @@ void PlayingGameState::init()
 	this->aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	//aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
 	this->graphics.addToDraw(aiObject.get());
+
 
 	// TODO reafctor out
 	this->graphics.loadModel("Road_pavement");
@@ -178,7 +179,16 @@ void PlayingGameState::init()
 	this->lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 50.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
 	this->lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
-
+	//Road Network Turtlewalker
+	this->testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
+	this->testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+	this->testNetwork.get()->setAngle(45);
+	for (int i = 0; i < 5; i++) {
+		this->testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
+		this->testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+	}
+	this->testNetwork.get()->cleanRoadNetwork();
+	this->testNetwork.get()->saveTestNetwork("test-network");
 
 	this->lightList->removeLight(this->lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
@@ -252,6 +262,7 @@ void PlayingGameState::update(float deltaTime)
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
 	this->graphics.render(this->camera.get());
+	this->testNetwork.get()->drawRoadNetwork(&this->graphics);
 
 	//ImGui rendering --BEGIN--
 	ImGui_ImplDX11_NewFrame();
@@ -265,11 +276,15 @@ void PlayingGameState::update(float deltaTime)
 	static int radioButtonValue = 0;
 	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
 	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
+	ImGui::RadioButton("Directional Smooth", &radioButtonValue, 2);
 	if (radioButtonValue == 0 && this->player->getDrivingMode() == 1) {
 		player->setDrivingMode(0);
 	}
 	if (radioButtonValue == 1 && this->player->getDrivingMode() == 0) {
 		this->player->setDrivingMode(1);
+	}
+	if (radioButtonValue == 2 && this->player->getDrivingMode() == 2) {
+		this->player->setDrivingMode(2);
 	}
 	Vector3 camPos = this->camera->getPosition();
 	Vector3 camRot = this->camera->getRotation();
