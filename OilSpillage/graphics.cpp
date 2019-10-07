@@ -4,7 +4,6 @@
 #include<cstring>
 #include "ShaderDefines.hlsli"
 #include "UI/UserInterface.h"
-#include <cassert>
 
 Graphics::Graphics()
 {
@@ -566,13 +565,10 @@ void Graphics::loadMesh(std::string fileName)
 	}
 }
 
-void Graphics::loadModel(std::string localPath)
+void Graphics::loadModel(std::string fileName)
 {
-   std::string modelDir {MODEL_ROOT_DIR};
-               modelDir += localPath;
-	this->loadMesh( modelDir+"/mesh.bin" );
-	this->loadTexture( modelDir+"/_diffuse.tga" );
-   // TODO: load other texture channels
+	this->loadMesh(fileName + ".bin");
+	this->loadTexture(fileName + ".tga");
 }
 
 void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
@@ -736,40 +732,28 @@ bool Graphics::loadTexture(std::string fileName)
 	return true;
 }
 
-const Mesh* Graphics::getMeshPointer(const char* localPath)
-{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
-   std::string meshPath;
-   if ( localPath != "Cube" ) {
-      meshPath = MODEL_ROOT_DIR;
-      meshPath += localPath;
-      meshPath += "/mesh.bin";
-   }
-   else meshPath = std::string(localPath);
+const Mesh* Graphics::getMeshPointer(const char* fileName)
+{
 
-	if ( meshes.find(meshPath) == meshes.end() ) return nullptr;
-	else return &meshes[meshPath];
+	if (meshes.find(fileName) == meshes.end())
+	{
+		return nullptr;
+	}
+	return &meshes[fileName];
 }
 
-Texture* Graphics::getTexturePointer(const char* localPath)
-{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
-   std::string texturePath;
-   if ( localPath != "Cube" ) {
-      texturePath = MODEL_ROOT_DIR;
-      texturePath += localPath;
-      texturePath += "/_diffuse.tga"; // TODO: add support for other texture channels
-   }
-
-	if (textures.find(texturePath) == textures.end())
+Texture* Graphics::getTexturePointer(const char* fileName)
+{
+	if (textures.find(fileName) == textures.end())
 	{
 		return nullptr;
 	}
 
-	return textures[texturePath];
+	return textures[fileName];
 }
 
 void Graphics::addToDraw(GameObject* o)
 {
-   assert( o != nullptr );
 	drawableObjects.push_back(o);
 }
 

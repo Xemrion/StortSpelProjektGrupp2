@@ -1,5 +1,4 @@
 #pragma once
-
 #include "window.h"
 #include "GameObject.h"
 #include "Camera.h"
@@ -20,9 +19,6 @@
 #include "Lights.h"
 #include <memory.h>
 #include <array>
-
-char const MODEL_ROOT_DIR[]   { "data/models/" };
-char const TEXTURE_ROOT_DIR[] { "data/textures/" };
 
 enum Shapes
 {

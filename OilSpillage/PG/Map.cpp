@@ -38,9 +38,8 @@ Vec<GameObject> Map::load_as_models(Graphics& graphics) const {
 			auto const  tile_i = index(x, y);
 			auto       &tile   = tiles[tile_i];
 			auto const  gfx_i  = gfx_tbl_idx(x, y);
-			auto const &[modelName, rotation] = gfx_tbl[gfx_i];
-			tile.mesh    = graphics.getMeshPointer( modelName.c_str() );
-         tile.setTexture( graphics.getTexturePointer(modelName.c_str()) );
+			auto const &[filename, rotation] = gfx_tbl[gfx_i];
+			tile.mesh = graphics.getMeshPointer( filename.c_str() );
 			if ( rotation != 0 )
 				tile.setRotation({ 0.0f, float(rotation) * 3.1415926535f/180.0f, 0.0f });
 			tile.setPosition( tile_xy_to_world_pos(x,y) );
@@ -50,13 +49,13 @@ Vec<GameObject> Map::load_as_models(Graphics& graphics) const {
 }
 
 Bool Map::neighbour_is_road(Dir dir, U16 x, U16 y) const noexcept {
-	assert( dir == Dir::north or dir == Dir::east
-	     or dir == Dir::south or dir == Dir::west );
+	assert(dir == Dir::north or dir == Dir::east
+		or dir == Dir::south or dir == Dir::west);
 
-	if      ( dir == Dir::north)      y--;
-	else if ( dir == Dir::east)       x++;
-	else if ( dir == Dir::south)      y++;
-	else /* ( dir == Dir::west  )  */ x--;
+	if      (dir == Dir::north)      y--;
+	else if (dir == Dir::east)       x++;
+	else if (dir == Dir::south)      y++;
+	else /* ( dir == Dir::west  ) */ x--;
 
 	return !in_bounds(x, y) or (data[index(x, y)] != Tile::ground);
 }
@@ -88,55 +87,25 @@ std::ostream& operator<< (std::ostream& out, Map const& map) {
 	return out;
 }
 
-Vec<V2u> Map::get_neighbour_tile_coords( V2u cell_coord ) const noexcept {
-   Vec<V2u>  neighbours {};
-   neighbours.reserve(8);
-
-   // check if any of the neighbouring tile coords are tiles within map bounds:
-   Bool const  w_border = (cell_coord.x == 0),
-               e_border = (cell_coord.x == width  - 1),
-               n_border = (cell_coord.y == 0),
-               s_border = (cell_coord.y == height - 1);
-   if ( !n_border ) {  // N
-      neighbours.emplace_back(    cell_coord.x,   cell_coord.y-1 );
-      if ( !w_border ) // NW
-         neighbours.emplace_back( cell_coord.x-1, cell_coord.y-1 );
-      if ( !e_border ) // NE 
-         neighbours.emplace_back( cell_coord.x+1, cell_coord.y-1 );
-   }
-   if ( !s_border ) {  // S
-      neighbours.emplace_back(    cell_coord.x,   cell_coord.y+1 );
-      if ( !w_border ) // SW
-         neighbours.emplace_back( cell_coord.x-1, cell_coord.y+1 );
-      if ( !e_border ) // SE 
-         neighbours.emplace_back( cell_coord.x+1, cell_coord.y+1 );
-   }
-   if ( !w_border )    // W
-      neighbours.emplace_back(    cell_coord.x-1, cell_coord.y );
-   if ( !e_border )    // E
-      neighbours.emplace_back(    cell_coord.x+1, cell_coord.y );
-   return neighbours;
-}
-
 // TODO: rotate bend mesh 180 degrees and update values in table to their proper value
 Vec<Map::TileEntry> const Map::gfx_tbl = {
 	// idx   WSEN      filename          rot      type                  rotation
-	/*   0   0000 */  {"Roads/Road_pavement",        0}, // no road,                 0 deg
-	/*   1   0001 */  {"Roads/Road_deadend",         0}, // deadend (south),         0 deg
-	/*   2   0010 */  {"Roads/Road_deadend",        90}, // deadend (west),         90 deg
-	/*   3   0011 */  {"Roads/Road_bend",          180}, // turn,                    0 deg
-	/*   4   0100 */  {"Roads/Road_deadend",       180}, // deadend (north),       180 deg
-	/*   5   0101 */  {"Roads/Road_straight",        0}, // straight vertical,       0 deg
-	/*   6   0110 */  {"Roads/Road_bend",          270}, // turn,                   90 deg
-	/*   7   0111 */  {"Roads/Road_3way",           90}, // 3-way intersection,     90 deg
-	/*   8   1000 */  {"Roads/Road_deadend",       270}, // deadend (east),        270 deg
-	/*   9   1001 */  {"Roads/Road_bend",           90}, // turn,                  270 deg
-	/*  10   1010 */  {"Roads/Road_straight",       90}, // straight horizontal,    90 deg
-	/*  11   1011 */  {"Roads/Road_3way",            0}, // 3-way intersection,      0 deg
-	/*  12   1100 */  {"Roads/Road_bend",            0}, // turn,                  180 deg
-	/*  13   1101 */  {"Roads/Road_3way",          270}, // 3-way intersection,    270 deg
-	/*  14   1110 */  {"Roads/Road_3way",          180}, // 3-way intersection,    180 deg
-	/*  15   1111 */  {"Roads/Road_4way",            0}, // 4-way intersection,      0 deg
+	/*   0   0000 */  {"Road_pavement.bin",    0}, // no road,                 0 deg
+	/*   1   0001 */  {"Road_deadend.bin",     0}, // deadend (south),         0 deg
+	/*   2   0010 */  {"Road_deadend.bin",    90}, // deadend (west),         90 deg
+	/*   3   0011 */  {"Road_bend.bin",      180}, // turn,                    0 deg
+	/*   4   0100 */  {"Road_deadend.bin",   180}, // deadend (north),       180 deg
+	/*   5   0101 */  {"Road_straight.bin",    0}, // straight vertical,       0 deg
+	/*   6   0110 */  {"Road_bend.bin",      270}, // turn,                   90 deg
+	/*   7   0111 */  {"Road_3way.bin",       90}, // 3-way intersection,     90 deg
+	/*   8   1000 */  {"Road_deadend.bin",   270}, // deadend (east),        270 deg
+	/*   9   1001 */  {"Road_bend.bin",       90}, // turn,                  270 deg
+	/*  10   1010 */  {"Road_straight.bin",   90}, // straight horizontal,    90 deg
+	/*  11   1011 */  {"Road_3way.bin",        0}, // 3-way intersection,      0 deg
+	/*  12   1100 */  {"Road_bend.bin",        0}, // turn,                  180 deg
+	/*  13   1101 */  {"Road_3way.bin",      270}, // 3-way intersection,    270 deg
+	/*  14   1110 */  {"Road_3way.bin",      180}, // 3-way intersection,    180 deg
+	/*  15   1111 */  {"Road_4way.bin",        0}, // 4-way intersection,      0 deg
 };
 
 // Used with a cellular automata to beautify the terminal output.

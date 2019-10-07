@@ -7,9 +7,9 @@ Camera::Camera()
 	this->farDist = 1000.f;
 	this->fieldOfView = 90.f * (DirectX::XM_PI / 180);
 	this->projection = DirectX::XMMatrixPerspectiveFovLH(this->fieldOfView, 16.f / 9.f, nearDist, farDist);
-	this->nearHeight = float(tan(fieldOfView * 0.5f));
+	this->nearHeight = tan(fieldOfView * 0.5f);
 	this->nearWidth = nearHeight * (16.f / 9.f);
-	this->farHeight = farDist * float(tan(fieldOfView * 0.5f));
+	this->farHeight = farDist * tan(fieldOfView * 0.5f);
 	this->farWidth = farHeight * (16.f / 9.f);
 }
 
@@ -21,20 +21,20 @@ Camera::Camera(float fovDegrees)
 	this->projection = DirectX::XMMatrixPerspectiveFovLH(this->fieldOfView, 16.f / 9.f, nearDist, farDist);
 	this->nearHeight = tan(fieldOfView * 0.5f);
 	this->nearWidth = nearHeight * (16.f / 9.f);
-	this->farHeight = farDist * float(tan(fieldOfView * 0.5f));
+	this->farHeight = farDist * tan(fieldOfView * 0.5f);
 	this->farWidth = farHeight * (16.f / 9.f);
 }
 
 Camera::Camera(float fovDegrees, float nearPlane, float farPlane)
 {
-	this->nearDist    = nearPlane;
-	this->farDist     = farPlane;
+	this->nearDist = nearPlane;
+	this->farDist = farPlane;
 	this->fieldOfView = fovDegrees * (DirectX::XM_PI / 180);
-	this->projection  = DirectX::XMMatrixPerspectiveFovLH(this->fieldOfView, 16.f / 9.f, nearPlane, farPlane);
-	this->nearHeight  = float(tan(fieldOfView * 0.5f));
-	this->nearWidth   = nearHeight * (16.f / 9.f);
-	this->farHeight   = farDist * float(tan(fieldOfView * 0.5f));
-	this->farWidth    = farHeight * (16.f / 9.f);
+	this->projection = DirectX::XMMatrixPerspectiveFovLH(this->fieldOfView, 16.f / 9.f, nearPlane, farPlane);
+	this->nearHeight = tan(fieldOfView * 0.5f);
+	this->nearWidth = nearHeight * (16.f / 9.f);
+	this->farHeight = farDist * tan(fieldOfView * 0.5f);
+	this->farWidth = farHeight * (16.f / 9.f);
 }
 
 Camera::~Camera()

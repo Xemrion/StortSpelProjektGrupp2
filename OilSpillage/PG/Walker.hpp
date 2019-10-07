@@ -282,29 +282,7 @@ public:
 #endif
          }
       }
-      clean_isles();
    }
-
-   // clean-up roads:
-   void clean_isles() noexcept {
-      for ( auto y = 1U;  y < map.width-1;  ++y )
-         for ( auto x = 1U;  x < map.height-1;  ++x )
-            if (       map.is_road( x,   y-1 )
-                  and  map.is_road( x+1, y-1 )
-                  and  map.is_road( x+1, y   )
-                  and  map.is_road( x+1, y+1 )
-                  and  map.is_road( x,   y+1 )
-                  and  map.is_road( x-1, y+1 )
-                  and  map.is_road( x-1, y   )
-                  and  map.is_road( x-1, y-1 ) )
-            map.data[ map.index(x,y) ] = Tile::ground;
-   }
-
-   void clean_ladders_x() {
-      //for ( auto y = 1;  y < map.width-1;  ++y )
-      //   for ( auto x = 1;  x < map.height-1;  ++x )
-   }
-
 
    // TODO: increasing depth value starting at 0!
    // schedules a branch at a given depth to be generated
@@ -315,7 +293,7 @@ public:
 
 private:
    U8                max_depth;
-   Map              &map;
+   Map const        &map;
    RD                rd;
    RNG               rng;
    Vec<Vec<Branch>>  branch_tree;
