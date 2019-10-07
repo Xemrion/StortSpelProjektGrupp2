@@ -19,7 +19,7 @@ class PlayingGameState : public GameState
 {
 private:
 	friend class Game;
-
+   Config                          config;
 	Graphics                       &graphics;
 	std::unique_ptr<Map>            map;
 	std::unique_ptr<AIPlayer>       aiObject;
@@ -33,10 +33,13 @@ private:
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight = nullptr;
 	std::unique_ptr<RoadNetwork>    testNetwork;
-	void generateMap( I32 const seed );
-   void generateBuildings( RNG &rng );
+	void           generateMap( Config const & );
+   void           generateBuildings( Config const &, RNG & );
+   void           ImGui_ProcGen();
+   void           ImGui_Driving();
    Opt<Vec<V2u>>  find_valid_house_lot( RNG &, U16 cell_id, Voronoi const &district_map, Map &, Vec<District> const &district_tbl );
-	void initiateAStar();
+   void           toggleDistrictColors() noexcept;
+	void           initiateAStar();
 public:
 	PlayingGameState();
 	virtual ~PlayingGameState();
