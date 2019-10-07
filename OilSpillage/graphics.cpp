@@ -3,6 +3,7 @@
 #include"Importer/importerClass.h"
 #include<cstring>
 #include "ShaderDefines.hlsli"
+#include "UI/UserInterface.h"
 
 Graphics::Graphics()
 {
@@ -419,9 +420,8 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->PSSetShader(this->shaderDebug.ps.GetShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDebug.vs.GetShader(), nullptr, 0);
 
-#if _DEBUG
-	debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
-	debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
+	//debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
+	//debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
 	//debugger->DrawRectangle(XMFLOAT3(0,0, 0), XMFLOAT3(1, 0, 0));
 #endif
 
@@ -498,6 +498,23 @@ bool Graphics::createShaders()
 	this->lightCullingShader.initialize(device, shaderfolder + L"ComputeLightCulling.cso");
 
 	return true;
+}
+
+void Graphics::clearScreen()
+{
+	float color[4] = { 0,0,0,1 };
+	deviceContext->ClearRenderTargetView(renderTargetView, color);
+	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
+}
+
+ID3D11DeviceContext* Graphics::getDeviceContext()
+{
+	return this->deviceContext;
+}
+
+ID3D11Device* Graphics::getDevice()
+{
+	return this->device;
 }
 
 void Graphics::loadMesh(std::string fileName)
@@ -756,6 +773,11 @@ void Graphics::removeFromDraw(GameObject* o)
 	{
 		drawableObjects.erase(obj);
 	}
+}
+
+void Graphics::clearDraw()
+{
+	drawableObjects.clear();
 }
 
 void Graphics::setLightList(LightList* lightList)

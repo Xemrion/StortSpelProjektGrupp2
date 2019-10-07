@@ -52,13 +52,13 @@ public:
 	void update(float deltaTime);
 	void startCinematic(std::vector<CinematicPos>* points, bool startAtCurrentPos);
 	void stopCinematic();
-	bool isCinematicDone();
+	bool isCinematicDone() const;
 
 	Vector3 getPosition() const;
-	const Vector3& getPositionRef();
+	const Vector3& getPositionRef() const;
 	void setPosition(Vector3 position);
 	Vector3 getRotation() const;
-	const Vector3& getRotationRef();
+	const Vector3& getRotationRef() const;
 	void setRotation(Vector3 rotation);
 	float getNearDistance();
 	float getFarDistance();

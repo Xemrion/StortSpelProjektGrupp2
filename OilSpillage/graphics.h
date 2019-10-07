@@ -85,8 +85,12 @@ public:
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
+	void clearDraw();
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera);
 	bool createShaders();
+	void clearScreen();
+	ID3D11DeviceContext* getDeviceContext();
+	ID3D11Device* getDevice();
 };
