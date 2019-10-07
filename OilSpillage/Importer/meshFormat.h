@@ -31,7 +31,7 @@ struct Material {
 	float reflR, reflG, reflB;			//Reflected color
 };
 
-struct Light {
+struct DummyLight {
 	char type[100];
 	float x, y, z;
 	float r, g, b;

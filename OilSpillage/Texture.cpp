@@ -133,6 +133,16 @@ unsigned short Texture::getHeight()
 	return this->height;
 }
 
+DirectX::SimpleMath::Vector2 Texture::getSize()
+{
+	return DirectX::SimpleMath::Vector2(this->width, this->height);
+}
+
+DirectX::SimpleMath::Vector2 Texture::getCenter()
+{
+	return DirectX::SimpleMath::Vector2(this->width, this->height) / 2;
+}
+
 bool Texture::LoadTarga(const char* filename, int& height, int& width)
 {
 	int error, bpp, imageSize, index, i, j, k;

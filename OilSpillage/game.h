@@ -1,28 +1,42 @@
 #pragma once
 
+#include <array>
 #include "window.h"
+#include "ImGui/imgui.h"
 #include "graphics.h"
 #include "Keyboard.h"
 #include "Mouse.h"
-#include "ImGui/imgui.h"
-//#include"ImGui/imgui_impl_win32.h"
-//#include"ImGui/imgui_impl_dx11.h"
+#include "States/GameState.h"
+#include "vehicle.h"
+#include "DynamicCamera.h"
+#include "Road Network/RoadNet.h"
 #include "PG/District.hpp"
 #include "PG/Voronoi.hpp"
 #include "PG/Map.hpp"
 #include "PG/defs.hpp"
-#include "vehicle.h"
 #include "AI/Actor.h"
-#include "Road Network/RoadNet.h"
-#include "DynamicCamera.h"
-#include <array>
 #include "UI/UIMainMenu.h"
 
+enum State
+{
+	STATE_MENU,
+	STATE_PLAYING,
+	STATECOUNT
+};
+
 class Game {
+public:
+	static GameState* getCurrentState();
+	static void setState(State state);
+	inline static Graphics& getGraphics() noexcept { return graphics; };
+private:
+	static Graphics graphics;
+	static     std::unique_ptr<GameState> states[]; // varför static?
+	static int currentState;                        // varför static?
+	static int oldState;                            // varför static?
 	UIMainMenu           menu;
 	Window*              window = nullptr;
 	UPtr<DirectX::Mouse> mouse;
-	static Graphics      graphics;
    UPtr<Map>            map;
    UPtr<Voronoi>        voronoi;
 	UPtr<GameObject>     parentTest;
@@ -41,20 +55,15 @@ class Game {
 	F32                  secPerCount      = 1.0f / countsPerSec;
 	I32                  RadioButtonValue = 0;
 	Arr<SpotLight, LightList::maxSize>::iterator playerLight;
-   
-   RoadNetwork* testNetwork = nullptr;
-   // AStar aStar; TODO
-	// TestAI AI;
+   RoadNetwork *testNetwork = nullptr;
 
 	void          generateMap( I32 seed );
    void          generateBuildings( RNG & );
    Opt<Vec<V2u>> find_valid_house_lot( RNG &, U16 cell_id, Voronoi const &district_map, Map &, Vec<District> const &lookup_tbl );
-	void          initiateAStar();
 
 public:
 	Game();
 	~Game();
-	void                    init(Window*);
-	void                    run();
-	inline static Graphics& getGraphics() noexcept { return graphics; };
+	void init(Window* window);
+	void run();
 };

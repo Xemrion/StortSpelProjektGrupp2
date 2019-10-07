@@ -50,9 +50,9 @@ class Graphics {
 	ID3D11Buffer* lightBuffer;
 	ID3D11Buffer* frustumBuffer;
 	ID3D11Buffer* culledLightBuffer;
-	ID3D11Buffer* lightCountBuffer;
-	ID3D11UnorderedAccessView* lightAppendBufferView;
-	ID3D11ShaderResourceView* culledLightBufferView;
+	ID3D11UnorderedAccessView* culledLightBufferUAV;
+	ID3D11ShaderResourceView* culledLightBufferSRV;
+	ID3D11ShaderResourceView* frustumBufferSRV;
 
 	ID3D11SamplerState* sampler;
 	std::unordered_map<std::string, Mesh> meshes;
@@ -72,11 +72,13 @@ class Graphics {
 	Debug* debugger;
 	ID3D11Debug* debug;
 
-	void fillLightBuffers(Frustum&& frustum);
+	void fillLightBuffers();
+	void cullLights();
 public:
 	Graphics();
 	~Graphics();
 	bool init(Window* window);
+	HRESULT createFrustumBuffer(DynamicCamera* camera);
 	Debug* getdebugger();
 	Window* getWindow();
 	void loadMesh(std::string fileName);
@@ -87,10 +89,12 @@ public:
 	Texture* getTexturePointer(const char* fileName);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
+	void clearDraw();
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera);
 	bool createShaders();
+	void clearScreen();
 	ID3D11DeviceContext* getDeviceContext();
 	ID3D11Device* getDevice();
 };
