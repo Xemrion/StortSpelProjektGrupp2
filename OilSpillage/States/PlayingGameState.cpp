@@ -272,12 +272,15 @@ void PlayingGameState::update(float deltaTime)
 
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::Text(("Vehicle velocity: "+ std::to_string(player->getVelocitySpeed())).c_str());
+
 	ImGui::Text("Driving Mode:");
 
 	static int radioButtonValue = 0;
 	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
 	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
 	ImGui::RadioButton("Directional Smooth", &radioButtonValue, 2);
+	ImGui::RadioButton("Old Directional Semi-Realistic", &radioButtonValue, 3);
 	if (radioButtonValue == 0) {
 		player->setDrivingMode(0);
 	}
@@ -286,6 +289,9 @@ void PlayingGameState::update(float deltaTime)
 	}
 	if (radioButtonValue == 2) {
 		this->player->setDrivingMode(2);
+	}
+	if (radioButtonValue == 3) {
+		this->player->setDrivingMode(3);
 	}
 	Vector3 camPos = this->camera->getPosition();
 	Vector3 camRot = this->camera->getRotation();

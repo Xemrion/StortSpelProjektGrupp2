@@ -48,6 +48,7 @@ private:
 
 	Vector2 currentDir;
 	float velocitySimple;
+	float velocitySpeed;
 public:
 	Vehicle();
 	virtual ~Vehicle();
@@ -60,6 +61,7 @@ public:
 	void setDrivingMode(int i);
 	bool getDrivingMode();
 	Vector3 getVelocity();
+	float getVelocitySpeed();
 	//void onCollision(Vector2 direction);
 
 };
