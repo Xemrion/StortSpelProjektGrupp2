@@ -1,6 +1,3 @@
-// author: Victor Falkengaard Itzel
-// copyright September 2019
-
 #include <cmath>
 #include <cassert>
 #include "Voronoi.hpp"

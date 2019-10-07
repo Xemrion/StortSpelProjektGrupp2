@@ -1,6 +1,6 @@
-#ifndef PLAYING_GAME_STATE_H
-#define PLAYING_GAME_STATE_H
+#pragma once 
 
+#include <array>
 #include "GameState.h"
 #include "../game.h"
 #include "../ImGui/imgui.h"
@@ -8,36 +8,39 @@
 #include "../AI/Actor.h"
 #include "../Road Network/RoadNet.h"
 #include "../DynamicCamera.h"
+#include "../PG/config.hpp"
 #include "../PG/Map.hpp"
-#include <array>
+#include "../PG/Walker.hpp"
+#include "../PG/Map.hpp"
+#include "../PG/Voronoi.hpp"
+#include "../PG/District.hpp"
 
 class PlayingGameState : public GameState
 {
 private:
 	friend class Game;
 
-	Graphics& graphics;
-	std::unique_ptr<Map> map;
-	std::unique_ptr<AIPlayer> aiObject;
-	std::vector<GameObject> markers;
-	std::vector<GameObject> tiles;
-	std::unique_ptr<LightList> lightList;
-	std::unique_ptr<Vehicle> player;
-	std::unique_ptr<DynamicCamera> camera;
-	std::vector<CinematicPos> points;
-	SpotLight* playerLight = nullptr;
-	std::unique_ptr<RoadNetwork> testNetwork;
-	//AStar aStar; TODO
-
-	void generateMap();
+	Graphics                       &graphics;
+	std::unique_ptr<Map>            map;
+	std::unique_ptr<AIPlayer>       aiObject;
+	std::vector<GameObject>         districtMarkers;
+	std::vector<GameObject>         roadTiles;
+   std::vector<GameObject>         houseTiles;
+	std::unique_ptr<LightList>      lightList;
+	std::unique_ptr<Vehicle>        player;
+   std::unique_ptr<Voronoi>        districtMap;
+	std::unique_ptr<DynamicCamera>  camera;
+	std::vector<CinematicPos>       points;
+	SpotLight                      *playerLight = nullptr;
+	std::unique_ptr<RoadNetwork>    testNetwork;
+	void generateMap( I32 const seed );
+   void generateBuildings( RNG &rng );
+   Opt<Vec<V2u>>  find_valid_house_lot( RNG &, U16 cell_id, Voronoi const &district_map, Map &, Vec<District> const &district_tbl );
 	void initiateAStar();
 public:
 	PlayingGameState();
 	virtual ~PlayingGameState();
-
 	void init();
-	void cleanUp();
+   virtual void cleanUp() {}
 	void update(float deltaTime);
 };
-
-#endif // !PLAYING_GAME_STATE_H

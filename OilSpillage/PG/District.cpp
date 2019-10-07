@@ -1,8 +1,5 @@
 #include "District.hpp"
 
-// author: Victor Falkengaard Itzel
-// copyright September 2019
-
 F32 get_building_density( District const d ) noexcept {
    F32 result;
    if      ( d == District::residential  ) { result = .6f; }

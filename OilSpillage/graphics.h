@@ -81,12 +81,12 @@ public:
 	HRESULT createFrustumBuffer(DynamicCamera* camera);
 	Debug* getdebugger();
 	Window* getWindow();
-	void loadMesh(std::string fileName);
-	void loadModel(std::string fileName);
+	void loadMesh(std::string path);
+	void loadModel(std::string path);
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
-	bool loadTexture(std::string fileName);
-	const Mesh* getMeshPointer(const char* fileName);
-	Texture* getTexturePointer(const char* fileName);
+	bool loadTexture(std::string fileName, bool overridePath=false);
+	const Mesh* getMeshPointer(const char *path);
+	Texture* getTexturePointer(const char *path, bool isModel=false);
 	void addToDraw(GameObject* o);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();

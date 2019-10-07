@@ -1,7 +1,4 @@
-﻿// author: Victor Falkengaard Itzel
-// copyright September 2019
-
-#include "Map.hpp"
+﻿#include "Map.hpp"
 
 // x = current X (may be mutated if successful)
 // y = current Y (may be mutated if successful)
@@ -40,7 +37,7 @@ Vec<GameObject> Map::load_as_models(Graphics& graphics) const {
 			auto const  gfx_i  = gfx_tbl_idx(x, y);
 			auto const &[modelName, rotation] = gfx_tbl[gfx_i];
 			tile.mesh    = graphics.getMeshPointer( modelName.c_str() );
-         tile.setTexture( graphics.getTexturePointer(modelName.c_str()) );
+         tile.setTexture( graphics.getTexturePointer(modelName.c_str(),true) );
 			if ( rotation != 0 )
 				tile.setRotation({ 0.0f, float(rotation) * 3.1415926535f/180.0f, 0.0f });
 			tile.setPosition( tile_xy_to_world_pos(x,y) );
