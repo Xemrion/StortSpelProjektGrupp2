@@ -390,15 +390,7 @@ void PlayingGameState::init()
 	Input::SetKeyboardPlayerID(0);
 }
 
-/*
-template <typename T>
-void delete_pointed_to(T* const ptr)
-{
-	delete ptr;
-}
-*/
-
-void PlayingGameState::update(float deltaTime) {
+void PlayingGameState::ImGui_Driving() {
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Driving Mode:");
@@ -407,18 +399,14 @@ void PlayingGameState::update(float deltaTime) {
 	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
 	ImGui::RadioButton("Directional Smooth", &radioButtonValue, 2);
 	ImGui::RadioButton("Old Directional Semi-Realistic", &radioButtonValue, 3);
-	if (radioButtonValue == 0) {
+	if (radioButtonValue == 0)
 		player->setDrivingMode(0);
-	}
-	if (radioButtonValue == 1) {
-		this->player->setDrivingMode(1);
-	}
-	if (radioButtonValue == 2) {
-		this->player->setDrivingMode(2);
-	}
-	if (radioButtonValue == 3) {
-		this->player->setDrivingMode(3);
-	}
+	else if (radioButtonValue == 1)
+		player->setDrivingMode(1);
+	else if (radioButtonValue == 2)
+		player->setDrivingMode(2);
+	else if (radioButtonValue == 3)
+		player->setDrivingMode(3);
 
 	Vector3 camPos = camera->getPosition();
 	Vector3 camRot = camera->getRotation();
