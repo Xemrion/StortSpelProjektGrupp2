@@ -17,7 +17,8 @@ private:
 	static const int bulletCount = 16;
 	float leftoverTime;
 	Weapon weapon;
-	Stats stats;
+	Stats defaultStats;
+	Stats updatedStats;
 
 	struct Bullet
 	{
