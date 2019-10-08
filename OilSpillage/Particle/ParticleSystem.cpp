@@ -32,8 +32,7 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 
 	std::wstring shaderfolder = L"";
 #pragma region DetermineShaderPath
-	if (IsDebuggerPresent() == TRUE)
-	{
+	
 #ifdef _DEBUG //Debug Mode
 #ifdef _WIN64 //x64
 		shaderfolder = L"..\\x64\\Debug\\";
@@ -47,7 +46,7 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 		shaderfolder = L"..\\Release\\";
 #endif
 #endif
-	}
+	
 
 
 	std::wstring filePath = shaderfolder + L"ParticleVS.cso";

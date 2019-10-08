@@ -401,8 +401,6 @@ bool Graphics::createShaders()
 	
 	std::wstring shaderfolder = L"";
 #pragma region DetermineShaderPath
-	if (IsDebuggerPresent() == TRUE)
-	{
 #ifdef _DEBUG //Debug Mode
 #ifdef _WIN64 //x64
 		shaderfolder = L"..\\x64\\Debug\\";
@@ -416,11 +414,7 @@ bool Graphics::createShaders()
 		shaderfolder = L"..\\Release\\";
 #endif
 #endif
-	}
-	else
-	{
-		shaderfolder = L"..\\x64\\Debug\\";
-	}
+
 
 	//2d shaders
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] =
