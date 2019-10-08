@@ -131,8 +131,10 @@ void Actor::chase()
 }
 void Actor::roam()
 {
-	findPath();
 	//Hitta random position och hitta väg till den.
+
+
+	findPath();
 }
 
 Status Actor::inRange()
@@ -204,18 +206,18 @@ void Actor::findPath()
 }
 void Actor::setUpActor()
 {
-	this->root = &bt.GetSelector();
-	Sequence& sequence = bt.GetSequence();
+	this->root = &bt.getSelector();
+	Sequence& sequence = bt.getSequence();
 
-	Behavior& inRange = bt.GetAction();
+	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Actor::inRange, std::ref(*this)));
-	Behavior& follow = bt.GetAction();
+	Behavior& follow = bt.getAction();
 	follow.addAction(std::bind(&Actor::setChaseState, std::ref(*this)));
-	Behavior& roam = bt.GetAction();
+	Behavior& roam = bt.getAction();
 	roam.addAction(std::bind(&Actor::setRoamState, std::ref(*this)));
 
-	root->AddChildren(sequence);
-	root->AddChildren(roam);
-	sequence.AddChildren(inRange);
-	sequence.AddChildren(follow);
+	root->addChildren(sequence);
+	root->addChildren(roam);
+	sequence.addChildren(inRange);
+	sequence.addChildren(follow);
 }

@@ -45,14 +45,15 @@ bool AStar::algorithm(Vector3 startPos,Vector3 endPos, std::vector<Node*>& path)
 					neighbour->SetFCost(newFCost);
 					neighbour->SetPreviousNode(current);
 					if (!isInVector(open, neighbour))
+					{
 						addToVector(open, neighbour);
+					}
 
 				}
 			}
 		}
 
 	}
-	std::vector<Node*> failed;
 	return false;
 }
 
@@ -130,9 +131,7 @@ AStar::AStar(int gridWidth, int gridHeight,Vector2 topLeftCoord)
 }
 int AStar::getDistance(Vector2 pos1, Vector2 pos2)
 {
-	int x1 = int( pos1.x - pos2.x );
-	int y1 = int( pos1.y - pos2.y );
-	return int( sqrt(pow(x1, 2) + pow(y1, 2)) * 10 );
+	return int((pos1 - pos2).Length() * 10 );	
 }
 
 void AStar::addToVector(std::vector<Node*>& nodes, Node* nodeToAdd)
