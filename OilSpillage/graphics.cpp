@@ -155,6 +155,7 @@ bool Graphics::init(Window* window)
 	if (FAILED(hr))
 		return false;
 
+	desc.ByteWidth = 4096;
 	hr = device->CreateBuffer(&desc, 0, &worldBuffer);
 	if (FAILED(hr))
 		return false;
@@ -740,8 +741,15 @@ Texture* Graphics::getTexturePointer(const char* path, bool isModel )
 
 void Graphics::addToDraw(GameObject* o)
 {
-   assert( o != nullptr );
-	drawableObjects.push_back(o);
+	assert( o != nullptr );
+	//drawableObjects.push_back(o);
+	drawableObjects.insert(
+		std::upper_bound(drawableObjects.begin(), drawableObjects.end(), o, [](GameObject* a, GameObject* b)
+		{
+			return a->mesh->vertexBuffer < a->mesh->vertexBuffer;
+		}),
+		o
+	);
 }
 
 void Graphics::removeFromDraw(GameObject* o)
