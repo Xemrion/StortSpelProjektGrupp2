@@ -74,6 +74,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
 	void cullLights();
+	void drawGameObjectsInstanced(std::vector<GameObject*>::iterator begin, std::vector<GameObject*>::iterator end, const Mesh* meshPtr, DynamicCamera* camera, Frustum& frustum);
 public:
 	Graphics();
 	~Graphics();
