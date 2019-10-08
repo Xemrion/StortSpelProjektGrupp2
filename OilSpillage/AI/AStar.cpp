@@ -1,16 +1,9 @@
 #include "AStar.h"
 
 
-void AStar::resetNodes()
+bool AStar::algorithm(Vector3 startPos,Vector3 endPos, std::vector<Node*>& path)
 {
-	for (int i = 0; i < nodes.size(); i++)
-	{
-		nodes.at(i)->reset();
-	}
-}
-
-std::vector<Node*> AStar::algorithm(Vector3 startPos, Vector3 endPos)
-{
+	path.clear();
 	resetNodes();
 	Node* start = getNode(startPos);
 	Node* goal = getNode(endPos);
@@ -19,12 +12,17 @@ std::vector<Node*> AStar::algorithm(Vector3 startPos, Vector3 endPos)
 	Node* current;
 	open.push_back(start);
 	Node* neighbour;
+	if (start == nullptr || goal == nullptr)
+	{
+		return false;
+	}
 	while (!open.empty())
 	{
 		current = open.at(open.size() - 1);
 		if (current == goal)
 		{
-			return reconstructPath(goal);
+			reconstructPath(goal,path);
+			return true;
 		}
 		open.pop_back();
 		closed.push_back(current);
@@ -41,6 +39,7 @@ std::vector<Node*> AStar::algorithm(Vector3 startPos, Vector3 endPos)
 
 				if (!isInVector(open, neighbour) || newFCost < neighbour->getFCost())
 				{
+					//G and H For debugging
 					neighbour->setGCost(newGCost);
 					neighbour->setHCost(newHCost);
 					neighbour->setFCost(newFCost);
@@ -55,8 +54,7 @@ std::vector<Node*> AStar::algorithm(Vector3 startPos, Vector3 endPos)
 		}
 
 	}
-	std::vector<Node*> failed;
-	return failed;
+	return false;
 }
 
 Node* AStar::getNode(Vector3 position)
@@ -86,7 +84,7 @@ AStar::~AStar()
 	nodes.clear();
 
 }
-AStar::AStar(int gridWidth, int gridHeight, Vector2 topLeftCoord)
+AStar::AStar(int gridWidth, int gridHeight,Vector2 topLeftCoord)
 {
 	//Create grid
 	this->gridWidth = gridWidth;
@@ -104,25 +102,17 @@ AStar::AStar(int gridWidth, int gridHeight, Vector2 topLeftCoord)
 		if (i % gridWidth != 0)
 		{
 			if (i + gridWidth < gridWidth * gridHeight)
-			{
 				nodes.at(i)->addNeighbour(nodes.at(i + gridWidth - 1));//Lower left
-			}
 
 			nodes.at(i)->addNeighbour(nodes.at(i - 1));//Left
-
 			if (i - gridWidth > 0)
-			{
 				nodes.at(i)->addNeighbour(nodes.at(i - gridWidth - 1)); //Upper left
-			}
 		}
 		if (i - gridWidth >= 0)
 		{
 			nodes.at(i)->addNeighbour(nodes.at(i - gridWidth)); //Upper mid
-
 			if (i % gridWidth != gridWidth - 1)
-			{
 				nodes.at(i)->addNeighbour(nodes.at(i - gridWidth + 1)); //upper right
-			}
 		}
 		if (i % gridWidth != gridWidth - 1)
 		{
@@ -141,9 +131,7 @@ AStar::AStar(int gridWidth, int gridHeight, Vector2 topLeftCoord)
 }
 int AStar::getDistance(Vector2 pos1, Vector2 pos2)
 {
-	int x1 = int(pos1.x - pos2.x);
-	int y1 = int(pos1.y - pos2.y);
-	return int(sqrt(pow(x1, 2) + pow(y1, 2)) * 10);
+	return int((pos1 - pos2).Length() * 10 );	
 }
 
 void AStar::addToVector(std::vector<Node*>& nodes, Node* nodeToAdd)
@@ -164,16 +152,13 @@ bool AStar::isInVector(std::vector<Node*> vector, Node* node)
 	for (int i = 0; i < vector.size(); i++)
 	{
 		if (vector.at(i) == node)
-		{
 			return true;
-		}
 	}
 	return false;
 }
 
-std::vector<Node*> AStar::reconstructPath(Node* goal)
+void AStar::reconstructPath(Node* goal, std::vector<Node*>& path)
 {
-	std::vector<Node*> path;
 	Node* current;
 	current = goal;
 	while (current->getPreviousNode() != nullptr)
@@ -181,5 +166,12 @@ std::vector<Node*> AStar::reconstructPath(Node* goal)
 		path.push_back(current);
 		current = current->getPreviousNode();
 	}
-	return path;
+}
+
+void AStar::resetNodes()
+{
+	for (int i = 0; i < nodes.size(); i++)
+	{
+		nodes.at(i)->reset();
+	}
 }

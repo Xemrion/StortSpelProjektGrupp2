@@ -5,16 +5,15 @@
 class Node {
 
 private:
+	int ID;
 	int gCost;
 	int hCost;
 	int fCost;
-	DirectX::SimpleMath::Vector2 Pos;
+	DirectX::SimpleMath::Vector2 pos;
 	bool traversable;
 	std::vector<Node*> neighbours;
 	Node* previousNode;
 public:
-	void reset();
-	int ID;
 	float nodeWidth = 0.5f;
 	void setGCost(int gCost);
 	void setHCost(int hCost);
@@ -27,8 +26,9 @@ public:
 	DirectX::SimpleMath::Vector2 getPos();
 	friend bool operator==(const Node* left, Node& right);
 	friend bool operator==(const Node& left, Node& right);
-	float getXPos();
-	float getYPos();
+	void reset();
+	int getXPos();
+	int getYPos();
 	int getID();
 	void setID(int ID);
 	bool isTraversable();
