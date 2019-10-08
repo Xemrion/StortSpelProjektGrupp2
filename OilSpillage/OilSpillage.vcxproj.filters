@@ -132,9 +132,6 @@
     <ClCompile Include="PG\Walker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AI\Action.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AI\Actor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -309,9 +306,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PG\District.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AI\Action.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AI\Actor.h">
