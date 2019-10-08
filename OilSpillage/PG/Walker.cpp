@@ -25,12 +25,13 @@ WalkerGenArgs create_child_args( WalkerGenArgs &parent_args,
    };
 }
 
-Void Branch::walk( U16 steps ) {
+Void Branch::walk( Config const &config ) {
+   auto steps = config.road_step_size;
 // main loop:
    while ( (tiles_walked != tiles_to_walk) and ( steps --> 0 ) ) {
       // potential branch:
       Bool  is_branch_eligible = ( args.cur_depth < args.max_depth-1 )
-         and ( tiles_since_last_branch >= config::MIN_TILES_BEFORE_BRANCH );
+         and ( tiles_since_last_branch >= config.min_tiles_before_branch );
       if ( is_branch_eligible and gen_selection(args.rng) > args.branch_prob ) {
          // TODO: delay by putting params in a vector and doing the branches after the main loop
          Dir branch_direction = gen_selection(args.rng) < 50 ?
@@ -41,7 +42,7 @@ Void Branch::walk( U16 steps ) {
       else ++tiles_since_last_branch;
 
       // potential turn:
-      Bool  is_turn_eligible = tiles_since_last_turn >= config::MIN_TILES_BEFORE_TURN;
+      Bool  is_turn_eligible = tiles_since_last_turn >= config.min_tiles_before_turn;
       if ( is_turn_eligible and gen_selection(args.rng) > args.turn_prob ) {
          dir = gen_selection(args.rng) < 50 ?
                      turn_left(dir) : turn_right(dir);
@@ -111,9 +112,9 @@ Walker::Walker( Map &map,
          branch_tree[depth].reserve( cPow<U32>(8U,depth) ); // OPTI
 	}
    // set up distributions
-   U16_Dist  gen_x         ( 0,  map.width  / 2 );
-   U16_Dist  gen_y         ( 0,  map.height / 2 );
-   F32_Dist  gen_selection ( 0,             100 );
+   U16_Dist  gen_x         ( 0, static_cast<U16>(map.width/2) );
+   U16_Dist  gen_y         ( 0, static_cast<U16>(map.height/2) );
+   F32_Dist  gen_selection ( 0, 100 );
    // set seed if not -1
    if ( seed != -1 )
       rng.seed( seed ); 
@@ -121,28 +122,15 @@ Walker::Walker( Map &map,
    U16  x, y;
    Dir  dir;
    F32  selection = gen_selection(rng);
-   // first we select which axis' side we'll start on (<50 => y, >=50 => x )
+   // first we select which axis' side we'll start on (<50 means y, >=50 means x )
    if ( selection < 50 ) {
-      x = gen_x(rng);
-      if ( selection < 25 ) {
-         y   = 0;
-         dir = Dir::south; 
-      }
-      else {
-         y   = map.height - 1;
-         dir = Dir::north;
-      }
-      y = selection < 25 ? 0 : map.height - 1; // select y side to start on
+      x   = gen_x(rng);
+      y   = selection < 25 ?  0 : static_cast<U16>(map.height-1); // select y side to start on
+      dir = selection < 25 ?  Dir::south : Dir::north;
    } else {
-      if ( selection < 75 ) {
-         x   = 0;
-         dir = Dir::east;
-      }
-      else {
-         x   = map.width - 1;
-         dir = Dir::west;
-      }
-      y = gen_y(rng);
+      y   = gen_y(rng);
+      x   = selection < 75 ?  0 : static_cast<U16>(map.width-1); // select x side to start on
+      dir = selection < 75 ?  Dir::east : Dir::west;
    }
    using namespace std::placeholders;
    auto scheduler_cb = std::bind( &Walker::schedule_branch, this, _1 );
@@ -169,7 +157,7 @@ Walker::Walker( Map &map,
 
 
 // generates the tree, one depth at a time, one tile per branch at a time
-Void Walker::generate() {
+Void Walker::generate( Config const &config ) {
 #ifdef _DEBUG_W_TERM
    U16 _DEBUG_iteration = 0;
 #endif
@@ -179,7 +167,7 @@ Void Walker::generate() {
          all_done = true;
          for ( auto  &branch : branch_tree[depth] ) {
             if ( !branch.is_done() ) {
-               branch.walk( config::STEP_SIZE );
+               branch.walk( config );
             }
             all_done &= branch.is_done();
          }

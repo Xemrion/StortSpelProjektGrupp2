@@ -65,7 +65,7 @@ public:
 
    inline Bool  is_done() const { return is_done_generating; };
 
-   Void walk( U16 steps );
+   Void walk( Config const & );
 
 private:
 // data member variables:
@@ -110,7 +110,7 @@ public:
 
 
    // generates the tree, one depth at a time, one tile per branch at a time
-   Void generate();
+   Void generate( Config const & );
 
 private:
    // TODO: increasing depth value starting at 0!
