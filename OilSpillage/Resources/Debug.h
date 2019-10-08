@@ -3,9 +3,11 @@
 #include "..//VertexBuffer.h"
 #include "..//IndexBuffer.h"
 #include <DirectXMath.h>
-#include<SimpleMath.h>
-#include"..//Camera.h"
+#include <SimpleMath.h>
+#include "..//Camera.h"
 #include "../GameObject.h"
+
+
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
