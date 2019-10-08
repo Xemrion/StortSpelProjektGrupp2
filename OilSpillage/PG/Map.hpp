@@ -1,8 +1,5 @@
 ﻿#pragma once
 
-// author: Victor Falkengaard Itzel
-// copyright September 2019
-
 #include <iostream>
 #include <cassert>
 #include "defs.hpp"
@@ -16,13 +13,16 @@
 // Map Generator class
 class Map {
 public:
-	U16 const  width, height;
+   Size const width, height;
+
+   Config const config;
 	Vec<Tile>  data;
 
-	Map(U16 width, U16 height) :
-		width  (width),
-		height (height),
-		data   ( Vec<Tile>( Size(width)*Size(height), Tile::ground ) )
+	Map( Config const &config ) :
+      config ( config ),
+      width  ( static_cast<Size>(config.map_dimensions.y) ),
+      height ( static_cast<Size>(config.map_dimensions.x) ),
+		data   ( Vec<Tile>( width * height, Tile::ground ) )
 	{}
 
 	// x = current X (may be mutated if successful)
@@ -78,7 +78,7 @@ public:
 
 	// convert an in-bounds 2D coordinate index (x,y) into an 1D index (i)
 	inline Size index(U16 x, U16 y) const noexcept {
-		return Size(y) * width + Size(x);
+		return static_cast<Size>(x) * width + static_cast<Size>(y);
 	}
 
 	// returns true if the x,y coordinate is in-bounds
@@ -87,10 +87,21 @@ public:
 	}
 
 	inline Vector3 tile_xy_to_world_pos(U16 const x, U16 const y) const {
-		static auto const x_offset = width  / 2.0f * config::TILE_SIDE_LENGTH,
-			               y_offset = height / 2.0f * config::TILE_SIDE_LENGTH;
-		return { x * config::TILE_SIDE_LENGTH - x_offset,  .0f,  y * -config::TILE_SIDE_LENGTH + y_offset };
+		static auto const x_offset = width  / 2.0f * config.tile_scale.x,
+			               y_offset = height / 2.0f * config.tile_scale.y;
+		return { x * config.tile_scale.x - x_offset,  .0f,  y * -config.tile_scale.y + y_offset };
 	}
+
+   inline V2u world_pos_to_tile_xy( Vector3 const &world_pos ) const {
+      static auto const x_offset = width  / 2.0f * config.tile_scale.x,
+			               y_offset = height / 2.0f * config.tile_scale.y;
+      V2u tile_pos;
+      tile_pos.x = (world_pos.x + x_offset) / config.tile_scale.x;
+      tile_pos.y = (world_pos.y + y_offset) / config.tile_scale.y;
+      return tile_pos;
+   }
+
+   Vec<V2u> get_neighbour_tile_coords( V2u cell_coord ) const noexcept;
 };
 
 

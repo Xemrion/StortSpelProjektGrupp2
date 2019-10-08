@@ -1,15 +1,18 @@
 #include "CheckBox.h"
 #include "UserInterface.h"
 #include "..//game.h"
+#include <cassert>
 
 Vector2 CheckBox::size = Vector2(64, 64);
 
 CheckBox::CheckBox(Vector2 position) : Element(position, 0.0f), activated(false)
 {
-	Game::getGraphics().loadTexture("boxChecked.tga");
-	Game::getGraphics().loadTexture("boxUnchecked.tga");
-	this->textureChecked = Game::getGraphics().getTexturePointer("boxChecked.tga");
-	this->textureUnchecked = Game::getGraphics().getTexturePointer("boxUnchecked.tga");
+	Game::getGraphics().loadTexture("UI/boxChecked");
+	Game::getGraphics().loadTexture("UI/boxUnchecked");
+	this->textureChecked   = Game::getGraphics().getTexturePointer("UI/boxChecked");
+	this->textureUnchecked = Game::getGraphics().getTexturePointer("UI/boxUnchecked");
+   assert( textureChecked   && "Texture failed to load!" );
+   assert( textureUnchecked && "Texture failed to load!" );
 }
 
 CheckBox::~CheckBox()

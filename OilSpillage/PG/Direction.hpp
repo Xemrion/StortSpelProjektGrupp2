@@ -1,8 +1,5 @@
 #pragma once
 
-// author: Victor Falkengaard Itzel
-// copyright September 2019
-
 #include <cassert>
 #include "defs.hpp"
 

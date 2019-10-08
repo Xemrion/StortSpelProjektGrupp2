@@ -29,7 +29,7 @@ void Game::setState(State state)
 
 Game::Game()
 {
-	states[STATE_MENU] = std::make_unique<MenuGameState>();
+	states[STATE_MENU]    = std::make_unique<MenuGameState>();
 	states[STATE_PLAYING] = std::make_unique<PlayingGameState>();
 }
 
@@ -44,7 +44,6 @@ void Game::init(Window* window)
 {
 	this->window = window; 
 	graphics.init(window);
-
 	Input::Init();
 	Sound::Init();
 	UserInterface::initStaticVariables();
@@ -54,38 +53,35 @@ void Game::run()
 {
 	//Store counts per second
 	countsPerSec = 0;
-	QueryPerformanceFrequency((LARGE_INTEGER*)& countsPerSec);
+	QueryPerformanceFrequency((LARGE_INTEGER*) &countsPerSec);
 	secPerCount = 1.0f / countsPerSec; //store seconds per count
 
 	//Initial previous time	
-	this->prevTime = 0;
-	QueryPerformanceCounter((LARGE_INTEGER*)& this->prevTime);
+	prevTime = 0;
+	QueryPerformanceCounter((LARGE_INTEGER*) &prevTime);
 
 	Input::SetKeyboardPlayerID(0);
 	states[currentState]->init();
 
-	while (this->window->update())
-	{
+	while (window->update()) {
 		//deltaTime
-		this->curTime = 0;
-		QueryPerformanceCounter((LARGE_INTEGER*)& this->curTime);
+		curTime = 0;
+		QueryPerformanceCounter((LARGE_INTEGER*) &curTime);
 		//Calculate deltaTime
-		this->deltaTime = (this->curTime - this->prevTime) * this->secPerCount;
+		deltaTime = (curTime - prevTime) * secPerCount;
 
 		Input::Update();
-		Sound::Update(this->deltaTime);
+		Sound::Update(deltaTime);
 		states[currentState]->update(deltaTime);
 
-		if (oldState != -1)
-		{
+		if (oldState != -1) {
 			states[oldState]->cleanUp();
 			graphics.clearDraw();
 			states[currentState]->init();
-
 			oldState = -1;
 		}
 
 		//deltaTime reset
-		this->prevTime = this->curTime;
+		prevTime = curTime;
 	}
-}
+}  

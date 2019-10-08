@@ -3,8 +3,23 @@
 struct Light
 {
 	float4 pos;
-	float4 color;
-	float4 directionWidth;
+	float3 color;
+	float luminance;
+	float3 direction;
+	float width;
+};
+
+struct Frustum {
+	float4 left;
+	float4 right;
+	float4 top;
+	float4 bottom;
+};
+
+struct TileData
+{
+	uint numLights;
+	uint indices[MAX_LIGHTS_PER_TILE];
 };
 
 cbuffer Lights : register(b0)
@@ -12,17 +27,17 @@ cbuffer Lights : register(b0)
 	Light lights[MAX_LIGHTS_TOTAL];
 }
 
-cbuffer FrustumPlanes : register(b1)
+cbuffer View : register(b1)
 {
-	float4 frustumNear;
-	float4 frustumFar;
-	float4 frustumLeft;
-	float4 frustumRight;
-	float4 frustumTop;
-	float4 frustumBottom;
+	float4x4 view;
 }
 
-AppendStructuredBuffer<Light> outLightBuffer : register(u0);
+RWStructuredBuffer<TileData> outLightBuffer : register(u0);
+StructuredBuffer<Frustum> frustumInfo : register(t0);
+
+groupshared uint lightCount;
+groupshared TileData groupTileData;
+groupshared Frustum groupFrustum;
 
 bool testPlane(float3 lightPos, float4 plane, float radius)
 {
@@ -30,21 +45,64 @@ bool testPlane(float3 lightPos, float4 plane, float radius)
 	return dist < radius;
 }
 
-[numthreads(1, 1, 1)]
-void main( uint3 DTid : SV_DispatchThreadID )
+void appendLight(uint lightIndex)
 {
-	bool inside = true;
-	uint index = DTid.x;
-	Light l = lights[index];
-	float radius = sqrt(l.color.w * 2.0);
-	
-	inside = inside && testPlane(l.pos.xyz, frustumLeft, radius);
-	inside = inside && testPlane(l.pos.xyz, frustumRight, radius);
-	inside = inside && testPlane(l.pos.xyz, frustumTop, radius);
-	inside = inside && testPlane(l.pos.xyz, frustumBottom, radius);
-
-	if (inside && l.color.w > 0.0)
+	uint index;
+	InterlockedAdd(lightCount, 1, index);
+	if (index < MAX_LIGHTS_PER_TILE)
 	{
-		outLightBuffer.Append(l);
+		InterlockedAdd(groupTileData.numLights, 1);
+		groupTileData.indices[index] = lightIndex;
+	}
+}
+
+[numthreads(LIGHT_CULLING_BLOCK_SIZE, LIGHT_CULLING_BLOCK_SIZE, 1)]
+void main( uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID )
+{
+	uint tileIndex = groupIndex;
+
+	if (groupIndex == 0)
+	{
+		lightCount = 0;
+		groupTileData.numLights = 0;
+		groupFrustum = frustumInfo[groupID.y * 80 + groupID.x];
+	}
+
+	GroupMemoryBarrierWithGroupSync();
+
+	for (uint i = groupIndex; i < MAX_LIGHTS_TOTAL; i += LIGHT_CULLING_BLOCK_SIZE * LIGHT_CULLING_BLOCK_SIZE)
+	{
+		bool inside = true;
+		Light l = lights[i];
+		if (l.luminance == 0.0f)
+		{
+			continue;
+		}
+
+		float4 pos = mul(float4(l.pos.xyz, 1.0), view);
+		float radius = max(sqrt(l.luminance), 1.0) * 15.0;
+
+		if (l.width > 0.0)
+		{
+			l.direction = mul(float4(l.direction, 0.0), view);
+			radius *= 4.0;
+		}
+
+		inside = testPlane(pos.xyz + l.direction * radius, groupFrustum.left, radius);
+		if (inside) inside = testPlane(pos.xyz + l.direction * radius, groupFrustum.right, radius);
+		if (inside) inside = testPlane(pos.xyz + l.direction * radius, groupFrustum.top, radius);
+		if (inside) inside = testPlane(pos.xyz + l.direction * radius, groupFrustum.bottom, radius);
+
+		if (inside)
+		{
+			appendLight(i);
+		}
+	}
+
+	GroupMemoryBarrierWithGroupSync();
+
+	if (groupIndex == 0)
+	{
+		outLightBuffer[groupID.y * 80 + groupID.x] = groupTileData;
 	}
 }

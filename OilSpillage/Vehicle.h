@@ -1,8 +1,12 @@
-#pragma once
-#include "window.h"
-#include "graphics.h"
-#include"Keyboard.h"
-#include"Mouse.h"
+#ifndef VEHICLE_H
+#define VEHICLE_H
+
+#include "GameObject.h"
+#include "VehicleWeapon.h"
+#include "VehicleStats.h"
+
+using namespace DirectX::SimpleMath;
+
 class Vehicle
 {
 private:
@@ -12,9 +16,9 @@ private:
 
 	static const int bulletCount = 16;
 	float leftoverTime;
-	float bulletLifetime;
-	float bulletSpeed;
-	float fireSpeed;
+	Weapon weapon;
+	Stats stats;
+
 	struct Bullet
 	{
 		Vector3 dir;
@@ -27,11 +31,11 @@ private:
 	DirectX::XMFLOAT2 velocity;
 	float strength;
 	float add;
-	
+
 	DirectX::XMFLOAT3 accelerator;
 	float acceleratorTempX;
 	float acceleratorTempZ;
-	
+
 	float targetRotation;
 	int drivingMode;
 	float topSpeed;
@@ -40,6 +44,11 @@ private:
 	float rotationSmoother = 1.0f;
 	float tempTargetRotation;
 	bool rotationDirection;
+
+
+	Vector2 currentDir;
+	float velocitySimple;
+	float velocitySpeed;
 public:
 	Vehicle();
 	virtual ~Vehicle();
@@ -52,5 +61,9 @@ public:
 	void setDrivingMode(int i);
 	bool getDrivingMode();
 	Vector3 getVelocity();
+	float getVelocitySpeed();
+	//void onCollision(Vector2 direction);
 
 };
+
+#endif // !VEHICLE_H

@@ -1,13 +1,15 @@
 #include "Button.h"
 #include "UserInterface.h"
 #include "..//game.h"
+#include <cassert>
 
 Vector2 Button::size = Vector2(256, 64);
 
 Button::Button(Text text, Vector2 position) : Element(position, 0.0f), text(text)
 {
-	Game::getGraphics().loadTexture("button.tga");
-	this->texture = Game::getGraphics().getTexturePointer("button.tga");
+	Game::getGraphics().loadTexture("UI/button");
+	this->texture = Game::getGraphics().getTexturePointer("UI/button");
+   assert( texture && "Texture failed to load!" );
 }
 
 Button::~Button()

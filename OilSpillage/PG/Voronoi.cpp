@@ -1,7 +1,5 @@
-// author: Victor Falkengaard Itzel
-// copyright September 2019
-
 #include <cmath>
+#include <cassert>
 #include "Voronoi.hpp"
 
 Voronoi::Voronoi( RNG &rng, U8 cell_size, U16 width, U16 height, EuclideanDistanceTag ):
@@ -92,4 +90,86 @@ Void Voronoi::generate_diagram( RNG &rng, std::function<F32(V2f const&, V2f cons
          diagram[diagram_index(U16(curr_pos.x), U16(curr_pos.y))] = best_match;
       }
    }
+}
+
+// TODO: refactor out?
+Size Voronoi::compute_cell_real_estate_area( U16 const cell_id, Map const &map ) const noexcept {
+   assert( cell_id < (WIDTH * HEIGHT) && "Cell ID is too low!" );
+
+   Size  counter { 0 };
+
+   Bounds  cell; {  /* first we calculate the relevant 1x1~3x3 cell matrix: */
+      V2u  center_cell { cell_id % WIDTH, cell_id / WIDTH };
+      cell.min.x = center_cell.x > 0        ?  center_cell.x-1  :  center_cell.x;
+      cell.max.x = center_cell.x < WIDTH-1  ?  center_cell.x+1  :  center_cell.x;
+      cell.min.y = center_cell.y > 0        ?  center_cell.y-1  :  center_cell.y;
+      cell.max.y = center_cell.y < HEIGHT-1 ?  center_cell.y+1  :  center_cell.y;
+   };
+
+
+   for ( U16  y = cell.min.y * CELL_SIZE, y_end = (cell.max.y+1) * CELL_SIZE;  y < y_end;  ++y )
+      for ( U16  x = cell.min.x * CELL_SIZE, x_end = (cell.max.x+1) * CELL_SIZE;  x < x_end;  ++x )
+            if ( (diagram[diagram_index(x,y)] == cell_id)
+            and (map.data[map.index(x,y)] == Tile::ground) )
+               ++counter;
+
+   return counter;
+}
+
+// TODO: refactor out?
+Voronoi::Bounds Voronoi::compute_cell_bounds( U16 const cell_id ) const noexcept {
+   assert( cell_id < (WIDTH * HEIGHT) && "Cell ID is too low!" );
+
+   Bounds result {};
+
+   Bounds cell; {  /* first we calculate the relevant 1x1~3x3 cell matrix: */
+      V2u center_cell { cell_id % WIDTH, cell_id / WIDTH };
+      cell.min.x = center_cell.x > 0        ?  center_cell.x-1  : center_cell.x;
+      cell.max.x = center_cell.x < WIDTH-1  ?  center_cell.x+1  : center_cell.x;
+      cell.min.y = center_cell.y > 0        ?  center_cell.y-1  : center_cell.y;
+      cell.max.y = center_cell.y < HEIGHT-1 ?  center_cell.y+1  : center_cell.y;
+   };
+
+//min_x_search: // find min x by probing column by column from the left
+   for ( U16 x = cell.min.x * CELL_SIZE, x_end = (cell.max.x+1) * CELL_SIZE;  x < x_end;  ++x ) {
+      for ( U16 y = cell.min.y * CELL_SIZE, y_end = (cell.max.y+1) * CELL_SIZE;  y < y_end;  ++y ) {
+         if ( diagram[diagram_index(x,y)] == cell_id ) {
+            result.min.x = x;
+            goto max_x_search;
+         }   
+      }
+   }
+
+max_x_search: // find max x by probing column by column from the right
+   for ( U16 x = (cell.max.x+1) * CELL_SIZE - 1, x_end = cell.min.x * CELL_SIZE;  x > x_end;  --x ) {
+      for ( U16 y = cell.min.y * CELL_SIZE, y_end = (cell.max.y+1) * CELL_SIZE;  y < y_end;  ++y ) {
+         if ( diagram[diagram_index(x,y)] == cell_id ) {
+            result.max.x = x;
+            goto min_y_search;;
+         }   
+      }
+   }
+
+min_y_search: // find min y by probing row by row from the top
+   for ( U16 y = cell.min.y * CELL_SIZE, y_end = (cell.max.y+1) * CELL_SIZE;  y < y_end;  ++y ) {
+      for ( U16 x = cell.min.x * CELL_SIZE, x_end = (cell.max.x+1) * CELL_SIZE;  x < x_end;  ++x ) {
+         if ( diagram[diagram_index(x,y)] == cell_id ) {
+            result.min.y = y;
+            goto max_y_search;;
+         }   
+      }
+   }
+
+max_y_search: // find max y by probing row by row from the bottom
+   for ( U16 y = (cell.max.y+1) * CELL_SIZE - 1, y_end = cell.min.y * CELL_SIZE;  y > y_end;  --y ) {
+      for ( U16 x = cell.min.x * CELL_SIZE, x_end = (cell.max.x+1) * CELL_SIZE;  x < x_end;  ++x ) {
+         if ( diagram[diagram_index(x,y)] == cell_id ) {
+            result.max.y = y;
+            goto end;
+         }   
+      }
+   }
+
+end:
+   return result;
 }
