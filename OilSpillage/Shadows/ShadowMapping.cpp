@@ -103,15 +103,22 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	// we do not need anymore this COM object, so we release it.
 	pVS->Release();
 
+	D3D11_BUFFER_DESC descB = { 0 };
 
 	
-	
-	result = this->perFrameCB.initialize(System::getDevice());
+	descB.Usage = D3D11_USAGE_DYNAMIC;
+	descB.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	descB.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	descB.MiscFlags = 0;
+	descB.ByteWidth = static_cast<UINT>(sizeof(Matrix) + (16 - (sizeof(Matrix) % 16)));
+	descB.StructureByteStride = 0;
+
+	result = device->CreateBuffer(&descB, 0, this->perFrameCB.GetAddressOf());
 	if (FAILED(result))
 	{
 		return false;
 	}
-	result = this->worldCB.initialize(System::getDevice());
+	result = device->CreateBuffer(&descB, 0, this->worldBuffer.GetAddressOf());
 	if (FAILED(result))
 	{
 		return false;
@@ -151,11 +158,11 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	sr_desc.Texture2D.MostDetailedMip = 0;
 	sr_desc.Texture2D.MipLevels = 1;
 
-	if (FAILED(System::getDevice()->CreateTexture2D(&depthStencilDesc, 0, &depthTexture)))
+	if (FAILED(this->device->CreateTexture2D(&depthStencilDesc, 0, depthTexture.GetAddressOf())))
 		return false;
-	if (FAILED(System::getDevice()->CreateDepthStencilView(depthTexture, &dsv_desc, &depthStencilView)))
+	if (FAILED(this->device->CreateDepthStencilView(depthTexture.Get(), &dsv_desc, depthStencilView.GetAddressOf())))
 		return false;
-	if (FAILED(System::getDevice()->CreateShaderResourceView(depthTexture, &sr_desc, &depthShaderResource)))
+	if (FAILED(this->device->CreateShaderResourceView(depthTexture.Get(), &sr_desc, depthShaderResource.GetAddressOf())))
 		return false;
 
 	D3D11_SAMPLER_DESC desc;
@@ -174,7 +181,7 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	desc.BorderColor[3] = bColor[3];
 	desc.MinLOD = 0;
 	desc.MaxLOD = 1;
-	HRESULT hr = System::getDevice()->CreateSamplerState(&desc, &this->sampler);
+	HRESULT hr = this->device->CreateSamplerState(&desc, this->sampler.GetAddressOf());
 	if (FAILED(hr))
 	{
 		//MessageBox(hwnd, "Error compiling shader.  Check shader-error.txt for message.", "error", MB_OK);

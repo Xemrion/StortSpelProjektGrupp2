@@ -1,37 +1,34 @@
 cbuffer PerFrameMatrices : register(b0)
 {
-	matrix viewMatrix;
-	matrix projectionMatrix;
-	float3 camera;
+	float4x4 viewProj;
 };
 
 cbuffer WorldMatrix : register(b1)
 {
-	matrix worldMatrix;
+	float4x4 worldMatrix;
 }
 struct VS_IN
 {
-	float4 position : POSITION;
-	float4 color : COLOR;
+	float3 Pos : SV_POSITION;
+	float2 Tex : TEXCOORD;
+	float3 Normal : NORMAL;
 };
 
 struct VS_OUT
 {
-	float4 position : SV_POSITION;
-	float4 color : COLOR;
+	float3 Pos : SV_POSITION;
+	float2 Tex : TEXCOORD;
+	float3 Normal : NORMAL;
 };
 
-VS_OUT VS_main(VS_IN input)
+VS_OUT main(VS_IN input)
 {
 	VS_OUT output;
 
-	input.position.w = 1.0f;
-
 	output.position = mul(input.position, worldMatrix);
-	output.position = mul(output.position, viewMatrix);
-	output.position = mul(output.position, projectionMatrix);
-
-	output.color = input.color;
+	output.position = mul(output.position, viewProj);
+	output.Normal = input.Normal;
+	output.Tex = input.Tex;
 
 	return output;
 }
