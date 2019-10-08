@@ -82,9 +82,9 @@ void PlayingGameState::generateMap( Config const &config ) {
       for ( U16 x=0;  x < map->width;  ++x ) {
          auto &tile = roadTiles[map->index(x,y)];
 		   graphics.addToDraw(&tile);
-		   tile.setScale( Vector3{ 0.0005f * config.tile_scale.x,
-                                 0.0005f * config.tile_scale.y,
-                                 0.0005f * config.tile_scale.z }); // TODO: scale models instead
+		   tile.setScale( Vector3{ .0005f * config.tile_scale.x,
+                                 .0005f * config.tile_scale.y,
+                                 .0005f * config.tile_scale.z }); // TODO: scale models instead
       }
 	}
    generateBuildings(config, rng);
@@ -174,7 +174,7 @@ void PlayingGameState::generateBuildings( Config const &config, RNG &rng) {
 Opt<Vec<V2u>>  PlayingGameState::find_valid_house_lot( RNG &rng, U16 cell_id, Voronoi const &district_map, Map &map, Vec<District> const &district_tbl ) {
    using Bounds = Voronoi::Bounds;
    Bounds    cell_bounds { district_map.compute_cell_bounds(cell_id) };
-   U16_Dist  gen_offset  {               0x0,            0xFF };
+   U16_Dist  gen_offset  {               0x0,              0xFF };
    U16_Dist  gen_x       { cell_bounds.min.x, cell_bounds.max.x };
    U16_Dist  gen_y       { cell_bounds.min.y, cell_bounds.max.y };
 
@@ -430,6 +430,7 @@ void PlayingGameState::ImGui_Driving() {
 void PlayingGameState::ImGui_ProcGen() {
    ImGui::Begin("Map Generation:");
    ImGui::SetWindowSize({425,275});
+
    // debug colors toggle:
    static auto districtColorsToggled          = false,
                districtColorsToggledPrevFrame = false;
@@ -438,20 +439,60 @@ void PlayingGameState::ImGui_ProcGen() {
       toggleDistrictColors();
       districtColorsToggledPrevFrame = districtColorsToggled;
    }
+
    // map:
-   ImGui::InputInt2(   "Map dimensions",      &config.map_dimensions.data[0]  );
-   // (TODO! bugged!) ImGui::InputFloat3( "Tile sddcale",          &config.tile_scale.data[0]      );
-   ImGui::InputFloat(  "Floor height factor", &config.floor_height_factor     );
-   ImGui::InputInt(    "Seed",                &config.seed                    );
-   ImGui::InputInt(    "District cell side",  &config.cell_side               );
+   ImGui::InputInt2( "Map dimensions", &config.map_dimensions.data[0] );
+   if ( config.map_dimensions.x < 1 )
+      config.map_dimensions.x = 1;
+   if ( config.map_dimensions.y < 1 )
+      config.map_dimensions.y = 1;
+
+   // (TODO! bugged!) ImGui::InputFloat3( "Tile scale", &config.tile_scale.data[0] );
+
+   ImGui::InputFloat( "Floor height factor", &config.floor_height_factor );
+
+   ImGui::InputInt( "Seed", &config.seed );
+
+   ImGui::InputInt( "District cell side",  &config.cell_side );
+   static auto cellSidePrev = config.cell_side;
+   int stepsCounter = 0;
+   auto constexpr MAX_STEPS = 128;
+   if ( config.cell_side < 1 )
+      config.cell_side = 1;
+   else if ( (config.cell_side - cellSidePrev) < 0 )
+      while (      (config.cell_side > 1)
+              and ((config.map_dimensions.x % config.cell_side) != 0)
+              and ((config.map_dimensions.y % config.cell_side) != 0)
+              and (++stepsCounter < MAX_STEPS) )
+         --config.cell_side;
+   else if ( (config.cell_side - cellSidePrev) > 0 )
+      while (     ((config.map_dimensions.x % config.cell_side) != 0)
+              and ((config.map_dimensions.y % config.cell_side) != 0)
+              and (++stepsCounter < MAX_STEPS) )
+         ++config.cell_side;
+   if ( stepsCounter == MAX_STEPS ) // no match found
+      config.cell_side = cellSidePrev;
+   cellSidePrev = config.cell_side;
+
    // roads:
-   ImGui::InputInt(    "Tiles before turn",   &config.min_tiles_before_turn   );
-   ImGui::InputInt(    "Tiles before branch", &config.min_tiles_before_branch );
-   ImGui::InputInt(    "Road step size",      &config.road_step_size          );
-            /// TODO: add walker_gen_args params as well
+   ImGui::InputInt( "Min tiles before turn", &config.min_tiles_before_turn );
+   if ( config.min_tiles_before_turn   < 0 )
+      config.min_tiles_before_turn = 0;
+
+   ImGui::InputInt( "Min tiles before branch", &config.min_tiles_before_branch );
+   if ( config.min_tiles_before_branch < 0 )
+      config.min_tiles_before_branch = 0;
+
+   ImGui::InputInt( "Road step size", &config.road_step_size );
+   if ( config.road_step_size < 1 )
+      config.road_step_size = 1;
+   
+   /// TODO: add walker_gen_args params as well
+
    // regen button:
-   if ( ImGui::Button("Re-generate!") )
+   if ( ImGui::Button("Re-generate") )
       generateMap(config);
+
    ImGui::End();
 }
 
