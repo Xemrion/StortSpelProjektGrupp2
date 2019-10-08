@@ -182,7 +182,7 @@ void Actor::followPath()
 		{
 			path.pop_back();
 		}
-		this->setPosition(newPosition);
+	this->setPosition(newPosition);
 	}
 	else
 	{

@@ -22,7 +22,7 @@ private:
    Config                          config;
 	Graphics                       &graphics;
 	std::unique_ptr<Map>            map;
-	std::unique_ptr<AIPlayer>       aiObject;
+	std::unique_ptr<Actor>       aiObject;
 	std::vector<GameObject>         districtMarkers;
 	std::vector<GameObject>         roadTiles;
    std::vector<GameObject>         houseTiles;
@@ -33,6 +33,7 @@ private:
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight = nullptr;
 	std::unique_ptr<RoadNetwork>    testNetwork;
+	AStar*							aStar;
 	void           generateMap( Config const & );
    void           generateBuildings( Config const &, RNG & );
    void           ImGui_ProcGen();

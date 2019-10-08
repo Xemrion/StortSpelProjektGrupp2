@@ -9,15 +9,15 @@ class AStar
 private:
 	int getDistance(Vector2 pos1, Vector2 pos2);
 	void addToVector(std::vector<Node*>& nodes, Node* nodeToAdd);
-	bool isInVector(std::vector<Node*> vector, Node* node);
+	bool isInVector(std::vector<Node*> closed, Node* node);
 	Node* getNode(Vector3 position);
+	void reconstructPath(Node* goal, std::vector<Node*>& path);
 	void resetNodes();
-	std::vector<Node*> reconstructPath(Node* goal);
 	std::vector<Node*> nodes;
 	int gridWidth;
 	int gridHeight;
 public:
-	std::vector<Node*> algorithm(Vector3 startPos, Vector3 endPos);
+	bool algorithm(Vector3 startPos, Vector3 endPos, std::vector<Node*>& path);
 	AStar();
 	~AStar();
 	AStar(int gridWidth, int gridHeight, Vector2 topLeftCoord);

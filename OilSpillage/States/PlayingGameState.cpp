@@ -309,6 +309,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics())
 
 PlayingGameState::~PlayingGameState()
 {
+	delete aStar;
 }
 
 void PlayingGameState::init()
@@ -319,14 +320,16 @@ void PlayingGameState::init()
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
-	graphics.loadMesh("sda");
+	aStar = new AStar(20, 20, Vector2(-10, 10));
+	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
 	graphics.loadModel("Dummy_Roller_Melee");
 
-	aiObject       = std::make_unique<AIPlayer>();
+	aiObject       = std::make_unique<Actor>();
 	aiObject->mesh = graphics.getMeshPointer("Cube");
 	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	aiObject->setAStar(aStar);
 	//aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
 	graphics.addToDraw(aiObject.get());
 
@@ -386,7 +389,6 @@ void PlayingGameState::init()
 	};
 	camera->startCinematic(&points, false);
 
-	aiObject->setTargetPos(player->getVehicle()->getPosition());
 	Input::SetKeyboardPlayerID(0);
 }
 
@@ -469,7 +471,7 @@ void PlayingGameState::update(float deltaTime)
 	playerLight->setDirection(spotlightDir);
 	playerLight->setPos(spotlightPos);
 
-	aiObject->Update(deltaTime);
+	aiObject->update(deltaTime,player->getVehicle()->getPosition());
 	camera->update(deltaTime);
 	camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, 25, 0));
 
