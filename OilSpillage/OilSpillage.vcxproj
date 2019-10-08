@@ -133,9 +133,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AI\Action.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
@@ -185,9 +182,6 @@
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AI\Action.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Behaviour.h" />
