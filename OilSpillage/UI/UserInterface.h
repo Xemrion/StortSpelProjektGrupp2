@@ -19,7 +19,7 @@ public:
 	static CommonStates* getCommonStates();
 	static SpriteBatch* getSpriteBatch();
 	static SpriteFont* getFontArial();
-	static void init();
+	static void initStaticVariables();
 
 protected:
 	Element* changeSelected(Element* selected) const;
@@ -31,7 +31,7 @@ public:
 	UserInterface();
 	virtual ~UserInterface();
 
-	virtual void initUI() = 0;
+	virtual void init() = 0;
 	void update(float deltaTime);
 };
 

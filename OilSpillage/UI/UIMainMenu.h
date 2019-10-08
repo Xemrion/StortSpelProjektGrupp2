@@ -24,7 +24,7 @@ public:
 	UIMainMenu();
 	virtual ~UIMainMenu();
 
-	void initUI();
+	void init();
 };
 
 #endif // !UI_MAIN_MENU_H

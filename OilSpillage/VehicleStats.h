@@ -13,13 +13,10 @@ struct Stats
 class VehicleStats
 {
 public:
-	static const Stats defaultStats;
-	static const Stats fastCar;
+	static constexpr Stats defaultStats = Stats();
+
+	                               //{ durability, armour, accelerationRate, maxSpeed, handlingRate };
+	static constexpr Stats fastCar = {       1.0F,   1.0F,             1.2F,     2.0F,         1.2F };
 };
-
-const Stats VehicleStats::defaultStats;
-
-								  //{ durability, armour, accelerationRate, maxSpeed, handlingRate };
-const Stats VehicleStats::fastCar =	{       1.0F,   1.0F,             1.2F,     2.0F,         1.2F };
 
 #endif // !VEHICLE_STATS_H

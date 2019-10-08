@@ -21,7 +21,7 @@ SpriteFont* UserInterface::getFontArial()
 	return UserInterface::fontArial.get();
 }
 
-void UserInterface::init()
+void UserInterface::initStaticVariables()
 {
 	UserInterface::commonStates = std::make_unique<CommonStates>(Game::getGraphics().getDevice());
 	UserInterface::spriteBatch = std::make_unique<SpriteBatch>(Game::getGraphics().getDeviceContext());

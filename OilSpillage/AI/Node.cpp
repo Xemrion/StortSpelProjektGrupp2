@@ -8,99 +8,97 @@ void Node::reset()
 	this->previousNode = nullptr;
 }
 
-void Node::SetGCost(int gCost)
+void Node::setGCost(int gCost)
 {
 	this->gCost = gCost;
 }
 
-void Node::SetHCost(int hCost)
+void Node::setHCost(int hCost)
 {
 	this->hCost = hCost;
 }
 
-void Node::SetFCost(int fCost)
+void Node::setFCost(int fCost)
 {
 	this->fCost = fCost;
 }
 
-void Node::SetXPos(int xPos)
+void Node::setXPos(int xPos)
 {
 	this->Pos.x = xPos;
 }
 
-void Node::SetYPos(int yPos)
+void Node::setYPos(int yPos)
 {
 	this->Pos.y = yPos;
 }
 
-int Node::GetGCost()
+int Node::getGCost()
 {
 	return this->gCost;
 }
 
-int Node::GetHCost()
+int Node::getHCost()
 {
 	return this->hCost;
 }
 
-int Node::GetFCost()
+int Node::getFCost()
 {
 	return this->fCost;
 }
 
-DirectX::SimpleMath::Vector2 Node::GetPos()
+DirectX::SimpleMath::Vector2 Node::getPos()
 {
 	return this->Pos;
 }
 
-
-
-float Node::GetXPos()
+float Node::getXPos()
 {
 	return float(this->Pos.x);
 }
 
-float Node::GetYPos()
+float Node::getYPos()
 {
 	return float(this->Pos.y);
 }
 
-int Node::GetID()
+int Node::getID()
 {
 	return this->ID;
 }
 
-void Node::SetID(int ID)
+void Node::setID(int ID)
 {
 	this->ID = ID;
 }
 
-bool Node::IsTraversable()
+bool Node::isTraversable()
 {
 	return traversable;
 }
 
-void Node::SetTraversable(bool isTraversable)
+void Node::setTraversable(bool isTraversable)
 {
 	this->traversable = isTraversable;
 }
 
-void Node::AddNeighbour(Node* neighbour)
+void Node::addNeighbour(Node* neighbour)
 {
 	this->neighbours.push_back(neighbour);
 }
 
-std::vector<Node*> Node::GetNeighbours()
+std::vector<Node*> Node::getNeighbours()
 {
 	return this->neighbours;
 }
 
-Node* Node::GetPreviousNode()
+Node* Node::getPreviousNode()
 {
 	return this->previousNode;
 }
 
-void Node::SetPreviousNode(Node* node)
+void Node::setPreviousNode(Node* node)
 {
 	this->previousNode = node;
 }
@@ -118,10 +116,13 @@ Node::Node()
 
 bool operator==(const Node* left, Node& right)
 {
-	return left->Pos.x == right.Pos.x && left->Pos.y == right.Pos.y;
+	//return left->Pos.x == right.Pos.x && left->Pos.y == right.Pos.y;
+	return left->ID == right.ID;
 }
 
 bool operator==(const Node& left, Node& right)
 {
-	return left.Pos.x == right.Pos.x && left.Pos.y == right.Pos.y;
+	//return left.Pos.x == right.Pos.x && left.Pos.y == right.Pos.y;
+	return left.ID == right.ID;
+
 }

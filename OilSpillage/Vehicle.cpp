@@ -24,9 +24,8 @@ Vehicle::Vehicle()
 	this->bodyRotationPoint = nullptr;
 
 	this->leftoverTime = 0.0f;
-	this->bulletSpeed = 4.f;
-	this->bulletLifetime = 2.0f;
-	this->fireSpeed = 0.5f;
+	this->weapon = VehicleWeapon::defaultWeapon;
+	this->stats = VehicleStats::defaultStats;
 }
 
 Vehicle::~Vehicle()
@@ -49,8 +48,8 @@ void Vehicle::init()
 	vehicle->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	//vehicle->setColor(Vector4(2,0.3,0.3,1));
 	vehicle->setScale(Vector3(0.75f, 0.2f, 0.8f));
-	Game::getGraphics().loadTexture("brickwall.tga");
-	vehicle->setTexture(Game::getGraphics().getTexturePointer("brickwall.tga"));
+	Game::getGraphics().loadTexture("brickwall");
+	vehicle->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
 
 	this->bodyRotation = new GameObject;
 	bodyRotation->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -58,8 +57,8 @@ void Vehicle::init()
 	bodyRotation->setPosition(Vector3(0.0f, 0.2f, 0.0f));
 	//vehicle->setColor(Vector4(2,0.3,0.3,1));
 	bodyRotation->setScale(Vector3(0.5f, 0.12f, 0.9f));
-	Game::getGraphics().loadTexture("CarTemp.tga");
-	bodyRotation->setTexture(Game::getGraphics().getTexturePointer("CarTemp.tga"));
+	Game::getGraphics().loadTexture("CarTemp");
+	bodyRotation->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 
 	this->bodyRotationPoint = new GameObject;
 	bodyRotationPoint->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -67,10 +66,13 @@ void Vehicle::init()
 	bodyRotationPoint->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	//vehicle->setColor(Vector4(2,0.3,0.3,1));
 	bodyRotationPoint->setScale(Vector3(0.2f, 0.2f, 0.2f));
-	Game::getGraphics().loadTexture("brickwall.tga");
-	bodyRotationPoint->setTexture(Game::getGraphics().getTexturePointer("brickwall.tga"));
+	Game::getGraphics().loadTexture("brickwall");
+	bodyRotationPoint->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
 
 	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
+
+	this->weapon = VehicleWeapon::missileLauncher;
+	this->stats = VehicleStats::defaultStats;
 
 	for (int i = 0; i < 16; i++)
 	{
@@ -88,14 +90,14 @@ void Vehicle::update(float deltaTime)
 	{
 		float tempDelta = deltaTime + this->leftoverTime;
 
-		if (tempDelta <= fireSpeed)
+		if (tempDelta <= this->weapon.fireSpeed)
 		{
 			this->leftoverTime = tempDelta;
 		}
 
-		while (tempDelta > fireSpeed)
+		while (tempDelta > this->weapon.fireSpeed)
 		{
-			tempDelta -= fireSpeed;
+			tempDelta -= this->weapon.fireSpeed;
 			int freeToUse = 0;
 
 			while (freeToUse < Vehicle::bulletCount && this->bullets[freeToUse].timeLeft > 0.0f)
@@ -108,8 +110,8 @@ void Vehicle::update(float deltaTime)
 				Vector2 dir = Input::GetDirectionR(0);
 				this->bullets[freeToUse].dir = Vector3(dir.x, 0, dir.y);
 				this->bullets[freeToUse].dir.Normalize();
-				this->bullets[freeToUse].timeLeft = this->bulletLifetime;
-				this->bullets[freeToUse].speed = this->bulletSpeed;
+				this->bullets[freeToUse].timeLeft = this->weapon.bulletLifetime;
+				this->bullets[freeToUse].speed = this->weapon.bulletSpeed + max(abs(velocity.x) , abs(velocity.y));
 				this->bullets[freeToUse].obj->setPosition(this->vehicle->getPosition() + Vector3(0, 2, 0));
 				this->bullets[freeToUse].obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->bullets[freeToUse].dir)) * Vector3(0, 1, 0));
 			}
@@ -119,7 +121,7 @@ void Vehicle::update(float deltaTime)
 				break;
 			}
 
-			if (tempDelta <= fireSpeed)
+			if (tempDelta <= this->weapon.fireSpeed)
 			{
 				this->leftoverTime = tempDelta;
 			}
@@ -158,13 +160,14 @@ void Vehicle::update(float deltaTime)
 
 	targetRotation = (atan2(-Input::GetDirectionL(0).x, -Input::GetDirectionL(0).y) * 180 / DirectX::XM_PI) + 180;
 
-	
+	velocitySpeed = (velocity.x * (dx)+velocity.y * (dy));
 	//Driving mode: Turn towards direction, semi-realistic
-	if (drivingMode == 0) {
-	
+	if (drivingMode == 0) {	
 		if (Input::GetStrengthL(0) > 0) {
-			this->velocity.x += dx * 0.2f *deltaTime* 4000 * Input::GetStrengthL(0);
-			this->velocity.y += dy * 0.2f * deltaTime * 4000 * Input::GetStrengthL(0);
+			if (velocitySpeed < 5000) {
+				this->velocity.x += dx * 0.2f *deltaTime* 4000 * Input::GetStrengthL(0);
+				this->velocity.y += dy * 0.2f * deltaTime * 4000 * Input::GetStrengthL(0);
+			}
 
 			if (strength < Input::GetStrengthL(0)) {
 				strength = Input::GetStrengthL(0);
@@ -173,37 +176,176 @@ void Vehicle::update(float deltaTime)
 				strength -= 0.01f * deltaTime;
 			}
 
-			if (velocity.x > topSpeed*strength) {
-				velocity.x = topSpeed * strength;
+			Vector2 targetDir(Input::GetDirectionL(0));
+
+			if ((targetDir - this->currentDir).Length() > 0.01f)
+			{
+				this->currentDir = Vector2::Lerp(this->currentDir, targetDir, deltaTime * min(4* min(velocitySpeed*0.0003f,1),2));
+				this->currentDir.Normalize();
 			}
-			if (velocity.x < -topSpeed * strength) {
-				velocity.x = -topSpeed * strength;
+			else
+			{
+				this->currentDir = targetDir;
 			}
-			if (velocity.y > topSpeed * strength) {
-				velocity.y = topSpeed * strength;
+
+			float newRot = atan2(this->currentDir.x, this->currentDir.y);
+			this->vehicle->setRotation(Vector3(0, newRot, 0));
+
+		}
+		else {
+			this->velocity.x = (velocity.x / (1 + (0.001f * 3000 * deltaTime)));
+			this->velocity.y = (velocity.y / (1 + (0.001f * 3000 * deltaTime)));
+
+			rotateAcceleration /= 1.0f + 0.005f * deltaTime * 20;
+			vehicle->addRotation(Vector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 60 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
+		}
+
+		rotateAcceleration /= 1.0f + 0.002f*deltaTime*1500;
+		/*if (abs(rotateAcceleration) < 0.5) {
+			rotateAcceleration = 0;
+		}*/
+	}
+	//Driving mode: Throttle and turning, realistic
+	else if (drivingMode == 1) {
+		if (Input::CheckButton(Keys::R_TRIGGER, HELD, 0) || Input::IsKeyDown_DEBUG(Keyboard::W)) {
+			if (velocitySpeed < 5000) {
+				this->velocity.x += dx * 0.2f * deltaTime * 4000 * Input::GetStrengthL(0);
+				this->velocity.y += dy * 0.2f * deltaTime * 4000 * Input::GetStrengthL(0);
 			}
-			if (velocity.y < -topSpeed * strength) {
-				velocity.y = -topSpeed * strength;
+		}
+		if (Input::GetDirectionL(0).x > 0) {
+			if (rotationDirection == true) {
+				rotateAcceleration = 0;
 			}
-			if (velocity.x > topSpeed * strength * 0.75f && velocity.y < -topSpeed * strength * 0.75f) {
-				velocity.x = topSpeed * strength * 0.75f;
-				velocity.y = -topSpeed * strength * 0.75f;
+			if (velocity.x * dx > 0.0f || velocity.y * dy > 0.0f) {
+				rotateAcceleration += 0.01f * 100 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
+				if (rotateAcceleration > 1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
+					rotateAcceleration = 1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
+				}
+				if (rotateAcceleration > 2.6f * Input::GetStrengthL(0)) {
+					rotateAcceleration = 2.6f * Input::GetStrengthL(0);
+				}
+				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((1.9f * 100 * 0.001f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				rotationDirection = false;
 			}
-			if (velocity.x < -topSpeed * strength * 0.75f && velocity.y > topSpeed * strength * 0.75f) {
-				velocity.x = -topSpeed * strength * 0.75f;
-				velocity.y = topSpeed * strength * 0.75f;
+			else {
+				rotateAcceleration -= 0.01f * 100 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
+				if (rotateAcceleration < -1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
+					rotateAcceleration = -1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
+				}
+				if (rotateAcceleration < -2.6f * Input::GetStrengthL(0)) {
+					rotateAcceleration = -2.6f * Input::GetStrengthL(0);
+				}
+				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((-1.9f * 100 * 0.001f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				rotationDirection = false;
 			}
-			if (velocity.y > topSpeed * strength * 0.75f && velocity.x > topSpeed * strength * 0.75f) {
-				velocity.y = topSpeed * strength * 0.75f;
-				velocity.x = topSpeed * strength * 0.75f;
+		}
+		else if (Input::GetDirectionL(0).x < 0) {
+			if (rotationDirection == false) {
+				rotateAcceleration = 0;
 			}
-			if (velocity.y < -topSpeed * strength * 0.75f && velocity.x < -topSpeed * strength * 0.75f) {
-				velocity.y = -topSpeed * strength * 0.75f;
-				velocity.x = -topSpeed * strength * 0.75f;
+			if (velocity.y * dy > 0.0f || velocity.x * dx > 0.0f) {
+				rotateAcceleration -= 0.01f * 100 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
+				if (rotateAcceleration < -1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
+					rotateAcceleration = -1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
+				}
+				if (rotateAcceleration < -2.6f * Input::GetStrengthL(0)) {
+					rotateAcceleration = -2.6f * Input::GetStrengthL(0);
+				}
+				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((-1.9f * 100 * 0.001f) + rotateAcceleration * 2) / 3) * DirectX::XM_PI / 180) * deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				rotationDirection = true;
+			}
+			else {
+				rotateAcceleration += 0.01f * 100 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
+				if (rotateAcceleration > 1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
+					rotateAcceleration = 1.9f * 20 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
+				}
+				if (rotateAcceleration > 2.6f * Input::GetStrengthL(0)) {
+					rotateAcceleration = 2.6f * Input::GetStrengthL(0);
+				}
+				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((1.9f * 100 * 0.001f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				rotationDirection = true;
+			}
+		}
+		else {
+			//rotateAcceleration = 0;
+			rotateAcceleration /= 1.0f + 0.05f * deltaTime * 200;
+			vehicle->addRotation(Vector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 60 * ((abs(velocity.x) + abs(velocity.y)) / 8000), 0));
+
+		}
+		if (Input::CheckButton(Keys::L_TRIGGER, HELD, 0) || Input::IsKeyDown_DEBUG(Keyboard::S)) {
+			this->velocity.x -= dx * 0.2f * deltaTime * 4000 * 0.7f /*Input::GetStrengthL(0)*/;
+			this->velocity.y -= dy * 0.2f * deltaTime * 4000 * 0.7f /*Input::GetStrengthL(0)*/;
+			if (velocity.y * dy > 0.0f || velocity.x * dx > 0.0f) {
+				this->velocity.x = (velocity.x / (1 + (0.003f * 300 * deltaTime)));
+				this->velocity.y = (velocity.y / (1 + (0.003f * 300 * deltaTime)));
+			}
+		}
+		if (!Input::CheckButton(Keys::R_TRIGGER, HELD, 0) && !Input::IsKeyDown_DEBUG(Keyboard::S) && !Input::CheckButton(Keys::L_TRIGGER, HELD, 0) && !Input::IsKeyDown_DEBUG(Keyboard::W)) {
+		
+			this->velocity.x = (velocity.x / (1 + (0.001f * 300 * deltaTime)));
+			this->velocity.y = (velocity.y / (1 + (0.001f * 300 * deltaTime)));
+		}
+	}
+	//Driving Mode: Directional Smooth
+	else if (drivingMode == 2)
+	{
+		if (Input::GetDirectionL(0) != Vector2())
+		{
+			Vector2 targetDir(Input::GetDirectionL(0));
+
+			if ((targetDir - this->currentDir).Length() > 0.01f)
+			{
+				this->currentDir = Vector2::Lerp(this->currentDir, targetDir, deltaTime*2);
+				this->currentDir.Normalize();
+			}
+			else
+			{
+				this->currentDir = targetDir;
+			}
+
+			float newRot = atan2(this->currentDir.x, this->currentDir.y);
+			this->vehicle->setRotation(Vector3(0, newRot, 0));
+
+			//v = v0 + a * t
+			this->velocitySimple = this->velocitySimple + 1.2f/*accelerationSimple*/ * deltaTime;
+		}
+		else
+		{
+			if (this->velocitySimple < 0.05f)
+			{
+				this->velocitySimple = 0;
+			}
+			else
+			{
+				this->velocitySimple /= 1 + (1.0f * deltaTime);
+			}
+		}
+
+		//OutputDebugStringA((std::to_string(this->velocitySimple) + "\n").c_str());
+
+		Vector3 direction(this->currentDir.x, 0, this->currentDir.y);
+		//s = s0 + v * t
+		this->vehicle->move(direction* this->velocitySimple* deltaTime);
+	}
+	//Driving Mode: Old Turn towards direction, semi-realistic
+	else if (drivingMode == 3) {
+		if (Input::GetStrengthL(0) > 0) {
+			if (velocitySpeed < 5000) {
+				this->velocity.x += dx * 0.2f *deltaTime* 4000 * Input::GetStrengthL(0);
+				this->velocity.y += dy * 0.2f * deltaTime * 4000 * Input::GetStrengthL(0);
+			}
+
+			if (strength < Input::GetStrengthL(0)) {
+				strength = Input::GetStrengthL(0);
+			}
+			else {
+				strength -= 0.01f * deltaTime;
 			}
 
 
-			if (vehicleRotation < targetRotation && !((abs(vehicleRotation - targetRotation)) < 0.3f)) {
+
+			if (vehicleRotation < targetRotation) {
 				if (abs(vehicleRotation - targetRotation) < 180) {
 					rotateAcceleration += 0.01f * 100 * deltaTime*5 * rotationSmoother;
 					if (rotateAcceleration > 1.9f * 200 * 0.04f * (rotationSmoother * 2)) {
@@ -222,7 +364,7 @@ void Vehicle::update(float deltaTime)
 				}
 			}
 
-			else if(!((abs(vehicleRotation - targetRotation)) < 0.3f)) {
+			else {
 				if (abs(vehicleRotation - targetRotation) < 180) {
 					rotateAcceleration += -0.01f * 100 * deltaTime*5 * rotationSmoother;
 					if (rotateAcceleration < -1.9f * 200 * 0.04f * (rotationSmoother * 2)) {
@@ -254,117 +396,37 @@ void Vehicle::update(float deltaTime)
 			rotateAcceleration = 0;
 		}*/
 	}
-	//Driving mode: Throttle and turning, realistic
-	else if (drivingMode == 1) {
-		if (Input::CheckButton(Keys::R_TRIGGER, HELD, 0) || Input::IsKeyDown_DEBUG(Keyboard::W)) {
-			this->velocity.x += dx * 0.2f * deltaTime * 4000 /** Input::GetStrengthL(0)*/;
-			this->velocity.y += dy * 0.2f * deltaTime * 4000 /** Input::GetStrengthL(0)*/;
-		}
-		if (Input::GetDirectionL(0).x > 0) {
-			if (rotationDirection == true) {
-				rotateAcceleration = 0;
-			}
-			if (velocity.x * dx > 0.0f || velocity.y * dy > 0.0f) {
-				rotateAcceleration += 0.01f * 200 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
-				if (rotateAcceleration > 1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
-					rotateAcceleration = 1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
-				}
-				if (rotateAcceleration > 2.6f * Input::GetStrengthL(0)) {
-					rotateAcceleration = 2.6f * Input::GetStrengthL(0);
-				}
-				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((1.9f * 200 * 0.002f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
-				rotationDirection = false;
-			}
-			else {
-				rotateAcceleration -= 0.01f * 200 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
-				if (rotateAcceleration < -1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
-					rotateAcceleration = -1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
-				}
-				if (rotateAcceleration < -2.6f * Input::GetStrengthL(0)) {
-					rotateAcceleration = -2.6f * Input::GetStrengthL(0);
-				}
-				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((-1.9f * 200 * 0.002f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
-				rotationDirection = false;
-			}
-		}
-		else if (Input::GetDirectionL(0).x < 0) {
-			if (rotationDirection == false) {
-				rotateAcceleration = 0;
-			}
-			if (velocity.y * dy > 0.0f || velocity.x * dx > 0.0f) {
-				rotateAcceleration -= 0.01f * 200 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
-				if (rotateAcceleration < -1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
-					rotateAcceleration = -1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
-				}
-				if (rotateAcceleration < -2.6f * Input::GetStrengthL(0)) {
-					rotateAcceleration = -2.6f * Input::GetStrengthL(0);
-				}
-				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((-1.9f * 200 * 0.002f) + rotateAcceleration * 2) / 3) * DirectX::XM_PI / 180) * deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
-				rotationDirection = true;
-			}
-			else {
-				rotateAcceleration += 0.01f * 200 * deltaTime * 5 * rotationSmoother * ((abs(velocity.x) + abs(velocity.y)) / 5000);
-				if (rotateAcceleration > 1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000)) {
-					rotateAcceleration = 1.9f * 200 * 0.04f * (rotationSmoother * 2) * ((abs(velocity.x) + abs(velocity.y)) / 14000);
-				}
-				if (rotateAcceleration > 2.6f * Input::GetStrengthL(0)) {
-					rotateAcceleration = 2.6f * Input::GetStrengthL(0);
-				}
-				vehicle->addRotation(Vector3(0, Input::GetStrengthL(0)* ((((1.9f * 200 * 0.002f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
-				rotationDirection = true;
-			}
-		}
-		else {
-			//rotateAcceleration = 0;
-			rotateAcceleration /= 1.0f + 0.05f * deltaTime * 200;
-			vehicle->addRotation(Vector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 60 * ((abs(velocity.x) + abs(velocity.y)) / 8000), 0));
-
-		}
-		if (Input::CheckButton(Keys::L_TRIGGER, HELD, 0) || Input::IsKeyDown_DEBUG(Keyboard::S)) {
-			this->velocity.x -= dx * 0.2f * deltaTime * 4000 * 0.7f /*Input::GetStrengthL(0)*/;
-			this->velocity.y -= dy * 0.2f * deltaTime * 4000 * 0.7f /*Input::GetStrengthL(0)*/;
-		}
-		if (!Input::CheckButton(Keys::R_TRIGGER, HELD, 0) && !Input::IsKeyDown_DEBUG(Keyboard::S) && !Input::CheckButton(Keys::L_TRIGGER, HELD, 0) && !Input::IsKeyDown_DEBUG(Keyboard::W)) {
-		
-			this->velocity.x = (velocity.x / (1 + (0.001f * 300 * deltaTime)));
-			this->velocity.y = (velocity.y / (1 + (0.001f * 300 * deltaTime)));
-		}
-	}
-	
-	//if ((tempTargetRotation != targetRotation) && (drivingMode == 0)) {
-	//	//rotationSmoother = 1;
-	//	rotateAcceleration = 0;
-	//}
-
-
 
 
 	//Drifting
 	float hypoC = sqrt(pow(dx, 2) + (pow(dy, 2)));
 	float driftForce = velocity.x * (dy / hypoC) + velocity.y * -(dx / hypoC);
+	Vector2 driftResistance = Vector2(-((dy / hypoC) * 2000 * deltaTime), -(-((dx / hypoC) * 2000 * deltaTime)));
+	if (abs(driftForce) < 250) {
+		driftResistance = driftResistance * (abs(driftForce)*0.005f);
+	}
 	if (drivingMode != 2) {
 		if (Input::GetStrengthL(0) > 0) {
-			if (driftForce < -350) {
-				this->velocity.x -= -((dy / hypoC) * 4000 * deltaTime);
-				this->velocity.y -= -(-((dx / hypoC) * 4000 * deltaTime));
+			if (driftForce < -0) {
+				this->velocity.x -= driftResistance.x;
+				this->velocity.y -= driftResistance.y;
 			}
-			else if (driftForce > 350) {
-				this->velocity.x += -((dy / hypoC) * 4000 * deltaTime);
-				this->velocity.y += -(-((dx / hypoC) * 4000 * deltaTime));
+			else if (driftForce > 0) {
+				this->velocity.x += driftResistance.x;
+				this->velocity.y += driftResistance.y;
 			}
 		}
 		else {
-			if (driftForce < -350) {
-				this->velocity.x -= -((dy / hypoC) * 4000 * deltaTime);
-				this->velocity.y -= -(-((dx / hypoC) * 4000 * deltaTime));
+			if (driftForce < -0) {
+				this->velocity.x -= driftResistance.x;
+				this->velocity.y -= driftResistance.y;
 			}
-			else if (driftForce > 350) {
-				this->velocity.x += -((dy / hypoC) * 4000 * deltaTime);
-				this->velocity.y += -(-((dx / hypoC) * 4000 * deltaTime));
+			else if (driftForce > 0) {
+				this->velocity.x += driftResistance.x;
+				this->velocity.y += driftResistance.y;
 			}
 		}
 	}
-
 
 	this->vehicle->move(Vector3((velocity.x * deltaTime *0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f)));
 
@@ -454,4 +516,9 @@ bool Vehicle::getDrivingMode()
 Vector3 Vehicle::getVelocity()
 {
 	return Vector3(velocity.x,0,velocity.y);
+}
+
+float Vehicle::getVelocitySpeed()
+{
+	return velocitySpeed;
 }

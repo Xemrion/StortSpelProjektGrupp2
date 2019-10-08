@@ -10,12 +10,10 @@ RoadNetwork::RoadNetwork(int randNr, Vector2 max, Vector2 min, float rotation)
 	this->turnLeftSymbol = '-';
 	this->turnRightSymbol = '+';
 	this->halfSymbol = 'H';
-
+	this->forward = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 	//Calculate startpoint
 	Vector2 fromMinToMaxDir = (roadNetworkMax - roadNetworkMin);
-	Vector2 partway;
-	partway.x = fromMinToMaxDir.x / 1024;
-	partway.y = fromMinToMaxDir.y / 1024;
+	Vector2 partway = fromMinToMaxDir / 1024.0f;
 	
 	int rand = randNr % 1024 + 1;
 	int xOrZ = rand % 2;
@@ -30,24 +28,24 @@ RoadNetwork::RoadNetwork(int randNr, Vector2 max, Vector2 min, float rotation)
 	if (xOrZ == 0) { //move start to x value
 		if (toMin) {
 			possibleStart.x = this->roadNetworkMin.x;
-			this->forwardDistance = fromMinToMaxDir.y / 32;
+			this->forwardDistance = fromMinToMaxDir.y / 32.0f;
 			this->forward.x = forwardDistance;
 		}
 		else {
 			possibleStart.x = this->roadNetworkMax.x;
-			this->forwardDistance = fromMinToMaxDir.y / 32;
+			this->forwardDistance = fromMinToMaxDir.y / 32.0f;
 			this->forward.x = -1 * forwardDistance;
 		}
 	}
 	else if (xOrZ == 1) { //move start to z value
 		if (toMin) {
 			possibleStart.y = this->roadNetworkMin.y;
-			this->forwardDistance = fromMinToMaxDir.y / 32;
+			this->forwardDistance = fromMinToMaxDir.y / 32.0f;
 			this->forward.z = forwardDistance;
 		}
 		else {
 			possibleStart.y = this->roadNetworkMax.y;
-			this->forwardDistance = fromMinToMaxDir.y / 32;
+			this->forwardDistance = fromMinToMaxDir.y / 32.0f;
 			this->forward.z = -1 * forwardDistance;
 		}
 	}
