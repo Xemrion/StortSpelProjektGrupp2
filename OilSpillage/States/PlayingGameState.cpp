@@ -2,13 +2,20 @@
 #include "../Input.h"
 #include "../Sound.h"
 
-#ifdef _DEBUG
-std::ofstream building_logs ("PG/logs/building_generation.txt");
-#endif
+void PlayingGameState::generateMap( Config const &config ) {
+   // TODO: this shit shouldn't be necessary. make it so GameObject's destructor handles this D:<
+   for ( auto &e : roadTiles )
+      graphics.removeFromDraw(&e);
+   for ( auto &e : districtMarkers )
+      graphics.removeFromDraw(&e);
+   for ( auto &e : houseTiles )
+      graphics.removeFromDraw(&e);
 
-void PlayingGameState::generateMap( I32 const seed ) {
+	roadTiles       = Vec<GameObject>( config.map_dimensions.x * config.map_dimensions.y );
+   districtMarkers = Vec<GameObject>( config.cell_side * config.cell_side );
+   houseTiles.clear();
 	// create blank map
-   map = std::make_unique<Map>( config::map_width, config::map_height );
+   map = std::make_unique<Map>( config );
 
    // debug output
 #define NO_TERMINAL_COLORS
@@ -21,68 +28,27 @@ void PlayingGameState::generateMap( I32 const seed ) {
 #endif
 
 	Walker roadnet {
-	  *map,      // the map to work on (mutate)
-		4,        // depth; number of generations     (max 4 for now)
-		80,       // min length of a branch           (number of tiles)
-	   120,      // max length of a branch           (number of tiles)
-		0.5f,     // child length factor              (e.g. 0.5 => the length will halve per generation)
-		4.0f,     // turn probability                 (e.g. 0.75 = 0.75%)
-		2.f,      // child turn probability factor    (multiplicative)
-		12.0f,    // branch probability               (e.g. 0.75 = 0.75%)
-		0.75f,    // child branch probability factor  (multiplicative)
-		seed      // seed
+	  *map,         // the map to work on (mutate)
+		4,           // depth; number of generations     (max 4 for now)
+		80,          // min length of a branch           (number of tiles)
+	   120,         // max length of a branch           (number of tiles)
+		0.5f,        // child length factor              (e.g. 0.5 => the length will halve per generation)
+		4.0f,        // turn probability                 (e.g. 0.75 = 0.75%)
+		2.f,         // child turn probability factor    (multiplicative)
+		12.0f,       // branch probability               (e.g. 0.75 = 0.75%)
+		0.75f,       // child branch probability factor  (multiplicative)
+		config.seed // seed
 	};
 
-	roadnet.generate();
+	roadnet.generate(config);
 
 	// debug output
 #ifdef _DEBUG
-	std::ofstream f2("PG/Logs/road_gen_debug_output_seed_" + std::to_string(seed) + ".txt");
+	std::ofstream f2("PG/Logs/road_gen_debug_output_seed_" + std::to_string(config.seed) + ".txt");
 	if (f2.is_open()) {
 		f2 << *map;
 		f2.close();
 	}
-
-   // TODO: remove when no longer needed for debugging
-   Vec<Vector4>  rgba_tbl {
-      { 0.0f, 0.0f, 0.0f, 1.0f },
-      { 0.0f, 0.0f, 0.5f, 1.0f },
-      { 0.0f, 0.0f, 1.0f, 1.0f },
-
-      { 0.0f, 0.5f, 0.0f, 1.0f },
-      { 0.0f, 0.5f, 0.5f, 1.0f },
-      { 0.0f, 0.5f, 1.0f, 1.0f },
-
-      { 0.0f, 1.0f, 0.0f, 1.0f },
-      { 0.0f, 1.0f, 0.5f, 1.0f },
-      { 0.0f, 1.0f, 1.0f, 1.0f },
-
-      { 0.5f, 0.0f, 0.0f, 1.0f },
-      { 0.5f, 0.0f, 0.5f, 1.0f },
-      { 0.5f, 0.0f, 1.0f, 1.0f },
-
-      { 0.5f, 0.5f, 0.0f, 1.0f },
-      { 0.5f, 0.5f, 0.5f, 1.0f },
-      { 0.5f, 0.5f, 1.0f, 1.0f },
-
-      { 0.5f, 1.0f, 0.0f, 1.0f },
-      { 0.5f, 1.0f, 0.5f, 1.0f },
-      { 0.5f, 1.0f, 1.0f, 1.0f },
-
-      { 1.0f, 0.0f, 0.0f, 1.0f },
-      { 1.0f, 0.0f, 0.5f, 1.0f },
-      { 1.0f, 0.0f, 1.0f, 1.0f },
-
-      { 1.0f, 0.5f, 0.0f, 1.0f },
-      { 1.0f, 0.5f, 0.5f, 1.0f },
-      { 1.0f, 0.5f, 1.0f, 1.0f },
-
-      { 1.0f, 1.0f, 0.0f, 1.0f },
-      { 1.0f, 1.0f, 0.5f, 1.0f },
-      { 1.0f, 1.0f, 1.0f, 1.0f }
-   };
-      for ( auto &rgba : rgba_tbl )
-         rgba = blend( rgba, Vector4{1.0f}, 0.5f );
 #endif
 
 	// game object instantiation
@@ -90,11 +56,11 @@ void PlayingGameState::generateMap( I32 const seed ) {
 
    RD  rd;
    RNG rng( rd() );
-   rng.seed(seed);
+   rng.seed(config.seed);
    districtMap = std::make_unique<Voronoi>( rng,
-                                            config::CELL_SIZE,
-                                            map->width  / config::CELL_SIZE,
-                                            map->height / config::CELL_SIZE,
+                                            config.cell_side,
+                                            map->width  / config.cell_side,
+                                            map->height / config.cell_side,
                                             Voronoi::ManhattanDistanceTag{} );
 
 #ifdef _DEBUG
@@ -116,29 +82,18 @@ void PlayingGameState::generateMap( I32 const seed ) {
       for ( U16 x=0;  x < map->width;  ++x ) {
          auto &tile = roadTiles[map->index(x,y)];
 		   graphics.addToDraw(&tile);
-#ifdef _DEBUG
-         // colour code tiles depending on cell index:
-         assert( map->data.size() == districtMap->diagram.size() && "BUG!" );
-         auto        cell_idx = districtMap->diagram_index(x,y);
-         auto        cell_id  = districtMap->diagram[cell_idx];
-         auto const &color    = rgba_tbl[ cell_id % rgba_tbl.size()];
-         tile.setColor( color );
-#endif
-		   tile.setScale( Vector3{ 0.0005f * config::TILE_SIDE_LENGTH,
-                                 0.0001f * config::TILE_SIDE_LENGTH,
-                                 0.0005f * config::TILE_SIDE_LENGTH }); // TODO: scale models instead
+		   tile.setScale( Vector3{ 0.0005f * config.tile_scale.x,
+                                 0.0005f * config.tile_scale.y,
+                                 0.0005f * config.tile_scale.z }); // TODO: scale models instead
       }
 	}
-   generateBuildings(rng);
-#ifdef _DEBUG
-   if ( building_logs.is_open() )
-      building_logs.close();
-#endif
+   generateBuildings(config, rng);
 }
 
-void PlayingGameState::generateBuildings( RNG &rng) {
+void PlayingGameState::generateBuildings( Config const &config, RNG &rng) {
 
 #ifdef _DEBUG
+   std::ofstream building_logs ("PG/logs/building_generation.txt");
    assert( building_logs.is_open() );
    U32  total_building_count      = 0;
 	building_logs << "=========================================== BEGINNING BUILDING GENERATION ===========================================\n";
@@ -192,9 +147,9 @@ void PlayingGameState::generateBuildings( RNG &rng) {
                   auto &house_tile = houseTiles.back();
                   house_tile.mesh  = graphics.getMeshPointer("Cube");
                   house_tile.setColor( {.75f, .75f, .75f, 1.0f} );
-                  house_tile.setScale( { 0.5f * config::TILE_SIDE_LENGTH,
-                                         0.5f * config::TILE_HEIGHT * rng_floor_count,
-                                         0.5f * config::TILE_SIDE_LENGTH } );
+                  house_tile.setScale( { 0.5f * config.tile_scale.x,
+                                         0.5f * config.tile_scale.y * config.floor_height_factor * rng_floor_count,
+                                         0.5f * config.tile_scale.z } );
                   house_tile.setPosition( { map->tile_xy_to_world_pos(U16(tile_coord.x), U16(tile_coord.y)) } );
                   ++total_building_tile_count;
                }
@@ -207,6 +162,11 @@ void PlayingGameState::generateBuildings( RNG &rng) {
    // adding all the tiles to draw:
    for ( auto &e : houseTiles )
       graphics.addToDraw(&e);
+
+#ifdef _DEBUG
+   if ( building_logs.is_open() )
+      building_logs.close();
+#endif
 }
 
 // basic proto placement algorithm
@@ -268,6 +228,76 @@ Opt<Vec<V2u>>  PlayingGameState::find_valid_house_lot( RNG &rng, U16 cell_id, Vo
    else return {};
 }
 
+void PlayingGameState::toggleDistrictColors() noexcept {
+   static auto toggled { false };
+   if ( !toggled ) {
+      Vec<Vector4> rgba_tbl {
+         { 0.0f, 0.0f, 0.0f, 1.0f },
+         { 0.0f, 0.0f, 0.5f, 1.0f },
+         { 0.0f, 0.0f, 1.0f, 1.0f },
+
+         { 0.0f, 0.5f, 0.0f, 1.0f },
+         { 0.0f, 0.5f, 0.5f, 1.0f },
+         { 0.0f, 0.5f, 1.0f, 1.0f },
+
+         { 0.0f, 1.0f, 0.0f, 1.0f },
+         { 0.0f, 1.0f, 0.5f, 1.0f },
+         { 0.0f, 1.0f, 1.0f, 1.0f },
+
+         { 0.5f, 0.0f, 0.0f, 1.0f },
+         { 0.5f, 0.0f, 0.5f, 1.0f },
+         { 0.5f, 0.0f, 1.0f, 1.0f },
+
+         { 0.5f, 0.5f, 0.0f, 1.0f },
+         { 0.5f, 0.5f, 0.5f, 1.0f },
+         { 0.5f, 0.5f, 1.0f, 1.0f },
+
+         { 0.5f, 1.0f, 0.0f, 1.0f },
+         { 0.5f, 1.0f, 0.5f, 1.0f },
+         { 0.5f, 1.0f, 1.0f, 1.0f },
+
+         { 1.0f, 0.0f, 0.0f, 1.0f },
+         { 1.0f, 0.0f, 0.5f, 1.0f },
+         { 1.0f, 0.0f, 1.0f, 1.0f },
+
+         { 1.0f, 0.5f, 0.0f, 1.0f },
+         { 1.0f, 0.5f, 0.5f, 1.0f },
+         { 1.0f, 0.5f, 1.0f, 1.0f },
+
+         { 1.0f, 1.0f, 0.0f, 1.0f },
+         { 1.0f, 1.0f, 0.5f, 1.0f },
+         { 1.0f, 1.0f, 1.0f, 1.0f }
+      };
+      for ( auto &rgba : rgba_tbl )
+         rgba = blend( rgba, Vector4{1.0f}, config.district_blend_factor );
+      // colour code tiles depending on cell index:
+      for ( U16 y=0;  y < map->height;  ++y ) {
+         for ( U16 x=0;  x < map->width;  ++x ) {
+            assert( map->data.size() == districtMap->diagram.size() && "BUG!" );
+            auto       &tile     = roadTiles[map->index(x,y)];
+            auto        cell_idx = districtMap->diagram_index(x,y);
+            auto        cell_id  = districtMap->diagram[cell_idx];
+            auto const &color    = rgba_tbl[ cell_id % rgba_tbl.size()];
+            tile.setColor( color );
+         }
+      }
+      for ( auto &e : houseTiles ) {
+         auto        pos      = map->world_pos_to_tile_xy( e.getPosition() );
+         auto        cell_idx = districtMap->diagram_index(pos.x,pos.y);
+         auto        cell_id  = districtMap->diagram[cell_idx];
+         auto const &color    = rgba_tbl[ cell_id % rgba_tbl.size()];
+         e.setColor( color );
+      }
+   } else {
+      static auto const default_color = Vector4 { .8f, .8f, .8f, 1.0f };
+      for ( auto &e : roadTiles )
+         e.setColor( default_color );
+      for ( auto &e : houseTiles )
+         e.setColor( default_color );
+   }
+   toggled = !toggled;
+}
+
 void PlayingGameState::initiateAStar()
 {
 	//this->aStar.setMap(*map); // TODO
@@ -279,6 +309,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics())
 
 PlayingGameState::~PlayingGameState()
 {
+	delete aStar;
 }
 
 void PlayingGameState::init()
@@ -289,14 +320,16 @@ void PlayingGameState::init()
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
-	graphics.loadMesh("sda");
+	aStar = new AStar(20, 20, Vector2(-10, 10));
+	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
 	graphics.loadModel("Dummy_Roller_Melee");
 
-	aiObject       = std::make_unique<AIPlayer>();
+	aiObject       = std::make_unique<Actor>();
 	aiObject->mesh = graphics.getMeshPointer("Cube");
 	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	aiObject->setAStar(aStar);
 	//aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
 	graphics.addToDraw(aiObject.get());
 
@@ -306,9 +339,9 @@ void PlayingGameState::init()
 	graphics.loadModel("Roads/Road_straight");
 	graphics.loadModel("Roads/Road_3way");
 	graphics.loadModel("Roads/Road_4way");
-	generateMap(config::START_SEED);
+	generateMap(config);
 
-#if _DEBUG
+#ifdef _DEBUG
 	// light tests
 	lightList->addLight(SpotLight(Vector3(-2.f,  1.0f,  0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f,  0.0f), 0.5));
 	lightList->addLight(SpotLight(Vector3( 2.f,  1.0f,  0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3( 2.f, -1.0f,  0.0f), 0.5));
@@ -330,8 +363,7 @@ void PlayingGameState::init()
 
 	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
-	for (int i = 0; i < 50; ++i)
-	{
+	for (int i = 0; i < 50; ++i) {
 		Vector3 randPos   = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand() / RAND_MAX));
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
@@ -344,6 +376,7 @@ void PlayingGameState::init()
 	}
 #endif
 	lightList->setSun(Sun(Vector3(0.0f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
+
 	graphics.setLightList(lightList.get());
 
 	player->init();
@@ -356,58 +389,26 @@ void PlayingGameState::init()
 	};
 	camera->startCinematic(&points, false);
 
-	aiObject->setTargetPos(player->getVehicle()->getPosition());
 	Input::SetKeyboardPlayerID(0);
 }
 
-/*
-template <typename T>
-void delete_pointed_to(T* const ptr)
-{
-	delete ptr;
-}
-*/
-
-void PlayingGameState::update(float deltaTime)
-{
-	/*-------------------------UPDATING-------------------------*/
-	player->update(deltaTime);
-
-	Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
-	Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);
-	spotlightPos += spotlightDir * 1;
-	playerLight->setDirection(spotlightDir);
-	playerLight->setPos(spotlightPos);
-
-	aiObject->Update(deltaTime);
-	camera->update(deltaTime);
-	camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, 25, 0));
-
-	/*-------------------------RENDERING-------------------------*/
-	//Render all objects
-	graphics.render(camera.get());
-	//testNetwork.get()->drawRoadNetwork(&graphics);
-
-	//ImGui rendering --BEGIN--
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-
+void PlayingGameState::ImGui_Driving() {
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Driving Mode:");
-
 	static int radioButtonValue = 0;
 	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
 	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
 	ImGui::RadioButton("Directional Smooth", &radioButtonValue, 2);
-
-	if (radioButtonValue == 0 && player->getDrivingMode() == 1)
+	ImGui::RadioButton("Old Directional Semi-Realistic", &radioButtonValue, 3);
+	if (radioButtonValue == 0)
 		player->setDrivingMode(0);
-	if (radioButtonValue == 1 && player->getDrivingMode() == 0)
+	else if (radioButtonValue == 1)
 		player->setDrivingMode(1);
-	if (radioButtonValue == 2 && player->getDrivingMode() == 2)
+	else if (radioButtonValue == 2)
 		player->setDrivingMode(2);
+	else if (radioButtonValue == 3)
+		player->setDrivingMode(3);
 
 	Vector3 camPos = camera->getPosition();
 	Vector3 camRot = camera->getRotation();
@@ -425,10 +426,70 @@ void PlayingGameState::update(float deltaTime)
 	ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
 	ImGui::Text(("R Str: " + std::to_string(rStr)).c_str());
 	ImGui::Text(("Accelerator: " + std::to_string(player->getAcceleratorX())).c_str());
+   ImGui::End();
+}
 
-	ImGui::End();
+void PlayingGameState::ImGui_ProcGen() {
+   ImGui::Begin("Map Generation:");
+   ImGui::SetWindowSize({425,275});
+   // debug colors toggle:
+   static auto districtColorsToggled          = false,
+               districtColorsToggledPrevFrame = false;
+   ImGui::Checkbox("Toggle district colors", &districtColorsToggled );
+   if ( districtColorsToggled != districtColorsToggledPrevFrame ) {
+      toggleDistrictColors();
+      districtColorsToggledPrevFrame = districtColorsToggled;
+   }
+   // map:
+   ImGui::InputInt2(   "Map dimensions",      &config.map_dimensions.data[0]  );
+   // (TODO! bugged!) ImGui::InputFloat3( "Tile sddcale",          &config.tile_scale.data[0]      );
+   ImGui::InputFloat(  "Floor height factor", &config.floor_height_factor     );
+   ImGui::InputInt(    "Seed",                &config.seed                    );
+   ImGui::InputInt(    "District cell side",  &config.cell_side               );
+   // roads:
+   ImGui::InputInt(    "Tiles before turn",   &config.min_tiles_before_turn   );
+   ImGui::InputInt(    "Tiles before branch", &config.min_tiles_before_branch );
+   ImGui::InputInt(    "Road step size",      &config.road_step_size          );
+            /// TODO: add walker_gen_args params as well
+   // regen button:
+   if ( ImGui::Button("Re-generate!") )
+      generateMap(config);
+   ImGui::End();
+}
+
+void PlayingGameState::update(float deltaTime)
+{
+   /*-------------------------UPDATING-------------------------*/
+	if (Input::IsKeyDown_DEBUG(Keyboard::E)) {
+		deltaTime /= 4;
+	}
+	player->update(deltaTime);
+
+	Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
+	Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);
+	spotlightPos += spotlightDir * 1;
+	playerLight->setDirection(spotlightDir);
+	playerLight->setPos(spotlightPos);
+
+	aiObject->update(deltaTime,player->getVehicle()->getPosition());
+	camera->update(deltaTime);
+	camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, 25, 0));
+
+	/*-------------------------RENDERING-------------------------*/
+	//Render all objects
+	graphics.render(camera.get());
+	//testNetwork.get()->drawRoadNetwork(&graphics);
+
+	//ImGui rendering --BEGIN--
+#ifdef _DEBUG
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+   ImGui::NewFrame();
+   ImGui_Driving();
+   ImGui_ProcGen();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+ #endif
 	// ImGui rendering --END--
 
 	// Present scene
