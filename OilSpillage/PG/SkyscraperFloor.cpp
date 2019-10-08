@@ -9,11 +9,13 @@ SkyscraperFloor::SkyscraperFloor(int edges)
 
 SkyscraperFloor::SkyscraperFloor(const SkyscraperFloor& other)
 {
+
 }
 
 SkyscraperFloor::~SkyscraperFloor()
 {
 }
+
 void SkyscraperFloor::rotateDeg(float degrees)
 {
 	float rotX = 0.0f, rotZ = 0.0f;
@@ -44,7 +46,7 @@ void SkyscraperFloor::generateShape(int edges)
 {
 	this->nrOfEdges = edges;
 	Vector3 temp = this->center + Vector3(0.0f, 0.0f, 1.0f);
-	float angle = ((pi * 2) / edges);
+	float angle = ((pi * 2) / float(edges));
 	this->verticies.push_back(temp);
 	for (int i = 1; i < edges; i++) {
 		float rotX = (temp.x * float(cos(angle))) + (temp.z * float(sin(angle)));
@@ -54,10 +56,24 @@ void SkyscraperFloor::generateShape(int edges)
 	}
 }
 
-void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion)
+void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 {
+
 }
+/* Union
+	This Shape A
+	Other Shape B
+	Copy A & B
+	Go through lines in A and see if they intersect with lines from B
+	If they intersect, add a point between the lines in the copy of A.
+	After all lines are done, compare points in A to Shape B
+	If inside, remove from Copy A
+	Repeat for B
+	Add points of B between the intersecting points added to A
+	You have a union.
+*/
 
 void SkyscraperFloor::translate(Vector3 newCenter)
 {
+	
 }

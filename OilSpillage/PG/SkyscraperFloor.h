@@ -13,8 +13,7 @@ public:
 
 	void rotateDeg(float degrees);
 	void rotateRad(float radians);
-	void unionShapes(SkyscraperFloor& toUnion);
-	void translate(Vector3 newCenter);
+	void unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter);
 private:
 	std::vector<Vector3> verticies;
 	int nrOfEdges;
@@ -22,19 +21,21 @@ private:
 
 	float pi = 3.141592653f;
 
+	void translate(Vector3 newCenter);
 	void generateShape(int edges); //3 - ?
 };
 
 
 //Sides: n quads
 
-/*
+/*	Display a complex shape with triangles
+
 	pick a point
 	make a line between neighboors
 		if a neighboor is unavailable, move one step further away from start point in the neighboors direction
 	make a line from one neighboor to all other points
 	cross product to check if any are within triangle
 	if yes, change start point and repeat
-		if point - unavailable points is two or lower, end loop
+		if (point - unavailable points) is two or lower, end loop
 	if no, make triangle, set start point to unavailable
 */
