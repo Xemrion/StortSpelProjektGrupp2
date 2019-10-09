@@ -4,13 +4,15 @@
 #include "graphics.h"
 #include "States/GameState.h"
 
-enum State {
+enum State
+{
 	STATE_MENU,
 	STATE_PLAYING,
 	STATECOUNT
 };
 
-class Game {
+class Game
+{
 public:
 	static GameState       *getCurrentState();
 	static void             setState(State);
