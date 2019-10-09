@@ -1,8 +1,7 @@
 #pragma once
 #include "Actor.h"
-class Defender : public Actor
+class Attacker : public Actor
 {
-
 public:
 	Defender();
 	~Defender();
@@ -12,10 +11,10 @@ public:
 private:
 	void setUpActor();
 	Vector3 objectivePos;
-
-	//Status attack();
 	Status inRange();
+	//Status attack();
 	//Status setChaseState();
 	//Status setRoamState();
+};
 };
 

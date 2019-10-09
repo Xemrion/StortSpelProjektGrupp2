@@ -326,7 +326,7 @@ void PlayingGameState::init()
 	graphics.loadTexture("brickwall");
 	graphics.loadModel("Dummy_Roller_Melee");
 
-	aiObject       = std::make_unique<Defender>();
+	aiObject       = std::make_unique<Attacker>();
 	aiObject->mesh = graphics.getMeshPointer("Cube");
 	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	aiObject->setAStar(aStar);

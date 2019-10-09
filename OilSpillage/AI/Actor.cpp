@@ -220,9 +220,7 @@ void Actor::findPath()
 {
 	aStar->algorithm(this->getPosition(), targetPos, path);
 }
-void Actor::setUpActor()
-{
-	this->root = &bt.getSelector();
+	/*this->root = &bt.getSelector();
 	Sequence& sequence = bt.getSequence();
 
 	Behavior& inRange = bt.getAction();
@@ -235,5 +233,4 @@ void Actor::setUpActor()
 	root->addChildren(sequence);
 	root->addChildren(roam);
 	sequence.addChildren(inRange);
-	sequence.addChildren(follow);
-}
+	sequence.addChildren(follow);*/

@@ -10,7 +10,7 @@ public:
 	~Actor();
 	virtual void update(float dt, Vector3 targetPos);
 	void setAStar(AStar* aStar);
-	virtual void setUpActor();
+	virtual void setUpActor() = 0 {};
 
 private:
 	enum State{Roaming,Chasing};

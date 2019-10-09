@@ -52,6 +52,7 @@
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="AI\Defender.cpp" />
+    <ClCompile Include="AI\Attacker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
@@ -113,6 +114,7 @@
     <ClInclude Include="VehicleWeapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="AI\Defender.h" />
+    <ClInclude Include="AI\Attacker.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="brickwall.tga" />

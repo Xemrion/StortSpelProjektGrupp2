@@ -6,6 +6,7 @@
 #include "../ImGui/imgui.h"
 #include "../vehicle.h"
 #include "../AI/Defender.h"
+#include "../AI/Attacker.h"
 #include "../Road Network/RoadNet.h"
 #include "../DynamicCamera.h"
 #include "../PG/config.hpp"
@@ -22,7 +23,7 @@ private:
    Config                          config;
 	Graphics                       &graphics;
 	std::unique_ptr<Map>            map;
-	std::unique_ptr<Defender>       aiObject;
+	std::unique_ptr<Attacker>       aiObject;
 	std::vector<GameObject>         districtMarkers;
 	std::vector<GameObject>         roadTiles;
    std::vector<GameObject>         houseTiles;
