@@ -313,7 +313,7 @@ void PlayingGameState::init() {
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
-	aStar = std::make_unique<AStar>(20, 20, Vector2(-10, 10));
+	aStar = std::make_unique<AStar>( 20, 20, Vector2(-10, 10) );
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
@@ -533,7 +533,7 @@ void PlayingGameState::ImGui_Camera() {
    static float cullingDistanceCurr = graphics.getCullingDistance();
    float const  cullingDistancePrev = cullingDistanceCurr;
    cullingDistanceCurr = graphics.getCullingDistance();
-      ImGui::SliderFloat( "Culling distance", &cullingDistanceCurr, .0f, 10000.0f, "%4.1f" );
+      ImGui::SliderFloat( "Culling distance", &cullingDistanceCurr, .0f, 1500.0f, "%4.1f" );
    if ( cullingDistanceCurr != cullingDistancePrev )
       graphics.setCullingDistance( cullingDistanceCurr );
    ImGui::End();

@@ -34,7 +34,7 @@ private:
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight = nullptr;
 	std::unique_ptr<RoadNetwork>    testNetwork;
-	AStar*				              aStar;
+	std::unique_ptr<AStar>          aStar;
 	void           generateMap( Config const & );
    void           generateBuildings( Config const &, RNG & );
    void           ImGui_ProcGen();
@@ -44,9 +44,9 @@ private:
    void           toggleDistrictColors() noexcept;
 	void           initiateAStar();
 public:
-	PlayingGameState();
+	         PlayingGameState();
 	virtual ~PlayingGameState();
-	void init();
-	void cleanUp();
-	void update(float deltaTime);
+	void     init();
+	void     cleanUp();
+	void     update(float deltaTime);
 };

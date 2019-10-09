@@ -96,8 +96,8 @@ public:
       static auto const x_offset = width  / 2.0f * config.tile_scale.x,
 			               y_offset = height / 2.0f * config.tile_scale.y;
       V2u tile_pos;
-      tile_pos.x = (world_pos.x + x_offset) / config.tile_scale.x;
-      tile_pos.y = (world_pos.y + y_offset) / config.tile_scale.y;
+      tile_pos.x = static_cast<U32>((world_pos.x + x_offset) / config.tile_scale.x);
+      tile_pos.y = static_cast<U32>((world_pos.y + y_offset) / config.tile_scale.y);
       return tile_pos;
    }
 
