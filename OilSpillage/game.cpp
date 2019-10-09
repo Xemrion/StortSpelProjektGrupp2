@@ -51,6 +51,8 @@ void Game::init(Window* window)
 
 void Game::run()
 {
+	Input::SetKeyboardPlayerID(0);
+	states[currentState]->init();
 	//Store counts per second
 	countsPerSec = 0;
 	QueryPerformanceFrequency((LARGE_INTEGER*) &countsPerSec);
@@ -60,8 +62,6 @@ void Game::run()
 	prevTime = 0;
 	QueryPerformanceCounter((LARGE_INTEGER*) &prevTime);
 
-	Input::SetKeyboardPlayerID(0);
-	states[currentState]->init();
 
 	while (window->update()) {
 		//deltaTime
@@ -78,6 +78,8 @@ void Game::run()
 			states[oldState]->cleanUp();
 			graphics.clearDraw();
 			states[currentState]->init();
+			curTime = 0;
+			QueryPerformanceCounter((LARGE_INTEGER*)& curTime);
 			oldState = -1;
 		}
 
