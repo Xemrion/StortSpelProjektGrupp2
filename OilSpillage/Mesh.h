@@ -22,12 +22,12 @@ public:
 	void insertDataToMesh(std::vector<Vertex3D>& vertexData);
 	void operator=(const Mesh& rh) { this->vertices = rh.vertices; }
 
-	virtual ~Mesh() { if (this->vertexBuffer) this->vertexBuffer->Release(); }
+	virtual ~Mesh() { }
 	std::vector<Vertex3D> vertices;
-	ID3D11Buffer* vertexBuffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
 	void setAABB(AABB obj);
-	AABB getAABB()const;
-	int getVertexCount()const;
+	AABB getAABB() const;
+	int getVertexCount() const;
 private:
 	AABB collisionBox;
 	int vertexCount = 0; 

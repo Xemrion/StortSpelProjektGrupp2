@@ -1,21 +1,36 @@
 #include "game.h"
 #include "Input.h"
+#include "Sound.h"
+#include "UI/UserInterface.h"
+#include "States/MenuGameState.h"
+#include "States/PlayingGameState.h"
+
 Graphics Game::graphics = Graphics();
 
-void Game::addQuad(int x)
-{
-	GameObject* object2 = new GameObject;
-	object2->mesh = graphics.getMeshPointer("Cube");
-	object2->setColor(Vector4(0, 1, 0, 1));
-	graphics.addToDraw(object2);
-	object2->setPosition(Vector3(static_cast<float>(x), 0.0f, 0.0f));
-	object2->setTexture(graphics.getTexturePointer("brickwall.tga"));
+std::unique_ptr<GameState> Game::states[STATECOUNT];
+int Game::currentState = STATE_MENU;
+int Game::oldState = -1;
 
+GameState* Game::getCurrentState()
+{
+	return states[currentState].get();
+}
+
+void Game::setState(State state)
+{
+	int newState = static_cast<int>(state);
+
+	if (oldState == -1 && currentState != newState)
+	{
+		oldState = currentState;
+		currentState = newState;
+	}
 }
 
 Game::Game()
 {
-
+	states[STATE_MENU]    = std::make_unique<MenuGameState>();
+	states[STATE_PLAYING] = std::make_unique<PlayingGameState>();
 }
 
 Game::~Game()
@@ -28,94 +43,42 @@ Game::~Game()
 void Game::init(Window* window)
 {
 	this->window = window; 
-	graphics.init(window, 90,this->camera);
-	
-	this->mouse = std::make_unique<Mouse>();
-	this->mouse->SetWindow(window->handle);
-	graphics.loadMesh("sda","fds");
-	graphics.loadShape(SHAPE_CUBE);
-	graphics.loadShape(SHAPE_QUAD);
-	graphics.loadTexture("brickwall.tga", "brickwall.tga");
-	graphics.loadModel("Dummy_Roller_Melee", "Dummy_Player_Car");
-	this->testObject = new GameObject;
-	testObject->mesh = graphics.getMeshPointer("Quad");
-	graphics.addToDraw(testObject);
-	testObject->setPosition(Vector3(0.0f, -0.1f, 0.0f));
-	testObject->setScale(Vector3(100.0f, 0.0f, 100.0f));
-	testObject->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
-	testObject->setTexture(graphics.getTexturePointer("brickwall.tga"));
-	//testObject->setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-	this->testObject2 = new GameObject;
-	testObject2->mesh = graphics.getMeshPointer("Dummy_Roller_Melee.bin");
-	graphics.addToDraw(testObject2);
-	testObject2->setPosition(Vector3(7.0f, 0.0f, 0.0f));
-	testObject2->setScale(Vector3(0.01, 0.01, 0.01f));
-	//testObject2->setColor(Vector4(0.5f, 0.5f, 0.5f, 1.0f));
-	testObject2->setTexture(graphics.getTexturePointer("brickwall.tga"));
-
-	aiObject = new AIPlayer();
-	aiObject->mesh = graphics.getMeshPointer("Cube");
-	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
-	aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
-	//graphics.addToDraw(aiObject);
-	//AiTestObject = new GameObject;
-	//AiTestObject->mesh = graphics.getMeshPointer("Cube");
-	//AiTestObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
-	//AiTestObject->setColor(Vector4(1.0f, 0.0f,0.0f,1.0f));
-	//graphics.addToDraw(AiTestObject);
-
-	
-	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 50.f));
-	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f),  50.f));
-	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f),  50.f));
-	graphics.addPointLight(PointLight(testObject2->getPosition() + Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 50.f));
-
-	graphics.setSunVector(Vector3(0.55f, 1.0f, 0.725f));
-
-	player.init();
-	Vector4 colorsP[4] =
-	{
-		Vector4(1.0f,1.0f,0.0f,1.0f),
-		Vector4(1.0f,0.0f,0.0f,1.0f),
-		Vector4(0.0f,0.0f,0.0f,1.0f),
-		Vector4(0.0f,0.0f,0.0f,1.0f)
-	};
-	this->graphics.setParticleColorNSize(colorsP, 4, 0.05f, 0.10f);
+	graphics.init(window);
+	Input::Init();
+	Sound::Init();
+	UserInterface::initStaticVariables();
 }
 
 void Game::run()
 {
 	//Store counts per second
 	countsPerSec = 0;
-	QueryPerformanceFrequency((LARGE_INTEGER*)& countsPerSec);
+	QueryPerformanceFrequency((LARGE_INTEGER*) &countsPerSec);
 	secPerCount = 1.0f / countsPerSec; //store seconds per count
 
 	//Initial previous time	
 	prevTime = 0;
-	QueryPerformanceCounter((LARGE_INTEGER*)& prevTime);
+	QueryPerformanceCounter((LARGE_INTEGER*) &prevTime);
 
-	this->aiObject->SetTarget(&this->player.getVehicle()->getPosition());
 	Input::SetKeyboardPlayerID(0);
+	states[currentState]->init();
 
-	while (this->window->update())
-	{
-		Input::Update();
-		//Game logic
-		//Graphics
-
+	while (window->update()) {
 		//deltaTime
 		curTime = 0;
-		QueryPerformanceCounter((LARGE_INTEGER*)& curTime);
+		QueryPerformanceCounter((LARGE_INTEGER*) &curTime);
 		//Calculate deltaTime
 		deltaTime = (curTime - prevTime) * secPerCount;
 
+		Input::Update();
+		Sound::Update(deltaTime);
+		states[currentState]->update(deltaTime);
 
-		auto mouse = this->mouse->GetState();
-		Vector2 mousePos = (1/camera.getPos().y)*Vector2(float(mouse.x-(this->window->width/2)), float(mouse.y -(this->window->height/2)));
-		mousePos.y *= -1.0f;
-		if (Input::IsKeyDown_DEBUG(Keyboard::Escape))
-		{
-			//Exit game
+		if (oldState != -1) {
+			states[oldState]->cleanUp();
+			graphics.clearDraw();
+			states[currentState]->init();
+			oldState = -1;
 		}
 		if (Input::IsKeyDown_DEBUG(Keyboard::E))
 			deltaTime /= 4;
@@ -217,20 +180,7 @@ void Game::run()
 		graphics.setSunVector(Vector3(sin(curTime * secPerCount * 0.1), cos(curTime * secPerCount * 0.1), -0.5));
 
 
-		/*Vector3 tempPos = AiTestObject->getPosition();
-		Vector4 tempColor = AiTestObject->getColor();
-		this->AI.update(player.getVehicle()->getPosition(), deltaTime, tempPos, tempColor);
-		AiTestObject->setPosition(tempPos);
-		AiTestObject->setColor(tempColor);*/
-		this->aiObject->Update(deltaTime);
 		//deltaTime reset
 		prevTime = curTime;
-		
-		this->graphics.presentScene();
-
 	}
-	delete this->testObject;
-	delete this->testObject2;
-	//delete this->AiTestObject;
-	delete this->aiObject;
-}
+}  

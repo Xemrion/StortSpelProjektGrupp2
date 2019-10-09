@@ -45,7 +45,7 @@ class Input
 {
 private:
 	static const int PLAYER_COUNT = 2;
-	static Input instance;
+	static std::unique_ptr<Input> instance;
 
 	int playerKeyboard;
 	Keyboard keyboard;
@@ -55,19 +55,21 @@ private:
 	GamePad::State gamePadStates[PLAYER_COUNT];
 	GamePad::ButtonStateTracker gamePadTrackers[PLAYER_COUNT];
 
-	Input();
-
 	static bool CheckButtonKeyboard(Keys key, States state);
 	static bool CheckButtonGamePad(Keys key, GamePad::ButtonStateTracker::ButtonState state, int playerId);
 
 public:
+	Input();
 	virtual ~Input();
 
 	static bool IsKeyDown_DEBUG(Keyboard::Keys key);
 
+	static void Init();
 	static void Update();
 	static void Reset();
 
+	static void SetRumble(int player, float leftMotor, float rightMotor, float leftTrigger = 0.f, float rightTrigger = 0.f);
+	static void ResetRumble(int player);
 	static bool CheckButton(Keys key, States state, int player);
 	static Vector2 GetDirectionL(int player);
 	static float GetStrengthL(int player);

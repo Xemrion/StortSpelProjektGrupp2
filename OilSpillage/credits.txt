@@ -1,0 +1,22 @@
+O i l S p i l l a g e
+------------------------------------------------------
+--Engine Programmer--
+Filip Karlsson
+Ludvig Lindau
+------------------------------------------------------
+--General Programmer--
+Viktor Bengtsson
+Daniel Lagula
+------------------------------------------------------
+--Procedural Generation Programmer--
+Victor Falkengaard Itzel
+Marco Tabell Johnsson
+Emil Lindholm
+------------------------------------------------------
+--Artificial Intelligence Programmer--
+Oscar :ostberg
+David Bj:orkberg
+Ala Jafar
+------------------------------------------------------
+--Graphics Design--
+Eric Hallengren

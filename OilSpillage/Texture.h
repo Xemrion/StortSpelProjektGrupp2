@@ -3,6 +3,7 @@
 #include <d3d11.h>
 #include <stdio.h>
 #include <fstream>
+#include <SimpleMath.h>
 
 class Texture
 {
@@ -42,6 +43,8 @@ public:
 	unsigned char* getTextureCharArray();
 	unsigned short getWidth();
 	unsigned short getHeight();
+	DirectX::SimpleMath::Vector2 getSize();
+	DirectX::SimpleMath::Vector2 getCenter();
 };
 
 #endif

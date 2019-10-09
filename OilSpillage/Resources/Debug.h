@@ -3,9 +3,13 @@
 #include "..//VertexBuffer.h"
 #include "..//IndexBuffer.h"
 #include <DirectXMath.h>
-#include<SimpleMath.h>
-#include"..//Camera.h"
+#include <SimpleMath.h>
+#include "..//Camera.h"
+#include "../GameObject.h"
+
+
 using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
 class Debug
 {
@@ -13,10 +17,6 @@ private:
 	struct CB_VS_World
 	{
 		DirectX::XMMATRIX wMatrix;
-	};
-	struct view
-	{
-
 	};
 	struct DebugVertex
 	{
@@ -31,12 +31,11 @@ private:
 
 	ID3D11DeviceContext* deviceContext;
 	ID3D11Device* device;
-	ID3D11Buffer* viewProjBuffer;
-	Camera *camera;
 public:
-	Debug(ID3D11DeviceContext* dc, ID3D11Device* d, Camera camera);
-	void DrawCube(DirectX::SimpleMath::Vector3 maxPos, DirectX::SimpleMath::Vector3 minPos,DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector3 color);
-	void DrawLine(XMFLOAT3 p, XMFLOAT3 p2, XMFLOAT3 color);
-	void DrawCube(XMFLOAT3 p, XMFLOAT3 color, float scale = 0.5f);
-	void DrawRectangle(XMFLOAT3 center, XMFLOAT3 color, float scale = 0.5);
+	Debug(ID3D11DeviceContext* dc, ID3D11Device* d);
+	void DrawAABB(GameObject* obj, Vector3 color);
+	void DrawCube(Vector3 maxPos, Vector3 minPos, Vector3 pos, Vector3 color);
+	void DrawLine(Vector3 p, Vector3 p2, Vector3 color);
+	void DrawCube(Vector3 p, Vector3 color, float scale = 0.5f);
+	void DrawRectangle(Vector3 center, Vector3 color, float scale = 0.5);
 };

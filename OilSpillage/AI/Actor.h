@@ -1,64 +1,59 @@
 #pragma once
-#include <queue>
-#include "../GameObject.h"
-#include <d3d11.h>
-#include <SimpleMath.h>
-using namespace DirectX::SimpleMath;
+#include "Behaviour.h"
+#include "Boid.h"
+#include "AStar.h"
 
-// https://docs.unrealengine.com/en-US/API/Runtime/AIModule/AAIController/index.html
-class Actor
+
+class Actor : public GameObject
 {
 public:
-	enum AItype //testa typer
-	{
-		Wanderer,
-		chaser,
-	};
-	void SetType(AItype type);
-	AItype& GetType();
+	Actor();
+	~Actor();
+	void update(float dt, Vector3 targetPos);
+	void setAStar(AStar* aStar);
+
 private:
-	AItype type;
-};
+	enum State{Roaming,Chasing};
+	State state;
+	void findPath();
+	void shoot(float deltaTime, Vector3 targetPos);
+	void chase();
+	void roam();
+	Status inRange();
+	Status setChaseState();
+	Status setRoamState();
+	void  followPath();
+	void setUpActor();
+	Selector* root;
+	BT bt;
+	std::vector<Boid*> boids;
 
+	std::vector<Node*> path;
+	AStar* aStar;
+	Vector3 targetNode;
+	int nrOfFrames = 0;
 
-class AIPlayer :public GameObject
-{
-public:
-	void Update(float dt);
-public:
-	// nodes on the grid to walk on
-	struct NodeList
+	struct Weapon
 	{
-		Vector3 wayPoint;
+		int damage = 100;
+		float fireSpeed = 3.0f;
+		float bulletSpeed = 4.0f;
+		float bulletLifetime = 2.0f;
 	};
-	// Set target
-	void SetTarget(Vector3 * target);
-	// Move toward a target
-	void Seek(float dt);
-	// Move away from target
-	void Flee();
-	// Move around randomly
-	void Wander();
-	//Keep a certain distance from a target
-	void Separate();
-	// Follow along a given path
-	void PathFollowing(float dt);
-	// Set path List
-	void SetPath(std::queue<NodeList> Path);
-	// Set path node
-	void SetWayPoint(NodeList* Path);
-	// Check if player is in line of sight
-	bool LineOfSight(Vector3 &position);
-	// Check if player is in range
-	bool InRangeOf(Vector3 & position);
+	Weapon weapon;
 
-	//bool isEmpty() { return this->Path.size(); }
-	int GetState();
-private:
-	bool Inside(Vector3 waypoint);
+	struct Bullet
+	{
+		Vector3 dir;
+		float speed = 0.0f;
+		float timeLeft = 0.0f;
+		GameObject* obj = nullptr;
+	};
+	static const int bulletCount = 16;
+	float leftoverTime;
+	Bullet bullets[bulletCount];
 
-	std::queue<NodeList*> Path;
-	//use ref to  get currentTarget to use behaviour on
-	Vector3 * currentTarget;
-	int state;
+	float deltaTime;
+	Vector3 targetPos;
+
 };
