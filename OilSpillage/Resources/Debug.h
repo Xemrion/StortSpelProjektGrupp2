@@ -4,7 +4,6 @@
 #include "..//IndexBuffer.h"
 #include <DirectXMath.h>
 #include <SimpleMath.h>
-#include "..//Camera.h"
 #include "../GameObject.h"
 
 
