@@ -492,9 +492,13 @@ void PlayingGameState::update(float deltaTime)
 	}
 	
 	player->update(deltaTime);
-	if (Input::IsKeyDown_DEBUG(Keyboard::C))
+	timerForParticle += deltaTime;
+	if (timerForParticle > 0.01f)
 	{
-		this->graphics.addParticle(this->player->getVehicle()->getPosition()+Vector3(0,2,0), this->player->getVelocity()+Vector3(Input::GetDirectionR(0).x * 5, 0, Input::GetDirectionR(0).y * 5), addNrOfParticles, lifeTime);
+		if (Input::IsKeyDown_DEBUG(Keyboard::C))
+		{
+			this->graphics.addParticle(this->player->getVehicle()->getPosition() + Vector3(0, 2, 0), 0.005f*-1.0f*this->player->getVelocity() + Vector3(Input::GetDirectionR(0).x * 5, 0, Input::GetDirectionR(0).y * 5), addNrOfParticles, lifeTime);
+		}
 	}
 	Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
 	Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);

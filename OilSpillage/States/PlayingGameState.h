@@ -50,6 +50,7 @@ private:
 	float size2 = 0.025f;
 	int addNrOfParticles = 2;
 	int lifeTime = 2;
+	float timerForParticle = 0.0f;
 
 	void           generateMap( Config const & );
    void           generateBuildings( Config const &, RNG & );

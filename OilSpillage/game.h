@@ -26,7 +26,6 @@ private:
 	long long                          prevTime     = 0;
 	long long                          countsPerSec = 0;
 	float                              secPerCount  = 1.0f / countsPerSec;
-	float timerForParticle = 0.0f;
 public:
 	Game();
 	~Game();
