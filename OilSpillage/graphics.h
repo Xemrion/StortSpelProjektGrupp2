@@ -68,6 +68,9 @@ class Graphics {
 	};
 	LightBufferContents* lightBufferContents = nullptr;
 
+	ParticleSystem particleSystem;
+	ParticleSystem particleSystem2;
+
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
@@ -93,7 +96,7 @@ public:
 	void clearDraw();
 	void setLightList(LightList* lightList);
 	void presentScene();
-	void render(Camera camera, float deltaTime);
+	void render(DynamicCamera* camera, float deltaTime);
 	bool createShaders();
 	void fillLightBuffers();
 	void clearScreen();

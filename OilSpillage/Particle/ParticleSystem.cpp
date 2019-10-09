@@ -18,7 +18,7 @@ ParticleSystem::~ParticleSystem()
 	
 }
 
-void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* depthSRV, const wchar_t * csUpdate, const wchar_t* csCreate, const wchar_t* gs)
+void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, const wchar_t * csUpdate, const wchar_t* csCreate, const wchar_t* gs)
 {
 	this->depthSRV = depthSRV;
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] =
@@ -298,14 +298,14 @@ void ParticleSystem::changeColornSize(Vector4 colors[4], int nrOfColors, float s
 	colorNSize.config.z = endSize;
 }
 
-void ParticleSystem::drawAll(Camera camera)
+void ParticleSystem::drawAll(DynamicCamera* camera)
 {
 
 
 	CameraInfo info;
-	info.viewProj= (camera.getViewMatrix() * camera.getProjectionMatrix()).Transpose();
+	info.viewProj= (camera->getViewMatrix() * camera->getProjectionMatrix()).Transpose();
 	info.upp = Vector4(0.0, 0.0, 1.0,otherFrame);
-	info.camPos = Vector4(camera.getPos().x, camera.getPos().y, camera.getPos().z, 0.0f);
+	info.camPos = Vector4(camera->getPosition().x, camera->getPosition().y, camera->getPosition().z, 0.0f);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);

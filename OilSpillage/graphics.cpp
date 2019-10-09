@@ -95,25 +95,16 @@ bool Graphics::init(Window* window)
 		descDepth.Height = (UINT)this->window->height;
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
-		descDepth.Format = DXGI_FORMAT_R24G8_TYPELESS;
+		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		descDepth.SampleDesc.Count = 4;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
-		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		descDepth.CPUAccessFlags = 0;
 		descDepth.MiscFlags = 0;
 
 
-		D3D11_DEPTH_STENCIL_VIEW_DESC dsv_desc;
-		dsv_desc.Flags = 0;
-		dsv_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		dsv_desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
-		dsv_desc.Texture2D.MipSlice = 0;
-		D3D11_SHADER_RESOURCE_VIEW_DESC sr_desc;
-		sr_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-		sr_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-		sr_desc.Texture2D.MostDetailedMip = 0;
-		sr_desc.Texture2D.MipLevels = 1;
+		
 		result = device->CreateTexture2D(&descDepth, NULL, &depthStencilBuffer);
 		if (FAILED(result))
 		{
@@ -291,8 +282,8 @@ bool Graphics::init(Window* window)
 	ImGui_ImplDX11_Init(this->device.Get(), this->deviceContext.Get());
 	ImGui::StyleColorsDark();
 
-	this->particleSystem.initiateParticles(device, deviceContext, this->depthSRV, L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
-	this->particleSystem2.initiateParticles(device, deviceContext, this->depthSRV, L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
+	this->particleSystem.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
+	this->particleSystem2.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
 
 	/*for (int i = 0; i < 150; i++)
 	{
@@ -319,7 +310,7 @@ Window* Graphics::getWindow()
 	return this->window;
 }
 
-void Graphics::render(DynamicCamera* camera)
+void Graphics::render(DynamicCamera* camera, float deltaTime)
 {
 	float color[4] = {
 		0,0,0,1
@@ -523,7 +514,6 @@ void Graphics::setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float s
 	}
 }
 
-void Graphics::loadMesh(std::string fileName,std::string meshName)
 void Graphics::clearScreen()
 {
 	float color[4] = { 0,0,0,1 };
@@ -554,21 +544,22 @@ void Graphics::loadMesh(std::string fileName)
 			
 			std::vector<Vertex3D> tempVec;
 			Vertex3D vertex;
+			Vertex* vertices = imp.getVertices();
 			for (int i = 0; i < imp.getVertexCount(); i++)
 			{
 				vertex.position.x = vertices[i].x;
 				vertex.position.y = vertices[i].y;
 				vertex.position.z = vertices[i].z;
 
-					vertex.normal.x = vertices[j].nx;
-					vertex.normal.y = vertices[j].ny;
-					vertex.normal.z = vertices[j].nz;
+					vertex.normal.x = vertices[i].nx;
+					vertex.normal.y = vertices[i].ny;
+					vertex.normal.z = vertices[i].nz;
 
-					vertex.uv.x = vertices[j].u;
-					vertex.uv.y = vertices[j].v;
+					vertex.uv.x = vertices[i].u;
+					vertex.uv.y = vertices[i].v;
 
 					tempVec.push_back(vertex);
-				}
+				
 			}
 
 			meshes[fileName].insertDataToMesh(tempVec);

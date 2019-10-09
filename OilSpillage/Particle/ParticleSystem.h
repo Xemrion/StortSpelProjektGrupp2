@@ -2,7 +2,7 @@
 #include<d3d11.h>
 #include<wrl/client.h>
 #include<d3dcompiler.h>
-#include"..//Camera.h"
+#include"..///DynamicCamera.h"
 using namespace DirectX::SimpleMath;
 struct Particle
 {
@@ -45,11 +45,11 @@ class ParticleSystem
 public:
 	ParticleSystem();
 	~ParticleSystem();
-	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* depthSRV, const wchar_t* csUpdate, const wchar_t* csCreate, const wchar_t* gs);
+	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, const wchar_t* csUpdate, const wchar_t* csCreate, const wchar_t* gs);
 	bool addParticle(int nrOf, int lifeTime, Vector3 position, Vector3 initialDirection);
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
-	void drawAll(Camera camera);
+	void drawAll(DynamicCamera* camera);
 private:
 	const int capParticle = 51200;//100*512
 	ID3D11Device* device;

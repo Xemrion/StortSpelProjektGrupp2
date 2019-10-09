@@ -388,6 +388,7 @@ void PlayingGameState::init()
 		{ Vector3(0.0f, 15.0f, 0.0f), Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
+	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 
 	Input::SetKeyboardPlayerID(0);
 }
@@ -429,6 +430,32 @@ void PlayingGameState::ImGui_Driving() {
    ImGui::End();
 }
 
+void PlayingGameState::ImGui_Particles()
+{
+	
+	ImGui::Begin("Particle");
+	ImGui::ColorPicker4("Color Slider", colors);
+	ImGui::ColorPicker4("Color 1 Slider", colors2);
+	ImGui::ColorPicker4("Color 2 Slider", colors3);
+	ImGui::ColorPicker4("Color 3 Slider", colors4);
+	ImGui::SliderFloat("First size", &size1, 0.0f, 1.0f);
+	ImGui::SliderFloat("Second size", &size2, 0.0f, 1.0f);
+	ImGui::SliderInt("Nr of particles times 8", &addNrOfParticles, 1, 10);
+	ImGui::SliderInt("LifeTime", &lifeTime, 1, 20);
+	colorsP[0] = Vector4(colors);
+	colorsP[1] = Vector4(colors2);
+	colorsP[2] = Vector4(colors3);
+	colorsP[3] = Vector4(colors4);
+	colorsP[0].w = 1.0f;
+	colorsP[1].w = 1.0f;
+	colorsP[2].w = 1.0f;
+	colorsP[3].w = 1.0f;
+
+	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+
+	ImGui::End();
+}
+
 void PlayingGameState::ImGui_ProcGen() {
    ImGui::Begin("Map Generation:");
    ImGui::SetWindowSize({425,275});
@@ -463,8 +490,12 @@ void PlayingGameState::update(float deltaTime)
 	if (Input::IsKeyDown_DEBUG(Keyboard::E)) {
 		deltaTime /= 4;
 	}
+	
 	player->update(deltaTime);
-
+	if (Input::IsKeyDown_DEBUG(Keyboard::C))
+	{
+		this->graphics.addParticle(this->player->getVehicle()->getPosition()+Vector3(0,2,0), this->player->getVelocity()+Vector3(Input::GetDirectionR(0).x * 5, 0, Input::GetDirectionR(0).y * 5), addNrOfParticles, lifeTime);
+	}
 	Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
 	Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);
 	spotlightPos += spotlightDir * 1;
@@ -477,7 +508,7 @@ void PlayingGameState::update(float deltaTime)
 
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
-	graphics.render(camera.get());
+	graphics.render(camera.get(),deltaTime);
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 	//ImGui rendering --BEGIN--
@@ -487,6 +518,7 @@ void PlayingGameState::update(float deltaTime)
    ImGui::NewFrame();
    ImGui_Driving();
    ImGui_ProcGen();
+   ImGui_Particles();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
  #endif
