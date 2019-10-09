@@ -317,6 +317,7 @@ void PlayingGameState::init()
 	player    = std::make_unique<Vehicle>();
 	camera    = std::make_unique<DynamicCamera>();
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
+	testFloor1 = std::make_unique<SkyscraperFloor>(4);
 	graphics.createFrustumBuffer(camera.get());
 
 	graphics.loadMesh("sda");
@@ -357,6 +358,8 @@ void PlayingGameState::init()
 	testNetwork.get()->cleanRoadNetwork();
 	testNetwork.get()->saveTestNetwork("test-network");
    */
+
+	
 
 	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
@@ -477,6 +480,7 @@ void PlayingGameState::update(float deltaTime)
 	//Render all objects
 	graphics.render(camera.get());
 	//testNetwork.get()->drawRoadNetwork(&graphics);
+	testFloor1.get()->testDraw(&graphics);
 
 	//ImGui rendering --BEGIN--
 #ifdef _DEBUG

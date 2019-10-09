@@ -14,6 +14,7 @@
 #include "../PG/Map.hpp"
 #include "../PG/Voronoi.hpp"
 #include "../PG/District.hpp"
+#include "../PG/SkyscraperFloor.h"
 
 class PlayingGameState : public GameState
 {
@@ -33,6 +34,7 @@ private:
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight = nullptr;
 	std::unique_ptr<RoadNetwork>    testNetwork;
+	std::unique_ptr<SkyscraperFloor> testFloor1;
 	void           generateMap( Config const & );
    void           generateBuildings( Config const &, RNG & );
    void           ImGui_ProcGen();

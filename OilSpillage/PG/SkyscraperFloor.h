@@ -1,7 +1,9 @@
 #pragma once
+#include<d3d11.h>
 #include<DirectXMath.h>
 #include<SimpleMath.h>
 #include<vector>
+#include"..//graphics.h"
 using namespace DirectX::SimpleMath;
 
 class SkyscraperFloor
@@ -14,6 +16,7 @@ public:
 	void rotateDeg(float degrees);
 	void rotateRad(float radians);
 	void unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter);
+	void testDraw(Graphics* graphics);
 private:
 	std::vector<Vector3> verticies;
 	int nrOfEdges;
@@ -23,6 +26,8 @@ private:
 
 	void translate(Vector3 newCenter);
 	void generateShape(int edges); //3 - ?
+	Vector3 intersectingLines(Vector3& pointA1, Vector3& pointA2, Vector3& pointB1, Vector3& pointB2);
+	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA);
 };
 
 
