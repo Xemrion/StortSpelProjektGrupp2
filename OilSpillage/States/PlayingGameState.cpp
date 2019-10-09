@@ -57,12 +57,17 @@ void PlayingGameState::generateMap( Config const &config ) {
 	RD  rd;
 	RNG rng( rd() );
 	rng.seed(config.seed);
-	districtMap = std::make_unique<Voronoi>( rng,
-                                            config.cell_side,
-                                            map->width  / config.cell_side,
-                                            map->height / config.cell_side,
-                                            Voronoi::ManhattanDistanceTag{} );
-
+   if ( config.isUsingManhattanDistance )
+	   districtMap = std::make_unique<Voronoi>( rng,
+                                               config.cell_side,
+                                               map->width  / config.cell_side,
+                                               map->height / config.cell_side,
+                                               Voronoi::ManhattanDistanceTag{} );
+   else districtMap = std::make_unique<Voronoi>( rng,
+                                                 config.cell_side,
+                                                 map->width  / config.cell_side,
+                                                 map->height / config.cell_side,
+                                                 Voronoi::EuclideanDistanceTag{} );
 #ifdef _DEBUG
 	// display noise centers:
 	districtMarkers.reserve( districtMap->noise.size() );
@@ -228,9 +233,8 @@ Opt<Vec<V2u>>  PlayingGameState::find_valid_house_lot( RNG &rng, U16 cell_id, Vo
 	else return {};
 }
 
-void PlayingGameState::toggleDistrictColors() noexcept {
-	static auto toggled { false };
-	if ( !toggled ) {
+void PlayingGameState::setDistrictColors( bool useColorCoding ) noexcept {
+	if ( useColorCoding ) {
 		Vec<Vector4> rgba_tbl {
 			{ 0.0f, 0.0f, 0.0f, 1.0f },
 			{ 0.0f, 0.0f, 0.5f, 1.0f },
@@ -289,17 +293,16 @@ void PlayingGameState::toggleDistrictColors() noexcept {
 			e.setColor( color );
 		}
 	} else {
-		static auto const default_color = Vector4 { .8f, .8f, .8f, 1.0f };
+		static auto const default_color = Vector4 { .2f, .2f, .2f, 1.0f };
 		for ( auto &e : roadTiles )
 			e.setColor( default_color );
 		for ( auto &e : houseTiles )
 			e.setColor( default_color );
 	}
-	toggled = !toggled;
 }
 
 void PlayingGameState::initiateAStar() {
-	//this->aStar.setMap(*map); // TODO
+	; //this->aStar.setMap(*map); // TODO
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()) {}
@@ -446,20 +449,18 @@ void PlayingGameState::ImGui_ProcGen() {
    ImGui::Begin("Map Generation:");
    if ( static bool firstFrame = true; firstFrame ) {
       ImGui::SetWindowPos({0,75});
-      ImGui::SetWindowSize({425,275});
+      ImGui::SetWindowSize({425,300});
       firstFrame = false;
+      setDistrictColors( config.isColorCodingDistricts );
    }
 
    ImGui::Separator();
 
    // debug colors toggle:
-   static auto districtColorsToggled          = false,
-               districtColorsToggledPrevFrame = false;
-   ImGui::Checkbox("Toggle district colors", &districtColorsToggled );
-   if ( districtColorsToggled != districtColorsToggledPrevFrame ) {
-      toggleDistrictColors();
-      districtColorsToggledPrevFrame = districtColorsToggled;
-   }
+   bool isColorCodingDistrictsPrevFrame = config.isColorCodingDistricts;
+   ImGui::Checkbox("Show district colors", &config.isColorCodingDistricts );
+   if ( config.isColorCodingDistricts != isColorCodingDistrictsPrevFrame )
+      setDistrictColors( config.isColorCodingDistricts );
 
    ImGui::Separator();
 
@@ -475,6 +476,8 @@ void PlayingGameState::ImGui_ProcGen() {
    ImGui::InputFloat( "Floor height factor", &config.floor_height_factor );
 
    ImGui::InputInt( "Seed", &config.seed );
+
+   ImGui::Checkbox( "Use Manhattan distance", &config.isUsingManhattanDistance ); // TODO: refactor into config
 
    ImGui::InputInt( "District cell side",  &config.cell_side );
    static auto cellSidePrev = config.cell_side;
@@ -516,8 +519,10 @@ void PlayingGameState::ImGui_ProcGen() {
 
    // regen button:
    ImGui::NewLine();
-   if ( ImGui::Button("Re-generate") )
+   if ( ImGui::Button("Re-generate") ) {
       generateMap(config);
+      setDistrictColors( config.isColorCodingDistricts );
+   }
 
    ImGui::End();
 }
@@ -585,27 +590,22 @@ void PlayingGameState::update(float deltaTime)
 	graphics.presentScene();
 }
 
-const float& PlayingGameState::getTimeRef() const
-{
-	return this->time;
+const float &PlayingGameState::getTimeRef() const noexcept {
+	return time;
 }
 
-float PlayingGameState::getTime() const
-{
-	return this->time;
+float PlayingGameState::getTime() const noexcept {
+	return time;
 }
 
-void PlayingGameState::setTime(float time)
-{
+void PlayingGameState::setTime(float time) noexcept {
 	this->time = time;
 }
 
-void PlayingGameState::addTime(float time)
-{
+void PlayingGameState::addTime(float time) noexcept {
 	this->time += time;
 }
 
-void PlayingGameState::removeTime(float time)
-{
+void PlayingGameState::removeTime(float time) noexcept {
 	this->time -= time;
 }
