@@ -59,7 +59,7 @@ Bool Map::neighbour_is_road(Dir dir, U16 x, U16 y) const noexcept {
 }
 
 Bool Map::is_road(U16 x, U16 y) const noexcept {
-	return data[index(x, y)] != Tile::ground;
+	return data[index(x, y)] != Tile::ground; // TODO: revamp if new tiles are addedd!
 }
 
 // road generator stream outputter implementation

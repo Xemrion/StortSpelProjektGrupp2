@@ -32,10 +32,10 @@ struct WalkerGenArgs {
       SchedulerCallback  scheduler_cb;
 };
 
-WalkerGenArgs create_child_args( WalkerGenArgs &parent_args,
-                                 U16            x,
-                                 U16            y,
-                                 Dir            d );
+WalkerGenArgs create_child_args( WalkerGenArgs const &parent_args,
+                                 U16                  x,
+                                 U16                  y,
+                                 Dir                  d );
 
 
 
@@ -43,33 +43,34 @@ class Branch {
 public:
    Branch( WalkerGenArgs  args )
    :
-      args(args),
-      x(args.x),
-      y(args.y),
-      dir(args.dir)
+      args (args),
+      x    (args.x),
+      y    (args.y),
+      dir  (args.dir)
    {
       U16_Dist  gen_tiles_to_walk( args.min_len, args.max_len );
       tiles_to_walk = gen_tiles_to_walk( args.rng );
    }
 
-   Branch( Branch &&other ):
-      args( std::move(other.args) ),
-      is_done_generating( other.is_done_generating ),
-      x( other.x ),
-      y( other.y ),
-      dir( other.dir )
+   Branch( Branch &&other ) noexcept:
+      args               ( std::move(other.args) ),
+      is_done_generating ( other.is_done_generating ),
+      x                  ( other.x ),
+      y                  ( other.y ),
+      dir                ( other.dir ),
+      tiles_to_walk      ( other.tiles_to_walk )
    {}
 
    Branch( Branch const &other ) = delete;
-
 
    inline Bool  is_done() const { return is_done_generating; };
 
    Void walk( Config const & );
 
+   WalkerGenArgs  const args;
+
 private:
 // data member variables:
-   WalkerGenArgs  args;
    // status flag:
    Bool           is_done_generating = false;
    // RNG:
@@ -108,9 +109,9 @@ public:
            F32  branch_prob_fac,
            I32  seed );
 
-
    // generates the tree, one depth at a time, one tile per branch at a time
    Void generate( Config const & );
+   V2u  getStartPosition() const noexcept;
 
 private:
    // TODO: increasing depth value starting at 0!

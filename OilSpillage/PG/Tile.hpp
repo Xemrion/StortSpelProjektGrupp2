@@ -6,7 +6,7 @@
 // tile enums
 // road0~4 just encode the depth at which the road was generated in order to facilitate debug output
 // TODO: unify as "road" or specific road variants
-enum class Tile : U8   { ground, road0, road1, road2, road3, road4 };
+enum class Tile : U8   { ground, road0, road1, road2, road3, road4 }; // MAKE SURE TO CHECK Map::is_road(x,y) IF ADDING NEW TILE TYPES!!!!
 
 
 // TODO: assert bounds (max level currently is 4)

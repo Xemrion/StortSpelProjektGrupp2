@@ -2,7 +2,7 @@
 #include "../Input.h"
 #include "../Sound.h"
 
-void PlayingGameState::generateMap( Config const &config ) {
+V2u PlayingGameState::generateMap( Config const &config ) {
 	// TODO: this shit shouldn't be necessary. make it so GameObject's destructor handles this D:<
 	for ( auto &e : roadTiles )
 		graphics.removeFromDraw(&e);
@@ -93,6 +93,23 @@ void PlayingGameState::generateMap( Config const &config ) {
 		}
 	}
    generateBuildings(config, rng);
+   
+   return roadnet.getStartPosition();
+}
+
+// TODO: make return value optional later instead of asserting
+V2u PlayingGameState::generateRoadPosition(  Config const &config, Map const &map, RNG &rng ) const noexcept {
+   static constexpr U16 MAX_TRIES = 1024; // TODO: refactor
+   U16_Dist  gen_x  ( 0, config.map_dimensions.x );
+   U16_Dist  gen_y  ( 0, config.map_dimensions.y );
+   U16       x, y, counter{0};
+   do {
+      x = gen_x(rng);
+      y = gen_y(rng);
+      if ( ++counter > MAX_TRIES )
+         assert( false && "No road tile found! ");
+   } while ( not map.is_road(x,y) );
+   return {x,y};
 }
 
 void PlayingGameState::generateBuildings( Config const &config, RNG &rng) {
@@ -139,9 +156,9 @@ void PlayingGameState::generateBuildings( Config const &config, RNG &rng) {
 				auto  building_size = building.size();
 #ifdef _DEBUG
 				building_logs << "\t\t"   "Generating building #" << district_building_count++ << ". (Map total building count: " << total_building_count++ << ")\n"
-							  << "\t\t\t" "Building size: "       << building_size << " tiles. (Map total tile count: " << (total_building_tile_count+=U32(building_size)) << ")\n"
-							  << "\t\t\t" "The district real estate coverage is now " << (compute_curr_coverage() * 100.0f) << "%\n"
-							  << "\t\t\t" "The target coverage is: " << target_coverage * 100.0f << "%\n";
+				              << "\t\t\t" "Building size: "       << building_size << " tiles. (Map total tile count: " << (total_building_tile_count+=U32(building_size)) << ")\n"
+				              << "\t\t\t" "The district real estate coverage is now " << (compute_curr_coverage() * 100.0f) << "%\n"
+				              << "\t\t\t" "The target coverage is: " << target_coverage * 100.0f << "%\n";
 #endif
 				U16_Dist floor_count ( get_min_height(district_type), get_max_height(district_type) );
 				F32 rng_floor_count = F32( floor_count(rng) );
@@ -153,8 +170,8 @@ void PlayingGameState::generateBuildings( Config const &config, RNG &rng) {
 					house_tile.mesh  = graphics.getMeshPointer("Cube");
 					house_tile.setColor( {.75f, .75f, .75f, 1.0f} );
 					house_tile.setScale( { 0.5f * config.tile_scale.x,
-										   0.5f * config.tile_scale.y * config.floor_height_factor * rng_floor_count,
-										   0.5f * config.tile_scale.z } );
+					                       0.5f * config.tile_scale.y * config.floor_height_factor * rng_floor_count,
+					                       0.5f * config.tile_scale.z } );
 					house_tile.setPosition( { map->tile_xy_to_world_pos(U16(tile_coord.x), U16(tile_coord.y)) } );
 					++total_building_tile_count;
 				}
@@ -233,7 +250,7 @@ Opt<Vec<V2u>>  PlayingGameState::find_valid_house_lot( RNG &rng, U16 cell_id, Vo
 	else return {};
 }
 
-void PlayingGameState::setDistrictColors( bool useColorCoding ) noexcept {
+Void PlayingGameState::setDistrictColors( bool useColorCoding ) noexcept {
 	if ( useColorCoding ) {
 		Vec<Vector4> rgba_tbl {
 			{ 0.0f, 0.0f, 0.0f, 1.0f },
@@ -301,7 +318,7 @@ void PlayingGameState::setDistrictColors( bool useColorCoding ) noexcept {
 	}
 }
 
-void PlayingGameState::initiateAStar() {
+Void PlayingGameState::initiateAStar() {
 	; //this->aStar.setMap(*map); // TODO
 }
 
@@ -309,7 +326,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()) {}
 
 PlayingGameState::~PlayingGameState() {}
 
-void PlayingGameState::init() {
+Void PlayingGameState::init() {
 	lightList = std::make_unique<LightList>();
 	player    = std::make_unique<Vehicle>();
 	camera    = std::make_unique<DynamicCamera>();
@@ -335,7 +352,6 @@ void PlayingGameState::init() {
 	graphics.loadModel("Roads/Road_straight");
 	graphics.loadModel("Roads/Road_3way");
 	graphics.loadModel("Roads/Road_4way");
-	generateMap(config);
 
 #ifdef _DEBUG
 	// light tests
@@ -377,6 +393,11 @@ void PlayingGameState::init() {
 
 	player->init();
 
+   auto startPos = generateMap(config);
+   auto *v = player->getVehicle();
+   assert( v != nullptr );
+   v->setPosition( map->tile_xy_to_world_pos(startPos.x, startPos.y) );
+
 	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
@@ -390,21 +411,21 @@ void PlayingGameState::init() {
 	Input::SetKeyboardPlayerID(0);
 }
 
-void PlayingGameState::cleanUp() {
-   this->map.reset();
-	this->aiObject.reset();
-	this->districtMarkers.clear();
-	this->roadTiles.clear();
-	this->houseTiles.clear();
-	this->lightList.reset();
-	this->player.reset();
-	this->districtMap.reset();
-	this->camera.reset();
-	this->points.clear();
-	this->testNetwork.reset();
+Void  PlayingGameState::cleanUp() {
+   map.reset();
+	aiObject.reset();
+	districtMarkers.clear();
+	roadTiles.clear();
+	houseTiles.clear();
+	lightList.reset();
+	player.reset();
+	districtMap.reset();
+	camera.reset();
+	points.clear();
+	testNetwork.reset();
 }
 
-void PlayingGameState::ImGui_Driving() {
+Void  PlayingGameState::ImGui_Driving() {
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
@@ -441,7 +462,7 @@ void PlayingGameState::ImGui_Driving() {
    ImGui::End();
 }
 
-void PlayingGameState::ImGui_ProcGen() {
+Void  PlayingGameState::ImGui_ProcGen() {
    ImGui::Begin("Map Generation:");
    if ( static bool firstFrame = true; firstFrame ) {
       ImGui::SetWindowPos({0,75});
@@ -516,14 +537,15 @@ void PlayingGameState::ImGui_ProcGen() {
    // regen button:
    ImGui::NewLine();
    if ( ImGui::Button("Re-generate") ) {
-      generateMap(config);
+      auto startPos = generateMap(config);
+      player->getVehicle()->setPosition( map->tile_xy_to_world_pos(startPos.x, startPos.y) ); // hacky
       setDistrictColors( config.isColorCodingDistricts );
    }
 
    ImGui::End();
 }
 
-void PlayingGameState::ImGui_Camera() {
+Void  PlayingGameState::ImGui_Camera() {
    ImGui::Begin("Camera & Culling:");
    if ( static bool firstFrame = true; firstFrame ) {
       ImGui::SetWindowPos({0,0});
@@ -542,7 +564,7 @@ void PlayingGameState::ImGui_Camera() {
    ImGui::End();
 }
 
-void PlayingGameState::update(float deltaTime)
+Void  PlayingGameState::update(float deltaTime)
 {
    /*-------------------------UPDATING-------------------------*/
 	if (Input::IsKeyDown_DEBUG(Keyboard::E)) {
@@ -586,22 +608,22 @@ void PlayingGameState::update(float deltaTime)
 	graphics.presentScene();
 }
 
-const float &PlayingGameState::getTimeRef() const noexcept {
+F32 const &PlayingGameState::getTimeRef() const noexcept {
 	return time;
 }
 
-float PlayingGameState::getTime() const noexcept {
+F32 PlayingGameState::getTime() const noexcept {
 	return time;
 }
 
-void PlayingGameState::setTime(float time) noexcept {
+Void PlayingGameState::setTime(F32 time) noexcept {
 	this->time = time;
 }
 
-void PlayingGameState::addTime(float time) noexcept {
+Void PlayingGameState::addTime(F32 time) noexcept {
 	this->time += time;
 }
 
-void PlayingGameState::removeTime(float time) noexcept {
+Void PlayingGameState::removeTime(F32 time) noexcept {
 	this->time -= time;
 }
