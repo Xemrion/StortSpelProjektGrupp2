@@ -130,6 +130,7 @@ void Actor::chase()
 	//	boids.at(i)->setDestination(targetPos);
 	//}
 }
+
 void Actor::roam()
 {
 	//Hitta random position och hitta väg till den.
