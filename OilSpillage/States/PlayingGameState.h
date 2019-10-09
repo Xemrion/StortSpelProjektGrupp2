@@ -19,10 +19,11 @@ class PlayingGameState : public GameState
 {
 private:
 	friend class Game;
+   float                           cameraDistance = 25;
    Config                          config;
 	Graphics                       &graphics;
 	std::unique_ptr<Map>            map;
-	std::unique_ptr<Actor>       aiObject;
+	std::unique_ptr<Actor>          aiObject;
 	std::vector<GameObject>         districtMarkers;
 	std::vector<GameObject>         roadTiles;
    std::vector<GameObject>         houseTiles;
@@ -38,6 +39,7 @@ private:
    void           generateBuildings( Config const &, RNG & );
    void           ImGui_ProcGen();
    void           ImGui_Driving();
+   void           ImGui_Camera();
    Opt<Vec<V2u>>  find_valid_house_lot( RNG &, U16 cell_id, Voronoi const &district_map, Map &, Vec<District> const &district_tbl );
    void           toggleDistrictColors() noexcept;
 	void           initiateAStar();

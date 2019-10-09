@@ -431,7 +431,13 @@ void PlayingGameState::ImGui_Driving() {
 
 void PlayingGameState::ImGui_ProcGen() {
    ImGui::Begin("Map Generation:");
-   ImGui::SetWindowSize({425,275});
+   if ( static bool firstFrame = true; firstFrame ) {
+      ImGui::SetWindowPos({0,75});
+      ImGui::SetWindowSize({425,275});
+      firstFrame = false;
+   }
+
+   ImGui::Separator();
 
    // debug colors toggle:
    static auto districtColorsToggled          = false,
@@ -441,6 +447,8 @@ void PlayingGameState::ImGui_ProcGen() {
       toggleDistrictColors();
       districtColorsToggledPrevFrame = districtColorsToggled;
    }
+
+   ImGui::Separator();
 
    // map:
    ImGui::InputInt2( "Map dimensions", &config.map_dimensions.data[0] );
@@ -476,6 +484,8 @@ void PlayingGameState::ImGui_ProcGen() {
       config.cell_side = cellSidePrev;
    cellSidePrev = config.cell_side;
 
+   ImGui::Separator();
+
    // roads:
    ImGui::InputInt( "Min tiles before turn", &config.min_tiles_before_turn );
    if ( config.min_tiles_before_turn   < 0 )
@@ -492,9 +502,29 @@ void PlayingGameState::ImGui_ProcGen() {
    /// TODO: add walker_gen_args params as well
 
    // regen button:
+   ImGui::NewLine();
    if ( ImGui::Button("Re-generate") )
       generateMap(config);
 
+   ImGui::End();
+}
+
+void PlayingGameState::ImGui_Camera() {
+   ImGui::Begin("Camera & Culling:");
+   if ( static bool firstFrame = true; firstFrame ) {
+      ImGui::SetWindowPos({0,0});
+      ImGui::SetWindowSize({425,75});
+      firstFrame = false;
+   }
+   // camera distance:
+   ImGui::SliderFloat( "Camera height", &cameraDistance, .0f, 1000.0f, "%4.1f" );
+   // culling distance:
+   static float cullingDistanceCurr = graphics.getCullingDistance();
+   float const  cullingDistancePrev = cullingDistanceCurr;
+   cullingDistanceCurr = graphics.getCullingDistance();
+      ImGui::SliderFloat( "Culling distance", &cullingDistanceCurr, .0f, 10000.0f, "%4.1f" );
+   if ( cullingDistanceCurr != cullingDistancePrev )
+      graphics.setCullingDistance( cullingDistanceCurr );
    ImGui::End();
 }
 
@@ -514,7 +544,7 @@ void PlayingGameState::update(float deltaTime)
 
 	aiObject->update(deltaTime,player->getVehicle()->getPosition());
 	camera->update(deltaTime);
-	camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, 25, 0));
+	camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, cameraDistance, 0));
 
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
@@ -528,6 +558,7 @@ void PlayingGameState::update(float deltaTime)
    ImGui::NewFrame();
    ImGui_Driving();
    ImGui_ProcGen();
+   ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
  #endif
