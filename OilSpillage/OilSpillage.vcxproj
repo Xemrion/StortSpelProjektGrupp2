@@ -132,13 +132,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AI\Action.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
     <ClCompile Include="AI\Boid.cpp" />
+    <ClCompile Include="AI\Defender.cpp" />
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="camera.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -184,13 +182,11 @@
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AI\Action.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Behaviour.h" />
     <ClInclude Include="AI\Boid.h" />
+    <ClInclude Include="AI\Defender.h" />
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="States\GameState.h" />
     <ClInclude Include="States\MenuGameState.h" />

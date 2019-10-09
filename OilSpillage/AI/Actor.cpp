@@ -49,23 +49,23 @@ void Actor::update(float dt, Vector3 targetPos)
 
 	this->root->func();
 	followPath();
+
+	for (int i = 0; i < boids.size(); i++) //Updating Boids
+	{
+		boids.at(i)->run(boids, dt);
+	}
+
 	for (int i = 0; i < bulletCount; i++)
 	{
 		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
 
 		if (this->bullets[i].timeLeft > 0.0f)
 		{
-			this->bullets[i].timeLeft -= dt;
-			this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * dt);
+			this->bullets[i].timeLeft -= deltaTime;
+			this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
 			Game::getGraphics().addToDraw(this->bullets[i].obj);
 		}
 	}
-
-	for (int i = 0; i < boids.size(); i++) //Updating Boids
-	{
-		boids.at(i)->run(boids, dt);
-	}
-	this->shoot(dt, targetPos);
 }
 
 void Actor::setAStar(AStar* aStar)
@@ -73,7 +73,7 @@ void Actor::setAStar(AStar* aStar)
 	this->aStar = aStar;
 }
 
-void Actor::shoot(float deltaTime, Vector3 targetPos)
+Status Actor::shoot()
 {
 	float tempDelta = deltaTime + this->leftoverTime;
 
@@ -113,6 +113,7 @@ void Actor::shoot(float deltaTime, Vector3 targetPos)
 			this->leftoverTime = tempDelta;
 		}
 	}
+	return Status::SUCCESS;
 }
 
 void Actor::chase()
@@ -141,7 +142,22 @@ Status Actor::inRange()
 {
 	Status status;
 
-	if ((getPosition() - targetPos).Length() > 10)
+	if ((getPosition() - targetPos).Length() > 7)
+	{
+		status = Status::FAILURE;
+	}
+	else
+	{
+		status = Status::SUCCESS;
+	}
+	return status;
+}
+
+Status Actor::enemyNear()
+{
+	Status status;
+
+	if ((getPosition() - targetPos).Length() > 20)
 	{
 		status = Status::FAILURE;
 	}
