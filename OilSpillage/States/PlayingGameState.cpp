@@ -391,9 +391,6 @@ void PlayingGameState::init() {
 }
 
 void PlayingGameState::cleanUp() {
-   // TODO: Sluta med detta? Bör vara helt onödigt (om inte något designats helt felt längre upp i callstacken)
-   // Låt RAII value semantics hantera cleanup automatiskt istället..? Destruktorer finns ju för just detta ändamål.
-   /*
    this->map.reset();
 	this->aiObject.reset();
 	this->districtMarkers.clear();
@@ -405,7 +402,6 @@ void PlayingGameState::cleanUp() {
 	this->camera.reset();
 	this->points.clear();
 	this->testNetwork.reset();
-   */
 }
 
 void PlayingGameState::ImGui_Driving() {
