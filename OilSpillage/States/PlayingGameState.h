@@ -20,6 +20,7 @@ class PlayingGameState : public GameState
 private:
 	friend class Game;
    float                           cameraDistance = 25;
+   float                           time;
    Config                          config;
 	Graphics                       &graphics;
 	std::unique_ptr<Map>            map;
@@ -44,9 +45,15 @@ private:
    void           toggleDistrictColors() noexcept;
 	void           initiateAStar();
 public:
-	         PlayingGameState();
-	virtual ~PlayingGameState();
-	void     init();
-	void     cleanUp();
-	void     update(float deltaTime);
+	             PlayingGameState();
+	virtual     ~PlayingGameState();
+
+	void         init();
+	void         cleanUp();
+	void         update(float deltaTime);
+	const float &getTimeRef() const noexcept;
+	float        getTime() const noexcept;
+	void         setTime(float time) noexcept;
+	void         addTime(float time) noexcept; // TODO: slå ihop addTime och removeTime? Enda skillnaden är väl tecknet på parametern?
+	void         removeTime(float time);
 };

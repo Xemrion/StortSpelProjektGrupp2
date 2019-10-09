@@ -14,6 +14,9 @@ private:
 	GameObject* bodyRotation;
 	GameObject* bodyRotationPoint;
 
+	int health;
+	int maxHealth;
+
 	static const int bulletCount = 16;
 	float leftoverTime;
 	Weapon weapon;
@@ -65,6 +68,12 @@ public:
 	float getVelocitySpeed();
 	//void onCollision(Vector2 direction);
 
+	const int& getHealthRef() const;
+	int getHealth() const;
+	void setHealth(int health);
+	void damage(int damageAmount);
+	void heal(int healAmount);
+	bool isDead() const;
 };
 
 #endif // !VEHICLE_H
