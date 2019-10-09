@@ -53,6 +53,7 @@
     <ClCompile Include="window.cpp" />
     <ClCompile Include="AI\Defender.cpp" />
     <ClCompile Include="AI\Attacker.cpp" />
+    <ClCompile Include="AI\ActorManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
@@ -115,6 +116,7 @@
     <ClInclude Include="window.h" />
     <ClInclude Include="AI\Defender.h" />
     <ClInclude Include="AI\Attacker.h" />
+    <ClInclude Include="AI\ActorManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="brickwall.tga" />

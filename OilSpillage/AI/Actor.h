@@ -7,15 +7,33 @@ class Actor : public GameObject
 {
 public:
 	Actor();
+	Actor(float x, float z);
 	~Actor();
 	virtual void update(float dt, Vector3 targetPos);
 	void setAStar(AStar* aStar);
 	virtual void setUpActor() = 0 {};
 
+	void applyForce(Vector3 force);
+	// Three Laws that boids follow
+	Vector3 separation(vector<Actor*> boids);
+	Vector3 alignment(vector<Actor*> boids);
+	Vector3 cohesion(vector<Actor*> boids);
+	// Other function for moving and interacting
+	Vector3 seek(Vector3 target);
+	void run(vector<Actor*> boids, float deltaTime);
+	void updateBoid(float deltaTime);
+	void flock(vector<Actor*> boids);
+	float angle(Vector3 target);
+	Vector3 getDestination();
+	void setDestination(Vector3 destination);
 private:
-	std::vector<Boid*> boids;
 	int nrOfFrames = 0;
+	Vector3 velocity;
+	Vector3 acceleration;
+	float maxSpeed;
+	float maxForce;
 
+	Vector3 destination;
 protected:
 	std::vector<Node*> path;
 	AStar* aStar;
