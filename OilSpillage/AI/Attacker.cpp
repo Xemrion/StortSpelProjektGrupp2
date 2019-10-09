@@ -5,6 +5,13 @@ Attacker::Attacker()
 	setUpActor();
 }
 
+Attacker::Attacker(float x, float z, AStar* aStar)
+	:Actor(x, z, aStar)
+{
+	this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	setUpActor();
+}
+
 Attacker::~Attacker()
 {
 }

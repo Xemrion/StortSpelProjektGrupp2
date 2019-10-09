@@ -5,6 +5,7 @@ class Defender : public Actor
 
 public:
 	Defender();
+	Defender(float x, float z, AStar* aStar);
 	~Defender();
 
 	void update(float dt, Vector3 targetPos);

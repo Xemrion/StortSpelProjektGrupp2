@@ -7,10 +7,9 @@ class Actor : public GameObject
 {
 public:
 	Actor();
-	Actor(float x, float z);
+	Actor(float x, float z, AStar* aStar);
 	~Actor();
 	virtual void update(float dt, Vector3 targetPos);
-	void setAStar(AStar* aStar);
 	virtual void setUpActor() = 0 {};
 
 	void applyForce(Vector3 force);
@@ -33,8 +32,8 @@ private:
 	float maxSpeed;
 	float maxForce;
 
-	Vector3 destination;
 protected:
+	Vector3 destination;
 	std::vector<Node*> path;
 	AStar* aStar;
 	Vector3 targetNode;

@@ -21,8 +21,12 @@ Actor::Actor()
 	this->destination = Vector3(20.0f, 0.0f, 20.0f);
 }
 
-Actor::Actor(float x, float z)
+Actor::Actor(float x, float z, AStar* aStar)
 {
+	this->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(this);
+
+	this->aStar = aStar;
 	this->setUpActor();
 	this->leftoverTime = 0;
 	for (int i = 0; i < bulletCount; i++)
@@ -68,11 +72,6 @@ void Actor::update(float dt, Vector3 targetPos)
 			Game::getGraphics().addToDraw(this->bullets[i].obj);
 		}
 	}
-}
-
-void Actor::setAStar(AStar* aStar)
-{
-	this->aStar = aStar;
 }
 
 Status Actor::shoot()
@@ -198,6 +197,7 @@ void Actor::followPath()
 		{
 			path.pop_back();
 		}
+		destination = targetNode;
 	this->setPosition(newPosition);
 	}
 	else
@@ -359,8 +359,15 @@ void Actor::updateBoid(float deltaTime)
 	{
 		velocity /= velocity.Length();
 	}
-	position += Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime);
-	this->move(Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime));
+	Vector3 dir = Vector3(velocity.x, 0.0f, velocity.z);
+	dir.Normalize();
+	Vector3 newPosition = this->getPosition() + dir * this->deltaTime;
+
+	if (newPosition.Distance(targetNode, newPosition) < 1)
+	{
+		path.pop_back();
+	}
+	this->move(newPosition);
 	// Reset accelertion to 0 each cycle
 	acceleration *= 0;
 }
@@ -372,8 +379,8 @@ void Actor::flock(vector<Actor*> boids)
 	Vector3 cohesionForce = cohesion(boids);
 	// Arbitrarily weight these forces
 	seperationForce *= 3.0f;
-	alignmentForce *= 1.4f; // Might need to alter weights for different characteristics
-	cohesionForce *= 1.2f;
+	alignmentForce *= 0.0f; // Might need to alter weights for different characteristics
+	cohesionForce *= 0.0f;
 
 	// Add the force vectors to acceleration
 	applyForce(seperationForce);

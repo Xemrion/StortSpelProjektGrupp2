@@ -8,6 +8,14 @@ Defender::Defender()
 	objectivePos = Vector3(9.0f,0.0f,9.0f);
 }
 
+Defender::Defender(float x, float z, AStar* aStar)
+	:Actor(x, z, aStar)
+{
+	this->setColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+	setUpActor();
+	objectivePos = Vector3(9.0f, 0.0f, 9.0f);
+}
+
 Defender::~Defender()
 {
 
@@ -32,6 +40,7 @@ void Defender::update(float dt, Vector3 targetPos)
 		}
 	}
 }
+
 void Defender::setUpActor()
 {
 	root = &bt.getSelector();
@@ -93,7 +102,8 @@ void Defender::followPath()
 		{
 			path.pop_back();
 		}
-		this->setPosition(newPosition);
+		destination = targetNode;
+		//this->setPosition(newPosition);
 	}
 	else
 	{
