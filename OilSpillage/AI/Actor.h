@@ -13,16 +13,15 @@ public:
 	virtual void setUpActor() = 0 {};
 
 private:
-	enum State{Roaming,Chasing};
-	State state;
 	std::vector<Boid*> boids;
-
-	std::vector<Node*> path;
-	AStar* aStar;
-	Vector3 targetNode;
 	int nrOfFrames = 0;
 
 protected:
+	std::vector<Node*> path;
+	AStar* aStar;
+	Vector3 targetNode;
+	enum State { Roaming, Chasing, Returning };
+	State state;
 
 	Selector* root;
 	BT bt;
@@ -34,7 +33,7 @@ protected:
 	virtual Status enemyNear();
 	virtual Status setChaseState();
 	virtual Status setRoamState();
-	void  followPath();
+	virtual void  followPath();
 	float deltaTime;
 	Vector3 targetPos;
 

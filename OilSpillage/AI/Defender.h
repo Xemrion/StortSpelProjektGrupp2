@@ -11,10 +11,16 @@ public:
 
 private:
 	void setUpActor();
+	void followPath();
+	void returning();
 	Vector3 objectivePos;
 
 	//Status attack();
 	Status inRange();
+	Status inObjectiveRange();
+	Status idle();
+	Status setReturnState();
+	Status enemyWhithinObjective();
 	//Status setChaseState();
 	//Status setRoamState();
 };
