@@ -3,9 +3,8 @@
 #include "../UI/UIOptions.h"
 #include "../UI/UICredits.h"
 
-MenuGameState::MenuGameState() : graphics(Game::getGraphics())
+MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(0)
 {
-	this->currentMenu = 0;
 }
 
 MenuGameState::~MenuGameState()

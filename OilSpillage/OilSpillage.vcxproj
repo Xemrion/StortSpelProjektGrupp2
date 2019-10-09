@@ -174,6 +174,7 @@
     <ClCompile Include="UI\UICredits.cpp" />
     <ClCompile Include="UI\UIMainMenu.cpp" />
     <ClCompile Include="UI\UIOptions.cpp" />
+    <ClCompile Include="UI\UIPlaying.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="UI\UICredits.h" />
     <ClInclude Include="UI\UIMainMenu.h" />
     <ClInclude Include="UI\UIOptions.h" />
+    <ClInclude Include="UI\UIPlaying.h" />
     <ClInclude Include="UI\UserInterface.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />
