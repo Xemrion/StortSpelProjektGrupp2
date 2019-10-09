@@ -18,7 +18,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	for (int i = 0; i < this->actors.size(); i++)
 	{
 		actors.at(i)->update(dt, targetPos);
-		//actors.at(i)->run(actors, dt);
+		actors.at(i)->run(actors, dt);
 	}
 }
 

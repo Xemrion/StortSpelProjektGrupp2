@@ -197,8 +197,7 @@ void Actor::followPath()
 		{
 			path.pop_back();
 		}
-		destination = targetNode;
-	this->setPosition(newPosition);
+	//this->setPosition(newPosition);
 	}
 	else
 	{
@@ -211,7 +210,7 @@ void Actor::followPath()
 			roam();
 		}
 	}
-
+	destination = targetNode;
 }
 
 void Actor::findPath()
@@ -361,7 +360,7 @@ void Actor::updateBoid(float deltaTime)
 	}
 	Vector3 dir = Vector3(velocity.x, 0.0f, velocity.z);
 	dir.Normalize();
-	Vector3 newPosition = this->getPosition() + dir * this->deltaTime;
+	Vector3 newPosition = (dir * this->deltaTime);
 
 	if (newPosition.Distance(targetNode, newPosition) < 1)
 	{

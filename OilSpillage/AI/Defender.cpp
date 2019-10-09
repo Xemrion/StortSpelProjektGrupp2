@@ -102,7 +102,6 @@ void Defender::followPath()
 		{
 			path.pop_back();
 		}
-		destination = targetNode;
 		//this->setPosition(newPosition);
 	}
 	else
@@ -120,6 +119,7 @@ void Defender::followPath()
 			returning();
 		}
 	}
+	destination = targetNode;
 }
 
 void Defender::returning()
