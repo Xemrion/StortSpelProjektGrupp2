@@ -20,6 +20,7 @@ class PlayingGameState : public GameState
 {
 private:
 	friend class Game;
+	float time;
 	Config config;
 	Graphics& graphics;
 	std::unique_ptr<Map> map;
@@ -50,6 +51,12 @@ public:
 	void init();
 	void cleanUp();
 	void update(float deltaTime);
+
+	const float& getTimeRef() const;
+	float getTime() const;
+	void setTime(float time);
+	void addTime(float time);
+	void removeTime(float time);
 };
 
 #endif // !PLAYING_GAME_STATE_H

@@ -303,7 +303,7 @@ void PlayingGameState::initiateAStar()
 	//this->aStar.setMap(*map); // TODO
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics())
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(0.0f)
 {
 }
 
@@ -388,6 +388,8 @@ void PlayingGameState::init()
 	};
 	camera->startCinematic(&points, false);
 
+	time = 20.0f;
+
 	Input::SetKeyboardPlayerID(0);
 }
 
@@ -409,6 +411,7 @@ void PlayingGameState::cleanUp()
 void PlayingGameState::ImGui_Driving() {
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::Text("Time Left: %f", time);
 	ImGui::Text("Driving Mode:");
 	static int radioButtonValue = 0;
 	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
@@ -433,7 +436,6 @@ void PlayingGameState::ImGui_Driving() {
 	bool status[4] = { Input::CheckButton(CONFIRM, UP, 0), Input::CheckButton(CONFIRM, HELD, 0), Input::CheckButton(CONFIRM, RELEASED, 0), Input::CheckButton(CONFIRM, PRESSED, 0) };
 	ImGui::Text(("Cam Pos: " + std::to_string(camPos.x) + " " + std::to_string(camPos.y) + " " + std::to_string(camPos.z)).c_str());
 	ImGui::Text(("Cam Rot: " + std::to_string(camRot.x) + " " + std::to_string(camRot.y) + " " + std::to_string(camRot.z)).c_str());
-	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text(("\n-- PLAYER 0 --\nConfirm Status - Up: " + std::to_string(status[0]) + " Held: " + std::to_string(status[1]) + " Released: " + std::to_string(status[2]) + " Pressed: " + std::to_string(status[3])).c_str());
 	ImGui::Text(("L Dir: " + std::to_string(lDir.x) + " " + std::to_string(lDir.y)).c_str());
 	ImGui::Text(("L Str: " + std::to_string(lStr)).c_str());
@@ -477,6 +479,12 @@ void PlayingGameState::update(float deltaTime)
 	if (Input::IsKeyDown_DEBUG(Keyboard::E)) {
 		deltaTime /= 4;
 	}
+
+	if (time > 0.0f)
+		time -= deltaTime;
+	if (time <= 0.0f)
+		time = 0.0f;
+
 	player->update(deltaTime);
 
 	Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
@@ -506,4 +514,29 @@ void PlayingGameState::update(float deltaTime)
 
 	// Present scene
 	graphics.presentScene();
+}
+
+const float& PlayingGameState::getTimeRef() const
+{
+	return this->time;
+}
+
+float PlayingGameState::getTime() const
+{
+	return this->time;
+}
+
+void PlayingGameState::setTime(float time)
+{
+	this->time = time;
+}
+
+void PlayingGameState::addTime(float time)
+{
+	this->time += time;
+}
+
+void PlayingGameState::removeTime(float time)
+{
+	this->time -= time;
 }
