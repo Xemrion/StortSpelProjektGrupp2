@@ -198,7 +198,7 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 		initialCount = -1;
 	}
 	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f);
-	pParams.emitterLocation = Vector4(position.x,position.y,position.z, lifeTime);
+	pParams.emitterLocation = Vector4(position.x,position.y,position.z, float(lifeTime));
 	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX,1.0f);
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -206,8 +206,7 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	deviceContext->Unmap(particleParamCB.Get(), 0);
 	ID3D11UnorderedAccessView* n = nullptr;
 	//run create particle compute shader here
-	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
-	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
+	
 	ID3D11Buffer* nB = nullptr;
 
 	this->deviceContext->CSSetConstantBuffers(2, 1, &nB);
@@ -284,6 +283,8 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 	this->deviceContext->CSSetConstantBuffers(0, 1, this->simParams.GetAddressOf());
 	this->deviceContext->CSSetShader(this->computeShader.Get(), nullptr, 0);
 	this->deviceContext->Dispatch(100, 1, 1);
+	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
+	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
 }
 
 void ParticleSystem::changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
