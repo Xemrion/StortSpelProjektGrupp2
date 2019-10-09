@@ -11,7 +11,7 @@ void UIOptions::updateUI(float deltaTime)
 	{
 		if (this->selected == this->buttonBack.get())
 		{
-			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(Menu::MENU_MAIN);
+			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(MenuGameState::MENU_MAIN);
 		}
 		else if (this->selected == this->checkBoxTest.get())
 		{

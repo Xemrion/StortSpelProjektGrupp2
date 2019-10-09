@@ -1,6 +1,9 @@
 #include "PlayingGameState.h"
 #include "../Input.h"
 #include "../Sound.h"
+#include "../UI/UIPlaying.h"
+//#include "../UI/UIPaused.h"
+#include "../UI/UIOptions.h"
 
 void PlayingGameState::generateMap( Config const &config ) {
 	// TODO: this shit shouldn't be necessary. make it so GameObject's destructor handles this D:<
@@ -305,11 +308,20 @@ void PlayingGameState::initiateAStar() {
 	; //this->aStar.setMap(*map); // TODO
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()) {}
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(0.0f), currentMenu(0) {}
 
 PlayingGameState::~PlayingGameState() {}
 
 void PlayingGameState::init() {
+	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
+	menues[MENU_PLAYING]->init();
+	//menues[MENU_PAUSED] = std::make_unique<UIPaused>();
+	//menues[MENU_PAUSED]->init();
+	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
+	menues[MENU_OPTIONS]->init();
+
+	currentMenu = MENU_PLAYING;
+
 	lightList = std::make_unique<LightList>();
 	player    = std::make_unique<Vehicle>();
 	camera    = std::make_unique<DynamicCamera>();
@@ -385,7 +397,7 @@ void PlayingGameState::init() {
 	};
 	camera->startCinematic(&points, false);
 
-	time = 20.0f;
+	time = 125.0f;
 
 	Input::SetKeyboardPlayerID(0);
 }
@@ -402,6 +414,11 @@ void PlayingGameState::cleanUp() {
 	this->camera.reset();
 	this->points.clear();
 	this->testNetwork.reset();
+
+	for (int i = 0; i < MENUCOUNT; i++)
+	{
+		this->menues[i].reset();
+	}
 }
 
 void PlayingGameState::ImGui_Driving() {
@@ -550,9 +567,7 @@ void PlayingGameState::update(float deltaTime)
 	}
 
 	if (time > 0.0f)
-		time -= deltaTime;
-	if (time <= 0.0f)
-		time = 0.0f;
+		time = max(time - deltaTime, 0.0f);
 
 	player->update(deltaTime);
 
@@ -569,6 +584,8 @@ void PlayingGameState::update(float deltaTime)
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
 	graphics.render(camera.get());
+	//Render UI
+	menues[currentMenu]->update(deltaTime);
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 #ifdef _DEBUG
@@ -595,13 +612,20 @@ float PlayingGameState::getTime() const noexcept {
 }
 
 void PlayingGameState::setTime(float time) noexcept {
-	this->time = time;
+	this->time = max(time, 0.0f);
 }
 
-void PlayingGameState::addTime(float time) noexcept {
-	this->time += time;
+void PlayingGameState::changeTime(float timeDiff) noexcept
+{
+	this->time = max(this->time + timeDiff, 0.0f);
 }
 
-void PlayingGameState::removeTime(float time) noexcept {
-	this->time -= time;
+void PlayingGameState::setCurrentMenu(Menu menu)
+{
+	this->currentMenu = static_cast<int>(menu);
+}
+
+Vehicle* PlayingGameState::getPlayer() const
+{
+	return this->player.get();
 }
