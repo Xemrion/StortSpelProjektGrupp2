@@ -58,6 +58,12 @@ void Actor::update(float dt, Vector3 targetPos)
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 
+	if(nrOfFrames % 100 == 0)
+	{
+		findPath();
+		nrOfFrames == 1;
+	}
+
 	this->root->func();
 	followPath();
 
@@ -72,6 +78,7 @@ void Actor::update(float dt, Vector3 targetPos)
 			Game::getGraphics().addToDraw(this->bullets[i].obj);
 		}
 	}
+	nrOfFrames++;
 }
 
 Status Actor::shoot()
@@ -215,7 +222,6 @@ void Actor::followPath()
 void Actor::findPath()
 {
 	aStar->algorithm(this->getPosition(), targetPos, path);
-
 }
 
 void Actor::applyForce(Vector3 force)
@@ -370,7 +376,7 @@ void Actor::flock(vector<Actor*> boids)
 	Vector3 alignmentForce = alignment(boids);
 	Vector3 cohesionForce = cohesion(boids);
 	// Arbitrarily weight these forces
-	seperationForce *= 5.0f;
+	seperationForce *= 3.0f;
 	alignmentForce *= 0.0f; // Might need to alter weights for different characteristics
 	cohesionForce *= 0.0f;
 

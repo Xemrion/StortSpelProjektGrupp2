@@ -329,8 +329,8 @@ void PlayingGameState::init()
 
 	actorManager = std::make_unique<ActorManager>();
 	actorManager->setAStar(aStar);
-	actorManager->createDefender(1, 1);
-	actorManager->createAttacker(2, 1);
+	actorManager->createDefender(1, 2);
+	//actorManager->createAttacker(1, -2);
 
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");

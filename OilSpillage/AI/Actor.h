@@ -26,13 +26,13 @@ public:
 	Vector3 getDestination();
 	void setDestination(Vector3 destination);
 private:
-	int nrOfFrames = 0;
 	Vector3 velocity;
 	Vector3 acceleration;
 	float maxSpeed;
 	float maxForce;
 
 protected:
+	int nrOfFrames = 0;
 	Vector3 destination;
 	std::vector<Node*> path;
 	AStar* aStar;
