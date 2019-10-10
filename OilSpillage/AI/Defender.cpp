@@ -28,6 +28,24 @@ void Defender::update(float dt, Vector3 targetPos)
 	this->root->func();
 	followPath();
 
+	if (nrOfFrames % 60 == 0)
+	{
+		if(state == State::Returning)
+		{
+			returning();
+		}
+		else if(state == State::Chasing)
+		{
+			chase();
+		}
+		else
+		{
+			roam();
+		}
+
+		nrOfFrames == 1;
+	}
+
 	for (int i = 0; i < bulletCount; i++)
 	{
 		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
@@ -39,6 +57,7 @@ void Defender::update(float dt, Vector3 targetPos)
 			Game::getGraphics().addToDraw(this->bullets[i].obj);
 		}
 	}
+	nrOfFrames++;
 }
 
 void Defender::setUpActor()
@@ -98,7 +117,6 @@ void Defender::followPath()
 		dir.Normalize();
 
 		destination = targetNode;
-		updateBoid(deltaTime);
 
 		if (position.Distance(targetNode, position) < 1)
 		{

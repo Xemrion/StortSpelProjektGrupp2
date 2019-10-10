@@ -28,7 +28,6 @@ public:
 	int getGroupNR();
 	void joinGroup(int NR);
 private:
-	int nrOfFrames = 0;
 	Vector3 velocity;
 	Vector3 acceleration;
 	float maxSpeed;
@@ -36,6 +35,7 @@ private:
 	int groupNR = -1;
 
 protected:
+	int nrOfFrames = 0;
 	Vector3 destination;
 	std::vector<Node*> path;
 	AStar* aStar;

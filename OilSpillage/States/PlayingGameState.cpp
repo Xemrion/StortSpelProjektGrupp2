@@ -329,9 +329,8 @@ void PlayingGameState::init()
 
 	actorManager = std::make_unique<ActorManager>();
 	actorManager->setAStar(aStar);
-	for (int i = 0; i < 200; i++)
-	{
-		actorManager->createDefender(i, i);
+	actorManager->createDefender(1, 2);
+	//actorManager->createAttacker(1, -2);
 
 	}
 	actorManager->initGroups();

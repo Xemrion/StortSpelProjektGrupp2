@@ -58,6 +58,12 @@ void Actor::update(float dt, Vector3 targetPos)
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 
+	if(nrOfFrames % 100 == 0)
+	{
+		findPath();
+		nrOfFrames == 1;
+	}
+
 	this->root->func();
 	followPath();
 
@@ -72,6 +78,7 @@ void Actor::update(float dt, Vector3 targetPos)
 			Game::getGraphics().addToDraw(this->bullets[i].obj);
 		}
 	}
+	nrOfFrames++;
 }
 
 Status Actor::shoot()
@@ -191,7 +198,7 @@ void Actor::followPath()
 		dir.Normalize();
 
 		destination = targetNode;
-		updateBoid(deltaTime);
+
 
 	if (position.Distance(targetNode, position) < 1)
 	{
@@ -215,7 +222,6 @@ void Actor::followPath()
 void Actor::findPath()
 {
 	aStar->algorithm(this->getPosition(), targetPos, path);
-
 }
 
 void Actor::applyForce(Vector3 force)
@@ -226,7 +232,7 @@ void Actor::applyForce(Vector3 force)
 Vector3 Actor::separation(vector<Actor*> boids)
 {
 	// Distance of field of vision for separation between boids
-	float desiredSeparationDistance = 1.5f;
+	float desiredSeparationDistance = 3.0f;
 	Vector3 direction(0.0f);
 	float nrInProximity = 0.0f;
 	// For every boid in the system, check if it's too close
@@ -344,15 +350,16 @@ Vector3 Actor::seek(Vector3 target)
 void Actor::run(vector<Actor*> boids, float deltaTime)
 {
 	flock(boids);
+	updateBoid(deltaTime);
 }
 
 void Actor::updateBoid(float deltaTime)
 {
 	//To make the slow down not as abrupt
-	acceleration += seek(Vector3(0.0f));
 	acceleration *= 0.4f;
 	// Update velocity
 	velocity += acceleration;
+	velocity += seek(Vector3(0.0f));
 	// Limit speed
 	if (velocity.Length() > maxForce)
 	{
