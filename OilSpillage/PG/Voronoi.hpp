@@ -1,7 +1,7 @@
 #pragma once
 
 #include <functional>
-#include "Map.hpp"
+#include "TileMap.hpp"
 #include "defs.hpp"
 
 class Voronoi {
@@ -22,7 +22,7 @@ public:
    Vec<V2f> const noise;
 	inline Size  noise_index(   U16 x, U16 y ) const noexcept { return Size(y) * WIDTH + x; }
    inline Size  diagram_index( U16 x, U16 y ) const noexcept { return Size(y) * WIDTH * U16(CELL_SIZE) + x; }
-   Size         compute_cell_real_estate_area( U16 const cell_id, Map const & ) const noexcept;
+   Size         compute_cell_real_estate_area( U16 const cell_id, TileMap const & ) const noexcept;
    Bounds       compute_cell_bounds( U16 const cell_id ) const noexcept;
  private:
    Vec<V2f>     generate_noise( RNG &rng ) const noexcept;

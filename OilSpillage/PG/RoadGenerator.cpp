@@ -1,4 +1,4 @@
-#include "Walker.hpp"
+#include "RoadGenerator.hpp"
 
 Branch::Branch( RoadGenBranchArgs  args )
 :
@@ -106,7 +106,7 @@ Void RoadGenerator::scheduleBranch( RoadGenBranchArgs &&args ) {
    branchTree[args.currentDepth].emplace_back(std::move(args)); // TODO: verify
 }
 
-RoadGenerator::RoadGenerator( Map &map ):
+RoadGenerator::RoadGenerator( TileMap &map ):
    map       ( map       ),
    rng       ( rd()      )
 {
@@ -201,7 +201,7 @@ Void RoadGenerator::cleanIsles() noexcept {
           and map.isRoad( x-1, y+1 )
           and map.isRoad( x-1, y   )
           and map.isRoad( x-1, y-1 ) )
-            map.getTileAt(x,y) = Tile::ground;
+            map.tileAt(x,y) = Tile::ground;
 }
 
 V2u RoadGenerator::getStartPosition() const noexcept {

@@ -1,174 +1,324 @@
-﻿#include "Map.hpp"
+#include "Map.hpp"
 
-Map::Map( MapConfig const &config ):
-   config ( config ),
-   width  ( static_cast<Size>(config.dimensions.y) ),
-   height ( static_cast<Size>(config.dimensions.x) ),
-	data   ( Vec<Tile>( width * height, Tile::ground ) )
-{}
-
-// x = current X (may be mutated if successful)
-// y = current Y (may be mutated if successful)
-// d = direction to walk
-// returns true if successful
-bool Map::walk(U16& x, U16& y, Direction d, Tile tile) {
-	U16  _x = x, _y = y;
-	switch (d) {
-		case Direction::north: --_y; break;
-		case Direction::east:  ++_x; break;
-		case Direction::south: ++_y; break;
-		case Direction::west:  --_x; break;
-	}
-
-	if (_x >= width or _y >= height)
-		return false;
-
-	auto idx = index(_x, _y);
-	if (data[idx] != Tile::ground)
-		return false;
-	else {
-		data[idx] = tile;
-		x = _x;
-		y = _y;
-		return true;
-	}
+Map::Map( Graphics &graphics, MapConfig const &config ):
+   graphics        ( graphics ),
+   config          ( config   ),
+   tilemap         ( std::make_unique<TileMap>(config) ),
+   districtMarkers ( static_cast<Size>( config.districtCellSide ) * config.districtCellSide ),
+   roadTiles       ( static_cast<Size>( config.dimensions.x     ) * config.dimensions.y     ),
+   houseTiles      ( static_cast<Size>( config.dimensions.x     ) * config.dimensions.y / 2 )
+{
+   // TODO: generate water etc
+   generateDistricts();
+   generateRoads();
+   generateBuildings();
 }
 
-Vec<GameObject> Map::loadAsModels(Graphics& graphics) const {
-	auto const to_reserve = width * height;
-	Vec<GameObject> tiles( to_reserve );
-	for (U16 y = 0; y < height; ++y) {
-		for (U16 x = 0; x < width; ++x) {
-			auto const  tile_i = index(x, y);
-			auto       &tile   = tiles[tile_i];
-			auto const  gfx_i  = getTileLookupIndex(x, y);
-			auto const &[modelName, rotation] = tileGraphicsTable[gfx_i];
-			tile.mesh    = graphics.getMeshPointer( modelName.c_str() );
-         tile.setTexture( graphics.getTexturePointer(modelName.c_str(),true) );
-			if ( rotation != 0 )
-				tile.setRotation({ 0.0f, float(rotation) * 3.1415926535f/180.0f, 0.0f });
-			tile.setPosition( convertTilePositionToWorldPosition(x,y) );
+
+Map::~Map() noexcept {
+   // TODO: this shouldn't be necessary. make it so GameObject's destructor handles this?
+	for ( auto &e : roadTiles )
+		graphics.removeFromDraw(&e);
+	for ( auto &e : districtMarkers )
+		graphics.removeFromDraw(&e);
+	for ( auto &e : houseTiles )
+		graphics.removeFromDraw(&e);
+}
+
+
+Void  Map::generateRoads() {
+   RoadGenerator roadGenerator( *tilemap );
+   roadGenerator.generate( config );
+   #ifdef _DEBUG
+   std::ofstream roadGenerationLog ( Str("PG/logs/")+mapConfigToFilename(config, "_road_gen.txt") );
+	   if ( roadGenerationLog.is_open() ) {
+		   roadGenerationLog << *tilemap;
+		   roadGenerationLog.close();
+	   }
+   #endif
+   roadTiles = tilemap->loadAsModels(graphics); // GameObject instantiation
+   for ( U16 y=0;  y < tilemap->height;  ++y ) {
+		for ( U16 x=0;  x < tilemap->width;  ++x ) {
+			auto &tile = roadTiles[tilemap->index(x,y)];
+			graphics.addToDraw(&tile);
+			tile.setScale( Vector3{ .0005f * config.tileScaleFactor.x,
+			                        .0005f * config.tileScaleFactor.y,
+			                        .0005f * config.tileScaleFactor.z }); // TODO: scale models instead
 		}
 	}
-	return tiles; // RVO/Copy Elision
+   startPositionInTileSpace = roadGenerator.getStartPosition();
 }
 
-Bool Map::neighbourIsRoad(Direction dir, U16 x, U16 y) const noexcept {
-	assert( dir == Direction::north or dir == Direction::east
-	     or dir == Direction::south or dir == Direction::west );
-
-	if      ( dir == Direction::north)      y--;
-	else if ( dir == Direction::east)       x++;
-	else if ( dir == Direction::south)      y++;
-	else /* ( dir == Dir::west  )  */ x--;
-
-	return !isInBounds(x, y) or (data[index(x, y)] != Tile::ground);
+Void  Map::generateDistricts() {
+   RD   rd;
+   RNG  rng( rd() );
+   rng.seed( config.seed );
+   if ( config.isUsingManhattanDistance )
+      districtMap = std::make_unique<Voronoi>( rng,
+                                               config.districtCellSide,
+                                               config.dimensions.x / config.districtCellSide,
+                                               config.dimensions.y / config.districtCellSide,
+                                               Voronoi::ManhattanDistanceTag{} );
+   else districtMap = std::make_unique<Voronoi>( rng,
+                                                 config.districtCellSide,
+                                                 config.dimensions.x / config.districtCellSide,
+                                                 config.dimensions.y / config.districtCellSide,
+                                                 Voronoi::EuclideanDistanceTag{} );
+   #ifdef _DEBUG
+	   // display noise centers:
+	   districtMarkers.reserve( districtMap->noise.size() );
+	   for ( auto const &cellCentre : districtMap->noise ) {
+		   districtMarkers.emplace_back();
+		   auto &marker = districtMarkers.back();
+		   marker.mesh  = graphics.getMeshPointer("Cube");
+		   marker.setColor({1, 0, 0, 1});
+		   marker.setScale({.2f, 4, .2f});
+         marker.setPosition({ tilemap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
+                                                                           static_cast<U16>(cellCentre.y) ) });
+		   graphics.addToDraw(&marker);
+	   }
+   #endif
 }
 
-Bool Map::isRoad(U16 x, U16 y) const noexcept {
-	return data[index(x, y)] != Tile::ground; // TODO: revamp if new tiles are addedd!
+// TODO: make return value optional later instead of asserting
+V2u Map::generateRoadPositionInTileSpace( RNG &rng ) const noexcept {
+   static constexpr U16 MAX_TRIES = 1024; // TODO: refactor
+   static U16_Dist  generateX     ( 0, config.dimensions.x );
+   static U16_Dist  generateY     ( 0, config.dimensions.y );
+   U16              x, y, counter { 0 };
+   do {
+      x = generateX( rng );
+      y = generateY( rng );
+      if ( ++counter > MAX_TRIES )
+         assert( false && "No road tile found! ");
+   } while ( not tilemap->isRoad( x, y ) );
+   return { x, y };
 }
 
-// road generator stream outputter implementation
-std::ostream& operator<< (std::ostream& out, Map const& map) {
+Vector3  Map::generateRoadPositionInWorldSpace( RNG &rng ) const noexcept {
+   auto positionInTileSpace = generateRoadPositionInTileSpace( rng );
+   return tilemap->convertTilePositionToWorldPosition( positionInTileSpace );
+}
+
+Void  Map::generateBuildings() {
+   RD   rd;
+	RNG  rng( rd() );
+   rng.seed( config.seed );
+
 #ifdef _DEBUG
-	out << "  PRINTING " << map.width << 'x' << map.height << " MAP:\n\t";
+	std::ofstream building_logs ( Str("PG/logs/building_generation_")+mapConfigToFilename(config, ".txt") );
+	assert( building_logs.is_open() );
+	U32  total_building_count      = 0;
+	building_logs << "=========================================== BEGINNING BUILDING GENERATION ===========================================\n";
 #endif
-	for (U16 y = 0; y < map.height; ++y) {
-		for (U16 x = 0; x < map.width; ++x) {
-			//*[@DEPRECATED]*/  out << ' ' << map.data[map.index(x,y)];
-			
-#ifdef NO_TERMINAL_COLORS
-         out << map.tileTerminalColorTable[    map.getTileColorLookupIndex( x, y )]
-             << map.tileTerminalGraphicsTable[ map.getTileLookupIndex(      x, y )]
-             << map.terminalColorDefault;
-#else
-			out << map.tileTerminalGraphicsTable[ map.getTileLookupIndex( x, y ) ];
+	U32  total_building_tile_count = 0; // TODO refactor into _DEBUG bloack
+
+
+	U16_Dist gen_offset    (   0, 256  );
+	F32_Dist genSelection ( .0f, 1.0f );
+	// TODO: embed into Map to ensure by design that voronoi and map are generated first
+
+	auto cell_id_to_district_enum = [&gen_offset,&rng]( U16 const ID ) {
+		return static_cast<District>( (ID+gen_offset(rng)) % static_cast<U16>(District::size) );
+	};
+
+	// generate look-up table (TODO: refactor)
+	Vec<District> district_tbl { districtMap->noise.size(), District::park };
+	for ( auto i = 0;  i < district_tbl.size();  ++i )
+		district_tbl[i] = cell_id_to_district_enum(i);
+
+	for ( U16  cell_id = 0;  cell_id < districtMap->noise.size();  ++cell_id ) {
+		District    districtType  { district_tbl[cell_id] };
+		Size        curr_area      { 0 };
+		Size const  cell_area      { districtMap->compute_cell_real_estate_area(cell_id,*tilemap) };
+
+#ifdef _DEBUG
+		U64 district_building_count = 0;
+		building_logs << "\n\t" "Generating buildings for district #" << cell_id << " (TYPE: \"" << stringify(districtType) << "\")\n";
 #endif
+
+		if ( (cell_area != 0) and (districtType != District::park) ) {
+			auto        compute_curr_coverage = [&curr_area, cell_area]() { return F32(curr_area)/F32(cell_area); };
+			F32  const  target_coverage       { get_building_density(districtType) };
+			while ( compute_curr_coverage() < target_coverage ) {
+			auto potentialLot = find_valid_house_lot( rng, cell_id, *districtMap, *tilemap, district_tbl );
+			if ( potentialLot ) {
+				auto &building      = potentialLot.value();
+				auto  building_size = building.size();
+#ifdef _DEBUG
+				building_logs << "\t\t"   "Generating building #" << district_building_count++ << ". (Map total building count: " << total_building_count++ << ")\n"
+				              << "\t\t\t" "Building size: "       << building_size << " tiles. (Map total tile count: " << (total_building_tile_count+=U32(building_size)) << ")\n"
+				              << "\t\t\t" "The district real estate coverage is now " << (compute_curr_coverage() * 100.0f) << "%\n"
+				              << "\t\t\t" "The target coverage is: " << target_coverage * 100.0f << "%\n";
+#endif
+				U16_Dist  generateFloorCount ( getMinFloorCount(districtType), getMaxFloorCount(districtType) );
+            F32       randomFloorCount   { static_cast<F32>( generateFloorCount(rng) ) };
+				curr_area += building_size;
+				houseTiles.reserve( building_size );
+				for ( auto &tilePosition : potentialLot.value() ) {
+					houseTiles.emplace_back();
+					auto &houseTile = houseTiles.back();
+               tilemap->tileAt(tilePosition) = Tile::building;
+					houseTile.mesh  = graphics.getMeshPointer("Cube");
+					houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
+					houseTile.setScale( { 0.5f * config.tileScaleFactor.x,
+					                       0.5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * randomFloorCount,
+					                       0.5f * config.tileScaleFactor.z } );
+					houseTile.setPosition( { tilemap->convertTilePositionToWorldPosition(tilePosition) } );
+					++total_building_tile_count;
+				}
+			}
+			else break; // TODO?
+			}
 		}
-
-		out << "\n\t";
 	}
-	return out;
+
+	// adding all the tiles to draw:
+	for ( auto &e : houseTiles )
+		graphics.addToDraw(&e);
+
+#ifdef _DEBUG
+	if ( building_logs.is_open() )
+		building_logs.close();
+#endif
 }
 
-Vec<V2u> Map::getNeighbouringTilePositions( V2u cellPosition ) const noexcept {
-   Vec<V2u>  neighbouringTilePositions {};
-   neighbouringTilePositions.reserve(8);
+// basic proto placement algorithm
+// TODO: refactor out of Game
+Opt<Vec<V2u>>  Map::find_valid_house_lot( RNG &rng, U16 cell_id, Voronoi const &district_map, TileMap &map, Vec<District> const &district_tbl ) {
+	using Bounds = Voronoi::Bounds;
+	Bounds    cell_bounds { district_map.compute_cell_bounds(cell_id) };
+	U16_Dist  gen_offset  {               0x0,            0xFF };
+	U16_Dist  gen_x       { cell_bounds.min.x, cell_bounds.max.x };
+	U16_Dist  gen_y       { cell_bounds.min.y, cell_bounds.max.y };
 
-   // check if any of the neighbouring tile coords are tiles within map bounds:
-   Bool const  isBorderingWest  = ( cellPosition.x ==          0 ),
-               isBorderingEast  = ( cellPosition.x == width  - 1 ),
-               isBorderingNorth = ( cellPosition.y ==          0 ),
-               isBorderingSouth = ( cellPosition.y == height - 1 );
-   if ( not isBorderingNorth ) {  // N
-      neighbouringTilePositions.emplace_back(    cellPosition.x,   cellPosition.y-1 );
-      if ( not isBorderingWest ) // NW
-         neighbouringTilePositions.emplace_back( cellPosition.x-1, cellPosition.y-1 );
-      if ( not isBorderingEast ) // NE 
-         neighbouringTilePositions.emplace_back( cellPosition.x+1, cellPosition.y-1 );
+	auto is_valid_position = [&]( V2u const &pos ) -> bool {
+		return  (district_map.diagram[district_map.diagram_index(pos.x,pos.y)] != cell_id)
+			or  (map.tileAt(pos.x,pos.y) != Tile::ground);
+	};
+
+	District const  district_type    { district_tbl[cell_id] }; // TODO: refactor? (and param)
+	U16_Dist        gen_target_size  { get_building_min_area(district_type), get_building_max_area(district_type) };
+	U16      const  target_size      { gen_target_size(rng) };
+
+	// find valid starting coordinate:
+	V2u  start_pos {};
+	do {
+		start_pos.x = gen_x(rng);
+		start_pos.y = gen_y(rng);
+	} while ( is_valid_position(start_pos) );
+
+	Vec<V2u>  claimed_positions, candidate_srcs;
+
+	claimed_positions.reserve( target_size );
+	claimed_positions.push_back( start_pos );
+
+	candidate_srcs.reserve( target_size );
+	candidate_srcs.push_back( start_pos );
+
+	while ( claimed_positions.size() != target_size  and  candidate_srcs.size() != 0 ) {
+		auto const  &src_pos = candidate_srcs[ gen_offset(rng) % candidate_srcs.size() ];
+		// find valid neighbours
+		auto  candidate_dsts = map.getNeighbouringTilePositions(src_pos);
+		// eliminate invalid ones from our destination candidate list
+		candidate_dsts.erase( std::remove_if(candidate_dsts.begin(), candidate_dsts.end(), is_valid_position), candidate_dsts.end() );
+
+      // if we found at least one valid destination position, pick one of the candiates
+      if ( candidate_dsts.size() != 0 ) {
+         // TODO: possibly improve results if weighted towards lower indices?
+         auto  &match = candidate_dsts[ gen_offset(rng) % candidate_dsts.size() ];
+         claimed_positions.push_back( match );
+         candidate_srcs.push_back( match );
+      } // otherwise remove the source position from the source candidates
+      else candidate_srcs.erase( std::remove_if( candidate_srcs.begin(),
+                                                 candidate_srcs.end(),
+                                                 [&src_pos] (auto const &e) { return e==src_pos; }
+                                 ),
+                                 candidate_srcs.end()
+      );
    }
-   if ( not isBorderingSouth ) {  // S
-      neighbouringTilePositions.emplace_back(    cellPosition.x,   cellPosition.y+1 );
-      if ( not isBorderingWest ) // SW
-         neighbouringTilePositions.emplace_back( cellPosition.x-1, cellPosition.y+1 );
-      if ( not isBorderingEast ) // SE 
-         neighbouringTilePositions.emplace_back( cellPosition.x+1, cellPosition.y+1 );
-   }
-   if ( not isBorderingWest )    // W
-      neighbouringTilePositions.emplace_back(    cellPosition.x-1, cellPosition.y );
-   if ( not isBorderingEast )    // E
-      neighbouringTilePositions.emplace_back(    cellPosition.x+1, cellPosition.y );
-   return neighbouringTilePositions;
+   
+	if ( claimed_positions.size() == target_size ) return claimed_positions;
+	else return {};
 }
 
-// TODO: rotate bend mesh 180 degrees and update values in table to their proper value
-Vec<Map::TileEntry> const Map::tileGraphicsTable = {
-	// idx   WSEN      filename          rot      type                  rotation
-	/*   0   0000 */  {"Roads/Road_pavement",        0}, // no road,                 0 deg
-	/*   1   0001 */  {"Roads/Road_deadend",         0}, // deadend (south),         0 deg
-	/*   2   0010 */  {"Roads/Road_deadend",        90}, // deadend (west),         90 deg
-	/*   3   0011 */  {"Roads/Road_bend",          180}, // turn,                    0 deg
-	/*   4   0100 */  {"Roads/Road_deadend",       180}, // deadend (north),       180 deg
-	/*   5   0101 */  {"Roads/Road_straight",        0}, // straight vertical,       0 deg
-	/*   6   0110 */  {"Roads/Road_bend",          270}, // turn,                   90 deg
-	/*   7   0111 */  {"Roads/Road_3way",           90}, // 3-way intersection,     90 deg
-	/*   8   1000 */  {"Roads/Road_deadend",       270}, // deadend (east),        270 deg
-	/*   9   1001 */  {"Roads/Road_bend",           90}, // turn,                  270 deg
-	/*  10   1010 */  {"Roads/Road_straight",       90}, // straight horizontal,    90 deg
-	/*  11   1011 */  {"Roads/Road_3way",            0}, // 3-way intersection,      0 deg
-	/*  12   1100 */  {"Roads/Road_bend",            0}, // turn,                  180 deg
-	/*  13   1101 */  {"Roads/Road_3way",          270}, // 3-way intersection,    270 deg
-	/*  14   1110 */  {"Roads/Road_3way",          180}, // 3-way intersection,    180 deg
-	/*  15   1111 */  {"Roads/Road_4way",            0}, // 4-way intersection,      0 deg
-};
 
-// Used with a cellular automata to beautify the terminal output.
-Vec<Str> const Map::tileTerminalGraphicsTable = {
-	// idx   WSEN     getTerminalColorLookupIndex      type                  rotation
-	/*   0   0000 */  u8".", // no road,                 0 deg
-	/*   1   0001 */  u8"╹", // deadend (south),         0 deg
-	/*   2   0010 */  u8"╺", // deadend (west),         90 deg
-	/*   3   0011 */  u8"╚", // turn,                    0 deg
-	/*   4   0100 */  u8"╻", // deadend (north),       180 deg
-	/*   5   0101 */  u8"║", // straight vertical,       0 deg
-	/*   6   0110 */  u8"╔", // turn,                   90 deg
-	/*   7   0111 */  u8"╠", // 3-way intersection,     90 deg
-	/*   8   1000 */  u8"╸", // deadend (east),        270 deg
-	/*   9   1001 */  u8"╝", // turn,                  270 deg
-	/*  10   1010 */  u8"═", // straight horizontal,    90 deg
-	/*  11   1011 */  u8"╩", // 3-way intersection,      0 deg
-	/*  12   1100 */  u8"╗", // turn,                  180 deg
-	/*  13   1101 */  u8"╣", // 3-way intersection,    270 deg
-	/*  14   1110 */  u8"╦", // 3-way intersection,    180 deg
-	/*  15   1111 */  u8"╬"  // 4-way intersection,      0 deg
-};
+TileMap const &Map::getTileMap() const noexcept {
+   return *tilemap;
+}
 
-// Used to color code tiles (for terminal output)
-Vec<Str> const Map::tileTerminalColorTable = {
-	/* ground */    "\033[38;5;150m",
-	/* road0  */    "\033[38;5;255m",
-	/* road1  */    "\033[38;5;249m",
-	/* road2  */    "\033[38;5;246m",
-	/* road3  */    "\033[38;5;243m"
-};
+Void  Map::setDistrictColorCoding( bool useColorCoding ) noexcept {
+	if ( useColorCoding ) {
+		Vec<Vector4> districtColorTable {
+			{ 0.0f, 0.0f, 0.0f, 1.0f },
+			{ 0.0f, 0.0f, 0.5f, 1.0f },
+			{ 0.0f, 0.0f, 1.0f, 1.0f },
+
+			{ 0.0f, 0.5f, 0.0f, 1.0f },
+			{ 0.0f, 0.5f, 0.5f, 1.0f },
+			{ 0.0f, 0.5f, 1.0f, 1.0f },
+
+			{ 0.0f, 1.0f, 0.0f, 1.0f },
+			{ 0.0f, 1.0f, 0.5f, 1.0f },
+			{ 0.0f, 1.0f, 1.0f, 1.0f },
+
+			{ 0.5f, 0.0f, 0.0f, 1.0f },
+			{ 0.5f, 0.0f, 0.5f, 1.0f },
+			{ 0.5f, 0.0f, 1.0f, 1.0f },
+
+			{ 0.5f, 0.5f, 0.0f, 1.0f },
+			{ 0.5f, 0.5f, 0.5f, 1.0f },
+			{ 0.5f, 0.5f, 1.0f, 1.0f },
+
+			{ 0.5f, 1.0f, 0.0f, 1.0f },
+			{ 0.5f, 1.0f, 0.5f, 1.0f },
+			{ 0.5f, 1.0f, 1.0f, 1.0f },
+
+			{ 1.0f, 0.0f, 0.0f, 1.0f },
+			{ 1.0f, 0.0f, 0.5f, 1.0f },
+			{ 1.0f, 0.0f, 1.0f, 1.0f },
+
+			{ 1.0f, 0.5f, 0.0f, 1.0f },
+			{ 1.0f, 0.5f, 0.5f, 1.0f },
+			{ 1.0f, 0.5f, 1.0f, 1.0f },
+
+			{ 1.0f, 1.0f, 0.0f, 1.0f },
+			{ 1.0f, 1.0f, 0.5f, 1.0f },
+			{ 1.0f, 1.0f, 1.0f, 1.0f }
+		};
+		for ( auto &rgba : districtColorTable )
+			rgba = blend( rgba, Vector4{1.0f}, config.districtColorCodingBlendFactor );
+		// colour code tiles depending on cell index:
+		for ( U16 y=0;  y < tilemap->height;  ++y ) {
+			for ( U16 x=0;  x < tilemap->width;  ++x ) {
+			   assert( tilemap->data.size() == districtMap->diagram.size() && "BUG!" );
+			   auto       &tile     = roadTiles[tilemap->index(x,y)];
+			   auto        cell_idx = districtMap->diagram_index(x,y);
+			   auto        cell_id  = districtMap->diagram[cell_idx];
+			   auto const &color    = districtColorTable[ cell_id % districtColorTable.size()];
+			   tile.setColor( color );
+			}
+		}
+		for ( auto &e : houseTiles ) {
+			auto        cellPosition = tilemap->convertWorldPositionToTilePosition( e.getPosition() );
+			auto        cellIndex    = districtMap->diagram_index(cellPosition.x, cellPosition.y);
+			auto        cellID       = districtMap->diagram[cellIndex];
+			auto const &color        = districtColorTable[ cellID % districtColorTable.size()];
+			e.setColor( color );
+		}
+	} else {
+		static auto const defaultColor = Vector4 { .2f, .2f, .2f, 1.0f };
+		for ( auto &e : roadTiles )
+			e.setColor( defaultColor );
+		for ( auto &e : houseTiles )
+			e.setColor( defaultColor );
+	}
+}
+
+V2u  Map::getStartPositionInTileSpace() const noexcept {
+   return startPositionInTileSpace;
+}
+
+Vector3  Map::getStartPositionInWorldSpace() const noexcept {
+   return tilemap->convertTilePositionToWorldPosition( startPositionInTileSpace );
+}

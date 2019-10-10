@@ -33,7 +33,7 @@ U8 get_building_max_area( District const d ) noexcept {
    return result;
 }
 
-U8 get_min_height( District const d ) noexcept {
+U8 getMinFloorCount( District const d ) noexcept {
    U8 result;
    if      ( d == District::residential  ) { result = 4;  }
    else if ( d == District::park         ) { result = 0;  }
@@ -45,7 +45,7 @@ U8 get_min_height( District const d ) noexcept {
 }
 
 
-U8 get_max_height( District const d ) noexcept {
+U8 getMaxFloorCount( District const d ) noexcept {
    U8 result;
    if      ( d == District::residential  ) { result = 6;  }
    else if ( d == District::park         ) { result = 0;  }

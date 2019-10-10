@@ -145,9 +145,10 @@
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
     <ClCompile Include="PG\MapConfig.cpp" />
+    <ClCompile Include="PG\Map.cpp" />
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
     <ClCompile Include="PG\utils.cpp" />
-    <ClCompile Include="PG\Walker.cpp" />
+    <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="PG\District.cpp" />
@@ -169,7 +170,7 @@
     <ClCompile Include="lights.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="PG\Map.cpp" />
+    <ClCompile Include="PG\TileMap.cpp" />
     <ClCompile Include="PG\Voronoi.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="Sound.cpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="AI\Boid.h" />
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />
+    <ClInclude Include="PG\Map.hpp" />
     <ClInclude Include="PG\MinimapTextureGenerator.hpp" />
     <ClInclude Include="States\GameState.h" />
     <ClInclude Include="States\MenuGameState.h" />
@@ -227,12 +229,12 @@
     <ClInclude Include="PG\MapConfig.hpp" />
     <ClInclude Include="PG\defs.hpp" />
     <ClInclude Include="PG\Direction.hpp" />
-    <ClInclude Include="PG\Map.hpp" />
+    <ClInclude Include="PG\TileMap.hpp" />
     <ClInclude Include="PG\RandomSegments.hpp" />
     <ClInclude Include="PG\Tile.hpp" />
     <ClInclude Include="PG\utils.hpp" />
     <ClInclude Include="PG\Voronoi.hpp" />
-    <ClInclude Include="PG\Walker.hpp" />
+    <ClInclude Include="PG\RoadGenerator.hpp" />
     <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Road Network\RoadNet.h" />

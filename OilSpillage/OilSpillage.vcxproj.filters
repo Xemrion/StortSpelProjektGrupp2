@@ -84,9 +84,6 @@
     <ClCompile Include="lights.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PG\Map.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UI\UserInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -126,9 +123,6 @@
     <ClCompile Include="PG\District.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PG\Walker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AI\Actor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -160,6 +154,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PG\MapConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PG\RoadGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PG\TileMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PG\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -254,9 +257,6 @@
     <ClInclude Include="PG\Direction.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PG\Map.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PG\RandomSegments.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -264,9 +264,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PG\utils.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\Walker.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DynamicCamera.h">
@@ -348,6 +345,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PG\MapConfig.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\RoadGenerator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\TileMap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\Map.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

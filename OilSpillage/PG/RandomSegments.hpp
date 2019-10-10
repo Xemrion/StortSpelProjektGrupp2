@@ -5,7 +5,7 @@
 
 // -1 seed => random seed
 [[deprecated]] // TODO: remove?
-void generate_random_segments(Map* map, U16 num_roads, I32 seed) {
+void generate_random_segments(TileMap* map, U16 num_roads, I32 seed) {
 	RD        rd;
 	RNG       rng           (rd());
 	U16_Dist  gen_x         (0, map->width / 2);

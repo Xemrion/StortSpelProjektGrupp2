@@ -5,4 +5,4 @@
 #include "Tile.hpp"
 #include "../Texture.h"
 
-Str createMinimapTexture( Map const & );
+Str createMinimapTexture( TileMap const & );

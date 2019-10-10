@@ -8,12 +8,7 @@
 #include "../AI/Actor.h"
 #include "../Road Network/RoadNet.h"
 #include "../DynamicCamera.h"
-#include "../PG/MapConfig.hpp"
 #include "../PG/Map.hpp"
-#include "../PG/Walker.hpp"
-#include "../PG/Map.hpp"
-#include "../PG/Voronoi.hpp"
-#include "../PG/District.hpp"
 #include "../UI/UserInterface.h"
 
 class PlayingGameState : public GameState {
@@ -41,23 +36,17 @@ private:
 	float                           cameraDistance           { 25   };
 	float                           time;
 	MapConfig                       config;
-	Vector3                         startPos;
 	Graphics                       &graphics;
 	std::unique_ptr<AStar>          aStar;
-	std::unique_ptr<Map>            map;
+   std::unique_ptr<Map>            map;
 	std::unique_ptr<Actor>          aiObject;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
-	std::unique_ptr<Voronoi>        districtMap;
 	std::unique_ptr<DynamicCamera>  camera;
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::vector<CinematicPos>       points;
-	std::vector<GameObject>         districtMarkers;
-	std::vector<GameObject>         roadTiles;
-	std::vector<GameObject>         houseTiles;
 	SpotLight                      *playerLight;
-
 	int                             addNrOfParticles  {     2 };
 	int                             lifeTime          {     2 };
 	float                           timerForParticle  {   .0f };
@@ -74,15 +63,10 @@ private:
 	                                                    Vector4( 1.0f,  .0f, .0f, 1.0f ),
 	                                                    Vector4(  .0f,  .0f, .0f, 1.0f ),
 	                                                    Vector4(  .1f,  .1f, .1f, 1.0f )  };
-
-	void           generateBuildings( MapConfig const &, RNG & );
-	void           ImGui_ProcGen();
-	void           ImGui_Driving();
-	void           ImGui_Particles();
-	void           initiateAStar();
-	V2u            generateMap( MapConfig const & );
-	V2u            generateRoadPosition(MapConfig const &, Map const &, RNG & ) const noexcept;
-	void           ImGui_Camera();
-	void           setDistrictColors(bool useColorCoding) noexcept;
-	Opt<Vec<V2u>>  find_valid_house_lot( RNG &, U16 cell_id, Voronoi const &district_map, Map &, Vec<District> const &districtTable );
+  
+   void initiateAStar();
+	void ImGui_ProcGen();
+	void ImGui_Driving();
+	void ImGui_Particles();
+	void ImGui_Camera();
 };

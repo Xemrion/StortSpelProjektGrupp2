@@ -22,7 +22,7 @@ struct RoadGenBranchArgs {
                                 currentLengthMax;
       F32                       currentTurnProbability,
                                 currentBranchProbability;
-      Map                      &map;
+      TileMap                      &map;
       RNG                      &rng;
       RoadGenSchedulerCallback  schedulerCallback;
 };
@@ -61,7 +61,7 @@ private:
 
 
 // usage:
-//    create a Map
+//    create a TileMap
 //    create a Walker with the generation parameters and map as arguments
 //    call RoadGenerator::generate()
 //    discard walker
@@ -71,7 +71,7 @@ public:
    // transfers the generation parameters 'args' to the root branch,
    // notifies it of the callback function to use (method  'scheduleBranch')
    // then hands it a reference to the map it's to work on.
-   RoadGenerator( Map & );
+   RoadGenerator( TileMap & );
    // generates the tree, one depth at a time, one tile per branch at a time
    Void generate( MapConfig const & );
    V2u  getStartPosition() const noexcept;
@@ -82,7 +82,7 @@ private:
    void scheduleBranch( RoadGenBranchArgs && );
    void cleanIsles() noexcept;
 
-   Map              &map;
+   TileMap          &map;
    RD                rd;
    RNG               rng;
    Vec<Vec<Branch>>  branchTree;

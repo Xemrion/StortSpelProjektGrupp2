@@ -22,7 +22,6 @@ struct MapConfig {
    F32   roadBranchProbability          {   .1f };
    F32   roadBranchProbabilityFactor    {  1.5f };
 
-   Bool  isColorCodingDistricts         {  true };
    F32   districtColorCodingBlendFactor {   .5f };
    V3f   tileScaleFactor                { 20.0f, 20.0f, 20.0f }; 
    F32   buildingFloorHeightFactor      {  .20f };

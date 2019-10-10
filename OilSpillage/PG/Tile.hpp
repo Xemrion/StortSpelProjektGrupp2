@@ -15,7 +15,7 @@ enum class Tile : U8 {
    road4,
    building,
    water
-   // MAKE SURE TO CHECK Map::isRoad(x,y) IF ADDING NEW TILE TYPES!!!!
+   // MAKE SURE TO CHECK TileMap::isRoad(x,y) IF ADDING NEW TILE TYPES!!!!
 };
 
 
@@ -24,21 +24,19 @@ inline Tile roadTileAtDepth(U8 depth) {
 	return static_cast<Tile>(depth+1);
 }
 
-struct RGBA {
-   F32 r,g,b,a;
-};
+using RGBA = U32;
 
 #pragma warning( disable : 4715 )
 RGBA constexpr minimapColorLookUpTable( Tile t ) {
    switch (t) {
-      case Tile::ground:   return { .7f, .8f, .6f, 1.0f };
+      case Tile::ground:   return 0xFF'15C499;
       case Tile::road0:
       case Tile::road1: 
       case Tile::road2: 
       case Tile::road3: 
-      case Tile::road4:    return { .4f, .4f, .4f, 1.0f };
-      case Tile::building: return { .2f, .2f, .2f, 1.0f };
-      case Tile::water:    return { .1f, .3f, .3f, 1.0f };
+      case Tile::road4:    return 0xFF'666666;
+      case Tile::building: return 0xFF'333333;
+      case Tile::water:    return 0xFF'4B4B19;
    }
    assert( false && "Unaccounted for enum value!" );
 }
