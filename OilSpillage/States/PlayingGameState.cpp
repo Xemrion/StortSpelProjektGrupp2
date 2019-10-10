@@ -404,17 +404,23 @@ void PlayingGameState::init() {
 	graphics.setLightList(lightList.get());
 
 	player->init();
-
-   auto startPos = generateMap(config);
+   {
+      auto startPosTile = generateMap(config);
+      startPos          = map->tile_xy_to_world_pos( startPosTile.x, startPosTile.y ); 
+   }
    auto *v = player->getVehicle();
    assert( v != nullptr );
-   v->setPosition( map->tile_xy_to_world_pos(startPos.x, startPos.y) );
+   v->setPosition( startPos );
 
 	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
-		{ Vector3(0.0f, 30.0f, -10.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f },
-		{ Vector3(0.0f, 15.0f, 0.0f), Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
+		{ 
+         Vector3(0.0f, 30.0f+cameraDistance, -10.0f) + player->getVehicle()->getPosition(),
+         Vector3(0.0f, 0.0f, 0.0f), 0.0f },
+		{ 
+         Vector3(0.0f, cameraDistance, 0.0f) + player->getVehicle()->getPosition(),
+         Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
 
@@ -554,8 +560,10 @@ Void  PlayingGameState::ImGui_ProcGen() {
    // regen button:
    ImGui::NewLine();
    if ( ImGui::Button("Re-generate") ) {
-      auto startPos = generateMap(config);
-      player->getVehicle()->setPosition( map->tile_xy_to_world_pos(startPos.x, startPos.y) ); // hacky
+      // (TODO: refactor) hacky, but:
+      auto startPosTile = generateMap(config);
+      startPos          = map->tile_xy_to_world_pos( startPosTile.x, startPosTile.y );
+      player->getVehicle()->setPosition( startPos );
       setDistrictColors( config.isColorCodingDistricts );
    }
 
