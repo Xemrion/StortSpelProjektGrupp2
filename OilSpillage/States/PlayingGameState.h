@@ -49,7 +49,8 @@ private:
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::unique_ptr<AStar>          aStar;
 
-	void			generateMap( Config const & );
+	V2u				generateMap( Config const & );
+	V2u				generateRoadPosition(Config const& config, Map const& map, RNG& rng) const noexcept;
 	void			generateBuildings( Config const &, RNG & );
 	void			ImGui_ProcGen();
 	void			ImGui_Driving();
