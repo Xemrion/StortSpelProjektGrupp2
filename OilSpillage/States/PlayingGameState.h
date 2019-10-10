@@ -47,7 +47,6 @@ private:
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight = nullptr;
 	std::unique_ptr<RoadNetwork>    testNetwork;
-	AStar*							aStar;
 	//Particles config
 	Vector4 colorsP[4] =
 	{
@@ -69,25 +68,19 @@ private:
 	float vectorFieldSize = 1.0f;
 	float randomPosPower = 1.0f;
 
-	void           generateMap( Config const & );
    void           generateBuildings( Config const &, RNG & );
    void           ImGui_ProcGen();
    void           ImGui_Driving();
    void           ImGui_Particles();
    Opt<Vec<V2u>>  find_valid_house_lot( RNG &, U16 cell_id, Voronoi const &district_map, Map &, Vec<District> const &district_tbl );
    void           toggleDistrictColors() noexcept;
-	void           initiateAStar();
-	std::unique_ptr<AStar>          aStar;
+   void           initiateAStar();
+   std::unique_ptr<AStar>          aStar;
 
 	V2u				generateMap( Config const & );
 	V2u				generateRoadPosition(Config const& config, Map const& map, RNG& rng) const noexcept;
-	void			generateBuildings( Config const &, RNG & );
-	void			ImGui_ProcGen();
-	void			ImGui_Driving();
 	void			ImGui_Camera();
-	Opt<Vec<V2u>>	find_valid_house_lot( RNG &, U16 cell_id, Voronoi const &district_map, Map &, Vec<District> const &district_tbl );
 	void			setDistrictColors(bool useColorCoding) noexcept;
-	void			initiateAStar();
 
 public:
 					PlayingGameState();

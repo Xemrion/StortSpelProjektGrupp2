@@ -611,11 +611,20 @@ Void  PlayingGameState::update(float deltaTime)
 		aiObject->update(deltaTime, player->getVehicle()->getPosition());
 		camera->update(deltaTime);
 		camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, cameraDistance, 0));
+
+		timerForParticle += deltaTime;
+		if (timerForParticle > 0.01f)
+		{
+			this->graphics.addParticle(this->player->getVehicle()->getPosition() + Vector3(0, 5, 0), 5 * Vector3(Input::GetDirectionR(0).x, 0, Input::GetDirectionR(0).y), addNrOfParticles, lifeTime, randomPosPower);
+			timerForParticle = 0;
+		}
 	}
+
+
 
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
-	graphics.render(camera.get());
+	graphics.render(camera.get(),deltaTime);
 
 	//Render UI
 	menues[MENU_PLAYING]->update(deltaTime);
