@@ -16,6 +16,7 @@
 #include "Graphic/Shaders.h"
 #include "Resources/Debug.h"
 #include "DynamicCamera.h"
+#include "QuadTree.h"
 #include<string>
 #include "Lights.h"
 #include <memory.h>
@@ -58,7 +59,6 @@ class Graphics {
 	std::unordered_map<std::string, Mesh> meshes;
 	std::unordered_map<std::string, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
-	std::vector<StaticGameObject*> drawableStaticObjects;
 	LightList* lightList;
 	float cullingDistance = 150.f;
 	
@@ -67,6 +67,7 @@ class Graphics {
 		PointLight lights[MAX_LIGHTS_TOTAL];
 	};
 	LightBufferContents* lightBufferContents = nullptr;
+	std::unique_ptr<QuadTree> quadTree;
 
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
@@ -75,7 +76,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
 	void cullLights();
-	void drawStaticGameObjects(std::vector<StaticGameObject*>::iterator begin, std::vector<StaticGameObject*>::iterator end, DynamicCamera* camera, Frustum& frustum);
+	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
 public:
 	Graphics();
 	~Graphics();
@@ -92,7 +93,6 @@ public:
 	void addToDraw(GameObject* o);
 	void addToDraw(StaticGameObject* o);
 	void removeFromDraw(GameObject* o);
-	void removeFromDraw(StaticGameObject* o);
 	void clearDraw();
 	void setLightList(LightList* lightList);
 	void presentScene();

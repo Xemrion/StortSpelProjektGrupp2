@@ -59,7 +59,7 @@ UINT LightList::findNextEmptySpace(UINT start)
 void LightList::removeLight(PointLight* lightPtr)
 {
 	*lightPtr = PointLight();
-	if (lightPtr < lights.data() + sizeof(Light) * firstEmptySpace)
+	if (lightPtr < (lights.data() + sizeof(Light) * firstEmptySpace))
 	{
 		Light* lightsStartPtr = lights.data();
 		firstEmptySpace = ((UINT)lightPtr - (UINT)lightsStartPtr) / sizeof(Light);
@@ -69,7 +69,7 @@ void LightList::removeLight(PointLight* lightPtr)
 void LightList::removeLight(SpotLight* lightPtr)
 {
 	*lightPtr = SpotLight();
-	if (lightPtr < lights.data() + sizeof(Light) * firstEmptySpace)
+	if (lightPtr < (lights.data() + sizeof(Light) * firstEmptySpace))
 	{
 		Light* lightsStartPtr = lights.data();
 		firstEmptySpace = ((UINT)lightPtr - (UINT)lightsStartPtr) / sizeof(Light);

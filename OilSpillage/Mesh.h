@@ -3,16 +3,6 @@
 #include"Structs.h"
 #include<vector>
 using namespace DirectX::SimpleMath;
-struct AABB
-{
-	Vector3 maxPos;
-	Vector3 minPos;
-	AABB scale(Vector3 scale)
-	{
-		AABB scaledAABB = { maxPos * scale, minPos * scale };
-		return scaledAABB;
-	};
-};
 
 class Mesh
 {

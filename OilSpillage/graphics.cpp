@@ -8,6 +8,8 @@
 
 Graphics::Graphics()
 {
+	this->window = nullptr;
+
 	this->vp = {};
 
 	this->debugger = nullptr;
@@ -15,6 +17,8 @@ Graphics::Graphics()
 	this->lightList = nullptr;
 
 	lightBufferContents = new LightBufferContents;
+
+	this->quadTree = std::make_unique<QuadTree>(Vector2(-96.f * 20.f, -96.f * 20.f), Vector2(96.f * 20.f, 96.f * 20.f), 4);
 }
 
 Graphics::~Graphics()
@@ -373,17 +377,7 @@ void Graphics::render(DynamicCamera* camera)
 		}
 	}
 
-	for (auto it = drawableStaticObjects.begin(); it != drawableStaticObjects.end();)
-	{
-		StaticGameObject* object = *it;
-		auto endIt = std::upper_bound(it, drawableStaticObjects.end(), object, [](StaticGameObject* a, StaticGameObject* b)
-			{
-				return a->getTexture() < b->getTexture();
-			}
-		);
-		drawStaticGameObjects(it, endIt, camera, frustum);
-		it = endIt;
-	}
+	drawStaticGameObjects(camera, frustum, 10.0);
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDebug.ps.getShader(), nullptr, 0);
@@ -723,14 +717,18 @@ bool Graphics::loadTexture(std::string path, bool overridePath )
 const Mesh* Graphics::getMeshPointer(const char* localPath)
 {  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
    std::string meshPath;
-   if ( localPath != "Cube" ) {
+   if (localPath != "Cube") 
+   {
       meshPath = MODEL_ROOT_DIR;
       meshPath += localPath;
       meshPath += "/mesh.bin";
    }
-   else meshPath = std::string(localPath);
+   else if (localPath != nullptr)
+   {
+	   meshPath = std::string(localPath);
+   }
 
-	if ( meshes.find(meshPath) == meshes.end() ) return nullptr;
+	if (meshes.find(meshPath) == meshes.end()) return nullptr;
 	else return &meshes[meshPath];
 }
 
@@ -773,30 +771,21 @@ void Graphics::addToDraw(StaticGameObject* o)
 	}
 
 	o->setAABB(aabb);
+	quadTree->insert(o);
 
-	int bufferSize = o->vertices.size() * sizeof(Vertex3D);
 	D3D11_BUFFER_DESC vBufferDesc;
 	ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
-
 	vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vBufferDesc.ByteWidth = bufferSize;
 	vBufferDesc.CPUAccessFlags = 0;
 	vBufferDesc.MiscFlags = 0;
-
+	vBufferDesc.ByteWidth = sizeof(Vertex3D) * o->vertices.size();
+	
 	D3D11_SUBRESOURCE_DATA subData;
 	ZeroMemory(&subData, sizeof(subData));
 	subData.pSysMem = o->vertices.data();
 
-	HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, o->vertexBuffer.ReleaseAndGetAddressOf());
-
-	drawableStaticObjects.insert(
-		std::upper_bound(drawableStaticObjects.begin(), drawableStaticObjects.end(), o, [](StaticGameObject* a, StaticGameObject* b)
-			{
-				return a->getTexture() < b->getTexture();
-			}),
-		o
-	);
+	device->CreateBuffer(&vBufferDesc, &subData, o->vertexBuffer.ReleaseAndGetAddressOf());
 }
 
 void Graphics::removeFromDraw(GameObject* o)
@@ -809,19 +798,10 @@ void Graphics::removeFromDraw(GameObject* o)
 	}
 }
 
-void Graphics::removeFromDraw(StaticGameObject* o)
-{
-	auto obj = std::find(drawableStaticObjects.begin(), drawableStaticObjects.end(), o);
-
-	if (obj != drawableStaticObjects.end())
-	{
-		drawableStaticObjects.erase(obj);
-	}
-}
-
 void Graphics::clearDraw()
 {
 	drawableObjects.clear();
+	quadTree->clearContents();
 }
 
 void Graphics::setLightList(LightList* lightList)
@@ -955,74 +935,44 @@ float Graphics::getCullingDistance()
 	return cullingDistance;
 }
 
-void Graphics::drawStaticGameObjects(std::vector<StaticGameObject*>::iterator begin, std::vector<StaticGameObject*>::iterator end, DynamicCamera* camera, Frustum& frustum)
+void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias)
 {
-	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
-	std::vector<Vertex3D> vertices;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-	D3D11_BUFFER_DESC vBufferDesc;
-	ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
-
-	vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vBufferDesc.CPUAccessFlags = 0;
-	vBufferDesc.MiscFlags = 0;
-
-	for (auto it = begin; it < end; ++it)
-	{
-		StaticGameObject* object = *it;
-		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
-		{
-			AABB boundingBox = object->getAABB();
-
-			if (frustum.intersect(boundingBox, 10.0)) {
-				vBufferDesc.ByteWidth += object->vertices.size() * sizeof(Vertex3D);
-				for (Vertex3D v : object->vertices)
-				{
-					vertices.push_back(std::move(v));
-				}
-			}
-		}
-	}
-
 	UINT stride = sizeof(Vertex3D);
 	UINT offset = 0;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	ID3D11ShaderResourceView* shaderResView;
-	StaticGameObject* beginObject = *begin;
+	shaderResView = nullptr;
 
-	if (beginObject->getTexture() != nullptr)
-		shaderResView = beginObject->getTexture()->getShaderResView();
-	else
+	std::vector<StaticGameObject*> objects;
+	quadTree->getObjects(objects, frustum, frustumBias);
+
+	Matrix identity = Matrix();
+	deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &identity, sizeof(SimpleMath::Matrix));
+	deviceContext->Unmap(worldBuffer.Get(), 0);
+	deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
+
+	for (StaticGameObject* o : objects)
 	{
-		shaderResView = nullptr;
-	}
-
-	if (vertices.size() > 0)
-	{
-		D3D11_SUBRESOURCE_DATA subData;
-		ZeroMemory(&subData, sizeof(subData));
-		subData.pSysMem = vertices.data();
-
-		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, vertexBuffer.GetAddressOf());
-
-		Vector4 modColor = beginObject->getColor();
+		Vector4 modColor = o->getColor();
 		deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
 		deviceContext->Unmap(colorBuffer.Get(), 0);
 
-		Matrix identity = Matrix();
-		hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, &identity, sizeof(SimpleMath::Matrix));
-		deviceContext->Unmap(worldBuffer.Get(), 0);
+		if (o->getTexture() != nullptr)
+		{
+			shaderResView = o->getTexture()->getShaderResView();
+		}
+		else
+		{
+			shaderResView = nullptr;
+		}
 
-		deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+		deviceContext->IASetVertexBuffers(0, 1, o->vertexBuffer.GetAddressOf(), &stride, &offset);
 		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
-
-		deviceContext->Draw(vertices.size(), 0);
+		deviceContext->Draw(static_cast<UINT>(o->vertices.size()), 0);
 	}
 }

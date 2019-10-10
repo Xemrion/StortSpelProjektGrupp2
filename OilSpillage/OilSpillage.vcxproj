@@ -143,6 +143,7 @@
     </ClCompile>
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="PG\Walker.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="PG\District.cpp" />
@@ -187,6 +188,8 @@
     <ClInclude Include="AI\Behaviour.h" />
     <ClInclude Include="AI\Boid.h" />
     <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="Frustum.h" />
+    <ClInclude Include="QuadTree.h" />
     <ClInclude Include="States\GameState.h" />
     <ClInclude Include="States\MenuGameState.h" />
     <ClInclude Include="States\PlayingGameState.h" />
