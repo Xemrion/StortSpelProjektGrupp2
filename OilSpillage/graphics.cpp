@@ -13,6 +13,7 @@ Graphics::Graphics()
 	this->debugger = nullptr;
 
 	this->lightList = nullptr;
+	this->window = nullptr;
 
 	lightBufferContents = new LightBufferContents;
 }
@@ -68,8 +69,7 @@ bool Graphics::init(Window* window)
 		NULL,
 		deviceContext.ReleaseAndGetAddressOf());
 
-	if (SUCCEEDED(result))
-	{
+
 		// get the address of the back buffer
 		ID3D11Texture2D* backBufferPtr = nullptr;
 		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)& backBufferPtr);
@@ -96,13 +96,16 @@ bool Graphics::init(Window* window)
 		descDepth.Height = (UINT)this->window->height;
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
-		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; //DXGI_FORMAT_R32_TYPELESS;
+		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		descDepth.SampleDesc.Count = 4;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		descDepth.CPUAccessFlags = 0;
 		descDepth.MiscFlags = 0;
+
+
+		
 		result = device->CreateTexture2D(&descDepth, NULL, &depthStencilBuffer);
 		if (FAILED(result))
 		{
@@ -131,7 +134,7 @@ bool Graphics::init(Window* window)
 			return false;
 		}
 
-	}
+	
 
 	this->vp.Width = (float)this->window->width;
 	this->vp.Height = (float)this->window->height;
@@ -248,7 +251,7 @@ bool Graphics::init(Window* window)
 	blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 	blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 	blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendStateDescription.RenderTarget[0].RenderTargetWriteMask = 0x0f;
 
@@ -267,6 +270,7 @@ bool Graphics::init(Window* window)
 	this->device->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(debug.GetAddressOf()));
 
 
+
 	createShaders();
 #ifdef _DEBUG
 	debugger = new Debug(deviceContext.Get(), device.Get());
@@ -279,6 +283,21 @@ bool Graphics::init(Window* window)
 	ImGui_ImplDX11_Init(this->device.Get(), this->deviceContext.Get());
 	ImGui::StyleColorsDark();
 
+	this->particleSystem.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
+	this->particleSystem2.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
+
+	/*for (int i = 0; i < 150; i++)
+	{
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+	}*/
+	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+
+
+	
 	return true;
 }
 
@@ -292,7 +311,7 @@ Window* Graphics::getWindow()
 	return this->window;
 }
 
-void Graphics::render(DynamicCamera* camera)
+void Graphics::render(DynamicCamera* camera, float deltaTime)
 {
 	float color[4] = {
 		0,0,0,1
@@ -316,6 +335,16 @@ void Graphics::render(DynamicCamera* camera)
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
 
+
+	this->particleSystem.updateParticles(deltaTime, viewProj);
+
+	//deviceContext->OMSetRenderTargets(1, &renderTargetView, this->depthStencilView);
+
+	this->particleSystem.drawAll(camera);
+
+	this->particleSystem2.updateParticles(deltaTime, viewProj);
+
+	this->particleSystem2.drawAll(camera);
 
 	//set up Shaders
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
@@ -454,6 +483,54 @@ bool Graphics::createShaders()
 	return true;
 }
 
+void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles,  int lifeTime, float randomPower)
+{
+	Vector3 randomPos = randomPower*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos2 = -1.0f*randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
+	randomPos += pos;
+	randomPos += randomPos2;
+	float grey = float(rand()) / RAND_MAX;
+	this->particleSystem.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+}
+
+void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, int lifeTime, float randomPower)
+{
+	Vector3 randomPos = randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos2 = -1.0f * randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
+	randomPos += pos;
+	randomPos += randomPos2;
+	float grey = float(rand()) / RAND_MAX;
+	this->particleSystem2.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+}
+
+void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
+{
+	if (nrOfColors < 5)
+	{
+		this->particleSystem.changeColornSize(colors, nrOfColors, startSize, endSize);
+	}
+}
+
+void Graphics::setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
+{
+	if (nrOfColors < 5)
+	{
+		this->particleSystem2.changeColornSize(colors, nrOfColors, startSize, endSize);
+	}
+}
+
+void Graphics::setVectorField(float vectorFieldSize, float vectorFieldPower)
+{
+	this->particleSystem.changeVectorField(vectorFieldPower, vectorFieldSize);
+}
+
+void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
+{
+	this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
+}
+
 void Graphics::clearScreen()
 {
 	float color[4] = { 0,0,0,1 };
@@ -481,25 +558,27 @@ void Graphics::loadMesh(std::string fileName)
 		if (imp.loadMesh(fileName.c_str()))
 		{
 			meshes[fileName] = newMesh;
-			Vertex* vertices = imp.getVertices();
+			
 			std::vector<Vertex3D> tempVec;
 			Vertex3D vertex;
+			Vertex* vertices = imp.getVertices();
 			for (int i = 0; i < imp.getVertexCount(); i++)
 			{
 				vertex.position.x = vertices[i].x;
 				vertex.position.y = vertices[i].y;
 				vertex.position.z = vertices[i].z;
 
-				vertex.normal.x = vertices[i].nx;
-				vertex.normal.y = vertices[i].ny;
-				vertex.normal.z = vertices[i].nz;
+					vertex.normal.x = vertices[i].nx;
+					vertex.normal.y = vertices[i].ny;
+					vertex.normal.z = vertices[i].nz;
 
-				vertex.uv.x = vertices[i].u;
-				vertex.uv.y = vertices[i].v;
+					vertex.uv.x = vertices[i].u;
+					vertex.uv.y = vertices[i].v;
 
-				tempVec.push_back(vertex);
+					tempVec.push_back(vertex);
+				
 			}
-			
+
 			meshes[fileName].insertDataToMesh(tempVec);
 			AABB aabb;
 			imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z);

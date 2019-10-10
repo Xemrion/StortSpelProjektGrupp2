@@ -51,9 +51,6 @@
     <ClCompile Include="TestAI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ImGui\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -147,6 +144,24 @@
     <ClCompile Include="AI\Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Particle\ParticleSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIPlaying.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIPaused.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PG\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PG\MinimapTextureGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PG\MapConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -168,9 +183,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
@@ -281,9 +293,6 @@
     <ClInclude Include="PG\Voronoi.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PG\config.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Road Network\RoadNet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -323,6 +332,24 @@
     <ClInclude Include="AI\Node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Particle\ParticleSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIPlaying.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIPaused.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="STB\stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\MinimapTextureGenerator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\MapConfig.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
@@ -338,6 +365,11 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="ComputeLightCulling.hlsl" />
+    <FxCompile Include="Particle\ParticleGS.hlsl" />
+    <FxCompile Include="Particle\ParticleCreateCS.hlsl" />
+    <FxCompile Include="Particle\ParticlePS.hlsl" />
+    <FxCompile Include="Particle\ParticleUpdateCS.hlsl" />
+    <FxCompile Include="Particle\ParticleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

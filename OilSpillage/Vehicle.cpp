@@ -18,15 +18,19 @@ Vehicle::Vehicle()
 	this->rotateAcceleration = 0.0f;
 	this->rotationSmoother = 1.0f;
 	this->tempTargetRotation = 0.0f;
+	this->velocitySimple = 0.0f;
+	this->velocitySpeed = 0.0f;
 	this->rotationDirection = true;
 	this->vehicle = nullptr;
 	this->bodyRotation = nullptr;
 	this->bodyRotationPoint = nullptr;
 
 	this->leftoverTime = 0.0f;
-	this->weapon = VehicleWeapon::defaultWeapon;
+	this->weapon = VehicleWeapon::missileLauncher;
 	this->defaultStats = VehicleStats::fastCar;
-	this->updatedStats = defaultStats;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
 }
 
 Vehicle::~Vehicle()
@@ -71,8 +75,6 @@ void Vehicle::init()
 	bodyRotationPoint->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
 
 	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
-
-	this->weapon = VehicleWeapon::missileLauncher;
 
 	for (int i = 0; i < 16; i++)
 	{
@@ -515,4 +517,44 @@ Vector3 Vehicle::getVelocity()
 float Vehicle::getVelocitySpeed()
 {
 	return velocitySpeed;
+}
+
+const int& Vehicle::getHealthRef() const
+{
+	return this->health;
+}
+
+int Vehicle::getHealth() const
+{
+	return this->health;
+}
+
+int Vehicle::getMaxHealth() const
+{
+	return this->updatedStats.maxHealth;
+}
+
+void Vehicle::setHealth(int health)
+{
+	this->health = std::clamp(health, 0, this->updatedStats.maxHealth);
+}
+
+void Vehicle::setMaxHealth(int maxHealth)
+{
+	this->updatedStats.maxHealth = max(maxHealth, 1);
+}
+
+void Vehicle::resetHealth()
+{
+	this->health = this->updatedStats.maxHealth;
+}
+
+void Vehicle::changeHealth(int amount)
+{
+	this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
+}
+
+bool Vehicle::isDead() const
+{
+	return this->health <= 0;
 }
