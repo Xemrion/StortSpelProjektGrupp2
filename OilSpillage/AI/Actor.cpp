@@ -18,7 +18,7 @@ Actor::Actor()
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
 
-	this->destination = Vector3(20.0f, 0.0f, 20.0f);
+	//this->destination = Vector3(20.0f, 0.0f, 20.0f);
 }
 
 Actor::Actor(float x, float z, AStar* aStar)
@@ -42,7 +42,7 @@ Actor::Actor(float x, float z, AStar* aStar)
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
 
-	this->destination = Vector3(20.0f, 0.0f, 20.0f);
+	//this->destination = Vector3(20.0f, 0.0f, 20.0f);
 }
 
 Actor::~Actor()
@@ -120,7 +120,6 @@ Status Actor::shoot()
 void Actor::chase()
 {
 	findPath();
-
 	//Vector3 dir = targetPos - this->getPosition();
 	//dir.Normalize();
 	//Vector3 newPosition = this->getPosition() + dir * deltaTime;
@@ -135,7 +134,6 @@ void Actor::chase()
 void Actor::roam()
 {
 	//Hitta random position och hitta väg till den.
-
 
 	findPath();
 }
@@ -191,13 +189,15 @@ void Actor::followPath()
 			float(path.at(path.size() - 1)->GetYPos()));
 		Vector3 dir = targetNode - this->getPosition();
 		dir.Normalize();
-		Vector3 newPosition = this->getPosition() + dir * deltaTime;
 
-		if (newPosition.Distance(targetNode, newPosition) < 1)
-		{
-			path.pop_back();
-		}
-	//this->setPosition(newPosition);
+		destination = targetNode;
+		updateBoid(deltaTime);
+
+	if (position.Distance(targetNode, position) < 1)
+	{
+		path.pop_back();
+	}
+
 	}
 	else
 	{
@@ -210,12 +210,12 @@ void Actor::followPath()
 			roam();
 		}
 	}
-	destination = targetNode;
 }
 
 void Actor::findPath()
 {
 	aStar->algorithm(this->getPosition(), targetPos, path);
+
 }
 
 void Actor::applyForce(Vector3 force)
@@ -344,12 +344,12 @@ Vector3 Actor::seek(Vector3 target)
 void Actor::run(vector<Actor*> boids, float deltaTime)
 {
 	flock(boids);
-	updateBoid(deltaTime);
 }
 
 void Actor::updateBoid(float deltaTime)
 {
 	//To make the slow down not as abrupt
+	acceleration += seek(Vector3(0.0f));
 	acceleration *= 0.4f;
 	// Update velocity
 	velocity += acceleration;
@@ -358,15 +358,7 @@ void Actor::updateBoid(float deltaTime)
 	{
 		velocity /= velocity.Length();
 	}
-	Vector3 dir = Vector3(velocity.x, 0.0f, velocity.z);
-	dir.Normalize();
-	Vector3 newPosition = (dir * this->deltaTime);
-
-	if (newPosition.Distance(targetNode, newPosition) < 1)
-	{
-		path.pop_back();
-	}
-	this->move(newPosition);
+	position += Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime);
 	// Reset accelertion to 0 each cycle
 	acceleration *= 0;
 }

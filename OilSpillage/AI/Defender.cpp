@@ -96,13 +96,14 @@ void Defender::followPath()
 			float(path.at(path.size() - 1)->GetYPos()));
 		Vector3 dir = targetNode - this->getPosition();
 		dir.Normalize();
-		Vector3 newPosition = this->getPosition() + dir * deltaTime;
 
-		if (newPosition.Distance(targetNode, newPosition) < 1)
+		destination = targetNode;
+		updateBoid(deltaTime);
+
+		if (position.Distance(targetNode, position) < 1)
 		{
 			path.pop_back();
 		}
-		//this->setPosition(newPosition);
 	}
 	else
 	{
@@ -119,13 +120,13 @@ void Defender::followPath()
 			returning();
 		}
 	}
-	destination = targetNode;
 }
 
 void Defender::returning()
 {
 	targetPos = objectivePos;
 	findPath();
+	destination = targetNode;
 }
 
 Status Defender::inRange()
