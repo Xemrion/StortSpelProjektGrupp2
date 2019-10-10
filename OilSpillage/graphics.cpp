@@ -13,6 +13,7 @@ Graphics::Graphics()
 	this->debugger = nullptr;
 
 	this->lightList = nullptr;
+	this->window = nullptr;
 
 	lightBufferContents = new LightBufferContents;
 }
