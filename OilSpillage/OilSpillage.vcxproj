@@ -138,9 +138,6 @@
     <ClCompile Include="AI\Behaviour.cpp" />
     <ClCompile Include="AI\Boid.cpp" />
     <ClCompile Include="AI\Node.cpp" />
-    <ClCompile Include="camera.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
     <ClCompile Include="PG\Walker.cpp" />
@@ -178,6 +175,8 @@
     <ClCompile Include="UI\UICredits.cpp" />
     <ClCompile Include="UI\UIMainMenu.cpp" />
     <ClCompile Include="UI\UIOptions.cpp" />
+    <ClCompile Include="UI\UIPaused.cpp" />
+    <ClCompile Include="UI\UIPlaying.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
@@ -194,9 +193,6 @@
     <ClInclude Include="States\PlayingGameState.h" />
     <ClInclude Include="PG\District.hpp" />
     <ClInclude Include="UI\Button.h" />
-    <ClInclude Include="Camera.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DynamicCamera.h" />
     <ClInclude Include="UI\CheckBox.h" />
@@ -240,6 +236,8 @@
     <ClInclude Include="UI\UICredits.h" />
     <ClInclude Include="UI\UIMainMenu.h" />
     <ClInclude Include="UI\UIOptions.h" />
+    <ClInclude Include="UI\UIPaused.h" />
+    <ClInclude Include="UI\UIPlaying.h" />
     <ClInclude Include="UI\UserInterface.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />

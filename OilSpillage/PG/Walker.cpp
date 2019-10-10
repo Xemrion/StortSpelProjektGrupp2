@@ -1,9 +1,9 @@
 #include "Walker.hpp"
 
-WalkerGenArgs create_child_args( WalkerGenArgs &parent_args,
-                                 U16            x,
-                                 U16            y,
-                                 Dir            d )
+WalkerGenArgs create_child_args( WalkerGenArgs const &parent_args,
+                                 U16                  x,
+                                 U16                  y,
+                                 Dir                  d )
 {
    return WalkerGenArgs {
        x,
@@ -31,7 +31,7 @@ Void Branch::walk( Config const &config ) {
    while ( (tiles_walked != tiles_to_walk) and ( steps --> 0 ) ) {
       // potential branch:
       Bool  is_branch_eligible = ( args.cur_depth < args.max_depth-1 )
-         and ( tiles_since_last_branch >= config.min_tiles_before_branch );
+         and ( tiles_since_last_branch >= static_cast<U16>(config.min_tiles_before_branch) );
       if ( is_branch_eligible and gen_selection(args.rng) > args.branch_prob ) {
          // TODO: delay by putting params in a vector and doing the branches after the main loop
          Dir branch_direction = gen_selection(args.rng) < 50 ?
@@ -42,7 +42,7 @@ Void Branch::walk( Config const &config ) {
       else ++tiles_since_last_branch;
 
       // potential turn:
-      Bool  is_turn_eligible = tiles_since_last_turn >= config.min_tiles_before_turn;
+      Bool  is_turn_eligible = tiles_since_last_turn >= static_cast<U16>(config.min_tiles_before_turn);
       if ( is_turn_eligible and gen_selection(args.rng) > args.turn_prob ) {
          dir = gen_selection(args.rng) < 50 ?
                      turn_left(dir) : turn_right(dir);
@@ -85,7 +85,7 @@ Void Branch::walk( Config const &config ) {
 
 
 
-void Walker::schedule_branch( WalkerGenArgs &&args ) {
+Void Walker::schedule_branch( WalkerGenArgs &&args ) {
    assert( args.cur_depth < args.max_depth && "Depth out of bounds!" ); 
    branch_tree[args.cur_depth].emplace_back(std::move(args)); // TODO: verify
 }
@@ -189,7 +189,7 @@ Void Walker::generate( Config const &config ) {
 }
 
 // clean-up roads:
-void Walker::clean_isles() noexcept {
+Void Walker::clean_isles() noexcept {
    for ( auto y = 1U;  y < map.width-1;  ++y )
       for ( auto x = 1U;  x < map.height-1;  ++x )
          if (       map.is_road( x,   y-1 )
@@ -203,7 +203,11 @@ void Walker::clean_isles() noexcept {
          map.data[ map.index(x,y) ] = Tile::ground;
 }
 
-void Walker::clean_ladders_x() noexcept {
+Void Walker::clean_ladders_x() noexcept {
    //for ( auto y = 1;  y < map.width-1;  ++y )
    //   for ( auto x = 1;  x < map.height-1;  ++x )
+}
+
+V2u Walker::getStartPosition() const noexcept {
+   return { branch_tree[0][0].args.x, branch_tree[0][0].args.y };
 }
