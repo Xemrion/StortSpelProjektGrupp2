@@ -69,7 +69,7 @@ public:
 			+ (neighbour_is_road(Dir::west,  x, y) ? cPow(2,3) : 0);
 	}
 
-	Vec<GameObject> load_as_models(Graphics& graphics) const;
+	Vec<StaticGameObject> load_as_models(Graphics& graphics) const;
 
 	// NOTE! pretends that all out-of-bounds tiles are roads
 	Bool neighbour_is_road(Dir dir, U16 x, U16 y) const noexcept;

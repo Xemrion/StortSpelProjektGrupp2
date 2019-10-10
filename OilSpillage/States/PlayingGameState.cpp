@@ -11,8 +11,8 @@ void PlayingGameState::generateMap( Config const &config ) {
    for ( auto &e : houseTiles )
       graphics.removeFromDraw(&e);
 
-	roadTiles       = Vec<GameObject>( config.map_dimensions.x * config.map_dimensions.y );
-   districtMarkers = Vec<GameObject>( config.cell_side * config.cell_side );
+	roadTiles       = Vec<StaticGameObject>( config.map_dimensions.x * config.map_dimensions.y );
+   districtMarkers = Vec<StaticGameObject>( config.cell_side * config.cell_side );
    houseTiles.clear();
 	// create blank map
    map = std::make_unique<Map>( config );
@@ -81,10 +81,10 @@ void PlayingGameState::generateMap( Config const &config ) {
    for ( U16 y=0;  y < map->height;  ++y ) {
       for ( U16 x=0;  x < map->width;  ++x ) {
          auto &tile = roadTiles[map->index(x,y)];
-		   graphics.addToDraw(&tile);
 		   tile.setScale( Vector3{ 0.0005f * config.tile_scale.x,
                                  0.0005f * config.tile_scale.y,
                                  0.0005f * config.tile_scale.z }); // TODO: scale models instead
+		   graphics.addToDraw(&tile);
       }
 	}
    generateBuildings(config, rng);
@@ -481,15 +481,14 @@ void PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 	//ImGui rendering --BEGIN--
-#ifdef _DEBUG
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
-   ImGui::NewFrame();
-   ImGui_Driving();
-   ImGui_ProcGen();
+    ImGui::NewFrame();
+    ImGui_Driving();
+    ImGui_ProcGen();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
- #endif
+
 	// ImGui rendering --END--
 
 	// Present scene

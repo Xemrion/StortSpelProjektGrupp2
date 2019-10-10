@@ -27,9 +27,9 @@ bool Map::walk(U16& x, U16& y, Dir d, Tile tile) {
 	}
 }
 
-Vec<GameObject> Map::load_as_models(Graphics& graphics) const {
+Vec<StaticGameObject> Map::load_as_models(Graphics& graphics) const {
 	auto const to_reserve = width * height;
-	Vec<GameObject> tiles( to_reserve );
+	Vec<StaticGameObject> tiles( to_reserve );
 	for (U16 y = 0; y < height; ++y) {
 		for (U16 x = 0; x < width; ++x) {
 			auto const  tile_i = index(x, y);

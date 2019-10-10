@@ -21,7 +21,7 @@ cbuffer CB_PER_FRAME : register(b0)
 
 cbuffer world : register(b1)
 {
-	float4x4 world[64];
+	float4x4 world;
 }
 //-----------------------------------------------------------------------------------------
 // VertexShader: VSScene
@@ -29,11 +29,11 @@ cbuffer world : register(b1)
 VS_OUT main(VS_IN input)
 {
 	VS_OUT output = (VS_OUT)0;
-	output.Pos = mul(float4(input.Pos, 1.0f), world[input.InstanceID]);
+	output.Pos = mul(float4(input.Pos, 1.0f), world);
 	output.wPos = output.Pos;
 	output.Pos = mul(output.Pos, viewProj);
 	output.Tex = input.Tex;
-	output.Normal = mul(float4(input.Normal, 0.0f), world[input.InstanceID]);
+	output.Normal = mul(float4(input.Normal, 0.0f), world);
 	output.Normal.xyz = normalize(output.Normal.xyz);
 	
 	return output;

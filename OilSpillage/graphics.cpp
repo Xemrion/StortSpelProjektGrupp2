@@ -155,7 +155,7 @@ bool Graphics::init(Window* window)
 	if (FAILED(hr))
 		return false;
 
-	desc.ByteWidth = 4096;
+	desc.ByteWidth = sizeof(Matrix);
 	hr = device->CreateBuffer(&desc, 0, &worldBuffer);
 	if (FAILED(hr))
 		return false;
@@ -330,15 +330,58 @@ void Graphics::render(DynamicCamera* camera)
 
 	Frustum frustum = camera->getFrustum();
 
-	for (auto it = drawableObjects.begin(); it != drawableObjects.end();)
+	for (GameObject* object : drawableObjects)
 	{
-		GameObject* object = *it;
-		auto endIt = std::upper_bound(it, drawableObjects.end(), object, [](GameObject* a, GameObject* b)
+		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		{
+			AABB boundingBox = object->getAABB();
+
+			if (frustum.intersect(boundingBox, 10.0)) 
 			{
-				return a->mesh->vertexBuffer < b->mesh->vertexBuffer;
+				SimpleMath::Matrix world = object->getTransform();
+				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+				D3D11_MAPPED_SUBRESOURCE mappedResource;
+				HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
+				deviceContext->Unmap(worldBuffer.Get(), 0);
+				UINT vertexCount = object->mesh->getVertexCount();
+				UINT stride = sizeof(Vertex3D);
+				UINT offset = 0;
+				ID3D11ShaderResourceView* shaderResView;
+				if (object->getTexture() != nullptr)
+				{
+					shaderResView = object->getTexture()->getShaderResView();
+				}
+				else
+				{
+					shaderResView = nullptr;
+				}
+
+				Vector4 modColor = object->getColor();
+				hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
+				deviceContext->Unmap(colorBuffer.Get(), 0);
+
+				deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
+				deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+				deviceContext->PSSetShaderResources(0, 1, &shaderResView);
+				deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
+
+				deviceContext->Draw(vertexCount, 0);
+			}
+		}
+	}
+
+	for (auto it = drawableStaticObjects.begin(); it != drawableStaticObjects.end();)
+	{
+		StaticGameObject* object = *it;
+		auto endIt = std::upper_bound(it, drawableStaticObjects.end(), object, [](StaticGameObject* a, StaticGameObject* b)
+			{
+				return a->getTexture() < b->getTexture();
 			}
 		);
-		drawGameObjectsInstanced(it, endIt, object->mesh, camera, frustum);
+		drawStaticGameObjects(it, endIt, camera, frustum);
 		it = endIt;
 	}
 
@@ -496,6 +539,7 @@ void Graphics::loadMesh(std::string fileName)
 	}
 }
 
+
 void Graphics::loadModel(std::string path)
 {
    std::string modelDir {MODEL_ROOT_DIR};
@@ -590,7 +634,6 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 			subData.pSysMem = meshes[fileName].vertices.data();
 
 			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[fileName].vertexBuffer.GetAddressOf());
-			meshes[fileName].vertices.clear();
 		}
 		break;
 	case SHAPE_QUAD:
@@ -710,12 +753,48 @@ Texture* Graphics::getTexturePointer(const char* path, bool isModel )
 void Graphics::addToDraw(GameObject* o)
 {
 	assert( o != nullptr );
-	//drawableObjects.push_back(o);
-	drawableObjects.insert(
-		std::upper_bound(drawableObjects.begin(), drawableObjects.end(), o, [](GameObject* a, GameObject* b)
-		{
-			return a->mesh->vertexBuffer < b->mesh->vertexBuffer;
-		}),
+	drawableObjects.push_back(o);
+}
+
+void Graphics::addToDraw(StaticGameObject* o)
+{
+	o->insertDataToMesh(o->mesh->vertices);
+	Matrix transform = o->getTransform();
+	AABB aabb;
+	aabb.minPos = Vector3(10000, 10000, 10000);
+	aabb.maxPos = Vector3(-10000, -10000, -10000);
+
+	for (Vertex3D& vert : o->vertices)
+	{
+		vert.position = Vector3::Transform(vert.position, transform);
+		vert.normal = Vector3::TransformNormal(vert.normal, transform);
+		aabb.minPos = Vector3::Min(aabb.minPos, vert.position);
+		aabb.maxPos = Vector3::Max(aabb.maxPos, vert.position);
+	}
+
+	o->setAABB(aabb);
+
+	int bufferSize = o->vertices.size() * sizeof(Vertex3D);
+	D3D11_BUFFER_DESC vBufferDesc;
+	ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+	vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vBufferDesc.ByteWidth = bufferSize;
+	vBufferDesc.CPUAccessFlags = 0;
+	vBufferDesc.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA subData;
+	ZeroMemory(&subData, sizeof(subData));
+	subData.pSysMem = o->vertices.data();
+
+	HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, o->vertexBuffer.ReleaseAndGetAddressOf());
+
+	drawableStaticObjects.insert(
+		std::upper_bound(drawableStaticObjects.begin(), drawableStaticObjects.end(), o, [](StaticGameObject* a, StaticGameObject* b)
+			{
+				return a->getTexture() < b->getTexture();
+			}),
 		o
 	);
 }
@@ -727,6 +806,16 @@ void Graphics::removeFromDraw(GameObject* o)
 	if (obj != drawableObjects.end())
 	{
 		drawableObjects.erase(obj);
+	}
+}
+
+void Graphics::removeFromDraw(StaticGameObject* o)
+{
+	auto obj = std::find(drawableStaticObjects.begin(), drawableStaticObjects.end(), o);
+
+	if (obj != drawableStaticObjects.end())
+	{
+		drawableStaticObjects.erase(obj);
 	}
 }
 
@@ -866,61 +955,74 @@ float Graphics::getCullingDistance()
 	return cullingDistance;
 }
 
-void Graphics::drawGameObjectsInstanced(std::vector<GameObject*>::iterator begin, std::vector<GameObject*>::iterator end, const Mesh* meshPtr, DynamicCamera* camera, Frustum& frustum)
+void Graphics::drawStaticGameObjects(std::vector<StaticGameObject*>::iterator begin, std::vector<StaticGameObject*>::iterator end, DynamicCamera* camera, Frustum& frustum)
 {
-	UINT instanceCount = 0;
-	Matrix worldMatrixContents[64];
+	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
+	std::vector<Vertex3D> vertices;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
+
+	D3D11_BUFFER_DESC vBufferDesc;
+	ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+	vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vBufferDesc.CPUAccessFlags = 0;
+	vBufferDesc.MiscFlags = 0;
 
 	for (auto it = begin; it < end; ++it)
 	{
-		GameObject* object = *it;
+		StaticGameObject* object = *it;
 		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
 		{
 			AABB boundingBox = object->getAABB();
-			boundingBox = boundingBox.scale(object->getScale());
-			boundingBox.maxPos += object->getPosition();
-			boundingBox.minPos += object->getPosition();
 
 			if (frustum.intersect(boundingBox, 10.0)) {
-				SimpleMath::Matrix world = object->getTransform();
-				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-				worldMatrixContents[instanceCount] = std::move(worldTr);
-				instanceCount += 1;
+				vBufferDesc.ByteWidth += object->vertices.size() * sizeof(Vertex3D);
+				for (Vertex3D v : object->vertices)
+				{
+					vertices.push_back(std::move(v));
+				}
 			}
 		}
+	}
 
-		if (it == end - 1 || instanceCount == 64)
-		{
-			HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-			CopyMemory(mappedResource.pData, worldMatrixContents, sizeof(Matrix) * instanceCount);
-			deviceContext->Unmap(worldBuffer.Get(), 0);
+	UINT stride = sizeof(Vertex3D);
+	UINT offset = 0;
+	ID3D11ShaderResourceView* shaderResView;
+	StaticGameObject* beginObject = *begin;
 
-			UINT vertexCount = object->mesh->getVertexCount();
-			UINT stride = sizeof(Vertex3D);
-			UINT offset = 0;
-			ID3D11ShaderResourceView* shaderResView;
-			if (object->getTexture() != nullptr)
-				shaderResView = object->getTexture()->getShaderResView();
-			else
-			{
-				shaderResView = nullptr;
-			}
+	if (beginObject->getTexture() != nullptr)
+		shaderResView = beginObject->getTexture()->getShaderResView();
+	else
+	{
+		shaderResView = nullptr;
+	}
 
-			Vector4 modColor = object->getColor();
-			hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-			CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
-			deviceContext->Unmap(colorBuffer.Get(), 0);
+	if (vertices.size() > 0)
+	{
+		D3D11_SUBRESOURCE_DATA subData;
+		ZeroMemory(&subData, sizeof(subData));
+		subData.pSysMem = vertices.data();
 
-			deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
-			deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-			deviceContext->PSSetShaderResources(0, 1, &shaderResView);
-			deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
+		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, vertexBuffer.GetAddressOf());
 
-			deviceContext->DrawInstanced(vertexCount, instanceCount, 0, 0);
+		Vector4 modColor = beginObject->getColor();
+		deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
+		deviceContext->Unmap(colorBuffer.Get(), 0);
 
-			instanceCount = 0;
-		}
+		Matrix identity = Matrix();
+		hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &identity, sizeof(SimpleMath::Matrix));
+		deviceContext->Unmap(worldBuffer.Get(), 0);
+
+		deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
+		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
+
+
+		deviceContext->Draw(vertices.size(), 0);
 	}
 }

@@ -82,5 +82,15 @@ Vector3 GameObject::getScale() const
 }
 AABB GameObject::getAABB() const
 {
-	return this->mesh->getAABB().scale(this->scale);
+	AABB boundingBox = this->mesh->getAABB().scale(this->scale);
+	boundingBox.maxPos += this->getPosition();
+	boundingBox.minPos += this->getPosition();
+	return boundingBox;
+}
+
+AABB StaticGameObject::getAABB() const
+{
+	AABB boundingBox = this->Mesh::getAABB();
+
+	return boundingBox;
 }

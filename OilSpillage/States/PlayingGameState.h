@@ -23,9 +23,9 @@ private:
 	Graphics                       &graphics;
 	std::unique_ptr<Map>            map;
 	std::unique_ptr<Actor>       aiObject;
-	std::vector<GameObject>         districtMarkers;
-	std::vector<GameObject>         roadTiles;
-   std::vector<GameObject>         houseTiles;
+	std::vector<StaticGameObject> districtMarkers;
+	std::vector<StaticGameObject> roadTiles;
+    std::vector<StaticGameObject> houseTiles;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
    std::unique_ptr<Voronoi>        districtMap;

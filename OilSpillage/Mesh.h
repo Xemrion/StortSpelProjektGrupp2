@@ -18,8 +18,7 @@ class Mesh
 {
 public:
 	Mesh();
-	void loadMesh(const char* filename);
-	void insertDataToMesh(std::vector<Vertex3D>& vertexData);
+	void insertDataToMesh(std::vector<Vertex3D> vertexData);
 	void operator=(const Mesh& rh) { this->vertices = rh.vertices; }
 
 	virtual ~Mesh() { }

@@ -58,6 +58,7 @@ class Graphics {
 	std::unordered_map<std::string, Mesh> meshes;
 	std::unordered_map<std::string, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
+	std::vector<StaticGameObject*> drawableStaticObjects;
 	LightList* lightList;
 	float cullingDistance = 150.f;
 	
@@ -74,7 +75,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
 	void cullLights();
-	void drawGameObjectsInstanced(std::vector<GameObject*>::iterator begin, std::vector<GameObject*>::iterator end, const Mesh* meshPtr, DynamicCamera* camera, Frustum& frustum);
+	void drawStaticGameObjects(std::vector<StaticGameObject*>::iterator begin, std::vector<StaticGameObject*>::iterator end, DynamicCamera* camera, Frustum& frustum);
 public:
 	Graphics();
 	~Graphics();
@@ -89,7 +90,9 @@ public:
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path, bool isModel=false);
 	void addToDraw(GameObject* o);
+	void addToDraw(StaticGameObject* o);
 	void removeFromDraw(GameObject* o);
+	void removeFromDraw(StaticGameObject* o);
 	void clearDraw();
 	void setLightList(LightList* lightList);
 	void presentScene();
