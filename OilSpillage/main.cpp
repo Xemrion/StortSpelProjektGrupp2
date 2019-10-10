@@ -6,12 +6,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	srand(static_cast<unsigned int>(time(NULL)));
 
-	Game game;
 	Window window;
 	window.init(hInstance, 1280, 720);
 	ShowWindow(window.handle, nShowCmd);
-	game.init(&window);
-	game.run();
-
+	
+	Game::start(&window);
 	return 0;
 }

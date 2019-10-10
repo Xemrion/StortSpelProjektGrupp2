@@ -62,8 +62,6 @@ private:
 public:
 					PlayingGameState();
 	virtual        ~PlayingGameState();
-	void			init();
-	void			cleanUp();
 	void			update(float deltaTime);
 	const float	   &getTimeRef() const noexcept;
 	float			getTime() const noexcept;
