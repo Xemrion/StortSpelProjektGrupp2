@@ -30,7 +30,7 @@ struct ParticleRenderParams
 struct SimulationParams
 {
 	Vector4 timeFactors;
-	Vector4 emitterLocation;
+	Vector4 vectorField;
 	Vector4 consumerLocation;
 };
 struct IndirDraw
@@ -49,6 +49,7 @@ public:
 	bool addParticle(int nrOf, int lifeTime, Vector3 position, Vector3 initialDirection);
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
+	void changeVectorField(float vectorFieldPower, float vectorFieldSize);
 	void drawAll(DynamicCamera* camera);
 private:
 	const int capParticle = 51200;//100*512
@@ -63,6 +64,7 @@ private:
 	IndirDraw indDraw;
 	ParticleRenderParams colorNSize;
 	ParticleParams pParams;
+	SimulationParams sP;
 
 	//Particle* particles;
 	//ID3D11Buffer* particleBuffer;

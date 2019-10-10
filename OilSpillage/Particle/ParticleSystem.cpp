@@ -11,6 +11,9 @@ ParticleSystem::ParticleSystem()
 	colorNSize.colors[0] = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	colorNSize.config = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
+	this->sP.vectorField.y = 1.0f;
+	this->sP.vectorField.z = 2.0f;
+
 }
 
 ParticleSystem::~ParticleSystem()
@@ -243,13 +246,12 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 	ID3D11ShaderResourceView* nSRV = nullptr;
 	this->deltaTime = delta;
 	UINT offset = 0;
-	SimulationParams sP;
 	this->sinMovement += 0.7f * delta;
 	if (this->sinMovement > (26 * XM_PI) / 9)
 	{
 		this->sinMovement = 0.0f;
 	}
-	sP.emitterLocation = Vector4(sinMovement, 0.0f, 0.0f, 0.0f);
+	sP.vectorField.x = sinMovement;// = Vector4(sinMovement, 0.0f, 0.0f, 0.0f);
 	sP.consumerLocation = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 	sP.timeFactors = Vector4(delta, 0.0f, 0.0f, 0.0f);
 	//run update computeshader here
@@ -297,7 +299,11 @@ void ParticleSystem::changeColornSize(Vector4 colors[4], int nrOfColors, float s
 	colorNSize.config.y = startSize;
 	colorNSize.config.z = endSize;
 }
-
+void ParticleSystem::changeVectorField(float vectorFieldPower, float vectorFieldSize)
+{
+	this->sP.vectorField.y = vectorFieldPower;
+	this->sP.vectorField.z = vectorFieldSize;
+}
 void ParticleSystem::drawAll(DynamicCamera* camera)
 {
 

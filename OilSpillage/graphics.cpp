@@ -482,18 +482,24 @@ bool Graphics::createShaders()
 	return true;
 }
 
-void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles,  int lifeTime)
+void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles,  int lifeTime, float randomPower)
 {
-	Vector3 randomPos = 0.5f*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos = randomPower*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos2 = -1.0f*randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
 	randomPos += pos;
+	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
 	this->particleSystem.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
 }
 
-void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, int lifeTime)
+void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, int lifeTime, float randomPower)
 {
-	Vector3 randomPos = 0.5f * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos = randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos2 = -1.0f * randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
 	randomPos += pos;
+	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
 	this->particleSystem2.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
 }
@@ -512,6 +518,16 @@ void Graphics::setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float s
 	{
 		this->particleSystem2.changeColornSize(colors, nrOfColors, startSize, endSize);
 	}
+}
+
+void Graphics::setVectorField(float vectorFieldSize, float vectorFieldPower)
+{
+	this->particleSystem.changeVectorField(vectorFieldPower, vectorFieldSize);
+}
+
+void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
+{
+	this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
 void Graphics::clearScreen()

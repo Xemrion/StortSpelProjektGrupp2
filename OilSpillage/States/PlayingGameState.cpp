@@ -442,6 +442,9 @@ void PlayingGameState::ImGui_Particles()
 	ImGui::SliderFloat("Second size", &size2, 0.0f, 1.0f);
 	ImGui::SliderInt("Nr of particles times 8", &addNrOfParticles, 1, 10);
 	ImGui::SliderInt("LifeTime", &lifeTime, 1, 20);
+	ImGui::SliderFloat("Vectorfield size", &vectorFieldSize, 0.0f, 10.0f);
+	ImGui::SliderFloat("Vectorfield power", &vectorFieldPower, 0.0f, 10.0f);
+	ImGui::SliderFloat("Random power", &randomPosPower, 0.0f, 10.0f);
 	colorsP[0] = Vector4(colors);
 	colorsP[1] = Vector4(colors2);
 	colorsP[2] = Vector4(colors3);
@@ -450,8 +453,9 @@ void PlayingGameState::ImGui_Particles()
 	colorsP[1].w = 1.0f;
 	colorsP[2].w = 1.0f;
 	colorsP[3].w = 1.0f;
-
+	this->graphics.setVectorField(vectorFieldSize, vectorFieldPower);
 	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+	this->graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
 
 	ImGui::End();
 }
@@ -497,8 +501,10 @@ void PlayingGameState::update(float deltaTime)
 	{
 		if (Input::IsKeyDown_DEBUG(Keyboard::C))
 		{
-			this->graphics.addParticle(this->player->getVehicle()->getPosition() + Vector3(0, 2, 0), 0.005f*-1.0f*this->player->getVelocity() + Vector3(Input::GetDirectionR(0).x * 5, 0, Input::GetDirectionR(0).y * 5), addNrOfParticles, lifeTime);
+			this->graphics.addParticle(this->player->getVehicle()->getPosition() + Vector3(0, 2, 0), 0.005f*-1.0f*this->player->getVelocity() + Vector3(Input::GetDirectionR(0).x * 5, 0, Input::GetDirectionR(0).y * 5), addNrOfParticles, lifeTime,randomPosPower);
 		}
+		this->graphics.addParticle2(this->player->getVehicle()->getPosition() + Vector3(0, 2, 0), 0.005f * -1.0f * this->player->getVelocity() + Vector3(Input::GetDirectionR(0).x * 5, 0, Input::GetDirectionR(0).y * 5), addNrOfParticles, lifeTime, randomPosPower);
+
 	}
 	Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
 	Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);
@@ -516,7 +522,7 @@ void PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 	//ImGui rendering --BEGIN--
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
    ImGui::NewFrame();
@@ -525,7 +531,7 @@ void PlayingGameState::update(float deltaTime)
    ImGui_Particles();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
- #endif
+ //#endif
 	// ImGui rendering --END--
 
 	// Present scene

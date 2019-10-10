@@ -51,6 +51,9 @@ private:
 	int addNrOfParticles = 2;
 	int lifeTime = 2;
 	float timerForParticle = 0.0f;
+	float vectorFieldPower = 1.0f;
+	float vectorFieldSize = 1.0f;
+	float randomPosPower = 1.0f;
 
 	void           generateMap( Config const & );
    void           generateBuildings( Config const &, RNG & );
