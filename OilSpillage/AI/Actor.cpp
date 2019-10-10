@@ -191,7 +191,7 @@ void Actor::followPath()
 		dir.Normalize();
 
 		destination = targetNode;
-		updateBoid(deltaTime);
+
 
 	if (position.Distance(targetNode, position) < 1)
 	{
@@ -226,7 +226,7 @@ void Actor::applyForce(Vector3 force)
 Vector3 Actor::separation(vector<Actor*> boids)
 {
 	// Distance of field of vision for separation between boids
-	float desiredSeparationDistance = 1.5f;
+	float desiredSeparationDistance = 3.0f;
 	Vector3 direction(0.0f);
 	float nrInProximity = 0.0f;
 	// For every boid in the system, check if it's too close
@@ -344,15 +344,16 @@ Vector3 Actor::seek(Vector3 target)
 void Actor::run(vector<Actor*> boids, float deltaTime)
 {
 	flock(boids);
+	updateBoid(deltaTime);
 }
 
 void Actor::updateBoid(float deltaTime)
 {
 	//To make the slow down not as abrupt
-	acceleration += seek(Vector3(0.0f));
 	acceleration *= 0.4f;
 	// Update velocity
 	velocity += acceleration;
+	velocity += seek(Vector3(0.0f));
 	// Limit speed
 	if (velocity.Length() > maxForce)
 	{
@@ -369,7 +370,7 @@ void Actor::flock(vector<Actor*> boids)
 	Vector3 alignmentForce = alignment(boids);
 	Vector3 cohesionForce = cohesion(boids);
 	// Arbitrarily weight these forces
-	seperationForce *= 3.0f;
+	seperationForce *= 5.0f;
 	alignmentForce *= 0.0f; // Might need to alter weights for different characteristics
 	cohesionForce *= 0.0f;
 

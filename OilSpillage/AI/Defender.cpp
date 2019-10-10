@@ -98,7 +98,6 @@ void Defender::followPath()
 		dir.Normalize();
 
 		destination = targetNode;
-		updateBoid(deltaTime);
 
 		if (position.Distance(targetNode, position) < 1)
 		{
