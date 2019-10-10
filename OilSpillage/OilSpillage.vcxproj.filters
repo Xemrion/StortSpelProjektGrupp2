@@ -144,6 +144,9 @@
     <ClCompile Include="AI\Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Particle\ParticleSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="UI\UIPlaying.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -323,6 +326,9 @@
     <ClInclude Include="AI\Node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Particle\ParticleSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="UI\UIPlaying.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -344,6 +350,11 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="ComputeLightCulling.hlsl" />
+    <FxCompile Include="Particle\ParticleGS.hlsl" />
+    <FxCompile Include="Particle\ParticleCreateCS.hlsl" />
+    <FxCompile Include="Particle\ParticlePS.hlsl" />
+    <FxCompile Include="Particle\ParticleUpdateCS.hlsl" />
+    <FxCompile Include="Particle\ParticleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

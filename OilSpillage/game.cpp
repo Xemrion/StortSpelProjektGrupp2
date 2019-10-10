@@ -80,6 +80,8 @@ void Game::run()
 			createCurrentState(); //Init the new state
 			oldState = -1;
 		}
+		//camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 500.0f, 0.0));
+		
 
 		//deltaTime reset
 		prevTime = curTime;

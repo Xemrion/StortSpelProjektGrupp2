@@ -412,6 +412,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 		{ Vector3(0.0f, 15.0f, 0.0f), Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
+	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+
+	Input::SetKeyboardPlayerID(0);
 }
 
 PlayingGameState::~PlayingGameState() {}
@@ -453,7 +456,37 @@ Void  PlayingGameState::ImGui_Driving() {
    ImGui::End();
 }
 
-Void  PlayingGameState::ImGui_ProcGen() {
+void PlayingGameState::ImGui_Particles()
+{
+	
+	ImGui::Begin("Particle");
+	ImGui::ColorPicker4("Color Slider", colors);
+	ImGui::ColorPicker4("Color 1 Slider", colors2);
+	ImGui::ColorPicker4("Color 2 Slider", colors3);
+	ImGui::ColorPicker4("Color 3 Slider", colors4);
+	ImGui::SliderFloat("First size", &size1, 0.0f, 1.0f);
+	ImGui::SliderFloat("Second size", &size2, 0.0f, 1.0f);
+	ImGui::SliderInt("Nr of particles times 8", &addNrOfParticles, 1, 10);
+	ImGui::SliderInt("LifeTime", &lifeTime, 1, 20);
+	ImGui::SliderFloat("Vectorfield size", &vectorFieldSize, 0.0f, 10.0f);
+	ImGui::SliderFloat("Vectorfield power", &vectorFieldPower, 0.0f, 10.0f);
+	ImGui::SliderFloat("Random power", &randomPosPower, 0.0f, 10.0f);
+	colorsP[0] = Vector4(colors);
+	colorsP[1] = Vector4(colors2);
+	colorsP[2] = Vector4(colors3);
+	colorsP[3] = Vector4(colors4);
+	colorsP[0].w = 1.0f;
+	colorsP[1].w = 1.0f;
+	colorsP[2].w = 1.0f;
+	colorsP[3].w = 1.0f;
+	this->graphics.setVectorField(vectorFieldSize, vectorFieldPower);
+	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+	this->graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
+
+	ImGui::End();
+}
+
+void PlayingGameState::ImGui_ProcGen() {
    ImGui::Begin("Map Generation:");
    if ( static bool firstFrame = true; firstFrame ) {
       ImGui::SetWindowPos({0,75});
@@ -578,11 +611,20 @@ Void  PlayingGameState::update(float deltaTime)
 		aiObject->update(deltaTime, player->getVehicle()->getPosition());
 		camera->update(deltaTime);
 		camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, cameraDistance, 0));
+
+		timerForParticle += deltaTime;
+		if (timerForParticle > 0.01f)
+		{
+			this->graphics.addParticle(this->player->getVehicle()->getPosition() + Vector3(0, 5, 0), 5 * Vector3(Input::GetDirectionR(0).x, 0, Input::GetDirectionR(0).y), addNrOfParticles, lifeTime, randomPosPower);
+			timerForParticle = 0;
+		}
 	}
+
+
 
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
-	graphics.render(camera.get());
+	graphics.render(camera.get(),deltaTime);
 
 	//Render UI
 	menues[MENU_PLAYING]->update(deltaTime);
@@ -599,6 +641,7 @@ Void  PlayingGameState::update(float deltaTime)
    ImGui::NewFrame();
    ImGui_Driving();
    ImGui_ProcGen();
+   ImGui_Particles();
    ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
