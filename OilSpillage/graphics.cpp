@@ -305,22 +305,35 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
 
 	shadowMap.prepare();
-	shadowMap.setViewProj(camera, Vector3(sunVector.x, sunVector.y, sunVector.z));
+	shadowMap.setViewProj(camera, Vector3(lightList->getSun().getDirection().x, lightList->getSun().getDirection().y, lightList->getSun().getDirection().z));
+	Frustum frustum = camera->getFrustum();
 	
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	for (GameObject* object : drawableObjects)
 	{
-		UINT vertexCount = object->mesh->getVertexCount();
-		UINT stride = sizeof(Vertex3D);
-		UINT offset = 0;
-		SimpleMath::Matrix world = object->getTransform();
-		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-		shadowMap.setWorld(worldTr);
-		deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-		deviceContext->Draw(vertexCount, 0);
-	}
+		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		{
+			AABB boundingBox = object->getAABB();
+			boundingBox = boundingBox.scale(object->getScale());
+			boundingBox.maxPos += object->getPosition();
+			boundingBox.minPos += object->getPosition();
 
+			if (frustum.intersect(boundingBox, 300.0f)) 
+			{
+				UINT vertexCount = object->mesh->getVertexCount();
+				UINT stride = sizeof(Vertex3D);
+				UINT offset = 0;
+				SimpleMath::Matrix world = object->getTransform();
+				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+				shadowMap.setWorld(worldTr);
+				deviceContext->PSSetShader(nullptr, nullptr, 0);
+				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+				deviceContext->Draw(vertexCount, 0);
+			}
+		}
+	}
+	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	Matrix view = camera->getViewMatrix().Transpose();
 	deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -337,6 +350,8 @@ void Graphics::render(DynamicCamera* camera)
 
 
 	//set up Shaders
+	deviceContext->RSSetViewports(1, &this->vp);
+
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDefault.ps.getShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDefault.vs.getShader(), nullptr, 0);
@@ -345,8 +360,7 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->PSSetShaderResources(1, 1, this->culledLightBufferSRV.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
-
-	Frustum frustum = camera->getFrustum();
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	for (GameObject* object : drawableObjects)
 	{

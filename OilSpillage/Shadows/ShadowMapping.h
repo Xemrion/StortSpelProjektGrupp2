@@ -30,17 +30,17 @@ private:
 	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> depthShaderResource;
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> simpleVertexShader;//only for creating the shadowmap
+	Microsoft::WRL::ComPtr<ID3D10Blob> vertexShaderBlob;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> vertexLayout;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> worldBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> perFrameCB;
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
 
-
+	DynamicCamera camera;
 	Matrix view;
 	Matrix orthoProj;
 
-	void shutdown();
 
 };
 

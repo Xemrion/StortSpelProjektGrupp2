@@ -80,7 +80,7 @@ private:
 	void updateRotationMatrix();
 	void updateViewMatrix();
 public:
-	DynamicCamera(float fovDegrees = 50.0f, float nearPlane = 1.0f, float farPlane = 1000.0f);
+	DynamicCamera(float fovDegrees = 90.0f, float nearPlane = 1.0f, float farPlane = 1000.0f);
 	DynamicCamera(Vector3 position, Vector3 rotation = Vector3(), float fovDegrees = 90.0f, float nearPlane = 1.0f, float farPlane = 1000.0f);
 	~DynamicCamera();
 

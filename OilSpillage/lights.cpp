@@ -80,3 +80,8 @@ void LightList::setSun(Sun sun)
 {
 	this->sun = sun;
 }
+
+Sun LightList::getSun()
+{
+	return this->sun;
+}

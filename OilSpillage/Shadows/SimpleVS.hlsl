@@ -9,7 +9,7 @@ cbuffer WorldMatrix : register(b1)
 }
 struct VS_IN
 {
-	float4 Pos : SV_POSITION;
+	float3 Pos : SV_POSITION;
 	float2 Tex : TEXCOORD;
 	float3 Normal : NORMAL;
 };
@@ -25,7 +25,7 @@ VS_OUT main(VS_IN input)
 {
 	VS_OUT output;
 
-	output.Pos = mul(input.Pos, worldMatrix);
+	output.Pos = mul(float4(input.Pos,1.0f), worldMatrix);
 	output.Pos = mul(output.Pos, viewProj);
 	output.Normal = input.Normal;
 	output.Tex = input.Tex;

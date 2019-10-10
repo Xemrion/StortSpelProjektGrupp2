@@ -9,7 +9,6 @@ ShadowMapping::ShadowMapping()
 
 ShadowMapping::~ShadowMapping()
 {
-	this->shutdown();
 }
 
 bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
@@ -17,46 +16,30 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	this->device = device;
 	this->deviceContext = deviceContext;
 
-	ID3DBlob* errorBlob = nullptr;
-	HRESULT result;
-	//LPCWSTR  vs = VertexShader.hlsl;
-	ID3DBlob* pVS = nullptr;
-	result = D3DCompileFromFile(
-		L"SimpleVS.hlsl", // filename vsFilename
-		nullptr,		// optional macros
-		nullptr,		// optional include files
-		"main",		// entry point
-		"vs_5_0",		// shader model (target)
-		D3DCOMPILE_DEBUG,	// shader compile options (DEBUGGING)
-		0,				// IGNORE...DEPRECATED.
-		&pVS,			// double pointer to ID3DBlob		
-		&errorBlob		// pointer for Error Blob messages.
-	);
-	// compilation failed?
-	if (FAILED(result))
-	{
-		if (errorBlob)
-		{
-			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-			//OutputShaderErrorMessage(errorBlob, hwnd, vsFilename); //able when parameter active
-			// release "reference" to errorBlob interface object
-			errorBlob->Release();
-		}
-		else
-		{
-			//MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK); //able when parameter active
-		}
-		if (pVS)
-			pVS->Release();
-		return false;
-	}
+	std::wstring shaderfolder = L"";
+#pragma region DetermineShaderPath
+	
+#ifdef _DEBUG //Debug Mode
+#ifdef _WIN64 //x64
+		shaderfolder = L"..\\x64\\Debug\\";
+#else  //x86 (Win32)
+		shaderfolder = L"..\\Debug\\";
+#endif
+#else //Release Mode
+#ifdef _WIN64 //x64
+		shaderfolder = L"..\\x64\\Release\\";
+#else  //x86 (Win32)
+		shaderfolder = L"..\\Release\\";
+#endif
+#endif
+	
 
-	device->CreateVertexShader(
-		pVS->GetBufferPointer(),
-		pVS->GetBufferSize(),
-		nullptr,
-		this->simpleVertexShader.GetAddressOf()
-	);
+
+	std::wstring filePath = shaderfolder + L"SimpleVS.cso";
+
+	HRESULT hr = D3DReadFileToBlob(filePath.c_str(), this->vertexShaderBlob.GetAddressOf());
+	hr = device->CreateVertexShader(this->vertexShaderBlob->GetBufferPointer(), this->vertexShaderBlob->GetBufferSize(), NULL, this->simpleVertexShader.GetAddressOf());
+	//hr = device->CreateInputLayout(inputDesc, numElements, this->vertexShaderBlob->GetBufferPointer(), this->vertexShaderBlob->GetBufferSize(), this->inputLayout.GetAddressOf());
 
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
 		{
@@ -93,15 +76,7 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 
 	};
 
-	//int lSize = sizeof(inputDesc) / sizeof(inputDesc[0]);
-	result = device->CreateInputLayout(inputDesc, ARRAYSIZE(inputDesc), pVS->GetBufferPointer(), pVS->GetBufferSize(), this->vertexLayout.GetAddressOf());
-
-	if (FAILED(result))
-	{
-		return false;
-	}
-	// we do not need anymore this COM object, so we release it.
-	pVS->Release();
+	
 
 	D3D11_BUFFER_DESC descB = { 0 };
 
@@ -113,13 +88,13 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	descB.ByteWidth = static_cast<UINT>(sizeof(Matrix) + (16 - (sizeof(Matrix) % 16)));
 	descB.StructureByteStride = 0;
 
-	result = device->CreateBuffer(&descB, 0, this->perFrameCB.GetAddressOf());
-	if (FAILED(result))
+	hr = device->CreateBuffer(&descB, 0, this->perFrameCB.GetAddressOf());
+	if (FAILED(hr))
 	{
 		return false;
 	}
-	result = device->CreateBuffer(&descB, 0, this->worldBuffer.GetAddressOf());
-	if (FAILED(result))
+	hr = device->CreateBuffer(&descB, 0, this->worldBuffer.GetAddressOf());
+	if (FAILED(hr))
 	{
 		return false;
 	}
@@ -181,14 +156,13 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	desc.BorderColor[3] = bColor[3];
 	desc.MinLOD = 0;
 	desc.MaxLOD = 1;
-	HRESULT hr = this->device->CreateSamplerState(&desc, this->sampler.GetAddressOf());
+	hr = this->device->CreateSamplerState(&desc, this->sampler.GetAddressOf());
 	if (FAILED(hr))
 	{
 		//MessageBox(hwnd, "Error compiling shader.  Check shader-error.txt for message.", "error", MB_OK);
 		//deal with error. Log it maybe
 
 	}
-
 	return true;
 }
 
@@ -196,8 +170,9 @@ void ShadowMapping::setWorld(const Matrix& world)
 {
 	
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	Matrix worldTemp = world;
 	HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, &world, sizeof(Matrix));
+	CopyMemory(mappedResource.pData, &worldTemp, sizeof(Matrix));
 	deviceContext->Unmap(worldBuffer.Get(), 0);
 	deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 
@@ -205,12 +180,49 @@ void ShadowMapping::setWorld(const Matrix& world)
 
 void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir)
 {
-	Vector3 pos(0, 5, 0);
-	pos += camera->getPosition();
-	view = Matrix::CreateLookAt(pos, pos + -1.0f*sunDir, Vector3(0.0f, 1.0f, 0.0f)).Transpose();
-	orthoProj = Matrix::CreateOrthographic(10.0f, 10.0f, 1.0f, 7.5f);
-	Matrix viewProj = view * orthoProj.Transpose();
+	Matrix rotationRes;
+	sunDir.Normalize();
+	float pitch = sqrt(pow(sunDir.x, 2) + pow(sunDir.y, 2)) / sunDir.z;
+	pitch = atan(pitch);
+	float yaw = sunDir.x / -sunDir.y;
+	yaw = atan(yaw);
+	yaw = sunDir.z > 0 ? yaw - (180* (DirectX::XM_PI/180)) : yaw;
+	//rotationRes = Matrix::CreateRotationZ(this->rotation.z); //Roll
+	rotationRes = Matrix::CreateRotationX(pitch); //Pitch
+	rotationRes = Matrix::CreateFromYawPitchRoll(yaw,pitch,0.0f); //Yaw
 	
+	Vector3 pos(camera->getPosition()+Vector3(-2.0f,0.0f,-2.0f));
+	//pos.y += 10.0f;
+	//pos *= -1.0f;
+	this->view = Matrix::CreateLookAt(
+		pos, //Position in world
+		pos + Vector3::Transform(Vector3(0.0f, 0.0f, -1.0f),rotationRes), //Front
+		Vector3::Transform(Vector3(0.0f, 1.0f, 0.0f), rotationRes) //Up
+		);
+	
+
+
+	
+	/*sunDir.Normalize();
+	pos *= -1.0f;
+	Matrix lightViewMatrix;
+	lightViewMatrix = Matrix::Identity;
+	
+
+	lightViewMatrix.CreateFromYawPitchRoll(pitch, new Vector3f(1, 0, 0), lightViewMatrix, lightViewMatrix);
+	Matrix4f.rotate((float)-Math.toRadians(yaw), new Vector3f(0, 1, 0), lightViewMatrix,
+		lightViewMatrix);
+	Matrix4f.translate(pos, lightViewMatrix, lightViewMatrix);*/
+	
+	
+	//pos += camera->getPosition();
+	//view = Matrix::CreateLookAt(pos, Vector3(-pos.x,0.0f,0.0f), Vector3(0.0f, 1.0f, 0.0f));
+	orthoProj = Matrix::CreateOrthographic(100.0f, 100.0f, 1.0f, 15.f);
+	float fieldOfView = 90 * (DirectX::XM_PI / 180);
+
+	//orthoProj = Matrix::CreatePerspectiveFieldOfView(fieldOfView, 16.f / 9.f, 0.1f, 100.0f);
+	Matrix viewProj = view * orthoProj;
+	viewProj = viewProj.Transpose();
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(perFrameCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
@@ -245,13 +257,3 @@ ID3D11ShaderResourceView* ShadowMapping::getShadowMap()
 	return this->depthShaderResource.Get();
 }
 
-void ShadowMapping::shutdown()
-{
-	if (this->depthShaderResource != nullptr)
-		this->depthShaderResource->Release();
-	if (this->depthStencilView != nullptr)
-		this->depthStencilView->Release();
-	if (this->depthTexture != nullptr)
-		this->depthTexture->Release();
-
-}
