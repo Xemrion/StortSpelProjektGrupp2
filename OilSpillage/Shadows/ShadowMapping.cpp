@@ -192,75 +192,57 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	return true;
 }
 
-void ShadowMapping::setWorld(const DirectX::XMMATRIX& world)
+void ShadowMapping::setWorld(const Matrix& world)
 {
-	this->worldCB.data.world = world;
-	this->worldCB.applyChanges(System::getDevice(), System::getDeviceContext());
+	
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &world, sizeof(Matrix));
+	deviceContext->Unmap(worldBuffer.Get(), 0);
+	deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
+
 }
 
-void ShadowMapping::setViewProj(DirectX::XMMATRIX view, DirectX::XMMATRIX proj, DirectX::XMFLOAT4 camPos)
+void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir)
 {
-	view = XMMatrixTranspose(view);
-	proj = XMMatrixTranspose(proj);
-	this->perFrameCB.data.proj = proj;
-	this->perFrameCB.data.view = view;
-	this->perFrameCB.data.camPos = camPos;
-	this->perFrameCB.applyChanges(System::getDevice(), System::getDeviceContext());
+	Vector3 pos(0, 5, 0);
+	pos += camera->getPosition();
+	view = Matrix::CreateLookAt(pos, pos + -1.0f*sunDir, Vector3(0.0f, 1.0f, 0.0f)).Transpose();
+	orthoProj = Matrix::CreateOrthographic(10.0f, 10.0f, 1.0f, 7.5f);
+	Matrix viewProj = view * orthoProj.Transpose();
+	
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(perFrameCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
+	deviceContext->Unmap(perFrameCB.Get(), 0);
+	deviceContext->VSSetConstantBuffers(0, 1, this->perFrameCB.GetAddressOf());
 }
 
-void ShadowMapping::setView(DirectX::XMMATRIX view)
-{
-	view = XMMatrixTranspose(view);
-	this->perFrameCB.data.view = view;
-	this->perFrameCB.applyChanges(System::getDevice(), System::getDeviceContext());
-}
 
-void ShadowMapping::setCamPosToMatricesPerFrame(DirectX::XMFLOAT3 campos)
-{
-	this->perFrameCB.data.camPos = DirectX::XMFLOAT4(campos.x, campos.y, campos.z, 1.0f);
-}
-
-void ShadowMapping::setCBuffers()
-{
-	this->setConstanbuffer(VERTEX, 0, this->perFrameCB.getBuffer());
-	this->setConstanbuffer(VERTEX, 1, this->worldCB.getBuffer());
-}
-
-void ShadowMapping::setCBViewAndProj()
-{
-	this->setConstanbuffer(VERTEX, 0, this->perFrameCB.getBuffer());
-}
-
-void ShadowMapping::prepare(DirectX::XMMATRIX& view)
+void ShadowMapping::prepare()
 {
 	ID3D11ShaderResourceView* fs = NULL;
 	Game::getGraphics().getDeviceContext()->PSSetShaderResources(4, 1, &fs);
 	Game::getGraphics().getDeviceContext()->RSSetViewports(1, &this->vp);
-	this->setShaders();
-	this->setCBuffers();
-	this->setView(view);
-	System::getDeviceContext()->ClearDepthStencilView(this->depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	
+	deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	ID3D11ShaderResourceView* s = NULL;
-	System::getDeviceContext()->PSSetShaderResources(3, 1, &s);
-	System::getDeviceContext()->OMSetRenderTargets(0, nullptr, this->depthStencilView);
+	deviceContext->PSSetShaderResources(3, 1, &s);
+	deviceContext->OMSetRenderTargets(0, nullptr, this->depthStencilView.Get());
+	deviceContext->VSSetShader(this->simpleVertexShader.Get(), nullptr, 0);
 	//System::getDeviceContext()->PSSetSamplers(0, 1, &this->sampler);
 	//System::getDeviceContext().omset
 }
 
-void ShadowMapping::setPSDepthView()
+ID3D11SamplerState* ShadowMapping::getShadowSampler()
 {
-	this->setConstanbuffer(PIXEL, 0, this->perFrameCB.getBuffer());
-	this->setConstanbuffer(PIXEL, 2, this->worldCB.getBuffer());
+	return this->sampler.Get();
 }
 
-ID3D11ShaderResourceView*& ShadowMapping::getShadowMap()
-{
-	return this->depthShaderResource;
-}
 
-void ShadowMapping::setSampler()
+ID3D11ShaderResourceView* ShadowMapping::getShadowMap()
 {
-	System::getDeviceContext()->PSSetSamplers(1, 1, &this->sampler);
+	return this->depthShaderResource.Get();
 }
 
 void ShadowMapping::shutdown()

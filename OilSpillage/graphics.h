@@ -20,7 +20,7 @@
 #include "Lights.h"
 #include <memory.h>
 #include <array>
-
+#include"Shadows/ShadowMapping.h"
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
 
@@ -71,6 +71,7 @@ class Graphics {
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
 	Debug* debugger;
+	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
 	void cullLights();

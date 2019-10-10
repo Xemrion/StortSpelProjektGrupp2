@@ -2,7 +2,9 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
+#include<SimpleMath.h>
 #include<wrl/client.h>
+#include"..///DynamicCamera.h"
 class ShadowMapping
 {
 public:
@@ -10,18 +12,12 @@ public:
 	virtual~ShadowMapping();
 
 	bool initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
-	void setWorld(const DirectX::XMMATRIX& world);
-	void setViewProj(DirectX::XMMATRIX view, DirectX::XMMATRIX proj, DirectX::XMFLOAT4 camPos);
-	void setView(DirectX::XMMATRIX view);
+	void setWorld(const Matrix& world);
+	void setViewProj(DynamicCamera* camera, Vector3 sunDir);
 	//uses the rendershader in Shader
-	void setCamPosToMatricesPerFrame(DirectX::XMFLOAT3 campos);
-	void setCBuffers();
-	void setCBViewAndProj();
-	void prepare(DirectX::XMMATRIX& view);
-
-	void setPSDepthView();
-	ID3D11ShaderResourceView*& getShadowMap();
-	void setSampler();
+	void prepare();
+	ID3D11SamplerState* getShadowSampler();
+	ID3D11ShaderResourceView* getShadowMap();
 private:
 
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
@@ -39,6 +35,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> perFrameCB;
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
+
+
+	Matrix view;
+	Matrix orthoProj;
 
 	void shutdown();
 

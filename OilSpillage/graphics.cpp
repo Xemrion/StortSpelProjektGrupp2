@@ -266,6 +266,7 @@ bool Graphics::init(Window* window)
 
 	this->device->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(debug.GetAddressOf()));
 
+	this->shadowMap.initialize(device.Get(), deviceContext.Get());
 
 	createShaders();
 #ifdef _DEBUG
@@ -301,6 +302,24 @@ void Graphics::render(DynamicCamera* camera)
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
+
+	shadowMap.prepare();
+	shadowMap.setViewProj(camera, Vector3(sunVector.x, sunVector.y, sunVector.z));
+	
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	for (GameObject* object : drawableObjects)
+	{
+		UINT vertexCount = object->mesh->getVertexCount();
+		UINT stride = sizeof(Vertex3D);
+		UINT offset = 0;
+		SimpleMath::Matrix world = object->getTransform();
+		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+		shadowMap.setWorld(worldTr);
+		deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+		deviceContext->Draw(vertexCount, 0);
+	}
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	Matrix view = camera->getViewMatrix().Transpose();
