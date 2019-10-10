@@ -2,7 +2,7 @@
 #include "../Input.h"
 #include "../Sound.h"
 #include "../UI/UIPlaying.h"
-//#include "../UI/UIPaused.h"
+#include "../UI/UIPaused.h"
 #include "../UI/UIOptions.h"
 
 V2u PlayingGameState::generateMap( Config const &config ) {
@@ -325,33 +325,28 @@ Void PlayingGameState::initiateAStar() {
 	; //this->aStar.setMap(*map); // TODO
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(0.0f), currentMenu(0) {}
-
-PlayingGameState::~PlayingGameState() {}
-
-void PlayingGameState::init() {
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
+{
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
-	//menues[MENU_PAUSED] = std::make_unique<UIPaused>();
-	//menues[MENU_PAUSED]->init();
+	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
+	menues[MENU_PAUSED]->init();
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_OPTIONS]->init();
 
-	currentMenu = MENU_PLAYING;
-
 	lightList = std::make_unique<LightList>();
-	player    = std::make_unique<Vehicle>();
-	camera    = std::make_unique<DynamicCamera>();
+	player = std::make_unique<Vehicle>();
+	camera = std::make_unique<DynamicCamera>();
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
-	aStar = std::make_unique<AStar>( 20, 20, Vector2(-10, 10) );
+	aStar = std::make_unique<AStar>(20, 20, Vector2(-10, 10));
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
 	graphics.loadModel("Dummy_Roller_Melee");
 
-	aiObject       = std::make_unique<Actor>();
+	aiObject = std::make_unique<Actor>();
 	aiObject->mesh = graphics.getMeshPointer("Cube");
 	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	aiObject->setAStar(aStar.get());
@@ -367,28 +362,28 @@ void PlayingGameState::init() {
 
 #ifdef _DEBUG
 	// light tests
-	lightList->addLight(SpotLight(Vector3(-2.f,  1.0f,  0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f,  0.0f), 0.5));
-	lightList->addLight(SpotLight(Vector3( 2.f,  1.0f,  0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3( 2.f, -1.0f,  0.0f), 0.5));
-	lightList->addLight(SpotLight(Vector3( 0.f,  1.0f,  2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3( 0.f, -1.0f,  2.0f), 0.5));
-	lightList->addLight(SpotLight(Vector3( 0.f,  1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3( 0.f, -1.0f, -2.0f), 0.5));
-   
-   /*
-	//Road Network Turtlewalker
-	testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-	testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-	testNetwork.get()->setAngle(45);
-	for (int i = 0; i < 5; i++) {
-		testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
-		testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	}
-	testNetwork.get()->cleanRoadNetwork();
-	testNetwork.get()->saveTestNetwork("test-network");
-   */
+	lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
+	lightList->addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
+	lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
+	lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+
+	/*
+	 //Road Network Turtlewalker
+	 testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
+	 testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+	 testNetwork.get()->setAngle(45);
+	 for (int i = 0; i < 5; i++) {
+		 testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
+		 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+	 }
+	 testNetwork.get()->cleanRoadNetwork();
+	 testNetwork.get()->saveTestNetwork("test-network");
+	*/
 
 	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
 	for (int i = 0; i < 50; ++i) {
-		Vector3 randPos   = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
+		Vector3 randPos = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand() / RAND_MAX));
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
@@ -423,30 +418,12 @@ void PlayingGameState::init() {
          Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
-
-	time = 125.0f;
+	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 
 	Input::SetKeyboardPlayerID(0);
 }
 
-void PlayingGameState::cleanUp() {
-   this->map.reset();
-	this->aiObject.reset();
-	this->districtMarkers.clear();
-	this->roadTiles.clear();
-	this->houseTiles.clear();
-	this->lightList.reset();
-	this->player.reset();
-	this->districtMap.reset();
-	this->camera.reset();
-	this->points.clear();
-	this->testNetwork.reset();
-
-	for (int i = 0; i < MENUCOUNT; i++)
-	{
-		this->menues[i].reset();
-	}
-}
+PlayingGameState::~PlayingGameState() {}
 
 Void  PlayingGameState::ImGui_Driving() {
 	ImGui::Begin("OilSpillage");
@@ -485,7 +462,37 @@ Void  PlayingGameState::ImGui_Driving() {
    ImGui::End();
 }
 
-Void  PlayingGameState::ImGui_ProcGen() {
+void PlayingGameState::ImGui_Particles()
+{
+	
+	ImGui::Begin("Particle");
+	ImGui::ColorPicker4("Color Slider", colors);
+	ImGui::ColorPicker4("Color 1 Slider", colors2);
+	ImGui::ColorPicker4("Color 2 Slider", colors3);
+	ImGui::ColorPicker4("Color 3 Slider", colors4);
+	ImGui::SliderFloat("First size", &size1, 0.0f, 1.0f);
+	ImGui::SliderFloat("Second size", &size2, 0.0f, 1.0f);
+	ImGui::SliderInt("Nr of particles times 8", &addNrOfParticles, 1, 10);
+	ImGui::SliderInt("LifeTime", &lifeTime, 1, 20);
+	ImGui::SliderFloat("Vectorfield size", &vectorFieldSize, 0.0f, 10.0f);
+	ImGui::SliderFloat("Vectorfield power", &vectorFieldPower, 0.0f, 10.0f);
+	ImGui::SliderFloat("Random power", &randomPosPower, 0.0f, 10.0f);
+	colorsP[0] = Vector4(colors);
+	colorsP[1] = Vector4(colors2);
+	colorsP[2] = Vector4(colors3);
+	colorsP[3] = Vector4(colors4);
+	colorsP[0].w = 1.0f;
+	colorsP[1].w = 1.0f;
+	colorsP[2].w = 1.0f;
+	colorsP[3].w = 1.0f;
+	this->graphics.setVectorField(vectorFieldSize, vectorFieldPower);
+	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+	this->graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
+
+	ImGui::End();
+}
+
+void PlayingGameState::ImGui_ProcGen() {
    ImGui::Begin("Map Generation:");
    if ( static bool firstFrame = true; firstFrame ) {
       ImGui::SetWindowPos({0,75});
@@ -592,30 +599,48 @@ Void  PlayingGameState::ImGui_Camera() {
 Void  PlayingGameState::update(float deltaTime)
 {
    /*-------------------------UPDATING-------------------------*/
-	if (Input::IsKeyDown_DEBUG(Keyboard::E)) {
-		deltaTime /= 4;
+	if (currentMenu == PlayingGameState::MENU_PLAYING)
+	{
+		if (Input::IsKeyDown_DEBUG(Keyboard::E)) {
+			deltaTime /= 4;
+		}
+
+		if (time > 0.0f)
+			time = max(time - deltaTime, 0.0f);
+
+		player->update(deltaTime);
+
+		Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
+		Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);
+		spotlightPos += spotlightDir * 1;
+		playerLight->setDirection(spotlightDir);
+		playerLight->setPos(spotlightPos);
+
+		aiObject->update(deltaTime, player->getVehicle()->getPosition());
+		camera->update(deltaTime);
+		camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, cameraDistance, 0));
+
+		timerForParticle += deltaTime;
+		if (timerForParticle > 0.01f)
+		{
+			this->graphics.addParticle(this->player->getVehicle()->getPosition() + Vector3(0, 5, 0), 5 * Vector3(Input::GetDirectionR(0).x, 0, Input::GetDirectionR(0).y), addNrOfParticles, lifeTime, randomPosPower);
+			timerForParticle = 0;
+		}
 	}
 
-	if (time > 0.0f)
-		time = max(time - deltaTime, 0.0f);
 
-	player->update(deltaTime);
-
-	Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
-	Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);
-	spotlightPos += spotlightDir * 1;
-	playerLight->setDirection(spotlightDir);
-	playerLight->setPos(spotlightPos);
-
-	aiObject->update(deltaTime,player->getVehicle()->getPosition());
-	camera->update(deltaTime);
-	camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, cameraDistance, 0));
 
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
-	graphics.render(camera.get());
+	graphics.render(camera.get(),deltaTime);
+
 	//Render UI
-	menues[currentMenu]->update(deltaTime);
+	menues[MENU_PLAYING]->update(deltaTime);
+	if (currentMenu != MENU_PLAYING)
+		menues[currentMenu]->update(deltaTime);
+	else if (Input::CheckButton(MENU, PRESSED, 0))
+		this->setCurrentMenu(PlayingGameState::MENU_PAUSED);
+
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 #ifdef _DEBUG
@@ -624,6 +649,7 @@ Void  PlayingGameState::update(float deltaTime)
    ImGui::NewFrame();
    ImGui_Driving();
    ImGui_ProcGen();
+   ImGui_Particles();
    ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

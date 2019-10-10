@@ -38,35 +38,70 @@ public:
    Vehicle     *getPlayer() const;
 
 private:
-   std::unique_ptr<UserInterface>  menues[MENUCOUNT];
-   int                             currentMenu;
-   bool                            isUsingManhattanDistance = true;
-   float                           cameraDistance = 25;
-   float                           time;
+	friend class Game;
+	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
+	int                             currentMenu;
+	bool                            isUsingManhattanDistance = true;
+	float                           cameraDistance = 25;
+	float                           time;
+	Config                          config;
    Vector3                         startPos;
-   Config                          config;
-   Graphics                       &graphics;
-   std::unique_ptr<Map>            map;
-   std::unique_ptr<Actor>          aiObject;
-   std::vector<GameObject>         districtMarkers;
-   std::vector<GameObject>         roadTiles;
-   std::vector<GameObject>         houseTiles;
-   std::unique_ptr<LightList>      lightList;
-   std::unique_ptr<Vehicle>        player;
-   std::unique_ptr<Voronoi>        districtMap;
-   std::unique_ptr<DynamicCamera>  camera;
-   std::vector<CinematicPos>       points;
-   SpotLight                      *playerLight = nullptr;
-   std::unique_ptr<RoadNetwork>    testNetwork;
-   std::unique_ptr<AStar>          aStar;
+	Graphics                       &graphics;
+	std::unique_ptr<Map>            map;
+	std::unique_ptr<Actor>          aiObject;
+	std::vector<GameObject>         districtMarkers;
+	std::vector<GameObject>         roadTiles;
+	std::vector<GameObject>         houseTiles;
+	std::unique_ptr<LightList>      lightList;
+	std::unique_ptr<Vehicle>        player;
+	std::unique_ptr<Voronoi>        districtMap;
+	std::unique_ptr<DynamicCamera>  camera;
+	std::vector<CinematicPos>       points;
+	SpotLight                      *playerLight = nullptr;
+	std::unique_ptr<RoadNetwork>    testNetwork;
+	//Particles config
+	Vector4 colorsP[4] =
+	{
+		Vector4(1.0f,1.0f,0.0f,1.0f),
+		Vector4(1.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.1f,0.1f,0.1f,1.0f)
+	};
+	float colors[4];
+	float colors2[4];
+	float colors3[4];
+	float colors4[4];
+	float size1 = 0.02f;
+	float size2 = 0.025f;
+	int addNrOfParticles = 2;
+	int lifeTime = 2;
+	float timerForParticle = 0.0f;
+	float vectorFieldPower = 1.0f;
+	float vectorFieldSize = 1.0f;
+	float randomPosPower = 1.0f;
 
-   V2u            generateMap( Config const & );
    void           generateBuildings( Config const &, RNG & );
-   V2u            generateRoadPosition( Config const &, Map const &, RNG & ) const noexcept;
    void           ImGui_ProcGen();
    void           ImGui_Driving();
-   void           ImGui_Camera();
+   void           ImGui_Particles();
    Opt<Vec<V2u>>  find_valid_house_lot( RNG &, U16 cell_id, Voronoi const &district_map, Map &, Vec<District> const &district_tbl );
-   void           setDistrictColors(bool useColorCoding) noexcept;
+   void           toggleDistrictColors() noexcept;
    void           initiateAStar();
+   std::unique_ptr<AStar>          aStar;
+
+	V2u				generateMap( Config const & );
+	V2u				generateRoadPosition(Config const& config, Map const& map, RNG& rng) const noexcept;
+	void			ImGui_Camera();
+	void			setDistrictColors(bool useColorCoding) noexcept;
+
+public:
+					PlayingGameState();
+	virtual        ~PlayingGameState();
+	void			update(float deltaTime);
+	const float	   &getTimeRef() const noexcept;
+	float			getTime() const noexcept;
+	void			setTime(float time) noexcept;
+	void			changeTime(float timeDiff) noexcept;
+	void			setCurrentMenu(Menu menu);
+	Vehicle		   *getPlayer() const;
 };

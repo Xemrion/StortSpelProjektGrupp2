@@ -3,15 +3,7 @@
 #include "../UI/UIOptions.h"
 #include "../UI/UICredits.h"
 
-MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(0)
-{
-}
-
-MenuGameState::~MenuGameState()
-{
-}
-
-void MenuGameState::init()
+MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU_MAIN)
 {
 	this->menues[MENU_MAIN] = std::make_unique<UIMainMenu>();
 	this->menues[MENU_MAIN]->init();
@@ -19,17 +11,9 @@ void MenuGameState::init()
 	this->menues[MENU_OPTIONS]->init();
 	this->menues[MENU_CREDITS] = std::make_unique<UICredits>();
 	this->menues[MENU_CREDITS]->init();
-
-	this->currentMenu = MENU_MAIN;
 }
 
-void MenuGameState::cleanUp()
-{
-	for (int i = 0; i < MENUCOUNT; i++)
-	{
-		this->menues[i].reset();
-	}
-}
+MenuGameState::~MenuGameState() {}
 
 void MenuGameState::update(float deltaTime)
 {

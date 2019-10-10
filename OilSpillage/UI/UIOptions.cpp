@@ -2,6 +2,7 @@
 #include "..//Input.h"
 #include "..//game.h"
 #include "..//States/MenuGameState.h"
+#include "..//States/PlayingGameState.h"
 
 void UIOptions::updateUI(float deltaTime)
 {
@@ -11,7 +12,21 @@ void UIOptions::updateUI(float deltaTime)
 	{
 		if (this->selected == this->buttonBack.get())
 		{
-			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(MenuGameState::MENU_MAIN);
+			MenuGameState* state = dynamic_cast<MenuGameState*>(Game::getCurrentState());
+
+			if (state)
+			{
+				state->setCurrentMenu(MenuGameState::MENU_MAIN);
+			}
+			else
+			{
+				PlayingGameState* state2 = dynamic_cast<PlayingGameState*>(Game::getCurrentState());
+
+				if (state2)
+				{
+					state2->setCurrentMenu(PlayingGameState::MENU_PAUSED);
+				}
+			}
 		}
 		else if (this->selected == this->checkBoxTest.get())
 		{
@@ -26,6 +41,24 @@ void UIOptions::updateUI(float deltaTime)
 			else
 			{
 				this->sliderTest->setAmount(this->sliderTest->getAmount() + 0.1f);
+			}
+		}
+	}
+	else if (Input::CheckButton(CANCEL, PRESSED, 0))
+	{
+		MenuGameState* state = dynamic_cast<MenuGameState*>(Game::getCurrentState());
+
+		if (state)
+		{
+			state->setCurrentMenu(MenuGameState::MENU_MAIN);
+		}
+		else
+		{
+			PlayingGameState* state2 = dynamic_cast<PlayingGameState*>(Game::getCurrentState());
+
+			if (state2)
+			{
+				state2->setCurrentMenu(PlayingGameState::MENU_PAUSED);
 			}
 		}
 	}
