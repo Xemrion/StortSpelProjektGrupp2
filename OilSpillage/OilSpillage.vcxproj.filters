@@ -153,6 +153,15 @@
     <ClCompile Include="UI\UIPaused.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PG\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PG\MinimapTextureGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PG\MapConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -284,9 +293,6 @@
     <ClInclude Include="PG\Voronoi.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PG\config.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Road Network\RoadNet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -333,6 +339,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\UIPaused.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="STB\stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\MinimapTextureGenerator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\MapConfig.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

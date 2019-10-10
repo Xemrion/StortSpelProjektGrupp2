@@ -110,7 +110,7 @@ Size Voronoi::compute_cell_real_estate_area( U16 const cell_id, Map const &map )
    for ( U16  y = cell.min.y * CELL_SIZE, y_end = (cell.max.y+1) * CELL_SIZE;  y < y_end;  ++y )
       for ( U16  x = cell.min.x * CELL_SIZE, x_end = (cell.max.x+1) * CELL_SIZE;  x < x_end;  ++x )
             if ( (diagram[diagram_index(x,y)] == cell_id)
-            and (map.data[map.index(x,y)] == Tile::ground) )
+            and (map.getTileAt(x,y) == Tile::ground) )
                ++counter;
 
    return counter;

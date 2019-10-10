@@ -3,25 +3,25 @@
 #include <cassert>
 #include "defs.hpp"
 
-enum class Dir : U8 { north, east, south, west };
+enum class Direction : U8 { north, east, south, west };
 
-constexpr Dir turn_left(Dir d) noexcept {
-	if      ( d == Dir::east  )  return Dir::north;
-	else if ( d == Dir::north )  return Dir::west;
-	else if ( d == Dir::south )  return Dir::east;
-	else   /* d == Dir::west */  return Dir::south;
+constexpr Direction turnLeft(Direction d) noexcept {
+	if      ( d == Direction::east  )  return Direction::north;
+	else if ( d == Direction::north )  return Direction::west;
+	else if ( d == Direction::south )  return Direction::east;
+	else   /* d == Dir::west */  return Direction::south;
 }
 
-constexpr Dir turn_right(Dir d) noexcept {
-	if      ( d == Dir::east  )  return Dir::south;
-	else if ( d == Dir::north )  return Dir::east;
-	else if ( d == Dir::south )  return Dir::west;
-	else   /* d == Dir::west */  return Dir::north;
+constexpr Direction turnRight(Direction d) noexcept {
+	if      ( d == Direction::east  )  return Direction::south;
+	else if ( d == Direction::north )  return Direction::east;
+	else if ( d == Direction::south )  return Direction::west;
+	else   /* d == Dir::west */  return Direction::north;
 }
 
-constexpr Dir turn_around(Dir d) noexcept {
-	if      ( d == Dir::east  )  return Dir::west;
-	else if ( d == Dir::north )  return Dir::south;
-	else if ( d == Dir::south )  return Dir::north;
-	else   /* d == Dir::west */  return Dir::east;
+constexpr Direction turn_around(Direction d) noexcept {
+	if      ( d == Direction::east  )  return Direction::west;
+	else if ( d == Direction::north )  return Direction::south;
+	else if ( d == Direction::south )  return Direction::north;
+	else   /* d == Dir::west */  return Direction::east;
 }

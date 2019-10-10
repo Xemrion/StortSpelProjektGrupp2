@@ -1,16 +1,23 @@
 ﻿#include "Map.hpp"
 
+Map::Map( MapConfig const &config ):
+   config ( config ),
+   width  ( static_cast<Size>(config.dimensions.y) ),
+   height ( static_cast<Size>(config.dimensions.x) ),
+	data   ( Vec<Tile>( width * height, Tile::ground ) )
+{}
+
 // x = current X (may be mutated if successful)
 // y = current Y (may be mutated if successful)
 // d = direction to walk
 // returns true if successful
-bool Map::walk(U16& x, U16& y, Dir d, Tile tile) {
+bool Map::walk(U16& x, U16& y, Direction d, Tile tile) {
 	U16  _x = x, _y = y;
 	switch (d) {
-		case Dir::north: --_y; break;
-		case Dir::east:  ++_x; break;
-		case Dir::south: ++_y; break;
-		case Dir::west:  --_x; break;
+		case Direction::north: --_y; break;
+		case Direction::east:  ++_x; break;
+		case Direction::south: ++_y; break;
+		case Direction::west:  --_x; break;
 	}
 
 	if (_x >= width or _y >= height)
@@ -27,38 +34,38 @@ bool Map::walk(U16& x, U16& y, Dir d, Tile tile) {
 	}
 }
 
-Vec<GameObject> Map::load_as_models(Graphics& graphics) const {
+Vec<GameObject> Map::loadAsModels(Graphics& graphics) const {
 	auto const to_reserve = width * height;
 	Vec<GameObject> tiles( to_reserve );
 	for (U16 y = 0; y < height; ++y) {
 		for (U16 x = 0; x < width; ++x) {
 			auto const  tile_i = index(x, y);
 			auto       &tile   = tiles[tile_i];
-			auto const  gfx_i  = gfx_tbl_idx(x, y);
-			auto const &[modelName, rotation] = gfx_tbl[gfx_i];
+			auto const  gfx_i  = getTileLookupIndex(x, y);
+			auto const &[modelName, rotation] = tileGraphicsTable[gfx_i];
 			tile.mesh    = graphics.getMeshPointer( modelName.c_str() );
          tile.setTexture( graphics.getTexturePointer(modelName.c_str(),true) );
 			if ( rotation != 0 )
 				tile.setRotation({ 0.0f, float(rotation) * 3.1415926535f/180.0f, 0.0f });
-			tile.setPosition( tile_xy_to_world_pos(x,y) );
+			tile.setPosition( convertTilePositionToWorldPosition(x,y) );
 		}
 	}
 	return tiles; // RVO/Copy Elision
 }
 
-Bool Map::neighbour_is_road(Dir dir, U16 x, U16 y) const noexcept {
-	assert( dir == Dir::north or dir == Dir::east
-	     or dir == Dir::south or dir == Dir::west );
+Bool Map::neighbourIsRoad(Direction dir, U16 x, U16 y) const noexcept {
+	assert( dir == Direction::north or dir == Direction::east
+	     or dir == Direction::south or dir == Direction::west );
 
-	if      ( dir == Dir::north)      y--;
-	else if ( dir == Dir::east)       x++;
-	else if ( dir == Dir::south)      y++;
+	if      ( dir == Direction::north)      y--;
+	else if ( dir == Direction::east)       x++;
+	else if ( dir == Direction::south)      y++;
 	else /* ( dir == Dir::west  )  */ x--;
 
-	return !in_bounds(x, y) or (data[index(x, y)] != Tile::ground);
+	return !isInBounds(x, y) or (data[index(x, y)] != Tile::ground);
 }
 
-Bool Map::is_road(U16 x, U16 y) const noexcept {
+Bool Map::isRoad(U16 x, U16 y) const noexcept {
 	return data[index(x, y)] != Tile::ground; // TODO: revamp if new tiles are addedd!
 }
 
@@ -72,11 +79,11 @@ std::ostream& operator<< (std::ostream& out, Map const& map) {
 			//*[@DEPRECATED]*/  out << ' ' << map.data[map.index(x,y)];
 			
 #ifdef NO_TERMINAL_COLORS
-			out << map.term_clr_tbl[map.term_clr_tbl_idx(x, y)]
-				<< map.term_gfx_tbl[map.term_gfx_tbl_idx(x, y)]
-				<< map.term_clr_def;
+         out << map.tileTerminalColorTable[    map.getTileColorLookupIndex( x, y )]
+             << map.tileTerminalGraphicsTable[ map.getTileLookupIndex(      x, y )]
+             << map.terminalColorDefault;
 #else
-			out << map.term_gfx_tbl[map.term_gfx_tbl_idx(x, y)];
+			out << map.tileTerminalGraphicsTable[ map.getTileLookupIndex( x, y ) ];
 #endif
 		}
 
@@ -85,38 +92,38 @@ std::ostream& operator<< (std::ostream& out, Map const& map) {
 	return out;
 }
 
-Vec<V2u> Map::get_neighbour_tile_coords( V2u cell_coord ) const noexcept {
-   Vec<V2u>  neighbours {};
-   neighbours.reserve(8);
+Vec<V2u> Map::getNeighbouringTilePositions( V2u cellPosition ) const noexcept {
+   Vec<V2u>  neighbouringTilePositions {};
+   neighbouringTilePositions.reserve(8);
 
    // check if any of the neighbouring tile coords are tiles within map bounds:
-   Bool const  w_border = (cell_coord.x == 0),
-               e_border = (cell_coord.x == width  - 1),
-               n_border = (cell_coord.y == 0),
-               s_border = (cell_coord.y == height - 1);
-   if ( !n_border ) {  // N
-      neighbours.emplace_back(    cell_coord.x,   cell_coord.y-1 );
-      if ( !w_border ) // NW
-         neighbours.emplace_back( cell_coord.x-1, cell_coord.y-1 );
-      if ( !e_border ) // NE 
-         neighbours.emplace_back( cell_coord.x+1, cell_coord.y-1 );
+   Bool const  isBorderingWest  = ( cellPosition.x ==          0 ),
+               isBorderingEast  = ( cellPosition.x == width  - 1 ),
+               isBorderingNorth = ( cellPosition.y ==          0 ),
+               isBorderingSouth = ( cellPosition.y == height - 1 );
+   if ( not isBorderingNorth ) {  // N
+      neighbouringTilePositions.emplace_back(    cellPosition.x,   cellPosition.y-1 );
+      if ( not isBorderingWest ) // NW
+         neighbouringTilePositions.emplace_back( cellPosition.x-1, cellPosition.y-1 );
+      if ( not isBorderingEast ) // NE 
+         neighbouringTilePositions.emplace_back( cellPosition.x+1, cellPosition.y-1 );
    }
-   if ( !s_border ) {  // S
-      neighbours.emplace_back(    cell_coord.x,   cell_coord.y+1 );
-      if ( !w_border ) // SW
-         neighbours.emplace_back( cell_coord.x-1, cell_coord.y+1 );
-      if ( !e_border ) // SE 
-         neighbours.emplace_back( cell_coord.x+1, cell_coord.y+1 );
+   if ( not isBorderingSouth ) {  // S
+      neighbouringTilePositions.emplace_back(    cellPosition.x,   cellPosition.y+1 );
+      if ( not isBorderingWest ) // SW
+         neighbouringTilePositions.emplace_back( cellPosition.x-1, cellPosition.y+1 );
+      if ( not isBorderingEast ) // SE 
+         neighbouringTilePositions.emplace_back( cellPosition.x+1, cellPosition.y+1 );
    }
-   if ( !w_border )    // W
-      neighbours.emplace_back(    cell_coord.x-1, cell_coord.y );
-   if ( !e_border )    // E
-      neighbours.emplace_back(    cell_coord.x+1, cell_coord.y );
-   return neighbours;
+   if ( not isBorderingWest )    // W
+      neighbouringTilePositions.emplace_back(    cellPosition.x-1, cellPosition.y );
+   if ( not isBorderingEast )    // E
+      neighbouringTilePositions.emplace_back(    cellPosition.x+1, cellPosition.y );
+   return neighbouringTilePositions;
 }
 
 // TODO: rotate bend mesh 180 degrees and update values in table to their proper value
-Vec<Map::TileEntry> const Map::gfx_tbl = {
+Vec<Map::TileEntry> const Map::tileGraphicsTable = {
 	// idx   WSEN      filename          rot      type                  rotation
 	/*   0   0000 */  {"Roads/Road_pavement",        0}, // no road,                 0 deg
 	/*   1   0001 */  {"Roads/Road_deadend",         0}, // deadend (south),         0 deg
@@ -137,8 +144,8 @@ Vec<Map::TileEntry> const Map::gfx_tbl = {
 };
 
 // Used with a cellular automata to beautify the terminal output.
-Vec<Str> const Map::term_gfx_tbl = {
-	// idx   WSEN     Char      type                  rotation
+Vec<Str> const Map::tileTerminalGraphicsTable = {
+	// idx   WSEN     getTerminalColorLookupIndex      type                  rotation
 	/*   0   0000 */  u8".", // no road,                 0 deg
 	/*   1   0001 */  u8"╹", // deadend (south),         0 deg
 	/*   2   0010 */  u8"╺", // deadend (west),         90 deg
@@ -158,7 +165,7 @@ Vec<Str> const Map::term_gfx_tbl = {
 };
 
 // Used to color code tiles (for terminal output)
-Vec<Str> const Map::term_clr_tbl = {
+Vec<Str> const Map::tileTerminalColorTable = {
 	/* ground */    "\033[38;5;150m",
 	/* road0  */    "\033[38;5;255m",
 	/* road1  */    "\033[38;5;249m",

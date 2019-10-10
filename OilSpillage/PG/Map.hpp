@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cassert>
 #include "defs.hpp"
-#include "config.hpp"
+#include "MapConfig.hpp"
 #include "utils.hpp"
 #include "Tile.hpp"
 #include "Direction.hpp"
@@ -15,93 +15,87 @@ class Map {
 public:
    Size const width, height;
 
-   Config const config;
-	Vec<Tile>  data;
+   MapConfig const config;
+	Vec<Tile> data;
 
-	Map( Config const &config ) :
-      config ( config ),
-      width  ( static_cast<Size>(config.map_dimensions.y) ),
-      height ( static_cast<Size>(config.map_dimensions.x) ),
-		data   ( Vec<Tile>( width * height, Tile::ground ) )
-	{}
+	Map( MapConfig const & );
 
 	// x = current X (may be mutated if successful)
 	// y = current Y (may be mutated if successful)
 	// d = direction to walk
 	// returns true if successful
-	Bool walk(U16& x, U16& y, Dir d, Tile tile);
+	Bool walk(U16 &tileX, U16 &tileY, Direction, Tile);
 
 	// stream outputter friend declaration
 	friend std::ostream& operator<< (std::ostream&, Map const&);
 
 	// look-up table used with a cellular automata to convert the map data to 3D tiles.
-	struct TileEntry   { Str filename = "N/A";   I32 rotation = -1; };
+	struct TileEntry { Str filename = "N/A";  I32 rotation = -1; };
 
-	static Vec<TileEntry> const gfx_tbl;
+	static Vec<TileEntry> const tileGraphicsTable;
 
 	// returns the proper look-up index for the tile @ x,y in the graphics table
-	inline Size gfx_tbl_idx(U16 x, U16 y) const noexcept {
-		return data[index(x, y)] == Tile::ground ? 0 : // else:
-		    ( (neighbour_is_road(Dir::north, x, y) ? cPow(2,0) : 0)
-			 + (neighbour_is_road(Dir::east,  x, y) ? cPow(2,1) : 0)
-			 + (neighbour_is_road(Dir::south, x, y) ? cPow(2,2) : 0)
-			 + (neighbour_is_road(Dir::west,  x, y) ? cPow(2,3) : 0) );
+	inline Size getTileLookupIndex(U16 tileX, U16 tileY) const noexcept {
+		return data[index(tileX, tileY)] == Tile::ground ? 0 : // else:
+		    ( (neighbourIsRoad(Direction::north, tileX, tileY) ? cPow<Size>(2,0) : 0)
+			 + (neighbourIsRoad(Direction::east,  tileX, tileY) ? cPow<Size>(2,1) : 0)
+			 + (neighbourIsRoad(Direction::south, tileX, tileY) ? cPow<Size>(2,2) : 0)
+			 + (neighbourIsRoad(Direction::west,  tileX, tileY) ? cPow<Size>(2,3) : 0) );
 	}
 
 	// Used with a cellular automata to beautify the terminal output.
-	static Vec<Str> const term_gfx_tbl;
+	static Vec<Str> const tileTerminalGraphicsTable;
 
 	// Used to color code tiles (for terminal output)
-	static Vec<Str> const term_clr_tbl;
+	static Vec<Str> const tileTerminalColorTable;
 
-	static Char constexpr term_clr_def[6] = "\033[0m"; // default colour resetter
+	static char constexpr terminalColorDefault[6] = "\033[0m"; // default colour resetter
 
-	inline Size term_clr_tbl_idx(U16 x, U16 y) const noexcept {
-		return static_cast<Size>(data[index(x, y)]);
+	inline Size getTileColorLookupIndex(U16 tileX, U16 tileY) const noexcept {
+		return static_cast<Size>(data[index(tileX, tileY)]);
 	}
 
-	// returns the proper look-up index for the tile @ x,y in the graphics table
-	inline Size term_gfx_tbl_idx(U16 x, U16 y) const noexcept {
-		return data[index(x, y)] == Tile::ground ? 0 : // else:
-			  (neighbour_is_road(Dir::north, x, y) ? cPow(2,0) : 0)
-			+ (neighbour_is_road(Dir::east,  x, y) ? cPow(2,1) : 0)
-			+ (neighbour_is_road(Dir::south, x, y) ? cPow(2,2) : 0)
-			+ (neighbour_is_road(Dir::west,  x, y) ? cPow(2,3) : 0);
-	}
-
-	Vec<GameObject> load_as_models(Graphics& graphics) const;
+	Vec<GameObject> loadAsModels(Graphics&) const;
 
 	// NOTE! pretends that all out-of-bounds tiles are roads
-	Bool neighbour_is_road(Dir dir, U16 x, U16 y) const noexcept;
+	Bool neighbourIsRoad(Direction, U16 tileX, U16 tileY) const noexcept;
 
-	Bool is_road(U16 x, U16 y) const noexcept;
+	Bool isRoad(U16 tileX, U16 tileY) const noexcept;
 
 	// convert an in-bounds 2D coordinate index (x,y) into an 1D index (i)
-	inline Size index(U16 x, U16 y) const noexcept {
-		return static_cast<Size>(x) * width + static_cast<Size>(y);
+	inline Size index(U16 tileX, U16 tileY) const noexcept {
+		return static_cast<Size>(tileX) * width + static_cast<Size>(tileY);
 	}
 
 	// returns true if the x,y coordinate is in-bounds
-	inline Bool in_bounds(U16 x, U16 y) const noexcept {
-		return x < width and y < height;
+	inline Bool isInBounds(U16 tileX, U16 tileY) const noexcept {
+		return tileX < width and tileY < height;
 	}
 
-	inline Vector3 tile_xy_to_world_pos(U16 const x, U16 const y) const {
-		static auto const x_offset = width  / 2.0f * config.tile_scale.x,
-			               y_offset = height / 2.0f * config.tile_scale.y;
-		return { x * config.tile_scale.x - x_offset,  .0f,  y * -config.tile_scale.y + y_offset };
+	inline Vector3 convertTilePositionToWorldPosition(U16 const tileX, U16 const tileY) const {
+		static auto const x_offset = width  / 2.0f * config.tileScaleFactor.x,
+			               y_offset = height / 2.0f * config.tileScaleFactor.y;
+		return { tileX * config.tileScaleFactor.x - x_offset, 
+               .0f,
+               tileY * -config.tileScaleFactor.y + y_offset };
 	}
 
-   inline V2u world_pos_to_tile_xy( Vector3 const &world_pos ) const {
-      static auto const x_offset = width  / 2.0f * config.tile_scale.x,
-			               y_offset = height / 2.0f * config.tile_scale.y;
-      V2u tile_pos;
-      tile_pos.x = static_cast<U32>((world_pos.x + x_offset) / config.tile_scale.x);
-      tile_pos.y = static_cast<U32>((world_pos.y + y_offset) / config.tile_scale.y);
-      return tile_pos;
+   inline V2u convertWorldPositionToTilePosition( Vector3 const &worldPosition ) const {
+      static auto const xOffset = width  / 2.0f * config.tileScaleFactor.x,
+			               yOffset = height / 2.0f * config.tileScaleFactor.y;
+      return { static_cast<U32>((worldPosition.x + xOffset) / config.tileScaleFactor.x), 
+               static_cast<U32>((worldPosition.y + yOffset) / config.tileScaleFactor.y) };
    }
 
-   Vec<V2u> get_neighbour_tile_coords( V2u cell_coord ) const noexcept;
+   Vec<V2u> getNeighbouringTilePositions( V2u cell_coord ) const noexcept;
+
+   inline Tile const &getTileAt( U16 x, U16 y) const noexcept {
+      return data[index(x,y)];
+   }
+
+   inline Tile &getTileAt( U16 x, U16 y) noexcept {
+      return data[index(x,y)];
+   }
 };
 
 

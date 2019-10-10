@@ -5,7 +5,7 @@
 #include "../UI/UIPaused.h"
 #include "../UI/UIOptions.h"
 
-V2u PlayingGameState::generateMap( Config const &config ) {
+V2u PlayingGameState::generateMap( MapConfig const &config ) {
 	// TODO: this shit shouldn't be necessary. make it so GameObject's destructor handles this D:<
 	for ( auto &e : roadTiles )
 		graphics.removeFromDraw(&e);
@@ -14,8 +14,8 @@ V2u PlayingGameState::generateMap( Config const &config ) {
 	for ( auto &e : houseTiles )
 		graphics.removeFromDraw(&e);
 
-	roadTiles       = Vec<GameObject>( static_cast<size_t>(config.map_dimensions.x) * config.map_dimensions.y );
-	districtMarkers = Vec<GameObject>( static_cast<size_t>(config.cell_side) * config.cell_side );
+	roadTiles       = Vec<GameObject>( static_cast<size_t>(config.dimensions.x) * config.dimensions.y );
+	districtMarkers = Vec<GameObject>( static_cast<size_t>(config.districtCellSide) * config.districtCellSide );
 	houseTiles.clear();
 	// create blank map
 	map = std::make_unique<Map>( config );
@@ -30,20 +30,8 @@ V2u PlayingGameState::generateMap( Config const &config ) {
 	}
 #endif
 
-	Walker roadnet {
-	  *map,         // the map to work on (mutate)
-		4,           // depth; number of generations     (max 4 for now)
-		80,          // min length of a branch           (number of tiles)
-	   120,         // max length of a branch           (number of tiles)
-		0.5f,        // child length factor              (e.g. 0.5 => the length will halve per generation)
-		4.0f,        // turn probability                 (e.g. 0.75 = 0.75%)
-		2.f,         // child turn probability factor    (multiplicative)
-		12.0f,       // branch probability               (e.g. 0.75 = 0.75%)
-		0.75f,       // child branch probability factor  (multiplicative)
-		config.seed  // seed
-	};
-
-	roadnet.generate(config);
+	RoadGenerator roadGenerator { *map };
+	roadGenerator.generate(config);
 
 	// debug output
 #ifdef _DEBUG
@@ -55,21 +43,21 @@ V2u PlayingGameState::generateMap( Config const &config ) {
 #endif
 
 	// game object instantiation
-	roadTiles = map->load_as_models(graphics); // TODO: RAII!
+	roadTiles = map->loadAsModels(graphics); // TODO: RAII!
 
 	RD  rd;
 	RNG rng( rd() );
 	rng.seed(config.seed);
    if ( config.isUsingManhattanDistance )
 	   districtMap = std::make_unique<Voronoi>( rng,
-                                               config.cell_side,
-                                               map->width  / config.cell_side,
-                                               map->height / config.cell_side,
+                                               config.districtCellSide,
+                                               map->width  / config.districtCellSide,
+                                               map->height / config.districtCellSide,
                                                Voronoi::ManhattanDistanceTag{} );
    else districtMap = std::make_unique<Voronoi>( rng,
-                                                 config.cell_side,
-                                                 map->width  / config.cell_side,
-                                                 map->height / config.cell_side,
+                                                 config.districtCellSide,
+                                                 map->width  / config.districtCellSide,
+                                                 map->height / config.districtCellSide,
                                                  Voronoi::EuclideanDistanceTag{} );
 #ifdef _DEBUG
 	// display noise centers:
@@ -80,7 +68,7 @@ V2u PlayingGameState::generateMap( Config const &config ) {
 		cell_center_marker.mesh  = graphics.getMeshPointer("Cube");
 		cell_center_marker.setColor({1, 0, 0, 1});
 		cell_center_marker.setScale({.2f, 4, .2f});
-		cell_center_marker.setPosition({ map->tile_xy_to_world_pos(U16(cell_center.x), U16(cell_center.y))});
+		cell_center_marker.setPosition({ map->convertTilePositionToWorldPosition(U16(cell_center.x), U16(cell_center.y))});
 		graphics.addToDraw(&cell_center_marker);
 	}
 #endif
@@ -90,32 +78,32 @@ V2u PlayingGameState::generateMap( Config const &config ) {
 		for ( U16 x=0;  x < map->width;  ++x ) {
 			auto &tile = roadTiles[map->index(x,y)];
 			graphics.addToDraw(&tile);
-			tile.setScale( Vector3{ .0005f * config.tile_scale.x,
-			                        .0005f * config.tile_scale.y,
-			                        .0005f * config.tile_scale.z }); // TODO: scale models instead
+			tile.setScale( Vector3{ .0005f * config.tileScaleFactor.x,
+			                        .0005f * config.tileScaleFactor.y,
+			                        .0005f * config.tileScaleFactor.z }); // TODO: scale models instead
 		}
 	}
    generateBuildings(config, rng);
    
-   return roadnet.getStartPosition();
+   return roadGenerator.getStartPosition();
 }
 
 // TODO: make return value optional later instead of asserting
-V2u PlayingGameState::generateRoadPosition(  Config const &config, Map const &map, RNG &rng ) const noexcept {
+V2u PlayingGameState::generateRoadPosition(  MapConfig const &config, Map const &map, RNG &rng ) const noexcept {
    static constexpr U16 MAX_TRIES = 1024; // TODO: refactor
-   U16_Dist  gen_x  ( 0, config.map_dimensions.x );
-   U16_Dist  gen_y  ( 0, config.map_dimensions.y );
+   U16_Dist  gen_x  ( 0, config.dimensions.x );
+   U16_Dist  gen_y  ( 0, config.dimensions.y );
    U16       x, y, counter{0};
    do {
       x = gen_x(rng);
       y = gen_y(rng);
       if ( ++counter > MAX_TRIES )
          assert( false && "No road tile found! ");
-   } while ( not map.is_road(x,y) );
+   } while ( not map.isRoad(x,y) );
    return {x,y};
 }
 
-void PlayingGameState::generateBuildings( Config const &config, RNG &rng) {
+void PlayingGameState::generateBuildings( MapConfig const &config, RNG &rng) {
 
 #ifdef _DEBUG
 	std::ofstream building_logs ("PG/logs/building_generation.txt");
@@ -127,7 +115,7 @@ void PlayingGameState::generateBuildings( Config const &config, RNG &rng) {
 
 
 	U16_Dist gen_offset    (   0, 256  );
-	F32_Dist gen_selection ( .0f, 1.0f );
+	F32_Dist genSelection ( .0f, 1.0f );
 	// TODO: embed into MapGenerator to ensure by design that voronoi and map are generated first
 
 	auto cell_id_to_district_enum = [&gen_offset,&rng]( U16 const ID ) {
@@ -172,10 +160,10 @@ void PlayingGameState::generateBuildings( Config const &config, RNG &rng) {
 					auto &house_tile = houseTiles.back();
 					house_tile.mesh  = graphics.getMeshPointer("Cube");
 					house_tile.setColor( {.75f, .75f, .75f, 1.0f} );
-					house_tile.setScale( { 0.5f * config.tile_scale.x,
-					                       0.5f * config.tile_scale.y * config.floor_height_factor * rng_floor_count,
-					                       0.5f * config.tile_scale.z } );
-					house_tile.setPosition( { map->tile_xy_to_world_pos(U16(tile_coord.x), U16(tile_coord.y)) } );
+					house_tile.setScale( { 0.5f * config.tileScaleFactor.x,
+					                       0.5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * rng_floor_count,
+					                       0.5f * config.tileScaleFactor.z } );
+					house_tile.setPosition( { map->convertTilePositionToWorldPosition(U16(tile_coord.x), U16(tile_coord.y)) } );
 					++total_building_tile_count;
 				}
 			}
@@ -205,7 +193,7 @@ Opt<Vec<V2u>>  PlayingGameState::find_valid_house_lot( RNG &rng, U16 cell_id, Vo
 
 	auto is_valid_position = [&]( V2u const &pos ) -> bool {
 		return  (district_map.diagram[district_map.diagram_index(pos.x,pos.y)] != cell_id)
-			or  (map.data[map.index(pos.x,pos.y)] != Tile::ground);
+			or  (map.getTileAt(pos.x,pos.y) != Tile::ground);
 	};
 
 	District const  district_type    { district_tbl[cell_id] }; // TODO: refactor? (and param)
@@ -230,7 +218,7 @@ Opt<Vec<V2u>>  PlayingGameState::find_valid_house_lot( RNG &rng, U16 cell_id, Vo
 	while ( claimed_positions.size() != target_size  and  candidate_srcs.size() != 0 ) {
 		auto const  &src_pos = candidate_srcs[ gen_offset(rng) % candidate_srcs.size() ];
 		// find valid neighbours
-		auto  candidate_dsts = map.get_neighbour_tile_coords(src_pos);
+		auto  candidate_dsts = map.getNeighbouringTilePositions(src_pos);
 		// eliminate invalid ones from our destination candidate list
 		candidate_dsts.erase( std::remove_if(candidate_dsts.begin(), candidate_dsts.end(), is_valid_position), candidate_dsts.end() );
 
@@ -293,7 +281,7 @@ Void PlayingGameState::setDistrictColors( bool useColorCoding ) noexcept {
 			{ 1.0f, 1.0f, 1.0f, 1.0f }
 		};
 		for ( auto &rgba : rgba_tbl )
-			rgba = blend( rgba, Vector4{1.0f}, config.district_blend_factor );
+			rgba = blend( rgba, Vector4{1.0f}, config.districtColorCodingBlendFactor );
 		// colour code tiles depending on cell index:
 		for ( U16 y=0;  y < map->height;  ++y ) {
 			for ( U16 x=0;  x < map->width;  ++x ) {
@@ -306,7 +294,7 @@ Void PlayingGameState::setDistrictColors( bool useColorCoding ) noexcept {
 			}
 		}
 		for ( auto &e : houseTiles ) {
-			auto        pos      = map->world_pos_to_tile_xy( e.getPosition() );
+			auto        pos      = map->convertWorldPositionToTilePosition( e.getPosition() );
 			auto        cell_idx = districtMap->diagram_index(pos.x,pos.y);
 			auto        cell_id  = districtMap->diagram[cell_idx];
 			auto const &color    = rgba_tbl[ cell_id % rgba_tbl.size()];
@@ -401,7 +389,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	player->init();
    {
       auto startPosTile = generateMap(config);
-      startPos          = map->tile_xy_to_world_pos( startPosTile.x, startPosTile.y ); 
+      startPos          = map->convertTilePositionToWorldPosition( startPosTile.x, startPosTile.y ); 
    }
    auto *v = player->getVehicle();
    assert( v != nullptr );
@@ -462,9 +450,7 @@ Void  PlayingGameState::ImGui_Driving() {
    ImGui::End();
 }
 
-void PlayingGameState::ImGui_Particles()
-{
-	
+void PlayingGameState::ImGui_Particles() {	
 	ImGui::Begin("Particle");
 	ImGui::ColorPicker4("Color Slider", colors);
 	ImGui::ColorPicker4("Color 1 Slider", colors2);
@@ -496,7 +482,7 @@ void PlayingGameState::ImGui_ProcGen() {
    ImGui::Begin("Map Generation:");
    if ( static bool firstFrame = true; firstFrame ) {
       ImGui::SetWindowPos({0,75});
-      ImGui::SetWindowSize({425,300});
+      ImGui::SetWindowSize({525,475});
       firstFrame = false;
       setDistrictColors( config.isColorCodingDistricts );
    }
@@ -512,64 +498,88 @@ void PlayingGameState::ImGui_ProcGen() {
    ImGui::Separator();
 
    // map:
-   ImGui::InputInt2( "Map dimensions", &config.map_dimensions.data[0] );
-   if ( config.map_dimensions.x < 1 )
-      config.map_dimensions.x = 1;
-   if ( config.map_dimensions.y < 1 )
-      config.map_dimensions.y = 1;
+   ImGui::InputInt2( "Map dimensions", &config.dimensions.data[0] );
+   if ( config.dimensions.x < 1 )
+      config.dimensions.x = 1;
+   if ( config.dimensions.y < 1 )
+      config.dimensions.y = 1;
 
-   // (TODO! bugged!) ImGui::InputFloat3( "Tile scale", &config.tile_scale.data[0] );
+   // (TODO! bugged!) ImGui::InputFloat3( "Tile scale", &config.tileScaleFactor.data[0] );
 
-   ImGui::InputFloat( "Floor height factor", &config.floor_height_factor );
+   ImGui::InputFloat( "Floor height factor", &config.buildingFloorHeightFactor );
 
    ImGui::InputInt( "Seed", &config.seed );
 
    ImGui::Checkbox( "Use Manhattan distance", &config.isUsingManhattanDistance ); // TODO: refactor into config
 
-   ImGui::InputInt( "District cell side",  &config.cell_side );
-   static auto cellSidePrev = config.cell_side;
+   ImGui::InputInt( "District cell side",  &config.districtCellSide );
+   static auto cellSidePrev = config.districtCellSide;
    int stepsCounter = 0;
    auto constexpr MAX_STEPS = 128;
-   if ( config.cell_side < 1 )
-      config.cell_side = 1;
-   else if ( (config.cell_side - cellSidePrev) < 0 )
-      while (      (config.cell_side > 1)
-              and ((config.map_dimensions.x % config.cell_side) != 0)
-              and ((config.map_dimensions.y % config.cell_side) != 0)
+   if ( config.districtCellSide < 1 )
+      config.districtCellSide = 1;
+   else if ( (config.districtCellSide - cellSidePrev) < 0 )
+      while (      (config.districtCellSide > 1)
+              and ((config.dimensions.x % config.districtCellSide) != 0)
+              and ((config.dimensions.y % config.districtCellSide) != 0)
               and (++stepsCounter < MAX_STEPS) )
-         --config.cell_side;
-   else if ( (config.cell_side - cellSidePrev) > 0 )
-      while (     ((config.map_dimensions.x % config.cell_side) != 0)
-              and ((config.map_dimensions.y % config.cell_side) != 0)
+         --config.districtCellSide;
+   else if ( (config.districtCellSide - cellSidePrev) > 0 )
+      while (     ((config.dimensions.x % config.districtCellSide) != 0)
+              and ((config.dimensions.y % config.districtCellSide) != 0)
               and (++stepsCounter < MAX_STEPS) )
-         ++config.cell_side;
+         ++config.districtCellSide;
    if ( stepsCounter == MAX_STEPS ) // no match found
-      config.cell_side = cellSidePrev;
-   cellSidePrev = config.cell_side;
+      config.districtCellSide = cellSidePrev;
+   cellSidePrev = config.districtCellSide;
 
    ImGui::Separator();
 
    // roads:
-   ImGui::InputInt( "Min tiles before turn", &config.min_tiles_before_turn );
-   if ( config.min_tiles_before_turn   < 0 )
-      config.min_tiles_before_turn = 0;
 
-   ImGui::InputInt( "Min tiles before branch", &config.min_tiles_before_branch );
-   if ( config.min_tiles_before_branch < 0 )
-      config.min_tiles_before_branch = 0;
+   ImGui::InputInt( "Max depth", &config.roadDepthMax );
+   if ( config.roadDepthMax > 4 ) // TODO: magic4
+      config.roadDepthMax = 4;
+   else if ( config.roadDepthMax < 1 )
+      config.roadDepthMax = 1;
 
-   ImGui::InputInt( "Road step size", &config.road_step_size );
-   if ( config.road_step_size < 1 )
-      config.road_step_size = 1;
-   
-   /// TODO: add walker_gen_args params as well
+   ImGui::InputInt( "Base min length", &config.roadLengthMin );
+   if ( config.roadLengthMin > config.roadLengthMax )
+      config.roadLengthMin = config.roadLengthMax;
+
+   ImGui::InputInt( "Base max length", &config.roadLengthMax );
+   if ( config.roadLengthMax < config.roadLengthMin )
+      config.roadLengthMax = config.roadLengthMin;
+
+   ImGui::SliderFloat( "Child length factor", &config.roadLengthFactor, .001f, 10.0f );
+
+
+   ImGui::SliderFloat( "Base turn probability", &config.roadTurnProbability,       .001f,  1.0f );
+   ImGui::SliderFloat( "Child turn% factor",    &config.roadTurnProbabilityFactor, .001f, 10.0f );
+
+
+   ImGui::SliderFloat( "Base branch probability", &config.roadBranchProbability,       .001f,  1.0f );
+   ImGui::SliderFloat( "Child branch% factor",    &config.roadBranchProbabilityFactor, .001f, 10.0f );
+
+
+   ImGui::InputInt( "Min tiles before turn", &config.roadMinTilesBeforeTurn );
+   if ( config.roadMinTilesBeforeTurn < 0 )
+      config.roadMinTilesBeforeTurn = 0;
+
+   ImGui::InputInt( "Min tiles before branch", &config.roadMinTilesBeforeBranch );
+   if ( config.roadMinTilesBeforeBranch < 0 )
+      config.roadMinTilesBeforeBranch = 0;
+
+   ImGui::InputInt( "Road step size", &config.roadStepSize );
+   if ( config.roadStepSize < 1 )
+      config.roadStepSize = 1;
 
    // regen button:
    ImGui::NewLine();
    if ( ImGui::Button("Re-generate") ) {
       // (TODO: refactor) hacky, but:
       auto startPosTile = generateMap(config);
-      startPos          = map->tile_xy_to_world_pos( startPosTile.x, startPosTile.y );
+      startPos          = map->convertTilePositionToWorldPosition( startPosTile.x, startPosTile.y );
       player->getVehicle()->setPosition( startPos );
       setDistrictColors( config.isColorCodingDistricts );
    }
@@ -585,7 +595,7 @@ Void  PlayingGameState::ImGui_Camera() {
       firstFrame = false;
    }
    // camera distance:
-   ImGui::SliderFloat( "Camera height", &cameraDistance, .0f, 1000.0f, "%4.1f" );
+   ImGui::SliderFloat( "Camera height", &cameraDistance, 2.5f, 1000.0f, "%4.1f" );
    // culling distance:
    static float cullingDistanceCurr = graphics.getCullingDistance();
    float const  cullingDistancePrev = cullingDistanceCurr;
@@ -628,8 +638,6 @@ Void  PlayingGameState::update(float deltaTime)
 		}
 	}
 
-
-
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
 	graphics.render(camera.get(),deltaTime);
@@ -671,17 +679,14 @@ void PlayingGameState::setTime(float time) noexcept {
 	this->time = max(time, 0.0f);
 }
 
-void PlayingGameState::changeTime(float timeDiff) noexcept
-{
-	this->time = max(this->time + timeDiff, 0.0f);
+void PlayingGameState::changeTime(float timeDiff) noexcept {
+	this->time = max(this->time + timeDiff, .0f);
 }
 
-void PlayingGameState::setCurrentMenu(Menu menu)
-{
-	this->currentMenu = static_cast<int>(menu);
+void PlayingGameState::setCurrentMenu(Menu menu) {
+	currentMenu = static_cast<int>(menu);
 }
 
-Vehicle* PlayingGameState::getPlayer() const
-{
-	return this->player.get();
+Vehicle* PlayingGameState::getPlayer() const {
+	return player.get();
 }
