@@ -31,7 +31,7 @@ private:
 	long long							curTime      = 0;
 	long long							prevTime     = 0;
 	long long							countsPerSec = 0;
-	float								secPerCount  = 1.0f / countsPerSec;
+	float								secPerCount  = 0.0f;
 public:
 	Game();
 	~Game();
