@@ -333,6 +333,10 @@ void Graphics::render(DynamicCamera* camera)
 			}
 		}
 	}
+	ID3D11DepthStencilView* nulDSV = nullptr;
+	ID3D11ShaderResourceView* nulSRV = nullptr;
+	deviceContext->OMSetRenderTargets(0,nullptr, nulDSV);
+
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	Matrix view = camera->getViewMatrix().Transpose();
@@ -356,8 +360,12 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->PSSetShader(this->shaderDefault.ps.getShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDefault.vs.getShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
+	deviceContext->VSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+
 	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
 	deviceContext->PSSetShaderResources(1, 1, this->culledLightBufferSRV.GetAddressOf());
+	deviceContext->PSSetShaderResources(2, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -405,6 +413,7 @@ void Graphics::render(DynamicCamera* camera)
 			}
 		}
 	}
+	deviceContext->PSSetShaderResources(2, 1, &nulSRV);
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDebug.ps.getShader(), nullptr, 0);

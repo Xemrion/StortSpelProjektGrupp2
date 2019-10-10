@@ -2,10 +2,11 @@
 
 struct VS_OUT
 {
-	float4 Pos: SV_POSITION;
+	float4 Pos : SV_POSITION;
 	float4 wPos: APOS;
 	float2 Tex : TEXCOORD;
 	float4 NormalWS : NORMAL;
+	float4 shadowPos : SHADOWPOS;
 };
 
 struct Light
@@ -37,7 +38,9 @@ cbuffer SunInfo : register(b2) {
 };
 
 Texture2D Tex : register(t0);
+Texture2D ShadowMap : register(t2);
 SamplerState SampSt : register(s0);
+SamplerState ShadowSamp : register(s1);
 StructuredBuffer<TileData> tileData : register(t1);
 
 float4 main(VS_OUT input) : SV_Target
@@ -47,7 +50,90 @@ float4 main(VS_OUT input) : SV_Target
 	uint2 lightTileIndex = floor(uint2(input.Pos.x, input.Pos.y) / uint2(16.f, 16.f));
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 
-	float4 ambient = max(-dot(sunDir, normal), float4(0.2, 0.2, 0.2, 1.0)) * sunColor;
+	float4x4 biasMatrix = {
+
+				0.5, 0.0, 0.0, 0.0,
+				0.0, 0.5, 0.0, 0.0,
+				0.0, 0.0, 0.5, 0.0,
+				0.5, 0.5, 0.5, 1.0
+	};
+	float4 shadowCoord = input.shadowPos;
+	
+	//biasMatrix = transpose(biasMatrix);
+	//shadowCoord = mul(float4(shadowCoord.xyz, 1.0f), biasMatrix);
+	shadowCoord.z = shadowCoord.z / shadowCoord.w;
+	shadowCoord.xy = (0.5f * shadowCoord.xy) + 0.5f;
+	shadowCoord.y = abs(shadowCoord.y - 1);
+
+
+
+
+	//float2 texShadowCoord;
+	//texShadowCoord.x = shadowCoord.x / shadowCoord.w / 2.0f + 0.5f;
+	//texShadowCoord.y = -shadowCoord.y / shadowCoord.w / 2.0f + 0.5f;
+	//float visibility = 1.0f;
+	//if ((saturate(texShadowCoord.x) == texShadowCoord.x) && (saturate(texShadowCoord.y) == texShadowCoord.y))
+	//{
+	//	float depthValue = ShadowMap.Sample(SampSt, texShadowCoord).r;
+
+	//	float lightDepth = shadowCoord.z / shadowCoord.w;
+	//	lightDepth = lightDepth - 0.001f;
+
+	//	//shadowCoord = (0.5f*shadowCoord) + 0.5f;
+	//	/*shadowCoord -= 1;
+	//	shadowCoord = abs(shadowCoord);*/
+	//	
+	//
+	//	//visibility = 0;
+	//	if (lightDepth < depthValue)
+	//	{
+	//		visibility = 0.5f;
+	//	}
+	//}
+
+
+
+	float visibility = 0.0;
+	//float cosTheta = dot((normal), (lights[0].direction.xyz));
+	//float bias = 0.005*tan(acos(cosTheta));
+	//max(0.05 * (1.0 - dot(normal, lightDir)), 0.015);
+	//bias = clamp(bias, 0,0.05);
+	float bias;
+	bias = max(0.030 * (1.0 - dot(normal, sunDir.xyz)), 0.005);
+	/*for (int i = 0; i < 4; i++)
+	{
+		if (ShadowMap.Sample(SampSt, shadowCoord.xy + poissonDisk[i] / 700.0).x < shadowCoord.z - bias)
+		{
+			visibility -= 0.20f;
+		}
+	}*/
+	//if (ShadowMap.Sample(SampSt, shadowCoord.xy /*+ (poissonDisk[i] / 700.0)*/).x < shadowCoord.z - bias)
+	//{
+	//	visibility = 0.5f;
+	//}
+	int width;
+	int height;
+	int nrOfLevels;
+	ShadowMap.GetDimensions(0, width, height, nrOfLevels);
+	float2 textureSize = float2(width, height);
+	float2 texelSize = 1.0 / textureSize;
+	for (int x = -1; x <= 1; ++x)
+	{
+		for (int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = ShadowMap.Sample(ShadowSamp, shadowCoord.xy + float2(x, y) * texelSize).r;
+			visibility += shadowCoord.z - bias > pcfDepth ? 1.0f : 0.0;
+		}
+	}
+	visibility /= 14.0;
+	//visibility += ShadowMap.SampleCmpLevelZero(ShadowSampler, shadowCoord.xy, shadowCoord.z);
+	/*if (shadowCoord.z > 1.0)
+		visibility = 0.0f;*/
+	/*if (visibility > 0.9f)
+		visibility = 0.9f;*/
+	//totalLight = dirLight(normal, lights[0], pos, colorT.xyz, visibility);
+
+	float4 ambient = max(-dot(sunDir, normal)*(1-visibility), float4(0.2, 0.2, 0.2, 1.0)) * sunColor;
 	
 	float4 diffuse = float4(0.0, 0.0, 0.0, 1.0);
 	for (int i = 0; i < lightTileData.numLights; ++i)

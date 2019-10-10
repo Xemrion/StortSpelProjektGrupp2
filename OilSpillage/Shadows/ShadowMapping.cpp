@@ -191,7 +191,7 @@ void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir)
 	rotationRes = Matrix::CreateRotationX(pitch); //Pitch
 	rotationRes = Matrix::CreateFromYawPitchRoll(yaw,pitch,0.0f); //Yaw
 	
-	Vector3 pos(camera->getPosition()+Vector3(-2.0f,0.0f,-2.0f));
+	Vector3 pos(camera->getPosition()+Vector3(0.f,10.0f,0.f));
 	//pos.y += 10.0f;
 	//pos *= -1.0f;
 	this->view = Matrix::CreateLookAt(
@@ -217,9 +217,9 @@ void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir)
 	
 	//pos += camera->getPosition();
 	//view = Matrix::CreateLookAt(pos, Vector3(-pos.x,0.0f,0.0f), Vector3(0.0f, 1.0f, 0.0f));
-	orthoProj = Matrix::CreateOrthographic(100.0f, 100.0f, 1.0f, 15.f);
+	orthoProj = Matrix::CreateOrthographic(100.0f, 100.0f, 0.01f, 25.0f);
 	float fieldOfView = 90 * (DirectX::XM_PI / 180);
-
+	//orthoProj = camera->getProjectionMatrix();
 	//orthoProj = Matrix::CreatePerspectiveFieldOfView(fieldOfView, 16.f / 9.f, 0.1f, 100.0f);
 	Matrix viewProj = view * orthoProj;
 	viewProj = viewProj.Transpose();
@@ -246,14 +246,19 @@ void ShadowMapping::prepare()
 	//System::getDeviceContext().omset
 }
 
-ID3D11SamplerState* ShadowMapping::getShadowSampler()
+Microsoft::WRL::ComPtr <ID3D11SamplerState> ShadowMapping::getShadowSampler()
 {
-	return this->sampler.Get();
+	return this->sampler;
 }
 
 
-ID3D11ShaderResourceView* ShadowMapping::getShadowMap()
+Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> ShadowMapping::getShadowMap()
 {
-	return this->depthShaderResource.Get();
+	return this->depthShaderResource;
+}
+
+Microsoft::WRL::ComPtr<ID3D11Buffer> ShadowMapping::getViewProj()
+{
+	return this->perFrameCB;
 }
 

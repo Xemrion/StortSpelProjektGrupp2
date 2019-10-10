@@ -16,8 +16,9 @@ public:
 	void setViewProj(DynamicCamera* camera, Vector3 sunDir);
 	//uses the rendershader in Shader
 	void prepare();
-	ID3D11SamplerState* getShadowSampler();
-	ID3D11ShaderResourceView* getShadowMap();
+	Microsoft::WRL::ComPtr <ID3D11SamplerState> getShadowSampler();
+	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> getShadowMap();
+	Microsoft::WRL::ComPtr<ID3D11Buffer> getViewProj();
 private:
 
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
