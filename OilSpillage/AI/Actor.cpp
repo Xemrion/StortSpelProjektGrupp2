@@ -395,3 +395,13 @@ void Actor::setDestination(Vector3 destination)
 {
 	this->destination = destination;
 }
+
+int Actor::getGroupNR()
+{
+	return this->groupNR;
+}
+
+void Actor::joinGroup(int NR)
+{
+	this->groupNR = NR;
+}

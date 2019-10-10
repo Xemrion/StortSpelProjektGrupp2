@@ -25,12 +25,15 @@ public:
 	float angle(Vector3 target);
 	Vector3 getDestination();
 	void setDestination(Vector3 destination);
+	int getGroupNR();
+	void joinGroup(int NR);
 private:
 	int nrOfFrames = 0;
 	Vector3 velocity;
 	Vector3 acceleration;
 	float maxSpeed;
 	float maxForce;
+	int groupNR = -1;
 
 protected:
 	Vector3 destination;

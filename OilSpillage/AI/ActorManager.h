@@ -10,8 +10,11 @@ public:
 	void createDefender(float x,float z);
 	void createAttacker(float x, float z);
 	void setAStar(AStar* aStar);
+	void initGroups();
 private:
+	void updateGroups();
 	std::vector<Actor*> actors;
-	std::vector<Actor*> group1;
+	std::vector<std::vector<Actor*>> groups;
+	std::vector<Vector3> averagePos;
 	AStar* aStar;
 };

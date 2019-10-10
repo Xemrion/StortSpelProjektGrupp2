@@ -329,9 +329,12 @@ void PlayingGameState::init()
 
 	actorManager = std::make_unique<ActorManager>();
 	actorManager->setAStar(aStar);
-	actorManager->createDefender(1, 1);
-	actorManager->createAttacker(2, 1);
+	for (int i = 0; i < 200; i++)
+	{
+		actorManager->createDefender(i, i);
 
+	}
+	actorManager->initGroups();
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
 	graphics.loadModel("Roads/Road_bend");
