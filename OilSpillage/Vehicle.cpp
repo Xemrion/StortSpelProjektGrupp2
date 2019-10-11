@@ -46,7 +46,7 @@ void Vehicle::init()
 	this->vehicle = new GameObject;
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(vehicle);
-	vehicle->setPosition(Vector3(0.0f, 0.0f, 0.0f));
+	vehicle->setPosition(Vector3(0.0f, 2.0f, 0.0f));
 	//vehicle->setColor(Vector4(2,0.3,0.3,1));
 	vehicle->setScale(Vector3(0.75f, 0.2f, 0.8f));
 	Game::getGraphics().loadTexture("brickwall");

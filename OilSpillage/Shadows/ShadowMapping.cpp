@@ -181,17 +181,22 @@ void ShadowMapping::setWorld(const Matrix& world)
 void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir)
 {
 	Matrix rotationRes;
-	sunDir.Normalize();
-	float pitch = sqrt(pow(sunDir.x, 2) + pow(sunDir.y, 2)) / sunDir.z;
+	Vector3 sunDirection = sunDir;
+	sunDirection.x = 0.5f;
+	sunDirection.Normalize();
+	float pitch = sqrt(pow(sunDirection.x, 2) + pow(sunDirection.y, 2)) / sunDirection.z;
 	pitch = atan(pitch);
-	float yaw = sunDir.x / -sunDir.y;
+	float yaw = sunDirection.x / -sunDirection.y;
 	yaw = atan(yaw);
-	yaw = sunDir.z > 0 ? yaw - (180* (DirectX::XM_PI/180)) : yaw;
+	//yaw = sunDirection.z > 0 ? yaw - (180* (DirectX::XM_PI/180)) : yaw;
 	//rotationRes = Matrix::CreateRotationZ(this->rotation.z); //Roll
 	rotationRes = Matrix::CreateRotationX(pitch); //Pitch
 	rotationRes = Matrix::CreateFromYawPitchRoll(yaw,pitch,0.0f); //Yaw
 	
-	Vector3 pos(camera->getPosition()+Vector3(0.f,10.0f,0.f));
+	//Vector3 pos(camera->getPosition().x, camera->getPosition().y*3, camera->getPosition().z);
+	Vector3 offset = (camera->getPosition().y / sunDir.y) * sunDir;
+	Vector3 pos(camera->getPosition().x + offset.x, camera->getPosition().y+5, camera->getPosition().z + offset.z);
+	//pos.z += -2.0f;
 	//pos.y += 10.0f;
 	//pos *= -1.0f;
 	this->view = Matrix::CreateLookAt(
@@ -200,10 +205,48 @@ void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir)
 		Vector3::Transform(Vector3(0.0f, 1.0f, 0.0f), rotationRes) //Up
 		);
 	
+	this->view = Matrix::CreateLookAt(
+		pos, //Position in world
+		pos + sunDirection,/*pos + Vector3::Transform(Vector3(0.0f, 0.0f, -1.0f),rotationRes*/ //Front
+		Vector3::Reflect(sunDirection, Vector3(0, 1, 0))/*Vector3::Transform(Vector3(0.0f, 1.0f, 0.0f), rotationRes)*/ //Up
+	);
+
+	
+
+	/*Från https://www.gamedev.net/forums/topic/505893-orthographic-projection-for-shadow-mapping/ och ska testa för o se om det funkar*/
+
+	Vector3 centroid(0, 0, 0);
+	Matrix invView = camera->getViewMatrix().Invert();
+	Vector4 viewDir = DirectX::XMVector4Transform(Vector4(0.0, 0.0, 1.0, 0.0), invView);
+	Vector4 viewUp = DirectX::XMVector4Transform(Vector4(0.0, 1.0, 0.0, 0.0), invView);
+	Vector4 viewRight = DirectX::XMVector4Transform(Vector4(1.0, 0.0, 0.0, 0.0), invView);
+	
+	
+	Vector3 nearCenter = camera->getPosition() + viewDir * camera->getNearDistance();
+	Vector3 farCenter = camera->getPosition() + viewDir * camera->getFarDistance();
+	Vector3 nearTopLeft = nearCenter + Vector3(viewUp) * camera->getNearHeight() - Vector3(viewRight) * camera->getNearWidth();
+	Vector3 nearTopRight = nearCenter + Vector3(viewUp) * camera->getNearHeight() + Vector3(viewRight) * camera->getNearWidth();
+	Vector3 nearBottomLeft = nearCenter - Vector3(viewUp) * camera->getNearHeight() - Vector3(viewRight) * camera->getNearWidth();
+	Vector3 nearBottomRight = nearCenter - Vector3(viewUp) * camera->getNearHeight() + Vector3(viewRight) * camera->getNearWidth();
+
+	Vector3 farTopLeft = farCenter + Vector3(viewUp) * camera->getFarHeight() - Vector3(viewRight) * camera->getFarWidth();
+	Vector3 farTopRight = farCenter + Vector3(viewUp) * camera->getFarHeight() + Vector3(viewRight) * camera->getFarWidth();
+	Vector3 farBottomLeft = farCenter - Vector3(viewUp) * camera->getFarHeight() - Vector3(viewRight) * camera->getFarWidth();
+	Vector3 farBottomRight = farCenter - Vector3(viewUp) * camera->getFarHeight() + Vector3(viewRight) * camera->getFarWidth();
+
+	centroid += nearTopLeft; centroid += nearTopRight; centroid += nearBottomLeft; centroid += nearBottomRight;
+	centroid += farTopLeft; centroid += farTopRight; centroid += farBottomLeft; centroid += farBottomRight;
+
+	centroid /= 8;
+
+	float nearClipOffset = 50.0f;
 
 
 	
-	/*sunDir.Normalize();
+
+
+
+	/*sunDirection.Normalize();
 	pos *= -1.0f;
 	Matrix lightViewMatrix;
 	lightViewMatrix = Matrix::Identity;
@@ -218,9 +261,10 @@ void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir)
 	//pos += camera->getPosition();
 	//view = Matrix::CreateLookAt(pos, Vector3(-pos.x,0.0f,0.0f), Vector3(0.0f, 1.0f, 0.0f));
 	orthoProj = Matrix::CreateOrthographic(100.0f, 100.0f, 0.01f, 25.0f);
-	float fieldOfView = 90 * (DirectX::XM_PI / 180);
-	//orthoProj = camera->getProjectionMatrix();
-	//orthoProj = Matrix::CreatePerspectiveFieldOfView(fieldOfView, 16.f / 9.f, 0.1f, 100.0f);
+	orthoProj = DirectX::XMMatrixOrthographicLH(200.0f, 200.0f, 1.0f, 400.0f);
+	float fieldOfView = 10 * (DirectX::XM_PI / 180);
+	orthoProj = camera->getProjectionMatrix();
+	//orthoProj = Matrix::CreatePerspectiveFieldOfView(fieldOfView, 16.f / 9.f, 900, 1400.0f);
 	Matrix viewProj = view * orthoProj;
 	viewProj = viewProj.Transpose();
 	D3D11_MAPPED_SUBRESOURCE mappedResource;

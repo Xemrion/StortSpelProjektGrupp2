@@ -312,7 +312,7 @@ void Graphics::render(DynamicCamera* camera)
 
 	for (GameObject* object : drawableObjects)
 	{
-		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance+500)
 		{
 			AABB boundingBox = object->getAABB();
 			boundingBox = boundingBox.scale(object->getScale());
