@@ -34,6 +34,11 @@ void ActorManager::createAttacker(float x, float z)
 	this->actors.emplace_back(new Attacker(x, z, this->aStar));
 }
 
+void ActorManager::createTurrent(float x, float z)
+{
+	this->actors.emplace_back(new Turrent(x, z, this->aStar));
+}
+
 void ActorManager::setAStar(AStar* aStar)
 {
 	this->aStar = aStar;

@@ -1,6 +1,7 @@
 #pragma once
 #include "Defender.h"
 #include "Attacker.h"
+#include "Turrent.h"
 class ActorManager
 {
 public:
@@ -9,6 +10,7 @@ public:
 	void update(float dt, Vector3 targetPos);
 	void createDefender(float x,float z);
 	void createAttacker(float x, float z);
+	void createTurrent(float x, float z);
 	void setAStar(AStar* aStar);
 	void initGroups();
 	std::vector<std::vector<Actor*>> groups;

@@ -38,10 +38,10 @@ private:
 	float                           cameraDistance{ 25 };
 	float                           time;
 	MapConfig                       config;
-	Graphics& graphics;
-	AStar* aStar;
-	std::unique_ptr<Map>             map;
-	ActorManager* actorManager;
+	Graphics                       &graphics;
+	AStar*				            aStar;
+    std::unique_ptr<Map>             map;
+	ActorManager*				    actorManager;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
