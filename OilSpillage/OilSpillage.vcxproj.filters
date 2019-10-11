@@ -1,21 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{43dfc8df-b186-4550-bec0-abfb0696a21f}</UniqueIdentifier>
-    </Filter>
+    <FxCompile Include="ComputeLightCulling.hlsl" />
+    <FxCompile Include="DebugPS.hlsl" />
+    <FxCompile Include="DebugVs.hlsl" />
+    <FxCompile Include="PixelShader.hlsl" />
+    <FxCompile Include="VertexShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -51,6 +41,9 @@
     <ClCompile Include="TestAI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ImGui\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -82,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PG\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI\UserInterface.cpp">
@@ -123,6 +119,12 @@
     <ClCompile Include="PG\District.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PG\Walker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AI\Action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="AI\Actor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -136,30 +138,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AI\Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Particle\ParticleSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\UIPlaying.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\UIPaused.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PG\MinimapTextureGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PG\MapConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PG\RoadGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PG\TileMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PG\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -183,6 +161,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
@@ -254,6 +235,9 @@
     <ClInclude Include="PG\Direction.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PG\Map.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="PG\RandomSegments.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -261,6 +245,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PG\utils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PG\Walker.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DynamicCamera.h">
@@ -287,6 +274,9 @@
     <ClInclude Include="PG\Voronoi.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PG\config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Road Network\RoadNet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -311,6 +301,9 @@
     <ClInclude Include="PG\District.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AI\Action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="AI\Actor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -324,33 +317,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AI\Node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Particle\ParticleSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\UIPlaying.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\UIPaused.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="STB\stb_image_write.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\MinimapTextureGenerator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\MapConfig.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\RoadGenerator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\TileMap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\Map.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -368,19 +334,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="ComputeLightCulling.hlsl" />
-    <FxCompile Include="Particle\ParticleGS.hlsl" />
-    <FxCompile Include="Particle\ParticleCreateCS.hlsl" />
-    <FxCompile Include="Particle\ParticlePS.hlsl" />
-    <FxCompile Include="Particle\ParticleUpdateCS.hlsl" />
-    <FxCompile Include="Particle\ParticleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="ShaderDefines.hlsli" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="brickwall.tga" />
-    <Image Include="CarTemp.tga" />
-    <Image Include="CarTest.tga" />
   </ItemGroup>
 </Project>

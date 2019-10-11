@@ -1,3 +1,4 @@
+
 #include "Node.h"
 
 void Node::setGCost(int gCost)

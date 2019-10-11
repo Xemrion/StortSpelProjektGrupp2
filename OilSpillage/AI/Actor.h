@@ -3,35 +3,59 @@
 #include "Boid.h"
 #include "AStar.h"
 
-
 class Actor : public GameObject
 {
 public:
 	Actor();
+	Actor(float x, float z, AStar* aStar);
 	~Actor();
-	void update(float dt, Vector3 targetPos);
-	void setAStar(AStar* aStar);
+	virtual void update(float dt, Vector3 targetPos);
+	virtual void setUpActor() = 0 {};
 
+	void applyForce(Vector3 force);
+	// Three Laws that boids follow
+	Vector3 separation(vector<Actor*> boids);
+	Vector3 alignment(vector<Actor*> boids);
+	Vector3 cohesion(vector<Actor*> boids);
+	// Other function for moving and interacting
+	Vector3 seek(Vector3 target);
+	void run(vector<Actor*> boids, float deltaTime);
+	void updateBoid(float deltaTime);
+	void flock(vector<Actor*> boids);
+	float angle(Vector3 target);
+	Vector3 getDestination();
+	void setDestination(Vector3 destination);
+	int getGroupNR();
+	void joinGroup(int NR);
 private:
-	enum State{Roaming,Chasing};
-	State state;
-	void findPath();
-	void shoot(float deltaTime, Vector3 targetPos);
-	void chase();
-	void roam();
-	Status inRange();
-	Status setChaseState();
-	Status setRoamState();
-	void  followPath();
-	void setUpActor();
-	Selector* root;
-	BT bt;
-	std::vector<Boid*> boids;
+	Vector3 velocity;
+	Vector3 acceleration;
+	float maxSpeed;
+	float maxForce;
+	int groupNR = -1;
 
+protected:
+	int nrOfFrames = 0;
+	Vector3 destination;
 	std::vector<Node*> path;
 	AStar* aStar;
 	Vector3 targetNode;
-	int nrOfFrames = 0;
+	enum State { Roaming, Chasing, Returning };
+	State state;
+
+	Selector* root;
+	BT bt;
+	void findPath();
+	void chase();
+	void roam();
+	virtual Status shoot();
+	virtual Status inRange();
+	virtual Status enemyNear();
+	virtual Status setChaseState();
+	virtual Status setRoamState();
+	virtual void  followPath();
+	float deltaTime;
+	Vector3 targetPos;
 
 	struct Weapon
 	{
@@ -52,8 +76,4 @@ private:
 	static const int bulletCount = 16;
 	float leftoverTime;
 	Bullet bullets[bulletCount];
-
-	float deltaTime;
-	Vector3 targetPos;
-
 };
