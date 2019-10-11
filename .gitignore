@@ -702,5 +702,5 @@ MigrationBackup/
 
 .ionide/
 
-/OilSpillage/States/PlayingGameState.cpp
-/OilSpillage/States/PlayingGameState.h
+OilSpillage/PG/Logs/
+OilSpillage/data/map/

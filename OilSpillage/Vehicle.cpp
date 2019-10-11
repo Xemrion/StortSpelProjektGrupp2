@@ -31,7 +31,6 @@ Vehicle::Vehicle()
 	this->updatedStats = this->defaultStats;
 
 	this->health = this->updatedStats.maxHealth;
-	this->maxHealth = this->updatedStats.maxHealth;
 }
 
 Vehicle::~Vehicle()
@@ -530,19 +529,29 @@ int Vehicle::getHealth() const
 	return this->health;
 }
 
+int Vehicle::getMaxHealth() const
+{
+	return this->updatedStats.maxHealth;
+}
+
 void Vehicle::setHealth(int health)
 {
-	this->health = std::clamp(health, 0, this->maxHealth);
+	this->health = std::clamp(health, 0, this->updatedStats.maxHealth);
 }
 
-void Vehicle::damage(int damageAmount)
+void Vehicle::setMaxHealth(int maxHealth)
 {
-	this->health = std::clamp(this->health - damageAmount, 0, this->maxHealth);
+	this->updatedStats.maxHealth = max(maxHealth, 1);
 }
 
-void Vehicle::heal(int healAmount)
+void Vehicle::resetHealth()
 {
-	this->health = std::clamp(this->health + healAmount, 0, this->maxHealth);
+	this->health = this->updatedStats.maxHealth;
+}
+
+void Vehicle::changeHealth(int amount)
+{
+	this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
 }
 
 bool Vehicle::isDead() const

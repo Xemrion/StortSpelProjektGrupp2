@@ -82,6 +82,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -95,6 +96,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <FloatingPointModel>Precise</FloatingPointModel>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -109,6 +111,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -125,6 +128,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -134,12 +138,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AI\Actor.cpp" />
+    <ClCompile Include="AI\ActorManager.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
+    <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
     <ClCompile Include="AI\Boid.cpp" />
+    <ClCompile Include="AI\Defender.cpp" />
     <ClCompile Include="AI\Node.cpp" />
+    <ClCompile Include="AI\Turrent.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
-    <ClCompile Include="PG\Walker.cpp" />
+    <ClCompile Include="Particle\ParticleSystem.cpp" />
+    <ClCompile Include="PG\MapConfig.cpp" />
+    <ClCompile Include="PG\Map.cpp" />
+    <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
+    <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="PG\District.cpp" />
@@ -162,7 +174,7 @@
     <ClCompile Include="lights.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="PG\Map.cpp" />
+    <ClCompile Include="PG\TileMap.cpp" />
     <ClCompile Include="PG\Voronoi.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="Sound.cpp" />
@@ -175,20 +187,30 @@
     <ClCompile Include="UI\UICredits.cpp" />
     <ClCompile Include="UI\UIMainMenu.cpp" />
     <ClCompile Include="UI\UIOptions.cpp" />
+    <ClCompile Include="UI\UIPaused.cpp" />
+    <ClCompile Include="UI\UIPlaying.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
+    <ClInclude Include="AI\ActorManager.h" />
     <ClInclude Include="AI\AStar.h" />
+    <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
     <ClInclude Include="AI\Boid.h" />
+    <ClInclude Include="AI\Defender.h" />
     <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="AI\Turrent.h" />
+    <ClInclude Include="Particle\ParticleSystem.h" />
+    <ClInclude Include="PG\Map.hpp" />
+    <ClInclude Include="PG\MinimapTextureGenerator.hpp" />
     <ClInclude Include="States\GameState.h" />
     <ClInclude Include="States\MenuGameState.h" />
     <ClInclude Include="States\PlayingGameState.h" />
     <ClInclude Include="PG\District.hpp" />
+    <ClInclude Include="STB\stb_image_write.h" />
     <ClInclude Include="UI\Button.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DynamicCamera.h" />
@@ -212,17 +234,17 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="PG\config.hpp" />
+    <ClInclude Include="PG\MapConfig.hpp" />
     <ClInclude Include="PG\defs.hpp" />
     <ClInclude Include="PG\Direction.hpp" />
-    <ClInclude Include="PG\Map.hpp" />
+    <ClInclude Include="PG\TileMap.hpp" />
     <ClInclude Include="PG\RandomSegments.hpp" />
     <ClInclude Include="PG\Skyscraper.h" />
     <ClInclude Include="PG\SkyscraperFloor.h" />
     <ClInclude Include="PG\Tile.hpp" />
     <ClInclude Include="PG\utils.hpp" />
     <ClInclude Include="PG\Voronoi.hpp" />
-    <ClInclude Include="PG\Walker.hpp" />
+    <ClInclude Include="PG\RoadGenerator.hpp" />
     <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Road Network\RoadNet.h" />
@@ -235,6 +257,8 @@
     <ClInclude Include="UI\UICredits.h" />
     <ClInclude Include="UI\UIMainMenu.h" />
     <ClInclude Include="UI\UIOptions.h" />
+    <ClInclude Include="UI\UIPaused.h" />
+    <ClInclude Include="UI\UIPlaying.h" />
     <ClInclude Include="UI\UserInterface.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />
@@ -263,6 +287,36 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Particle\ParticleCreateCS.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Particle\ParticleGS.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Particle\ParticlePS.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Particle\ParticleUpdateCS.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Particle\ParticleVS.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="PixelShader.hlsl">

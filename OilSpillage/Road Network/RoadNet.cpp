@@ -400,8 +400,8 @@ bool RoadNetwork::segmentIntersection(Segment& first, Segment& second)
 
 		if (t1 > 0 && t2 > 0 && t1 < 1 && t2 < 1) {
 			intersect = true;
-			first.crossingPosition = new Vector3((point1.x + point2.x * t1), 0.0f, (point1.y + point2.y * t1));
-			second.crossingPosition = new Vector3((point3.x + point4.x * t2), 0.0f, (point3.y + point4.y * t2));
+			first.crossingPosition = new Vector3((point1.x + (point2.x - point1.x) * t1), 0.0f, (point1.y + (point2.y - point1.y) * t1));
+			second.crossingPosition = new Vector3((point3.x + (point4.x - point3.x) * t2), 0.0f, (point3.y + (point4.y - point3.y) * t2));
 		}
 	}
 
