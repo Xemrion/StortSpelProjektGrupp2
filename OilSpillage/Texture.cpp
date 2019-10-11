@@ -135,12 +135,12 @@ unsigned short Texture::getHeight()
 
 DirectX::SimpleMath::Vector2 Texture::getSize()
 {
-	return DirectX::SimpleMath::Vector2(this->width, this->height);
+	return DirectX::SimpleMath::Vector2(static_cast<float>(this->width), static_cast<float>(this->height));
 }
 
 DirectX::SimpleMath::Vector2 Texture::getCenter()
 {
-	return DirectX::SimpleMath::Vector2(this->width, this->height) / 2;
+	return DirectX::SimpleMath::Vector2(static_cast<float>(this->width), static_cast<float>(this->height)) / 2;
 }
 
 bool Texture::LoadTarga(const char* filename, int& height, int& width)

@@ -15,7 +15,6 @@ private:
 	GameObject* bodyRotationPoint;
 
 	int health;
-	int maxHealth;
 
 	static const int bulletCount = 16;
 	float leftoverTime;
@@ -70,9 +69,11 @@ public:
 
 	const int& getHealthRef() const;
 	int getHealth() const;
+	int getMaxHealth() const;
 	void setHealth(int health);
-	void damage(int damageAmount);
-	void heal(int healAmount);
+	void setMaxHealth(int maxHealth);
+	void resetHealth();
+	void changeHealth(int amount);
 	bool isDead() const;
 };
 

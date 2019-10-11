@@ -1,322 +1,139 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{43dfc8df-b186-4550-bec0-abfb0696a21f}</UniqueIdentifier>
-    </Filter>
+    <FxCompile Include="ComputeLightCulling.hlsl" />
+    <FxCompile Include="DebugPS.hlsl" />
+    <FxCompile Include="DebugVs.hlsl" />
+    <FxCompile Include="PixelShader.hlsl" />
+    <FxCompile Include="VertexShader.hlsl" />
+    <FxCompile Include="Particle\ParticleCreateCS.hlsl" />
+    <FxCompile Include="Particle\ParticleGS.hlsl" />
+    <FxCompile Include="Particle\ParticlePS.hlsl" />
+    <FxCompile Include="Particle\ParticleUpdateCS.hlsl" />
+    <FxCompile Include="Particle\ParticleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphic\Shaders.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Resources\Debug.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vehicle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TestAI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_demo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_dx11.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_win32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_widgets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Importer\importerClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sound.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DynamicCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lights.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PG\Map.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\UserInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\UIMainMenu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\Element.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\Button.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\CheckBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\Slider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PG\Voronoi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Road Network\RoadNet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="States\MenuGameState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="States\PlayingGameState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\UIOptions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\UICredits.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PG\District.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PG\Walker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AI\Actor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AI\AStar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AI\Behaviour.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AI\Boid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AI\Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClCompile Include="AI\Actor.cpp" />
+    <ClCompile Include="AI\ActorManager.cpp" />
+    <ClCompile Include="AI\AStar.cpp" />
+    <ClCompile Include="AI\Attacker.cpp" />
+    <ClCompile Include="AI\Behaviour.cpp" />
+    <ClCompile Include="AI\Boid.cpp" />
+    <ClCompile Include="AI\Defender.cpp" />
+    <ClCompile Include="AI\Node.cpp" />
+    <ClCompile Include="DynamicCamera.cpp" />
+    <ClCompile Include="Particle\ParticleSystem.cpp" />
+    <ClCompile Include="PG\MapConfig.cpp" />
+    <ClCompile Include="PG\Map.cpp" />
+    <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
+    <ClCompile Include="PG\RoadGenerator.cpp" />
+    <ClCompile Include="States\MenuGameState.cpp" />
+    <ClCompile Include="States\PlayingGameState.cpp" />
+    <ClCompile Include="PG\District.cpp" />
+    <ClCompile Include="UI\Button.cpp" />
+    <ClCompile Include="UI\CheckBox.cpp" />
+    <ClCompile Include="UI\Element.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="graphics.cpp" />
+    <ClCompile Include="Graphic\Shaders.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="ImGui\imgui.cpp" />
+    <ClCompile Include="ImGui\imgui_demo.cpp" />
+    <ClCompile Include="ImGui\imgui_draw.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="Importer\importerClass.cpp" />
+    <ClCompile Include="lights.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="PG\TileMap.cpp" />
+    <ClCompile Include="PG\Voronoi.cpp" />
+    <ClCompile Include="Resources\Debug.cpp" />
+    <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="TestAI.cpp" />
+    <ClCompile Include="Road Network\RoadNet.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UI\Slider.cpp" />
+    <ClCompile Include="UI\UICredits.cpp" />
+    <ClCompile Include="UI\UIMainMenu.cpp" />
+    <ClCompile Include="UI\UIOptions.cpp" />
+    <ClCompile Include="UI\UIPaused.cpp" />
+    <ClCompile Include="UI\UIPlaying.cpp" />
+    <ClCompile Include="UI\UserInterface.cpp" />
+    <ClCompile Include="Vehicle.cpp" />
+    <ClCompile Include="window.cpp" />
+    <ClCompile Include="AI\Turrent.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="graphics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Structs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphic\Shaders.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Resources\Debug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IndexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vehicle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TestAI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imconfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_dx11.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_win32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_rectpack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_textedit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_truetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Importer\importerClass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Importer\meshFormat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sound.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Lights.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VehicleStats.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\defs.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\Direction.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\Map.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\RandomSegments.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\Tile.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\utils.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\Walker.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DynamicCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\UserInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\UIMainMenu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Element.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Button.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\CheckBox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Slider.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\Voronoi.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\config.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Road Network\RoadNet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="States\GameState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="States\MenuGameState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="States\PlayingGameState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\UIOptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\UICredits.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VehicleWeapon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PG\District.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AI\Actor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AI\AStar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AI\Behaviour.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AI\Boid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AI\Node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="AI\Actor.h" />
+    <ClInclude Include="AI\ActorManager.h" />
+    <ClInclude Include="AI\AStar.h" />
+    <ClInclude Include="AI\Attacker.h" />
+    <ClInclude Include="AI\Behaviour.h" />
+    <ClInclude Include="AI\Boid.h" />
+    <ClInclude Include="AI\Defender.h" />
+    <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="Particle\ParticleSystem.h" />
+    <ClInclude Include="PG\Map.hpp" />
+    <ClInclude Include="PG\MinimapTextureGenerator.hpp" />
+    <ClInclude Include="States\GameState.h" />
+    <ClInclude Include="States\MenuGameState.h" />
+    <ClInclude Include="States\PlayingGameState.h" />
+    <ClInclude Include="PG\District.hpp" />
+    <ClInclude Include="STB\stb_image_write.h" />
+    <ClInclude Include="UI\Button.h" />
+    <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="DynamicCamera.h" />
+    <ClInclude Include="UI\CheckBox.h" />
+    <ClInclude Include="UI\Element.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="graphics.h" />
+    <ClInclude Include="Graphic\Shaders.h" />
+    <ClInclude Include="ImGui\imconfig.h" />
+    <ClInclude Include="ImGui\imgui.h" />
+    <ClInclude Include="ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="ImGui\imgui_internal.h" />
+    <ClInclude Include="ImGui\imstb_rectpack.h" />
+    <ClInclude Include="ImGui\imstb_textedit.h" />
+    <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="Importer\importerClass.h" />
+    <ClInclude Include="Importer\meshFormat.h" />
+    <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="Lights.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="PG\MapConfig.hpp" />
+    <ClInclude Include="PG\defs.hpp" />
+    <ClInclude Include="PG\Direction.hpp" />
+    <ClInclude Include="PG\TileMap.hpp" />
+    <ClInclude Include="PG\RandomSegments.hpp" />
+    <ClInclude Include="PG\Tile.hpp" />
+    <ClInclude Include="PG\utils.hpp" />
+    <ClInclude Include="PG\Voronoi.hpp" />
+    <ClInclude Include="PG\RoadGenerator.hpp" />
+    <ClInclude Include="Resources\Debug.h" />
+    <ClInclude Include="Sound.h" />
+    <ClInclude Include="Road Network\RoadNet.h" />
+    <ClInclude Include="Structs.h" />
+    <ClInclude Include="TestAI.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="UI\Slider.h" />
+    <ClInclude Include="UI\UICredits.h" />
+    <ClInclude Include="UI\UIMainMenu.h" />
+    <ClInclude Include="UI\UIOptions.h" />
+    <ClInclude Include="UI\UIPaused.h" />
+    <ClInclude Include="UI\UIPlaying.h" />
+    <ClInclude Include="UI\UserInterface.h" />
+    <ClInclude Include="Vehicle.h" />
+    <ClInclude Include="VehicleStats.h" />
+    <ClInclude Include="VertexBuffer.h" />
+    <ClInclude Include="VehicleWeapon.h" />
+    <ClInclude Include="window.h" />
+    <ClInclude Include="AI\Turrent.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

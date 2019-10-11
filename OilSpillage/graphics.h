@@ -19,6 +19,7 @@
 #include "Lights.h"
 #include <memory.h>
 #include <array>
+#include"Particle/ParticleSystem.h"
 
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
@@ -66,6 +67,9 @@ class Graphics {
 	};
 	LightBufferContents* lightBufferContents = nullptr;
 
+	ParticleSystem particleSystem;
+	ParticleSystem particleSystem2;
+
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
@@ -91,7 +95,7 @@ public:
 	void clearDraw();
 	void setLightList(LightList* lightList);
 	void presentScene();
-	void render(DynamicCamera* camera);
+	void render(DynamicCamera* camera, float deltaTime);
 	bool createShaders();
 	void fillLightBuffers();
 	void clearScreen();
@@ -100,4 +104,13 @@ public:
 	//culling by distance from camera
 	void setCullingDistance(float dist);
 	float getCullingDistance();
+	//Randompower means hom large the random position area is. 
+	void addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, int lifeTime = 2, float randomPower = 0.5f);
+	void addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, int lifeTime = 2, float randomPower = 0.5f);
+	void setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
+	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
+	void setVectorField(float vectorFieldSize,float vectorFieldPower);
+	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
+
+
 };

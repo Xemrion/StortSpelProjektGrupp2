@@ -5,16 +5,16 @@
 #include "../game.h"
 #include "../UI/UserInterface.h"
 
-enum Menu
-{
-	MENU_MAIN,
-	MENU_OPTIONS,
-	MENU_CREDITS,
-	MENUCOUNT
-};
-
 class MenuGameState : public GameState
 {
+public:
+	enum Menu
+	{
+		MENU_MAIN,
+		MENU_OPTIONS,
+		MENU_CREDITS,
+		MENUCOUNT
+	};
 private:
 	Graphics& graphics;
 	std::unique_ptr<UserInterface> menues[MENUCOUNT];
