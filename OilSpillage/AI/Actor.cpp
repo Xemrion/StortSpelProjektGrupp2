@@ -61,7 +61,7 @@ void Actor::update(float dt, Vector3 targetPos)
 	if(nrOfFrames % 100 == 0)
 	{
 		findPath();
-		nrOfFrames == 1;
+		nrOfFrames = 1;
 	}
 
 	this->root->func();

@@ -102,17 +102,23 @@ AStar::AStar(int gridWidth, int gridHeight, Vector2 topLeftCoord)
 		if (i % gridWidth != 0)
 		{
 			if (i + gridWidth < gridWidth * gridHeight)
+			{
 				nodes.at(i)->addNeighbour(nodes.at(i + gridWidth - 1));//Lower left
+			}
 
 			nodes.at(i)->addNeighbour(nodes.at(i - 1));//Left
 			if (i - gridWidth > 0)
+			{
 				nodes.at(i)->addNeighbour(nodes.at(i - gridWidth - 1)); //Upper left
+			}
 		}
 		if (i - gridWidth >= 0)
 		{
 			nodes.at(i)->addNeighbour(nodes.at(i - gridWidth)); //Upper mid
 			if (i % gridWidth != gridWidth - 1)
+			{
 				nodes.at(i)->addNeighbour(nodes.at(i - gridWidth + 1)); //upper right
+			}
 		}
 		if (i % gridWidth != gridWidth - 1)
 		{

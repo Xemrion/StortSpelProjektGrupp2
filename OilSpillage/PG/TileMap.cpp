@@ -125,7 +125,8 @@ Vec<V2u>  TileMap::getNeighbouringTilePositions( V2u tilePosition ) const noexce
                isBorderingEast  = ( tilePosition.x == width  - 1 ),
                isBorderingNorth = ( tilePosition.y ==          0 ),
                isBorderingSouth = ( tilePosition.y == height - 1 );
-   if ( not isBorderingNorth ) {  // N
+   if ( not isBorderingNorth ) 
+   {  // N
       neighbouringTilePositions.emplace_back(    tilePosition.x,   tilePosition.y-1 );
       if ( not isBorderingWest ) // NW
          neighbouringTilePositions.emplace_back( tilePosition.x-1, tilePosition.y-1 );
