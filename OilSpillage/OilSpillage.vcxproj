@@ -94,6 +94,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -134,11 +135,9 @@
   <ItemGroup>
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
+    <ClCompile Include="AI\Behaviour.cpp" />
     <ClCompile Include="AI\Boid.cpp" />
     <ClCompile Include="AI\Node.cpp" />
-    <ClCompile Include="camera.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="PG\Walker.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
@@ -183,6 +182,7 @@
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\AStar.h" />
+    <ClInclude Include="AI\Behaviour.h" />
     <ClInclude Include="AI\Boid.h" />
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="States\GameState.h" />
@@ -190,9 +190,6 @@
     <ClInclude Include="States\PlayingGameState.h" />
     <ClInclude Include="PG\District.hpp" />
     <ClInclude Include="UI\Button.h" />
-    <ClInclude Include="Camera.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DynamicCamera.h" />
     <ClInclude Include="UI\CheckBox.h" />

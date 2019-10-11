@@ -2,7 +2,6 @@
 
 #include "window.h"
 #include "GameObject.h"
-#include "Camera.h"
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
@@ -32,29 +31,29 @@ enum Shapes
 
 class Graphics {
 	Window* window;
-	IDXGISwapChain* swapChain;
-	ID3D11Device* device;
-	ID3D11DeviceContext* deviceContext;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
+	Microsoft::WRL::ComPtr<ID3D11Device> device;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;
 	D3D11_VIEWPORT vp;
 
-	ID3D11RenderTargetView* renderTargetView;
-	ID3D11Texture2D* depthStencilBuffer;
-	ID3D11DepthStencilState* depthStencilState;
-	ID3D11DepthStencilView* depthStencilView;
-	ID3D11RasterizerState* rasterState;
-	ID3D11BlendState* alphaEnableBlendingState;
-	ID3D11Buffer* viewProjBuffer;
-	ID3D11Buffer* worldBuffer;
-	ID3D11Buffer* colorBuffer;
-	ID3D11Buffer* sunBuffer;
-	ID3D11Buffer* lightBuffer;
-	ID3D11Buffer* frustumBuffer;
-	ID3D11Buffer* culledLightBuffer;
-	ID3D11UnorderedAccessView* culledLightBufferUAV;
-	ID3D11ShaderResourceView* culledLightBufferSRV;
-	ID3D11ShaderResourceView* frustumBufferSRV;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterState;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> alphaEnableBlendingState;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> worldBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> colorBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> sunBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> lightBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> frustumBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> culledLightBuffer;
+	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> culledLightBufferUAV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> culledLightBufferSRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> frustumBufferSRV;
 
-	ID3D11SamplerState* sampler;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
 	std::unordered_map<std::string, Mesh> meshes;
 	std::unordered_map<std::string, Texture*> textures;
 	std::vector<GameObject*> drawableObjects;
@@ -71,7 +70,7 @@ class Graphics {
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
 	Debug* debugger;
-	ID3D11Debug* debug;
+	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
 	void cullLights();
 public:

@@ -31,7 +31,7 @@ Void Branch::walk( Config const &config ) {
    while ( (tiles_walked != tiles_to_walk) and ( steps --> 0 ) ) {
       // potential branch:
       Bool  is_branch_eligible = ( args.cur_depth < args.max_depth-1 )
-         and ( tiles_since_last_branch >= config.min_tiles_before_branch );
+         and ( tiles_since_last_branch >= static_cast<U16>(config.min_tiles_before_branch) );
       if ( is_branch_eligible and gen_selection(args.rng) > args.branch_prob ) {
          // TODO: delay by putting params in a vector and doing the branches after the main loop
          Dir branch_direction = gen_selection(args.rng) < 50 ?
@@ -42,7 +42,7 @@ Void Branch::walk( Config const &config ) {
       else ++tiles_since_last_branch;
 
       // potential turn:
-      Bool  is_turn_eligible = tiles_since_last_turn >= config.min_tiles_before_turn;
+      Bool  is_turn_eligible = tiles_since_last_turn >= static_cast<U16>(config.min_tiles_before_turn);
       if ( is_turn_eligible and gen_selection(args.rng) > args.turn_prob ) {
          dir = gen_selection(args.rng) < 50 ?
                      turn_left(dir) : turn_right(dir);
