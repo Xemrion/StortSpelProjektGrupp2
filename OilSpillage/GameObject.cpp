@@ -87,10 +87,3 @@ AABB GameObject::getAABB() const
 	boundingBox.minPos += this->getPosition();
 	return boundingBox;
 }
-
-AABB StaticGameObject::getAABB() const
-{
-	AABB boundingBox = this->Mesh::getAABB();
-
-	return boundingBox;
-}

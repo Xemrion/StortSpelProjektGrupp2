@@ -42,28 +42,29 @@ QuadTree::Node::Node(AABB&& boundingBox, UINT treeDepth)
 	seChild = make_unique<Node>(move(seBoundingBox), treeDepth - 1);
 }
 
-void QuadTree::insert(StaticGameObject* o)
+void QuadTree::insert(GameObject* o)
 {
 	root->insert(o);
 }
 
-void QuadTree::Node::insert(StaticGameObject* o)
+void QuadTree::Node::insert(GameObject* o)
 {
 	if (depth > 0)
 	{
-		if (o->getAABB().intersect(nwChild->boundingBox))
+		
+		if (nwChild->boundingBox.intersect(o->getAABB()))
 		{
 			nwChild->insert(o);
 		}
-		else if (o->getAABB().intersect(neChild->boundingBox))
+		else if (neChild->boundingBox.intersect(o->getAABB()))
 		{
 			neChild->insert(o);
 		}
-		else if (o->getAABB().intersect(swChild->boundingBox))
+		else if (swChild->boundingBox.intersect(o->getAABB()))
 		{
 			swChild->insert(o);
 		}
-		else if (o->getAABB().intersect(seChild->boundingBox))
+		else if (seChild->boundingBox.intersect(o->getAABB()))
 		{
 			seChild->insert(o);
 		}
@@ -74,25 +75,25 @@ void QuadTree::Node::insert(StaticGameObject* o)
 	}
 }
 
-void QuadTree::getObjects(std::vector<StaticGameObject*>& objects, Frustum viewFrustum, float frustumBias)
+void QuadTree::getGameObjects(std::vector<GameObject*>& objects, Frustum viewFrustum, float frustumBias)
 {
-	root->getObjects(objects, viewFrustum, frustumBias);
+	root->getGameObjects(objects, viewFrustum, frustumBias);
 }
 
-void QuadTree::Node::getObjects(std::vector<StaticGameObject*>& objects, Frustum& viewFrustum, float& frustumBias)
+void QuadTree::Node::getGameObjects(std::vector<GameObject*>& objects, Frustum& viewFrustum, float& frustumBias)
 {
 	if (viewFrustum.intersect(boundingBox, frustumBias))
 	{
 		if (depth > 0)
 		{
-			nwChild->getObjects(objects, viewFrustum, frustumBias);
-			neChild->getObjects(objects, viewFrustum, frustumBias);
-			swChild->getObjects(objects, viewFrustum, frustumBias);
-			seChild->getObjects(objects, viewFrustum, frustumBias);
+			nwChild->getGameObjects(objects, viewFrustum, frustumBias);
+			neChild->getGameObjects(objects, viewFrustum, frustumBias);
+			swChild->getGameObjects(objects, viewFrustum, frustumBias);
+			seChild->getGameObjects(objects, viewFrustum, frustumBias);
 		}
 		else
 		{
-			for (StaticGameObject* o : this->objects)
+			for (GameObject* o : this->objects)
 			{
 				if (viewFrustum.intersect(o->getAABB(), frustumBias))
 				{
@@ -103,88 +104,22 @@ void QuadTree::Node::getObjects(std::vector<StaticGameObject*>& objects, Frustum
 	}
 }
 
-
-void QuadTree::createVertexBuffers(ID3D11Device* device)
+void QuadTree::clearGameObjects()
 {
-	root->createVertexBuffers(device);
+	root->clearGameObjects();
 }
 
-void QuadTree::Node::createVertexBuffers(ID3D11Device* device)
+void QuadTree::Node::clearGameObjects()
 {
 	if (depth > 0)
 	{
-		nwChild->createVertexBuffers(device);
-		neChild->createVertexBuffers(device);
-		swChild->createVertexBuffers(device);
-		seChild->createVertexBuffers(device);
-	}
-	else
-	{
-		std::vector<Vertex3D> vertices;
-		D3D11_BUFFER_DESC vBufferDesc;
-		ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
-		vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vBufferDesc.CPUAccessFlags = 0;
-		vBufferDesc.MiscFlags = 0;
-
-		for (StaticGameObject* o : objects)
-		{
-			for (Vertex3D v : o->vertices)
-			{
-				vBufferDesc.ByteWidth += sizeof(Vertex3D);
-				vertices.push_back(std::move(v));
-			}
-		}
-
-		D3D11_SUBRESOURCE_DATA subData;
-		ZeroMemory(&subData, sizeof(subData));
-		subData.pSysMem = vertices.data();
-
-		device->CreateBuffer(&vBufferDesc, &subData, vertexBuffer.ReleaseAndGetAddressOf());
-	}
-}
-
-void QuadTree::getVertexBuffers(std::vector<ID3D11Buffer**>& vertexBuffers, Frustum viewFrustum, float frustumBias)
-{
-	root->getVertexBuffers(vertexBuffers, viewFrustum, frustumBias);
-}
-
-void QuadTree::Node::getVertexBuffers(std::vector<ID3D11Buffer**>& vertexBuffers, Frustum& viewFrustum, float& frustumBias)
-{
-	if (viewFrustum.intersect(boundingBox, frustumBias))
-	{
-		if (depth > 0)
-		{
-			nwChild->getVertexBuffers(vertexBuffers, viewFrustum, frustumBias);
-			neChild->getVertexBuffers(vertexBuffers, viewFrustum, frustumBias);
-			swChild->getVertexBuffers(vertexBuffers, viewFrustum, frustumBias);
-			seChild->getVertexBuffers(vertexBuffers, viewFrustum, frustumBias);
-		}
-		else
-		{
-			vertexBuffers.push_back(vertexBuffer.GetAddressOf());
-		}
-	}
-}
-
-void QuadTree::clearContents()
-{
-	root->clearContents();
-}
-
-void QuadTree::Node::clearContents()
-{
-	if (depth > 0)
-	{
-		nwChild->clearContents();
-		neChild->clearContents();
-		swChild->clearContents();
-		seChild->clearContents();
+		nwChild->clearGameObjects();
+		neChild->clearGameObjects();
+		swChild->clearGameObjects();
+		seChild->clearGameObjects();
 	}
 	else
 	{
 		objects.clear();
-		vertexBuffer.ReleaseAndGetAddressOf();
 	}
 }

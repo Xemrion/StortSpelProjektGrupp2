@@ -18,7 +18,7 @@ Graphics::Graphics()
 
 	lightBufferContents = new LightBufferContents;
 
-	this->quadTree = std::make_unique<QuadTree>(Vector2(-96.f * 20.f, -96.f * 20.f), Vector2(96.f * 20.f, 96.f * 20.f), 4);
+	this->quadTree = std::make_unique<QuadTree>(Vector2(-96.f * 10.f, -96.f * 10.f), Vector2(96.f * 10.f, 96.f * 10.f), 4);
 }
 
 Graphics::~Graphics()
@@ -748,44 +748,17 @@ Texture* Graphics::getTexturePointer(const char* path, bool isModel )
 	else return textures[texturePath];
 }
 
-void Graphics::addToDraw(GameObject* o)
+void Graphics::addToDraw(GameObject* o, bool isStatic)
 {
 	assert( o != nullptr );
-	drawableObjects.push_back(o);
-}
-
-void Graphics::addToDraw(StaticGameObject* o)
-{
-	o->insertDataToMesh(o->mesh->vertices);
-	Matrix transform = o->getTransform();
-	AABB aabb;
-	aabb.minPos = Vector3(10000, 10000, 10000);
-	aabb.maxPos = Vector3(-10000, -10000, -10000);
-
-	for (Vertex3D& vert : o->vertices)
+	if (!isStatic)
 	{
-		vert.position = Vector3::Transform(vert.position, transform);
-		vert.normal = Vector3::TransformNormal(vert.normal, transform);
-		aabb.minPos = Vector3::Min(aabb.minPos, vert.position);
-		aabb.maxPos = Vector3::Max(aabb.maxPos, vert.position);
+		drawableObjects.push_back(o);
 	}
-
-	o->setAABB(aabb);
-	quadTree->insert(o);
-
-	D3D11_BUFFER_DESC vBufferDesc;
-	ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
-	vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vBufferDesc.CPUAccessFlags = 0;
-	vBufferDesc.MiscFlags = 0;
-	vBufferDesc.ByteWidth = sizeof(Vertex3D) * o->vertices.size();
-	
-	D3D11_SUBRESOURCE_DATA subData;
-	ZeroMemory(&subData, sizeof(subData));
-	subData.pSysMem = o->vertices.data();
-
-	device->CreateBuffer(&vBufferDesc, &subData, o->vertexBuffer.ReleaseAndGetAddressOf());
+	else
+	{
+		quadTree->insert(o);
+	}
 }
 
 void Graphics::removeFromDraw(GameObject* o)
@@ -801,7 +774,12 @@ void Graphics::removeFromDraw(GameObject* o)
 void Graphics::clearDraw()
 {
 	drawableObjects.clear();
-	quadTree->clearContents();
+	quadTree->clearGameObjects();
+}
+
+void Graphics::clearStaticObjects()
+{
+	quadTree->clearGameObjects();
 }
 
 void Graphics::setLightList(LightList* lightList)
@@ -943,17 +921,17 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 	ID3D11ShaderResourceView* shaderResView;
 	shaderResView = nullptr;
 
-	std::vector<StaticGameObject*> objects;
-	quadTree->getObjects(objects, frustum, frustumBias);
+	std::vector<GameObject*> objects;
+	quadTree->getGameObjects(objects, frustum, frustumBias);
 
-	Matrix identity = Matrix();
-	deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, &identity, sizeof(SimpleMath::Matrix));
-	deviceContext->Unmap(worldBuffer.Get(), 0);
-	deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
-
-	for (StaticGameObject* o : objects)
+	for (GameObject* o : objects)
 	{
+		Matrix world = o->getTransform().Transpose();
+		deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &world, sizeof(SimpleMath::Matrix));
+		deviceContext->Unmap(worldBuffer.Get(), 0);
+		deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
+
 		Vector4 modColor = o->getColor();
 		deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
@@ -969,10 +947,10 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 		}
 
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		deviceContext->IASetVertexBuffers(0, 1, o->vertexBuffer.GetAddressOf(), &stride, &offset);
+		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
-		deviceContext->Draw(static_cast<UINT>(o->vertices.size()), 0);
+		deviceContext->Draw(static_cast<UINT>(o->mesh->getVertexCount()), 0);
 	}
 }

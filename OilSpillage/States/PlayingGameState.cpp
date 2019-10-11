@@ -3,16 +3,10 @@
 #include "../Sound.h"
 
 void PlayingGameState::generateMap( Config const &config ) {
-   // TODO: this shit shouldn't be necessary. make it so GameObject's destructor handles this D:<
-   for ( auto &e : roadTiles )
-      graphics.removeFromDraw(&e);
-   for ( auto &e : districtMarkers )
-      graphics.removeFromDraw(&e);
-   for ( auto &e : houseTiles )
-      graphics.removeFromDraw(&e);
+	graphics.clearStaticObjects();
 
-	roadTiles       = Vec<StaticGameObject>( config.map_dimensions.x * config.map_dimensions.y );
-   districtMarkers = Vec<StaticGameObject>( config.cell_side * config.cell_side );
+	roadTiles       = Vec<GameObject>( config.map_dimensions.x * config.map_dimensions.y );
+   districtMarkers = Vec<GameObject>( config.cell_side * config.cell_side );
    houseTiles.clear();
 	// create blank map
    map = std::make_unique<Map>( config );
@@ -77,6 +71,7 @@ void PlayingGameState::generateMap( Config const &config ) {
    }
 #endif
 
+   generateBuildings(config, rng);
 
    for ( U16 y=0;  y < map->height;  ++y ) {
       for ( U16 x=0;  x < map->width;  ++x ) {
@@ -84,10 +79,9 @@ void PlayingGameState::generateMap( Config const &config ) {
 		   tile.setScale( Vector3{ 0.0005f * config.tile_scale.x,
                                  0.0005f * config.tile_scale.y,
                                  0.0005f * config.tile_scale.z }); // TODO: scale models instead
-		   graphics.addToDraw(&tile);
+		   graphics.addToDraw(&tile, true);
       }
 	}
-   generateBuildings(config, rng);
 }
 
 void PlayingGameState::generateBuildings( Config const &config, RNG &rng) {
@@ -161,7 +155,7 @@ void PlayingGameState::generateBuildings( Config const &config, RNG &rng) {
 
    // adding all the tiles to draw:
    for ( auto &e : houseTiles )
-      graphics.addToDraw(&e);
+      graphics.addToDraw(&e, true);
 
 #ifdef _DEBUG
    if ( building_logs.is_open() )

@@ -90,10 +90,10 @@ public:
 	bool loadTexture(std::string fileName, bool overridePath=false);
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path, bool isModel=false);
-	void addToDraw(GameObject* o);
-	void addToDraw(StaticGameObject* o);
+	void addToDraw(GameObject* o, bool isStatic = false);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
+	void clearStaticObjects();
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera);

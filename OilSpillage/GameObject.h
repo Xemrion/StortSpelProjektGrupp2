@@ -32,10 +32,3 @@ public:
 	Vector3  getScale()    const;
 	AABB     getAABB()     const;
 };
-
-
-class StaticGameObject : public GameObject, public Mesh
-{
-public:
-	AABB getAABB() const;
-};

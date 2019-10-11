@@ -20,9 +20,11 @@ struct AABB
 	DirectX::SimpleMath::Vector3 maxPos;
 	AABB scale(DirectX::SimpleMath::Vector3 scale)
 	{
-		AABB scaledAABB = { maxPos * scale, minPos * scale };
+		AABB scaledAABB = { minPos * scale, maxPos * scale };
 		return scaledAABB;
 	};
+
+	
 
 	bool intersect(AABB other)
 	{
