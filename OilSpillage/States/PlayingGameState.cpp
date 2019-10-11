@@ -330,9 +330,10 @@ void PlayingGameState::init()
 	actorManager = std::make_unique<ActorManager>();
 	actorManager->setAStar(aStar);
 	actorManager->createDefender(1, 2);
-	//actorManager->createAttacker(1, -2);
+	actorManager->createAttacker(1, -2);
+	actorManager->createAttacker(1, -4);
 
-	}
+	
 	actorManager->initGroups();
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
@@ -427,6 +428,20 @@ void PlayingGameState::ImGui_Driving() {
 	ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
 	ImGui::Text(("R Str: " + std::to_string(rStr)).c_str());
 	ImGui::Text(("Accelerator: " + std::to_string(player->getAcceleratorX())).c_str());
+	ImGui::Text(("Groups: " + std::to_string(actorManager->groups.size())).c_str());
+	ImGui::End();
+}
+
+void PlayingGameState::ImGui_AI()
+{
+	ImGui::Begin("AI");
+	ImGui::SetWindowSize({ 100,150 });
+
+	ImGui::Text(("Groups: " + std::to_string(actorManager->groups.size())).c_str());
+	for (int i = 0; i < actorManager->groups.size(); i++)
+	{
+		ImGui::Text(("Group " + std::to_string(i) + ":" + std::to_string(actorManager->groups.at(i).size())).c_str());
+	}
 	ImGui::End();
 }
 
@@ -488,6 +503,7 @@ void PlayingGameState::update(float deltaTime)
 	ImGui::NewFrame();
 	ImGui_Driving();
 	ImGui_ProcGen();
+	ImGui_AI();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #endif
