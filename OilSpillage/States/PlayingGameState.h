@@ -35,10 +35,13 @@ private:
 	std::unique_ptr<DynamicCamera>  camera;
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight = nullptr;
-	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::unique_ptr<AStar>          aStar;
-
+	
+	//Test
+	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::unique_ptr<SkyscraperFloor> testFloor1;
+	std::unique_ptr<SkyscraperFloor> testFloor2;
+
 	void           generateMap( Config const & );
    void           generateBuildings( Config const &, RNG & );
    void           ImGui_ProcGen();

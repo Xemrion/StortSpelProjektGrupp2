@@ -1,6 +1,5 @@
 #pragma once
 #include<d3d11.h>
-#include<DirectXMath.h>
 #include<SimpleMath.h>
 #include<vector>
 #include"..//graphics.h"
@@ -17,6 +16,10 @@ public:
 	void rotateRad(float radians);
 	void unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter);
 	void testDraw(Graphics* graphics);
+	Vector3 getAVertex(int vertex);
+	void translate(Vector3 newCenter);
+	void regenerateShape(int edges);
+
 private:
 	std::vector<Vector3> verticies;
 	int nrOfEdges;
@@ -24,8 +27,8 @@ private:
 
 	float pi = 3.141592653f;
 
-	void translate(Vector3 newCenter);
-	void generateShape(int edges); //3 - ?
+
+	void generateShape(int edges);
 	Vector3 intersectingLines(Vector3& pointA1, Vector3& pointA2, Vector3& pointB1, Vector3& pointB2);
 	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA);
 };

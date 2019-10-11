@@ -313,8 +313,17 @@ void PlayingGameState::init() {
 	lightList = std::make_unique<LightList>();
 	player    = std::make_unique<Vehicle>();
 	camera    = std::make_unique<DynamicCamera>();
+	
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	testFloor1 = std::make_unique<SkyscraperFloor>(4);
+	testFloor2 = std::make_unique<SkyscraperFloor>(5);
+	testFloor2.get()->rotateDeg(56);
+	//testFloor2.get()->translate(testFloor1.get()->getAVertex(3));
+	testFloor1.get()->unionShapes(*testFloor2.get(), testFloor1.get()->getAVertex(3));
+	testFloor2.get()->regenerateShape(3);
+	testFloor2.get()->rotateDeg(67);
+	testFloor1.get()->unionShapes(*testFloor2.get(), testFloor1.get()->getAVertex(1));
+
 	graphics.createFrustumBuffer(camera.get());
 
 	aStar = std::make_unique<AStar>( 20, 20, Vector2(-10, 10) );
@@ -574,6 +583,7 @@ void PlayingGameState::update(float deltaTime)
 	graphics.render(camera.get());
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	testFloor1.get()->testDraw(&graphics);
+	//testFloor2.get()->testDraw(&graphics);
 
 #ifdef _DEBUG
 	ImGui_ImplDX11_NewFrame();
