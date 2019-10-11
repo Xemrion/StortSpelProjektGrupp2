@@ -333,7 +333,6 @@ void PlayingGameState::init()
 	actorManager->createAttacker(1, -2);
 	actorManager->createAttacker(1, -4);
 
-	
 	actorManager->initGroups();
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
