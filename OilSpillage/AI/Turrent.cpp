@@ -10,8 +10,9 @@ Turrent::Turrent()
 
 Turrent::Turrent(float x, float z, AStar* aStar) :Actor(x, z, aStar)
 {
+	this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
 	this->sightRange = 10;
-	this->setPosition(Vector3(-15.0f, 0.0f, 0.0f));
+	//this->setPosition(Vector3(x, 0.0f, z));
 	setUpActor();
 	this->vecForward = Vector3(0.0f, 0.0f, 1.0f);
 }
@@ -21,6 +22,7 @@ void Turrent::update(float dt, Vector3 targetPos)
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 	this->root->func();
+	followPath();
 }
 
 void Turrent::setForwardVector(Vector3 forward)
@@ -57,6 +59,7 @@ void Turrent::setUpActor()
 
 void Turrent::followPath()
 {
+	destination = position;
 }
 
 Status Turrent::rotateToWards()
