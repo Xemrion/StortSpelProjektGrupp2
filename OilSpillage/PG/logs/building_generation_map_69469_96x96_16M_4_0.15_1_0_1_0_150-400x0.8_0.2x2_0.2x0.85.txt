@@ -1,0 +1,1853 @@
+==================================== BEGINNING BUILDING GENERATION ====================================
+
+	Generating buildings for district #0 (TYPE: "park")
+
+	Generating buildings for district #1 (TYPE: "downtown")
+		Generating building #0. (Map total building count: 0)
+			Building size: 8 tiles. (Map total tile count: 8)
+			The district real estate coverage is now 0%
+			The target coverage is: 40%
+		Generating building #1. (Map total building count: 1)
+			Building size: 4 tiles. (Map total tile count: 20)
+			The district real estate coverage is now 3.61991%
+			The target coverage is: 40%
+		Generating building #2. (Map total building count: 2)
+			Building size: 6 tiles. (Map total tile count: 30)
+			The district real estate coverage is now 5.42986%
+			The target coverage is: 40%
+		Generating building #3. (Map total building count: 3)
+			Building size: 5 tiles. (Map total tile count: 41)
+			The district real estate coverage is now 8.1448%
+			The target coverage is: 40%
+		Generating building #4. (Map total building count: 4)
+			Building size: 7 tiles. (Map total tile count: 53)
+			The district real estate coverage is now 10.4072%
+			The target coverage is: 40%
+		Generating building #5. (Map total building count: 5)
+			Building size: 8 tiles. (Map total tile count: 68)
+			The district real estate coverage is now 13.5747%
+			The target coverage is: 40%
+		Generating building #6. (Map total building count: 6)
+			Building size: 5 tiles. (Map total tile count: 81)
+			The district real estate coverage is now 17.1946%
+			The target coverage is: 40%
+		Generating building #7. (Map total building count: 7)
+			Building size: 7 tiles. (Map total tile count: 93)
+			The district real estate coverage is now 19.457%
+			The target coverage is: 40%
+		Generating building #8. (Map total building count: 8)
+			Building size: 7 tiles. (Map total tile count: 107)
+			The district real estate coverage is now 22.6244%
+			The target coverage is: 40%
+		Generating building #9. (Map total building count: 9)
+			Building size: 6 tiles. (Map total tile count: 120)
+			The district real estate coverage is now 25.7919%
+			The target coverage is: 40%
+		Generating building #10. (Map total building count: 10)
+			Building size: 5 tiles. (Map total tile count: 131)
+			The district real estate coverage is now 28.5068%
+			The target coverage is: 40%
+		Generating building #11. (Map total building count: 11)
+			Building size: 6 tiles. (Map total tile count: 142)
+			The district real estate coverage is now 30.7692%
+			The target coverage is: 40%
+		Generating building #12. (Map total building count: 12)
+			Building size: 8 tiles. (Map total tile count: 156)
+			The district real estate coverage is now 33.4842%
+			The target coverage is: 40%
+		Generating building #13. (Map total building count: 13)
+			Building size: 5 tiles. (Map total tile count: 169)
+			The district real estate coverage is now 37.1041%
+			The target coverage is: 40%
+		Generating building #14. (Map total building count: 14)
+			Building size: 8 tiles. (Map total tile count: 182)
+			The district real estate coverage is now 39.3665%
+			The target coverage is: 40%
+
+	Generating buildings for district #2 (TYPE: "residential")
+		Generating building #0. (Map total building count: 15)
+			Building size: 13 tiles. (Map total tile count: 203)
+			The district real estate coverage is now 0%
+			The target coverage is: 60%
+		Generating building #1. (Map total building count: 16)
+			Building size: 15 tiles. (Map total tile count: 231)
+			The district real estate coverage is now 8.33333%
+			The target coverage is: 60%
+
+	Generating buildings for district #3 (TYPE: "residential")
+		Generating building #0. (Map total building count: 17)
+			Building size: 14 tiles. (Map total tile count: 260)
+			The district real estate coverage is now 0%
+			The target coverage is: 60%
+		Generating building #1. (Map total building count: 18)
+			Building size: 15 tiles. (Map total tile count: 289)
+			The district real estate coverage is now 10.5263%
+			The target coverage is: 60%
+		Generating building #2. (Map total building count: 19)
+			Building size: 13 tiles. (Map total tile count: 317)
+			The district real estate coverage is now 21.8045%
+			The target coverage is: 60%
+		Generating building #3. (Map total building count: 20)
+			Building size: 13 tiles. (Map total tile count: 343)
+			The district real estate coverage is now 31.5789%
+			The target coverage is: 60%
+		Generating building #4. (Map total building count: 21)
+			Building size: 10 tiles. (Map total tile count: 366)
+			The district real estate coverage is now 41.3534%
+			The target coverage is: 60%
+		Generating building #5. (Map total building count: 22)
+			Building size: 11 tiles. (Map total tile count: 387)
+			The district real estate coverage is now 48.8722%
+			The target coverage is: 60%
+		Generating building #6. (Map total building count: 23)
+			Building size: 15 tiles. (Map total tile count: 413)
+			The district real estate coverage is now 57.1429%
+			The target coverage is: 60%
+
+	Generating buildings for district #4 (TYPE: "residential")
+		Generating building #0. (Map total building count: 24)
+			Building size: 10 tiles. (Map total tile count: 438)
+			The district real estate coverage is now 0%
+			The target coverage is: 60%
+		Generating building #1. (Map total building count: 25)
+			Building size: 15 tiles. (Map total tile count: 463)
+			The district real estate coverage is now 3.27869%
+			The target coverage is: 60%
+		Generating building #2. (Map total building count: 26)
+			Building size: 10 tiles. (Map total tile count: 488)
+			The district real estate coverage is now 8.19672%
+			The target coverage is: 60%
+		Generating building #3. (Map total building count: 27)
+			Building size: 15 tiles. (Map total tile count: 513)
+			The district real estate coverage is now 11.4754%
+			The target coverage is: 60%
+		Generating building #4. (Map total building count: 28)
+			Building size: 12 tiles. (Map total tile count: 540)
+			The district real estate coverage is now 16.3934%
+			The target coverage is: 60%
+		Generating building #5. (Map total building count: 29)
+			Building size: 8 tiles. (Map total tile count: 560)
+			The district real estate coverage is now 20.3279%
+			The target coverage is: 60%
+		Generating building #6. (Map total building count: 30)
+			Building size: 14 tiles. (Map total tile count: 582)
+			The district real estate coverage is now 22.9508%
+			The target coverage is: 60%
+		Generating building #7. (Map total building count: 31)
+			Building size: 11 tiles. (Map total tile count: 607)
+			The district real estate coverage is now 27.541%
+			The target coverage is: 60%
+		Generating building #8. (Map total building count: 32)
+			Building size: 10 tiles. (Map total tile count: 628)
+			The district real estate coverage is now 31.1475%
+			The target coverage is: 60%
+		Generating building #9. (Map total building count: 33)
+			Building size: 14 tiles. (Map total tile count: 652)
+			The district real estate coverage is now 34.4262%
+			The target coverage is: 60%
+		Generating building #10. (Map total building count: 34)
+			Building size: 10 tiles. (Map total tile count: 676)
+			The district real estate coverage is now 39.0164%
+			The target coverage is: 60%
+		Generating building #11. (Map total building count: 35)
+			Building size: 8 tiles. (Map total tile count: 694)
+			The district real estate coverage is now 42.2951%
+			The target coverage is: 60%
+		Generating building #12. (Map total building count: 36)
+			Building size: 14 tiles. (Map total tile count: 716)
+			The district real estate coverage is now 44.918%
+			The target coverage is: 60%
+		Generating building #13. (Map total building count: 37)
+			Building size: 15 tiles. (Map total tile count: 745)
+			The district real estate coverage is now 49.5082%
+			The target coverage is: 60%
+		Generating building #14. (Map total building count: 38)
+			Building size: 8 tiles. (Map total tile count: 768)
+			The district real estate coverage is now 54.4262%
+			The target coverage is: 60%
+		Generating building #15. (Map total building count: 39)
+			Building size: 9 tiles. (Map total tile count: 785)
+			The district real estate coverage is now 57.0492%
+			The target coverage is: 60%
+
+	Generating buildings for district #5 (TYPE: "residential")
+		Generating building #0. (Map total building count: 40)
+			Building size: 10 tiles. (Map total tile count: 804)
+			The district real estate coverage is now 0%
+			The target coverage is: 60%
+		Generating building #1. (Map total building count: 41)
+			Building size: 16 tiles. (Map total tile count: 830)
+			The district real estate coverage is now 3.663%
+			The target coverage is: 60%
+		Generating building #2. (Map total building count: 42)
+			Building size: 15 tiles. (Map total tile count: 861)
+			The district real estate coverage is now 9.52381%
+			The target coverage is: 60%
+		Generating building #3. (Map total building count: 43)
+			Building size: 16 tiles. (Map total tile count: 892)
+			The district real estate coverage is now 15.0183%
+			The target coverage is: 60%
+		Generating building #4. (Map total building count: 44)
+			Building size: 13 tiles. (Map total tile count: 921)
+			The district real estate coverage is now 20.8791%
+			The target coverage is: 60%
+		Generating building #5. (Map total building count: 45)
+			Building size: 13 tiles. (Map total tile count: 947)
+			The district real estate coverage is now 25.641%
+			The target coverage is: 60%
+		Generating building #6. (Map total building count: 46)
+			Building size: 16 tiles. (Map total tile count: 976)
+			The district real estate coverage is now 30.4029%
+			The target coverage is: 60%
+		Generating building #7. (Map total building count: 47)
+			Building size: 14 tiles. (Map total tile count: 1006)
+			The district real estate coverage is now 36.2637%
+			The target coverage is: 60%
+		Generating building #8. (Map total building count: 48)
+			Building size: 8 tiles. (Map total tile count: 1028)
+			The district real estate coverage is now 41.3919%
+			The target coverage is: 60%
+		Generating building #9. (Map total building count: 49)
+			Building size: 10 tiles. (Map total tile count: 1046)
+			The district real estate coverage is now 44.3223%
+			The target coverage is: 60%
+		Generating building #10. (Map total building count: 50)
+			Building size: 14 tiles. (Map total tile count: 1070)
+			The district real estate coverage is now 47.9853%
+			The target coverage is: 60%
+		Generating building #11. (Map total building count: 51)
+			Building size: 14 tiles. (Map total tile count: 1098)
+			The district real estate coverage is now 53.1136%
+			The target coverage is: 60%
+		Generating building #12. (Map total building count: 52)
+			Building size: 10 tiles. (Map total tile count: 1122)
+			The district real estate coverage is now 58.2418%
+			The target coverage is: 60%
+
+	Generating buildings for district #6 (TYPE: "downtown")
+
+	Generating buildings for district #7 (TYPE: "suburban")
+		Generating building #0. (Map total building count: 53)
+			Building size: 1 tiles. (Map total tile count: 1133)
+			The district real estate coverage is now 0%
+			The target coverage is: 10%
+		Generating building #1. (Map total building count: 54)
+			Building size: 1 tiles. (Map total tile count: 1135)
+			The district real estate coverage is now 0.980392%
+			The target coverage is: 10%
+		Generating building #2. (Map total building count: 55)
+			Building size: 1 tiles. (Map total tile count: 1137)
+			The district real estate coverage is now 1.96078%
+			The target coverage is: 10%
+		Generating building #3. (Map total building count: 56)
+			Building size: 1 tiles. (Map total tile count: 1139)
+			The district real estate coverage is now 2.94118%
+			The target coverage is: 10%
+		Generating building #4. (Map total building count: 57)
+			Building size: 1 tiles. (Map total tile count: 1141)
+			The district real estate coverage is now 3.92157%
+			The target coverage is: 10%
+		Generating building #5. (Map total building count: 58)
+			Building size: 1 tiles. (Map total tile count: 1143)
+			The district real estate coverage is now 4.90196%
+			The target coverage is: 10%
+		Generating building #6. (Map total building count: 59)
+			Building size: 1 tiles. (Map total tile count: 1145)
+			The district real estate coverage is now 5.88235%
+			The target coverage is: 10%
+		Generating building #7. (Map total building count: 60)
+			Building size: 1 tiles. (Map total tile count: 1147)
+			The district real estate coverage is now 6.86275%
+			The target coverage is: 10%
+		Generating building #8. (Map total building count: 61)
+			Building size: 1 tiles. (Map total tile count: 1149)
+			The district real estate coverage is now 7.84314%
+			The target coverage is: 10%
+		Generating building #9. (Map total building count: 62)
+			Building size: 1 tiles. (Map total tile count: 1151)
+			The district real estate coverage is now 8.82353%
+			The target coverage is: 10%
+		Generating building #10. (Map total building count: 63)
+			Building size: 1 tiles. (Map total tile count: 1153)
+			The district real estate coverage is now 9.80392%
+			The target coverage is: 10%
+
+	Generating buildings for district #8 (TYPE: "park")
+
+	Generating buildings for district #9 (TYPE: "park")
+
+	Generating buildings for district #10 (TYPE: "residential")
+		Generating building #0. (Map total building count: 64)
+			Building size: 13 tiles. (Map total tile count: 1167)
+			The district real estate coverage is now 0%
+			The target coverage is: 60%
+		Generating building #1. (Map total building count: 65)
+			Building size: 8 tiles. (Map total tile count: 1188)
+			The district real estate coverage is now 7.47126%
+			The target coverage is: 60%
+		Generating building #2. (Map total building count: 66)
+			Building size: 13 tiles. (Map total tile count: 1209)
+			The district real estate coverage is now 12.069%
+			The target coverage is: 60%
+		Generating building #3. (Map total building count: 67)
+			Building size: 14 tiles. (Map total tile count: 1236)
+			The district real estate coverage is now 19.5402%
+			The target coverage is: 60%
+		Generating building #4. (Map total building count: 68)
+			Building size: 15 tiles. (Map total tile count: 1265)
+			The district real estate coverage is now 27.5862%
+			The target coverage is: 60%
+		Generating building #5. (Map total building count: 69)
+			Building size: 15 tiles. (Map total tile count: 1295)
+			The district real estate coverage is now 36.2069%
+			The target coverage is: 60%
+		Generating building #6. (Map total building count: 70)
+			Building size: 8 tiles. (Map total tile count: 1318)
+			The district real estate coverage is now 44.8276%
+			The target coverage is: 60%
+		Generating building #7. (Map total building count: 71)
+			Building size: 13 tiles. (Map total tile count: 1339)
+			The district real estate coverage is now 49.4253%
+			The target coverage is: 60%
+		Generating building #8. (Map total building count: 72)
+			Building size: 13 tiles. (Map total tile count: 1365)
+			The district real estate coverage is now 56.8965%
+			The target coverage is: 60%
+
+	Generating buildings for district #11 (TYPE: "park")
+
+	Generating buildings for district #12 (TYPE: "park")
+
+	Generating buildings for district #13 (TYPE: "suburban")
+		Generating building #0. (Map total building count: 73)
+			Building size: 1 tiles. (Map total tile count: 1379)
+			The district real estate coverage is now 0%
+			The target coverage is: 10%
+		Generating building #1. (Map total building count: 74)
+			Building size: 1 tiles. (Map total tile count: 1381)
+			The district real estate coverage is now 1.6129%
+			The target coverage is: 10%
+		Generating building #2. (Map total building count: 75)
+			Building size: 1 tiles. (Map total tile count: 1383)
+			The district real estate coverage is now 3.22581%
+			The target coverage is: 10%
+		Generating building #3. (Map total building count: 76)
+			Building size: 1 tiles. (Map total tile count: 1385)
+			The district real estate coverage is now 4.83871%
+			The target coverage is: 10%
+		Generating building #4. (Map total building count: 77)
+			Building size: 1 tiles. (Map total tile count: 1387)
+			The district real estate coverage is now 6.45161%
+			The target coverage is: 10%
+		Generating building #5. (Map total building count: 78)
+			Building size: 1 tiles. (Map total tile count: 1389)
+			The district real estate coverage is now 8.06452%
+			The target coverage is: 10%
+		Generating building #6. (Map total building count: 79)
+			Building size: 1 tiles. (Map total tile count: 1391)
+			The district real estate coverage is now 9.67742%
+			The target coverage is: 10%
+
+	Generating buildings for district #14 (TYPE: "suburban")
+		Generating building #0. (Map total building count: 80)
+			Building size: 1 tiles. (Map total tile count: 1393)
+			The district real estate coverage is now 0%
+			The target coverage is: 10%
+		Generating building #1. (Map total building count: 81)
+			Building size: 1 tiles. (Map total tile count: 1395)
+			The district real estate coverage is now 0.543478%
+			The target coverage is: 10%
+		Generating building #2. (Map total building count: 82)
+			Building size: 1 tiles. (Map total tile count: 1397)
+			The district real estate coverage is now 1.08696%
+			The target coverage is: 10%
+		Generating building #3. (Map total building count: 83)
+			Building size: 1 tiles. (Map total tile count: 1399)
+			The district real estate coverage is now 1.63043%
+			The target coverage is: 10%
+		Generating building #4. (Map total building count: 84)
+			Building size: 1 tiles. (Map total tile count: 1401)
+			The district real estate coverage is now 2.17391%
+			The target coverage is: 10%
+		Generating building #5. (Map total building count: 85)
+			Building size: 1 tiles. (Map total tile count: 1403)
+			The district real estate coverage is now 2.71739%
+			The target coverage is: 10%
+		Generating building #6. (Map total building count: 86)
+			Building size: 1 tiles. (Map total tile count: 1405)
+			The district real estate coverage is now 3.26087%
+			The target coverage is: 10%
+		Generating building #7. (Map total building count: 87)
+			Building size: 1 tiles. (Map total tile count: 1407)
+			The district real estate coverage is now 3.80435%
+			The target coverage is: 10%
+		Generating building #8. (Map total building count: 88)
+			Building size: 1 tiles. (Map total tile count: 1409)
+			The district real estate coverage is now 4.34783%
+			The target coverage is: 10%
+		Generating building #9. (Map total building count: 89)
+			Building size: 1 tiles. (Map total tile count: 1411)
+			The district real estate coverage is now 4.8913%
+			The target coverage is: 10%
+		Generating building #10. (Map total building count: 90)
+			Building size: 1 tiles. (Map total tile count: 1413)
+			The district real estate coverage is now 5.43478%
+			The target coverage is: 10%
+		Generating building #11. (Map total building count: 91)
+			Building size: 1 tiles. (Map total tile count: 1415)
+			The district real estate coverage is now 5.97826%
+			The target coverage is: 10%
+		Generating building #12. (Map total building count: 92)
+			Building size: 1 tiles. (Map total tile count: 1417)
+			The district real estate coverage is now 6.52174%
+			The target coverage is: 10%
+		Generating building #13. (Map total building count: 93)
+			Building size: 1 tiles. (Map total tile count: 1419)
+			The district real estate coverage is now 7.06522%
+			The target coverage is: 10%
+		Generating building #14. (Map total building count: 94)
+			Building size: 1 tiles. (Map total tile count: 1421)
+			The district real estate coverage is now 7.6087%
+			The target coverage is: 10%
+		Generating building #15. (Map total building count: 95)
+			Building size: 1 tiles. (Map total tile count: 1423)
+			The district real estate coverage is now 8.15217%
+			The target coverage is: 10%
+		Generating building #16. (Map total building count: 96)
+			Building size: 1 tiles. (Map total tile count: 1425)
+			The district real estate coverage is now 8.69565%
+			The target coverage is: 10%
+		Generating building #17. (Map total building count: 97)
+			Building size: 1 tiles. (Map total tile count: 1427)
+			The district real estate coverage is now 9.23913%
+			The target coverage is: 10%
+		Generating building #18. (Map total building count: 98)
+			Building size: 1 tiles. (Map total tile count: 1429)
+			The district real estate coverage is now 9.78261%
+			The target coverage is: 10%
+
+	Generating buildings for district #15 (TYPE: "residential")
+		Generating building #0. (Map total building count: 99)
+			Building size: 14 tiles. (Map total tile count: 1444)
+			The district real estate coverage is now 0%
+			The target coverage is: 60%
+		Generating building #1. (Map total building count: 100)
+			Building size: 10 tiles. (Map total tile count: 1468)
+			The district real estate coverage is now 6.36364%
+			The target coverage is: 60%
+		Generating building #2. (Map total building count: 101)
+			Building size: 8 tiles. (Map total tile count: 1486)
+			The district real estate coverage is now 10.9091%
+			The target coverage is: 60%
+		Generating building #3. (Map total building count: 102)
+			Building size: 8 tiles. (Map total tile count: 1502)
+			The district real estate coverage is now 14.5455%
+			The target coverage is: 60%
+		Generating building #4. (Map total building count: 103)
+			Building size: 12 tiles. (Map total tile count: 1522)
+			The district real estate coverage is now 18.1818%
+			The target coverage is: 60%
+		Generating building #5. (Map total building count: 104)
+			Building size: 13 tiles. (Map total tile count: 1547)
+			The district real estate coverage is now 23.6364%
+			The target coverage is: 60%
+		Generating building #6. (Map total building count: 105)
+			Building size: 15 tiles. (Map total tile count: 1575)
+			The district real estate coverage is now 29.5455%
+			The target coverage is: 60%
+		Generating building #7. (Map total building count: 106)
+			Building size: 14 tiles. (Map total tile count: 1604)
+			The district real estate coverage is now 36.3636%
+			The target coverage is: 60%
+		Generating building #8. (Map total building count: 107)
+			Building size: 9 tiles. (Map total tile count: 1627)
+			The district real estate coverage is now 42.7273%
+			The target coverage is: 60%
+		Generating building #9. (Map total building count: 108)
+			Building size: 11 tiles. (Map total tile count: 1647)
+			The district real estate coverage is now 46.8182%
+			The target coverage is: 60%
+		Generating building #10. (Map total building count: 109)
+			Building size: 11 tiles. (Map total tile count: 1669)
+			The district real estate coverage is now 51.8182%
+			The target coverage is: 60%
+		Generating building #11. (Map total building count: 110)
+			Building size: 9 tiles. (Map total tile count: 1689)
+			The district real estate coverage is now 56.8182%
+			The target coverage is: 60%
+
+	Generating buildings for district #16 (TYPE: "downtown")
+		Generating building #0. (Map total building count: 111)
+			Building size: 4 tiles. (Map total tile count: 1702)
+			The district real estate coverage is now 0%
+			The target coverage is: 40%
+		Generating building #1. (Map total building count: 112)
+			Building size: 4 tiles. (Map total tile count: 1710)
+			The district real estate coverage is now 2.73973%
+			The target coverage is: 40%
+		Generating building #2. (Map total building count: 113)
+			Building size: 5 tiles. (Map total tile count: 1719)
+			The district real estate coverage is now 5.47945%
+			The target coverage is: 40%
+		Generating building #3. (Map total building count: 114)
+			Building size: 7 tiles. (Map total tile count: 1731)
+			The district real estate coverage is now 8.90411%
+			The target coverage is: 40%
+		Generating building #4. (Map total building count: 115)
+			Building size: 8 tiles. (Map total tile count: 1746)
+			The district real estate coverage is now 13.6986%
+			The target coverage is: 40%
+		Generating building #5. (Map total building count: 116)
+			Building size: 8 tiles. (Map total tile count: 1762)
+			The district real estate coverage is now 19.1781%
+			The target coverage is: 40%
+		Generating building #6. (Map total building count: 117)
+			Building size: 5 tiles. (Map total tile count: 1775)
+			The district real estate coverage is now 24.6575%
+			The target coverage is: 40%
+		Generating building #7. (Map total building count: 118)
+			Building size: 5 tiles. (Map total tile count: 1785)
+			The district real estate coverage is now 28.0822%
+			The target coverage is: 40%
+		Generating building #8. (Map total building count: 119)
+			Building size: 6 tiles. (Map total tile count: 1796)
+			The district real estate coverage is now 31.5068%
+			The target coverage is: 40%
+		Generating building #9. (Map total building count: 120)
+			Building size: 6 tiles. (Map total tile count: 1808)
+			The district real estate coverage is now 35.6164%
+			The target coverage is: 40%
+		Generating building #10. (Map total building count: 121)
+			Building size: 4 tiles. (Map total tile count: 1818)
+			The district real estate coverage is now 39.726%
+			The target coverage is: 40%
+
+	Generating buildings for district #17 (TYPE: "suburban")
+		Generating building #0. (Map total building count: 122)
+			Building size: 1 tiles. (Map total tile count: 1823)
+			The district real estate coverage is now 0%
+			The target coverage is: 10%
+		Generating building #1. (Map total building count: 123)
+			Building size: 1 tiles. (Map total tile count: 1825)
+			The district real estate coverage is now 0.269542%
+			The target coverage is: 10%
+		Generating building #2. (Map total building count: 124)
+			Building size: 1 tiles. (Map total tile count: 1827)
+			The district real estate coverage is now 0.539084%
+			The target coverage is: 10%
+		Generating building #3. (Map total building count: 125)
+			Building size: 1 tiles. (Map total tile count: 1829)
+			The district real estate coverage is now 0.808625%
+			The target coverage is: 10%
+		Generating building #4. (Map total building count: 126)
+			Building size: 1 tiles. (Map total tile count: 1831)
+			The district real estate coverage is now 1.07817%
+			The target coverage is: 10%
+		Generating building #5. (Map total building count: 127)
+			Building size: 1 tiles. (Map total tile count: 1833)
+			The district real estate coverage is now 1.34771%
+			The target coverage is: 10%
+		Generating building #6. (Map total building count: 128)
+			Building size: 1 tiles. (Map total tile count: 1835)
+			The district real estate coverage is now 1.61725%
+			The target coverage is: 10%
+		Generating building #7. (Map total building count: 129)
+			Building size: 1 tiles. (Map total tile count: 1837)
+			The district real estate coverage is now 1.88679%
+			The target coverage is: 10%
+		Generating building #8. (Map total building count: 130)
+			Building size: 1 tiles. (Map total tile count: 1839)
+			The district real estate coverage is now 2.15633%
+			The target coverage is: 10%
+		Generating building #9. (Map total building count: 131)
+			Building size: 1 tiles. (Map total tile count: 1841)
+			The district real estate coverage is now 2.42588%
+			The target coverage is: 10%
+		Generating building #10. (Map total building count: 132)
+			Building size: 1 tiles. (Map total tile count: 1843)
+			The district real estate coverage is now 2.69542%
+			The target coverage is: 10%
+		Generating building #11. (Map total building count: 133)
+			Building size: 1 tiles. (Map total tile count: 1845)
+			The district real estate coverage is now 2.96496%
+			The target coverage is: 10%
+		Generating building #12. (Map total building count: 134)
+			Building size: 1 tiles. (Map total tile count: 1847)
+			The district real estate coverage is now 3.2345%
+			The target coverage is: 10%
+		Generating building #13. (Map total building count: 135)
+			Building size: 1 tiles. (Map total tile count: 1849)
+			The district real estate coverage is now 3.50404%
+			The target coverage is: 10%
+		Generating building #14. (Map total building count: 136)
+			Building size: 1 tiles. (Map total tile count: 1851)
+			The district real estate coverage is now 3.77358%
+			The target coverage is: 10%
+		Generating building #15. (Map total building count: 137)
+			Building size: 1 tiles. (Map total tile count: 1853)
+			The district real estate coverage is now 4.04313%
+			The target coverage is: 10%
+		Generating building #16. (Map total building count: 138)
+			Building size: 1 tiles. (Map total tile count: 1855)
+			The district real estate coverage is now 4.31267%
+			The target coverage is: 10%
+		Generating building #17. (Map total building count: 139)
+			Building size: 1 tiles. (Map total tile count: 1857)
+			The district real estate coverage is now 4.58221%
+			The target coverage is: 10%
+		Generating building #18. (Map total building count: 140)
+			Building size: 1 tiles. (Map total tile count: 1859)
+			The district real estate coverage is now 4.85175%
+			The target coverage is: 10%
+		Generating building #19. (Map total building count: 141)
+			Building size: 1 tiles. (Map total tile count: 1861)
+			The district real estate coverage is now 5.12129%
+			The target coverage is: 10%
+		Generating building #20. (Map total building count: 142)
+			Building size: 1 tiles. (Map total tile count: 1863)
+			The district real estate coverage is now 5.39084%
+			The target coverage is: 10%
+		Generating building #21. (Map total building count: 143)
+			Building size: 1 tiles. (Map total tile count: 1865)
+			The district real estate coverage is now 5.66038%
+			The target coverage is: 10%
+		Generating building #22. (Map total building count: 144)
+			Building size: 1 tiles. (Map total tile count: 1867)
+			The district real estate coverage is now 5.92992%
+			The target coverage is: 10%
+		Generating building #23. (Map total building count: 145)
+			Building size: 1 tiles. (Map total tile count: 1869)
+			The district real estate coverage is now 6.19946%
+			The target coverage is: 10%
+		Generating building #24. (Map total building count: 146)
+			Building size: 1 tiles. (Map total tile count: 1871)
+			The district real estate coverage is now 6.469%
+			The target coverage is: 10%
+		Generating building #25. (Map total building count: 147)
+			Building size: 1 tiles. (Map total tile count: 1873)
+			The district real estate coverage is now 6.73854%
+			The target coverage is: 10%
+		Generating building #26. (Map total building count: 148)
+			Building size: 1 tiles. (Map total tile count: 1875)
+			The district real estate coverage is now 7.00809%
+			The target coverage is: 10%
+		Generating building #27. (Map total building count: 149)
+			Building size: 1 tiles. (Map total tile count: 1877)
+			The district real estate coverage is now 7.27763%
+			The target coverage is: 10%
+		Generating building #28. (Map total building count: 150)
+			Building size: 1 tiles. (Map total tile count: 1879)
+			The district real estate coverage is now 7.54717%
+			The target coverage is: 10%
+		Generating building #29. (Map total building count: 151)
+			Building size: 1 tiles. (Map total tile count: 1881)
+			The district real estate coverage is now 7.81671%
+			The target coverage is: 10%
+		Generating building #30. (Map total building count: 152)
+			Building size: 1 tiles. (Map total tile count: 1883)
+			The district real estate coverage is now 8.08625%
+			The target coverage is: 10%
+		Generating building #31. (Map total building count: 153)
+			Building size: 1 tiles. (Map total tile count: 1885)
+			The district real estate coverage is now 8.35579%
+			The target coverage is: 10%
+		Generating building #32. (Map total building count: 154)
+			Building size: 1 tiles. (Map total tile count: 1887)
+			The district real estate coverage is now 8.62534%
+			The target coverage is: 10%
+		Generating building #33. (Map total building count: 155)
+			Building size: 1 tiles. (Map total tile count: 1889)
+			The district real estate coverage is now 8.89488%
+			The target coverage is: 10%
+		Generating building #34. (Map total building count: 156)
+			Building size: 1 tiles. (Map total tile count: 1891)
+			The district real estate coverage is now 9.16442%
+			The target coverage is: 10%
+		Generating building #35. (Map total building count: 157)
+			Building size: 1 tiles. (Map total tile count: 1893)
+			The district real estate coverage is now 9.43396%
+			The target coverage is: 10%
+		Generating building #36. (Map total building count: 158)
+			Building size: 1 tiles. (Map total tile count: 1895)
+			The district real estate coverage is now 9.7035%
+			The target coverage is: 10%
+		Generating building #37. (Map total building count: 159)
+			Building size: 1 tiles. (Map total tile count: 1897)
+			The district real estate coverage is now 9.97305%
+			The target coverage is: 10%
+
+	Generating buildings for district #18 (TYPE: "downtown")
+		Generating building #0. (Map total building count: 160)
+			Building size: 8 tiles. (Map total tile count: 1906)
+			The district real estate coverage is now 0%
+			The target coverage is: 40%
+		Generating building #1. (Map total building count: 161)
+			Building size: 7 tiles. (Map total tile count: 1921)
+			The district real estate coverage is now 2.86738%
+			The target coverage is: 40%
+		Generating building #2. (Map total building count: 162)
+			Building size: 4 tiles. (Map total tile count: 1932)
+			The district real estate coverage is now 5.37634%
+			The target coverage is: 40%
+		Generating building #3. (Map total building count: 163)
+			Building size: 7 tiles. (Map total tile count: 1943)
+			The district real estate coverage is now 6.81004%
+			The target coverage is: 40%
+		Generating building #4. (Map total building count: 164)
+			Building size: 6 tiles. (Map total tile count: 1956)
+			The district real estate coverage is now 9.319%
+			The target coverage is: 40%
+		Generating building #5. (Map total building count: 165)
+			Building size: 6 tiles. (Map total tile count: 1968)
+			The district real estate coverage is now 11.4695%
+			The target coverage is: 40%
+		Generating building #6. (Map total building count: 166)
+			Building size: 5 tiles. (Map total tile count: 1979)
+			The district real estate coverage is now 13.6201%
+			The target coverage is: 40%
+		Generating building #7. (Map total building count: 167)
+			Building size: 7 tiles. (Map total tile count: 1991)
+			The district real estate coverage is now 15.4122%
+			The target coverage is: 40%
+		Generating building #8. (Map total building count: 168)
+			Building size: 4 tiles. (Map total tile count: 2002)
+			The district real estate coverage is now 17.9211%
+			The target coverage is: 40%
+		Generating building #9. (Map total building count: 169)
+			Building size: 4 tiles. (Map total tile count: 2010)
+			The district real estate coverage is now 19.3548%
+			The target coverage is: 40%
+		Generating building #10. (Map total building count: 170)
+			Building size: 7 tiles. (Map total tile count: 2021)
+			The district real estate coverage is now 20.7885%
+			The target coverage is: 40%
+		Generating building #11. (Map total building count: 171)
+			Building size: 5 tiles. (Map total tile count: 2033)
+			The district real estate coverage is now 23.2975%
+			The target coverage is: 40%
+		Generating building #12. (Map total building count: 172)
+			Building size: 5 tiles. (Map total tile count: 2043)
+			The district real estate coverage is now 25.0896%
+			The target coverage is: 40%
+		Generating building #13. (Map total building count: 173)
+			Building size: 8 tiles. (Map total tile count: 2056)
+			The district real estate coverage is now 26.8817%
+			The target coverage is: 40%
+		Generating building #14. (Map total building count: 174)
+			Building size: 7 tiles. (Map total tile count: 2071)
+			The district real estate coverage is now 29.7491%
+			The target coverage is: 40%
+		Generating building #15. (Map total building count: 175)
+			Building size: 4 tiles. (Map total tile count: 2082)
+			The district real estate coverage is now 32.2581%
+			The target coverage is: 40%
+		Generating building #16. (Map total building count: 176)
+			Building size: 4 tiles. (Map total tile count: 2090)
+			The district real estate coverage is now 33.6918%
+			The target coverage is: 40%
+		Generating building #17. (Map total building count: 177)
+			Building size: 8 tiles. (Map total tile count: 2102)
+			The district real estate coverage is now 35.1255%
+			The target coverage is: 40%
+		Generating building #18. (Map total building count: 178)
+			Building size: 4 tiles. (Map total tile count: 2114)
+			The district real estate coverage is now 37.9928%
+			The target coverage is: 40%
+		Generating building #19. (Map total building count: 179)
+			Building size: 5 tiles. (Map total tile count: 2123)
+			The district real estate coverage is now 39.4265%
+			The target coverage is: 40%
+
+	Generating buildings for district #19 (TYPE: "metropolitan")
+		Generating building #0. (Map total building count: 180)
+			Building size: 3 tiles. (Map total tile count: 2131)
+			The district real estate coverage is now 0%
+			The target coverage is: 90%
+		Generating building #1. (Map total building count: 181)
+			Building size: 4 tiles. (Map total tile count: 2138)
+			The district real estate coverage is now 3.09278%
+			The target coverage is: 90%
+		Generating building #2. (Map total building count: 182)
+			Building size: 6 tiles. (Map total tile count: 2148)
+			The district real estate coverage is now 7.21649%
+			The target coverage is: 90%
+		Generating building #3. (Map total building count: 183)
+			Building size: 6 tiles. (Map total tile count: 2160)
+			The district real estate coverage is now 13.4021%
+			The target coverage is: 90%
+		Generating building #4. (Map total building count: 184)
+			Building size: 4 tiles. (Map total tile count: 2170)
+			The district real estate coverage is now 19.5876%
+			The target coverage is: 90%
+		Generating building #5. (Map total building count: 185)
+			Building size: 6 tiles. (Map total tile count: 2180)
+			The district real estate coverage is now 23.7113%
+			The target coverage is: 90%
+		Generating building #6. (Map total building count: 186)
+			Building size: 6 tiles. (Map total tile count: 2192)
+			The district real estate coverage is now 29.8969%
+			The target coverage is: 90%
+
+	Generating buildings for district #20 (TYPE: "park")
+
+	Generating buildings for district #21 (TYPE: "park")
+
+	Generating buildings for district #22 (TYPE: "residential")
+		Generating building #0. (Map total building count: 187)
+			Building size: 11 tiles. (Map total tile count: 2209)
+			The district real estate coverage is now 0%
+			The target coverage is: 60%
+		Generating building #1. (Map total building count: 188)
+			Building size: 10 tiles. (Map total tile count: 2230)
+			The district real estate coverage is now 4.58333%
+			The target coverage is: 60%
+		Generating building #2. (Map total building count: 189)
+			Building size: 16 tiles. (Map total tile count: 2256)
+			The district real estate coverage is now 8.75%
+			The target coverage is: 60%
+		Generating building #3. (Map total building count: 190)
+			Building size: 12 tiles. (Map total tile count: 2284)
+			The district real estate coverage is now 15.4167%
+			The target coverage is: 60%
+		Generating building #4. (Map total building count: 191)
+			Building size: 11 tiles. (Map total tile count: 2307)
+			The district real estate coverage is now 20.4167%
+			The target coverage is: 60%
+		Generating building #5. (Map total building count: 192)
+			Building size: 10 tiles. (Map total tile count: 2328)
+			The district real estate coverage is now 25%
+			The target coverage is: 60%
+		Generating building #6. (Map total building count: 193)
+			Building size: 11 tiles. (Map total tile count: 2349)
+			The district real estate coverage is now 29.1667%
+			The target coverage is: 60%
+		Generating building #7. (Map total building count: 194)
+			Building size: 16 tiles. (Map total tile count: 2376)
+			The district real estate coverage is now 33.75%
+			The target coverage is: 60%
+		Generating building #8. (Map total building count: 195)
+			Building size: 9 tiles. (Map total tile count: 2401)
+			The district real estate coverage is now 40.4167%
+			The target coverage is: 60%
+		Generating building #9. (Map total building count: 196)
+			Building size: 11 tiles. (Map total tile count: 2421)
+			The district real estate coverage is now 44.1667%
+			The target coverage is: 60%
+		Generating building #10. (Map total building count: 197)
+			Building size: 11 tiles. (Map total tile count: 2443)
+			The district real estate coverage is now 48.75%
+			The target coverage is: 60%
+		Generating building #11. (Map total building count: 198)
+			Building size: 8 tiles. (Map total tile count: 2462)
+			The district real estate coverage is now 53.3333%
+			The target coverage is: 60%
+		Generating building #12. (Map total building count: 199)
+			Building size: 9 tiles. (Map total tile count: 2479)
+			The district real estate coverage is now 56.6667%
+			The target coverage is: 60%
+
+	Generating buildings for district #23 (TYPE: "residential")
+		Generating building #0. (Map total building count: 200)
+			Building size: 12 tiles. (Map total tile count: 2500)
+			The district real estate coverage is now 0%
+			The target coverage is: 60%
+		Generating building #1. (Map total building count: 201)
+			Building size: 9 tiles. (Map total tile count: 2521)
+			The district real estate coverage is now 2.746%
+			The target coverage is: 60%
+		Generating building #2. (Map total building count: 202)
+			Building size: 14 tiles. (Map total tile count: 2544)
+			The district real estate coverage is now 4.80549%
+			The target coverage is: 60%
+		Generating building #3. (Map total building count: 203)
+			Building size: 11 tiles. (Map total tile count: 2569)
+			The district real estate coverage is now 8.00915%
+			The target coverage is: 60%
+		Generating building #4. (Map total building count: 204)
+			Building size: 16 tiles. (Map total tile count: 2596)
+			The district real estate coverage is now 10.5263%
+			The target coverage is: 60%
+		Generating building #5. (Map total building count: 205)
+			Building size: 16 tiles. (Map total tile count: 2628)
+			The district real estate coverage is now 14.1876%
+			The target coverage is: 60%
+		Generating building #6. (Map total building count: 206)
+			Building size: 13 tiles. (Map total tile count: 2657)
+			The district real estate coverage is now 17.849%
+			The target coverage is: 60%
+		Generating building #7. (Map total building count: 207)
+			Building size: 13 tiles. (Map total tile count: 2683)
+			The district real estate coverage is now 20.8238%
+			The target coverage is: 60%
+		Generating building #8. (Map total building count: 208)
+			Building size: 15 tiles. (Map total tile count: 2711)
+			The district real estate coverage is now 23.7986%
+			The target coverage is: 60%
+		Generating building #9. (Map total building count: 209)
+			Building size: 10 tiles. (Map total tile count: 2736)
+			The district real estate coverage is now 27.2311%
+			The target coverage is: 60%
+		Generating building #10. (Map total building count: 210)
+			Building size: 13 tiles. (Map total tile count: 2759)
+			The district real estate coverage is now 29.5195%
+			The target coverage is: 60%
+		Generating building #11. (Map total building count: 211)
+			Building size: 8 tiles. (Map total tile count: 2780)
+			The district real estate coverage is now 32.4943%
+			The target coverage is: 60%
+		Generating building #12. (Map total building count: 212)
+			Building size: 16 tiles. (Map total tile count: 2804)
+			The district real estate coverage is now 34.3249%
+			The target coverage is: 60%
+		Generating building #13. (Map total building count: 213)
+			Building size: 11 tiles. (Map total tile count: 2831)
+			The district real estate coverage is now 37.9863%
+			The target coverage is: 60%
+		Generating building #14. (Map total building count: 214)
+			Building size: 11 tiles. (Map total tile count: 2853)
+			The district real estate coverage is now 40.5034%
+			The target coverage is: 60%
+		Generating building #15. (Map total building count: 215)
+			Building size: 8 tiles. (Map total tile count: 2872)
+			The district real estate coverage is now 43.0206%
+			The target coverage is: 60%
+		Generating building #16. (Map total building count: 216)
+			Building size: 9 tiles. (Map total tile count: 2889)
+			The district real estate coverage is now 44.8513%
+			The target coverage is: 60%
+		Generating building #17. (Map total building count: 217)
+			Building size: 12 tiles. (Map total tile count: 2910)
+			The district real estate coverage is now 46.9108%
+			The target coverage is: 60%
+		Generating building #18. (Map total building count: 218)
+			Building size: 14 tiles. (Map total tile count: 2936)
+			The district real estate coverage is now 49.6568%
+			The target coverage is: 60%
+		Generating building #19. (Map total building count: 219)
+			Building size: 14 tiles. (Map total tile count: 2964)
+			The district real estate coverage is now 52.8604%
+			The target coverage is: 60%
+		Generating building #20. (Map total building count: 220)
+			Building size: 15 tiles. (Map total tile count: 2993)
+			The district real estate coverage is now 56.0641%
+			The target coverage is: 60%
+		Generating building #21. (Map total building count: 221)
+			Building size: 11 tiles. (Map total tile count: 3019)
+			The district real estate coverage is now 59.4966%
+			The target coverage is: 60%
+
+	Generating buildings for district #24 (TYPE: "metropolitan")
+		Generating building #0. (Map total building count: 222)
+			Building size: 5 tiles. (Map total tile count: 3035)
+			The district real estate coverage is now 0%
+			The target coverage is: 90%
+		Generating building #1. (Map total building count: 223)
+			Building size: 3 tiles. (Map total tile count: 3043)
+			The district real estate coverage is now 2.28311%
+			The target coverage is: 90%
+		Generating building #2. (Map total building count: 224)
+			Building size: 4 tiles. (Map total tile count: 3050)
+			The district real estate coverage is now 3.65297%
+			The target coverage is: 90%
+		Generating building #3. (Map total building count: 225)
+			Building size: 5 tiles. (Map total tile count: 3059)
+			The district real estate coverage is now 5.47945%
+			The target coverage is: 90%
+		Generating building #4. (Map total building count: 226)
+			Building size: 6 tiles. (Map total tile count: 3070)
+			The district real estate coverage is now 7.76256%
+			The target coverage is: 90%
+		Generating building #5. (Map total building count: 227)
+			Building size: 5 tiles. (Map total tile count: 3081)
+			The district real estate coverage is now 10.5023%
+			The target coverage is: 90%
+		Generating building #6. (Map total building count: 228)
+			Building size: 6 tiles. (Map total tile count: 3092)
+			The district real estate coverage is now 12.7854%
+			The target coverage is: 90%
+		Generating building #7. (Map total building count: 229)
+			Building size: 5 tiles. (Map total tile count: 3103)
+			The district real estate coverage is now 15.5251%
+			The target coverage is: 90%
+		Generating building #8. (Map total building count: 230)
+			Building size: 6 tiles. (Map total tile count: 3114)
+			The district real estate coverage is now 17.8082%
+			The target coverage is: 90%
+		Generating building #9. (Map total building count: 231)
+			Building size: 6 tiles. (Map total tile count: 3126)
+			The district real estate coverage is now 20.5479%
+			The target coverage is: 90%
+		Generating building #10. (Map total building count: 232)
+			Building size: 4 tiles. (Map total tile count: 3136)
+			The district real estate coverage is now 23.2877%
+			The target coverage is: 90%
+		Generating building #11. (Map total building count: 233)
+			Building size: 4 tiles. (Map total tile count: 3144)
+			The district real estate coverage is now 25.1142%
+			The target coverage is: 90%
+		Generating building #12. (Map total building count: 234)
+			Building size: 6 tiles. (Map total tile count: 3154)
+			The district real estate coverage is now 26.9406%
+			The target coverage is: 90%
+		Generating building #13. (Map total building count: 235)
+			Building size: 4 tiles. (Map total tile count: 3164)
+			The district real estate coverage is now 29.6804%
+			The target coverage is: 90%
+		Generating building #14. (Map total building count: 236)
+			Building size: 6 tiles. (Map total tile count: 3174)
+			The district real estate coverage is now 31.5068%
+			The target coverage is: 90%
+		Generating building #15. (Map total building count: 237)
+			Building size: 3 tiles. (Map total tile count: 3183)
+			The district real estate coverage is now 34.2466%
+			The target coverage is: 90%
+		Generating building #16. (Map total building count: 238)
+			Building size: 3 tiles. (Map total tile count: 3189)
+			The district real estate coverage is now 35.6164%
+			The target coverage is: 90%
+		Generating building #17. (Map total building count: 239)
+			Building size: 5 tiles. (Map total tile count: 3197)
+			The district real estate coverage is now 36.9863%
+			The target coverage is: 90%
+		Generating building #18. (Map total building count: 240)
+			Building size: 6 tiles. (Map total tile count: 3208)
+			The district real estate coverage is now 39.2694%
+			The target coverage is: 90%
+		Generating building #19. (Map total building count: 241)
+			Building size: 5 tiles. (Map total tile count: 3219)
+			The district real estate coverage is now 42.0091%
+			The target coverage is: 90%
+		Generating building #20. (Map total building count: 242)
+			Building size: 3 tiles. (Map total tile count: 3227)
+			The district real estate coverage is now 44.2922%
+			The target coverage is: 90%
+		Generating building #21. (Map total building count: 243)
+			Building size: 4 tiles. (Map total tile count: 3234)
+			The district real estate coverage is now 45.6621%
+			The target coverage is: 90%
+		Generating building #22. (Map total building count: 244)
+			Building size: 3 tiles. (Map total tile count: 3241)
+			The district real estate coverage is now 47.4886%
+			The target coverage is: 90%
+		Generating building #23. (Map total building count: 245)
+			Building size: 6 tiles. (Map total tile count: 3250)
+			The district real estate coverage is now 48.8584%
+			The target coverage is: 90%
+		Generating building #24. (Map total building count: 246)
+			Building size: 6 tiles. (Map total tile count: 3262)
+			The district real estate coverage is now 51.5982%
+			The target coverage is: 90%
+		Generating building #25. (Map total building count: 247)
+			Building size: 6 tiles. (Map total tile count: 3274)
+			The district real estate coverage is now 54.3379%
+			The target coverage is: 90%
+		Generating building #26. (Map total building count: 248)
+			Building size: 5 tiles. (Map total tile count: 3285)
+			The district real estate coverage is now 57.0776%
+			The target coverage is: 90%
+		Generating building #27. (Map total building count: 249)
+			Building size: 4 tiles. (Map total tile count: 3294)
+			The district real estate coverage is now 59.3607%
+			The target coverage is: 90%
+		Generating building #28. (Map total building count: 250)
+			Building size: 6 tiles. (Map total tile count: 3304)
+			The district real estate coverage is now 61.1872%
+			The target coverage is: 90%
+		Generating building #29. (Map total building count: 251)
+			Building size: 3 tiles. (Map total tile count: 3313)
+			The district real estate coverage is now 63.9269%
+			The target coverage is: 90%
+		Generating building #30. (Map total building count: 252)
+			Building size: 6 tiles. (Map total tile count: 3322)
+			The district real estate coverage is now 65.2968%
+			The target coverage is: 90%
+		Generating building #31. (Map total building count: 253)
+			Building size: 5 tiles. (Map total tile count: 3333)
+			The district real estate coverage is now 68.0365%
+			The target coverage is: 90%
+		Generating building #32. (Map total building count: 254)
+			Building size: 3 tiles. (Map total tile count: 3341)
+			The district real estate coverage is now 70.3196%
+			The target coverage is: 90%
+		Generating building #33. (Map total building count: 255)
+			Building size: 4 tiles. (Map total tile count: 3348)
+			The district real estate coverage is now 71.6895%
+			The target coverage is: 90%
+		Generating building #34. (Map total building count: 256)
+			Building size: 3 tiles. (Map total tile count: 3355)
+			The district real estate coverage is now 73.516%
+			The target coverage is: 90%
+		Generating building #35. (Map total building count: 257)
+			Building size: 5 tiles. (Map total tile count: 3363)
+			The district real estate coverage is now 74.8858%
+			The target coverage is: 90%
+		Generating building #36. (Map total building count: 258)
+			Building size: 4 tiles. (Map total tile count: 3372)
+			The district real estate coverage is now 77.1689%
+			The target coverage is: 90%
+		Generating building #37. (Map total building count: 259)
+			Building size: 6 tiles. (Map total tile count: 3382)
+			The district real estate coverage is now 78.9954%
+			The target coverage is: 90%
+		Generating building #38. (Map total building count: 260)
+			Building size: 3 tiles. (Map total tile count: 3391)
+			The district real estate coverage is now 81.7352%
+			The target coverage is: 90%
+		Generating building #39. (Map total building count: 261)
+			Building size: 4 tiles. (Map total tile count: 3398)
+			The district real estate coverage is now 83.105%
+			The target coverage is: 90%
+
+	Generating buildings for district #25 (TYPE: "suburban")
+		Generating building #0. (Map total building count: 262)
+			Building size: 1 tiles. (Map total tile count: 3403)
+			The district real estate coverage is now 0%
+			The target coverage is: 10%
+		Generating building #1. (Map total building count: 263)
+			Building size: 1 tiles. (Map total tile count: 3405)
+			The district real estate coverage is now 0.420168%
+			The target coverage is: 10%
+		Generating building #2. (Map total building count: 264)
+			Building size: 1 tiles. (Map total tile count: 3407)
+			The district real estate coverage is now 0.840336%
+			The target coverage is: 10%
+		Generating building #3. (Map total building count: 265)
+			Building size: 1 tiles. (Map total tile count: 3409)
+			The district real estate coverage is now 1.2605%
+			The target coverage is: 10%
+		Generating building #4. (Map total building count: 266)
+			Building size: 1 tiles. (Map total tile count: 3411)
+			The district real estate coverage is now 1.68067%
+			The target coverage is: 10%
+		Generating building #5. (Map total building count: 267)
+			Building size: 1 tiles. (Map total tile count: 3413)
+			The district real estate coverage is now 2.10084%
+			The target coverage is: 10%
+		Generating building #6. (Map total building count: 268)
+			Building size: 1 tiles. (Map total tile count: 3415)
+			The district real estate coverage is now 2.52101%
+			The target coverage is: 10%
+		Generating building #7. (Map total building count: 269)
+			Building size: 1 tiles. (Map total tile count: 3417)
+			The district real estate coverage is now 2.94118%
+			The target coverage is: 10%
+		Generating building #8. (Map total building count: 270)
+			Building size: 1 tiles. (Map total tile count: 3419)
+			The district real estate coverage is now 3.36134%
+			The target coverage is: 10%
+		Generating building #9. (Map total building count: 271)
+			Building size: 1 tiles. (Map total tile count: 3421)
+			The district real estate coverage is now 3.78151%
+			The target coverage is: 10%
+		Generating building #10. (Map total building count: 272)
+			Building size: 1 tiles. (Map total tile count: 3423)
+			The district real estate coverage is now 4.20168%
+			The target coverage is: 10%
+		Generating building #11. (Map total building count: 273)
+			Building size: 1 tiles. (Map total tile count: 3425)
+			The district real estate coverage is now 4.62185%
+			The target coverage is: 10%
+		Generating building #12. (Map total building count: 274)
+			Building size: 1 tiles. (Map total tile count: 3427)
+			The district real estate coverage is now 5.04202%
+			The target coverage is: 10%
+		Generating building #13. (Map total building count: 275)
+			Building size: 1 tiles. (Map total tile count: 3429)
+			The district real estate coverage is now 5.46218%
+			The target coverage is: 10%
+		Generating building #14. (Map total building count: 276)
+			Building size: 1 tiles. (Map total tile count: 3431)
+			The district real estate coverage is now 5.88235%
+			The target coverage is: 10%
+		Generating building #15. (Map total building count: 277)
+			Building size: 1 tiles. (Map total tile count: 3433)
+			The district real estate coverage is now 6.30252%
+			The target coverage is: 10%
+		Generating building #16. (Map total building count: 278)
+			Building size: 1 tiles. (Map total tile count: 3435)
+			The district real estate coverage is now 6.72269%
+			The target coverage is: 10%
+		Generating building #17. (Map total building count: 279)
+			Building size: 1 tiles. (Map total tile count: 3437)
+			The district real estate coverage is now 7.14286%
+			The target coverage is: 10%
+		Generating building #18. (Map total building count: 280)
+			Building size: 1 tiles. (Map total tile count: 3439)
+			The district real estate coverage is now 7.56303%
+			The target coverage is: 10%
+		Generating building #19. (Map total building count: 281)
+			Building size: 1 tiles. (Map total tile count: 3441)
+			The district real estate coverage is now 7.98319%
+			The target coverage is: 10%
+		Generating building #20. (Map total building count: 282)
+			Building size: 1 tiles. (Map total tile count: 3443)
+			The district real estate coverage is now 8.40336%
+			The target coverage is: 10%
+		Generating building #21. (Map total building count: 283)
+			Building size: 1 tiles. (Map total tile count: 3445)
+			The district real estate coverage is now 8.82353%
+			The target coverage is: 10%
+		Generating building #22. (Map total building count: 284)
+			Building size: 1 tiles. (Map total tile count: 3447)
+			The district real estate coverage is now 9.2437%
+			The target coverage is: 10%
+		Generating building #23. (Map total building count: 285)
+			Building size: 1 tiles. (Map total tile count: 3449)
+			The district real estate coverage is now 9.66387%
+			The target coverage is: 10%
+
+	Generating buildings for district #26 (TYPE: "downtown")
+		Generating building #0. (Map total building count: 286)
+			Building size: 8 tiles. (Map total tile count: 3458)
+			The district real estate coverage is now 0%
+			The target coverage is: 40%
+		Generating building #1. (Map total building count: 287)
+			Building size: 7 tiles. (Map total tile count: 3473)
+			The district real estate coverage is now 3.75587%
+			The target coverage is: 40%
+		Generating building #2. (Map total building count: 288)
+			Building size: 7 tiles. (Map total tile count: 3487)
+			The district real estate coverage is now 7.04225%
+			The target coverage is: 40%
+		Generating building #3. (Map total building count: 289)
+			Building size: 5 tiles. (Map total tile count: 3499)
+			The district real estate coverage is now 10.3286%
+			The target coverage is: 40%
+		Generating building #4. (Map total building count: 290)
+			Building size: 8 tiles. (Map total tile count: 3512)
+			The district real estate coverage is now 12.6761%
+			The target coverage is: 40%
+		Generating building #5. (Map total building count: 291)
+			Building size: 7 tiles. (Map total tile count: 3527)
+			The district real estate coverage is now 16.4319%
+			The target coverage is: 40%
+		Generating building #6. (Map total building count: 292)
+			Building size: 7 tiles. (Map total tile count: 3541)
+			The district real estate coverage is now 19.7183%
+			The target coverage is: 40%
+		Generating building #7. (Map total building count: 293)
+			Building size: 6 tiles. (Map total tile count: 3554)
+			The district real estate coverage is now 23.0047%
+			The target coverage is: 40%
+		Generating building #8. (Map total building count: 294)
+			Building size: 8 tiles. (Map total tile count: 3568)
+			The district real estate coverage is now 25.8216%
+			The target coverage is: 40%
+		Generating building #9. (Map total building count: 295)
+			Building size: 7 tiles. (Map total tile count: 3583)
+			The district real estate coverage is now 29.5775%
+			The target coverage is: 40%
+		Generating building #10. (Map total building count: 296)
+			Building size: 5 tiles. (Map total tile count: 3595)
+			The district real estate coverage is now 32.8638%
+			The target coverage is: 40%
+		Generating building #11. (Map total building count: 297)
+			Building size: 7 tiles. (Map total tile count: 3607)
+			The district real estate coverage is now 35.2113%
+			The target coverage is: 40%
+		Generating building #12. (Map total building count: 298)
+			Building size: 5 tiles. (Map total tile count: 3619)
+			The district real estate coverage is now 38.4977%
+			The target coverage is: 40%
+
+	Generating buildings for district #27 (TYPE: "suburban")
+		Generating building #0. (Map total building count: 299)
+			Building size: 1 tiles. (Map total tile count: 3625)
+			The district real estate coverage is now 0%
+			The target coverage is: 10%
+		Generating building #1. (Map total building count: 300)
+			Building size: 1 tiles. (Map total tile count: 3627)
+			The district real estate coverage is now 0.473934%
+			The target coverage is: 10%
+		Generating building #2. (Map total building count: 301)
+			Building size: 1 tiles. (Map total tile count: 3629)
+			The district real estate coverage is now 0.947867%
+			The target coverage is: 10%
+		Generating building #3. (Map total building count: 302)
+			Building size: 1 tiles. (Map total tile count: 3631)
+			The district real estate coverage is now 1.4218%
+			The target coverage is: 10%
+		Generating building #4. (Map total building count: 303)
+			Building size: 1 tiles. (Map total tile count: 3633)
+			The district real estate coverage is now 1.89573%
+			The target coverage is: 10%
+		Generating building #5. (Map total building count: 304)
+			Building size: 1 tiles. (Map total tile count: 3635)
+			The district real estate coverage is now 2.36967%
+			The target coverage is: 10%
+		Generating building #6. (Map total building count: 305)
+			Building size: 1 tiles. (Map total tile count: 3637)
+			The district real estate coverage is now 2.8436%
+			The target coverage is: 10%
+		Generating building #7. (Map total building count: 306)
+			Building size: 1 tiles. (Map total tile count: 3639)
+			The district real estate coverage is now 3.31754%
+			The target coverage is: 10%
+		Generating building #8. (Map total building count: 307)
+			Building size: 1 tiles. (Map total tile count: 3641)
+			The district real estate coverage is now 3.79147%
+			The target coverage is: 10%
+		Generating building #9. (Map total building count: 308)
+			Building size: 1 tiles. (Map total tile count: 3643)
+			The district real estate coverage is now 4.2654%
+			The target coverage is: 10%
+		Generating building #10. (Map total building count: 309)
+			Building size: 1 tiles. (Map total tile count: 3645)
+			The district real estate coverage is now 4.73934%
+			The target coverage is: 10%
+		Generating building #11. (Map total building count: 310)
+			Building size: 1 tiles. (Map total tile count: 3647)
+			The district real estate coverage is now 5.21327%
+			The target coverage is: 10%
+		Generating building #12. (Map total building count: 311)
+			Building size: 1 tiles. (Map total tile count: 3649)
+			The district real estate coverage is now 5.6872%
+			The target coverage is: 10%
+		Generating building #13. (Map total building count: 312)
+			Building size: 1 tiles. (Map total tile count: 3651)
+			The district real estate coverage is now 6.16114%
+			The target coverage is: 10%
+		Generating building #14. (Map total building count: 313)
+			Building size: 1 tiles. (Map total tile count: 3653)
+			The district real estate coverage is now 6.63507%
+			The target coverage is: 10%
+		Generating building #15. (Map total building count: 314)
+			Building size: 1 tiles. (Map total tile count: 3655)
+			The district real estate coverage is now 7.109%
+			The target coverage is: 10%
+		Generating building #16. (Map total building count: 315)
+			Building size: 1 tiles. (Map total tile count: 3657)
+			The district real estate coverage is now 7.58294%
+			The target coverage is: 10%
+		Generating building #17. (Map total building count: 316)
+			Building size: 1 tiles. (Map total tile count: 3659)
+			The district real estate coverage is now 8.05687%
+			The target coverage is: 10%
+		Generating building #18. (Map total building count: 317)
+			Building size: 1 tiles. (Map total tile count: 3661)
+			The district real estate coverage is now 8.53081%
+			The target coverage is: 10%
+		Generating building #19. (Map total building count: 318)
+			Building size: 1 tiles. (Map total tile count: 3663)
+			The district real estate coverage is now 9.00474%
+			The target coverage is: 10%
+		Generating building #20. (Map total building count: 319)
+			Building size: 1 tiles. (Map total tile count: 3665)
+			The district real estate coverage is now 9.47867%
+			The target coverage is: 10%
+		Generating building #21. (Map total building count: 320)
+			Building size: 1 tiles. (Map total tile count: 3667)
+			The district real estate coverage is now 9.95261%
+			The target coverage is: 10%
+
+	Generating buildings for district #28 (TYPE: "downtown")
+		Generating building #0. (Map total building count: 321)
+			Building size: 5 tiles. (Map total tile count: 3673)
+			The district real estate coverage is now 0%
+			The target coverage is: 40%
+		Generating building #1. (Map total building count: 322)
+			Building size: 7 tiles. (Map total tile count: 3685)
+			The district real estate coverage is now 1.90114%
+			The target coverage is: 40%
+		Generating building #2. (Map total building count: 323)
+			Building size: 5 tiles. (Map total tile count: 3697)
+			The district real estate coverage is now 4.56274%
+			The target coverage is: 40%
+		Generating building #3. (Map total building count: 324)
+			Building size: 7 tiles. (Map total tile count: 3709)
+			The district real estate coverage is now 6.46388%
+			The target coverage is: 40%
+		Generating building #4. (Map total building count: 325)
+			Building size: 7 tiles. (Map total tile count: 3723)
+			The district real estate coverage is now 9.12548%
+			The target coverage is: 40%
+		Generating building #5. (Map total building count: 326)
+			Building size: 7 tiles. (Map total tile count: 3737)
+			The district real estate coverage is now 11.7871%
+			The target coverage is: 40%
+		Generating building #6. (Map total building count: 327)
+			Building size: 7 tiles. (Map total tile count: 3751)
+			The district real estate coverage is now 14.4487%
+			The target coverage is: 40%
+		Generating building #7. (Map total building count: 328)
+			Building size: 5 tiles. (Map total tile count: 3763)
+			The district real estate coverage is now 17.1103%
+			The target coverage is: 40%
+		Generating building #8. (Map total building count: 329)
+			Building size: 7 tiles. (Map total tile count: 3775)
+			The district real estate coverage is now 19.0114%
+			The target coverage is: 40%
+		Generating building #9. (Map total building count: 330)
+			Building size: 8 tiles. (Map total tile count: 3790)
+			The district real estate coverage is now 21.673%
+			The target coverage is: 40%
+		Generating building #10. (Map total building count: 331)
+			Building size: 8 tiles. (Map total tile count: 3806)
+			The district real estate coverage is now 24.7148%
+			The target coverage is: 40%
+		Generating building #11. (Map total building count: 332)
+			Building size: 6 tiles. (Map total tile count: 3820)
+			The district real estate coverage is now 27.7567%
+			The target coverage is: 40%
+		Generating building #12. (Map total building count: 333)
+			Building size: 5 tiles. (Map total tile count: 3831)
+			The district real estate coverage is now 30.038%
+			The target coverage is: 40%
+		Generating building #13. (Map total building count: 334)
+			Building size: 5 tiles. (Map total tile count: 3841)
+			The district real estate coverage is now 31.9392%
+			The target coverage is: 40%
+		Generating building #14. (Map total building count: 335)
+			Building size: 6 tiles. (Map total tile count: 3852)
+			The district real estate coverage is now 33.8403%
+			The target coverage is: 40%
+		Generating building #15. (Map total building count: 336)
+			Building size: 7 tiles. (Map total tile count: 3865)
+			The district real estate coverage is now 36.1217%
+			The target coverage is: 40%
+		Generating building #16. (Map total building count: 337)
+			Building size: 7 tiles. (Map total tile count: 3879)
+			The district real estate coverage is now 38.7833%
+			The target coverage is: 40%
+
+	Generating buildings for district #29 (TYPE: "metropolitan")
+		Generating building #0. (Map total building count: 338)
+			Building size: 6 tiles. (Map total tile count: 3892)
+			The district real estate coverage is now 0%
+			The target coverage is: 90%
+		Generating building #1. (Map total building count: 339)
+			Building size: 3 tiles. (Map total tile count: 3901)
+			The district real estate coverage is now 2.39044%
+			The target coverage is: 90%
+		Generating building #2. (Map total building count: 340)
+			Building size: 3 tiles. (Map total tile count: 3907)
+			The district real estate coverage is now 3.58566%
+			The target coverage is: 90%
+		Generating building #3. (Map total building count: 341)
+			Building size: 3 tiles. (Map total tile count: 3913)
+			The district real estate coverage is now 4.78088%
+			The target coverage is: 90%
+		Generating building #4. (Map total building count: 342)
+			Building size: 4 tiles. (Map total tile count: 3920)
+			The district real estate coverage is now 5.9761%
+			The target coverage is: 90%
+		Generating building #5. (Map total building count: 343)
+			Building size: 3 tiles. (Map total tile count: 3927)
+			The district real estate coverage is now 7.56972%
+			The target coverage is: 90%
+		Generating building #6. (Map total building count: 344)
+			Building size: 5 tiles. (Map total tile count: 3935)
+			The district real estate coverage is now 8.76494%
+			The target coverage is: 90%
+		Generating building #7. (Map total building count: 345)
+			Building size: 4 tiles. (Map total tile count: 3944)
+			The district real estate coverage is now 10.757%
+			The target coverage is: 90%
+		Generating building #8. (Map total building count: 346)
+			Building size: 3 tiles. (Map total tile count: 3951)
+			The district real estate coverage is now 12.3506%
+			The target coverage is: 90%
+		Generating building #9. (Map total building count: 347)
+			Building size: 3 tiles. (Map total tile count: 3957)
+			The district real estate coverage is now 13.5458%
+			The target coverage is: 90%
+		Generating building #10. (Map total building count: 348)
+			Building size: 3 tiles. (Map total tile count: 3963)
+			The district real estate coverage is now 14.741%
+			The target coverage is: 90%
+		Generating building #11. (Map total building count: 349)
+			Building size: 6 tiles. (Map total tile count: 3972)
+			The district real estate coverage is now 15.9363%
+			The target coverage is: 90%
+		Generating building #12. (Map total building count: 350)
+			Building size: 6 tiles. (Map total tile count: 3984)
+			The district real estate coverage is now 18.3267%
+			The target coverage is: 90%
+		Generating building #13. (Map total building count: 351)
+			Building size: 5 tiles. (Map total tile count: 3995)
+			The district real estate coverage is now 20.7171%
+			The target coverage is: 90%
+		Generating building #14. (Map total building count: 352)
+			Building size: 3 tiles. (Map total tile count: 4003)
+			The district real estate coverage is now 22.7092%
+			The target coverage is: 90%
+		Generating building #15. (Map total building count: 353)
+			Building size: 6 tiles. (Map total tile count: 4012)
+			The district real estate coverage is now 23.9044%
+			The target coverage is: 90%
+		Generating building #16. (Map total building count: 354)
+			Building size: 4 tiles. (Map total tile count: 4022)
+			The district real estate coverage is now 26.2948%
+			The target coverage is: 90%
+		Generating building #17. (Map total building count: 355)
+			Building size: 4 tiles. (Map total tile count: 4030)
+			The district real estate coverage is now 27.8884%
+			The target coverage is: 90%
+		Generating building #18. (Map total building count: 356)
+			Building size: 3 tiles. (Map total tile count: 4037)
+			The district real estate coverage is now 29.4821%
+			The target coverage is: 90%
+		Generating building #19. (Map total building count: 357)
+			Building size: 5 tiles. (Map total tile count: 4045)
+			The district real estate coverage is now 30.6773%
+			The target coverage is: 90%
+		Generating building #20. (Map total building count: 358)
+			Building size: 5 tiles. (Map total tile count: 4055)
+			The district real estate coverage is now 32.6693%
+			The target coverage is: 90%
+		Generating building #21. (Map total building count: 359)
+			Building size: 4 tiles. (Map total tile count: 4064)
+			The district real estate coverage is now 34.6614%
+			The target coverage is: 90%
+		Generating building #22. (Map total building count: 360)
+			Building size: 3 tiles. (Map total tile count: 4071)
+			The district real estate coverage is now 36.255%
+			The target coverage is: 90%
+		Generating building #23. (Map total building count: 361)
+			Building size: 3 tiles. (Map total tile count: 4077)
+			The district real estate coverage is now 37.4502%
+			The target coverage is: 90%
+		Generating building #24. (Map total building count: 362)
+			Building size: 4 tiles. (Map total tile count: 4084)
+			The district real estate coverage is now 38.6454%
+			The target coverage is: 90%
+		Generating building #25. (Map total building count: 363)
+			Building size: 6 tiles. (Map total tile count: 4094)
+			The district real estate coverage is now 40.239%
+			The target coverage is: 90%
+		Generating building #26. (Map total building count: 364)
+			Building size: 5 tiles. (Map total tile count: 4105)
+			The district real estate coverage is now 42.6295%
+			The target coverage is: 90%
+		Generating building #27. (Map total building count: 365)
+			Building size: 5 tiles. (Map total tile count: 4115)
+			The district real estate coverage is now 44.6215%
+			The target coverage is: 90%
+		Generating building #28. (Map total building count: 366)
+			Building size: 5 tiles. (Map total tile count: 4125)
+			The district real estate coverage is now 46.6135%
+			The target coverage is: 90%
+
+	Generating buildings for district #30 (TYPE: "metropolitan")
+		Generating building #0. (Map total building count: 367)
+			Building size: 4 tiles. (Map total tile count: 4134)
+			The district real estate coverage is now 0%
+			The target coverage is: 90%
+		Generating building #1. (Map total building count: 368)
+			Building size: 5 tiles. (Map total tile count: 4143)
+			The district real estate coverage is now 2.48447%
+			The target coverage is: 90%
+		Generating building #2. (Map total building count: 369)
+			Building size: 3 tiles. (Map total tile count: 4151)
+			The district real estate coverage is now 5.59006%
+			The target coverage is: 90%
+		Generating building #3. (Map total building count: 370)
+			Building size: 4 tiles. (Map total tile count: 4158)
+			The district real estate coverage is now 7.45342%
+			The target coverage is: 90%
+		Generating building #4. (Map total building count: 371)
+			Building size: 3 tiles. (Map total tile count: 4165)
+			The district real estate coverage is now 9.93789%
+			The target coverage is: 90%
+		Generating building #5. (Map total building count: 372)
+			Building size: 3 tiles. (Map total tile count: 4171)
+			The district real estate coverage is now 11.8012%
+			The target coverage is: 90%
+		Generating building #6. (Map total building count: 373)
+			Building size: 5 tiles. (Map total tile count: 4179)
+			The district real estate coverage is now 13.6646%
+			The target coverage is: 90%
+		Generating building #7. (Map total building count: 374)
+			Building size: 5 tiles. (Map total tile count: 4189)
+			The district real estate coverage is now 16.7702%
+			The target coverage is: 90%
+		Generating building #8. (Map total building count: 375)
+			Building size: 3 tiles. (Map total tile count: 4197)
+			The district real estate coverage is now 19.8758%
+			The target coverage is: 90%
+		Generating building #9. (Map total building count: 376)
+			Building size: 3 tiles. (Map total tile count: 4203)
+			The district real estate coverage is now 21.7391%
+			The target coverage is: 90%
+		Generating building #10. (Map total building count: 377)
+			Building size: 5 tiles. (Map total tile count: 4211)
+			The district real estate coverage is now 23.6025%
+			The target coverage is: 90%
+		Generating building #11. (Map total building count: 378)
+			Building size: 5 tiles. (Map total tile count: 4221)
+			The district real estate coverage is now 26.7081%
+			The target coverage is: 90%
+		Generating building #12. (Map total building count: 379)
+			Building size: 4 tiles. (Map total tile count: 4230)
+			The district real estate coverage is now 29.8137%
+			The target coverage is: 90%
+		Generating building #13. (Map total building count: 380)
+			Building size: 4 tiles. (Map total tile count: 4238)
+			The district real estate coverage is now 32.2981%
+			The target coverage is: 90%
+		Generating building #14. (Map total building count: 381)
+			Building size: 5 tiles. (Map total tile count: 4247)
+			The district real estate coverage is now 34.7826%
+			The target coverage is: 90%
+		Generating building #15. (Map total building count: 382)
+			Building size: 6 tiles. (Map total tile count: 4258)
+			The district real estate coverage is now 37.8882%
+			The target coverage is: 90%
+		Generating building #16. (Map total building count: 383)
+			Building size: 5 tiles. (Map total tile count: 4269)
+			The district real estate coverage is now 41.6149%
+			The target coverage is: 90%
+		Generating building #17. (Map total building count: 384)
+			Building size: 5 tiles. (Map total tile count: 4279)
+			The district real estate coverage is now 44.7205%
+			The target coverage is: 90%
+		Generating building #18. (Map total building count: 385)
+			Building size: 4 tiles. (Map total tile count: 4288)
+			The district real estate coverage is now 47.8261%
+			The target coverage is: 90%
+		Generating building #19. (Map total building count: 386)
+			Building size: 5 tiles. (Map total tile count: 4297)
+			The district real estate coverage is now 50.3106%
+			The target coverage is: 90%
+		Generating building #20. (Map total building count: 387)
+			Building size: 4 tiles. (Map total tile count: 4306)
+			The district real estate coverage is now 53.4161%
+			The target coverage is: 90%
+		Generating building #21. (Map total building count: 388)
+			Building size: 4 tiles. (Map total tile count: 4314)
+			The district real estate coverage is now 55.9006%
+			The target coverage is: 90%
+		Generating building #22. (Map total building count: 389)
+			Building size: 6 tiles. (Map total tile count: 4324)
+			The district real estate coverage is now 58.3851%
+			The target coverage is: 90%
+		Generating building #23. (Map total building count: 390)
+			Building size: 3 tiles. (Map total tile count: 4333)
+			The district real estate coverage is now 62.1118%
+			The target coverage is: 90%
+		Generating building #24. (Map total building count: 391)
+			Building size: 6 tiles. (Map total tile count: 4342)
+			The district real estate coverage is now 63.9752%
+			The target coverage is: 90%
+		Generating building #25. (Map total building count: 392)
+			Building size: 3 tiles. (Map total tile count: 4351)
+			The district real estate coverage is now 67.7019%
+			The target coverage is: 90%
+		Generating building #26. (Map total building count: 393)
+			Building size: 5 tiles. (Map total tile count: 4359)
+			The district real estate coverage is now 69.5652%
+			The target coverage is: 90%
+		Generating building #27. (Map total building count: 394)
+			Building size: 4 tiles. (Map total tile count: 4368)
+			The district real estate coverage is now 72.6708%
+			The target coverage is: 90%
+		Generating building #28. (Map total building count: 395)
+			Building size: 6 tiles. (Map total tile count: 4378)
+			The district real estate coverage is now 75.1553%
+			The target coverage is: 90%
+		Generating building #29. (Map total building count: 396)
+			Building size: 5 tiles. (Map total tile count: 4389)
+			The district real estate coverage is now 78.882%
+			The target coverage is: 90%
+		Generating building #30. (Map total building count: 397)
+			Building size: 3 tiles. (Map total tile count: 4397)
+			The district real estate coverage is now 81.9876%
+			The target coverage is: 90%
+		Generating building #31. (Map total building count: 398)
+			Building size: 5 tiles. (Map total tile count: 4405)
+			The district real estate coverage is now 83.8509%
+			The target coverage is: 90%
+
+	Generating buildings for district #31 (TYPE: "suburban")
+		Generating building #0. (Map total building count: 399)
+			Building size: 1 tiles. (Map total tile count: 4411)
+			The district real estate coverage is now 0%
+			The target coverage is: 10%
+		Generating building #1. (Map total building count: 400)
+			Building size: 1 tiles. (Map total tile count: 4413)
+			The district real estate coverage is now 0.487805%
+			The target coverage is: 10%
+		Generating building #2. (Map total building count: 401)
+			Building size: 1 tiles. (Map total tile count: 4415)
+			The district real estate coverage is now 0.97561%
+			The target coverage is: 10%
+		Generating building #3. (Map total building count: 402)
+			Building size: 1 tiles. (Map total tile count: 4417)
+			The district real estate coverage is now 1.46341%
+			The target coverage is: 10%
+		Generating building #4. (Map total building count: 403)
+			Building size: 1 tiles. (Map total tile count: 4419)
+			The district real estate coverage is now 1.95122%
+			The target coverage is: 10%
+		Generating building #5. (Map total building count: 404)
+			Building size: 1 tiles. (Map total tile count: 4421)
+			The district real estate coverage is now 2.43902%
+			The target coverage is: 10%
+		Generating building #6. (Map total building count: 405)
+			Building size: 1 tiles. (Map total tile count: 4423)
+			The district real estate coverage is now 2.92683%
+			The target coverage is: 10%
+		Generating building #7. (Map total building count: 406)
+			Building size: 1 tiles. (Map total tile count: 4425)
+			The district real estate coverage is now 3.41463%
+			The target coverage is: 10%
+		Generating building #8. (Map total building count: 407)
+			Building size: 1 tiles. (Map total tile count: 4427)
+			The district real estate coverage is now 3.90244%
+			The target coverage is: 10%
+		Generating building #9. (Map total building count: 408)
+			Building size: 1 tiles. (Map total tile count: 4429)
+			The district real estate coverage is now 4.39024%
+			The target coverage is: 10%
+		Generating building #10. (Map total building count: 409)
+			Building size: 1 tiles. (Map total tile count: 4431)
+			The district real estate coverage is now 4.87805%
+			The target coverage is: 10%
+		Generating building #11. (Map total building count: 410)
+			Building size: 1 tiles. (Map total tile count: 4433)
+			The district real estate coverage is now 5.36585%
+			The target coverage is: 10%
+		Generating building #12. (Map total building count: 411)
+			Building size: 1 tiles. (Map total tile count: 4435)
+			The district real estate coverage is now 5.85366%
+			The target coverage is: 10%
+		Generating building #13. (Map total building count: 412)
+			Building size: 1 tiles. (Map total tile count: 4437)
+			The district real estate coverage is now 6.34146%
+			The target coverage is: 10%
+		Generating building #14. (Map total building count: 413)
+			Building size: 1 tiles. (Map total tile count: 4439)
+			The district real estate coverage is now 6.82927%
+			The target coverage is: 10%
+		Generating building #15. (Map total building count: 414)
+			Building size: 1 tiles. (Map total tile count: 4441)
+			The district real estate coverage is now 7.31707%
+			The target coverage is: 10%
+		Generating building #16. (Map total building count: 415)
+			Building size: 1 tiles. (Map total tile count: 4443)
+			The district real estate coverage is now 7.80488%
+			The target coverage is: 10%
+		Generating building #17. (Map total building count: 416)
+			Building size: 1 tiles. (Map total tile count: 4445)
+			The district real estate coverage is now 8.29268%
+			The target coverage is: 10%
+		Generating building #18. (Map total building count: 417)
+			Building size: 1 tiles. (Map total tile count: 4447)
+			The district real estate coverage is now 8.78049%
+			The target coverage is: 10%
+		Generating building #19. (Map total building count: 418)
+			Building size: 1 tiles. (Map total tile count: 4449)
+			The district real estate coverage is now 9.26829%
+			The target coverage is: 10%
+		Generating building #20. (Map total building count: 419)
+			Building size: 1 tiles. (Map total tile count: 4451)
+			The district real estate coverage is now 9.7561%
+			The target coverage is: 10%
+
+	Generating buildings for district #32 (TYPE: "park")
+
+	Generating buildings for district #33 (TYPE: "park")
+
+	Generating buildings for district #34 (TYPE: "downtown")
+		Generating building #0. (Map total building count: 420)
+			Building size: 5 tiles. (Map total tile count: 4457)
+			The district real estate coverage is now 0%
+			The target coverage is: 40%
+		Generating building #1. (Map total building count: 421)
+			Building size: 6 tiles. (Map total tile count: 4468)
+			The district real estate coverage is now 2.97619%
+			The target coverage is: 40%
+		Generating building #2. (Map total building count: 422)
+			Building size: 4 tiles. (Map total tile count: 4478)
+			The district real estate coverage is now 6.54762%
+			The target coverage is: 40%
+		Generating building #3. (Map total building count: 423)
+			Building size: 7 tiles. (Map total tile count: 4489)
+			The district real estate coverage is now 8.92857%
+			The target coverage is: 40%
+		Generating building #4. (Map total building count: 424)
+			Building size: 5 tiles. (Map total tile count: 4501)
+			The district real estate coverage is now 13.0952%
+			The target coverage is: 40%
+		Generating building #5. (Map total building count: 425)
+			Building size: 4 tiles. (Map total tile count: 4510)
+			The district real estate coverage is now 16.0714%
+			The target coverage is: 40%
+		Generating building #6. (Map total building count: 426)
+			Building size: 7 tiles. (Map total tile count: 4521)
+			The district real estate coverage is now 18.4524%
+			The target coverage is: 40%
+		Generating building #7. (Map total building count: 427)
+			Building size: 6 tiles. (Map total tile count: 4534)
+			The district real estate coverage is now 22.619%
+			The target coverage is: 40%
+		Generating building #8. (Map total building count: 428)
+			Building size: 4 tiles. (Map total tile count: 4544)
+			The district real estate coverage is now 26.1905%
+			The target coverage is: 40%
+		Generating building #9. (Map total building count: 429)
+			Building size: 8 tiles. (Map total tile count: 4556)
+			The district real estate coverage is now 28.5714%
+			The target coverage is: 40%
+		Generating building #10. (Map total building count: 430)
+			Building size: 7 tiles. (Map total tile count: 4571)
+			The district real estate coverage is now 33.3333%
+			The target coverage is: 40%
+		Generating building #11. (Map total building count: 431)
+			Building size: 7 tiles. (Map total tile count: 4585)
+			The district real estate coverage is now 37.5%
+			The target coverage is: 40%
+
+	Generating buildings for district #35 (TYPE: "suburban")
+		Generating building #0. (Map total building count: 432)
+			Building size: 1 tiles. (Map total tile count: 4593)
+			The district real estate coverage is now 0%
+			The target coverage is: 10%
+		Generating building #1. (Map total building count: 433)
+			Building size: 1 tiles. (Map total tile count: 4595)
+			The district real estate coverage is now 0.769231%
+			The target coverage is: 10%
+		Generating building #2. (Map total building count: 434)
+			Building size: 1 tiles. (Map total tile count: 4597)
+			The district real estate coverage is now 1.53846%
+			The target coverage is: 10%
+		Generating building #3. (Map total building count: 435)
+			Building size: 1 tiles. (Map total tile count: 4599)
+			The district real estate coverage is now 2.30769%
+			The target coverage is: 10%
+		Generating building #4. (Map total building count: 436)
+			Building size: 1 tiles. (Map total tile count: 4601)
+			The district real estate coverage is now 3.07692%
+			The target coverage is: 10%
+		Generating building #5. (Map total building count: 437)
+			Building size: 1 tiles. (Map total tile count: 4603)
+			The district real estate coverage is now 3.84615%
+			The target coverage is: 10%
+		Generating building #6. (Map total building count: 438)
+			Building size: 1 tiles. (Map total tile count: 4605)
+			The district real estate coverage is now 4.61538%
+			The target coverage is: 10%
+		Generating building #7. (Map total building count: 439)
+			Building size: 1 tiles. (Map total tile count: 4607)
+			The district real estate coverage is now 5.38462%
+			The target coverage is: 10%
+		Generating building #8. (Map total building count: 440)
+			Building size: 1 tiles. (Map total tile count: 4609)
+			The district real estate coverage is now 6.15385%
+			The target coverage is: 10%
+		Generating building #9. (Map total building count: 441)
+			Building size: 1 tiles. (Map total tile count: 4611)
+			The district real estate coverage is now 6.92308%
+			The target coverage is: 10%
+		Generating building #10. (Map total building count: 442)
+			Building size: 1 tiles. (Map total tile count: 4613)
+			The district real estate coverage is now 7.69231%
+			The target coverage is: 10%
+		Generating building #11. (Map total building count: 443)
+			Building size: 1 tiles. (Map total tile count: 4615)
+			The district real estate coverage is now 8.46154%
+			The target coverage is: 10%
+		Generating building #12. (Map total building count: 444)
+			Building size: 1 tiles. (Map total tile count: 4617)
+			The district real estate coverage is now 9.23077%
+			The target coverage is: 10%
