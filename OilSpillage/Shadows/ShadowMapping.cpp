@@ -240,8 +240,21 @@ void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir)
 	centroid /= 8;
 
 	float nearClipOffset = 50.0f;
+	float farZ = 40.0f;
+	float distFromCentroid = farZ + nearClipOffset;
+	Matrix viewMatrix = Matrix::CreateLookAt(centroid - (sunDir * distFromCentroid), centroid, Vector3(0, 1, 0));
 
+	Vector3 lightFCs[8];
 
+	lightFCs[0] = Vector3::Transform(nearTopLeft,viewMatrix);
+	lightFCs[1] = Vector3::Transform(nearTopRight, viewMatrix); 
+	lightFCs[2] = Vector3::Transform(nearBottomLeft, viewMatrix); 
+	lightFCs[3] = Vector3::Transform(nearBottomRight, viewMatrix); 
+	lightFCs[4] = Vector3::Transform(farTopLeft, viewMatrix); 
+	lightFCs[5] = Vector3::Transform(farTopRight, viewMatrix); 
+	lightFCs[6] = Vector3::Transform(farBottomLeft, viewMatrix);
+	lightFCs[7] = Vector3::Transform(farBottomRight, viewMatrix);
+	
 	
 
 
@@ -263,7 +276,8 @@ void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir)
 	orthoProj = Matrix::CreateOrthographic(100.0f, 100.0f, 0.01f, 25.0f);
 	orthoProj = DirectX::XMMatrixOrthographicLH(200.0f, 200.0f, 1.0f, 400.0f);
 	float fieldOfView = 10 * (DirectX::XM_PI / 180);
-	orthoProj = camera->getProjectionMatrix();
+	//orthoProj = camera->getProjectionMatrix();
+	this->view = viewMatrix;
 	//orthoProj = Matrix::CreatePerspectiveFieldOfView(fieldOfView, 16.f / 9.f, 900, 1400.0f);
 	Matrix viewProj = view * orthoProj;
 	viewProj = viewProj.Transpose();
