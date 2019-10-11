@@ -6,7 +6,7 @@
 
 class Slider : public Element
 {
-private:
+protected:
 	Texture* textureBG;
 	Texture* textureFG;
 	float amount;

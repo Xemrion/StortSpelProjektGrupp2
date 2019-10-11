@@ -8,69 +8,20 @@
 
 Graphics::Graphics()
 {
-	this->window = nullptr;
-	this->swapChain = nullptr;
-	this->device = nullptr;
-	this->deviceContext = nullptr;
 	this->vp = {};
 
-	this->renderTargetView = nullptr;
-	this->depthStencilBuffer = nullptr;
-	this->depthStencilState = nullptr;
-	this->depthStencilView = nullptr;
-	this->rasterState = nullptr;
-	this->alphaEnableBlendingState = nullptr;
-	this->viewProjBuffer = nullptr;
-	this->worldBuffer = nullptr;
-	this->colorBuffer = nullptr;
-	this->lightBuffer = nullptr;
-	this->frustumBuffer = nullptr;
-	this->culledLightBuffer = nullptr;
-	this->culledLightBufferUAV = nullptr;
-	this->culledLightBufferSRV = nullptr;
-	this->frustumBufferSRV = nullptr;
-
-	this->sampler = nullptr;
-
 	this->debugger = nullptr;
-	this->debug = nullptr;
 
 	this->lightList = nullptr;
-	this->sunBuffer = nullptr;
+	this->window = nullptr;
+
 	lightBufferContents = new LightBufferContents;
 }
 
 Graphics::~Graphics()
 {
-	this->depthStencilBuffer->Release();
-	this->depthStencilView->Release();
-	this->depthStencilState->Release();
-	this->alphaEnableBlendingState->Release();
-	this->rasterState->Release();
-	this->renderTargetView->Release();
-
-	this->viewProjBuffer->Release();
-	this->worldBuffer->Release();
-	this->colorBuffer->Release();
-	this->lightBuffer->Release();
-	this->frustumBuffer->Release();
-	this->culledLightBuffer->Release();
-
-	this->culledLightBufferUAV->Release();
-	this->culledLightBufferSRV->Release();
-
-	this->sampler->Release();
-
-	if (this->swapChain)
-		this->swapChain->Release();
-	if (this->deviceContext)
-		this->deviceContext->Release();
 	if(debug!=nullptr)
 		debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY | D3D11_RLDO_DETAIL);
-	if (this->device)
-		this->device->Release();
-	if (this->debug)
-		this->debug->Release();
 
 	delete this->debugger;
 
@@ -113,13 +64,12 @@ bool Graphics::init(Window* window)
 		NULL,
 		D3D11_SDK_VERSION,
 		&swapchainDesc,
-		&swapChain,
-		&device,
+		swapChain.ReleaseAndGetAddressOf(),
+		device.ReleaseAndGetAddressOf(),
 		NULL,
-		&deviceContext);
+		deviceContext.ReleaseAndGetAddressOf());
 
-	if (SUCCEEDED(result))
-	{
+
 		// get the address of the back buffer
 		ID3D11Texture2D* backBufferPtr = nullptr;
 		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)& backBufferPtr);
@@ -130,7 +80,7 @@ bool Graphics::init(Window* window)
 		}
 
 		// use the back buffer address to create the render target
-		device->CreateRenderTargetView(backBufferPtr, NULL, &renderTargetView);
+		device->CreateRenderTargetView(backBufferPtr, NULL, renderTargetView.ReleaseAndGetAddressOf());
 		if (FAILED(result))
 		{
 			MessageBox(this->window->handle, "Could not ID3D11Texture2D* backBufferPtr", "Error", MB_OK);
@@ -146,24 +96,27 @@ bool Graphics::init(Window* window)
 		descDepth.Height = (UINT)this->window->height;
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
-		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; //DXGI_FORMAT_R32_TYPELESS;
+		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		descDepth.SampleDesc.Count = 4;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		descDepth.CPUAccessFlags = 0;
 		descDepth.MiscFlags = 0;
+
+
+		
 		result = device->CreateTexture2D(&descDepth, NULL, &depthStencilBuffer);
 		if (FAILED(result))
 		{
 			return false;
 		}
-		result = device->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView);
+		result = device->CreateDepthStencilView(depthStencilBuffer.Get(), NULL, &depthStencilView);
 		if (FAILED(result))
 		{
 			return false;
 		}
-		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+		deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 
 		//the depth Stencil State
 		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -175,13 +128,13 @@ bool Graphics::init(Window* window)
 		depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
 
 		// Create depth stencil state
-		result = device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState);
+		result = device->CreateDepthStencilState(&depthStencilDesc, depthStencilState.ReleaseAndGetAddressOf());
 		if (FAILED(result))
 		{
 			return false;
 		}
 
-	}
+	
 
 	this->vp.Width = (float)this->window->width;
 	this->vp.Height = (float)this->window->height;
@@ -262,7 +215,7 @@ bool Graphics::init(Window* window)
 	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 
-	device->CreateUnorderedAccessView(culledLightBuffer, &uavDesc, &culledLightBufferUAV);
+	device->CreateUnorderedAccessView(culledLightBuffer.Get(), &uavDesc, &culledLightBufferUAV);
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -270,7 +223,7 @@ bool Graphics::init(Window* window)
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = 80 * 45;
 
-	hr = device->CreateShaderResourceView(culledLightBuffer, &srvDesc, &culledLightBufferSRV);
+	hr = device->CreateShaderResourceView(culledLightBuffer.Get(), &srvDesc, &culledLightBufferSRV);
 	if (FAILED(hr))
 		return false;
 
@@ -288,7 +241,7 @@ bool Graphics::init(Window* window)
 		return false;
 	}
 
-	deviceContext->RSSetState(rasterState);
+	deviceContext->RSSetState(rasterState.Get());
 	// Clear the blend state description.
 	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
 
@@ -298,7 +251,7 @@ bool Graphics::init(Window* window)
 	blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 	blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 	blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendStateDescription.RenderTarget[0].RenderTargetWriteMask = 0x0f;
 
@@ -312,23 +265,39 @@ bool Graphics::init(Window* window)
 	float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
 
 	// Turn on the alpha blending.
-	deviceContext->OMSetBlendState(alphaEnableBlendingState, blendFactor, 0xffffffff);
+	deviceContext->OMSetBlendState(alphaEnableBlendingState.Get(), blendFactor, 0xffffffff);
 
-	this->device->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&debug));
+	this->device->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(debug.GetAddressOf()));
+
 
 
 	createShaders();
 #ifdef _DEBUG
-	debugger = new Debug(deviceContext, device);
+	debugger = new Debug(deviceContext.Get(), device.Get());
 #endif
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); // (void)io;
 	ImGui_ImplWin32_Init(this->window->handle);
-	ImGui_ImplDX11_Init(this->device, this->deviceContext);
+	ImGui_ImplDX11_Init(this->device.Get(), this->deviceContext.Get());
 	ImGui::StyleColorsDark();
 
+	this->particleSystem.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
+	this->particleSystem2.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
+
+	/*for (int i = 0; i < 150; i++)
+	{
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
+	}*/
+	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+
+
+	
 	return true;
 }
 
@@ -342,40 +311,50 @@ Window* Graphics::getWindow()
 	return this->window;
 }
 
-void Graphics::render(DynamicCamera* camera)
+void Graphics::render(DynamicCamera* camera, float deltaTime)
 {
 	float color[4] = {
 		0,0,0,1
 	};
-	deviceContext->ClearRenderTargetView(renderTargetView, color);
+	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
 	// Clear the depth buffer.
-	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
-	deviceContext->OMSetDepthStencilState(this->depthStencilState, 0);
+	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
+	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	Matrix view = camera->getViewMatrix().Transpose();
-	deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &view, sizeof(Matrix));
-	deviceContext->Unmap(viewProjBuffer, 0);
-	deviceContext->CSSetConstantBuffers(1, 1, &viewProjBuffer);
+	deviceContext->Unmap(viewProjBuffer.Get(), 0);
+	deviceContext->CSSetConstantBuffers(1, 1, viewProjBuffer.GetAddressOf());
 	fillLightBuffers();
 	cullLights();
 
 	Matrix viewProj = (camera->getViewMatrix() * camera->getProjectionMatrix()).Transpose();
-	HRESULT hr = deviceContext->Map(viewProjBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	HRESULT hr = deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
-	deviceContext->Unmap(viewProjBuffer, 0);
+	deviceContext->Unmap(viewProjBuffer.Get(), 0);
 
+
+	this->particleSystem.updateParticles(deltaTime, viewProj);
+
+	//deviceContext->OMSetRenderTargets(1, &renderTargetView, this->depthStencilView);
+
+	this->particleSystem.drawAll(camera);
+
+	this->particleSystem2.updateParticles(deltaTime, viewProj);
+
+	this->particleSystem2.drawAll(camera);
 
 	//set up Shaders
-	deviceContext->IASetInputLayout(this->shaderDefault.vs.GetInputLayout());
-	deviceContext->PSSetShader(this->shaderDefault.ps.GetShader(), nullptr, 0);
-	deviceContext->VSSetShader(this->shaderDefault.vs.GetShader(), nullptr, 0);
-	deviceContext->VSSetConstantBuffers(0, 1, &this->viewProjBuffer);
-	deviceContext->PSSetSamplers(0, 1, &this->sampler);
-	deviceContext->PSSetShaderResources(1, 1, &this->culledLightBufferSRV);
-	deviceContext->PSSetConstantBuffers(2, 1, &this->sunBuffer);
-	deviceContext->PSSetConstantBuffers(1, 1, &this->lightBuffer);
+	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
+	deviceContext->PSSetShader(this->shaderDefault.ps.getShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->shaderDefault.vs.getShader(), nullptr, 0);
+	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
+	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
+	deviceContext->PSSetShaderResources(1, 1, this->culledLightBufferSRV.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
 
 	Frustum frustum = camera->getFrustum();
 
@@ -388,13 +367,13 @@ void Graphics::render(DynamicCamera* camera)
 			boundingBox.maxPos += object->getPosition();
 			boundingBox.minPos += object->getPosition();
 
-			if (frustum.intersect(boundingBox, 2.0)) {
+			if (frustum.intersect(boundingBox, 10.0)) {
 				SimpleMath::Matrix world = object->getTransform();
 				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				HRESULT hr = deviceContext->Map(worldBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 				CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
-				deviceContext->Unmap(worldBuffer, 0);
+				deviceContext->Unmap(worldBuffer.Get(), 0);
 				UINT vertexCount = object->mesh->getVertexCount();
 				UINT stride = sizeof(Vertex3D);
 				UINT offset = 0;
@@ -408,24 +387,24 @@ void Graphics::render(DynamicCamera* camera)
 
 
 				Vector4 modColor = object->getColor();
-				hr = deviceContext->Map(colorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 				CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
-				deviceContext->Unmap(colorBuffer, 0);
+				deviceContext->Unmap(colorBuffer.Get(), 0);
 
-				deviceContext->VSSetConstantBuffers(1, 1, &this->worldBuffer);
+				deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 				deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				deviceContext->IASetVertexBuffers(0, 1, &object->mesh->vertexBuffer, &stride, &offset);
+				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 				deviceContext->PSSetShaderResources(0, 1, &shaderResView);
-				deviceContext->PSSetConstantBuffers(0, 1, &this->colorBuffer);
+				deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
 				deviceContext->Draw(vertexCount, 0);
 			}
 		}
 	}
 
-	deviceContext->IASetInputLayout(this->shaderDebug.vs.GetInputLayout());
-	deviceContext->PSSetShader(this->shaderDebug.ps.GetShader(), nullptr, 0);
-	deviceContext->VSSetShader(this->shaderDebug.vs.GetShader(), nullptr, 0);
+	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
+	deviceContext->PSSetShader(this->shaderDebug.ps.getShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->shaderDebug.vs.getShader(), nullptr, 0);
 #if _DEBUG
 	//debugger->DrawLine(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0 ), XMFLOAT3(1, 1, 0));
 	//debugger->DrawCube(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 0, 0));
@@ -440,8 +419,6 @@ bool Graphics::createShaders()
 	
 	std::wstring shaderfolder = L"";
 #pragma region DetermineShaderPath
-	if (IsDebuggerPresent() == TRUE)
-	{
 #ifdef _DEBUG //Debug Mode
 #ifdef _WIN64 //x64
 		shaderfolder = L"..\\x64\\Debug\\";
@@ -455,7 +432,6 @@ bool Graphics::createShaders()
 		shaderfolder = L"..\\Release\\";
 #endif
 #endif
-	}
 
 	//2d shaders
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] =
@@ -467,8 +443,8 @@ bool Graphics::createShaders()
 
 
 	UINT numElements = ARRAYSIZE(inputDesc);
-	this->shaderDefault.createVS(device, shaderfolder + L"VertexShader.cso", inputDesc, numElements);
-	this->shaderDefault.createPS(device, shaderfolder + L"PixelShader.cso");
+	this->shaderDefault.createVS(device.Get(), shaderfolder + L"VertexShader.cso", inputDesc, numElements);
+	this->shaderDefault.createPS(device.Get(), shaderfolder + L"PixelShader.cso");
 
 	D3D11_INPUT_ELEMENT_DESC inputDesc2[] =
 	{
@@ -476,8 +452,8 @@ bool Graphics::createShaders()
 		{"COLOR", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },	};
 	
 	UINT numElements2 = ARRAYSIZE(inputDesc2);
-	this->shaderDebug.createVS(device, shaderfolder + L"DebugVs.cso", inputDesc2, numElements2);
-	this->shaderDebug.createPS(device, shaderfolder + L"DebugPS.cso");
+	this->shaderDebug.createVS(device.Get(), shaderfolder + L"DebugVs.cso", inputDesc2, numElements2);
+	this->shaderDebug.createPS(device.Get(), shaderfolder + L"DebugPS.cso");
 
 
 
@@ -496,32 +472,80 @@ bool Graphics::createShaders()
 	samplerDesc.MinLOD = 0;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	// Create the texture sampler state.
-	HRESULT result = device->CreateSamplerState(&samplerDesc, &sampler);
+	HRESULT result = device->CreateSamplerState(&samplerDesc, sampler.GetAddressOf());
 	if (FAILED(result))
 	{
 		return false;
 	}
 
-	this->lightCullingShader.initialize(device, shaderfolder + L"ComputeLightCulling.cso");
+	this->lightCullingShader.initialize(device.Get(), shaderfolder + L"ComputeLightCulling.cso");
 
 	return true;
+}
+
+void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles,  int lifeTime, float randomPower)
+{
+	Vector3 randomPos = randomPower*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos2 = -1.0f*randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
+	randomPos += pos;
+	randomPos += randomPos2;
+	float grey = float(rand()) / RAND_MAX;
+	this->particleSystem.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+}
+
+void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, int lifeTime, float randomPower)
+{
+	Vector3 randomPos = randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos2 = -1.0f * randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
+	randomPos += pos;
+	randomPos += randomPos2;
+	float grey = float(rand()) / RAND_MAX;
+	this->particleSystem2.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+}
+
+void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
+{
+	if (nrOfColors < 5)
+	{
+		this->particleSystem.changeColornSize(colors, nrOfColors, startSize, endSize);
+	}
+}
+
+void Graphics::setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
+{
+	if (nrOfColors < 5)
+	{
+		this->particleSystem2.changeColornSize(colors, nrOfColors, startSize, endSize);
+	}
+}
+
+void Graphics::setVectorField(float vectorFieldSize, float vectorFieldPower)
+{
+	this->particleSystem.changeVectorField(vectorFieldPower, vectorFieldSize);
+}
+
+void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
+{
+	this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
 void Graphics::clearScreen()
 {
 	float color[4] = { 0,0,0,1 };
-	deviceContext->ClearRenderTargetView(renderTargetView, color);
-	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
+	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 }
 
 ID3D11DeviceContext* Graphics::getDeviceContext()
 {
-	return this->deviceContext;
+	return this->deviceContext.Get();
 }
 
 ID3D11Device* Graphics::getDevice()
 {
-	return this->device;
+	return this->device.Get();
 }
 
 void Graphics::loadMesh(std::string fileName)
@@ -534,25 +558,27 @@ void Graphics::loadMesh(std::string fileName)
 		if (imp.loadMesh(fileName.c_str()))
 		{
 			meshes[fileName] = newMesh;
-			Vertex* vertices = imp.getVertices();
+			
 			std::vector<Vertex3D> tempVec;
 			Vertex3D vertex;
+			Vertex* vertices = imp.getVertices();
 			for (int i = 0; i < imp.getVertexCount(); i++)
 			{
 				vertex.position.x = vertices[i].x;
 				vertex.position.y = vertices[i].y;
 				vertex.position.z = vertices[i].z;
 
-				vertex.normal.x = vertices[i].nx;
-				vertex.normal.y = vertices[i].ny;
-				vertex.normal.z = vertices[i].nz;
+					vertex.normal.x = vertices[i].nx;
+					vertex.normal.y = vertices[i].ny;
+					vertex.normal.z = vertices[i].nz;
 
-				vertex.uv.x = vertices[i].u;
-				vertex.uv.y = vertices[i].v;
+					vertex.uv.x = vertices[i].u;
+					vertex.uv.y = vertices[i].v;
 
-				tempVec.push_back(vertex);
+					tempVec.push_back(vertex);
+				
 			}
-			
+
 			meshes[fileName].insertDataToMesh(tempVec);
 			AABB aabb;
 			imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z);
@@ -574,7 +600,7 @@ void Graphics::loadMesh(std::string fileName)
 			ZeroMemory(&subData, sizeof(subData));
 			subData.pSysMem = meshes[fileName].vertices.data();
 
-			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[fileName].vertexBuffer.GetAddressOf());
 			//meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
 		}
 	}
@@ -673,7 +699,7 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 			ZeroMemory(&subData, sizeof(subData));
 			subData.pSysMem = meshes[fileName].vertices.data();
 
-			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[fileName].vertexBuffer.GetAddressOf());
 			meshes[fileName].vertices.clear();
 		}
 		break;
@@ -711,8 +737,8 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 
 			meshes[fileName].insertDataToMesh(vecTemp);
 			AABB boundingBox;
-			boundingBox.minPos = Vector3(-1.0, -0.01, -1.0);
-			boundingBox.maxPos = Vector3(1.0, 0.01, 1.0);
+			boundingBox.minPos = Vector3(-1.0f, -0.01f, -1.0f);
+			boundingBox.maxPos = Vector3(1.0f, 0.01f, 1.0f);
 			meshes[fileName].setAABB(boundingBox);
 
 			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
@@ -731,7 +757,7 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 			ZeroMemory(&subData, sizeof(subData));
 			subData.pSysMem = meshes[fileName].vertices.data();
 
-			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, &meshes[fileName].vertexBuffer);
+			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[fileName].vertexBuffer.GetAddressOf());
 			meshes[fileName].vertices.clear();
 		}
 		break;
@@ -752,7 +778,7 @@ bool Graphics::loadTexture(std::string path, bool overridePath )
 	if (textures.find(texturePath) == textures.end()) {
 		Texture* newTexture = new Texture();
 
-		if (!newTexture->Initialize(this->device, this->deviceContext, texturePath.c_str(), -1)) {
+		if (!newTexture->Initialize(this->device.Get(), this->deviceContext.Get(), texturePath.c_str(), -1)) {
 			delete newTexture;
 			return false;
 		}
@@ -826,13 +852,13 @@ void Graphics::presentScene()
 void Graphics::fillLightBuffers()
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	HRESULT hr = deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	HRESULT hr = deviceContext->Map(lightBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &lightList->lights, sizeof(Light) * lightList->maxSize);
-	deviceContext->Unmap(lightBuffer, 0);
+	deviceContext->Unmap(lightBuffer.Get(), 0);
 
-	hr = deviceContext->Map(sunBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	hr = deviceContext->Map(sunBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &lightList->sun, sizeof(Sun));
-	deviceContext->Unmap(sunBuffer, 0);
+	deviceContext->Unmap(sunBuffer.Get(), 0);
 }
 
 void Graphics::cullLights()
@@ -840,10 +866,10 @@ void Graphics::cullLights()
 	deviceContext->CSSetShader(lightCullingShader.getShader(), NULL, 0);
 	ID3D11ShaderResourceView* nullSRV = NULL;
 	deviceContext->PSSetShaderResources(1, 1, &nullSRV);
-	deviceContext->CSSetConstantBuffers(0, 1, &lightBuffer);
-	deviceContext->CSSetShaderResources(0, 1, &frustumBufferSRV);
+	deviceContext->CSSetConstantBuffers(0, 1, lightBuffer.GetAddressOf());
+	deviceContext->CSSetShaderResources(0, 1, frustumBufferSRV.GetAddressOf());
 	const UINT uavCounter = 0;
-	deviceContext->CSSetUnorderedAccessViews(0, 1, &culledLightBufferUAV, &uavCounter);
+	deviceContext->CSSetUnorderedAccessViews(0, 1, culledLightBufferUAV.GetAddressOf(), &uavCounter);
 
 	deviceContext->Dispatch(80, 45, 1);
 
@@ -916,7 +942,7 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 		}
 	}
 
-	HRESULT hr = device->CreateBuffer(&desc, &data, &frustumBuffer);
+	HRESULT hr = device->CreateBuffer(&desc, &data, frustumBuffer.GetAddressOf());
 	delete[] frustumTiles;
 	
 	if (FAILED(hr))
@@ -928,7 +954,7 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = 80 * 45;
 
-	hr = device->CreateShaderResourceView(frustumBuffer, &srvDesc, &frustumBufferSRV);
+	hr = device->CreateShaderResourceView(frustumBuffer.Get(), &srvDesc, frustumBufferSRV.GetAddressOf());
 
 	return hr;
 }

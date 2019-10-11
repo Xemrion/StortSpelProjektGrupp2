@@ -191,9 +191,9 @@ void Actor::followPath()
 {
 	if (path.size() > 0)
 	{
-		targetNode = DirectX::SimpleMath::Vector3(float(path.at(path.size() - 1)->GetXPos()),
+		targetNode = DirectX::SimpleMath::Vector3(float(path.at(path.size() - 1)->getXPos()),
 			.0f,
-			float(path.at(path.size() - 1)->GetYPos()));
+			float(path.at(path.size() - 1)->getYPos()));
 		Vector3 dir = targetNode - this->getPosition();
 		dir.Normalize();
 
