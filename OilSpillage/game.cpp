@@ -78,7 +78,6 @@ void Game::run()
 		if (oldState != -1) {
 			graphics.clearDraw();
 			createCurrentState(); //Init the new state
-			states[currentState]->init();
 			curTime = 0;
 			QueryPerformanceCounter((LARGE_INTEGER*)& curTime);
 			oldState = -1;

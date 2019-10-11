@@ -37,9 +37,9 @@ private:
 	float                           time;
 	MapConfig                       config;
 	Graphics                       &graphics;
-	std::unique_ptr<AStar>          aStar;
-   std::unique_ptr<Map>            map;
-	std::unique_ptr<Actor>          aiObject;
+	AStar*				            aStar;
+    std::unique_ptr<Map>             map;
+	ActorManager*				    actorManager;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
@@ -69,4 +69,5 @@ private:
 	void ImGui_Driving();
 	void ImGui_Particles();
 	void ImGui_Camera();
+	void ImGui_AI();
 };
