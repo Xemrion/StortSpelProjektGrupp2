@@ -1,6 +1,6 @@
 #include "MapConfig.hpp"
 
-Str mapConfigToFilename( MapConfig const &config, Str extension ) {
+Str  mapConfigToFilename( MapConfig const &config, Str extension ) {
    std::ostringstream filename;
    filename << "map_"
             <<  config.seed
@@ -13,6 +13,8 @@ Str mapConfigToFilename( MapConfig const &config, Str extension ) {
             << (config.isUsingManhattanDistance? 'M':'E')
             << '_'
             <<  config.roadDepthMax
+            << '_'
+            <<  config.roadMinTotalCoverage
             << '_'
             <<  config.roadStepSize
             << '_'

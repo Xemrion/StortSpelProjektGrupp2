@@ -11,120 +11,145 @@ TileMap::TileMap( MapConfig const &config ):
 // y = current Y (may be mutated if successful)
 // d = direction to walk
 // returns true if successful
-bool TileMap::walk(U16& x, U16& y, Direction d, Tile tile) {
-	U16  _x = x, _y = y;
+Bool  TileMap::walk( U16& x, U16& y, Direction d, Tile tile ) {
+	U16  targetX { x },
+        targetY { y };
 	switch (d) {
-		case Direction::north: --_y; break;
-		case Direction::east:  ++_x; break;
-		case Direction::south: ++_y; break;
-		case Direction::west:  --_x; break;
+		case Direction::north: --targetY; break;
+		case Direction::east:  ++targetX; break;
+		case Direction::south: ++targetY; break;
+		case Direction::west:  --targetX; break;
 	}
 
-	if (_x >= width or _y >= height)
+	if ( targetX >= width or targetY >= height )
 		return false;
 
-	auto idx = index(_x, _y);
-	if (data[idx] != Tile::ground)
+	auto targetIndex = index(targetX, targetY);
+	if ( data[targetIndex] != Tile::ground )
 		return false;
 	else {
-		data[idx] = tile;
-		x = _x;
-		y = _y;
+		data[targetIndex] = tile;
+		x = targetX;
+		y = targetY;
 		return true;
 	}
 }
 
-Vec<GameObject> TileMap::loadAsModels(Graphics& graphics) const {
-	auto const to_reserve = width * height;
-	Vec<GameObject> tiles( to_reserve );
-	for (U16 y = 0; y < height; ++y) {
-		for (U16 x = 0; x < width; ++x) {
-			auto const  tile_i = index(x, y);
-			auto       &tile   = tiles[tile_i];
-			auto const  gfx_i  = getTileLookupIndex(x, y);
-			auto const &[modelName, rotation] = tileGraphicsTable[gfx_i];
-			tile.mesh    = graphics.getMeshPointer( modelName.c_str() );
-         tile.setTexture( graphics.getTexturePointer(modelName.c_str(),true) );
+Vec<GameObject>  TileMap::loadAsModels(Graphics& graphics) const {
+   auto const  toReserve { width * height };
+	Vec<GameObject> tiles( toReserve );
+	for ( U16 y = 0;  y < height;  ++y ) {
+		for ( U16 x = 0;  x < width;  ++x ) {
+			auto const  tileIndex             { index(x, y)                       };
+			auto       &tile                  { tiles[tileIndex]                  };
+			auto const  graphicsIndex         { getTileLookupIndex(x, y)          };
+         auto const &[modelName, rotation] { tileGraphicsTable[graphicsIndex]  };
+			tile.mesh      = graphics.getMeshPointer(    modelName.c_str()        );
+         tile.setTexture( graphics.getTexturePointer( modelName.c_str(), true) );
 			if ( rotation != 0 )
-				tile.setRotation({ 0.0f, float(rotation) * 3.1415926535f/180.0f, 0.0f });
-			tile.setPosition( convertTilePositionToWorldPosition(x,y) );
+				tile.setRotation({ .0f, F32(rotation) * 3.1415926535f/180.0f, .0f });
+			tile.setPosition( convertTilePositionToWorldPosition( x, y ) );
 		}
 	}
 	return tiles; // RVO/Copy Elision
 }
 
-Bool TileMap::neighbourIsRoad(Direction dir, U16 x, U16 y) const noexcept {
+Bool  TileMap::neighbourIsRoad( Direction dir, U16 x, U16 y ) const noexcept {
 	assert( dir == Direction::north or dir == Direction::east
 	     or dir == Direction::south or dir == Direction::west );
 
-	if      ( dir == Direction::north)      y--;
-	else if ( dir == Direction::east)       x++;
-	else if ( dir == Direction::south)      y++;
-	else /* ( dir == Dir::west  )  */ x--;
+	if      ( dir == Direction::north )    y--;
+	else if ( dir == Direction::east  )    x++;
+	else if ( dir == Direction::south )    y++;
+	else /* ( dir == Direction::west  ) */ x--;
 
-	return !isInBounds(x, y) or (data[index(x, y)] != Tile::ground);
+	return isInBounds( x, y ) and (data[index(x, y)] == Tile::road);
 }
 
-Bool TileMap::isRoad(U16 x, U16 y) const noexcept {
-	return data[index(x, y)] != Tile::ground; // TODO: revamp if new tiles are addedd!
+F32  TileMap::getRoadCoverage() const noexcept {
+   Size  roadTileCount { 0 };
+   for ( Size i = 0;  i < width * height;  ++i )
+      if ( data[i] == Tile::road )
+         roadTileCount++;
+   return F32(roadTileCount) / F32(width * height);
 }
+
 
 // road generator stream outputter implementation
-std::ostream& operator<< (std::ostream& out, TileMap const& map) {
+std::ostream &operator<<( std::ostream &out, TileMap const &map ) {
 #ifdef _DEBUG
 	out << "  PRINTING " << map.width << 'x' << map.height << " MAP:\n\t";
 #endif
-	for (U16 y = 0; y < map.height; ++y) {
-		for (U16 x = 0; x < map.width; ++x) {
-			//*[@DEPRECATED]*/  out << ' ' << map.data[map.index(x,y)];
-			
-#ifdef NO_TERMINAL_COLORS
-         out << map.tileTerminalColorTable[    map.getTileColorLookupIndex( x, y )]
-             << map.tileTerminalGraphicsTable[ map.getTileLookupIndex(      x, y )]
-             << map.terminalColorDefault;
-#else
-			out << map.tileTerminalGraphicsTable[ map.getTileLookupIndex( x, y ) ];
-#endif
+	for ( U16 y = 0;  y < map.height;  ++y ) {
+		for ( U16 x = 0;  x < map.width;  ++x ) {
+			//*[@DEPRECATED]*/  out << ' ' << map.data[map.index( x, y )];
+         #ifdef NO_TERMINAL_COLORS
+            out << map.tileTerminalColorTable[    map.getTileColorLookupIndex( x, y )]
+                << map.tileTerminalGraphicsTable[ map.getTileLookupIndex(      x, y )]
+                << map.terminalColorDefault;
+         #else
+			   out << map.tileTerminalGraphicsTable[ map.getTileLookupIndex( x, y ) ];
+         #endif
 		}
-
 		out << "\n\t";
 	}
 	return out;
 }
 
-Vec<V2u> TileMap::getNeighbouringTilePositions( V2u cellPosition ) const noexcept {
+Vec<V2u> TileMap::getCardinallyNeighbouringTilePositions( V2u tilePosition ) const noexcept {
+   Vec<V2u>  neighbouringTilePositions {};
+   neighbouringTilePositions.reserve(4);
+
+   // check if any of the neighbouring tile coords are tiles within map bounds:
+   Bool const  isBorderingWest   { tilePosition.x ==          0 },
+               isBorderingEast   { tilePosition.x == width  - 1 },
+               isBorderingNorth  { tilePosition.y ==          0 },
+               isBorderingSouth  { tilePosition.y == height - 1 };
+   if ( not isBorderingNorth ) // N
+      neighbouringTilePositions.emplace_back( tilePosition.x,   tilePosition.y-1 );
+   if ( not isBorderingSouth ) // S
+      neighbouringTilePositions.emplace_back( tilePosition.x,   tilePosition.y+1 );
+   if ( not isBorderingWest  ) // W
+      neighbouringTilePositions.emplace_back( tilePosition.x-1, tilePosition.y   );
+   if ( not isBorderingEast  ) // E
+      neighbouringTilePositions.emplace_back( tilePosition.x+1, tilePosition.y   );
+   return neighbouringTilePositions;
+}
+
+Vec<V2u>  TileMap::getNeighbouringTilePositions( V2u tilePosition ) const noexcept {
    Vec<V2u>  neighbouringTilePositions {};
    neighbouringTilePositions.reserve(8);
 
    // check if any of the neighbouring tile coords are tiles within map bounds:
-   Bool const  isBorderingWest  = ( cellPosition.x ==          0 ),
-               isBorderingEast  = ( cellPosition.x == width  - 1 ),
-               isBorderingNorth = ( cellPosition.y ==          0 ),
-               isBorderingSouth = ( cellPosition.y == height - 1 );
+   Bool const  isBorderingWest  = ( tilePosition.x ==          0 ),
+               isBorderingEast  = ( tilePosition.x == width  - 1 ),
+               isBorderingNorth = ( tilePosition.y ==          0 ),
+               isBorderingSouth = ( tilePosition.y == height - 1 );
    if ( not isBorderingNorth ) {  // N
-      neighbouringTilePositions.emplace_back(    cellPosition.x,   cellPosition.y-1 );
+      neighbouringTilePositions.emplace_back(    tilePosition.x,   tilePosition.y-1 );
       if ( not isBorderingWest ) // NW
-         neighbouringTilePositions.emplace_back( cellPosition.x-1, cellPosition.y-1 );
+         neighbouringTilePositions.emplace_back( tilePosition.x-1, tilePosition.y-1 );
       if ( not isBorderingEast ) // NE 
-         neighbouringTilePositions.emplace_back( cellPosition.x+1, cellPosition.y-1 );
+         neighbouringTilePositions.emplace_back( tilePosition.x+1, tilePosition.y-1 );
    }
    if ( not isBorderingSouth ) {  // S
-      neighbouringTilePositions.emplace_back(    cellPosition.x,   cellPosition.y+1 );
+      neighbouringTilePositions.emplace_back(    tilePosition.x,   tilePosition.y+1 );
       if ( not isBorderingWest ) // SW
-         neighbouringTilePositions.emplace_back( cellPosition.x-1, cellPosition.y+1 );
+         neighbouringTilePositions.emplace_back( tilePosition.x-1, tilePosition.y+1 );
       if ( not isBorderingEast ) // SE 
-         neighbouringTilePositions.emplace_back( cellPosition.x+1, cellPosition.y+1 );
+         neighbouringTilePositions.emplace_back( tilePosition.x+1, tilePosition.y+1 );
    }
    if ( not isBorderingWest )    // W
-      neighbouringTilePositions.emplace_back(    cellPosition.x-1, cellPosition.y );
+      neighbouringTilePositions.emplace_back(    tilePosition.x-1, tilePosition.y );
    if ( not isBorderingEast )    // E
-      neighbouringTilePositions.emplace_back(    cellPosition.x+1, cellPosition.y );
+      neighbouringTilePositions.emplace_back(    tilePosition.x+1, tilePosition.y );
    return neighbouringTilePositions;
 }
 
+
 // TODO: rotate bend mesh 180 degrees and update values in table to their proper value
-Vec<TileMap::TileEntry> const TileMap::tileGraphicsTable = {
-	// idx   WSEN      filename          rot      type                  rotation
+Vec<TileMap::TileEntry> const  TileMap::tileGraphicsTable {
+	// targetIndex   WSEN      filename          rot      type                  rotation
 	/*   0   0000 */  {"Roads/Road_pavement",        0}, // no road,                 0 deg
 	/*   1   0001 */  {"Roads/Road_deadend",         0}, // deadend (south),         0 deg
 	/*   2   0010 */  {"Roads/Road_deadend",        90}, // deadend (west),         90 deg
@@ -144,8 +169,8 @@ Vec<TileMap::TileEntry> const TileMap::tileGraphicsTable = {
 };
 
 // Used with a cellular automata to beautify the terminal output.
-Vec<Str> const TileMap::tileTerminalGraphicsTable = {
-	// idx   WSEN     getTerminalColorLookupIndex      type                  rotation
+Vec<Str> const   TileMap::tileTerminalGraphicsTable {
+	// targetIndex   WSEN     getTerminalColorLookupIndex      type                  rotation
 	/*   0   0000 */  u8".", // no road,                 0 deg
 	/*   1   0001 */  u8"╹", // deadend (south),         0 deg
 	/*   2   0010 */  u8"╺", // deadend (west),         90 deg
@@ -165,7 +190,7 @@ Vec<Str> const TileMap::tileTerminalGraphicsTable = {
 };
 
 // Used to color code tiles (for terminal output)
-Vec<Str> const TileMap::tileTerminalColorTable = {
+Vec<Str> const  TileMap::tileTerminalColorTable {
 	/* ground */    "\033[38;5;150m",
 	/* road0  */    "\033[38;5;255m",
 	/* road1  */    "\033[38;5;249m",

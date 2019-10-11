@@ -274,7 +274,7 @@ void PlayingGameState::ImGui_ProcGen() {
       map = std::make_unique<Map>(graphics, config);
       player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
       map->setDistrictColorCoding( shouldColorCodeDistricts );
-      createMinimapTexture( map->getTileMap() );
+      createMinimapTexture( *map );
    }
 
    ImGui::End();

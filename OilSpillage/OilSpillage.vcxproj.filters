@@ -147,9 +147,6 @@
     <ClCompile Include="UI\UIPaused.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PG\utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PG\MinimapTextureGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

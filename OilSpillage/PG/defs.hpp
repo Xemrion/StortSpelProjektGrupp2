@@ -49,7 +49,6 @@ template <typename T> union V2 {
    V2(                      ): x(T()), y(T())         {}
    V2( T const x, T const y ): x(x), y(y)             {}
    V2( V2<T> const  &other  ): x(other.x), y(other.y) {}
-   //V2( V2<T>       &&other  ) = delete;
 
    inline Bool operator==( V2<T> const &other ) const noexcept {
       return (x == other.x) && (y == other.y);
@@ -62,8 +61,6 @@ template <typename T> union V2 {
       }
       return *this;
    }
-
-   //void operator=( V2<T> && ) = delete;
 };
 using V2f = V2<F32>;
 using V2u = V2<U32>;
@@ -77,8 +74,7 @@ template <typename T> union V3 {
 
    V3(                                 ): x(T()), y(T()), z(T())             {}
    V3( T const x, T const y, T const z ): x(x), y(y), z(z)                   {}
-   V3( V3<T> const  &other             ): x(other.x), y(other.y), z(other.z) {}
-   //V3( V3<T>       &&other             ) = delete;
+   V3( V3<T> const &other              ): x(other.x), y(other.y), z(other.z) {}
 
    inline Bool operator==( V3<T> const &other ) const noexcept {
       return (x == other.x) && (y == other.y) && (z == other.z);
@@ -93,7 +89,6 @@ template <typename T> union V3 {
       return *this;
    }
 
-   //void operator=( V3<T> && ) = delete;
 };
 using V3f = V3<F32>;
 using V3u = V3<U32>;
@@ -107,7 +102,6 @@ template <typename T> union V4 {
    V4(                                            ): x(T()), y(T()), z(T()), w(T())                 {}
    V4( T const x, T const y, T const z, T const w ): x(x), y(y), z(z), w(w)                         {}
    V4( V4<T> const  &other                        ): x(other.x), y(other.y), z(other.z), w(other.w) {}
-   //V4( V4<T>       &&other                        ) = delete;
 
    inline Bool operator==( V4<T> const &other ) const noexcept {
       return (x == other.x) && (y == other.y) && (z == other.z) && (w == other.w);
@@ -122,8 +116,6 @@ template <typename T> union V4 {
       }
       return *this;
    }
-
-   //void operator=( V4<T> && ) = delete;
 };
 using V4f = V4<F32>;
 using V4u = V4<U32>;

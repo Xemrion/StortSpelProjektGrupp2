@@ -24,7 +24,7 @@ public:
 
    V2u              generateRoadPositionInTileSpace(  RNG & ) const noexcept;
    Vector3          generateRoadPositionInWorldSpace( RNG & ) const noexcept;
-   Void             setDistrictColorCoding(bool useColorCoding) noexcept;
+   Void             setDistrictColorCoding ( Bool useColorCoding ) noexcept;
    V2u              getStartPositionInTileSpace()  const noexcept;
    Vector3          getStartPositionInWorldSpace() const noexcept;
    TileMap const   &getTileMap() const noexcept;
@@ -33,5 +33,5 @@ private:
    Void             generateDistricts();
    Void             generateRoads();
    Void             generateBuildings();
-   Opt<Vec<V2u>>    find_valid_house_lot( RNG &, U16 districtCellID, Voronoi const &, TileMap &, Vec<District> const &districtTable );
+   Opt<Vec<V2u>>    findValidHouseLot( RNG &, U16 districtCellID, Voronoi const &, TileMap &, Vec<District> const &districtTable );
 };
