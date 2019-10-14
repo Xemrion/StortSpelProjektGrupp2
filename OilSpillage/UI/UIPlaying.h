@@ -3,6 +3,7 @@
 
 #include "UserInterface.h"
 #include "Slider.h"
+#include "Minimap.h"
 
 class UIPlaying : public UserInterface
 {
@@ -11,7 +12,9 @@ private:
 	void updateUI(float deltaTime);
 	void drawUI();
 
+	bool initMinimap;
 	std::unique_ptr<Slider> healthBar;
+	std::unique_ptr<Minimap> minimap;
 public:
 	UIPlaying();
 	virtual ~UIPlaying();

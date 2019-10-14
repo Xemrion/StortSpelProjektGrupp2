@@ -4,18 +4,12 @@
 #include "../UI/UIPlaying.h"
 #include "../UI/UIPaused.h"
 #include "../UI/UIOptions.h"
-
+#include "../PG/MinimapTextureGenerator.hpp"
 
 Void PlayingGameState::initiateAStar() {}
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING) {
-	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
-	menues[MENU_PLAYING]->init();
-	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
-	menues[MENU_PAUSED]->init();
-	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
-	menues[MENU_OPTIONS]->init();
-
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
+{
 	lightList = std::make_unique<LightList>();
 	player = std::make_unique<Vehicle>();
 	camera = std::make_unique<DynamicCamera>();
@@ -50,16 +44,16 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	/*
-	 //Road Network Turtlewalker
-	 testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-	 testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-	 testNetwork.get()->setAngle(45);
-	 for (int i = 0; i < 5; i++) {
-		 testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
-		 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	 }
-	 testNetwork.get()->cleanRoadNetwork();
-	 testNetwork.get()->saveTestNetwork("test-network");
+		//Road Network Turtlewalker
+		testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
+		testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+		testNetwork.get()->setAngle(45);
+		for (int i = 0; i < 5; i++) {
+			testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
+			testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+		}
+		testNetwork.get()->cleanRoadNetwork();
+		testNetwork.get()->saveTestNetwork("test-network");
 	*/
 
 	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
@@ -80,25 +74,37 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	graphics.setLightList(lightList.get());
 
-   map = std::make_unique<Map>( graphics, config );
+	map = std::make_unique<Map>( graphics, config );
+
+	//Minimap stuff
+	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
+	bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1);
+	tileSize = Vector3(config.tileScaleFactor.data);
+	//Needs to be loaded before the menues
+	this->minimap = createMinimapTexture(*this->map);
+
+	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
+	menues[MENU_PLAYING]->init();
+	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
+	menues[MENU_PAUSED]->init();
+	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
+	menues[MENU_OPTIONS]->init();
 
 	player->init(); 
-   player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
+	player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
 
 	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
 		{ 
-         Vector3(0.0f, 30.0f+cameraDistance, -10.0f) + player->getVehicle()->getPosition(),
-         Vector3(0.0f, 0.0f, 0.0f), 0.0f },
+			Vector3(0.0f, 30.0f+cameraDistance, -10.0f) + player->getVehicle()->getPosition(),
+			Vector3(0.0f, 0.0f, 0.0f), 0.0f },
 		{ 
-         Vector3(0.0f, cameraDistance, 0.0f) + player->getVehicle()->getPosition(),
-         Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
+			Vector3(0.0f, cameraDistance, 0.0f) + player->getVehicle()->getPosition(),
+			Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
 	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-
-	Input::SetKeyboardPlayerID(0);
 }
 
 PlayingGameState::~PlayingGameState() {}
@@ -274,7 +280,11 @@ void PlayingGameState::ImGui_ProcGen() {
       map = std::make_unique<Map>(graphics, config);
       player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
       map->setDistrictColorCoding( shouldColorCodeDistricts );
-      createMinimapTexture( *map );
+      minimap = createMinimapTexture( *map );
+	  topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0) - Vector3(config.tileScaleFactor.x / 2, 0.0f, config.tileScaleFactor.z / 2);
+	  tileSize = Vector3(config.tileScaleFactor.data);
+
+	  graphics.reloadTexture(minimap);
    }
 
    ImGui::End();
@@ -382,4 +392,24 @@ void PlayingGameState::setCurrentMenu(Menu menu) {
 
 Vehicle* PlayingGameState::getPlayer() const {
 	return player.get();
+}
+
+std::string PlayingGameState::getMinimap() const
+{
+	return this->minimap;
+}
+
+Vector3 PlayingGameState::getTopLeft() const
+{
+	return this->topLeft;
+}
+
+Vector3 PlayingGameState::getBottomRight() const
+{
+	return this->bottomRight;
+}
+
+Vector3 PlayingGameState::getTileSize() const
+{
+	return this->tileSize;
 }

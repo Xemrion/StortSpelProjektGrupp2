@@ -28,9 +28,17 @@ public:
 	void         changeTime(float delta) noexcept;
 	void         setCurrentMenu(Menu);
 	Vehicle     *getPlayer() const;
+	std::string	 getMinimap() const;
+	Vector3		 getTopLeft() const;
+	Vector3		 getBottomRight() const;
+	Vector3		 getTileSize() const;
 
 private:
 	friend class Game;
+	std::string						minimap;
+	Vector3							topLeft;
+	Vector3							bottomRight;
+	Vector3							tileSize;
 	int                             currentMenu;
 	bool                            isUsingManhattanDistance { true };
 	float                           cameraDistance           { 25   };
@@ -38,7 +46,7 @@ private:
 	MapConfig                       config;
 	Graphics                       &graphics;
 	std::unique_ptr<AStar>          aStar;
-   std::unique_ptr<Map>            map;
+	std::unique_ptr<Map>            map;
 	std::unique_ptr<Actor>          aiObject;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;

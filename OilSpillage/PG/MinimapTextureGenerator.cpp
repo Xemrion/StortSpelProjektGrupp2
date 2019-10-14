@@ -104,7 +104,7 @@ Str createMinimapTexture( Map const &map ) {
       }
    }
 
-   auto path = Str("data/map/") + mapConfigToFilename( map.config, ".tga" );
+   auto path = Str("data/textures/map/map.tga");// +mapConfigToFilename(map.config, ".tga");
    stbi_write_tga( path.c_str(), static_cast<I32>(TEX_WIDTH), static_cast<I32>(TEX_HEIGHT), 4, pixels.data() );
-   return path;   
+   return Str("map/map");// +mapConfigToFilename(map.config);
 }

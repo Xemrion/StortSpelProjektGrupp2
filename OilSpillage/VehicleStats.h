@@ -17,7 +17,7 @@ public:
 	static constexpr Stats defaultStats = Stats();
 
 	                               //{ health, durability, armour, accelerationRate, maxSpeed, handlingRate };
-	static constexpr Stats fastCar = {    100,       2.0F,   2.0F,             1.0F,     1.0F,         1.0F };
+	static constexpr Stats fastCar = {    100,       2.0F,   2.0F,             1.0F,     5.0F,         1.0F };
 };
 
 #endif // !VEHICLE_STATS_H
