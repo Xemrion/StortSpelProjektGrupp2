@@ -375,7 +375,7 @@ void PlayingGameState::init()
 				1.0f));
 	}
 #endif
-	lightList->setSun(Sun(Vector3(0.0f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
+	lightList->setSun(Sun(Vector3(0.5f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
 
 	graphics.setLightList(lightList.get());
 
@@ -485,6 +485,9 @@ void PlayingGameState::update(float deltaTime)
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
    ImGui::NewFrame();
+   ImGui::Begin("Graphics test");
+   ImGui::SliderFloat("Far z shadow map:", &graphics.farZTempShadow, 100.0f, 100000.0f);
+   ImGui::End();
    ImGui_Driving();
    ImGui_ProcGen();
 	ImGui::Render();

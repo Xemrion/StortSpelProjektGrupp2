@@ -5,7 +5,7 @@ Matrix GameObject::getTransform() {
 	Matrix transform(Matrix::CreateScale(scale));
 	transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
 	transform *= Matrix::CreateTranslation(position);
-
+	
 	if (this->parent != nullptr)
 	{
 		transform *= this->parent->getTransform();

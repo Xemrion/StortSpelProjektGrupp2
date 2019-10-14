@@ -42,6 +42,8 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterStateShadow;
+
 	Microsoft::WRL::ComPtr<ID3D11BlendState> alphaEnableBlendingState;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> worldBuffer;
@@ -102,4 +104,6 @@ public:
 	//culling by distance from camera
 	void setCullingDistance(float dist);
 	float getCullingDistance();
+	float farZTempShadow;
+
 };

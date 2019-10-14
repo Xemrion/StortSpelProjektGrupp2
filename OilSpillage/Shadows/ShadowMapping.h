@@ -13,7 +13,7 @@ public:
 
 	bool initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 	void setWorld(const Matrix& world);
-	void setViewProj(DynamicCamera* camera, Vector3 sunDir);
+	void setViewProj(DynamicCamera* camera, Vector3 sunDir, float farPlaneTest=1000.0f);
 	//uses the rendershader in Shader
 	void prepare();
 	Microsoft::WRL::ComPtr <ID3D11SamplerState> getShadowSampler();

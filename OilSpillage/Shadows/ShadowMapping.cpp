@@ -102,8 +102,8 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 
-	depthStencilDesc.Width = 2000/*System::getWindowArea().width*/;
-	depthStencilDesc.Height = 2000/*System::getWindowArea().height*/;
+	depthStencilDesc.Width = 1024/*System::getWindowArea().width*/;
+	depthStencilDesc.Height = 1024/*System::getWindowArea().height*/;
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.ArraySize = 1;
 	depthStencilDesc.Format = DXGI_FORMAT_R32_TYPELESS;
@@ -178,108 +178,17 @@ void ShadowMapping::setWorld(const Matrix& world)
 
 }
 
-void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir)
+void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir, float farPlaneTest)
 {
-	Matrix rotationRes;
-	Vector3 sunDirection = sunDir;
-	sunDirection.x = 0.5f;
-	sunDirection.Normalize();
-	float pitch = sqrt(pow(sunDirection.x, 2) + pow(sunDirection.y, 2)) / sunDirection.z;
-	pitch = atan(pitch);
-	float yaw = sunDirection.x / -sunDirection.y;
-	yaw = atan(yaw);
-	//yaw = sunDirection.z > 0 ? yaw - (180* (DirectX::XM_PI/180)) : yaw;
-	//rotationRes = Matrix::CreateRotationZ(this->rotation.z); //Roll
-	rotationRes = Matrix::CreateRotationX(pitch); //Pitch
-	rotationRes = Matrix::CreateFromYawPitchRoll(yaw,pitch,0.0f); //Yaw
-	
-	//Vector3 pos(camera->getPosition().x, camera->getPosition().y*3, camera->getPosition().z);
-	Vector3 offset = (camera->getPosition().y / sunDir.y) * sunDir;
-	Vector3 pos(camera->getPosition().x + offset.x, camera->getPosition().y+5, camera->getPosition().z + offset.z);
-	//pos.z += -2.0f;
-	//pos.y += 10.0f;
-	//pos *= -1.0f;
-	this->view = Matrix::CreateLookAt(
-		pos, //Position in world
-		pos + Vector3::Transform(Vector3(0.0f, 0.0f, -1.0f),rotationRes), //Front
-		Vector3::Transform(Vector3(0.0f, 1.0f, 0.0f), rotationRes) //Up
-		);
-	
-	this->view = Matrix::CreateLookAt(
-		pos, //Position in world
-		pos + sunDirection,/*pos + Vector3::Transform(Vector3(0.0f, 0.0f, -1.0f),rotationRes*/ //Front
-		Vector3::Reflect(sunDirection, Vector3(0, 1, 0))/*Vector3::Transform(Vector3(0.0f, 1.0f, 0.0f), rotationRes)*/ //Up
-	);
-
-	
-
-	/*Från https://www.gamedev.net/forums/topic/505893-orthographic-projection-for-shadow-mapping/ och ska testa för o se om det funkar*/
-
-	Vector3 centroid(0, 0, 0);
-	Matrix invView = camera->getViewMatrix().Invert();
-	Vector4 viewDir = DirectX::XMVector4Transform(Vector4(0.0, 0.0, 1.0, 0.0), invView);
-	Vector4 viewUp = DirectX::XMVector4Transform(Vector4(0.0, 1.0, 0.0, 0.0), invView);
-	Vector4 viewRight = DirectX::XMVector4Transform(Vector4(1.0, 0.0, 0.0, 0.0), invView);
-	
-	
-	Vector3 nearCenter = camera->getPosition() + viewDir * camera->getNearDistance();
-	Vector3 farCenter = camera->getPosition() + viewDir * camera->getFarDistance();
-	Vector3 nearTopLeft = nearCenter + Vector3(viewUp) * camera->getNearHeight() - Vector3(viewRight) * camera->getNearWidth();
-	Vector3 nearTopRight = nearCenter + Vector3(viewUp) * camera->getNearHeight() + Vector3(viewRight) * camera->getNearWidth();
-	Vector3 nearBottomLeft = nearCenter - Vector3(viewUp) * camera->getNearHeight() - Vector3(viewRight) * camera->getNearWidth();
-	Vector3 nearBottomRight = nearCenter - Vector3(viewUp) * camera->getNearHeight() + Vector3(viewRight) * camera->getNearWidth();
-
-	Vector3 farTopLeft = farCenter + Vector3(viewUp) * camera->getFarHeight() - Vector3(viewRight) * camera->getFarWidth();
-	Vector3 farTopRight = farCenter + Vector3(viewUp) * camera->getFarHeight() + Vector3(viewRight) * camera->getFarWidth();
-	Vector3 farBottomLeft = farCenter - Vector3(viewUp) * camera->getFarHeight() - Vector3(viewRight) * camera->getFarWidth();
-	Vector3 farBottomRight = farCenter - Vector3(viewUp) * camera->getFarHeight() + Vector3(viewRight) * camera->getFarWidth();
-
-	centroid += nearTopLeft; centroid += nearTopRight; centroid += nearBottomLeft; centroid += nearBottomRight;
-	centroid += farTopLeft; centroid += farTopRight; centroid += farBottomLeft; centroid += farBottomRight;
-
-	centroid /= 8;
-
-	float nearClipOffset = 50.0f;
-	float farZ = 40.0f;
-	float distFromCentroid = farZ + nearClipOffset;
-	Matrix viewMatrix = Matrix::CreateLookAt(centroid - (sunDir * distFromCentroid), centroid, Vector3(0, 1, 0));
-
-	Vector3 lightFCs[8];
-
-	lightFCs[0] = Vector3::Transform(nearTopLeft,viewMatrix);
-	lightFCs[1] = Vector3::Transform(nearTopRight, viewMatrix); 
-	lightFCs[2] = Vector3::Transform(nearBottomLeft, viewMatrix); 
-	lightFCs[3] = Vector3::Transform(nearBottomRight, viewMatrix); 
-	lightFCs[4] = Vector3::Transform(farTopLeft, viewMatrix); 
-	lightFCs[5] = Vector3::Transform(farTopRight, viewMatrix); 
-	lightFCs[6] = Vector3::Transform(farBottomLeft, viewMatrix);
-	lightFCs[7] = Vector3::Transform(farBottomRight, viewMatrix);
-	
-	
-
-
-
-	/*sunDirection.Normalize();
-	pos *= -1.0f;
-	Matrix lightViewMatrix;
-	lightViewMatrix = Matrix::Identity;
-	
-
-	lightViewMatrix.CreateFromYawPitchRoll(pitch, new Vector3f(1, 0, 0), lightViewMatrix, lightViewMatrix);
-	Matrix4f.rotate((float)-Math.toRadians(yaw), new Vector3f(0, 1, 0), lightViewMatrix,
-		lightViewMatrix);
-	Matrix4f.translate(pos, lightViewMatrix, lightViewMatrix);*/
-	
-	
-	//pos += camera->getPosition();
-	//view = Matrix::CreateLookAt(pos, Vector3(-pos.x,0.0f,0.0f), Vector3(0.0f, 1.0f, 0.0f));
-	orthoProj = Matrix::CreateOrthographic(100.0f, 100.0f, 0.01f, 25.0f);
-	orthoProj = DirectX::XMMatrixOrthographicLH(200.0f, 200.0f, 1.0f, 400.0f);
-	float fieldOfView = 10 * (DirectX::XM_PI / 180);
-	//orthoProj = camera->getProjectionMatrix();
+	Vector3 target;
+	Vector3 eye = Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
+	eye += -sunDir * 4*(camera->getPosition().y / -sunDir.y);
+	target= Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
+	Matrix viewMatrix;
+	viewMatrix = DirectX::XMMatrixLookAtLH(eye, target, Vector3(0, 1, 0));
+	this->orthoProj = DirectX::XMMatrixOrthographicLH(60.0f, 60.0f, 10.0f, farPlaneTest);
 	this->view = viewMatrix;
-	//orthoProj = Matrix::CreatePerspectiveFieldOfView(fieldOfView, 16.f / 9.f, 900, 1400.0f);
-	Matrix viewProj = view * orthoProj;
+	Matrix viewProj = this->view * this->orthoProj;
 	viewProj = viewProj.Transpose();
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(perFrameCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);

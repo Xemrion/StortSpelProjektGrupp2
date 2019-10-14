@@ -11,7 +11,9 @@ Graphics::Graphics()
 	this->vp = {};
 
 	this->debugger = nullptr;
-
+	/*TA BORT*/
+	this->farZTempShadow = 1000.0f;
+	/* */
 	this->lightList = nullptr;
 
 	lightBufferContents = new LightBufferContents;
@@ -238,6 +240,20 @@ bool Graphics::init(Window* window)
 		return false;
 	}
 
+	D3D11_RASTERIZER_DESC rasterizerDesc2;
+	ZeroMemory(&rasterizerDesc2, sizeof(D3D11_RASTERIZER_DESC));
+	rasterizerDesc2.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+	rasterizerDesc2.CullMode = D3D11_CULL_MODE::D3D11_CULL_FRONT;
+
+
+	result = device->CreateRasterizerState(&rasterizerDesc2, &rasterStateShadow);
+	if (FAILED(result))
+	{
+		MessageBox(NULL, "Failed to create rasterizer state.",
+			"D3D11 Initialisation Error", MB_OK);
+		return false;
+	}
+
 	deviceContext->RSSetState(rasterState.Get());
 	// Clear the blend state description.
 	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
@@ -303,23 +319,24 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
-
+	
 	shadowMap.prepare();
 	shadowMap.setViewProj(camera, Vector3(lightList->getSun().getDirection().x, lightList->getSun().getDirection().y, lightList->getSun().getDirection().z));
 	Frustum frustum = camera->getFrustum();
 	
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//deviceContext->RSSetState(rasterStateShadow.Get());
 
 	for (GameObject* object : drawableObjects)
 	{
-		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance+500)
+		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
 		{
 			AABB boundingBox = object->getAABB();
 			boundingBox = boundingBox.scale(object->getScale());
 			boundingBox.maxPos += object->getPosition();
 			boundingBox.minPos += object->getPosition();
 
-			if (frustum.intersect(boundingBox, 300.0f)) 
+			if (frustum.intersect(boundingBox, 100.0f)) 
 			{
 				UINT vertexCount = object->mesh->getVertexCount();
 				UINT stride = sizeof(Vertex3D);
@@ -333,6 +350,8 @@ void Graphics::render(DynamicCamera* camera)
 			}
 		}
 	}
+	deviceContext->RSSetState(rasterState.Get());
+
 	ID3D11DepthStencilView* nulDSV = nullptr;
 	ID3D11ShaderResourceView* nulSRV = nullptr;
 	deviceContext->OMSetRenderTargets(0,nullptr, nulDSV);

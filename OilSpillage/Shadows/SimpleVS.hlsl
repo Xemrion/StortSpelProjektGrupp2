@@ -27,6 +27,7 @@ VS_OUT main(VS_IN input)
 
 	output.Pos = mul(float4(input.Pos,1.0f), worldMatrix);
 	output.Pos = mul(output.Pos, viewProj);
+
 	output.Normal = input.Normal;
 	output.Tex = input.Tex;
 
