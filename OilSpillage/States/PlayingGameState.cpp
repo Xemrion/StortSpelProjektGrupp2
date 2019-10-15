@@ -79,6 +79,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	//Minimap stuff
 	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
 	bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1);
+	tileCount = Vector2(config.dimensions.x, config.dimensions.y);
 	tileSize = Vector3(config.tileScaleFactor.data);
 	//Needs to be loaded before the menues
 	this->minimap = createMinimapTexture(*this->map);
@@ -281,7 +282,10 @@ void PlayingGameState::ImGui_ProcGen() {
       player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
       map->setDistrictColorCoding( shouldColorCodeDistricts );
       minimap = createMinimapTexture( *map );
-	  topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0) - Vector3(config.tileScaleFactor.x / 2, 0.0f, config.tileScaleFactor.z / 2);
+	  //Minimap stuff
+	  topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
+	  bottomRight = map->tilemap->convertTilePositionToWorldPosition(0, 0);
+	  tileCount = Vector2(config.dimensions.x, config.dimensions.y);
 	  tileSize = Vector3(config.tileScaleFactor.data);
 
 	  graphics.reloadTexture(minimap);
@@ -412,4 +416,9 @@ Vector3 PlayingGameState::getBottomRight() const
 Vector3 PlayingGameState::getTileSize() const
 {
 	return this->tileSize;
+}
+
+Vector2 PlayingGameState::getTileCount() const
+{
+	return this->tileCount;
 }
