@@ -386,7 +386,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	graphics.setLightList(lightList.get());
 
-	player->init();
+	physics = std::make_unique<Physics>();
+	player->init(physics.get());
    {
       auto startPosTile = generateMap(config);
       startPos          = map->convertTilePositionToWorldPosition( startPosTile.x, startPosTile.y ); 
@@ -409,6 +410,16 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 
 	Input::SetKeyboardPlayerID(0);
+	//Bullet
+	buildingTest = std::make_unique<GameObject>();
+	buildingTest->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(buildingTest.get());
+	btRigidBody* tempo2 = physics->addBox(btVector3(-15,0.0f,-15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
+	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
+	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
+	buildingTest->setColor(Vector4(0.5,0.5,0.5,1));
+	buildingTest->setRigidBody(tempo2);
+
 }
 
 PlayingGameState::~PlayingGameState() {}
@@ -417,8 +428,9 @@ Void  PlayingGameState::ImGui_Driving() {
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
+	ImGui::Text(("Rotation: " + to_string(player->getRotator())).c_str());
 	ImGui::Text("Driving Mode:");
-	static int radioButtonValue = 0;
+	static int radioButtonValue = 1;
 	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
 	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
 	//ImGui::RadioButton("Directional Smooth", &radioButtonValue, 2);
@@ -618,7 +630,15 @@ Void  PlayingGameState::update(float deltaTime)
 		if (time > 0.0f)
 			time = max(time - deltaTime, 0.0f);
 
+		//Bullet
+		//player->getVehicle()->getRigidBody()->(btVector3(Input::GetDirectionL(0).x * deltaTime * 1000, 0, Input::GetDirectionL(0).y * deltaTime * 1000), btVector3(0, 0, 0));
+
+		//player->getVehicle()->setPosition(Vector3(player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getX(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getY(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getZ()));
+		//player->getVehicle()->updateRigidBody();
+
 		player->update(deltaTime);
+
+		physics->update(deltaTime);
 
 		Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
 		Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);
@@ -628,7 +648,8 @@ Void  PlayingGameState::update(float deltaTime)
 
 		aiObject->update(deltaTime, player->getVehicle()->getPosition());
 		camera->update(deltaTime);
-		camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, cameraDistance, 0));
+		btVector3 positionCam = player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin();
+		camera->setPosition(Vector3(positionCam.getX(),positionCam.getY(),positionCam.getZ()) + Vector3(0, cameraDistance, 0));
 
 		timerForParticle += deltaTime;
 		if (timerForParticle > 0.01f)

@@ -58,6 +58,10 @@ private:
 	std::vector<GameObject>         houseTiles;
 	SpotLight                      *playerLight;
 
+	//Bullet
+	std::unique_ptr<Physics>		physics;
+	std::unique_ptr<GameObject>		buildingTest;
+
 	int                             addNrOfParticles  {     2 };
 	int                             lifeTime          {     2 };
 	float                           timerForParticle  {   .0f };
