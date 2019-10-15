@@ -47,11 +47,11 @@ namespace Profiler {
       std::sort( sortedByTotalRunCount.begin(), sortedByTotalRunCount.end(), predicate );
 
       output << "\nTOTAL CALLS:\n"
-             << "\trank\t" << std::setw(labelWidth) << std::left << "label" << "\ttotal #calls\n";
+             << "\trank\t" << std::setw(labelWidth) << std::left << "label" << " \ttotal #calls\n";
       for ( auto i=0u;  i<sortedByTotalRunCount.size();  ++i ) 
-         output << "\t#" << i+1 /*TODO: pad*/
-                << "\t"  << std::setw(labelWidth) << std::left << sortedByTotalRunCount[i].label
-                << "\t"  << sortedByTotalRunCount[i].callCount << "\n";
+         output << "\t #" << i+1 /*TODO: pad*/
+                << "\t "  << std::setw(labelWidth) << std::left << sortedByTotalRunCount[i].label
+                << "\t "  << sortedByTotalRunCount[i].callCount << "\n";
    }
 
 
@@ -67,11 +67,11 @@ namespace Profiler {
       std::sort( sortedByTotalRuntime.begin(), sortedByTotalRuntime.end(), predicate );
 
       output << "\nTOTAL RUNTIME:\n"
-             << "\trank\t" << std::setw(labelWidth) << std::left << "label" << "\ttotal runtime (in microseconds)\n";
+             << "\trank\t" << std::setw(labelWidth) << std::left << "label" << " \ttotal runtime (in microseconds)\n";
       for ( auto i=0u;  i<sortedByTotalRuntime.size();  ++i ) 
-         output << "\t#" << i+1 /*TODO: pad*/
-                << "\t"  << std::setw(labelWidth) << std::left << sortedByTotalRuntime[i].label
-                << "\t"  << sortedByTotalRuntime[i].runtimeMicrosecsTotal << "\n";
+         output << "\t #" << i+1 /*TODO: pad*/
+                << "\t "  << std::setw(labelWidth) << std::left << sortedByTotalRuntime[i].label
+                << "\t "  << sortedByTotalRuntime[i].runtimeMicrosecsTotal << "\n";
    }
 
 
@@ -87,11 +87,11 @@ namespace Profiler {
       std::sort( sortedByMinRuntime.begin(), sortedByMinRuntime.end(), predicate );
 
       output << "\nMIN RUNTIME:\n"
-             << "\trank\t" << std::setw(labelWidth) << std::left << "label" << "\tmin runtime (in microseconds)\n";
+             << "\trank\t" << std::setw(labelWidth) << std::left << "label" << " \tmin runtime (in microseconds)\n";
       for ( auto i=0u;  i<sortedByMinRuntime.size();  ++i ) 
-         output << "\t#" << i+1 /*TODO: pad*/
-                << "\t"  << std::setw(labelWidth) << std::left << sortedByMinRuntime[i].label
-                << "\t"  << sortedByMinRuntime[i].runtimeMicrosecsMin << "\n";
+         output << "\t #" << i+1 /*TODO: pad*/
+                << "\t "  << std::setw(labelWidth) << std::left << sortedByMinRuntime[i].label
+                << "\t "  << sortedByMinRuntime[i].runtimeMicrosecsMin << "\n";
    }
 
 
@@ -107,11 +107,11 @@ namespace Profiler {
       std::sort( sortedByMaxRuntime.begin(), sortedByMaxRuntime.end(), predicate );
 
       output << "\nMAX RUNTIME:\n"
-             << "\trank\t" << std::setw(labelWidth) << std::left << "label" << "\tmax runtime (in microseconds)\n";
+             << "\trank\t" << std::setw(labelWidth) << std::left << "label" << " \tmax runtime (in microseconds)\n";
       for ( auto i=0u;  i<sortedByMaxRuntime.size();  ++i ) 
-         output << "\t#" << i+1 /*TODO: pad*/
-                << "\t"  << std::setw(labelWidth) << std::left << sortedByMaxRuntime[i].label
-                << "\t"  << sortedByMaxRuntime[i].runtimeMicrosecsMax << "\n";
+         output << "\t #" << i+1 /*TODO: pad*/
+                << "\t "  << std::setw(labelWidth) << std::left << sortedByMaxRuntime[i].label
+                << "\t "  << sortedByMaxRuntime[i].runtimeMicrosecsMax << "\n";
    }
 
 
@@ -132,12 +132,12 @@ namespace Profiler {
       std::sort( sortedByAverageRuntime.begin(), sortedByAverageRuntime.end(), predicate );
 
       output << "\nAVG RUNTIME:\n"
-             << "\trank\t" << std::setw(labelWidth) << std::left << "label" << "\taverage runtime (in microseconds)\n";
+             << "\trank\t" << std::setw(labelWidth) << std::left << "label" << " \taverage runtime (in microseconds)\n";
       for ( auto i=0u;  i<sortedByAverageRuntime.size();  ++i ) {
          auto const &entry = sortedByAverageRuntime[i];
-         output << "\t#" << i+1 /*TODO: pad*/
-                << "\t" << std::setw(labelWidth) << std::left << entry.label
-                << "\t" << averageRuntime(entry) << "\n";
+         output << "\t #" << i+1 /*TODO: pad*/
+                << "\t " << std::setw(labelWidth) << std::left << entry.label
+                << "\t " << averageRuntime(entry) << "\n";
       }
    }
 

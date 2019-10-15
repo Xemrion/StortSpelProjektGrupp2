@@ -300,24 +300,23 @@ void PlayingGameState::ImGui_ProcGen() {
 	if (config.roadStepSize < 1)
 		config.roadStepSize = 1;
 
-   // regen button:
-   ImGui::NewLine();
-   if ( ImGui::Button("Re-generate") ) {
-      // (TODO: refactor) hacky, but:
-      map = std::make_unique<Map>(graphics, config);
-      player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
-      map->setDistrictColorCoding( shouldColorCodeDistricts );
-      minimap = createMinimapTexture( *map );
-	  aStar->generateTileData(map->getTileMap());
-	  //Minimap stuff
-	  topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
-	  bottomRight = map->tilemap->convertTilePositionToWorldPosition(0, 0);
-	  tileCount = Vector2(static_cast<float>(config.dimensions.x), static_cast<float>(config.dimensions.y));
-	  tileSize = Vector3(config.tileScaleFactor.data);
-
-	  graphics.reloadTexture(minimap);
-   }
-
+	// regen button:
+	ImGui::NewLine();
+	if ( ImGui::Button("Re-generate") ) {
+		// (TODO: refactor) hacky, but:
+		map = std::make_unique<Map>(graphics, config);
+		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
+		map->setDistrictColorCoding( shouldColorCodeDistricts );
+		minimap = createMinimapTexture( *map );
+		aStar->generateTileData( map->getTileMap() );
+		// minimap stuff
+		topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
+		bottomRight = map->tilemap->convertTilePositionToWorldPosition(0, 0);
+		tileCount = Vector2( static_cast<float>(config.dimensions.x),
+		                     static_cast<float>(config.dimensions.y) );
+		tileSize = Vector3( config.tileScaleFactor.data );
+		graphics.reloadTexture(minimap);
+	}
 	ImGui::End();
 }
 
@@ -384,7 +383,7 @@ void  PlayingGameState::update(float deltaTime)
 
 		actorManager->update(deltaTime, player->getVehicle()->getPosition());
 		camera->update(deltaTime);
-		camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, 25, 0));
+		camera->setPosition(player->getVehicle()->getPosition() + Vector3(.0f, cameraDistance, .0f));
 
 		timerForParticle += deltaTime;
 		if (timerForParticle > 0.01f)

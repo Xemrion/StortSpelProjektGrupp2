@@ -20,8 +20,10 @@ Map::~Map() noexcept {
 	graphics.clearStaticObjects();
    #ifdef _DEBUG
 		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?
+		assert(profilerLogs.is_open());
 		DBG_PROFILE_OUTPUT(profilerLogs); // outputs profiler logs (if in debug mode)
-      DBG_PROFILE_RESET();
+		DBG_PROFILE_RESET();
+      profilerLogs.close();
 	#endif
 }
 
