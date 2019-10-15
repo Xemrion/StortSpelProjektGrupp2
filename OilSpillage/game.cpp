@@ -18,7 +18,13 @@ void Game::start(Window* window)
 	UserInterface::initStaticVariables();
 
 	Input::SetKeyboardPlayerID(0);
+	instance->running = true;
 	instance->run();
+}
+
+void Game::quit()
+{
+	instance->running = false;
 }
 
 GameState* Game::getCurrentState()
@@ -64,7 +70,7 @@ void Game::run()
 	prevTime = 0;
 	QueryPerformanceCounter((LARGE_INTEGER*)&prevTime);
 
-	while (window->update()) {
+	while (running && window->update()) {
 		//deltaTime
 		curTime = 0;
 		QueryPerformanceCounter((LARGE_INTEGER*)&curTime);
@@ -88,7 +94,7 @@ void Game::run()
 	}
 }
 
-Game::Game() : currentState(STATE_MENU), oldState(-1) {}
+Game::Game() : currentState(STATE_MENU), oldState(-1), running(false) {}
 
 Game::~Game()
 {
