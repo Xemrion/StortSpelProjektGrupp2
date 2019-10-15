@@ -282,7 +282,7 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 		}
 	}
 }
-void SkyscraperFloor::testDraw(Graphics* graphics)
+void SkyscraperFloor::testDrawLines(Graphics* graphics)
 {
 	for (int i = 0; i < this->nrOfEdges; i++) {
 		if (i == nrOfEdges - 1) {
@@ -296,6 +296,10 @@ void SkyscraperFloor::testDraw(Graphics* graphics)
 				XMFLOAT3(0.0f, 1.0f, 1.0f));
 		}
 	}
+}
+void SkyscraperFloor::testDrawTriangle()
+{
+
 }
 Vector3 SkyscraperFloor::getAVertex(int vertex)
 {

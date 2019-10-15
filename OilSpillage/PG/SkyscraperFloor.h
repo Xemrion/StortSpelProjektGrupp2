@@ -15,11 +15,12 @@ public:
 	void rotateDeg(float degrees);
 	void rotateRad(float radians);
 	void unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter);
-	void testDraw(Graphics* graphics);
 	Vector3 getAVertex(int vertex);
 	void translate(Vector3 newCenter);
 	void regenerateShape(int edges);
 
+	void testDrawLines(Graphics* graphics); //Lines
+	void testDrawTriangle();
 private:
 	std::vector<Vector3> verticies;
 	int nrOfEdges;
