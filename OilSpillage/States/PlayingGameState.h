@@ -79,7 +79,7 @@ private:
 	                                                    Vector4(  .0f,  .0f, .0f, 1.0f ),
 	                                                    Vector4(  .1f,  .1f, .1f, 1.0f )  };
   
-    void initiateAStar();
+    void initAI();
 	void ImGui_ProcGen();
 	void ImGui_Driving();
 	void ImGui_Particles();

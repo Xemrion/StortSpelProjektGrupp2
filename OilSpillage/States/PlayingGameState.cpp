@@ -6,8 +6,17 @@
 #include "../UI/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
 
-Void PlayingGameState::initiateAStar() {}
-
+void PlayingGameState::initAI()
+{
+	aStar = new AStar(20, 20, Vector2(-10, 10));
+	actorManager = new ActorManager(aStar);
+	aStar->generateTileData(map->getTileMap());
+	actorManager->createDefender(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
+	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 1);
+	actorManager->initGroups();
+}
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {
 #ifdef _DEBUG
@@ -20,14 +29,11 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
-	aStar = new AStar(20, 20, Vector2(-10, 10));
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
 	graphics.loadModel("Dummy_Roller_Melee");
 
-	actorManager = new ActorManager();
-	actorManager->setAStar(aStar);
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
 	graphics.loadModel("Roads/Road_bend");
@@ -74,7 +80,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.setLightList(lightList.get());
 
 	map = std::make_unique<Map>(graphics, config);
-
+	initAI();
 	//Minimap stuff
 	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
 	bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1);
@@ -92,13 +98,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	player->init();
 	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
-    aStar->generateTileData( map->getTileMap() );
 
-	actorManager->createDefender(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
-	actorManager->createTurrent(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 1);
-	actorManager->initGroups();
 
 	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
