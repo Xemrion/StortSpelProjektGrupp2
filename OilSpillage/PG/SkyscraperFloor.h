@@ -20,7 +20,7 @@ public:
 	void regenerateShape(int edges);
 
 	void testDrawLines(Graphics* graphics); //Lines
-	void testDrawTriangle();
+	void testDrawTriangles();
 private:
 	std::vector<Vector3> verticies;
 	int nrOfEdges;
@@ -43,7 +43,8 @@ private:
 	make a line between neighboors
 		if a neighboor is unavailable, move one step further away from start point in the neighboors direction
 	make a line from one neighboor to all other points
-	cross product to check if any are within triangle
+	cross product to check the side the start point is one
+	cross product with the other ones, if any other is on the same side as the start point, it cannot be
 	if yes, change start point and repeat
 		if (point - unavailable points) is two or lower, end loop
 	if no, make triangle, set start point to unavailable

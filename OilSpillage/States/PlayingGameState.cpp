@@ -21,13 +21,14 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	testFloor1 = std::make_unique<SkyscraperFloor>(4);
+	testFloor1.get()->translate(Vector3(-960.0f, 5.0f, 440.0f));
 	testFloor2 = std::make_unique<SkyscraperFloor>(5);
 	testFloor2.get()->rotateDeg(56);
 	//testFloor2.get()->translate(testFloor1.get()->getAVertex(3));
 	testFloor1.get()->unionShapes(*testFloor2.get(), testFloor1.get()->getAVertex(3));
 	testFloor2.get()->regenerateShape(3);
 	testFloor2.get()->rotateDeg(67);
-	testFloor1.get()->unionShapes(*testFloor2.get(), testFloor1.get()->getAVertex(1));
+	testFloor1.get()->unionShapes(*testFloor2.get(), testFloor1.get()->getAVertex(2));
 
 	graphics.createFrustumBuffer(camera.get());
 
@@ -363,6 +364,9 @@ Void  PlayingGameState::update(float deltaTime)
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
 	graphics.render(camera.get(), deltaTime);
+	//testNetwork.get()->drawRoadNetwork(&graphics);
+	testFloor1.get()->testDrawLines(&graphics);
+	//testFloor2.get()->testDraw(&graphics);
 
 	//Render UI
 	menues[MENU_PLAYING]->update(deltaTime);
@@ -371,9 +375,7 @@ Void  PlayingGameState::update(float deltaTime)
 	else if (Input::CheckButton(MENU, PRESSED, 0))
 		this->setCurrentMenu(PlayingGameState::MENU_PAUSED);
 
-	//testNetwork.get()->drawRoadNetwork(&graphics);
-	testFloor1.get()->testDraw(&graphics);
-	//testFloor2.get()->testDraw(&graphics);
+	
 
 #ifdef _DEBUG
 	ImGui_ImplDX11_NewFrame();

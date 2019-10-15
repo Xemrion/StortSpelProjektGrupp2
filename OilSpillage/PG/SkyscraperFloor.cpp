@@ -43,11 +43,6 @@ void SkyscraperFloor::rotateRad(float radians)
 	}
 }
 
-/*
-nextX = (currentForward.x * float((cos(rotationAngle)))) + (currentForward.z * float(sin(rotationAngle)));
-nextZ = (currentForward.z * float(cos(rotationAngle))) - (currentForward.x * float(sin(rotationAngle)));
-*/
-
 void SkyscraperFloor::generateShape(int edges)
 {
 	if (edges >= 3) {
@@ -122,6 +117,18 @@ bool SkyscraperFloor::evenOddCheck( Vector3 pointB1,Vector3 pointB2, Vector3 poi
 
 void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 {
+	/* Union
+	This Shape A
+	Other Shape B
+	Go through lines in A and see if they intersect with lines from B
+	If they intersect, add a point between the lines in A & B.
+	After all lines are done, compare points in A to Shape B
+	If inside, remove from Copy A
+	Repeat for B
+	Add points of B between the intersecting points added to A
+	You have a union.
+	*/
+
 	//Phase 1: Intersections.
 	toUnion.translate(newCenter);
 	std::vector<Vector3> intersections;
@@ -297,27 +304,36 @@ void SkyscraperFloor::testDrawLines(Graphics* graphics)
 		}
 	}
 }
-void SkyscraperFloor::testDrawTriangle()
-{
 
+void SkyscraperFloor::testDrawTriangles()
+{
+	std::vector<int> triangleIndices;
+	std::vector<int> usedIndices;
+	int counter = 1;
+	bool counterUsed = false;
+
+	while (this->verticies.size() - usedIndices.size() > 2) {
+		for (int i = 0; i < usedIndices.size() && !counterUsed; i++) {
+			if (counter == usedIndices[i]) {
+				counterUsed = true;
+			}
+		}
+		if (!counterUsed) {
+
+		}
+
+		counter++;
+		counterUsed = false;
+	}
+	
 }
+
 Vector3 SkyscraperFloor::getAVertex(int vertex)
 {
 	Vector3 returnVertex;
 	returnVertex = this->verticies[(size_t(vertex) - 1) % this->nrOfEdges];
 	return returnVertex;
 }
-/* Union
-	This Shape A
-	Other Shape B
-	Go through lines in A and see if they intersect with lines from B
-	If they intersect, add a point between the lines in A & B.
-	After all lines are done, compare points in A to Shape B
-	If inside, remove from Copy A
-	Repeat for B
-	Add points of B between the intersecting points added to A
-	You have a union.
-*/
 
 void SkyscraperFloor::translate(Vector3 newCenter)
 {
