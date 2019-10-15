@@ -28,6 +28,11 @@ std::string UIPlaying::getFormattedTime()
 
 void UIPlaying::updateUI(float deltaTime)
 {
+	if (this->initMinimap)
+	{
+		this->minimap->init();
+		this->initMinimap = false;
+	}
 }
 
 void UIPlaying::drawUI()
@@ -40,10 +45,11 @@ void UIPlaying::drawUI()
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 10), Colors::LightPink);
 	this->healthBar->draw(false);
+	this->minimap->draw(false);
 	UserInterface::getSpriteBatch()->End();
 }
 
-UIPlaying::UIPlaying()
+UIPlaying::UIPlaying() : initMinimap(true)
 {
 }
 
@@ -54,4 +60,5 @@ UIPlaying::~UIPlaying()
 void UIPlaying::init()
 {
 	this->healthBar = std::make_unique<Slider>(Vector2(10, 10));
+	this->minimap = std::make_unique<Minimap>(0.25f, Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
 }

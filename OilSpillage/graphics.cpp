@@ -27,6 +27,7 @@ Graphics::~Graphics()
 
 	for (auto i = textures.begin(); i != textures.end(); i++)
 	{
+		i->second->Shutdown();
 		delete i->second;
 	}
 
@@ -768,12 +769,13 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 
 bool Graphics::loadTexture(std::string path, bool overridePath )
 {
-   std::string texturePath;
-   if (!overridePath) {
-      texturePath += TEXTURE_ROOT_DIR;
-      texturePath += path;
-      texturePath += ".tga";
-   } else texturePath = path;
+	std::string texturePath;
+	if (!overridePath) {
+		texturePath += TEXTURE_ROOT_DIR;
+		texturePath += path;
+		texturePath += ".tga";
+	}
+	else texturePath = path;
 
 	if (textures.find(texturePath) == textures.end()) {
 		Texture* newTexture = new Texture();
@@ -785,6 +787,37 @@ bool Graphics::loadTexture(std::string path, bool overridePath )
 		textures[texturePath] = newTexture;
 	}
 	return true;
+}
+
+bool Graphics::reloadTexture(std::string path, bool overridePath)
+{
+	std::string texturePath;
+	if (!overridePath) {
+		texturePath += TEXTURE_ROOT_DIR;
+		texturePath += path;
+		texturePath += ".tga";
+	}
+	else texturePath = path;
+
+	auto texture = textures.find(texturePath);
+
+	if (texture != textures.end()) {
+		Texture* oldTexture = texture->second;
+		Texture newTexture;
+
+		if (newTexture.Initialize(this->device.Get(), this->deviceContext.Get(), texturePath.c_str(), -1))
+		{
+			oldTexture->Shutdown();
+
+			oldTexture->width = newTexture.width;
+			oldTexture->height = newTexture.height;
+			//oldTexture->m_targaData = newTexture.m_targaData;
+			oldTexture->m_texture = newTexture.m_texture;
+			oldTexture->m_textureView = newTexture.m_textureView;
+			return true;
+		}
+	}
+	return false;
 }
 
 const Mesh* Graphics::getMeshPointer(const char* localPath)

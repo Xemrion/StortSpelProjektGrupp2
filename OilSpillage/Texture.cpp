@@ -1,7 +1,9 @@
 #include "Texture.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "STB/stb_image.h"
 Texture::Texture()
 {
-	this->m_targaData = nullptr;
+	//this->m_targaData = nullptr;
 	this->m_texture = nullptr;
 	this->m_textureView = nullptr;
 
@@ -11,36 +13,32 @@ Texture::Texture()
 	this->transparent = false;
 }
 
-
-Texture::Texture(const Texture& other)
-{
-	//TODO: Fix warnings
-}
-
-
 Texture::~Texture()
 {
-	this->Shutdown();
 }
 
 bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceContext, const char* filename, int mipLevels)
 {
+	
+
 	bool result;
-	int height, width;
+	//int height, width;
 	D3D11_TEXTURE2D_DESC textureDesc;
 	HRESULT hResult;
 	unsigned int rowPitch;
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	// Load the targa image data into memory.
-	result = LoadTarga(filename, height, width);
-	if (!result)
+	int bpp = 0;
+	unsigned char* m_targaData = stbi_load(filename, &this->width, &this->height, &bpp, STBI_rgb_alpha);
+	//result = LoadTarga(filename, height, width);
+	if (!m_targaData)
 	{
 		return false;
 	}
 
 	// Setup the description of the texture.
-	textureDesc.Height = height;
-	textureDesc.Width = width;
+	textureDesc.Height = this->height;
+	textureDesc.Width = this->width;
 	textureDesc.MipLevels = 0;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -78,7 +76,7 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 
 	deviceContext->GenerateMips(m_textureView);
 
-
+	stbi_image_free(m_targaData);
 	return true;
 }
 
@@ -99,11 +97,11 @@ void Texture::Shutdown()
 	}
 
 	// Release the targa data.
-	if (m_targaData)
+	/*if (m_targaData)
 	{
 		delete[] m_targaData;
 		m_targaData = 0;
-	}
+	}*/
 
 	return;
 }
@@ -118,10 +116,10 @@ bool Texture::isTransparent()
 	return this->transparent;
 }
 
-unsigned char* Texture::getTextureCharArray()
+/*unsigned char* Texture::getTextureCharArray()
 {
 	return m_targaData;
-}
+}*/
 
 unsigned short Texture::getWidth()
 {
@@ -143,7 +141,7 @@ DirectX::SimpleMath::Vector2 Texture::getCenter()
 	return DirectX::SimpleMath::Vector2(static_cast<float>(this->width), static_cast<float>(this->height)) / 2;
 }
 
-bool Texture::LoadTarga(const char* filename, int& height, int& width)
+/*bool Texture::LoadTarga(const char* filename, int& height, int& width)
 {
 	int error, bpp, imageSize, index, i, j, k;
 	FILE* filePtr = nullptr;
@@ -248,4 +246,4 @@ bool Texture::LoadTarga(const char* filename, int& height, int& width)
 	targaImage = 0;
 
 	return true;
-}
+}*/

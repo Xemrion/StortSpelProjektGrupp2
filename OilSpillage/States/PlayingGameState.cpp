@@ -4,16 +4,15 @@
 #include "../UI/UIPlaying.h"
 #include "../UI/UIPaused.h"
 #include "../UI/UIOptions.h"
+#include "../PG/MinimapTextureGenerator.hpp"
 
 Void PlayingGameState::initiateAStar() {}
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING) {
-	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
-	menues[MENU_PLAYING]->init();
-	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
-	menues[MENU_PAUSED]->init();
-	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
-	menues[MENU_OPTIONS]->init();
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
+{
+#ifdef _DEBUG
+	pausedTime = false;
+#endif // _DEBUG
 
 	lightList = std::make_unique<LightList>();
 	player = std::make_unique<Vehicle>();
@@ -76,10 +75,25 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	map = std::make_unique<Map>(graphics, config);
 
-   aStar->generateTileData( map->getTileMap() );
+	//Minimap stuff
+	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
+	bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1);
+	tileCount = Vector2(static_cast<float>(config.dimensions.x), static_cast<float>(config.dimensions.y));
+	tileSize = Vector3(config.tileScaleFactor.data);
+	//Needs to be loaded before the menues
+	this->minimap = createMinimapTexture(*this->map);
+
+	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
+	menues[MENU_PLAYING]->init();
+	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
+	menues[MENU_PAUSED]->init();
+	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
+	menues[MENU_OPTIONS]->init();
 
 	player->init();
 	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
+    aStar->generateTileData( map->getTileMap() );
+
 	actorManager->createDefender(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 2);
 	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
 	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
@@ -98,8 +112,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	};
 	camera->startCinematic(&points, false);
 	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-
-	Input::SetKeyboardPlayerID(0);
 }
 
 PlayingGameState::~PlayingGameState()
@@ -286,16 +298,23 @@ void PlayingGameState::ImGui_ProcGen() {
 	if (config.roadStepSize < 1)
 		config.roadStepSize = 1;
 
-	// regen button:
-	ImGui::NewLine();
-	if (ImGui::Button("Re-generate")) {
-		// (TODO: refactor) hacky, but:
-		map = std::make_unique<Map>(graphics, config);
-		player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
-		map->setDistrictColorCoding(shouldColorCodeDistricts);
-		createMinimapTexture(*map);
-      aStar->generateTileData( map->getTileMap() );
-	}
+   // regen button:
+   ImGui::NewLine();
+   if ( ImGui::Button("Re-generate") ) {
+      // (TODO: refactor) hacky, but:
+      map = std::make_unique<Map>(graphics, config);
+      player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
+      map->setDistrictColorCoding( shouldColorCodeDistricts );
+      minimap = createMinimapTexture( *map );
+	  aStar->generateTileData(map->getTileMap());
+	  //Minimap stuff
+	  topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
+	  bottomRight = map->tilemap->convertTilePositionToWorldPosition(0, 0);
+	  tileCount = Vector2(static_cast<float>(config.dimensions.x), static_cast<float>(config.dimensions.y));
+	  tileSize = Vector3(config.tileScaleFactor.data);
+
+	  graphics.reloadTexture(minimap);
+   }
 
 	ImGui::End();
 }
@@ -328,8 +347,30 @@ Void  PlayingGameState::update(float deltaTime)
 			deltaTime /= 4;
 		}
 
-		if (time > 0.0f)
+#ifdef _DEBUG
+		if (Input::CheckButton(ACTION_1, PRESSED, 0))
+		{
+			pausedTime = !pausedTime;
+		}
+
+		if (!pausedTime && time > 0.0f)
+		{
 			time = max(time - deltaTime, 0.0f);
+		}
+		else if (time <= 0.0f)
+		{
+			Game::setState(Game::STATE_MENU);
+		}
+#else
+		if (time > 0.0f)
+		{
+			time = max(time - deltaTime, 0.0f);
+		}
+		else
+		{
+			Game::setState(Game::STATE_MENU);
+		}
+#endif // !_DEBUG
 
 		player->update(deltaTime);
 
@@ -348,6 +389,12 @@ Void  PlayingGameState::update(float deltaTime)
 		{
 			this->graphics.addParticle(this->player->getVehicle()->getPosition() + Vector3(0, 5, 0), 5 * Vector3(Input::GetDirectionR(0).x, 0, Input::GetDirectionR(0).y), addNrOfParticles, lifeTime, randomPosPower);
 			timerForParticle = 0;
+		}
+
+		if (player->isDead())
+		{
+			changeTime(-30.0f);
+			player->resetHealth();
 		}
 	}
 
@@ -381,7 +428,7 @@ Void  PlayingGameState::update(float deltaTime)
 	graphics.presentScene();
 }
 
-F32 const& PlayingGameState::getTimeRef() const noexcept {
+F32 const &PlayingGameState::getTimeRef() const noexcept {
 	return time;
 }
 
@@ -394,7 +441,7 @@ void PlayingGameState::setTime(float time) noexcept {
 }
 
 void PlayingGameState::changeTime(float timeDiff) noexcept {
-	this->time = max(this->time + timeDiff, .0f);
+	this->time = max(this->time + timeDiff, 0.0f);
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
@@ -403,4 +450,29 @@ void PlayingGameState::setCurrentMenu(Menu menu) {
 
 Vehicle* PlayingGameState::getPlayer() const {
 	return player.get();
+}
+
+std::string PlayingGameState::getMinimap() const
+{
+	return this->minimap;
+}
+
+Vector3 PlayingGameState::getTopLeft() const
+{
+	return this->topLeft;
+}
+
+Vector3 PlayingGameState::getBottomRight() const
+{
+	return this->bottomRight;
+}
+
+Vector3 PlayingGameState::getTileSize() const
+{
+	return this->tileSize;
+}
+
+Vector2 PlayingGameState::getTileCount() const
+{
+	return this->tileCount;
 }
