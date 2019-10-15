@@ -76,6 +76,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	map = std::make_unique<Map>(graphics, config);
 
+   aStar->generateTileData( map->getTileMap() );
+
 	player->init();
 	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
 	actorManager->createDefender(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 2);
@@ -292,6 +294,7 @@ void PlayingGameState::ImGui_ProcGen() {
 		player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
 		map->setDistrictColorCoding(shouldColorCodeDistricts);
 		createMinimapTexture(*map);
+      aStar->generateTileData( map->getTileMap() );
 	}
 
 	ImGui::End();

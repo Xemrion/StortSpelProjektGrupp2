@@ -4,6 +4,7 @@
 #include "defs.hpp"
 
 enum class Tile : U8 {
+   // 2 ints, 1 bool, 1 pekare
    ground,
    road,
    building,

@@ -1,12 +1,12 @@
 #include "Map.hpp"
 
 Map::Map(Graphics& graphics, MapConfig const& config) :
-	graphics(graphics),
-	config(config),
-	tilemap(std::make_unique<TileMap>(config)),
-	districtMarkers(static_cast<Size>(config.districtCellSide)* config.districtCellSide),
-	roadTiles(static_cast<Size>(config.dimensions.x)* config.dimensions.y),
-	houseTiles(static_cast<Size>(config.dimensions.x)* config.dimensions.y / 2)
+	graphics        ( graphics                                                              ),
+	config          ( config                                                                ),
+	tilemap         ( std::make_unique<TileMap>(config)                                     ),
+	districtMarkers ( static_cast<Size>( config.districtCellSide) * config.districtCellSide ),
+	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y     ),
+	houseTiles      ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y / 2 )
 {
 	// TODO: generate water etc
 	generateDistricts();
@@ -46,41 +46,41 @@ Void  Map::generateRoads() {
 		}
 	}
 
-#ifdef _DEBUG
-	std::ofstream roadGenerationLog(Str("PG/logs/") + mapConfigToFilename(config, "_road_gen.txt"));
-	if (roadGenerationLog.is_open()) {
-		roadGenerationLog << *tilemap;
-		roadGenerationLog.close();
-	}
-#endif
+   #ifdef _DEBUG
+	   std::ofstream roadGenerationLog(Str("PG/logs/") + mapConfigToFilename(config, "_road_gen.txt"));
+	   if (roadGenerationLog.is_open()) {
+		   roadGenerationLog << *tilemap;
+		   roadGenerationLog.close();
+	   }
+   #endif
 
 	roadTiles = tilemap->loadAsModels(graphics); // GameObject instantiation
-	for (U16 y = 0; y < tilemap->height; ++y) {
-		for (U16 x = 0; x < tilemap->width; ++x) {
-			auto& tile = roadTiles[tilemap->index(x, y)];
-			graphics.addToDraw(&tile);
+	for ( U16 y = 0;  y < tilemap->height;  ++y ) {
+		for ( U16 x = 0;  x < tilemap->width;  ++x ) {
+			auto& tile = roadTiles[tilemap->index(x,y)];
+			graphics.addToDraw( &tile );
 			tile.setScale(Vector3{ .0005f * config.tileScaleFactor.x,
-									.0005f * config.tileScaleFactor.y,
-									.0005f * config.tileScaleFactor.z }); // TODO: scale models instead
+			                       .0005f * config.tileScaleFactor.y,
+			                       .0005f * config.tileScaleFactor.z }); // TODO: scale models instead
 		}
 	}
 }
 
 Void  Map::generateDistricts() {
 	RD   rd;
-	RNG  rng(rd());
-	rng.seed(config.seed);
-	if (config.isUsingManhattanDistance)
-		districtMap = std::make_unique<Voronoi>(rng,
-			config.districtCellSide,
-			config.dimensions.x / config.districtCellSide,
-			config.dimensions.y / config.districtCellSide,
-			Voronoi::ManhattanDistanceTag{});
-	else districtMap = std::make_unique<Voronoi>(rng,
-		config.districtCellSide,
-		config.dimensions.x / config.districtCellSide,
-		config.dimensions.y / config.districtCellSide,
-		Voronoi::EuclideanDistanceTag{});
+	RNG  rng( rd() );
+	rng.seed( config.seed );
+	if ( config.isUsingManhattanDistance )
+		districtMap = std::make_unique<Voronoi>( rng,
+		                                         config.districtCellSide,
+		                                         config.dimensions.x / config.districtCellSide,
+		                                         config.dimensions.y / config.districtCellSide,
+		                                         Voronoi::ManhattanDistanceTag{});
+	else districtMap = std::make_unique<Voronoi>( rng,
+	                                              config.districtCellSide,
+	                                              config.dimensions.x / config.districtCellSide,
+	                                              config.dimensions.y / config.districtCellSide,
+	                                              Voronoi::EuclideanDistanceTag{});
 #ifdef _DEBUG
 	// display noise centers:
 	districtMarkers.reserve(districtMap->noise.size());
@@ -90,8 +90,8 @@ Void  Map::generateDistricts() {
 		marker.mesh = graphics.getMeshPointer("Cube");
 		marker.setColor({ 1, 0, 0, 1 });
 		marker.setScale({ .2f, 4, .2f });
-		marker.setPosition({ tilemap->convertTilePositionToWorldPosition(static_cast<U16>(cellCentre.x),
-																		  static_cast<U16>(cellCentre.y)) });
+		marker.setPosition({ tilemap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
+		                                                                  static_cast<U16>(cellCentre.y)) });
 		graphics.addToDraw(&marker);
 	}
 #endif
@@ -99,22 +99,17 @@ Void  Map::generateDistricts() {
 
 // TODO: make return value optional later instead of asserting
 V2u Map::generateRoadPositionInTileSpace(RNG& rng) const noexcept {
-	static constexpr U16  MAX_TRIES{ 1024 };
-	static U16_Dist       generateX(0, config.dimensions.x);
-	static U16_Dist       generateY(0, config.dimensions.y);
-	U16                   x, y, counter{ 0 };
-	do
-	{
-		x = generateX(rng);
-		y = generateY(rng);
-		if (++counter > MAX_TRIES)
-		{
-			assert(false && "No road tile found! ");
-		}
-	} while (tilemap->tileAt(x, y) != Tile::road);
-	{
-		return { x, y };
-	}
+   static constexpr U16  MAX_TRIES{ 1024 };
+   static U16_Dist       generateX(0, config.dimensions.x);
+   static U16_Dist       generateY(0, config.dimensions.y);
+   U16                   x, y, counter{ 0 };
+   do {
+      x = generateX( rng );
+      y = generateY( rng );
+      if ( ++counter > MAX_TRIES )
+         assert( false and "No road tile found!" );
+   } while ( tilemap->tileAt(x,y) != Tile::road );
+   return { x, y };
 }
 
 Vector3  Map::generateRoadPositionInWorldSpace(RNG& rng) const noexcept {
@@ -127,13 +122,13 @@ Void  Map::generateBuildings() {
 	RNG  rng(rd());
 	rng.seed(config.seed);
 
-#ifdef _DEBUG
-	U32            total_building_count{ 0 };
-	U32            total_building_tile_count{ 0 };
-	std::ofstream  buildingLogs{ Str("PG/logs/building_generation_") + mapConfigToFilename(config, ".txt") };
-	assert(buildingLogs.is_open());
-	buildingLogs << "==================================== BEGINNING BUILDING GENERATION ====================================\n";
-#endif
+   #ifdef _DEBUG
+	   U32            total_building_count{ 0 };
+	   U32            total_building_tile_count{ 0 };
+	   std::ofstream  buildingLogs{ Str("PG/logs/building_generation_") + mapConfigToFilename(config, ".txt") };
+	   assert(buildingLogs.is_open());
+	   buildingLogs << "==================================== BEGINNING BUILDING GENERATION ====================================\n";
+   #endif
 
 	U16_Dist generateOffset(0, 256);
 	F32_Dist generateSelection(.0f, 1.0f);
@@ -154,11 +149,11 @@ Void  Map::generateBuildings() {
 		Size        currentArea{ 0 };
 		Size const  cellArea{ districtMap->computeCellRealEstateArea(cellId,*tilemap) };
 
-#ifdef _DEBUG
-		U64  currrentDistrictBuildingCount{ 0 };
-		buildingLogs << "\n\t" "Generating buildings for district #"
-			<< cellId << " (TYPE: \"" << stringify(districtType) << "\")\n";
-#endif
+      #ifdef _DEBUG
+		   U64  currrentDistrictBuildingCount{ 0 };
+		   buildingLogs << "\n\t" "Generating buildings for district #"
+			   << cellId << " (TYPE: \"" << stringify(districtType) << "\")\n";
+      #endif
 
 		if ((cellArea != 0) and (districtType != District::park)) {
 			F32  const  targetDistrictCoverage{ District_getBuildingDensity(districtType) };
@@ -170,15 +165,15 @@ Void  Map::generateBuildings() {
 				if (potentialLot) {
 					auto& building = potentialLot.value();
 					auto  buildingSize = building.size();
-#ifdef _DEBUG
-					buildingLogs << "\t\t"   "Generating building #" << currrentDistrictBuildingCount++
-						<< ". (Map total building count: " << total_building_count++ << ")\n"
-						<< "\t\t\t" "Building size: " << buildingSize << " tiles. (Map total tile count: "
-						<< (total_building_tile_count += U32(buildingSize)) << ")\n"
-						<< "\t\t\t" "The district real estate coverage is now "
-						<< (computeCurrentDistrictCoverage() * 100.0f) << "%\n"
-						<< "\t\t\t" "The target coverage is: " << targetDistrictCoverage * 100.0f << "%\n";
-#endif
+               #ifdef _DEBUG
+					   buildingLogs << "\t\t"   "Generating building #" << currrentDistrictBuildingCount++
+						   << ". (Map total building count: " << total_building_count++ << ")\n"
+						   << "\t\t\t" "Building size: " << buildingSize << " tiles. (Map total tile count: "
+						   << (total_building_tile_count += U32(buildingSize)) << ")\n"
+						   << "\t\t\t" "The district real estate coverage is now "
+						   << (computeCurrentDistrictCoverage() * 100.0f) << "%\n"
+						   << "\t\t\t" "The target coverage is: " << targetDistrictCoverage * 100.0f << "%\n";
+               #endif
 					U16_Dist  generateFloorCount(District_getMinFloorCount(districtType), District_getMaxFloorCount(districtType));
 					F32       randomFloorCount{ static_cast<F32>(generateFloorCount(rng)) };
 					currentArea += buildingSize;
@@ -195,7 +190,10 @@ Void  Map::generateBuildings() {
 											  .5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * randomFloorCount,
 											  .5f * config.tileScaleFactor.z });
 						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) });
-						++total_building_tile_count;
+
+                  #ifdef _DEBUG
+						   ++total_building_tile_count;
+                  #endif
 					}
 				}
 				else break; // TODO?

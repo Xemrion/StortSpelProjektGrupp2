@@ -40,6 +40,12 @@ using Bool = bool;
 using Size = size_t;
 using Void = void;
 
+#ifdef _DEBUG
+   Bool constexpr isDebugging {  true };
+#else
+   Bool constexpr isDebugging { false };
+#endif
+
 // vectors (TODO: padding alignment if sizeof(T)%4!=0?)
 template <typename T> union V2 {
 	T  data[2];
