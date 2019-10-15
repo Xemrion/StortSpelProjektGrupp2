@@ -42,6 +42,7 @@ private:
 	pick a point
 	make a line between neighboors
 		if a neighboor is unavailable, move one step further away from start point in the neighboors direction
+		repeat until both neighboor are available
 	make a line from one neighboor to all other points
 	cross product to check the side the start point is one
 	cross product with the other ones, if any other is on the same side as the start point, it cannot be

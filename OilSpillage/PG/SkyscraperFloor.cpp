@@ -309,21 +309,32 @@ void SkyscraperFloor::testDrawTriangles()
 {
 	std::vector<int> triangleIndices;
 	std::vector<int> usedIndices;
-	int counter = 1;
-	bool counterUsed = false;
+	int counter = 1, forwardsOffset = 1, backwardsOffset = 1;
+	int size = this->verticies.size();
+	bool counterUsed = false, forwardsUsed = false, backwardsUsed = false;
 
-	while (this->verticies.size() - usedIndices.size() > 2) {
-		for (int i = 0; i < usedIndices.size() && !counterUsed; i++) {
+	while (size - usedIndices.size() > 2) {
+		for (int i = 0; i < size && !counterUsed; i++) {
 			if (counter == usedIndices[i]) {
 				counterUsed = true;
 			}
 		}
 		if (!counterUsed) {
+			//Check forward until an available is found, save offset from point
+			//do while?
+			//Check backward until an available is found, save offset from point
+			
+			//Make a line from forward/backward to other, then to all other available points
+			//Cross product the start point line first, then others, if any are on the same side as the point line, there cannot be a triangle
+			//Make a line and cross product it together, save a counter of how many positive vs negative y-axis products
 
 		}
 
 		counter++;
 		counterUsed = false;
+		if (counter > size) {
+			counter -= size;
+		}
 	}
 	
 }
