@@ -78,7 +78,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	//Minimap stuff
 	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
 	bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1);
-	tileCount = Vector2(config.dimensions.x, config.dimensions.y);
+	tileCount = Vector2(static_cast<float>(config.dimensions.x), static_cast<float>(config.dimensions.y));
 	tileSize = Vector3(config.tileScaleFactor.data);
 	//Needs to be loaded before the menues
 	this->minimap = createMinimapTexture(*this->map);
@@ -310,7 +310,7 @@ void PlayingGameState::ImGui_ProcGen() {
 	  //Minimap stuff
 	  topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
 	  bottomRight = map->tilemap->convertTilePositionToWorldPosition(0, 0);
-	  tileCount = Vector2(config.dimensions.x, config.dimensions.y);
+	  tileCount = Vector2(static_cast<float>(config.dimensions.x), static_cast<float>(config.dimensions.y));
 	  tileSize = Vector3(config.tileScaleFactor.data);
 
 	  graphics.reloadTexture(minimap);

@@ -53,12 +53,17 @@ void Minimap::draw(bool selected)
 	Vector3 playerZoomedPos = (playerMapPos - mapCamPos) * zoomedMinimapScale;
 	playerZoomedPos.Clamp(Vector3(), Vector3(Minimap::size.x, 0, Minimap::size.y));
 
-	RECT zoomedRect = SimpleMath::Rectangle(mapCamPos.x, mapCamPos.z, zoomedMinimapSize.x, zoomedMinimapSize.z);
-	RECT mapRect = SimpleMath::Rectangle(this->position.x, this->position.y, Minimap::size.x, Minimap::size.y);
-
+	RECT zoomedRect = SimpleMath::Rectangle(
+		static_cast<long>(mapCamPos.x), static_cast<long>(mapCamPos.z),
+		static_cast<long>(zoomedMinimapSize.x), static_cast<long>(zoomedMinimapSize.z)
+	);
+	RECT mapRect = SimpleMath::Rectangle(
+		static_cast<long>(this->position.x), static_cast<long>(this->position.y),
+		static_cast<long>(Minimap::size.x), static_cast<long>(Minimap::size.y)
+	);
 	RECT markerRect = SimpleMath::Rectangle(
-		this->position.x + playerZoomedPos.x, this->position.y + playerZoomedPos.z,
-		this->texturePlayerMarker->getWidth() * zoomedMinimapScale.x, this->texturePlayerMarker->getHeight() * zoomedMinimapScale.z
+		static_cast<long>(this->position.x + playerZoomedPos.x), static_cast<long>(this->position.y + playerZoomedPos.z),
+			static_cast<long>(this->texturePlayerMarker->getWidth() * zoomedMinimapScale.x), static_cast<long>(this->texturePlayerMarker->getHeight() * zoomedMinimapScale.z)
 	);
 
 	SpriteBatch* sb = UserInterface::getSpriteBatch();
