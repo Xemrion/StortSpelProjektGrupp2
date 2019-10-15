@@ -13,6 +13,7 @@
     <FxCompile Include="Particle\ParticleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
+	<ClCompile Include="physics.cpp" />
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\ActorManager.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
@@ -70,6 +71,7 @@
     <ClCompile Include="PG\Profiler.cpp" />
   </ItemGroup>
   <ItemGroup>
+	<ClInclude Include="physics.h" />
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\ActorManager.h" />
     <ClInclude Include="AI\AStar.h" />

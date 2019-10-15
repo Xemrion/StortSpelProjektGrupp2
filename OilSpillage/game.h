@@ -3,6 +3,7 @@
 #include "window.h"
 #include "graphics.h"
 #include "States/GameState.h"
+#include "physics.h"
 
 class Game
 {
