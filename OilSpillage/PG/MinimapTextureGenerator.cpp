@@ -5,12 +5,12 @@
 #include "MapConfig.hpp"
 
 #pragma warning( disable : 4715 ) 
-Str createMinimapTexture( Map const &map ) {
+String createMinimapTexture( Map const &map ) {
    auto const &tilemap = map.getTileMap();
    // image data:
    Size const  TEX_WIDTH          { tilemap.width  * 3 },
                TEX_HEIGHT         { tilemap.height * 3 };
-   Vec<RGBA>   pixels             ( TEX_WIDTH * TEX_HEIGHT );
+   Vector<RGBA>   pixels             ( TEX_WIDTH * TEX_HEIGHT );
 
    // random number generation:
    RNG         rng{ RD()() };
@@ -103,7 +103,7 @@ Str createMinimapTexture( Map const &map ) {
       }
    }
 
-   auto path = Str("data/textures/map/map.tga");// +mapConfigToFilename(map.config, ".tga");
+   auto path = String("data/textures/map/map.tga");// +mapConfigToFilename(map.config, ".tga");
    stbi_write_tga( path.c_str(), static_cast<I32>(TEX_WIDTH), static_cast<I32>(TEX_HEIGHT), 4, pixels.data() );
-   return Str("map/map");// +mapConfigToFilename(map.config);
+   return String("map/map");// +mapConfigToFilename(map.config);
 }

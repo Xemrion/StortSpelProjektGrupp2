@@ -68,8 +68,8 @@ U8  District_getMaxFloorCount( District d ) noexcept {
    return result;
 }
 
-Str  stringify( District d ) noexcept {
-   Str  result;
+String  stringify( District d ) noexcept {
+   String  result;
    if      ( d == District::residential  ) { result = "residential";  }
    else if ( d == District::park         ) { result = "park";         }
    else if ( d == District::metropolitan ) { result = "metropolitan"; }

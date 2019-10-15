@@ -30,31 +30,31 @@ public:
 	void         changeTime(float delta) noexcept;
 	void         setCurrentMenu(Menu);
 	Vehicle     *getPlayer() const;
-	std::string	 getMinimap() const;
-	Vector3		 getTopLeft() const;
-	Vector3		 getBottomRight() const;
-	Vector3		 getTileSize() const;
-	Vector2		 getTileCount() const;
+	std::string  getMinimap() const;
+	Vector3      getTopLeft() const;
+	Vector3      getBottomRight() const;
+	Vector3      getTileSize() const;
+	Vector2      getTileCount() const;
 
 private:
 	friend class Game;
-#ifdef _DEBUG
-	bool							pausedTime;
-#endif // _DEBUG
-	std::string						minimap;
-	Vector3							topLeft;
-	Vector3							bottomRight;
-	Vector3							tileSize;
-	Vector2							tileCount;
+   #ifdef _DEBUG
+	   bool                         pausedTime;
+   #endif // _DEBUG
+	std::string                     minimap;
+	Vector3                         topLeft;
+	Vector3                         bottomRight;
+	Vector3                         tileSize;
+	Vector2                         tileCount;
 	int                             currentMenu;
 	bool                            isUsingManhattanDistance { true };
 	float                           cameraDistance           { 25   };
 	float                           time;
 	MapConfig                       config;
 	Graphics                       &graphics;
-	AStar*				            aStar;
-    std::unique_ptr<Map>            map;
-	ActorManager*				    actorManager;
+	AStar                          *aStar;
+	std::unique_ptr<Map>            map;
+	ActorManager                   *actorManager;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
@@ -78,8 +78,7 @@ private:
 	                                                    Vector4( 1.0f,  .0f, .0f, 1.0f ),
 	                                                    Vector4(  .0f,  .0f, .0f, 1.0f ),
 	                                                    Vector4(  .1f,  .1f, .1f, 1.0f )  };
-  
-    void initiateAStar();
+	void initiateAStar();
 	void ImGui_ProcGen();
 	void ImGui_Driving();
 	void ImGui_Particles();

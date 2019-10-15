@@ -1,6 +1,7 @@
 #include "Map.hpp"
+#include "Profiler.hpp"
 
-Map::Map(Graphics& graphics, MapConfig const& config) :
+Map::Map( Graphics &graphics, MapConfig const &config ):
 	graphics        ( graphics                                                              ),
 	config          ( config                                                                ),
 	tilemap         ( std::make_unique<TileMap>(config)                                     ),
@@ -8,6 +9,7 @@ Map::Map(Graphics& graphics, MapConfig const& config) :
 	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y     ),
 	houseTiles      ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y / 2 )
 {
+   DBG_PROBE(Map::Map);
 	// TODO: generate water etc
 	generateDistricts();
 	generateRoads();
@@ -16,7 +18,12 @@ Map::Map(Graphics& graphics, MapConfig const& config) :
 
 
 Map::~Map() noexcept {
-	// TODO: this shouldn't be necessary. make it so GameObject's destructor handles this?
+   #ifdef _DEBUG
+		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?
+		DBG_PROFILE_OUTPUT(profilerLogs); // outputs profiler logs (if in debug mode)
+      DBG_PROFILE_RESET();
+	#endif
+   // TODO: this shouldn't be necessary. make it so GameObject's destructor handles this?
 	for ( auto &e : roadTiles )
 		graphics.removeFromDraw(&e);
 	for ( auto &e : districtMarkers )
@@ -26,7 +33,8 @@ Map::~Map() noexcept {
 }
 
 // TODO: ensure Map.config doesn't stays synchronized during re-rolls.
-Void  Map::generateRoads() {
+void  Map::generateRoads() {
+   DBG_PROBE(Map::generateRoads);
    RNG      rng{ RD()() };
 	I32_Dist generateSeed{};
 	rng.seed(config.seed);
@@ -46,7 +54,7 @@ Void  Map::generateRoads() {
 	}
 
    if constexpr ( isDebugging ) {
-	   std::ofstream roadGenerationLog(Str("PG/logs/") + mapConfigToFilename(config, "_road_gen.txt"));
+	   std::ofstream roadGenerationLog(String("PG/logs/") + mapConfigToFilename(config, "_road_gen.txt"));
 	   if (roadGenerationLog.is_open()) {
 		   roadGenerationLog << *tilemap;
 		   roadGenerationLog.close();
@@ -65,7 +73,8 @@ Void  Map::generateRoads() {
 	}
 }
 
-Void  Map::generateDistricts() {
+void  Map::generateDistricts() {
+   DBG_PROBE(Map::generateDistricts);
 	RNG  rng{ RD()() };
 	rng.seed( config.seed );
 	if ( config.isUsingManhattanDistance )
@@ -97,6 +106,7 @@ Void  Map::generateDistricts() {
 
 // TODO: make return value optional later instead of asserting
 V2u Map::generateRoadPositionInTileSpace(RNG& rng) const noexcept {
+   DBG_PROBE(Map::generateRoadPositionInTileSpace);
    static constexpr U16  MAX_TRIES{ 1024 };
    static U16_Dist       generateX(0, config.dimensions.x);
    static U16_Dist       generateY(0, config.dimensions.y);
@@ -115,14 +125,15 @@ Vector3  Map::generateRoadPositionInWorldSpace(RNG& rng) const noexcept {
 	return tilemap->convertTilePositionToWorldPosition(positionInTileSpace);
 }
 
-Void  Map::generateBuildings() {
+void  Map::generateBuildings() {
+   DBG_PROBE(Map::generateBuildings);
    RNG  rng{ RD()() };
 	rng.seed( config.seed );
 
    #ifdef _DEBUG
 	   U32            total_building_count{ 0 };
 	   U32            total_building_tile_count{ 0 };
-	   std::ofstream  buildingLogs{ Str("PG/logs/building_generation_") + mapConfigToFilename(config, ".txt") };
+	   std::ofstream  buildingLogs{ String("PG/logs/building_generation_") + mapConfigToFilename(config, ".txt") };
 	   assert(buildingLogs.is_open());
 	   buildingLogs << "==================================== BEGINNING BUILDING GENERATION ====================================\n";
    #endif
@@ -135,7 +146,7 @@ Void  Map::generateBuildings() {
 	                            } };
 
 	// generate look-up table (TODO: refactor)
-	Vec<District> districtLookupTable{ districtMap->noise.size(), District::park };
+	Vector<District> districtLookupTable{ districtMap->noise.size(), District::park };
 	for (U16 i = 0; i < districtLookupTable.size(); ++i)
 	{
 		districtLookupTable[i] = cellIdToDistrictEnum(i);
@@ -209,7 +220,8 @@ Void  Map::generateBuildings() {
 
 // basic proto placement algorithm
 // TODO: refactor out of Game
-Opt<Vec<V2u>>  Map::findValidHouseLot(RNG& rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vec<District> const& districtLookUpTable) {
+Opt<Vector<V2u>>  Map::findValidHouseLot(RNG& rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vector<District> const& districtLookUpTable) {
+   DBG_PROBE(Map::findValidHouseLot);
 	using Bounds = Voronoi::Bounds;
 	Bounds    cellBounds      { districtMap.computeCellBounds(cellId) };
 	U16_Dist  generateOffset  { 0x0, 0xFF };
@@ -231,7 +243,7 @@ Opt<Vec<V2u>>  Map::findValidHouseLot(RNG& rng, U16 cellId, Voronoi const& distr
 		startPosition.y = generateY(rng);
 	} while (isValidPosition(startPosition));
 
-	Vec<V2u>  claimedPositions, candidateSources;
+	Vector<V2u>  claimedPositions, candidateSources;
 
 	claimedPositions.reserve(targetSize);
 	claimedPositions.push_back(startPosition);
@@ -272,9 +284,9 @@ TileMap const& Map::getTileMap() const noexcept {
 	return *tilemap;
 }
 
-Void  Map::setDistrictColorCoding(bool useColorCoding) noexcept {
+void  Map::setDistrictColorCoding(bool useColorCoding) noexcept {
 	if (useColorCoding) {
-		Vec<Vector4> districtColorTable{
+		Vector<Vector4> districtColorTable{
 			{ 0.0f, 0.0f, 0.0f, 1.0f },
 			{ 0.0f, 0.0f, 0.5f, 1.0f },
 			{ 0.0f, 0.0f, 1.0f, 1.0f },
@@ -311,25 +323,25 @@ Void  Map::setDistrictColorCoding(bool useColorCoding) noexcept {
 			{ 1.0f, 1.0f, 0.5f, 1.0f },
 			{ 1.0f, 1.0f, 1.0f, 1.0f }
 		};
-		for (auto& rgba : districtColorTable)
-			rgba = blend(rgba, Vector4{ 1.0f }, config.districtColorCodingBlendFactor);
+		for ( auto &rgba : districtColorTable )
+			rgba = util::blend( rgba, Vector4{ 1.0f }, config.districtColorCodingBlendFactor );
 		// colour code tiles depending on cell index:
-		for (U16 y = 0; y < tilemap->height; ++y) {
-			for (U16 x = 0; x < tilemap->width; ++x) {
+		for ( U16 y = 0;  y < tilemap->height;  ++y ) {
+			for ( U16 x = 0;  x < tilemap->width;  ++x ) {
 				assert(tilemap->data.size() == districtMap->diagram.size() && "BUG!");
-				auto& tile = roadTiles[tilemap->index(x, y)];
+				auto       &tile      = roadTiles[tilemap->index(x, y)];
 				auto        cellIndex = districtMap->diagramIndex(x, y);
-				auto        cellId = districtMap->diagram[cellIndex];
-				auto const& color = districtColorTable[cellId % districtColorTable.size()];
-				tile.setColor(color);
+				auto        cellId    = districtMap->diagram[cellIndex];
+				auto const &color     = districtColorTable[cellId % districtColorTable.size()];
+				tile.setColor( color );
 			}
 		}
-		for (auto& e : houseTiles) {
-			auto        cellPosition = tilemap->convertWorldPositionToTilePosition(e.getPosition());
-			auto        cellIndex = districtMap->diagramIndex(cellPosition.x, cellPosition.y);
-			auto        cellID = districtMap->diagram[cellIndex];
-			auto const& color = districtColorTable[cellID % districtColorTable.size()];
-			e.setColor(color);
+		for ( auto &e : houseTiles ) {
+			auto        cellPosition = tilemap->convertWorldPositionToTilePosition( e.getPosition() );
+			auto        cellIndex    = districtMap->diagramIndex( cellPosition.x, cellPosition.y );
+			auto        cellID       = districtMap->diagram[cellIndex];
+			auto const &color        = districtColorTable[cellID % districtColorTable.size()];
+			e.setColor( color );
 		}
 	}
 	else {

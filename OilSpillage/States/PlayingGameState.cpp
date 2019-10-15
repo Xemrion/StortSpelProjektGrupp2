@@ -5,14 +5,15 @@
 #include "../UI/UIPaused.h"
 #include "../UI/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
+#include "../PG/Profiler.hpp"
 
-Void PlayingGameState::initiateAStar() {}
+void PlayingGameState::initiateAStar() {}
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState(): graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {
-#ifdef _DEBUG
-	pausedTime = false;
-#endif // _DEBUG
+   #ifdef _DEBUG
+	   pausedTime = false;
+   #endif // _DEBUG
 
 	lightList = std::make_unique<LightList>();
 	player = std::make_unique<Vehicle>();
@@ -81,7 +82,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	tileCount = Vector2(static_cast<float>(config.dimensions.x), static_cast<float>(config.dimensions.y));
 	tileSize = Vector3(config.tileScaleFactor.data);
 	//Needs to be loaded before the menues
-	this->minimap = createMinimapTexture(*this->map);
+	this->minimap = createMinimapTexture(*map);
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
@@ -120,7 +121,7 @@ PlayingGameState::~PlayingGameState()
 	delete actorManager;
 }
 
-Void  PlayingGameState::ImGui_Driving() {
+void  PlayingGameState::ImGui_Driving() {
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
@@ -319,7 +320,7 @@ void PlayingGameState::ImGui_ProcGen() {
 	ImGui::End();
 }
 
-Void  PlayingGameState::ImGui_Camera() {
+void  PlayingGameState::ImGui_Camera() {
 	ImGui::Begin("Camera & Culling:");
 	if (static bool firstFrame = true; firstFrame) {
 		ImGui::SetWindowPos({ 0,0 });
@@ -338,7 +339,7 @@ Void  PlayingGameState::ImGui_Camera() {
 	ImGui::End();
 }
 
-Void  PlayingGameState::update(float deltaTime)
+void  PlayingGameState::update(float deltaTime)
 {
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)

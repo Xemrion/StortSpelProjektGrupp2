@@ -4,7 +4,7 @@ TileMap::TileMap( MapConfig const &config ):
    config ( config ),
    width  ( static_cast<Size>(config.dimensions.y) ),
    height ( static_cast<Size>(config.dimensions.x) ),
-	data   ( Vec<Tile>( width * height, Tile::ground ) )
+	data   ( Vector<Tile>( width * height, Tile::ground ) )
 {}
 
 // x = current X (may be mutated if successful)
@@ -35,9 +35,9 @@ Bool  TileMap::walk( U16& x, U16& y, Direction d, Tile tile ) {
 	}
 }
 
-Vec<GameObject>  TileMap::loadAsModels(Graphics& graphics) const {
+Vector<GameObject>  TileMap::loadAsModels(Graphics& graphics) const {
    auto const  toReserve { width * height };
-	Vec<GameObject> tiles( toReserve );
+	Vector<GameObject> tiles( toReserve );
 	for ( U16 y = 0;  y < height;  ++y ) {
 		for ( U16 x = 0;  x < width;  ++x ) {
 			auto const  tileIndex             { index(x, y)                       };
@@ -95,8 +95,8 @@ std::ostream &operator<<( std::ostream &out, TileMap const &map ) {
 	return out;
 }
 
-Vec<V2u> TileMap::getCardinallyNeighbouringTilePositions( V2u tilePosition ) const noexcept {
-   Vec<V2u>  neighbouringTilePositions {};
+Vector<V2u> TileMap::getCardinallyNeighbouringTilePositions( V2u tilePosition ) const noexcept {
+   Vector<V2u>  neighbouringTilePositions {};
    neighbouringTilePositions.reserve(4);
 
    // check if any of the neighbouring tile coords are tiles within map bounds:
@@ -115,8 +115,8 @@ Vec<V2u> TileMap::getCardinallyNeighbouringTilePositions( V2u tilePosition ) con
    return neighbouringTilePositions;
 }
 
-Vec<V2u>  TileMap::getNeighbouringTilePositions( V2u tilePosition ) const noexcept {
-   Vec<V2u>  neighbouringTilePositions {};
+Vector<V2u>  TileMap::getNeighbouringTilePositions( V2u tilePosition ) const noexcept {
+   Vector<V2u>  neighbouringTilePositions {};
    neighbouringTilePositions.reserve(8);
 
    // check if any of the neighbouring tile coords are tiles within map bounds:
@@ -148,7 +148,7 @@ Vec<V2u>  TileMap::getNeighbouringTilePositions( V2u tilePosition ) const noexce
 
 
 // TODO: rotate bend mesh 180 degrees and update values in table to their proper value
-Vec<TileMap::TileEntry> const  TileMap::tileGraphicsTable {
+Vector<TileMap::TileEntry> const  TileMap::tileGraphicsTable {
 	// targetIndex   WSEN      filename          rot      type                  rotation
 	/*   0   0000 */  {"Roads/Road_pavement",        0}, // no road,                 0 deg
 	/*   1   0001 */  {"Roads/Road_deadend",         0}, // deadend (south),         0 deg
@@ -169,7 +169,7 @@ Vec<TileMap::TileEntry> const  TileMap::tileGraphicsTable {
 };
 
 // Used with a cellular automata to beautify the terminal output.
-Vec<Str> const   TileMap::tileTerminalGraphicsTable {
+Vector<String> const   TileMap::tileTerminalGraphicsTable {
 	// idx   WSEN     char      type                  rotation
 	/*   0   0000 */  u8".", // no road,                 0 deg
 	/*   1   0001 */  u8"╹", // deadend (south),         0 deg
@@ -190,7 +190,7 @@ Vec<Str> const   TileMap::tileTerminalGraphicsTable {
 };
 
 // Used to color code tiles (for terminal output)
-Vec<Str> const  TileMap::tileTerminalColorTable {
+Vector<String> const  TileMap::tileTerminalColorTable {
 	/* ground */    "\033[38;5;150m",
 	/* road0  */    "\033[38;5;255m",
 	/* road1  */    "\033[38;5;249m",

@@ -18,20 +18,20 @@ public:
    V2u              startPositionInTileSpace;
    UPtr<TileMap>    tilemap;
    UPtr<Voronoi>    districtMap;
-   Vec<GameObject>  districtMarkers;
-   Vec<GameObject>  roadTiles;
-   Vec<GameObject>  houseTiles;
+   Vector<GameObject>  districtMarkers;
+   Vector<GameObject>  roadTiles;
+   Vector<GameObject>  houseTiles;
 
    V2u              generateRoadPositionInTileSpace(  RNG & ) const noexcept;
    Vector3          generateRoadPositionInWorldSpace( RNG & ) const noexcept;
-   Void             setDistrictColorCoding ( Bool useColorCoding ) noexcept;
+   void             setDistrictColorCoding ( Bool useColorCoding ) noexcept;
    V2u              getStartPositionInTileSpace()  const noexcept;
    Vector3          getStartPositionInWorldSpace() const noexcept;
    TileMap const   &getTileMap() const noexcept;
 
 private:
-   Void             generateDistricts();
-   Void             generateRoads();
-   Void             generateBuildings();
-   Opt<Vec<V2u>>    findValidHouseLot( RNG &, U16 districtCellID, Voronoi const &, TileMap &, Vec<District> const &districtTable );
+   void             generateDistricts();
+   void             generateRoads();
+   void             generateBuildings();
+   Opt<Vector<V2u>>    findValidHouseLot( RNG &, U16 districtCellID, Voronoi const &, TileMap &, Vector<District> const &districtTable );
 };

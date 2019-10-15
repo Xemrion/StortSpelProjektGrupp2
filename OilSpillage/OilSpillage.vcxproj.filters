@@ -65,6 +65,8 @@
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="AI\Turrent.cpp" />
+    <ClCompile Include="UI\Minimap.cpp" />
+    <ClCompile Include="PG\Profiler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
@@ -134,6 +136,9 @@
     <ClInclude Include="VehicleWeapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="AI\Turrent.h" />
+    <ClInclude Include="STB\stb_image.h" />
+    <ClInclude Include="UI\Minimap.h" />
+    <ClInclude Include="PG\Profiler.hpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

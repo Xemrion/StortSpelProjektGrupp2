@@ -151,6 +151,7 @@
     <ClCompile Include="PG\MapConfig.cpp" />
     <ClCompile Include="PG\Map.cpp" />
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
+    <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="Particle\ParticleSystem.h" />
     <ClInclude Include="PG\Map.hpp" />
     <ClInclude Include="PG\MinimapTextureGenerator.hpp" />
+    <ClInclude Include="PG\Profiler.hpp" />
     <ClInclude Include="States\GameState.h" />
     <ClInclude Include="States\MenuGameState.h" />
     <ClInclude Include="States\PlayingGameState.h" />

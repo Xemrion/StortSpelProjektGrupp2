@@ -4,4 +4,4 @@
 #include "defs.hpp"
 #include "Tile.hpp"
 
-Str  createMinimapTexture( Map const & );
+String  createMinimapTexture( Map const & );

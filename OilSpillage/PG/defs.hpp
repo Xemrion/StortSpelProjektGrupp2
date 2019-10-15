@@ -7,11 +7,13 @@
 #include <memory>
 #include <optional>
 #include <cstdint>
+#include <unordered_map>
 // using aliases
 
 // collections
-template <typename T>           using Vec = std::vector<T>;
-template <typename T, size_t N> using Arr = std::array<T,N>;
+template <typename T>           using Vector  = std::vector<T>;
+template <typename T, size_t N> using Array   = std::array<T,N>;
+template <class K, class V>     using HashMap = std::unordered_map<K,V>;
 
 // smart pointers
 template <typename T> using UPtr = std::unique_ptr<T>;
@@ -20,9 +22,8 @@ template <typename T> using SPtr = std::shared_ptr<T>;
 // optional
 template <typename T> using Opt = std::optional<T>;
 
-
 // string
-using Str  = std::basic_string<char>;
+using String = std::basic_string<char>;
 
 // primitives
 using U8   = std::uint_fast8_t;
@@ -37,7 +38,6 @@ using F32  = float;
 using F64  = double;
 using Bool = bool;
 using Size = size_t;
-using Void = void;
 
 #ifdef _DEBUG
    Bool constexpr isDebugging {  true };
