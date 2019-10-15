@@ -13,8 +13,7 @@ Str createMinimapTexture( Map const &map ) {
    Vec<RGBA>   pixels             ( TEX_WIDTH * TEX_HEIGHT );
 
    // random number generation:
-   RD          rd                 {};
-   RNG         rng                { rd() };
+   RNG         rng{ RD()() };
    F32_Dist    generateSelection  { .0f, 1.0f };
 
    // converts a tile-space XY into a pixel XY:

@@ -22,7 +22,7 @@ template <typename T> using Opt = std::optional<T>;
 
 
 // string
-using Str      = std::basic_string<char>;
+using Str  = std::basic_string<char>;
 
 // primitives
 using U8   = std::uint_fast8_t;
@@ -35,7 +35,6 @@ using I32  = std::int_fast32_t;
 using I64  = std::int_fast64_t;
 using F32  = float;
 using F64  = double;
-using getTerminalColorLookupIndex = char;
 using Bool = bool;
 using Size = size_t;
 using Void = void;

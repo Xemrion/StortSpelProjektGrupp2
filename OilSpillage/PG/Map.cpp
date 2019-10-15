@@ -17,18 +17,17 @@ Map::Map(Graphics& graphics, MapConfig const& config) :
 
 Map::~Map() noexcept {
 	// TODO: this shouldn't be necessary. make it so GameObject's destructor handles this?
-	for (auto& e : roadTiles)
+	for ( auto &e : roadTiles )
 		graphics.removeFromDraw(&e);
-	for (auto& e : districtMarkers)
+	for ( auto &e : districtMarkers )
 		graphics.removeFromDraw(&e);
-	for (auto& e : houseTiles)
+	for ( auto &e : houseTiles )
 		graphics.removeFromDraw(&e);
 }
 
 // TODO: ensure Map.config doesn't stays synchronized during re-rolls.
 Void  Map::generateRoads() {
-	RD       rd;
-	RNG      rng(rd());
+   RNG      rng{ RD()() };
 	I32_Dist generateSeed{};
 	rng.seed(config.seed);
 
@@ -46,13 +45,13 @@ Void  Map::generateRoads() {
 		}
 	}
 
-   #ifdef _DEBUG
+   if constexpr ( isDebugging ) {
 	   std::ofstream roadGenerationLog(Str("PG/logs/") + mapConfigToFilename(config, "_road_gen.txt"));
 	   if (roadGenerationLog.is_open()) {
 		   roadGenerationLog << *tilemap;
 		   roadGenerationLog.close();
 	   }
-   #endif
+   }
 
 	roadTiles = tilemap->loadAsModels(graphics); // GameObject instantiation
 	for ( U16 y = 0;  y < tilemap->height;  ++y ) {
@@ -67,8 +66,7 @@ Void  Map::generateRoads() {
 }
 
 Void  Map::generateDistricts() {
-	RD   rd;
-	RNG  rng( rd() );
+	RNG  rng{ RD()() };
 	rng.seed( config.seed );
 	if ( config.isUsingManhattanDistance )
 		districtMap = std::make_unique<Voronoi>( rng,
@@ -81,20 +79,20 @@ Void  Map::generateDistricts() {
 	                                              config.dimensions.x / config.districtCellSide,
 	                                              config.dimensions.y / config.districtCellSide,
 	                                              Voronoi::EuclideanDistanceTag{});
-#ifdef _DEBUG
-	// display noise centers:
-	districtMarkers.reserve(districtMap->noise.size());
-	for (auto const& cellCentre : districtMap->noise) {
-		districtMarkers.emplace_back();
-		auto& marker = districtMarkers.back();
-		marker.mesh = graphics.getMeshPointer("Cube");
-		marker.setColor({ 1, 0, 0, 1 });
-		marker.setScale({ .2f, 4, .2f });
-		marker.setPosition({ tilemap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
-		                                                                  static_cast<U16>(cellCentre.y)) });
-		graphics.addToDraw(&marker);
-	}
-#endif
+   if constexpr ( isDebugging ) {
+	   // display noise centers:
+	   districtMarkers.reserve( districtMap->noise.size() );
+	   for ( auto const &cellCentre : districtMap->noise ) {
+		   districtMarkers.emplace_back();
+		   auto &marker = districtMarkers.back();
+		   marker.mesh  = graphics.getMeshPointer("Cube");
+		   marker.setColor({ 1, 0,  0, 1 });
+		   marker.setScale({ .2f, 4.0f, .2f });
+		   marker.setPosition({ tilemap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
+		                                                                     static_cast<U16>(cellCentre.y)) });
+		   graphics.addToDraw(&marker);
+	   }
+   }
 }
 
 // TODO: make return value optional later instead of asserting
@@ -113,14 +111,13 @@ V2u Map::generateRoadPositionInTileSpace(RNG& rng) const noexcept {
 }
 
 Vector3  Map::generateRoadPositionInWorldSpace(RNG& rng) const noexcept {
-	auto positionInTileSpace{ generateRoadPositionInTileSpace(rng) };
+	auto  positionInTileSpace{ generateRoadPositionInTileSpace(rng) };
 	return tilemap->convertTilePositionToWorldPosition(positionInTileSpace);
 }
 
 Void  Map::generateBuildings() {
-	RD   rd;
-	RNG  rng(rd());
-	rng.seed(config.seed);
+   RNG  rng{ RD()() };
+	rng.seed( config.seed );
 
    #ifdef _DEBUG
 	   U32            total_building_count{ 0 };
@@ -130,12 +127,12 @@ Void  Map::generateBuildings() {
 	   buildingLogs << "==================================== BEGINNING BUILDING GENERATION ====================================\n";
    #endif
 
-	U16_Dist generateOffset(0, 256);
-	F32_Dist generateSelection(.0f, 1.0f);
+	U16_Dist  generateOffset(      0,  256 );
+	F32_Dist  generateSelection( .0f, 1.0f );
 
-	auto  cellIdToDistrictEnum{ [&generateOffset,&rng](U16 const ID) {
-								  return static_cast<District>((ID + generateOffset(rng)) % static_cast<U16>(District::size));
-							  } };
+	auto  cellIdToDistrictEnum{ [&generateOffset,&rng]( U16 const ID ) {
+	                               return static_cast<District>((ID + generateOffset(rng)) % static_cast<U16>(District::size));
+	                            } };
 
 	// generate look-up table (TODO: refactor)
 	Vec<District> districtLookupTable{ districtMap->noise.size(), District::park };
@@ -144,26 +141,26 @@ Void  Map::generateBuildings() {
 		districtLookupTable[i] = cellIdToDistrictEnum(i);
 	}
 
-	for (U16 cellId = 0; cellId < districtMap->noise.size(); ++cellId) {
+	for ( U16 cellId = 0;  cellId < districtMap->noise.size();  ++cellId) {
 		District    districtType{ districtLookupTable[cellId] };
 		Size        currentArea{ 0 };
 		Size const  cellArea{ districtMap->computeCellRealEstateArea(cellId,*tilemap) };
 
       #ifdef _DEBUG
-		   U64  currrentDistrictBuildingCount{ 0 };
+		   U64  currrentDistrictBuildingCount { 0 };
 		   buildingLogs << "\n\t" "Generating buildings for district #"
-			   << cellId << " (TYPE: \"" << stringify(districtType) << "\")\n";
+		                << cellId << " (TYPE: \"" << stringify(districtType) << "\")\n";
       #endif
 
-		if ((cellArea != 0) and (districtType != District::park)) {
-			F32  const  targetDistrictCoverage{ District_getBuildingDensity(districtType) };
-			auto        computeCurrentDistrictCoverage{ [&currentArea, cellArea]() {
-														  return F32(currentArea) / F32(cellArea);
-													   } };
+		if ( (cellArea != 0) and (districtType != District::park) ) {
+			F32  const  targetDistrictCoverage         { District_getBuildingDensity(districtType) };
+			auto        computeCurrentDistrictCoverage { [&currentArea, cellArea]() {
+			                                                return F32(currentArea) / F32(cellArea);
+			                                             } };
 			while (computeCurrentDistrictCoverage() < targetDistrictCoverage) {
 				auto potentialLot = findValidHouseLot(rng, cellId, *districtMap, *tilemap, districtLookupTable);
 				if (potentialLot) {
-					auto& building = potentialLot.value();
+					auto &building     = potentialLot.value();
 					auto  buildingSize = building.size();
                #ifdef _DEBUG
 					   buildingLogs << "\t\t"   "Generating building #" << currrentDistrictBuildingCount++
@@ -173,22 +170,21 @@ Void  Map::generateBuildings() {
 						   << "\t\t\t" "The district real estate coverage is now "
 						   << (computeCurrentDistrictCoverage() * 100.0f) << "%\n"
 						   << "\t\t\t" "The target coverage is: " << targetDistrictCoverage * 100.0f << "%\n";
-               #endif
-					U16_Dist  generateFloorCount(District_getMinFloorCount(districtType), District_getMaxFloorCount(districtType));
-					F32       randomFloorCount{ static_cast<F32>(generateFloorCount(rng)) };
+					#endif
+					U16_Dist  generateFloorCount { District_getMinFloorCount(districtType), District_getMaxFloorCount(districtType) };
+					F32       randomFloorCount   { static_cast<F32>(generateFloorCount(rng)) };
 					currentArea += buildingSize;
 					houseTiles.reserve(buildingSize);
-					for (auto& tilePosition : potentialLot.value()) 
-					{
+					for ( auto &tilePosition : potentialLot.value() ) {
 						houseTiles.emplace_back();
-						auto& houseTile = houseTiles.back();
+						auto &houseTile = houseTiles.back();
 						tilemap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
 						houseTile.mesh = graphics.getMeshPointer("Cube");
 						//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
 						houseTile.setScale({ .5f * config.tileScaleFactor.x,
-											  .5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * randomFloorCount,
-											  .5f * config.tileScaleFactor.z });
+						                     .5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * randomFloorCount,
+						                     .5f * config.tileScaleFactor.z });
 						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) });
 
                   #ifdef _DEBUG
@@ -202,27 +198,27 @@ Void  Map::generateBuildings() {
 	}
 
 	// adding all the tiles to draw:
-	for (auto& e : houseTiles)
-		graphics.addToDraw(&e);
+	for ( auto &e : houseTiles )
+		graphics.addToDraw( &e );
 
-#ifdef _DEBUG
-	if (buildingLogs.is_open())
-		buildingLogs.close();
-#endif
+   #ifdef _DEBUG
+	   if (buildingLogs.is_open())
+		   buildingLogs.close();
+   #endif
 }
 
 // basic proto placement algorithm
 // TODO: refactor out of Game
 Opt<Vec<V2u>>  Map::findValidHouseLot(RNG& rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vec<District> const& districtLookUpTable) {
 	using Bounds = Voronoi::Bounds;
-	Bounds    cellBounds{ districtMap.computeCellBounds(cellId) };
-	U16_Dist  generateOffset{ 0x0,             0xFF };
-	U16_Dist  generateX{ cellBounds.min.x, cellBounds.max.x };
-	U16_Dist  generateY{ cellBounds.min.y, cellBounds.max.y };
-	auto      isValidPosition{ [&](V2u const& tilePosition) -> Bool {
-								 return  (districtMap.diagram[districtMap.diagramIndex(tilePosition)] != cellId)
-									 or (map.tileAt(tilePosition) != Tile::ground);
-							  } };
+	Bounds    cellBounds      { districtMap.computeCellBounds(cellId) };
+	U16_Dist  generateOffset  { 0x0, 0xFF };
+	U16_Dist  generateX       { cellBounds.min.x, cellBounds.max.x };
+	U16_Dist  generateY       { cellBounds.min.y, cellBounds.max.y };
+	auto      isValidPosition { [&](V2u const& tilePosition) -> Bool {
+	                               return  (districtMap.diagram[districtMap.diagramIndex(tilePosition)] != cellId)
+	                                   or (map.tileAt(tilePosition) != Tile::ground);
+	                            } };
 
 	District const  districtType{ districtLookUpTable[cellId] }; // TODO: refactor? (and param)
 	U16_Dist        generateTargetSize{ District_getBuildingMinArea(districtType), District_getBuildingMaxArea(districtType) };
@@ -244,12 +240,14 @@ Opt<Vec<V2u>>  Map::findValidHouseLot(RNG& rng, U16 cellId, Voronoi const& distr
 	candidateSources.push_back(startPosition);
 
 	while (claimedPositions.size() != targetSize and candidateSources.size() != 0) {
-		auto const& sourcePosition = candidateSources[generateOffset(rng) % candidateSources.size()];
+		auto const &sourcePosition = candidateSources[generateOffset(rng) % candidateSources.size()];
 		// find valid neighbours
 		auto  candidateDestinations = map.getCardinallyNeighbouringTilePositions(sourcePosition);
 		// eliminate invalid ones from our destination candidate list
-		candidateDestinations.erase(std::remove_if(candidateDestinations.begin(), candidateDestinations.end(), isValidPosition), candidateDestinations.end());
-
+		candidateDestinations.erase( std::remove_if( candidateDestinations.begin(),
+		                                             candidateDestinations.end(),
+		                                             isValidPosition ),
+		                             candidateDestinations.end());
 		// if we found at least one valid destination position, pick one of the candiates
 		if (candidateDestinations.size() != 0) {
 			// TODO: possibly improve results if weighted towards lower indices?
@@ -257,11 +255,11 @@ Opt<Vec<V2u>>  Map::findValidHouseLot(RNG& rng, U16 cellId, Voronoi const& distr
 			claimedPositions.push_back(match);
 			candidateSources.push_back(match);
 		} // otherwise remove the source position from the source candidates
-		else candidateSources.erase(std::remove_if(candidateSources.begin(),
-			candidateSources.end(),
-			[&sourcePosition](auto const& e) { return e == sourcePosition; }
-		),
-			candidateSources.end()
+		else candidateSources.erase( std::remove_if( candidateSources.begin(),
+		                                             candidateSources.end(),
+		                                             [&sourcePosition](auto const &e) { return e == sourcePosition; }
+		                                           ),
+		                             candidateSources.end()
 		);
 	}
 

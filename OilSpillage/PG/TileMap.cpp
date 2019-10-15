@@ -77,9 +77,8 @@ F32  TileMap::getRoadCoverage() const noexcept {
 
 // road generator stream outputter implementation
 std::ostream &operator<<( std::ostream &out, TileMap const &map ) {
-#ifdef _DEBUG
-	out << "  PRINTING " << map.width << 'x' << map.height << " MAP:\n\t";
-#endif
+   if constexpr ( isDebugging )
+	   out << "  PRINTING " << map.width << 'x' << map.height << " MAP:\n\t";
 	for ( U16 y = 0;  y < map.height;  ++y ) {
 		for ( U16 x = 0;  x < map.width;  ++x ) {
 			//*[@DEPRECATED]*/  out << ' ' << map.data[map.index( x, y )];
@@ -171,7 +170,7 @@ Vec<TileMap::TileEntry> const  TileMap::tileGraphicsTable {
 
 // Used with a cellular automata to beautify the terminal output.
 Vec<Str> const   TileMap::tileTerminalGraphicsTable {
-	// targetIndex   WSEN     getTerminalColorLookupIndex      type                  rotation
+	// idx   WSEN     char      type                  rotation
 	/*   0   0000 */  u8".", // no road,                 0 deg
 	/*   1   0001 */  u8"╹", // deadend (south),         0 deg
 	/*   2   0010 */  u8"╺", // deadend (west),         90 deg
