@@ -702,5 +702,4 @@ MigrationBackup/
 
 .ionide/
 
-/OilSpillage/PG/logs/map_69469_96x96_16M_4_0.15_1_0_1_0_150-400x0.8_0.2x2_0.2x0.85_road_gen.txt
-/OilSpillage/PG/logs/building_generation_map_69469_96x96_16M_4_0.15_1_0_1_0_150-400x0.8_0.2x2_0.2x0.85.txt
+OilSpillage/PG/Logs/

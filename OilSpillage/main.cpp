@@ -8,12 +8,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 #endif
 	srand(static_cast<unsigned int>(time(NULL)));
 
-	Game game;
 	Window window;
 	window.init(hInstance, 1280, 720);
 	ShowWindow(window.handle, nShowCmd);
-	game.init(&window);
-	game.run();
-
+	
+	Game::start(&window);
 	return 0;
 }

@@ -8,6 +8,7 @@
 class Texture
 {
 private:
+	friend class Graphics;
 	struct TargaHeader
 	{
 		unsigned char data1[12];
@@ -17,22 +18,22 @@ private:
 		unsigned char data2;
 	};
 
-	bool LoadTarga(const char*, int&, int&);
+	//bool LoadTarga(const char*, int&, int&);
 
-	unsigned char* targaData;
-	ID3D11Texture2D* texture;
-	ID3D11ShaderResourceView* textureView;
+	//unsigned char* m_targaData;
+	ID3D11Texture2D* m_texture;
+	ID3D11ShaderResourceView* m_textureView;
 
 	//TO STORE WIDTH & HEIGHT
 	int width;
 	int height;
 
 	bool transparent;
-public:
-	Texture();
-	Texture(const Texture&);
-	~Texture();
 
+	Texture();
+	Texture(const Texture&) = delete;
+	~Texture();
+public:
 	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, const char* filename, int mipLevels);
 	void Shutdown();
 
@@ -40,7 +41,7 @@ public:
 
 	bool isTransparent();
 
-	unsigned char* getTextureCharArray();
+	//unsigned char* getTextureCharArray();
 	unsigned short getWidth();
 	unsigned short getHeight();
 	DirectX::SimpleMath::Vector2 getSize();

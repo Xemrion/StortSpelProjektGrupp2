@@ -5,33 +5,98 @@
 #include "States/MenuGameState.h"
 #include "States/PlayingGameState.h"
 
-Graphics Game::graphics = Graphics();
+std::unique_ptr<Game> Game::instance;
 
-std::unique_ptr<GameState> Game::states[STATECOUNT];
-int Game::currentState = STATE_MENU;
-int Game::oldState = -1;
+void Game::start(Window* window)
+{
+	instance = std::make_unique<Game>();
+	instance->window = window;
+	instance->graphics.init(window);
+
+	Input::Init();
+	Sound::Init();
+	UserInterface::initStaticVariables();
+
+	Input::SetKeyboardPlayerID(0);
+	instance->running = true;
+	instance->run();
+}
+
+void Game::quit()
+{
+	instance->running = false;
+}
 
 GameState* Game::getCurrentState()
 {
-	return states[currentState].get();
+	return instance->state.get();
 }
 
 void Game::setState(State state)
 {
 	int newState = static_cast<int>(state);
 
-	if (oldState == -1 && currentState != newState)
+	if (instance->oldState == -1 && instance->currentState != newState)
 	{
-		oldState = currentState;
-		currentState = newState;
+		instance->oldState = instance->currentState;
+		instance->currentState = newState;
 	}
 }
 
-Game::Game()
+Graphics& Game::getGraphics() noexcept
 {
-	states[STATE_MENU]    = std::make_unique<MenuGameState>();
-	states[STATE_PLAYING] = std::make_unique<PlayingGameState>();
+	return instance->graphics;
 }
+
+void Game::createCurrentState()
+{
+	if (currentState == STATE_MENU)
+		state = std::make_unique<MenuGameState>();
+	else if (currentState == STATE_PLAYING)
+		state = std::make_unique<PlayingGameState>();
+}
+
+void Game::run()
+{
+	//Init the state
+	createCurrentState();
+
+	//Store counts per second
+	countsPerSec = 0;
+	QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSec);
+	secPerCount = 1.0f / countsPerSec; //store seconds per count
+
+	//Initial previous time	
+	prevTime = 0;
+	QueryPerformanceCounter((LARGE_INTEGER*)&prevTime);
+
+	while (running && window->update()) {
+		//deltaTime
+		curTime = 0;
+		QueryPerformanceCounter((LARGE_INTEGER*)&curTime);
+		//Calculate deltaTime
+		deltaTime = (curTime - prevTime) * secPerCount;
+
+		Input::Update();
+		Sound::Update(deltaTime);
+		state->update(deltaTime);
+
+		if (oldState != -1) {
+			graphics.clearDraw();
+			createCurrentState(); //Init the new state
+			curTime = 0;
+			QueryPerformanceCounter((LARGE_INTEGER*)& curTime);
+			oldState = -1;
+		}
+		//camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 500.0f, 0.0));
+		
+
+		//deltaTime reset
+		prevTime = curTime;
+	}
+}
+
+Game::Game() : currentState(STATE_MENU), oldState(-1), running(false) {}
 
 Game::~Game()
 {
@@ -39,49 +104,3 @@ Game::~Game()
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 }
-
-void Game::init(Window* window)
-{
-	this->window = window; 
-	graphics.init(window);
-	Input::Init();
-	Sound::Init();
-	UserInterface::initStaticVariables();
-}
-
-void Game::run()
-{
-	//Store counts per second
-	countsPerSec = 0;
-	QueryPerformanceFrequency((LARGE_INTEGER*) &countsPerSec);
-	secPerCount = 1.0f / countsPerSec; //store seconds per count
-
-	//Initial previous time	
-	prevTime = 0;
-	QueryPerformanceCounter((LARGE_INTEGER*) &prevTime);
-
-	Input::SetKeyboardPlayerID(0);
-	states[currentState]->init();
-
-	while (window->update()) {
-		//deltaTime
-		curTime = 0;
-		QueryPerformanceCounter((LARGE_INTEGER*) &curTime);
-		//Calculate deltaTime
-		deltaTime = (curTime - prevTime) * secPerCount;
-
-		Input::Update();
-		Sound::Update(deltaTime);
-		states[currentState]->update(deltaTime);
-
-		if (oldState != -1) {
-			states[oldState]->cleanUp();
-			graphics.clearDraw();
-			states[currentState]->init();
-			oldState = -1;
-		}
-
-		//deltaTime reset
-		prevTime = curTime;
-	}
-}  

@@ -11,15 +11,19 @@ void UIMainMenu::updateUI(float deltaTime)
 	{
 		if (this->selected == this->buttonPlay.get())
 		{
-			Game::setState(State::STATE_PLAYING);
+			Game::setState(Game::STATE_PLAYING);
 		}
 		else if (this->selected == this->buttonOptions.get())
 		{
-			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(Menu::MENU_OPTIONS);
+			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(MenuGameState::MENU_OPTIONS);
 		}
 		else if (this->selected == this->buttonCredits.get())
 		{
-			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(Menu::MENU_CREDITS);
+			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(MenuGameState::MENU_CREDITS);
+		}
+		else if (this->selected == this->buttonQuit.get())
+		{
+			Game::quit();
 		}
 		else if (this->selected == this->checkBoxTest.get())
 		{
