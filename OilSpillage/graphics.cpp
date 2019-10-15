@@ -320,8 +320,10 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
 	
-	shadowMap.prepare();
-	shadowMap.setViewProj(camera, Vector3(lightList->getSun().getDirection().x, lightList->getSun().getDirection().y, lightList->getSun().getDirection().z));
+	shadowMap.prepare();//clear depth
+	shadowMap.prepareSpot();//clear depth
+	shadowMap.setViewProjSun(camera, Vector3(lightList->getSun().getDirection().x, lightList->getSun().getDirection().y, lightList->getSun().getDirection().z));
+	//Setting the viewprojSpot in playinggamestate cause playerlight is there
 	Frustum frustum = camera->getFrustum();
 	
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -346,6 +348,9 @@ void Graphics::render(DynamicCamera* camera)
 				shadowMap.setWorld(worldTr);
 				deviceContext->PSSetShader(nullptr, nullptr, 0);
 				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+				shadowMap.setDSun();
+				deviceContext->Draw(vertexCount, 0);
+				shadowMap.setDSpot();
 				deviceContext->Draw(vertexCount, 0);
 			}
 		}
@@ -380,10 +385,13 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->VSSetShader(this->shaderDefault.vs.getShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
 	deviceContext->VSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->VSSetConstantBuffers(3, 1, this->shadowMap.getViewProjSpot().GetAddressOf());
 
 	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
 	deviceContext->PSSetShaderResources(1, 1, this->culledLightBufferSRV.GetAddressOf());
 	deviceContext->PSSetShaderResources(2, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->PSSetShaderResources(3, 1, this->shadowMap.getShadowMapSpot().GetAddressOf());
+
 	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
@@ -949,4 +957,9 @@ void Graphics::setCullingDistance(float dist)
 float Graphics::getCullingDistance()
 {
 	return cullingDistance;
+}
+
+void Graphics::setSpotLighShadow(SpotLight* spotLight)
+{
+	shadowMap.setViweProjSpot(spotLight->getPos(), spotLight->getDirection(), spotLight->getLuminance());//REMOVE LUMINANCE
 }

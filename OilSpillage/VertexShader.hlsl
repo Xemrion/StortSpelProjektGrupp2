@@ -12,6 +12,8 @@ struct VS_OUT
 	float2 Tex : TEXCOORD;
 	float4 Normal : NORMAL;
 	float4 shadowPos : SHADOWPOS;
+	float4 shadowPosSpot : SHADOWPOSSPOT;
+
 };
 
 cbuffer CB_PER_FRAME : register(b0)
@@ -28,6 +30,10 @@ cbuffer LightViewProj : register(b2)
 {
 	float4x4 shadowViewProj;
 }
+cbuffer LightViewProjSpot : register(b3)
+{
+	float4x4 shadowViewProjSpot;
+}
 //-----------------------------------------------------------------------------------------
 // VertexShader: VSScene
 //-----------------------------------------------------------------------------------------
@@ -42,5 +48,7 @@ VS_OUT main(VS_IN input)
 	output.Normal.xyz = normalize(output.Normal.xyz);
 	output.shadowPos = mul(float4(input.Pos, 1.0f), world);
 	output.shadowPos = mul(output.shadowPos, shadowViewProj);
+	output.shadowPosSpot = mul(float4(input.Pos, 1.0f), world);
+	output.shadowPosSpot = mul(output.shadowPosSpot, shadowViewProjSpot);
 	return output;
 }

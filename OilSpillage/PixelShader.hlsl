@@ -7,6 +7,7 @@ struct VS_OUT
 	float2 Tex : TEXCOORD;
 	float4 NormalWS : NORMAL;
 	float4 shadowPos : SHADOWPOS;
+	float4 shadowPosSpot : SHADOWPOSSPOT;
 };
 
 struct Light
@@ -39,10 +40,43 @@ cbuffer SunInfo : register(b2) {
 
 Texture2D Tex : register(t0);
 Texture2D ShadowMap : register(t2);
+Texture2D ShadowMapSpot : register(t3);
 SamplerState SampSt : register(s0);
 SamplerState ShadowSamp : register(s1);
 StructuredBuffer<TileData> tileData : register(t1);
 
+
+float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float biasTemp)
+{
+	float4 shadowCoord = shadowPosition;
+	shadowCoord.z = shadowCoord.z / shadowCoord.w;
+	shadowCoord.xy = (0.5f * shadowCoord.xy) + 0.5f;
+	shadowCoord.y = abs(shadowCoord.y - 1);
+	float visibility = 0.0f;
+	float bias  = 0.0f;
+	bias = biasTemp;
+
+	int width;
+	int height;
+	int nrOfLevels;
+	shadowMap.GetDimensions(0, width, height, nrOfLevels);
+	float2 textureSize = float2(width, height);
+	float2 texelSize = 1.0 / textureSize;
+	for (int x = -1; x <= 1; ++x)
+	{
+		for (int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = shadowMap.Sample(ShadowSamp, shadowCoord.xy + float2(x, y) * texelSize).r;
+			visibility += shadowCoord.z - bias > pcfDepth ? 1.0f : 0.0;
+		}
+	}
+	visibility /= 9.0;
+
+	if (shadowCoord.z > 1.0)
+		visibility = 0.0f;
+
+	return visibility;
+};
 float4 main(VS_OUT input) : SV_Target
 {
 	float3 normal = input.NormalWS.xyz;
@@ -51,35 +85,9 @@ float4 main(VS_OUT input) : SV_Target
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 
 
-	float4 shadowCoord = input.shadowPos;
-	shadowCoord.z = shadowCoord.z / shadowCoord.w;
-	shadowCoord.xy = (0.5f * shadowCoord.xy) + 0.5f;
-	shadowCoord.y = abs(shadowCoord.y - 1);
-	float visibility = 0.0;
-	float bias;
-	bias = max(0.01 * (1.0 - dot(normal, sunDir.xyz)), 0.005);
-	bias = 0.00025f;
-
-	int width;
-	int height;
-	int nrOfLevels;
-	ShadowMap.GetDimensions(0, width, height, nrOfLevels);
-	float2 textureSize = float2(width, height);
-	float2 texelSize = 1.0 / textureSize;
-	for (int x = -1; x <= 1; ++x)
-	{
-		for (int y = -1; y <= 1; ++y)
-		{
-			float pcfDepth = ShadowMap.Sample(ShadowSamp, shadowCoord.xy + float2(x, y) * texelSize).r;
-			visibility += shadowCoord.z - bias > pcfDepth ? 1.0f : 0.0;
-		}
-	}
-	visibility /= 9.0;
 	
-	if (shadowCoord.z > 1.0)
-		visibility = 0.0f;
 
-	float4 ambient = max(-dot(sunDir, normal)*(1-visibility), float4(0.2, 0.2, 0.2, 1.0)) * sunColor;
+	float4 ambient = max(-dot(sunDir, normal)*(1- shadowVisible(input.shadowPos, ShadowMap, 0.00025f)), float4(0.2, 0.2, 0.2, 1.0)) * sunColor;
 	
 	float4 diffuse = float4(0.0, 0.0, 0.0, 1.0);
 	for (int i = 0; i < lightTileData.numLights; ++i)
@@ -102,6 +110,10 @@ float4 main(VS_OUT input) : SV_Target
 				directional = (s - umbra) / (penumbra - umbra);
 				directional *= directional;
 			}
+
+			float shadowSpotVisible = shadowVisible(input.shadowPosSpot, ShadowMapSpot, 0.0f);
+			nDotL *= 1 - shadowSpotVisible;
+
 		}
 
 		diffuse.rgb += max(l.color.xyz * nDotL * attenuation * directional, 0.0);

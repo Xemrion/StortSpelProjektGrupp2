@@ -105,5 +105,5 @@ public:
 	void setCullingDistance(float dist);
 	float getCullingDistance();
 	float farZTempShadow;
-
+	void setSpotLighShadow(SpotLight* spotLight);
 };

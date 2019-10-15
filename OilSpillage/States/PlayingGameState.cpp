@@ -477,6 +477,7 @@ void PlayingGameState::update(float deltaTime)
 
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
+	graphics.setSpotLighShadow(playerLight);
 	graphics.render(camera.get());
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 

@@ -98,7 +98,11 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	{
 		return false;
 	}
-
+	hr = device->CreateBuffer(&descB, 0, this->perFrameCBSpot.GetAddressOf());
+	if (FAILED(hr))
+	{
+		return false;
+	}
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 
@@ -140,6 +144,13 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	if (FAILED(this->device->CreateShaderResourceView(depthTexture.Get(), &sr_desc, depthShaderResource.GetAddressOf())))
 		return false;
 
+	if (FAILED(this->device->CreateTexture2D(&depthStencilDesc, 0, depthTextureSpot.GetAddressOf())))
+		return false;
+	if (FAILED(this->device->CreateDepthStencilView(depthTextureSpot.Get(), &dsv_desc, depthStencilViewSpot.GetAddressOf())))
+		return false;
+	if (FAILED(this->device->CreateShaderResourceView(depthTextureSpot.Get(), &sr_desc, depthShaderResourceSpot.GetAddressOf())))
+		return false;
+
 	D3D11_SAMPLER_DESC desc;
 	float bColor[4] = {
 		1.0f, 1.0f, 1.0f, 1.0f
@@ -178,23 +189,40 @@ void ShadowMapping::setWorld(const Matrix& world)
 
 }
 
-void ShadowMapping::setViewProj(DynamicCamera *camera, Vector3 sunDir, float farPlaneTest)
+void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float farPlaneTest)
 {
 	Vector3 target;
 	Vector3 eye = Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
 	eye += -sunDir * 4*(camera->getPosition().y / -sunDir.y);
 	target= Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
 	Matrix viewMatrix;
+	Matrix proj;
 	viewMatrix = DirectX::XMMatrixLookAtLH(eye, target, Vector3(0, 1, 0));
-	this->orthoProj = DirectX::XMMatrixOrthographicLH(60.0f, 60.0f, 10.0f, farPlaneTest);
-	this->view = viewMatrix;
-	Matrix viewProj = this->view * this->orthoProj;
+	proj = DirectX::XMMatrixOrthographicLH(60.0f, 60.0f, 10.0f, farPlaneTest);
+	Matrix viewProj = viewMatrix * proj;
 	viewProj = viewProj.Transpose();
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(perFrameCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(perFrameCB.Get(), 0);
-	deviceContext->VSSetConstantBuffers(0, 1, this->perFrameCB.GetAddressOf());
+}
+
+void ShadowMapping::setViweProjSpot(Vector3 pos,Vector3 dir, float fov)
+{
+	Vector3 tempPos = pos + Vector3(0, 0, 0);
+	Vector3 target = tempPos + dir;
+	Vector3 eye = tempPos;
+
+	Matrix viewMatrix;
+	Matrix proj;
+	viewMatrix = DirectX::XMMatrixLookAtLH(eye, target, Vector3(0, 1, 0));
+	proj = DirectX::XMMatrixPerspectiveFovLH(0.78, 1.0f, 1.0f, 400.0f);
+	Matrix viewProj = viewMatrix * proj;
+	viewProj = viewProj.Transpose();
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(perFrameCBSpot.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
+	deviceContext->Unmap(perFrameCBSpot.Get(), 0);
 }
 
 
@@ -207,10 +235,30 @@ void ShadowMapping::prepare()
 	deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	ID3D11ShaderResourceView* s = NULL;
 	deviceContext->PSSetShaderResources(3, 1, &s);
-	deviceContext->OMSetRenderTargets(0, nullptr, this->depthStencilView.Get());
 	deviceContext->VSSetShader(this->simpleVertexShader.Get(), nullptr, 0);
 	//System::getDeviceContext()->PSSetSamplers(0, 1, &this->sampler);
 	//System::getDeviceContext().omset
+}
+
+void ShadowMapping::prepareSpot()
+{
+	ID3D11ShaderResourceView* fs = NULL;
+
+	deviceContext->ClearDepthStencilView(this->depthStencilViewSpot.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	ID3D11ShaderResourceView* s = NULL;
+}
+
+void ShadowMapping::setDSun()
+{
+	deviceContext->OMSetRenderTargets(0, nullptr, this->depthStencilView.Get());
+	deviceContext->VSSetConstantBuffers(0, 1, this->perFrameCB.GetAddressOf());
+
+}
+
+void ShadowMapping::setDSpot()
+{
+	deviceContext->OMSetRenderTargets(0, nullptr, this->depthStencilViewSpot.Get());
+	deviceContext->VSSetConstantBuffers(0, 1, this->perFrameCBSpot.GetAddressOf());
 }
 
 Microsoft::WRL::ComPtr <ID3D11SamplerState> ShadowMapping::getShadowSampler()
@@ -224,8 +272,18 @@ Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> ShadowMapping::getShadowMap()
 	return this->depthShaderResource;
 }
 
+Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ShadowMapping::getShadowMapSpot()
+{
+	return this->depthShaderResourceSpot;
+}
+
 Microsoft::WRL::ComPtr<ID3D11Buffer> ShadowMapping::getViewProj()
 {
 	return this->perFrameCB;
+}
+
+Microsoft::WRL::ComPtr<ID3D11Buffer> ShadowMapping::getViewProjSpot()
+{
+	return this->perFrameCBSpot;
 }
 
