@@ -52,6 +52,8 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Buffer> lightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> frustumBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> culledLightBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> indexSpot;
+
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> culledLightBufferUAV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> culledLightBufferSRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> frustumBufferSRV;

@@ -333,6 +333,12 @@ void PlayingGameState::init()
 	//aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
 	graphics.addToDraw(aiObject.get());
 
+	testShadow.mesh = graphics.getMeshPointer("Cube");
+	testShadow.setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	testShadow.setScale(Vector3(0.5, 10, 0.5f));
+	//aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
+	graphics.addToDraw(&testShadow);
+
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
 	graphics.loadModel("Roads/Road_bend");
@@ -343,11 +349,11 @@ void PlayingGameState::init()
 
 #ifdef _DEBUG
 	// light tests
-	lightList->addLight(SpotLight(Vector3(-2.f,  1.0f,  0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f,  0.0f), 0.5));
+	/*lightList->addLight(SpotLight(Vector3(-2.f,  1.0f,  0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f,  0.0f), 0.5));
 	lightList->addLight(SpotLight(Vector3( 2.f,  1.0f,  0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3( 2.f, -1.0f,  0.0f), 0.5));
 	lightList->addLight(SpotLight(Vector3( 0.f,  1.0f,  2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3( 0.f, -1.0f,  2.0f), 0.5));
 	lightList->addLight(SpotLight(Vector3( 0.f,  1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3( 0.f, -1.0f, -2.0f), 0.5));
-   
+   */
    /*
 	//Road Network Turtlewalker
 	testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
@@ -362,7 +368,6 @@ void PlayingGameState::init()
    */
 
 	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
-
 	for (int i = 0; i < 50; ++i) {
 		Vector3 randPos   = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand() / RAND_MAX));
@@ -381,8 +386,8 @@ void PlayingGameState::init()
 
 	player->init();
 
-	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
-
+	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	
 	points = {
 		{ Vector3(0.0f, 30.0f, -10.0f), Vector3(0.0f, 0.0f, 0.0f), 0.0f },
 		{ Vector3(0.0f, 15.0f, 0.0f), Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
@@ -473,7 +478,7 @@ void PlayingGameState::update(float deltaTime)
 
 	aiObject->update(deltaTime,player->getVehicle()->getPosition());
 	camera->update(deltaTime);
-	camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, 25, 0));
+	camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, 50, 0));
 
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects

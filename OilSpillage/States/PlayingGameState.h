@@ -41,6 +41,7 @@ private:
    Opt<Vec<V2u>>  find_valid_house_lot( RNG &, U16 cell_id, Voronoi const &district_map, Map &, Vec<District> const &district_tbl );
    void           toggleDistrictColors() noexcept;
 	void           initiateAStar();
+	GameObject testShadow;
 public:
 	PlayingGameState();
 	virtual ~PlayingGameState();

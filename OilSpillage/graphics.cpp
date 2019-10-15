@@ -195,6 +195,16 @@ bool Graphics::init(Window* window)
 	if (FAILED(hr))
 		return false;
 	
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = 16;
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &indexSpot);
+	if (FAILED(hr))
+		return false;
 
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
@@ -393,6 +403,8 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->PSSetShaderResources(3, 1, this->shadowMap.getShadowMapSpot().GetAddressOf());
 
 	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
+	deviceContext->PSSetConstantBuffers(3, 1, this->indexSpot.GetAddressOf());
+
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -962,4 +974,9 @@ float Graphics::getCullingDistance()
 void Graphics::setSpotLighShadow(SpotLight* spotLight)
 {
 	shadowMap.setViweProjSpot(spotLight->getPos(), spotLight->getDirection(), spotLight->getLuminance());//REMOVE LUMINANCE
+	UINT index = (static_cast<Light*>(spotLight) - lightList->lights.data());
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(indexSpot.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &index, sizeof(UINT));
+	deviceContext->Unmap(indexSpot.Get(), 0);
 }

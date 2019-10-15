@@ -55,8 +55,6 @@ private:
 	DynamicCamera camera;
 	Matrix view;
 	Matrix orthoProj;
-
-
 };
 
 

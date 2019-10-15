@@ -157,9 +157,9 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	};
 	ZeroMemory(&desc, sizeof(desc));
 	desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	desc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-	desc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-	desc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	desc.BorderColor[0] = bColor[0];
 	desc.BorderColor[1] = bColor[1];
@@ -198,7 +198,7 @@ void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float 
 	Matrix viewMatrix;
 	Matrix proj;
 	viewMatrix = DirectX::XMMatrixLookAtLH(eye, target, Vector3(0, 1, 0));
-	proj = DirectX::XMMatrixOrthographicLH(60.0f, 60.0f, 10.0f, farPlaneTest);
+	proj = DirectX::XMMatrixOrthographicLH(100.0f, 100.0f, 10.0f, farPlaneTest);
 	Matrix viewProj = viewMatrix * proj;
 	viewProj = viewProj.Transpose();
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -210,13 +210,15 @@ void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float 
 void ShadowMapping::setViweProjSpot(Vector3 pos,Vector3 dir, float fov)
 {
 	Vector3 tempPos = pos + Vector3(0, 0, 0);
+	tempPos -= dir;
 	Vector3 target = tempPos + dir;
 	Vector3 eye = tempPos;
 
 	Matrix viewMatrix;
 	Matrix proj;
+	float fovTemp = 90 * (DirectX::XM_PI / 180);
 	viewMatrix = DirectX::XMMatrixLookAtLH(eye, target, Vector3(0, 1, 0));
-	proj = DirectX::XMMatrixPerspectiveFovLH(0.78, 1.0f, 1.0f, 400.0f);
+	proj = DirectX::XMMatrixPerspectiveFovLH(fovTemp, 1.0f, 1.0f, 400.0f);
 	Matrix viewProj = viewMatrix * proj;
 	viewProj = viewProj.Transpose();
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -236,8 +238,6 @@ void ShadowMapping::prepare()
 	ID3D11ShaderResourceView* s = NULL;
 	deviceContext->PSSetShaderResources(3, 1, &s);
 	deviceContext->VSSetShader(this->simpleVertexShader.Get(), nullptr, 0);
-	//System::getDeviceContext()->PSSetSamplers(0, 1, &this->sampler);
-	//System::getDeviceContext().omset
 }
 
 void ShadowMapping::prepareSpot()
