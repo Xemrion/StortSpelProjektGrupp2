@@ -4,7 +4,6 @@
 #include <functional>
 #include <iostream>
 #include <vector>
-using namespace std;
 using namespace std::placeholders;
 
 class Selector;
@@ -32,7 +31,7 @@ public:
 class Sequence :public Behavior
 {
 private:
-	vector<Behavior*> children;
+	std::vector<Behavior*> children;
 public:
 	virtual	void addChildren(Behavior& child);
 	Status func();
@@ -42,7 +41,7 @@ public:
 class Selector :public Behavior
 {
 private:
-	vector<Behavior*> children;
+	std::vector<Behavior*> children;
 public:
 	void addChildren(Behavior& child);
 	Status func();
@@ -53,9 +52,9 @@ public:
 class BT
 {
 private:
-	vector<Sequence*> sequence;
-	vector<Selector*> selector;
-	vector<Behavior*> action;
+	std::vector<Sequence*> sequence;
+	std::vector<Selector*> selector;
+	std::vector<Behavior*> action;
 public:
 	Sequence& getSequence();
 	Selector& getSelector();

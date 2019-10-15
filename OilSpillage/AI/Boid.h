@@ -26,7 +26,7 @@ public:
 	// Other function for moving and interacting
 	Vector3 seek(Vector3 target);
 	void run(vector<Boid*> boids, float deltaTime);
-	void update(float deltaTime);
+	void updateBoid(float deltaTime);
 	void flock(vector<Boid*> boids);
 	float angle(Vector3 target);
 	Vector3 getDestination();

@@ -7,11 +7,13 @@
 #include <memory>
 #include <optional>
 #include <cstdint>
+#include <unordered_map>
 // using aliases
 
 // collections
-template <typename T>           using Vec = std::vector<T>;
-template <typename T, size_t N> using Arr = std::array<T,N>;
+template <typename T>           using Vector  = std::vector<T>;
+template <typename T, size_t N> using Array   = std::array<T,N>;
+template <class K, class V>     using HashMap = std::unordered_map<K,V>;
 
 // smart pointers
 template <typename T> using UPtr = std::unique_ptr<T>;
@@ -20,9 +22,8 @@ template <typename T> using SPtr = std::shared_ptr<T>;
 // optional
 template <typename T> using Opt = std::optional<T>;
 
-
 // string
-using Str      = std::basic_string<char>;
+using String = std::basic_string<char>;
 
 // primitives
 using U8   = std::uint_fast8_t;
@@ -35,10 +36,14 @@ using I32  = std::int_fast32_t;
 using I64  = std::int_fast64_t;
 using F32  = float;
 using F64  = double;
-using getTerminalColorLookupIndex = char;
 using Bool = bool;
 using Size = size_t;
-using Void = void;
+
+#ifdef _DEBUG
+   Bool constexpr isDebugging {  true };
+#else
+   Bool constexpr isDebugging { false };
+#endif
 
 // vectors (TODO: padding alignment if sizeof(T)%4!=0?)
 template <typename T> union V2 {
@@ -49,7 +54,6 @@ template <typename T> union V2 {
    V2(                      ): x(T()), y(T())         {}
    V2( T const x, T const y ): x(x), y(y)             {}
    V2( V2<T> const  &other  ): x(other.x), y(other.y) {}
-   //V2( V2<T>       &&other  ) = delete;
 
    inline Bool operator==( V2<T> const &other ) const noexcept {
       return (x == other.x) && (y == other.y);
@@ -62,8 +66,6 @@ template <typename T> union V2 {
       }
       return *this;
    }
-
-   //void operator=( V2<T> && ) = delete;
 };
 using V2f = V2<F32>;
 using V2u = V2<U32>;
@@ -77,8 +79,7 @@ template <typename T> union V3 {
 
    V3(                                 ): x(T()), y(T()), z(T())             {}
    V3( T const x, T const y, T const z ): x(x), y(y), z(z)                   {}
-   V3( V3<T> const  &other             ): x(other.x), y(other.y), z(other.z) {}
-   //V3( V3<T>       &&other             ) = delete;
+   V3( V3<T> const &other              ): x(other.x), y(other.y), z(other.z) {}
 
    inline Bool operator==( V3<T> const &other ) const noexcept {
       return (x == other.x) && (y == other.y) && (z == other.z);
@@ -93,7 +94,6 @@ template <typename T> union V3 {
       return *this;
    }
 
-   //void operator=( V3<T> && ) = delete;
 };
 using V3f = V3<F32>;
 using V3u = V3<U32>;
@@ -107,7 +107,6 @@ template <typename T> union V4 {
    V4(                                            ): x(T()), y(T()), z(T()), w(T())                 {}
    V4( T const x, T const y, T const z, T const w ): x(x), y(y), z(z), w(w)                         {}
    V4( V4<T> const  &other                        ): x(other.x), y(other.y), z(other.z), w(other.w) {}
-   //V4( V4<T>       &&other                        ) = delete;
 
    inline Bool operator==( V4<T> const &other ) const noexcept {
       return (x == other.x) && (y == other.y) && (z == other.z) && (w == other.w);
@@ -122,8 +121,6 @@ template <typename T> union V4 {
       }
       return *this;
    }
-
-   //void operator=( V4<T> && ) = delete;
 };
 using V4f = V4<F32>;
 using V4u = V4<U32>;

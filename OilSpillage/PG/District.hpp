@@ -3,11 +3,18 @@
 #include <cassert>
 #include "defs.hpp"
 
-enum class District : U8 { residential, park, metropolitan, suburban, downtown, /* <- insert here */ size };
+enum class District : U8 { residential,
+                           park,
+                           metropolitan,
+                           suburban,
+                           downtown,
+                           // ^-- insert new types here
+                           size // <-- must always be last
+                         };
 
-F32 get_building_density(  District const d ) noexcept;
-U8  get_building_min_area( District const d ) noexcept;
-U8  get_building_max_area( District const d ) noexcept;
-U8  get_min_height(        District const d ) noexcept;
-U8  get_max_height(        District const d ) noexcept;
-Str stringify(             District const d ) noexcept;
+F32 District_getBuildingDensity( District ) noexcept;
+U8  District_getBuildingMinArea( District ) noexcept;
+U8  District_getBuildingMaxArea( District ) noexcept;
+U8  District_getMinFloorCount(   District ) noexcept;
+U8  District_getMaxFloorCount(   District ) noexcept;
+String stringify(                   District ) noexcept;

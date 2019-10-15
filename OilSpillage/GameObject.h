@@ -15,7 +15,8 @@ protected:
 	Vector3  rotation;
 	Quaternion rotationQt;
 	Vector4  color;
-	Texture *texture   = nullptr;
+	Texture* texture   = nullptr;
+	Texture* normalMap = nullptr;
 public:
 	void updateRigidBody();
 	const Mesh *mesh   = nullptr;
@@ -29,6 +30,8 @@ public:
 	void     setScale(Vector3);
 	Texture *getTexture();
 	void     setTexture(Texture *);
+	Texture* getNormalMap();
+	void     setNormalMap(Texture*);
 	void     setColor(Vector4 aColor);
 	Vector4  getColor()    const;
 	Vector3  getPosition() const;

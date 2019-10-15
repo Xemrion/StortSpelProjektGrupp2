@@ -147,10 +147,10 @@ Vector3 Boid::seek(Vector3 target)
 void Boid::run(vector<Boid*> boids, float deltaTime)
 {
 	flock(boids);
-	update(deltaTime);
+	updateBoid(deltaTime);
 }
 
-void Boid::update(float deltaTime)
+void Boid::updateBoid(float deltaTime)
 {
 	//To make the slow down not as abrupt
 	acceleration *= 0.4f;

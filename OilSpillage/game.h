@@ -16,6 +16,7 @@ public:
 		STATE_PLAYING
 	};
 	static void							start(Window* window);
+	static void							quit();
 	static GameState				   *getCurrentState();
 	static void							setState(State);
 	static Graphics					   &getGraphics() noexcept;
@@ -23,6 +24,7 @@ public:
 private:
 	void								createCurrentState();
 	void								run();
+	bool								running;
 	Graphics							graphics;
 	std::unique_ptr<GameState>			state;
 	int									currentState;

@@ -10,7 +10,7 @@
 #include "Direction.hpp"
 
 struct RoadGenBranchArgs; // forward declaration
-using RoadGenSchedulerCallback = std::function<void(RoadGenBranchArgs&&)>; // alias
+using  RoadGenSchedulerCallback = std::function<void(RoadGenBranchArgs&&)>; // alias
 
 // -1 seed => random seed
 struct RoadGenBranchArgs {
@@ -22,46 +22,42 @@ struct RoadGenBranchArgs {
                                 currentLengthMax;
       F32                       currentTurnProbability,
                                 currentBranchProbability;
-      Map                      &map;
+      TileMap                  &map;
       RNG                      &rng;
       RoadGenSchedulerCallback  schedulerCallback;
 };
-
-
 
 RoadGenBranchArgs createChildArgs( RoadGenBranchArgs const &parentArgs,
                                    U16                      startX,
                                    U16                      startY,
                                    Direction                startDirection );
 
-
-
 class Branch {
 public:
-                  Branch( RoadGenBranchArgs );
-                  Branch( Branch && ) noexcept;
-                  Branch( Branch const & ) = delete;
-   inline Bool    isDone() const { return isDoneGenerating; };
-   Void           walk( MapConfig const & );
+                Branch( RoadGenBranchArgs );
+                Branch( Branch && ) noexcept;
+                Branch( Branch const & ) = delete;
+   inline Bool  isDone() const noexcept { return isDoneGenerating; };
+   void         walk( MapConfig const & );
 
    RoadGenBranchArgs const args;
 
 private:
-   Bool           isDoneGenerating     { false };
-   F32_Dist       generateSelection    { .0f, 1.0f };
-   U16            tilesToWalk,
-                  tilesWalked          { 0 },
-                  tilesSinceLastBranch { 0 },
-                  tilesSinceLastTurn   { 0 },
-                  currentX,
-                  currentY;
-   Direction      currentDirection;
+   Bool       isDoneGenerating     { false };
+   F32_Dist   generateSelection    { .0f, 1.0f };
+   U16        tilesToWalk,
+              tilesWalked          { 0 },
+              tilesSinceLastBranch { 0 },
+              tilesSinceLastTurn   { 0 },
+              currentX,
+              currentY;
+   Direction  currentDirection;
 };
 
 
 
 // usage:
-//    create a Map
+//    create a TileMap
 //    create a Walker with the generation parameters and map as arguments
 //    call RoadGenerator::generate()
 //    discard walker
@@ -71,19 +67,19 @@ public:
    // transfers the generation parameters 'args' to the root branch,
    // notifies it of the callback function to use (method  'scheduleBranch')
    // then hands it a reference to the map it's to work on.
-   RoadGenerator( Map & );
+         RoadGenerator( TileMap & );
    // generates the tree, one depth at a time, one tile per branch at a time
-   Void generate( MapConfig const & );
-   V2u  getStartPosition() const noexcept;
+   void  generate( MapConfig const & );
+   V2u   getStartPosition() const noexcept;
 
 private:
    // TODO: increasing depth value starting at 0!
    // schedules a branch at a given depth to be generated
-   void scheduleBranch( RoadGenBranchArgs && );
-   void cleanIsles() noexcept;
+   void  scheduleBranch( RoadGenBranchArgs && );
+   void  cleanIsles() noexcept;
 
-   Map              &map;
+   TileMap          &map;
    RD                rd;
    RNG               rng;
-   Vec<Vec<Branch>>  branchTree;
+   Vector<Vector<Branch>>  branchTree;
 };
