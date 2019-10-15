@@ -11,7 +11,8 @@ protected:
 	Vector3  scale    { 1.0f, 1.0f, 1.0f };
 	Vector3  rotation;
 	Vector4  color;
-	Texture *texture   = nullptr;
+	Texture* texture   = nullptr;
+	Texture* normalMap = nullptr;
 public:
 	const Mesh *mesh   = nullptr;
 	GameObject *parent = nullptr;
@@ -24,6 +25,8 @@ public:
 	void     setScale(Vector3);
 	Texture *getTexture();
 	void     setTexture(Texture *);
+	Texture* getNormalMap();
+	void     setNormalMap(Texture*);
 	void     setColor(Vector4 aColor);
 	Vector4  getColor()    const;
 	Vector3  getPosition() const;

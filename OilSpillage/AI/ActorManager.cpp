@@ -2,6 +2,12 @@
 
 ActorManager::ActorManager()
 {
+	this->aStar = nullptr;
+}
+
+ActorManager::ActorManager(AStar* aStar)
+{
+	this->aStar = aStar;
 }
 
 ActorManager::~ActorManager()
@@ -18,10 +24,11 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	for (int i = 0; i < this->actors.size(); i++)
 	{
 		actors.at(i)->update(dt, targetPos);
-		actors.at(i)->run(actors, dt);
+		actors.at(i)->run(actors, dt, targetPos);
 	}
 	updateGroups();
 	updateAveragePos();
+	//assignPathsToGroups(targetPos);
 }
 
 void ActorManager::createDefender(float x, float z)
@@ -34,36 +41,28 @@ void ActorManager::createAttacker(float x, float z)
 	this->actors.emplace_back(new Attacker(x, z, this->aStar));
 }
 
-void ActorManager::createTurrent(float x, float z)
+void ActorManager::createTurret(float x, float z)
 {
-	this->actors.emplace_back(new Turrent(x, z, this->aStar));
-}
-
-void ActorManager::setAStar(AStar* aStar)
-{
-	this->aStar = aStar;
+	this->actors.emplace_back(new Turret(x, z));
 }
 
 void ActorManager::initGroups()
 {
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		if (actors.at(i)->getGroupNR() == -1)
+		if (!actors.at(i)->hasGroup())
 		{
 			//Create new group
 			createGroup(actors.at(i));
 			int activeGroup = groups.size() - 1;
-			/*groups.at(activeGroup).push_back(actors.at(i));
-			actors.at(i)->joinGroup(activeGroup);
-			averagePos.push_back(actors.at(i)->getPosition());*/
 			for (int j = 0; j < actors.size(); j++)
 			{
-				if (actors.at(j)->getGroupNR() == -1)
+				if (!actors.at(j)->hasGroup())
 				{
 					if ((actors.at(j)->getPosition() - averagePos.at(activeGroup)).Length() < groupRadius)
 					{
 						groups.at(activeGroup).push_back(actors.at(j));
-						actors.at(j)->joinGroup(activeGroup);
+						actors.at(j)->joinGroup();
 						Vector3 totalPos;
 						for (int k = 0; k < groups.at(activeGroup).size(); k++)
 						{
@@ -88,6 +87,7 @@ void ActorManager::updateAveragePos()
 		{
 			totalPos += groups.at(i).at(j)->getPosition();
 		}
+
 		averagePos.emplace_back(totalPos / groups.at(i).size());
 	}
 }
@@ -111,7 +111,7 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 
 void ActorManager::joinGroup(Actor* actor, int groupIndex)
 {
-	actor->joinGroup(groupIndex);
+	actor->joinGroup();
 	groups.at(groupIndex).push_back(actor);
 }
 
@@ -119,6 +119,21 @@ void ActorManager::leaveGroup(int groupIndex, int where)
 {
 	groups.at(groupIndex).erase(groups.at(groupIndex).begin() + where);
 
+}
+
+void ActorManager::assignPathsToGroups(Vector3 targetPos)
+{
+	std::vector<Node*> path;
+	for (int i = 0; i < groups.size(); i++)
+	{
+		aStar->algorithm(averagePos.at(i), targetPos, path);
+
+		for (int j = 0; j < groups.at(i).size(); j++)
+		{
+			groups.at(i).at(j)->setPath(path);
+		}
+
+	}
 }
 
 void ActorManager::updateGroups()
@@ -173,6 +188,6 @@ void ActorManager::createGroup(Actor* actor)
 {
 	groups.push_back(std::vector<Actor*>());
 	groups.at(groups.size() - 1).push_back(actor);
-	actor->joinGroup(groups.size() - 1);
+	actor->joinGroup();
 	averagePos.push_back(actor->getPosition());
 }

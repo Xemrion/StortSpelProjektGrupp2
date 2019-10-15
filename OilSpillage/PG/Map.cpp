@@ -6,8 +6,7 @@ Map::Map( Graphics &graphics, MapConfig const &config ):
 	config          ( config                                                                ),
 	tilemap         ( std::make_unique<TileMap>(config)                                     ),
 	districtMarkers ( static_cast<Size>( config.districtCellSide) * config.districtCellSide ),
-	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y     ),
-	houseTiles      ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y / 2 )
+	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y     )
 {
    DBG_PROBE(Map::Map);
 	// TODO: generate water etc
@@ -18,18 +17,12 @@ Map::Map( Graphics &graphics, MapConfig const &config ):
 
 
 Map::~Map() noexcept {
+	graphics.clearStaticObjects();
    #ifdef _DEBUG
 		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?
 		DBG_PROFILE_OUTPUT(profilerLogs); // outputs profiler logs (if in debug mode)
       DBG_PROFILE_RESET();
 	#endif
-   // TODO: this shouldn't be necessary. make it so GameObject's destructor handles this?
-	for ( auto &e : roadTiles )
-		graphics.removeFromDraw(&e);
-	for ( auto &e : districtMarkers )
-		graphics.removeFromDraw(&e);
-	for ( auto &e : houseTiles )
-		graphics.removeFromDraw(&e);
 }
 
 // TODO: ensure Map.config doesn't stays synchronized during re-rolls.
@@ -65,10 +58,11 @@ void  Map::generateRoads() {
 	for ( U16 y = 0;  y < tilemap->height;  ++y ) {
 		for ( U16 x = 0;  x < tilemap->width;  ++x ) {
 			auto& tile = roadTiles[tilemap->index(x,y)];
-			graphics.addToDraw( &tile );
 			tile.setScale(Vector3{ .0005f * config.tileScaleFactor.x,
 			                       .0005f * config.tileScaleFactor.y,
 			                       .0005f * config.tileScaleFactor.z }); // TODO: scale models instead
+			tile.setNormalMap(graphics.getTexturePointer("brickwallnormal"));
+			graphics.addToDraw(&tile , true);
 		}
 	}
 }
@@ -99,7 +93,7 @@ void  Map::generateDistricts() {
 		   marker.setScale({ .2f, 4.0f, .2f });
 		   marker.setPosition({ tilemap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
 		                                                                     static_cast<U16>(cellCentre.y)) });
-		   graphics.addToDraw(&marker);
+		   graphics.addToDraw(&marker, true);
 	   }
    }
 }
@@ -185,7 +179,6 @@ void  Map::generateBuildings() {
 					U16_Dist  generateFloorCount { District_getMinFloorCount(districtType), District_getMaxFloorCount(districtType) };
 					F32       randomFloorCount   { static_cast<F32>(generateFloorCount(rng)) };
 					currentArea += buildingSize;
-					houseTiles.reserve(buildingSize);
 					for ( auto &tilePosition : potentialLot.value() ) {
 						houseTiles.emplace_back();
 						auto &houseTile = houseTiles.back();
@@ -210,7 +203,7 @@ void  Map::generateBuildings() {
 
 	// adding all the tiles to draw:
 	for ( auto &e : houseTiles )
-		graphics.addToDraw( &e );
+		graphics.addToDraw(&e , true);
 
    #ifdef _DEBUG
 	   if (buildingLogs.is_open())

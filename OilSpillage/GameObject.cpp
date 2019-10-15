@@ -55,6 +55,16 @@ void GameObject::setTexture(Texture* aTexture)
 	this->texture = aTexture;
 }
 
+Texture* GameObject::getNormalMap()
+{
+	return this->normalMap;
+}
+
+void GameObject::setNormalMap(Texture* normalMap)
+{
+	this->normalMap = normalMap;
+}
+
 void GameObject::setColor(Vector4 aColor)
 {
 	this->color = aColor;
@@ -64,23 +74,31 @@ Vector4 GameObject::getColor()const
 {
 	return this->color;
 }
+
 Vector3 GameObject::getPosition() const
 {
 	return this->position;
 }
+
 Vector3 & GameObject::getPosition()
 {
 	return this->position;
 }
+
 Vector3 GameObject::getRotation() const
 {
 	return this->rotation;
 }
+
 Vector3 GameObject::getScale() const
 {
 	return this->scale;
 }
+
 AABB GameObject::getAABB() const
 {
-	return this->mesh->getAABB().scale(this->scale);
+	AABB boundingBox = this->mesh->getAABB().scale(this->scale);
+	boundingBox.maxPos += this->getPosition();
+	boundingBox.minPos += this->getPosition();
+	return boundingBox;
 }

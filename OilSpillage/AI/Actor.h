@@ -14,37 +14,40 @@ public:
 
 	void applyForce(Vector3 force);
 	// Three Laws that boids follow
-	Vector3 separation(vector<Actor*> boids);
+	Vector3 separation(vector<Actor*> boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	Vector3 alignment(vector<Actor*> boids);
 	Vector3 cohesion(vector<Actor*> boids);
 	// Other function for moving and interacting
 	Vector3 seek(Vector3 target);
-	void run(vector<Actor*> boids, float deltaTime);
-	void updateBoid(float deltaTime);
-	void flock(vector<Actor*> boids);
+	void run(vector<Actor*> boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
+	virtual void updateBoid(float deltaTime);
+	void flock(vector<Actor*> boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	float angle(Vector3 target);
+	void setPath(std::vector<Node*> path);
 	Vector3 getDestination();
+	bool hasGroup();
 	void setDestination(Vector3 destination);
-	int getGroupNR();
-	void joinGroup(int NR);
+	void joinGroup();
 private:
 	Vector3 velocity;
 	Vector3 acceleration;
 	float maxSpeed;
 	float maxForce;
-	int groupNR = -1;
+	bool isInGroup = false;
 
 protected:
 	int nrOfFrames = 0;
 	Vector3 destination;
+	Selector* root;
 	std::vector<Node*> path;
 	AStar* aStar;
 	Vector3 targetNode;
 	enum State { Roaming, Chasing, Returning };
 	State state;
-
-	Selector* root;
 	BT bt;
+	float deltaTime;
+	Vector3 targetPos;
+
 	void findPath();
 	void chase();
 	void roam();
@@ -54,8 +57,6 @@ protected:
 	virtual Status setChaseState();
 	virtual Status setRoamState();
 	virtual void  followPath();
-	float deltaTime;
-	Vector3 targetPos;
 
 	struct Weapon
 	{

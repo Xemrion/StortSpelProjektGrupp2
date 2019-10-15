@@ -145,7 +145,7 @@
     <ClCompile Include="AI\Boid.cpp" />
     <ClCompile Include="AI\Defender.cpp" />
     <ClCompile Include="AI\Node.cpp" />
-    <ClCompile Include="AI\Turrent.cpp" />
+    <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
     <ClCompile Include="PG\MapConfig.cpp" />
@@ -153,6 +153,7 @@
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
+	<ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="PG\District.cpp" />
@@ -203,10 +204,12 @@
     <ClInclude Include="AI\Boid.h" />
     <ClInclude Include="AI\Defender.h" />
     <ClInclude Include="AI\Node.h" />
-    <ClInclude Include="AI\Turrent.h" />
+    <ClInclude Include="AI\Turret.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />
     <ClInclude Include="PG\Map.hpp" />
     <ClInclude Include="PG\MinimapTextureGenerator.hpp" />
+    <ClInclude Include="Frustum.h" />
+    <ClInclude Include="QuadTree.h" />
     <ClInclude Include="PG\Profiler.hpp" />
     <ClInclude Include="States\GameState.h" />
     <ClInclude Include="States\MenuGameState.h" />

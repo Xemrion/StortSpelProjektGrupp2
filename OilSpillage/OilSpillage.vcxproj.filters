@@ -64,7 +64,8 @@
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
-    <ClCompile Include="AI\Turrent.cpp" />
+    <ClCompile Include="AI\Turret.cpp" />
+	<ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="UI\Minimap.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
   </ItemGroup>
@@ -135,7 +136,9 @@
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VehicleWeapon.h" />
     <ClInclude Include="window.h" />
-    <ClInclude Include="AI\Turrent.h" />
+    <ClInclude Include="AI\Turret.h" />
+	<ClInclude Include="Frustum.h" />
+	<ClInclude Include="QuadTree.h" />
     <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="UI\Minimap.h" />
     <ClInclude Include="PG\Profiler.hpp" />

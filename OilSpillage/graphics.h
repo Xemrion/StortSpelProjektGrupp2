@@ -15,6 +15,7 @@
 #include "Graphic/Shaders.h"
 #include "Resources/Debug.h"
 #include "DynamicCamera.h"
+#include "QuadTree.h"
 #include<string>
 #include "Lights.h"
 #include <memory.h>
@@ -66,6 +67,7 @@ class Graphics {
 		PointLight lights[MAX_LIGHTS_TOTAL];
 	};
 	LightBufferContents* lightBufferContents = nullptr;
+	std::unique_ptr<QuadTree> quadTree;
 
 	ParticleSystem particleSystem;
 	ParticleSystem particleSystem2;
@@ -77,6 +79,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
 	void cullLights();
+	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
 public:
 	Graphics();
 	~Graphics();
@@ -91,9 +94,10 @@ public:
 	bool reloadTexture(std::string fileName, bool overridePath=false);
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path, bool isModel=false);
-	void addToDraw(GameObject* o);
+	void addToDraw(GameObject* o, bool isStatic = false);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
+	void clearStaticObjects();
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera, float deltaTime);

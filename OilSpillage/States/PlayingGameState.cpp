@@ -7,9 +7,18 @@
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
 
-void PlayingGameState::initiateAStar() {}
-
-PlayingGameState::PlayingGameState(): graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
+void PlayingGameState::initAI()
+{
+	aStar = new AStar(20, 20, Vector2(-10, 10));
+	actorManager = new ActorManager(aStar);
+	aStar->generateTileData(map->getTileMap());
+	actorManager->createDefender(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
+	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 1);
+	actorManager->initGroups();
+}
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {
    #ifdef _DEBUG
 	   pausedTime = false;
@@ -21,14 +30,12 @@ PlayingGameState::PlayingGameState(): graphics(Game::getGraphics()), time(125.0f
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
-	aStar = new AStar(20, 20, Vector2(-10, 10));
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
+	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 
-	actorManager = new ActorManager();
-	actorManager->setAStar(aStar);
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
 	graphics.loadModel("Roads/Road_bend");
@@ -43,39 +50,39 @@ PlayingGameState::PlayingGameState(): graphics(Game::getGraphics()), time(125.0f
 	   lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
 	   lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
-	   /*
-	    //Road Network Turtlewalker
-	    testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-	    testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-	    testNetwork.get()->setAngle(45);
-	    for (int i = 0; i < 5; i++) {
-		    testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
-		    testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	    }
-	    testNetwork.get()->cleanRoadNetwork();
-	    testNetwork.get()->saveTestNetwork("test-network");
-	   */
+	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
-	   lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
+	for (int i = 0; i < 50; ++i) {
+		Vector3 randPos   = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
+		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand() / RAND_MAX));
+		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
-	   for (int i = 0; i < 50; ++i) {
-		   Vector3 randPos = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
-		   Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand() / RAND_MAX));
-		   randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
-
-		   lightList->addLight(
-			   PointLight(
-				   randPos,
-				   randColor,
-				   1.0f));
-	   }
+		lightList->addLight(
+			PointLight(
+				randPos,
+				randColor,
+				1.0f));
+	}
+   
+   /*
+	//Road Network Turtlewalker
+	testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
+	testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+	testNetwork.get()->setAngle(45);
+	for (int i = 0; i < 5; i++) {
+		testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
+		testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+	}
+	testNetwork.get()->cleanRoadNetwork();
+	testNetwork.get()->saveTestNetwork("test-network");
+   */
    }
 	lightList->setSun(Sun(Vector3(0.0f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
 
 	graphics.setLightList(lightList.get());
 
 	map = std::make_unique<Map>(graphics, config);
-
+	initAI();
 	//Minimap stuff
 	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
 	bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1);
@@ -93,13 +100,7 @@ PlayingGameState::PlayingGameState(): graphics(Game::getGraphics()), time(125.0f
 
 	player->init();
 	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
-    aStar->generateTileData( map->getTileMap() );
 
-	actorManager->createDefender(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
-	actorManager->createTurrent(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 1);
-	actorManager->initGroups();
 
 	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
