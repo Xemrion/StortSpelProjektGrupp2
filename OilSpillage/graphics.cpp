@@ -344,8 +344,6 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	this->particleSystem.updateParticles(deltaTime, viewProj);
 
-	//deviceContext->OMSetRenderTargets(1, &renderTargetView, this->depthStencilView);
-
 	this->particleSystem.drawAll(camera);
 
 	this->particleSystem2.updateParticles(deltaTime, viewProj);
@@ -828,8 +826,8 @@ bool Graphics::reloadTexture(std::string path, bool overridePath)
 			oldTexture->width = newTexture.width;
 			oldTexture->height = newTexture.height;
 			//oldTexture->m_targaData = newTexture.m_targaData;
-			oldTexture->m_texture = newTexture.m_texture;
-			oldTexture->m_textureView = newTexture.m_textureView;
+			oldTexture->texture = newTexture.texture;
+			oldTexture->textureView = newTexture.textureView;
 			return true;
 		}
 	}

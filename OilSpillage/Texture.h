@@ -18,11 +18,8 @@ private:
 		unsigned char data2;
 	};
 
-	//bool LoadTarga(const char*, int&, int&);
-
-	//unsigned char* m_targaData;
-	ID3D11Texture2D* m_texture;
-	ID3D11ShaderResourceView* m_textureView;
+	ID3D11Texture2D* texture;
+	ID3D11ShaderResourceView* textureView;
 
 	//TO STORE WIDTH & HEIGHT
 	int width;
@@ -41,7 +38,6 @@ public:
 
 	bool isTransparent();
 
-	//unsigned char* getTextureCharArray();
 	unsigned short getWidth();
 	unsigned short getHeight();
 	DirectX::SimpleMath::Vector2 getSize();
