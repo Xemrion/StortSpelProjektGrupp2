@@ -8,11 +8,11 @@
 using namespace DirectX::SimpleMath;
 class AStar
 {
-   struct TileData {
-      int   gCost = 0, fCost = 0;
-      bool  isTraversible;
-      Tile *prev = nullptr;
-   };
+	struct TileData {
+		int   gCost = 0, fCost = 0;
+		bool  isTraversible;
+		Tile* prev = nullptr;
+	};
 private:
 	int getDistance(Vector2 pos1, Vector2 pos2);
 	void addToVector(std::vector<Node*>& nodes, Node* nodeToAdd);
@@ -23,9 +23,9 @@ private:
 	std::vector<Node*> nodes;
 	int gridWidth;
 	int gridHeight;
-   std::vector<TileData> tileData;
+	std::vector<TileData> tileData;
 public:
-   void generateTileData( TileMap const &map );
+	void generateTileData(TileMap const& map);
 	bool algorithm(Vector3 startPos, Vector3 endPos, std::vector<Node*>& path);
 	AStar();
 	~AStar();

@@ -8,12 +8,12 @@ Defender::Defender()
 	objectivePos = Vector3(9.0f,0.0f,9.0f);
 }
 
-Defender::Defender(float x, float z, AStar* aStar)
+Defender::Defender(float x, float z, AStar* aStar,Vector3 objectivePos)
 	:Actor(x, z, aStar)
 {
 	this->setColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 	setUpActor();
-	objectivePos = Vector3(9.0f, 0.0f, 9.0f);
+	this->objectivePos = objectivePos;
 }
 
 Defender::~Defender()
@@ -43,7 +43,7 @@ void Defender::update(float dt, Vector3 targetPos)
 			roam();
 		}
 
-		nrOfFrames = 1;
+		nrOfFrames = 0;
 	}
 
 	for (int i = 0; i < bulletCount; i++)
@@ -71,19 +71,22 @@ void Defender::setUpActor()
 
 	Behavior& enemyNear = bt.getAction();
 	enemyNear.addAction(std::bind(&Defender::enemyWhithinObjective, std::ref(*this)));
+
 	Behavior& chase = bt.getAction();
 	chase.addAction(std::bind(&Defender::setChaseState, std::ref(*this)));
-	//Behavior& roam = bt.getAction();
-	//roam.addAction(std::bind(&Defender::setRoamState, std::ref(*this)));
+
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Defender::inRange, std::ref(*this)));
+
 	Behavior& attack = bt.getAction();
 	attack.addAction(std::bind(&Defender::shoot, std::ref(*this)));
 
 	Behavior& returning = bt.getAction();
 	returning.addAction(std::bind(&Defender::setReturnState, std::ref(*this)));
+
 	Behavior& idle = bt.getAction();
 	idle.addAction(std::bind(&Defender::idle, std::ref(*this)));
+
 	Behavior& inObjectiveRange = bt.getAction();
 	inObjectiveRange.addAction(std::bind(&Defender::inObjectiveRange, std::ref(*this)));
 
@@ -110,15 +113,11 @@ void Defender::followPath()
 {
 	if (path.size() > 0)
 	{
-		targetNode = DirectX::SimpleMath::Vector3(float(path.at(path.size() - 1)->getXPos()),
+		destination = DirectX::SimpleMath::Vector3(float(path.at(path.size() - 1)->getXPos()),
 			.0f,
 			float(path.at(path.size() - 1)->getYPos()));
-		Vector3 dir = targetNode - this->getPosition();
-		dir.Normalize();
 
-		destination = targetNode;
-
-		if (position.Distance(targetNode, position) < 1)
+		if (position.Distance(destination, position) < 1)
 		{
 			path.pop_back();
 		}
@@ -144,7 +143,6 @@ void Defender::returning()
 {
 	targetPos = objectivePos;
 	findPath();
-	destination = targetNode;
 }
 
 Status Defender::inRange()

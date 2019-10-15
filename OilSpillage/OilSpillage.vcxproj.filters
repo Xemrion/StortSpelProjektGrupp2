@@ -64,7 +64,7 @@
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
-    <ClCompile Include="AI\Turrent.cpp" />
+    <ClCompile Include="AI\Turret.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
@@ -133,7 +133,7 @@
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VehicleWeapon.h" />
     <ClInclude Include="window.h" />
-    <ClInclude Include="AI\Turrent.h" />
+    <ClInclude Include="AI\Turret.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
