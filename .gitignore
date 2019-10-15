@@ -703,7 +703,7 @@ MigrationBackup/
 .ionide/
 
 Oilspillage/imgui.ini
-OilSpillage/PG/Logs/*
-OilSpillage/data/logs/profiler/*
-OilSpillage/data/map/*
+OilSpillage/PG/Logs/*.txt
+OilSpillage/data/logs/profiler/*.txt
+OilSpillage/data/map/*.tga
 OilSpillage/data/textures/map/map.tga
