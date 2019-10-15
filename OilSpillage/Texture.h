@@ -19,9 +19,9 @@ private:
 
 	bool LoadTarga(const char*, int&, int&);
 
-	unsigned char* m_targaData;
-	ID3D11Texture2D* m_texture;
-	ID3D11ShaderResourceView* m_textureView;
+	unsigned char* targaData;
+	ID3D11Texture2D* texture;
+	ID3D11ShaderResourceView* textureView;
 
 	//TO STORE WIDTH & HEIGHT
 	int width;

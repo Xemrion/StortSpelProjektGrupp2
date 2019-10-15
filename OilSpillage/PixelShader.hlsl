@@ -6,6 +6,8 @@ struct VS_OUT
 	float4 wPos: APOS;
 	float2 Tex : TEXCOORD;
 	float4 NormalWS : NORMAL;
+	float4 TangentWS : TANGENT;
+	float4 BitangentWS : BINORMAL;
 };
 
 struct Light
@@ -21,7 +23,7 @@ struct TileData
 	uint indices[MAX_LIGHTS_PER_TILE];
 };
 
-cbuffer CB_COLOR : register(b0)
+cbuffer MaterialBuffer : register(b0)
 {
 	float4 color;
 }
@@ -37,13 +39,26 @@ cbuffer SunInfo : register(b2) {
 };
 
 Texture2D Tex : register(t0);
+Texture2D NormalMap : register(t1);
 SamplerState SampSt : register(s0);
-StructuredBuffer<TileData> tileData : register(t1);
+StructuredBuffer<TileData> tileData : register(t2);
 
 float4 main(VS_OUT input) : SV_Target
 {
 	float3 normal = input.NormalWS.xyz;
+	float3 tangent = input.TangentWS.xyz;
+	float3 bitangent = input.BitangentWS.xyz;
+	float3 normalMap = NormalMap.Sample(SampSt, input.Tex).xyz;
+	
+	if (length(normalMap) > 0.f)
+	{
+		normalMap = 2.0f * normalMap - 1.0f;
+		float3x3 TBN = float3x3(tangent, bitangent, normal);
+		normal = normalize(mul(normalMap, TBN));
+	}
+
 	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
+
 	uint2 lightTileIndex = floor(uint2(input.Pos.x, input.Pos.y) / uint2(16.f, 16.f));
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 
@@ -76,6 +91,6 @@ float4 main(VS_OUT input) : SV_Target
 	}
 
 	float4 outColor = (texColor + color) * (diffuse + ambient);
-	return outColor;
+	//return float4(normal, 1.0);
 	return outColor / (outColor + float4(1.0, 1.0, 1.0, 0.0));
 }

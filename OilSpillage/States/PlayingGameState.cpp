@@ -79,6 +79,8 @@ void PlayingGameState::generateMap( Config const &config ) {
 		   tile.setScale( Vector3{ 0.0005f * config.tile_scale.x,
                                  0.0005f * config.tile_scale.y,
                                  0.0005f * config.tile_scale.z }); // TODO: scale models instead
+		   tile.setTexture(graphics.getTexturePointer("brickwall"));
+		   tile.setNormalMap(graphics.getTexturePointer("brickwallnormal"));
 		   graphics.addToDraw(&tile, true);
       }
 	}
@@ -318,6 +320,7 @@ void PlayingGameState::init()
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
+	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 
 	aiObject       = std::make_unique<Actor>();
@@ -342,6 +345,20 @@ void PlayingGameState::init()
 	lightList->addLight(SpotLight(Vector3( 0.f,  1.0f,  2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3( 0.f, -1.0f,  2.0f), 0.5));
 	lightList->addLight(SpotLight(Vector3( 0.f,  1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3( 0.f, -1.0f, -2.0f), 0.5));
    
+	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
+
+	for (int i = 0; i < 50; ++i) {
+		Vector3 randPos   = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
+		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand())) / RAND_MAX;
+		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
+
+		lightList->addLight(
+			PointLight(
+				randPos,
+				randColor,
+				1.0f));
+	}
+
    /*
 	//Road Network Turtlewalker
 	testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
@@ -354,20 +371,6 @@ void PlayingGameState::init()
 	testNetwork.get()->cleanRoadNetwork();
 	testNetwork.get()->saveTestNetwork("test-network");
    */
-
-	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
-
-	for (int i = 0; i < 50; ++i) {
-		Vector3 randPos   = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
-		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand() / RAND_MAX));
-		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
-
-		lightList->addLight(
-			PointLight(
-				randPos,
-				randColor,
-				1.0f));
-	}
 #endif
 	lightList->setSun(Sun(Vector3(0.0f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
 
@@ -465,7 +468,7 @@ void PlayingGameState::update(float deltaTime)
 	playerLight->setDirection(spotlightDir);
 	playerLight->setPos(spotlightPos);
 
-	aiObject->update(deltaTime,player->getVehicle()->getPosition());
+	//aiObject->update(deltaTime,player->getVehicle()->getPosition());
 	camera->update(deltaTime);
 	camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, 25, 0));
 
@@ -473,7 +476,7 @@ void PlayingGameState::update(float deltaTime)
 	//Render all objects
 	graphics.render(camera.get());
 	//testNetwork.get()->drawRoadNetwork(&graphics);
-
+#ifdef _DEBUG
 	//ImGui rendering --BEGIN--
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -482,8 +485,8 @@ void PlayingGameState::update(float deltaTime)
     ImGui_ProcGen();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
 	// ImGui rendering --END--
+#endif
 
 	// Present scene
 	graphics.presentScene();

@@ -328,7 +328,7 @@ void Graphics::render(DynamicCamera* camera)
 	deviceContext->VSSetShader(this->shaderDefault.vs.getShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
 	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
-	deviceContext->PSSetShaderResources(1, 1, this->culledLightBufferSRV.GetAddressOf());
+	deviceContext->PSSetShaderResources(2, 1, this->culledLightBufferSRV.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
 
@@ -351,14 +351,15 @@ void Graphics::render(DynamicCamera* camera)
 				UINT vertexCount = object->mesh->getVertexCount();
 				UINT stride = sizeof(Vertex3D);
 				UINT offset = 0;
-				ID3D11ShaderResourceView* shaderResView;
+				ID3D11ShaderResourceView* textureSRV = nullptr;
 				if (object->getTexture() != nullptr)
 				{
-					shaderResView = object->getTexture()->getShaderResView();
+					textureSRV = object->getTexture()->getShaderResView();
 				}
-				else
+				ID3D11ShaderResourceView* normalSRV = nullptr;
+				if (object->getNormalMap() != nullptr)
 				{
-					shaderResView = nullptr;
+					normalSRV = object->getNormalMap()->getShaderResView();
 				}
 
 				Vector4 modColor = object->getColor();
@@ -369,7 +370,8 @@ void Graphics::render(DynamicCamera* camera)
 				deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 				deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-				deviceContext->PSSetShaderResources(0, 1, &shaderResView);
+				deviceContext->PSSetShaderResources(0, 1, &textureSRV);
+				deviceContext->PSSetShaderResources(1, 1, &normalSRV);
 				deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
 				deviceContext->Draw(vertexCount, 0);
@@ -416,6 +418,8 @@ bool Graphics::createShaders()
 		{"SV_POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
 		{"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
 		{"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"TANGENT", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"BINORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  }
 	};
 
 
@@ -482,7 +486,6 @@ void Graphics::loadMesh(std::string fileName)
 	Mesh newMesh;
 	if (meshes.find(fileName) == meshes.end())
 	{
-		
 		Importer imp;
 		if (imp.loadMesh(fileName.c_str()))
 		{
@@ -496,12 +499,20 @@ void Graphics::loadMesh(std::string fileName)
 				vertex.position.y = vertices[i].y;
 				vertex.position.z = vertices[i].z;
 
+				vertex.uv.x = vertices[i].u;
+				vertex.uv.y = vertices[i].v;
+
 				vertex.normal.x = vertices[i].nx;
 				vertex.normal.y = vertices[i].ny;
 				vertex.normal.z = vertices[i].nz;
 
-				vertex.uv.x = vertices[i].u;
-				vertex.uv.y = vertices[i].v;
+				vertex.tangent.x = vertices[i].tangentX;
+				vertex.tangent.y = vertices[i].tangentY;
+				vertex.tangent.z = vertices[i].tangentZ;
+
+				vertex.bitangent.x = vertices[i].binormalX;
+				vertex.bitangent.y = vertices[i].binormalY;
+				vertex.bitangent.z = vertices[i].binormalZ;
 
 				tempVec.push_back(vertex);
 			}
@@ -918,8 +929,6 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 	UINT stride = sizeof(Vertex3D);
 	UINT offset = 0;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	ID3D11ShaderResourceView* shaderResView;
-	shaderResView = nullptr;
 
 	std::vector<GameObject*> objects;
 	quadTree->getGameObjects(objects, frustum, frustumBias);
@@ -937,18 +946,21 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
 		deviceContext->Unmap(colorBuffer.Get(), 0);
 
+		ID3D11ShaderResourceView* textureSRV = nullptr;
 		if (o->getTexture() != nullptr)
 		{
-			shaderResView = o->getTexture()->getShaderResView();
+			textureSRV = o->getTexture()->getShaderResView();
 		}
-		else
+		ID3D11ShaderResourceView* normalSRV = nullptr;
+		if (o->getNormalMap() != nullptr)
 		{
-			shaderResView = nullptr;
+			normalSRV = o->getNormalMap()->getShaderResView();
 		}
 
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-		deviceContext->PSSetShaderResources(0, 1, &shaderResView);
+		deviceContext->PSSetShaderResources(0, 1, &textureSRV);
+		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
 		deviceContext->Draw(static_cast<UINT>(o->mesh->getVertexCount()), 0);

@@ -1,9 +1,9 @@
 #include "Texture.h"
 Texture::Texture()
 {
-	this->m_targaData = nullptr;
-	this->m_texture = nullptr;
-	this->m_textureView = nullptr;
+	this->targaData = nullptr;
+	this->texture = nullptr;
+	this->textureView = nullptr;
 
 	this->width = 0;
 	this->height = 0;
@@ -52,7 +52,7 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 	// Create the empty texture.
-	hResult = device->CreateTexture2D(&textureDesc, NULL, &m_texture);
+	hResult = device->CreateTexture2D(&textureDesc, NULL, &texture);
 	if (FAILED(hResult))
 	{
 		return false;
@@ -62,7 +62,7 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 	rowPitch = (width * 4) * sizeof(unsigned char);
 
 	// Copy the targa image data into the texture.
-	deviceContext->UpdateSubresource(m_texture, 0, NULL, m_targaData, rowPitch, 0);
+	deviceContext->UpdateSubresource(texture, 0, NULL, targaData, rowPitch, 0);
 
 	// Setup the shader resource view description.
 	srvDesc.Format = textureDesc.Format;
@@ -70,13 +70,13 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = mipLevels;//Miplevels in parameter
 
-	hResult = device->CreateShaderResourceView(m_texture, &srvDesc, &m_textureView);
+	hResult = device->CreateShaderResourceView(texture, &srvDesc, &textureView);
 	if (FAILED(hResult))
 	{
 		return false;
 	}
 
-	deviceContext->GenerateMips(m_textureView);
+	deviceContext->GenerateMips(textureView);
 
 
 	return true;
@@ -85,24 +85,24 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 void Texture::Shutdown()
 {
 	// Release the texture view resource.
-	if (m_textureView)
+	if (textureView)
 	{
-		m_textureView->Release();
-		m_textureView = 0;
+		textureView->Release();
+		textureView = 0;
 	}
 
 	// Release the texture.
-	if (m_texture)
+	if (texture)
 	{
-		m_texture->Release();
-		m_texture = 0;
+		texture->Release();
+		texture = 0;
 	}
 
 	// Release the targa data.
-	if (m_targaData)
+	if (targaData)
 	{
-		delete[] m_targaData;
-		m_targaData = 0;
+		delete[] targaData;
+		targaData = 0;
 	}
 
 	return;
@@ -110,7 +110,7 @@ void Texture::Shutdown()
 
 ID3D11ShaderResourceView* Texture::getShaderResView()
 {
-	return m_textureView;
+	return textureView;
 }
 
 bool Texture::isTransparent()
@@ -120,7 +120,7 @@ bool Texture::isTransparent()
 
 unsigned char* Texture::getTextureCharArray()
 {
-	return m_targaData;
+	return targaData;
 }
 
 unsigned short Texture::getWidth()
@@ -208,8 +208,8 @@ bool Texture::LoadTarga(const char* filename, int& height, int& width)
 	}
 
 	// Allocate memory for the targa destination data.
-	m_targaData = new unsigned char[imageSize];
-	if (!m_targaData)
+	targaData = new unsigned char[imageSize];
+	if (!targaData)
 	{
 		return false;
 	}
@@ -225,11 +225,11 @@ bool Texture::LoadTarga(const char* filename, int& height, int& width)
 	{
 		for (i = 0; i < width; i++)
 		{
-			m_targaData[index + 0] = targaImage[k + 2];  // Red.
-			m_targaData[index + 1] = targaImage[k + 1];  // Green.
-			m_targaData[index + 2] = targaImage[k + 0];  // Blue
-			m_targaData[index + 3] = targaImage[k + 3];  // Alpha
-			if (!transparent && m_targaData[index + 3] != 255)
+			targaData[index + 0] = targaImage[k + 2];  // Red.
+			targaData[index + 1] = targaImage[k + 1];  // Green.
+			targaData[index + 2] = targaImage[k + 0];  // Blue
+			targaData[index + 3] = targaImage[k + 3];  // Alpha
+			if (!transparent && targaData[index + 3] != 255)
 			{
 				transparent = true;
 			}
