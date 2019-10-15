@@ -328,12 +328,27 @@ Void  PlayingGameState::update(float deltaTime)
 
 #ifdef _DEBUG
 		if (Input::CheckButton(ACTION_1, PRESSED, 0))
+		{
 			pausedTime = !pausedTime;
+		}
+
 		if (!pausedTime && time > 0.0f)
+		{
 			time = max(time - deltaTime, 0.0f);
+		}
+		else if (time <= 0.0f)
+		{
+			Game::setState(Game::STATE_MENU);
+		}
 #else
 		if (time > 0.0f)
+		{
 			time = max(time - deltaTime, 0.0f);
+		}
+		else
+		{
+			Game::setState(Game::STATE_MENU);
+		}
 #endif // !_DEBUG
 
 		player->update(deltaTime);
@@ -353,6 +368,12 @@ Void  PlayingGameState::update(float deltaTime)
 		{
 			this->graphics.addParticle(this->player->getVehicle()->getPosition() + Vector3(0, 5, 0), 5 * Vector3(Input::GetDirectionR(0).x, 0, Input::GetDirectionR(0).y), addNrOfParticles, lifeTime, randomPosPower);
 			timerForParticle = 0;
+		}
+
+		if (player->isDead())
+		{
+			changeTime(-30.0f);
+			player->resetHealth();
 		}
 	}
 
@@ -398,7 +419,7 @@ void PlayingGameState::setTime(float time) noexcept {
 }
 
 void PlayingGameState::changeTime(float timeDiff) noexcept {
-	this->time = max(this->time + timeDiff, .0f);
+	this->time = max(this->time + timeDiff, 0.0f);
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
