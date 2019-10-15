@@ -157,12 +157,9 @@
     <ClCompile Include="PG\MapConfig.cpp" />
     <ClCompile Include="PG\Map.cpp" />
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
-    <ClCompile Include="PG\utils.cpp" />
-    <ClCompile Include="PG\Walker.cpp" />
-    <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
-	<ClCompile Include="QuadTree.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="PG\District.cpp" />
@@ -203,6 +200,7 @@
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
+    <ClCompile Include="physics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
@@ -217,7 +215,6 @@
     <ClInclude Include="Particle\ParticleSystem.h" />
     <ClInclude Include="PG\Map.hpp" />
     <ClInclude Include="PG\MinimapTextureGenerator.hpp" />
-    <ClInclude Include="Physics.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="PG\Profiler.hpp" />
@@ -280,6 +277,7 @@
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VehicleWeapon.h" />
     <ClInclude Include="window.h" />
+    <ClInclude Include="physics.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ComputeLightCulling.hlsl">

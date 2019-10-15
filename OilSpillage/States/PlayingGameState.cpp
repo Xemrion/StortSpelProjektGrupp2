@@ -81,8 +81,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	graphics.setLightList(lightList.get());
 
-	physics = std::make_unique<Physics>();
-	player->init(physics.get());
+	
 	map = std::make_unique<Map>(graphics, config);
 	initAI();
 	//Minimap stuff
@@ -100,7 +99,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_OPTIONS]->init();
 
-	
+	physics = std::make_unique<Physics>();
+	player->init(physics.get());
 	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
 
 
@@ -116,19 +116,25 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	};
 	camera->startCinematic(&points, false);
 	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-}
 
 	Input::SetKeyboardPlayerID(0);
 	//Bullet
 	buildingTest = std::make_unique<GameObject>();
 	buildingTest->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(buildingTest.get());
-	btRigidBody* tempo2 = physics->addBox(btVector3(-15,0.0f,-15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
+	btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
 	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
 	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
-	buildingTest->setColor(Vector4(0.5,0.5,0.5,1));
+	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
 	buildingTest->setRigidBody(tempo2);
 
+
+}
+
+PlayingGameState::~PlayingGameState()
+{
+	delete aStar;
+	delete actorManager;
 }
 
 void  PlayingGameState::ImGui_Driving() {
@@ -391,6 +397,8 @@ void  PlayingGameState::update(float deltaTime)
 		//player->getVehicle()->updateRigidBody();
 
 		player->update(deltaTime);
+
+		physics->update(deltaTime);
 
 		Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
 		Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);
