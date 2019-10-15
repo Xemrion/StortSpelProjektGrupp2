@@ -8,11 +8,11 @@ Vector2 Minimap::size = Vector2(96 * 2, 96 * 2);
 
 Minimap::Minimap(float zoom, Vector2 position) : Element(position, 0.0f), zoom(std::clamp(zoom, 0.0f, 1.0f)), textureMap(nullptr)
 {
-	//Game::getGraphics().loadTexture("UI/mapOutline");
+	Game::getGraphics().loadTexture("UI/mapOutline");
 	Game::getGraphics().loadTexture("UI/mapPlayerMarker");
-	//this->textureOutline = Game::getGraphics().getTexturePointer("UI/mapOutline");
+	this->textureOutline = Game::getGraphics().getTexturePointer("UI/mapOutline");
 	this->texturePlayerMarker = Game::getGraphics().getTexturePointer("UI/mapPlayerMarker");
-	//assert(textureOutline && "Texture failed to load!");
+	assert(textureOutline && "Texture failed to load!");
 	assert(texturePlayerMarker && "Texture failed to load!");
 }
 
@@ -64,4 +64,5 @@ void Minimap::draw(bool selected)
 	SpriteBatch* sb = UserInterface::getSpriteBatch();
 	sb->Draw(this->textureMap->getShaderResView(), mapRect, &zoomedRect);
 	sb->Draw(this->texturePlayerMarker->getShaderResView(), markerRect, nullptr, Colors::White, playerRot, this->texturePlayerMarker->getCenter());
+	sb->Draw(this->textureOutline->getShaderResView(), this->position - Vector2(5, 5));
 }
