@@ -329,7 +329,7 @@ Void  PlayingGameState::update(float deltaTime)
 #ifdef _DEBUG
 		if (Input::CheckButton(ACTION_1, PRESSED, 0))
 			pausedTime = !pausedTime;
-		if (!pausedTime & time > 0.0f)
+		if (!pausedTime && time > 0.0f)
 			time = max(time - deltaTime, 0.0f);
 #else
 		if (time > 0.0f)
