@@ -20,19 +20,14 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
-	aStar = std::make_unique<AStar>(20, 20, Vector2(-10, 10));
+	aStar = new AStar(20, 20, Vector2(-10, 10));
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
 	graphics.loadModel("Dummy_Roller_Melee");
 
-	aiObject = std::make_unique<Actor>();
-	aiObject->mesh = graphics.getMeshPointer("Cube");
-	aiObject->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
-	aiObject->setAStar(aStar.get());
-	//aiObject->setPosition(Vector3(-7.0f, 0.0f, 5.0f));
-	graphics.addToDraw(aiObject.get());
-
+	actorManager = new ActorManager();
+	actorManager->setAStar(aStar);
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
 	graphics.loadModel("Roads/Road_bend");
@@ -48,16 +43,16 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	/*
-		//Road Network Turtlewalker
-		testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-		testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-		testNetwork.get()->setAngle(45);
-		for (int i = 0; i < 5; i++) {
-			testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
-			testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-		}
-		testNetwork.get()->cleanRoadNetwork();
-		testNetwork.get()->saveTestNetwork("test-network");
+	 //Road Network Turtlewalker
+	 testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
+	 testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+	 testNetwork.get()->setAngle(45);
+	 for (int i = 0; i < 5; i++) {
+		 testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
+		 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+	 }
+	 testNetwork.get()->cleanRoadNetwork();
+	 testNetwork.get()->saveTestNetwork("test-network");
 	*/
 
 	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
@@ -78,7 +73,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	graphics.setLightList(lightList.get());
 
-	map = std::make_unique<Map>( graphics, config );
+	map = std::make_unique<Map>(graphics, config);
 
 	//Minimap stuff
 	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
@@ -95,24 +90,35 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_OPTIONS]->init();
 
-	player->init(); 
-	player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
+	player->init();
+	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
+    aStar->generateTileData( map->getTileMap() );
+
+	actorManager->createDefender(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
+	actorManager->createTurrent(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 1);
+	actorManager->initGroups();
 
 	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
-		{ 
-			Vector3(0.0f, 30.0f+cameraDistance, -10.0f) + player->getVehicle()->getPosition(),
-			Vector3(0.0f, 0.0f, 0.0f), 0.0f },
-		{ 
-			Vector3(0.0f, cameraDistance, 0.0f) + player->getVehicle()->getPosition(),
-			Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
+		{
+		 Vector3(0.0f, 30.0f + cameraDistance, -10.0f) + player->getVehicle()->getPosition(),
+		 Vector3(0.0f, 0.0f, 0.0f), 0.0f },
+		{
+		 Vector3(0.0f, cameraDistance, 0.0f) + player->getVehicle()->getPosition(),
+		 Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
 	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 }
 
-PlayingGameState::~PlayingGameState() {}
+PlayingGameState::~PlayingGameState()
+{
+	delete aStar;
+	delete actorManager;
+}
 
 Void  PlayingGameState::ImGui_Driving() {
 	ImGui::Begin("OilSpillage");
@@ -135,10 +141,10 @@ Void  PlayingGameState::ImGui_Driving() {
 
 	Vector3 camPos = camera->getPosition();
 	Vector3 camRot = camera->getRotation();
-	Vector2 lDir   = Input::GetDirectionL(0);
-	Vector2 rDir   = Input::GetDirectionR(0);
-	float lStr     = Input::GetStrengthL(0);
-	float rStr     = Input::GetStrengthR(0);
+	Vector2 lDir = Input::GetDirectionL(0);
+	Vector2 rDir = Input::GetDirectionR(0);
+	float lStr = Input::GetStrengthL(0);
+	float rStr = Input::GetStrengthR(0);
 	bool status[4] = { Input::CheckButton(CONFIRM, UP, 0), Input::CheckButton(CONFIRM, HELD, 0), Input::CheckButton(CONFIRM, RELEASED, 0), Input::CheckButton(CONFIRM, PRESSED, 0) };
 	ImGui::Text(("Cam Pos: " + std::to_string(camPos.x) + " " + std::to_string(camPos.y) + " " + std::to_string(camPos.z)).c_str());
 	ImGui::Text(("Cam Rot: " + std::to_string(camRot.x) + " " + std::to_string(camRot.y) + " " + std::to_string(camRot.z)).c_str());
@@ -148,10 +154,24 @@ Void  PlayingGameState::ImGui_Driving() {
 	ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
 	ImGui::Text(("R Str: " + std::to_string(rStr)).c_str());
 	ImGui::Text(("Accelerator: " + std::to_string(player->getAcceleratorX())).c_str());
-   ImGui::End();
+	ImGui::Text(("Groups: " + std::to_string(actorManager->groups.size())).c_str());
+	ImGui::End();
 }
 
-void PlayingGameState::ImGui_Particles() {	
+void PlayingGameState::ImGui_AI()
+{
+	ImGui::Begin("AI");
+	ImGui::SetWindowSize({ 100,150 });
+
+	ImGui::Text(("Groups: " + std::to_string(actorManager->groups.size())).c_str());
+	for (int i = 0; i < actorManager->groups.size(); i++)
+	{
+		ImGui::Text(("Group " + std::to_string(i) + ":" + std::to_string(actorManager->groups.at(i).size())).c_str());
+	}
+	ImGui::End();
+}
+
+void PlayingGameState::ImGui_Particles() {
 	ImGui::Begin("Particle");
 	ImGui::ColorPicker4("Color Slider", colors);
 	ImGui::ColorPicker4("Color 1 Slider", colors2);
@@ -182,101 +202,101 @@ void PlayingGameState::ImGui_Particles() {
 
 #include "../PG/MinimapTextureGenerator.hpp"
 void PlayingGameState::ImGui_ProcGen() {
-   static Bool shouldColorCodeDistricts = true;
-   ImGui::Begin("Map Generation:");
-   if ( static bool firstFrame = true; firstFrame ) {
-      ImGui::SetWindowPos({0,75});
-      ImGui::SetWindowSize({525,475});
-      firstFrame = false;
-      map->setDistrictColorCoding( shouldColorCodeDistricts );
-   }
+	static Bool shouldColorCodeDistricts = true;
+	ImGui::Begin("Map Generation:");
+	if (static bool firstFrame = true; firstFrame) {
+		ImGui::SetWindowPos({ 0,75 });
+		ImGui::SetWindowSize({ 525,475 });
+		firstFrame = false;
+		map->setDistrictColorCoding(shouldColorCodeDistricts);
+	}
 
-   ImGui::Separator();
+	ImGui::Separator();
 
-   // debug colors toggle:
-   bool shouldColorCodeDistrictsPrevFrame = shouldColorCodeDistricts;
-   ImGui::Checkbox("Show district colors", &shouldColorCodeDistricts );
-   if ( shouldColorCodeDistricts != shouldColorCodeDistrictsPrevFrame )
-      map->setDistrictColorCoding( shouldColorCodeDistricts );
+	// debug colors toggle:
+	bool shouldColorCodeDistrictsPrevFrame = shouldColorCodeDistricts;
+	ImGui::Checkbox("Show district colors", &shouldColorCodeDistricts);
+	if (shouldColorCodeDistricts != shouldColorCodeDistrictsPrevFrame)
+		map->setDistrictColorCoding(shouldColorCodeDistricts);
 
-   ImGui::Separator();
+	ImGui::Separator();
 
-   // map:
-   ImGui::InputInt2( "TileMap dimensions", &config.dimensions.data[0] );
-   if ( config.dimensions.x < 1 )
-      config.dimensions.x = 1;
-   if ( config.dimensions.y < 1 )
-      config.dimensions.y = 1;
+	// map:
+	ImGui::InputInt2("TileMap dimensions", &config.dimensions.data[0]);
+	if (config.dimensions.x < 1)
+		config.dimensions.x = 1;
+	if (config.dimensions.y < 1)
+		config.dimensions.y = 1;
 
-   // (TODO! bugged!) ImGui::InputFloat3( "Tile scale", &config.tileScaleFactor.data[0] );
+	// (TODO! bugged!) ImGui::InputFloat3( "Tile scale", &config.tileScaleFactor.data[0] );
 
-   ImGui::InputFloat( "Floor height factor", &config.buildingFloorHeightFactor );
+	ImGui::InputFloat("Floor height factor", &config.buildingFloorHeightFactor);
 
-   ImGui::InputInt( "Seed", &config.seed );
+	ImGui::InputInt("Seed", &config.seed);
 
-   ImGui::Checkbox( "Use Manhattan distance", &config.isUsingManhattanDistance ); // TODO: refactor into config
+	ImGui::Checkbox("Use Manhattan distance", &config.isUsingManhattanDistance); // TODO: refactor into config
 
-   ImGui::InputInt( "District cell side",  &config.districtCellSide );
-   static auto cellSidePrev = config.districtCellSide;
-   int stepsCounter = 0;
-   auto constexpr MAX_STEPS = 128;
-   if ( config.districtCellSide < 1 )
-      config.districtCellSide = 1;
-   else if ( (config.districtCellSide - cellSidePrev) < 0 )
-      while (      (config.districtCellSide > 1)
-              and ((config.dimensions.x % config.districtCellSide) != 0)
-              and ((config.dimensions.y % config.districtCellSide) != 0)
-              and (++stepsCounter < MAX_STEPS) )
-         --config.districtCellSide;
-   else if ( (config.districtCellSide - cellSidePrev) > 0 )
-      while (     ((config.dimensions.x % config.districtCellSide) != 0)
-              and ((config.dimensions.y % config.districtCellSide) != 0)
-              and (++stepsCounter < MAX_STEPS) )
-         ++config.districtCellSide;
-   if ( stepsCounter == MAX_STEPS ) // no match found
-      config.districtCellSide = cellSidePrev;
-   cellSidePrev = config.districtCellSide;
+	ImGui::InputInt("District cell side", &config.districtCellSide);
+	static auto cellSidePrev = config.districtCellSide;
+	int stepsCounter = 0;
+	auto constexpr MAX_STEPS = 128;
+	if (config.districtCellSide < 1)
+		config.districtCellSide = 1;
+	else if ((config.districtCellSide - cellSidePrev) < 0)
+		while ((config.districtCellSide > 1)
+			and ((config.dimensions.x % config.districtCellSide) != 0)
+			and ((config.dimensions.y % config.districtCellSide) != 0)
+			and (++stepsCounter < MAX_STEPS))
+			--config.districtCellSide;
+	else if ((config.districtCellSide - cellSidePrev) > 0)
+		while (((config.dimensions.x % config.districtCellSide) != 0)
+			and ((config.dimensions.y % config.districtCellSide) != 0)
+			and (++stepsCounter < MAX_STEPS))
+			++config.districtCellSide;
+	if (stepsCounter == MAX_STEPS) // no match found
+		config.districtCellSide = cellSidePrev;
+	cellSidePrev = config.districtCellSide;
 
-   ImGui::Separator();
+	ImGui::Separator();
 
-   // roads:
+	// roads:
 
-   ImGui::InputInt( "Max depth", &config.roadDepthMax );
-   if ( config.roadDepthMax > 4 ) // TODO: magic4
-      config.roadDepthMax = 4;
-   else if ( config.roadDepthMax < 1 )
-      config.roadDepthMax = 1;
+	ImGui::InputInt("Max depth", &config.roadDepthMax);
+	if (config.roadDepthMax > 4) // TODO: magic4
+		config.roadDepthMax = 4;
+	else if (config.roadDepthMax < 1)
+		config.roadDepthMax = 1;
 
-   ImGui::InputInt( "Base min length", &config.roadLengthMin );
-   if ( config.roadLengthMin > config.roadLengthMax )
-      config.roadLengthMin = config.roadLengthMax;
+	ImGui::InputInt("Base min length", &config.roadLengthMin);
+	if (config.roadLengthMin > config.roadLengthMax)
+		config.roadLengthMin = config.roadLengthMax;
 
-   ImGui::InputInt( "Base max length", &config.roadLengthMax );
-   if ( config.roadLengthMax < config.roadLengthMin )
-      config.roadLengthMax = config.roadLengthMin;
+	ImGui::InputInt("Base max length", &config.roadLengthMax);
+	if (config.roadLengthMax < config.roadLengthMin)
+		config.roadLengthMax = config.roadLengthMin;
 
-   ImGui::SliderFloat( "Child length factor", &config.roadLengthFactor, .001f, 10.0f );
-
-
-   ImGui::SliderFloat( "Base turn probability", &config.roadTurnProbability,       .001f,  1.0f );
-   ImGui::SliderFloat( "Child turn% factor",    &config.roadTurnProbabilityFactor, .001f, 10.0f );
+	ImGui::SliderFloat("Child length factor", &config.roadLengthFactor, .001f, 10.0f);
 
 
-   ImGui::SliderFloat( "Base branch probability", &config.roadBranchProbability,       .001f,  1.0f );
-   ImGui::SliderFloat( "Child branch% factor",    &config.roadBranchProbabilityFactor, .001f, 10.0f );
+	ImGui::SliderFloat("Base turn probability", &config.roadTurnProbability, .001f, 1.0f);
+	ImGui::SliderFloat("Child turn% factor", &config.roadTurnProbabilityFactor, .001f, 10.0f);
 
 
-   ImGui::InputInt( "Min tiles before turn", &config.roadMinTilesBeforeTurn );
-   if ( config.roadMinTilesBeforeTurn < 0 )
-      config.roadMinTilesBeforeTurn = 0;
+	ImGui::SliderFloat("Base branch probability", &config.roadBranchProbability, .001f, 1.0f);
+	ImGui::SliderFloat("Child branch% factor", &config.roadBranchProbabilityFactor, .001f, 10.0f);
 
-   ImGui::InputInt( "Min tiles before branch", &config.roadMinTilesBeforeBranch );
-   if ( config.roadMinTilesBeforeBranch < 0 )
-      config.roadMinTilesBeforeBranch = 0;
 
-   ImGui::InputInt( "Road step size", &config.roadStepSize );
-   if ( config.roadStepSize < 1 )
-      config.roadStepSize = 1;
+	ImGui::InputInt("Min tiles before turn", &config.roadMinTilesBeforeTurn);
+	if (config.roadMinTilesBeforeTurn < 0)
+		config.roadMinTilesBeforeTurn = 0;
+
+	ImGui::InputInt("Min tiles before branch", &config.roadMinTilesBeforeBranch);
+	if (config.roadMinTilesBeforeBranch < 0)
+		config.roadMinTilesBeforeBranch = 0;
+
+	ImGui::InputInt("Road step size", &config.roadStepSize);
+	if (config.roadStepSize < 1)
+		config.roadStepSize = 1;
 
    // regen button:
    ImGui::NewLine();
@@ -286,6 +306,7 @@ void PlayingGameState::ImGui_ProcGen() {
       player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
       map->setDistrictColorCoding( shouldColorCodeDistricts );
       minimap = createMinimapTexture( *map );
+	  aStar->generateTileData(map->getTileMap());
 	  //Minimap stuff
 	  topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
 	  bottomRight = map->tilemap->convertTilePositionToWorldPosition(0, 0);
@@ -295,31 +316,31 @@ void PlayingGameState::ImGui_ProcGen() {
 	  graphics.reloadTexture(minimap);
    }
 
-   ImGui::End();
+	ImGui::End();
 }
 
 Void  PlayingGameState::ImGui_Camera() {
-   ImGui::Begin("Camera & Culling:");
-   if ( static bool firstFrame = true; firstFrame ) {
-      ImGui::SetWindowPos({0,0});
-      ImGui::SetWindowSize({425,75});
-      firstFrame = false;
-   }
-   // camera distance:
-   ImGui::SliderFloat( "Camera height", &cameraDistance, 2.5f, 1000.0f, "%4.1f" );
-   // culling distance:
-   static float cullingDistanceCurr = graphics.getCullingDistance();
-   float const  cullingDistancePrev = cullingDistanceCurr;
-   cullingDistanceCurr = graphics.getCullingDistance();
-      ImGui::SliderFloat( "Culling distance", &cullingDistanceCurr, .0f, 1500.0f, "%4.1f" );
-   if ( cullingDistanceCurr != cullingDistancePrev )
-      graphics.setCullingDistance( cullingDistanceCurr );
-   ImGui::End();
+	ImGui::Begin("Camera & Culling:");
+	if (static bool firstFrame = true; firstFrame) {
+		ImGui::SetWindowPos({ 0,0 });
+		ImGui::SetWindowSize({ 425,75 });
+		firstFrame = false;
+	}
+	// camera distance:
+	ImGui::SliderFloat("Camera height", &cameraDistance, 2.5f, 1000.0f, "%4.1f");
+	// culling distance:
+	static float cullingDistanceCurr = graphics.getCullingDistance();
+	float const  cullingDistancePrev = cullingDistanceCurr;
+	cullingDistanceCurr = graphics.getCullingDistance();
+	ImGui::SliderFloat("Culling distance", &cullingDistanceCurr, .0f, 1500.0f, "%4.1f");
+	if (cullingDistanceCurr != cullingDistancePrev)
+		graphics.setCullingDistance(cullingDistanceCurr);
+	ImGui::End();
 }
 
 Void  PlayingGameState::update(float deltaTime)
 {
-   /*-------------------------UPDATING-------------------------*/
+	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{
 		if (Input::IsKeyDown_DEBUG(Keyboard::E)) {
@@ -359,9 +380,9 @@ Void  PlayingGameState::update(float deltaTime)
 		playerLight->setDirection(spotlightDir);
 		playerLight->setPos(spotlightPos);
 
-		aiObject->update(deltaTime, player->getVehicle()->getPosition());
+		actorManager->update(deltaTime, player->getVehicle()->getPosition());
 		camera->update(deltaTime);
-		camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, cameraDistance, 0));
+		camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, 25, 0));
 
 		timerForParticle += deltaTime;
 		if (timerForParticle > 0.01f)
@@ -379,7 +400,7 @@ Void  PlayingGameState::update(float deltaTime)
 
 	/*-------------------------RENDERING-------------------------*/
 	//Render all objects
-	graphics.render(camera.get(),deltaTime);
+	graphics.render(camera.get(), deltaTime);
 
 	//Render UI
 	menues[MENU_PLAYING]->update(deltaTime);
@@ -393,14 +414,15 @@ Void  PlayingGameState::update(float deltaTime)
 #ifdef _DEBUG
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
-   ImGui::NewFrame();
-   ImGui_Driving();
-   ImGui_ProcGen();
-   ImGui_Particles();
-   ImGui_Camera();
+	ImGui::NewFrame();
+	ImGui_Driving();
+	ImGui_ProcGen();
+	ImGui_AI();
+	ImGui_Particles();
+	ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
- #endif
+#endif
 
 	// Present scene
 	graphics.presentScene();

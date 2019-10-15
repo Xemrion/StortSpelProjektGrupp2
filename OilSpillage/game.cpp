@@ -84,6 +84,8 @@ void Game::run()
 		if (oldState != -1) {
 			graphics.clearDraw();
 			createCurrentState(); //Init the new state
+			curTime = 0;
+			QueryPerformanceCounter((LARGE_INTEGER*)& curTime);
 			oldState = -1;
 		}
 		//camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 500.0f, 0.0));

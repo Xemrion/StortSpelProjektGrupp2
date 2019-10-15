@@ -5,19 +5,21 @@
 #include "../game.h"
 #include "../ImGui/imgui.h"
 #include "../vehicle.h"
-#include "../AI/Actor.h"
+#include "../AI/ActorManager.h"
 #include "../Road Network/RoadNet.h"
 #include "../DynamicCamera.h"
 #include "../PG/Map.hpp"
 #include "../UI/UserInterface.h"
 
 class PlayingGameState : public GameState {
-friend class Game;
+	friend class Game;
 public:
-	enum  Menu { MENU_PLAYING,
-	             MENU_PAUSED,
-	             MENU_OPTIONS,
-	             MENUCOUNT };
+	enum  Menu {
+		MENU_PLAYING,
+		MENU_PAUSED,
+		MENU_OPTIONS,
+		MENUCOUNT
+	};
 
 	             PlayingGameState();
 	virtual     ~PlayingGameState();
@@ -50,9 +52,9 @@ private:
 	float                           time;
 	MapConfig                       config;
 	Graphics                       &graphics;
-	std::unique_ptr<AStar>          aStar;
-	std::unique_ptr<Map>            map;
-	std::unique_ptr<Actor>          aiObject;
+	AStar*				            aStar;
+    std::unique_ptr<Map>            map;
+	ActorManager*				    actorManager;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
@@ -77,9 +79,10 @@ private:
 	                                                    Vector4(  .0f,  .0f, .0f, 1.0f ),
 	                                                    Vector4(  .1f,  .1f, .1f, 1.0f )  };
   
-   void initiateAStar();
+    void initiateAStar();
 	void ImGui_ProcGen();
 	void ImGui_Driving();
 	void ImGui_Particles();
 	void ImGui_Camera();
+	void ImGui_AI();
 };

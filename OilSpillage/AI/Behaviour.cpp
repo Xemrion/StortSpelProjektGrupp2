@@ -104,19 +104,19 @@ Behavior& BT::getAction()
 
 BT::~BT()
 {
-	for (vector<Sequence*>::iterator pObj = sequence.begin();
+	for (std::vector<Sequence*>::iterator pObj = sequence.begin();
 		pObj != sequence.end(); ++pObj) {
 		delete* pObj; // Note that this is deleting what pObj points to,
 					  // which is a pointer
 	}
 
-	for (vector<Selector*>::iterator pObj = selector.begin();
+	for (std::vector<Selector*>::iterator pObj = selector.begin();
 		pObj != selector.end(); ++pObj) {
 		delete* pObj; // Note that this is deleting what pObj points to,
 					  // which is a pointer
 	}
 
-	for (vector<Behavior*>::iterator pObj = action.begin();
+	for (std::vector<Behavior*>::iterator pObj = action.begin();
 		pObj != action.end(); ++pObj) {
 		delete* pObj; // Note that this is deleting what pObj points to,
 					  // which is a pointer
