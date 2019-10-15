@@ -36,6 +36,9 @@ public:
 
 private:
 	friend class Game;
+#ifdef _DEBUG
+	bool							pausedTime;
+#endif // _DEBUG
 	std::string						minimap;
 	Vector3							topLeft;
 	Vector3							bottomRight;

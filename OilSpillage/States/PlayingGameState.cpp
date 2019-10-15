@@ -10,6 +10,10 @@ Void PlayingGameState::initiateAStar() {}
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {
+#ifdef _DEBUG
+	pausedTime = false;
+#endif // _DEBUG
+
 	lightList = std::make_unique<LightList>();
 	player = std::make_unique<Vehicle>();
 	camera = std::make_unique<DynamicCamera>();
@@ -322,8 +326,15 @@ Void  PlayingGameState::update(float deltaTime)
 			deltaTime /= 4;
 		}
 
+#ifdef _DEBUG
+		if (Input::CheckButton(ACTION_1, PRESSED, 0))
+			pausedTime = !pausedTime;
+		if (!pausedTime & time > 0.0f)
+			time = max(time - deltaTime, 0.0f);
+#else
 		if (time > 0.0f)
 			time = max(time - deltaTime, 0.0f);
+#endif // !_DEBUG
 
 		player->update(deltaTime);
 
