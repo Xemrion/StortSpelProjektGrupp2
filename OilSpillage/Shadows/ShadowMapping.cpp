@@ -39,22 +39,21 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 
 	HRESULT hr = D3DReadFileToBlob(filePath.c_str(), this->vertexShaderBlob.GetAddressOf());
 	hr = device->CreateVertexShader(this->vertexShaderBlob->GetBufferPointer(), this->vertexShaderBlob->GetBufferSize(), NULL, this->simpleVertexShader.GetAddressOf());
-	//hr = device->CreateInputLayout(inputDesc, numElements, this->vertexShaderBlob->GetBufferPointer(), this->vertexShaderBlob->GetBufferSize(), this->inputLayout.GetAddressOf());
 
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
 		{
-			"SV_POSITION",		// "semantic" name in shader
-			0,				// "semantic" index (not used)
-			DXGI_FORMAT_R32G32B32_FLOAT, // size of ONE element (3 floats)
-			0,							 // input slot
-			D3D11_APPEND_ALIGNED_ELEMENT, // offset of first element
-			D3D11_INPUT_PER_VERTEX_DATA, // specify data PER vertex
-			0							 // used for INSTANCING (ignore)
+			"SV_POSITION",		
+			0,				
+			DXGI_FORMAT_R32G32B32_FLOAT, 
+			0,							 
+			D3D11_APPEND_ALIGNED_ELEMENT,
+			D3D11_INPUT_PER_VERTEX_DATA, 
+			0							 
 		},
 		{
 			"TEXCOORD",
 			0,
-			DXGI_FORMAT_R32G32_FLOAT, //2 values
+			DXGI_FORMAT_R32G32_FLOAT, 
 			0,
 			D3D11_APPEND_ALIGNED_ELEMENT,
 			D3D11_INPUT_PER_VERTEX_DATA,
@@ -63,13 +62,13 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 
 		{
 			"NORMAL",
-			0,				// same slot as previous (same vertexBuffer)
+			0,				
 			DXGI_FORMAT_R32G32B32_FLOAT,
 			0,
-			D3D11_APPEND_ALIGNED_ELEMENT,							// offset of FIRST element (after POSITION)
+			D3D11_APPEND_ALIGNED_ELEMENT,							
 			D3D11_INPUT_PER_VERTEX_DATA,
 			0
-			//for normal mapping. tangent binormal
+			
 		}
 
 
@@ -106,8 +105,8 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 
-	depthStencilDesc.Width = 1024/*System::getWindowArea().width*/;
-	depthStencilDesc.Height = 1024/*System::getWindowArea().height*/;
+	depthStencilDesc.Width = 1024;
+	depthStencilDesc.Height = 1024;
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.ArraySize = 1;
 	depthStencilDesc.Format = DXGI_FORMAT_R32_TYPELESS;
@@ -118,8 +117,8 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	depthStencilDesc.CPUAccessFlags = 0;
 	depthStencilDesc.MiscFlags = 0;
 
-	this->vp.Width = (float)depthStencilDesc.Width/*System::getWindowArea().width*/;
-	this->vp.Height = (float)depthStencilDesc.Height/*System::getWindowArea().height*/;
+	this->vp.Width = (float)depthStencilDesc.Width;
+	this->vp.Height = (float)depthStencilDesc.Height;
 	this->vp.MinDepth = 0.0f;
 	this->vp.MaxDepth = 1.0f;
 	this->vp.TopLeftX = 0;
@@ -170,9 +169,7 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	hr = this->device->CreateSamplerState(&desc, this->sampler.GetAddressOf());
 	if (FAILED(hr))
 	{
-		//MessageBox(hwnd, "Error compiling shader.  Check shader-error.txt for message.", "error", MB_OK);
-		//deal with error. Log it maybe
-
+		return false;
 	}
 	return true;
 }
@@ -193,12 +190,41 @@ void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float 
 {
 	Vector3 target;
 	Vector3 eye = Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
-	eye += -sunDir * 4*(camera->getPosition().y / -sunDir.y);
+	eye += -sunDir * 3.0f*(camera->getPosition().y / -sunDir.y);
 	target= Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
 	Matrix viewMatrix;
 	Matrix proj;
+	Vector3 camToGroundNor = Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z) - camera->getPosition();
+	Vector3 camToGround = camToGroundNor;
+	camToGroundNor.Normalize();
+	Matrix invView = this->camera.getViewMatrix().Invert();
+	Vector4 viewDir = DirectX::XMVector4Transform(Vector4(0.0, 0.0, 1.0, 0.0), invView);
+	Vector4 viewUp = DirectX::XMVector4Transform(Vector4(0.0, 1.0, 0.0, 0.0), invView);
+	Vector4 viewRight = DirectX::XMVector4Transform(Vector4(1.0, 0.0, 0.0, 0.0), invView);
+	Vector3 farCenter = camera->getPosition() + viewDir * camera->getFarDistance();
+
+	Vector3 farTopLeft = farCenter + Vector3(viewUp) * camera->getFarHeight() - Vector3(viewRight) * camera->getFarWidth();
+	Vector3 farBottomLeft = farCenter - Vector3(viewUp) * camera->getFarHeight() - Vector3(viewRight) * camera->getFarWidth();
+	Vector3 farTopRight = farCenter + Vector3(viewUp) * camera->getFarHeight() + Vector3(viewRight) * camera->getFarWidth();
+
+	Vector3 dirFarTopLeft = Vector3(farTopLeft - camera->getPosition());
+	dirFarTopLeft.Normalize();
+	Vector3 dirFarTopRight = Vector3(farTopRight - camera->getPosition());
+	dirFarTopRight.Normalize();
+	Vector3 dirFarBottomLeft = Vector3(farBottomLeft - camera->getPosition());
+	dirFarBottomLeft.Normalize();
+
+	Vector3 camToLeftBotGround = camera->getPosition().y * dirFarBottomLeft;
+	Vector3 camToLeftGround = camera->getPosition().y * dirFarTopLeft;
+	Vector3 camToRightGround = camera->getPosition().y * dirFarTopRight;
+
+	float width = (camToLeftGround - camToRightGround).Length();
+	width *= 3.0f;
+	float height = (camToLeftBotGround - camToLeftGround).Length();
+	height *= 3.0f;
+
 	viewMatrix = DirectX::XMMatrixLookAtLH(eye, target, Vector3(0, 1, 0));
-	proj = DirectX::XMMatrixOrthographicLH(100.0f, 100.0f, 10.0f, farPlaneTest);
+	proj = DirectX::XMMatrixOrthographicLH(width, height, 10.0f, farPlaneTest);
 	Matrix viewProj = viewMatrix * proj;
 	viewProj = viewProj.Transpose();
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -221,6 +247,7 @@ void ShadowMapping::setViweProjSpot(Vector3 pos,Vector3 dir, float fov)
 	proj = DirectX::XMMatrixPerspectiveFovLH(fovTemp, 1.0f, 1.0f, 400.0f);
 	Matrix viewProj = viewMatrix * proj;
 	viewProj = viewProj.Transpose();
+	
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(perFrameCBSpot.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
