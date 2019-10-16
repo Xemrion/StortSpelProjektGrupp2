@@ -85,12 +85,14 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	player->init(physics.get());
 	
 	map = std::make_unique<Map>(graphics, config, physics.get());
+   map->setDistrictColorCoding( isDebugging );
 	initAI();
-	//Minimap stuff
-	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
-	bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
-	//Needs to be loaded before the menues
-	this->minimap = createMinimapTexture(*map);
+	// Minimap stuff
+   auto tilemap = map->getTileMap();
+	topLeft      = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
+	bottomRight  = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+	// Needs to be loaded before the menues
+	minimap = createMinimapTexture(*map);
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
@@ -100,7 +102,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	menues[MENU_OPTIONS]->init();
 
 	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
-
 
 	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
@@ -113,7 +114,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 		 Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
-	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 
 	Input::SetKeyboardPlayerID(0);
 	//Bullet
@@ -125,8 +126,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
 	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
 	buildingTest->setRigidBody(tempo2, physics.get());
-
-
 }
 
 PlayingGameState::~PlayingGameState()
@@ -220,39 +219,38 @@ void PlayingGameState::ImGui_Particles() {
 void PlayingGameState::ImGui_ProcGen() {
 	static Bool shouldColorCodeDistricts = true;
 	ImGui::Begin("Map Generation:");
-	if (static bool firstFrame = true; firstFrame) {
-		ImGui::SetWindowPos({ 0,75 });
-		ImGui::SetWindowSize({ 525,475 });
-		firstFrame = false;
-		map->setDistrictColorCoding(shouldColorCodeDistricts);
+	if ( static bool isFirstFrame = true;  isFirstFrame ) {
+		ImGui::SetWindowPos({    0,  75 });
+		ImGui::SetWindowSize({ 525, 475 });
+		isFirstFrame = false;
 	}
 
 	ImGui::Separator();
 
 	// debug colors toggle:
 	bool shouldColorCodeDistrictsPrevFrame = shouldColorCodeDistricts;
-	ImGui::Checkbox("Show district colors", &shouldColorCodeDistricts);
-	if (shouldColorCodeDistricts != shouldColorCodeDistrictsPrevFrame)
-		map->setDistrictColorCoding(shouldColorCodeDistricts);
+	ImGui::Checkbox( "Show district colors", &shouldColorCodeDistricts );
+	if ( shouldColorCodeDistricts != shouldColorCodeDistrictsPrevFrame )
+		map->setDistrictColorCoding( shouldColorCodeDistricts );
 
 	ImGui::Separator();
 
 	// map:
-	ImGui::InputInt2("TileMap dimensions", &config.dimensions.data[0]);
-	if (config.dimensions.x < 1)
+	ImGui::InputInt2( "TileMap dimensions", &config.dimensions.data[0] );
+	if ( config.dimensions.x < 1 )
 		config.dimensions.x = 1;
-	if (config.dimensions.y < 1)
+	if ( config.dimensions.y < 1 )
 		config.dimensions.y = 1;
 
 	// (TODO! bugged!) ImGui::InputFloat3( "Tile scale", &config.tileScaleFactor.data[0] );
 
-	ImGui::InputFloat("Floor height factor", &config.buildingFloorHeightFactor);
+	ImGui::InputFloat( "Floor height factor", &config.buildingFloorHeightFactor );
 
-	ImGui::InputInt("Seed", &config.seed);
+	ImGui::InputInt( "Seed", &config.seed );
 
-	ImGui::Checkbox("Use Manhattan distance", &config.isUsingManhattanDistance); // TODO: refactor into config
+	ImGui::Checkbox( "Use Manhattan distance", &config.isUsingManhattanDistance ); // TODO: refactor into config
 
-	ImGui::InputInt("District cell side", &config.districtCellSide);
+	ImGui::InputInt( "District cell side", &config.districtCellSide );
 	static auto cellSidePrev = config.districtCellSide;
 	int stepsCounter = 0;
 	auto constexpr MAX_STEPS = 128;
@@ -324,8 +322,9 @@ void PlayingGameState::ImGui_ProcGen() {
 		minimap = createMinimapTexture( *map );
 		aStar->generateTileData( map->getTileMap() );
 		// minimap stuff
-		topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
-		bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+      auto tilemap = map->getTileMap();
+		topLeft      = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
+		bottomRight  = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 
 		graphics.reloadTexture(minimap);
 	}

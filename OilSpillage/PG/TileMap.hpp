@@ -59,11 +59,9 @@ public:
 	}
 
 	inline Vector3  convertTilePositionToWorldPosition(U16 const tileX, U16 const tileY) const {
-		static auto const x_offset = width  / 2.0f * config.tileScaleFactor.x,
-			               y_offset = height / 2.0f * config.tileScaleFactor.y;
-		return { tileX * config.tileScaleFactor.x - x_offset, 
+		return { tileX * config.tileScaleFactor.x, 
                .0f,
-               tileY * -config.tileScaleFactor.y + y_offset };
+               tileY * -config.tileScaleFactor.y };
 	}
 
    inline Vector3  convertTilePositionToWorldPosition( V2u const &tilePosition ) const {
@@ -71,10 +69,8 @@ public:
 	}
 
    inline V2u  convertWorldPositionToTilePosition( Vector3 const &worldPosition ) const {
-      static auto const xOffset = width  / 2.0f * config.tileScaleFactor.x,
-			               yOffset = height / 2.0f * config.tileScaleFactor.y;
-      return { static_cast<U32>((worldPosition.x + xOffset) / config.tileScaleFactor.x), 
-               static_cast<U32>((worldPosition.y + yOffset) / config.tileScaleFactor.y) };
+      return { static_cast<U32>( worldPosition.x / config.tileScaleFactor.x ), 
+               static_cast<U32>( worldPosition.y / config.tileScaleFactor.y ) };
    }
 
    inline Tile const &tileAt( U16 x, U16 y) const noexcept {
