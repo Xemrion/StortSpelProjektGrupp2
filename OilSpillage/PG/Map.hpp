@@ -10,7 +10,7 @@
 
 class Map {
 public:
-   Map( Graphics &, MapConfig const & );
+   Map( Graphics &, MapConfig const &, Physics* physics);
   ~Map() noexcept;
 
    Graphics        &graphics;
@@ -32,6 +32,6 @@ public:
 private:
    void             generateDistricts();
    void             generateRoads();
-   void             generateBuildings();
+   void             generateBuildings(Physics* physics);
    Opt<Vector<V2u>>    findValidHouseLot( RNG &, U16 districtCellID, Voronoi const &, TileMap &, Vector<District> const &districtTable );
 };

@@ -933,6 +933,8 @@ void Graphics::cullLights()
 	deviceContext->CSSetConstantBuffers(0, 1, lightBuffer.GetAddressOf());
 	deviceContext->CSSetShaderResources(0, 1, frustumBufferSRV.GetAddressOf());
 	const UINT uavCounter = 0;
+	deviceContext->PSSetShaderResources(2, 1, &nullSRV);
+
 	deviceContext->CSSetUnorderedAccessViews(0, 1, culledLightBufferUAV.GetAddressOf(), &uavCounter);
 
 	deviceContext->Dispatch(80, 45, 1);

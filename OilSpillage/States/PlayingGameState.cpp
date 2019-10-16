@@ -81,8 +81,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	graphics.setLightList(lightList.get());
 
+	physics = std::make_unique<Physics>();
+	player->init(physics.get());
 	
-	map = std::make_unique<Map>(graphics, config);
+	map = std::make_unique<Map>(graphics, config, physics.get());
 	initAI();
 	//Minimap stuff
 	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
@@ -99,8 +101,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_OPTIONS]->init();
 
-	physics = std::make_unique<Physics>();
-	player->init(physics.get());
 	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
 
 
@@ -126,7 +126,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
 	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
 	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
-	buildingTest->setRigidBody(tempo2);
+	buildingTest->setRigidBody(tempo2, physics.get());
 
 
 }
@@ -320,7 +320,7 @@ void PlayingGameState::ImGui_ProcGen() {
 	ImGui::NewLine();
 	if ( ImGui::Button("Re-generate") ) {
 		// (TODO: refactor) hacky, but:
-		map = std::make_unique<Map>(graphics, config);
+		map = std::make_unique<Map>(graphics, config, physics.get());
 		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
 		map->setDistrictColorCoding( shouldColorCodeDistricts );
 		minimap = createMinimapTexture( *map );

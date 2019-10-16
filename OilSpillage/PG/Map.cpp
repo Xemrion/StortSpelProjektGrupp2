@@ -1,7 +1,7 @@
 #include "Map.hpp"
 #include "Profiler.hpp"
 
-Map::Map( Graphics &graphics, MapConfig const &config ):
+Map::Map( Graphics &graphics, MapConfig const &config, Physics* physics):
 	graphics        ( graphics                                                              ),
 	config          ( config                                                                ),
 	tilemap         ( std::make_unique<TileMap>(config)                                     ),
@@ -12,7 +12,7 @@ Map::Map( Graphics &graphics, MapConfig const &config ):
 	// TODO: generate water etc
 	generateDistricts();
 	generateRoads();
-	generateBuildings();
+	generateBuildings(physics);
 }
 
 
@@ -121,7 +121,7 @@ Vector3  Map::generateRoadPositionInWorldSpace(RNG& rng) const noexcept {
 	return tilemap->convertTilePositionToWorldPosition(positionInTileSpace);
 }
 
-void  Map::generateBuildings() {
+void  Map::generateBuildings(Physics* physics) {
    DBG_PROBE(Map::generateBuildings);
    RNG  rng{ RD()() };
 	rng.seed( config.seed );
@@ -192,6 +192,8 @@ void  Map::generateBuildings() {
 						                     .5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * randomFloorCount,
 						                     .5f * config.tileScaleFactor.z });
 						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) });
+						btRigidBody* tempo = physics->addBox(btVector3(houseTile.getPosition().x, houseTile.getPosition().y, houseTile.getPosition().z), btVector3(houseTile.getScale().x, houseTile.getScale().y, houseTile.getScale().z), 0.0f);
+						houseTile.setRigidBody(tempo,physics);
 
                   #ifdef _DEBUG
 						   ++total_building_tile_count;

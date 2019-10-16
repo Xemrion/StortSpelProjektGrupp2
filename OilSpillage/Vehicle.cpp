@@ -53,6 +53,8 @@ Vehicle::~Vehicle()
 
 void Vehicle::init(Physics *physics)
 {
+	this->physics = physics;
+
 	this->vehicle = new GameObject;
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(vehicle);
@@ -103,19 +105,19 @@ void Vehicle::init(Physics *physics)
 	wheel4->setColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f)); //Bottom Right
 
 	btRigidBody* tempo = physics->addBox(btVector3(0, 0, 0), btVector3(this->getVehicle()->getScale().x, this->getVehicle()->getScale().y, this->getVehicle()->getScale().z), 10.0f);
-	this->getVehicle()->setRigidBody(tempo);
+	this->getVehicle()->setRigidBody(tempo, physics);
 	this->getVehicle()->getRigidBody()->activate();
 	this->getVehicle()->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	this->getVehicle()->getRigidBody()->setFriction(0);
 
 	tempo = physics->addSphere(0.2f, btVector3(wheel1->getPosition().x, wheel1->getPosition().y, wheel1->getPosition().z),10.0f);
-	wheel1->setRigidBody(tempo);
+	wheel1->setRigidBody(tempo, physics);
 	tempo = physics->addSphere(0.2f, btVector3(wheel2->getPosition().x, wheel2->getPosition().y, wheel2->getPosition().z), 10.0f);
-	wheel2->setRigidBody(tempo);
+	wheel2->setRigidBody(tempo, physics);
 	tempo = physics->addSphere(0.2f, btVector3(wheel3->getPosition().x, wheel3->getPosition().y, wheel3->getPosition().z), 10.0f);
-	wheel3->setRigidBody(tempo);
+	wheel3->setRigidBody(tempo, physics);
 	tempo = physics->addSphere(0.2f, btVector3(wheel4->getPosition().x, wheel4->getPosition().y, wheel4->getPosition().z), 10.0f);
-	wheel4->setRigidBody(tempo);
+	wheel4->setRigidBody(tempo, physics);
 
 	spring1 = new btGeneric6DofSpring2Constraint(
 		*this->vehicle->getRigidBody(), *wheel1->getRigidBody(), 
