@@ -393,54 +393,66 @@ void  PlayingGameState::update(float deltaTime)
 
 		//player->getVehicle()->setPosition(Vector3(player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getX(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getY(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getZ()));
 		//player->getVehicle()->updateRigidBody();
+		
+		auto playerVehicle { player->getVehicle() };
+		
+		player->update(       deltaTime );
+		physics->update(      deltaTime );
+		actorManager->update( deltaTime, playerVehicle->getPosition() );
+		camera->update(       deltaTime );
 
-		player->update(deltaTime);
+		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
-		physics->update(deltaTime);
+		camera->setPosition( Vector3( positionCam.getX(),
+		                              positionCam.getY(),
+		                              positionCam.getZ() ) + Vector3(.0f, cameraDistance, .0f) );
 
-		Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
-		Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);
+		Vector3 spotlightDir { sin(playerVehicle->getRotation().y),
+		                       .0f,
+		                       cos(playerVehicle->getRotation().y) };
+
+      playerLight->setDirection( spotlightDir );
+
+		Vector3 spotlightPos { playerVehicle->getPosition().x,
+		                       playerVehicle->getPosition().y + 1,
+		                       playerVehicle->getPosition().z };
+
 		spotlightPos += spotlightDir * 1;
-		playerLight->setDirection(spotlightDir);
-		playerLight->setPos(spotlightPos);
 
-		actorManager->update(deltaTime, player->getVehicle()->getPosition());
-		camera->update(deltaTime);
-		btVector3 positionCam = player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin();
-		camera->setPosition(Vector3(positionCam.getX(),positionCam.getY(),positionCam.getZ()) + Vector3(0, cameraDistance, 0));
-
+		playerLight->setPos( spotlightPos );
+		
 		timerForParticle += deltaTime;
-		if (timerForParticle > 0.01f)
+		if ( timerForParticle > .01f )
 		{
 			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
-                               5 * Vector3(Input::GetDirectionR(0).x,
-                               0,
-                               Input::GetDirectionR(0).y),
-                               addNrOfParticles, lifeTime, randomPosPower);
+			                      5 * Vector3(Input::GetDirectionR(0).x,
+			                      0,
+			                      Input::GetDirectionR(0).y),
+			                      addNrOfParticles, lifeTime, randomPosPower);
 			timerForParticle = 0;
 		}
-
-		if (player->isDead())
+		
+		if ( player->isDead() )
 		{
-			changeTime(-30.0f);
+			changeTime( -30.0f );
 			player->resetHealth();
 		}
 	}
-
+	
 	/*-------------------------RENDERING-------------------------*/
-	//Render all objects
-	graphics.render(camera.get(), deltaTime);
-
-	//Render UI
-	menues[MENU_PLAYING]->update(deltaTime);
-	if (currentMenu != MENU_PLAYING)
-		menues[currentMenu]->update(deltaTime);
-	else if (Input::CheckButton(MENU, PRESSED, 0))
-		this->setCurrentMenu(PlayingGameState::MENU_PAUSED);
-
+	// render all objects
+	graphics.render( camera.get(), deltaTime );
+	
+	// render UI
+	menues[MENU_PLAYING]->update( deltaTime );
+	if ( currentMenu != MENU_PLAYING )
+		menues[currentMenu]->update( deltaTime );
+	else if ( Input::CheckButton(MENU, PRESSED, 0) )
+		setCurrentMenu( PlayingGameState::MENU_PAUSED );
+	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
-
-   if constexpr ( isDebugging ) {
+	
+	if constexpr ( isDebugging ) {
 	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();
 	   ImGui::NewFrame();
@@ -452,8 +464,7 @@ void  PlayingGameState::update(float deltaTime)
 	   ImGui::Render();
 	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
    }
-
-	// Present scene
+	
 	graphics.presentScene();
 }
 
@@ -466,11 +477,11 @@ F32 PlayingGameState::getTime() const noexcept {
 }
 
 void PlayingGameState::setTime(float time) noexcept {
-	this->time = max(time, 0.0f);
+	time = max( time, .0f );
 }
 
 void PlayingGameState::changeTime(float timeDiff) noexcept {
-	this->time = max(this->time + timeDiff, 0.0f);
+	time = max( time + timeDiff, .0f );
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
@@ -483,15 +494,15 @@ Vehicle* PlayingGameState::getPlayer() const {
 
 std::string PlayingGameState::getMinimap() const
 {
-	return this->minimap;
+	return minimap;
 }
 
 Vector3 PlayingGameState::getTopLeft() const
 {
-	return this->topLeft;
+	return topLeft;
 }
 
 Vector3 PlayingGameState::getBottomRight() const
 {
-	return this->bottomRight;
+	return bottomRight;
 }
