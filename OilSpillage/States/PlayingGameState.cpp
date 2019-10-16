@@ -85,10 +85,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	map = std::make_unique<Map>(graphics, config);
 	initAI();
 	//Minimap stuff
-	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
-	bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1);
-	tileCount = Vector2(static_cast<float>(config.dimensions.x), static_cast<float>(config.dimensions.y));
-	tileSize = Vector3(config.tileScaleFactor.data);
+	topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
+	bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 	//Needs to be loaded before the menues
 	this->minimap = createMinimapTexture(*map);
 
@@ -326,11 +324,9 @@ void PlayingGameState::ImGui_ProcGen() {
 		minimap = createMinimapTexture( *map );
 		aStar->generateTileData( map->getTileMap() );
 		// minimap stuff
-		topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0);
-		bottomRight = map->tilemap->convertTilePositionToWorldPosition(0, 0);
-		tileCount = Vector2( static_cast<float>(config.dimensions.x),
-		                     static_cast<float>(config.dimensions.y) );
-		tileSize = Vector3( config.tileScaleFactor.data );
+		topLeft = map->tilemap->convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
+		bottomRight = map->tilemap->convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+
 		graphics.reloadTexture(minimap);
 	}
 	ImGui::End();
@@ -491,14 +487,4 @@ Vector3 PlayingGameState::getTopLeft() const
 Vector3 PlayingGameState::getBottomRight() const
 {
 	return this->bottomRight;
-}
-
-Vector3 PlayingGameState::getTileSize() const
-{
-	return this->tileSize;
-}
-
-Vector2 PlayingGameState::getTileCount() const
-{
-	return this->tileCount;
 }

@@ -33,8 +33,6 @@ public:
 	std::string  getMinimap() const;
 	Vector3      getTopLeft() const;
 	Vector3      getBottomRight() const;
-	Vector3      getTileSize() const;
-	Vector2      getTileCount() const;
 
 private:
 	friend class Game;
@@ -44,8 +42,6 @@ private:
 	std::string                     minimap;
 	Vector3                         topLeft;
 	Vector3                         bottomRight;
-	Vector3                         tileSize;
-	Vector2                         tileCount;
 	int                             currentMenu;
 	bool                            isUsingManhattanDistance { true };
 	float                           cameraDistance           { 25   };
