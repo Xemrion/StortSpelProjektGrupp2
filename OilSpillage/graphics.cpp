@@ -21,7 +21,7 @@ Graphics::Graphics()
 
 	lightBufferContents = new LightBufferContents;
 
-	this->quadTree = std::make_unique<QuadTree>(Vector2(-96.f * 10.f, -96.f * 10.f), Vector2(96.f * 10.f, 96.f * 10.f), 4);
+	this->quadTree = std::make_unique<QuadTree>(Vector2(-96.f * 20.f, -96.f * 20.f), Vector2(96.f * 20.f, 96.f * 20.f), 4); // TODO: improve situation
 }
 
 Graphics::~Graphics()
