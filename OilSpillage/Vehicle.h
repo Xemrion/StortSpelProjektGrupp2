@@ -13,6 +13,16 @@ private:
 	GameObject* vehicle;
 	GameObject* bodyRotation;
 	GameObject* bodyRotationPoint;
+	btScalar mRotation;
+
+	GameObject* wheel1;
+	GameObject* wheel2;
+	GameObject* wheel3;
+	GameObject* wheel4;
+	btGeneric6DofSpring2Constraint* spring1;
+	btGeneric6DofSpring2Constraint* spring2;
+	btGeneric6DofSpring2Constraint* spring3;
+	btGeneric6DofSpring2Constraint* spring4;
 
 	int health;
 
@@ -52,11 +62,12 @@ private:
 	Vector2 currentDir;
 	float velocitySimple;
 	float velocitySpeed;
+	class Physics* physics;
 public:
 	Vehicle();
 	virtual ~Vehicle();
 
-	void init();
+	void init(Physics *physics);
 	void update(float deltaTime);
 	GameObject* getVehicle() { return this->vehicle; }
 	float getAcceleratorX();
@@ -65,6 +76,7 @@ public:
 	bool getDrivingMode();
 	Vector3 getVelocity();
 	float getVelocitySpeed();
+	float getRotator();
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;
@@ -75,6 +87,11 @@ public:
 	void resetHealth();
 	void changeHealth(int amount);
 	bool isDead() const;
+
+
+	float getPitch(DirectX::XMVECTOR Quaternion);
+	float getYaw(DirectX::XMVECTOR Quaternion);
+	float getRoll(DirectX::XMVECTOR Quaternion);
 };
 
 #endif // !VEHICLE_H

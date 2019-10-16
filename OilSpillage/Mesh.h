@@ -3,23 +3,12 @@
 #include"Structs.h"
 #include<vector>
 using namespace DirectX::SimpleMath;
-struct AABB
-{
-	Vector3 maxPos;
-	Vector3 minPos;
-	AABB scale(Vector3 scale)
-	{
-		AABB scaledAABB = { maxPos * scale, minPos * scale };
-		return scaledAABB;
-	};
-};
 
 class Mesh
 {
 public:
 	Mesh();
-	void loadMesh(const char* filename);
-	void insertDataToMesh(std::vector<Vertex3D>& vertexData);
+	void insertDataToMesh(std::vector<Vertex3D> vertexData);
 	void operator=(const Mesh& rh) { this->vertices = rh.vertices; }
 
 	virtual ~Mesh() { }
