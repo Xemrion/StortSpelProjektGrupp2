@@ -123,7 +123,7 @@ Vector3  Map::generateRoadPositionInWorldSpace(RNG& rng) const noexcept {
 }
 
 void  Map::generateBuildings( ) {
-	DBG_PROBE(Map::generateBuildings);
+	DBG_PROBE( Map::generateBuildings );
 	RNG  rng{ RD()() };
 	rng.seed( config.seed );
 	
@@ -225,7 +225,7 @@ void  Map::generateBuildings( ) {
 // basic proto placement algorithm
 // TODO: refactor out of Game
 Opt<Vector<V2u>>  Map::findValidHouseLot( RNG& rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vector<District> const& districtLookUpTable ) {
-   DBG_PROBE(Map::findValidHouseLot);
+   DBG_PROBE( Map::findValidHouseLot );
 	using Bounds = Voronoi::Bounds;
 	Bounds    cellBounds      { districtMap.computeCellBounds(cellId) };
 	U16_Dist  generateOffset  { 0x0, 0xFF };
@@ -236,27 +236,27 @@ Opt<Vector<V2u>>  Map::findValidHouseLot( RNG& rng, U16 cellId, Voronoi const& d
 	                                   or (map.tileAt(tilePosition) != Tile::ground);
 	                            } };
 
-	District const  districtType{ districtLookUpTable[cellId] }; // TODO: refactor? (and param)
-	U16_Dist        generateTargetSize{ District_getBuildingMinArea(districtType), District_getBuildingMaxArea(districtType) };
-	U16      const  targetSize{ generateTargetSize(rng) };
+	District const  districtType       { districtLookUpTable[cellId] }; // TODO: refactor? (and param)
+	U16_Dist        generateTargetSize { District_getBuildingMinArea(districtType), District_getBuildingMaxArea(districtType) };
+	U16      const  targetSize         { generateTargetSize(rng) };
 
 	// find valid starting coordinate:
 	V2u  startPosition{};
 	do {
-		startPosition.x = generateX(rng);
-		startPosition.y = generateY(rng);
-	} while (isValidPosition(startPosition));
+		startPosition.x = generateX( rng );
+		startPosition.y = generateY( rng );
+	} while (isValidPosition( startPosition) );
 
 	Vector<V2u>  claimedPositions, candidateSources;
 
-	claimedPositions.reserve(targetSize);
-	claimedPositions.push_back(startPosition);
+	claimedPositions.reserve( targetSize );
+	claimedPositions.push_back( startPosition );
 
-	candidateSources.reserve(targetSize);
-	candidateSources.push_back(startPosition);
+	candidateSources.reserve( targetSize );
+	candidateSources.push_back( startPosition );
 
 	while (claimedPositions.size() != targetSize and candidateSources.size() != 0) {
-		auto const &sourcePosition = candidateSources[generateOffset(rng) % candidateSources.size()];
+		auto const &sourcePosition = candidateSources[ generateOffset(rng) % candidateSources.size() ];
 		// find valid neighbours
 		auto  candidateDestinations = map.getCardinallyNeighbouringTilePositions(sourcePosition);
 		// eliminate invalid ones from our destination candidate list
@@ -336,7 +336,7 @@ void  Map::setDistrictColorCoding( bool useColorCoding ) noexcept {
 		// colour code tiles depending on cell index:
 		for ( U16 y = 0;  y < tilemap->height;  ++y ) {
 			for ( U16 x = 0;  x < tilemap->width;  ++x ) {
-				assert(tilemap->data.size() == districtMap->diagram.size() && "BUG!");
+				assert( tilemap->data.size() == districtMap->diagram.size() and "BUG!" );
 				auto       &tile      = roadTiles[ tilemap->index(x, y) ];
 				auto        cellIndex = districtMap->diagramIndex(x, y);
 				auto        cellId    = districtMap->diagram[ cellIndex ];
@@ -366,5 +366,5 @@ V2u  Map::getStartPositionInTileSpace() const noexcept {
 }
 
 Vector3  Map::getStartPositionInWorldSpace() const noexcept {
-	return tilemap->convertTilePositionToWorldPosition(startPositionInTileSpace);
+	return tilemap->convertTilePositionToWorldPosition( startPositionInTileSpace );
 }

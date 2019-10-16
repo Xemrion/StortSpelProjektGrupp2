@@ -101,16 +101,17 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_OPTIONS]->init();
 
-	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
+   auto playerVehicle = player->getVehicle();
+	playerVehicle->setPosition(map->getStartPositionInWorldSpace());
 
-	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
 		{
-		 Vector3(0.0f, 30.0f + cameraDistance, -10.0f) + player->getVehicle()->getPosition(),
+		 Vector3(0.0f, 30.0f + cameraDistance, -10.0f) + playerVehicle->getPosition(),
 		 Vector3(0.0f, 0.0f, 0.0f), 0.0f },
 		{
-		 Vector3(0.0f, cameraDistance, 0.0f) + player->getVehicle()->getPosition(),
+		 Vector3(0.0f, cameraDistance, 0.0f) + playerVehicle->getPosition(),
 		 Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
@@ -118,14 +119,14 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	Input::SetKeyboardPlayerID(0);
 	//Bullet
-	buildingTest = std::make_unique<GameObject>();
-	buildingTest->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(buildingTest.get());
-	btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
-	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
-	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
-	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
-	buildingTest->setRigidBody(tempo2, physics.get());
+	//buildingTest = std::make_unique<GameObject>();
+	//buildingTest->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//Game::getGraphics().addToDraw(buildingTest.get());
+	//btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
+	//buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
+	//buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
+	//buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
+	//buildingTest->setRigidBody(tempo2, physics.get());
 }
 
 PlayingGameState::~PlayingGameState()
@@ -134,7 +135,8 @@ PlayingGameState::~PlayingGameState()
 	delete actorManager;
 }
 
-void  PlayingGameState::ImGui_Driving() {
+void  PlayingGameState::ImGui_Driving()
+{
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
@@ -186,7 +188,8 @@ void PlayingGameState::ImGui_AI()
 	ImGui::End();
 }
 
-void PlayingGameState::ImGui_Particles() {
+void PlayingGameState::ImGui_Particles()
+{
 	ImGui::Begin("Particle");
 	ImGui::ColorPicker4("Color Slider", colors);
 	ImGui::ColorPicker4("Color 1 Slider", colors2);
@@ -207,18 +210,19 @@ void PlayingGameState::ImGui_Particles() {
 	colorsP[1].w = 1.0f;
 	colorsP[2].w = 1.0f;
 	colorsP[3].w = 1.0f;
-	this->graphics.setVectorField(vectorFieldSize, vectorFieldPower);
-	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-	this->graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
+	graphics.setVectorField(vectorFieldSize, vectorFieldPower);
+	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+	graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
 
 	ImGui::End();
 }
 
 
 #include "../PG/MinimapTextureGenerator.hpp"
-void PlayingGameState::ImGui_ProcGen() {
-	static Bool shouldColorCodeDistricts = true;
-	ImGui::Begin("Map Generation:");
+void PlayingGameState::ImGui_ProcGen()
+{
+   static Bool shouldColorCodeDistricts { true };
+	ImGui::Begin( "Map Generation:" );
 	if ( static bool isFirstFrame = true;  isFirstFrame ) {
 		ImGui::SetWindowPos({    0,  75 });
 		ImGui::SetWindowSize({ 525, 475 });
@@ -408,7 +412,11 @@ void  PlayingGameState::update(float deltaTime)
 		timerForParticle += deltaTime;
 		if (timerForParticle > 0.01f)
 		{
-			this->graphics.addParticle(this->player->getVehicle()->getPosition() + Vector3(0, 5, 0), 5 * Vector3(Input::GetDirectionR(0).x, 0, Input::GetDirectionR(0).y), addNrOfParticles, lifeTime, randomPosPower);
+			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
+                               5 * Vector3(Input::GetDirectionR(0).x,
+                               0,
+                               Input::GetDirectionR(0).y),
+                               addNrOfParticles, lifeTime, randomPosPower);
 			timerForParticle = 0;
 		}
 
