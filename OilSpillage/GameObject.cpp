@@ -1,30 +1,34 @@
 #include"GameObject.h"
 #include"game.h"
-GameObject::~GameObject()
+
+GameObject::~GameObject() noexcept
 {
-	if (rigidBody != nullptr) {
-		physics->DeleteRigidBody(rigidBody);
-		this->rigidBody = nullptr;
+	if ( rigidBody ) {
+      // TODO: refactor so UPtrs are used instead?
+		physics->deleteRigidBody( rigidBody );
+		rigidBody = nullptr;
 	}
 }
+
 void GameObject::updateRigidBody()
 {
+   // TODO?
 }
-Matrix GameObject::getTransform() {
 
-
-	if (rigidBody == nullptr) {
+Matrix GameObject::getTransform()
+{
+	if ( !rigidBody ) {
 		Matrix transform(Matrix::CreateScale(scale));
 		transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
 		transform *= Matrix::CreateTranslation(position);
 
-		if (this->parent != nullptr)
+		if ( parent )
 		{
-			transform *= this->parent->getTransform();
+			transform *= parent->getTransform();
 		}
 
 		return transform;
-	}else {
+	} else {
 
 		//btVector3 pos = btVector3(rigidBody->getWorldTransform().getOrigin());
 		//this->position = Vector3(pos.getX(),pos.getY(),pos.getZ());
@@ -35,151 +39,142 @@ Matrix GameObject::getTransform() {
 		btQuaternion rot = rigidBody->getWorldTransform().getRotation();
 		Quaternion d3drotation(rot.x(), rot.y(), rot.z(), rot.w());
 
-		this->rotationQt = d3drotation;
+		rotationQt = d3drotation;
 
 		transform *= Matrix::CreateFromQuaternion(d3drotation);
 		transform *= Matrix::CreateTranslation(position);
 
-		if (this->parent != nullptr)
+		if ( parent )
 		{
-			transform *= this->parent->getTransform();
+			transform *= parent->getTransform();
 		}
 
 		return transform;
 	}
 }
 
-void GameObject::setPosition(Vector3 newPos)
+void GameObject::setPosition( Vector3 const &p )
 {
-	this->position = newPos;
+	position = p;
 }
 
-void GameObject::move(Vector3 addPos)
+void GameObject::move( Vector3 const &offset )
 {
-	this->position += addPos;
+	position += offset;
 }
 
-void GameObject::addRotation(Vector3 addRotaiton)
+void GameObject::addRotation( Vector3 const &r )
 {
-	this->rotation += addRotaiton;
-	this->rotation.x = fmod(this->rotation.x, 2 * DirectX::XM_PI);
-	this->rotation.y = fmod(this->rotation.y, 2 * DirectX::XM_PI);
-	this->rotation.z = fmod(this->rotation.z, 2 * DirectX::XM_PI);
+	rotation += r;
+	rotation.x = fmod( rotation.x, 2 * DirectX::XM_PI );
+	rotation.y = fmod( rotation.y, 2 * DirectX::XM_PI );
+	rotation.z = fmod( rotation.z, 2 * DirectX::XM_PI );
 }
 
-void GameObject::setRotation(Vector3 newRotation)
+void GameObject::setRotation( Vector3 const &r )
 {
-	this->rotation = newRotation;
-	this->rotation.x = fmod(this->rotation.x, 2 * DirectX::XM_PI);
-	this->rotation.y = fmod(this->rotation.y, 2 * DirectX::XM_PI);
-	this->rotation.z = fmod(this->rotation.z, 2 * DirectX::XM_PI);
+	rotation = r;
+	rotation.x = fmod( rotation.x, 2 * DirectX::XM_PI );
+	rotation.y = fmod( rotation.y, 2 * DirectX::XM_PI );
+	rotation.z = fmod( rotation.z, 2 * DirectX::XM_PI );
 }
 
-void GameObject::setScale(Vector3 newScale)
+void GameObject::setScale( Vector3 const &s )
 {
-	this->scale = newScale;
+	scale = s;
 }
 
 Texture* GameObject::getTexture()
 {
-	return this->texture;
+	return texture;
 }
 
-void GameObject::setTexture(Texture* aTexture)
+void GameObject::setTexture( Texture *t )
 {
-	this->texture = aTexture;
+	texture = t;
 }
 
-Texture* GameObject::getNormalMap()
+Texture *GameObject::getNormalMap()
 {
-	return this->normalMap;
+	return normalMap;
 }
 
-void GameObject::setNormalMap(Texture* normalMap)
+void GameObject::setNormalMap( Texture *n )
 {
-	this->normalMap = normalMap;
+	normalMap = n;
 }
 
-void GameObject::setColor(Vector4 aColor)
+void GameObject::setColor( Vector4 const &c )
 {
-	this->color = aColor;
+	color = c;
 }
 
-Vector4 GameObject::getColor()const
+Vector4 const &GameObject::getColor() const
 {
-	return this->color;
+	return color;
 }
 
-Vector3 GameObject::getPosition() const
+Vector3 const &GameObject::getPosition() const
 {
-	return this->position;
+	return position;
 }
 
-Vector3 & GameObject::getPosition()
+Vector3 const &GameObject::getRotation() const
 {
-	return this->position;
+	return rotation;
 }
 
-Vector3 GameObject::getRotation() const
+Quaternion const &GameObject::getRotationQuaternion() const
 {
-	return this->rotation;
+	return rotationQt;
 }
-Quaternion GameObject::getRotationQuaternion() const
+
+Vector3 const &GameObject::getScale() const
 {
-	return this->rotationQt;
-}
-Vector3 GameObject::getScale() const
-{
-	return this->scale;
+	return scale;
 }
 
 AABB GameObject::getAABB() const
 {
 	AABB boundingBox = this->mesh->getAABB().scale(this->scale);
-	boundingBox.maxPos += this->getPosition();
-	boundingBox.minPos += this->getPosition();
+   auto position = getPosition();
+	boundingBox.maxPos += position;
+	boundingBox.minPos += position;
 	return boundingBox;
 }
 
-btRigidBody* GameObject::getRigidBody()
+btRigidBody *GameObject::getRigidBody()
 {
-	return this->rigidBody;
+	return rigidBody;
 }
 
-void GameObject::setRigidBody(btRigidBody* body, Physics* physics)
+void GameObject::setRigidBody( btRigidBody *b, Physics *p )
 {
-	this->rigidBody = body;
-	this->physics = physics;
+	rigidBody = b;
+	physics   = p;
 }
 
-Matrix GameObject::btTransform_to_XMMATRIX(btTransform const& trans)
+Matrix GameObject::btTransform_to_XMMATRIX( btTransform const &t )
 {
-	//store btTranform in 4x4 Matrix
+	// store btTranform in 4x4 Matrix
 	Matrix matrix;
-	//XMFLOAT4X4 matrix4x4 = XMFLOAT4X4();
-	btMatrix3x3 const& Rotation = trans.getBasis();
-	btVector3 const& Position = trans.getOrigin();
+	// XMFLOAT4X4 matrix4x4 = XMFLOAT4X4();
+	btMatrix3x3 const &rot = t.getBasis();
+	btVector3   const &pos = t.getOrigin();
 	// copy rotation matrix
-	for (int row = 0; row < 3; ++row)
-	{
-
-		for (int column = 0; column < 3; ++column)
-		{
-			matrix.m[row][column] = Rotation[column][row];
-		}
-	}
+	for ( int row = 0;  row < 3;  ++row )
+		for ( int column = 0;  column < 3;  ++column )
+			matrix.m[row][column] = rot[column][row];
 
 	// copy position
-	for (int column = 0; column < 3; ++column)
-	{
-		matrix.m[3][column] = Position[column];
-	}
+	for ( int column = 0;  column < 3;  ++column )
+		matrix.m[3][column] = pos[column];
+
 	return matrix;
 }
 
 Vector3 GameObject::btTransform_to_XMFLOAT3(btTransform const& trans)
 {
-	btVector3 const Position = trans.getOrigin();
-
-	return Vector3(Position.getX(), Position.getY(), Position.getZ());
+	btVector3 const pos = trans.getOrigin();
+	return Vector3( pos.getX(), pos.getY(), pos.getZ() );
 }

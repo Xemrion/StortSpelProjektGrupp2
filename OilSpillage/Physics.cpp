@@ -135,7 +135,7 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass)
 //	return body;
 //}
 
-bool Physics::DeleteRigidBody(btRigidBody * rb)
+bool Physics::deleteRigidBody(btRigidBody * rb)
 {
 	
 		for (int i = 0; i < this->bodies.size(); i++)

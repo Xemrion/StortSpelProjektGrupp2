@@ -1,18 +1,23 @@
 #include "Map.hpp"
 #include "Profiler.hpp"
 
+// TODO: refactor out building gen into separate header|source
+
 Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	graphics        ( graphics                                                              ),
 	physics         ( physics                                                               ),
 	config          ( config                                                                ),
-	tilemap         ( std::make_unique<TileMap>(config)                                     ),
+	tileMap         ( std::make_unique<TileMap>(config)                                     ),
 	districtMarkers ( static_cast<Size>( config.districtCellSide) * config.districtCellSide ),
-	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y     )
+	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y     ),
+	buildingIDs     ( config.dimensions.x * config.dimensions.y, 0U                         ),
+	roadDistanceMap ( config.dimensions.x * config.dimensions.y, 0U                         )
 {
 	DBG_PROBE(Map::Map);
 	// TODO: generate water etc
 	generateDistricts();
 	generateRoads();
+   generateDistanceMap(); // must be done after generateRoads() and before generateBuildings()
 	generateBuildings();
 }
 
@@ -37,11 +42,11 @@ void  Map::generateRoads() {
 	
 	MapConfig  roadConfig{ config };
 	while (true) { // TODO: add MAX_TRIES?
-		RoadGenerator roadGenerator{ *tilemap };
+		RoadGenerator roadGenerator{ *tileMap };
 		roadGenerator.generate(roadConfig);
-		if (tilemap->getRoadCoverage() < roadConfig.roadMinTotalCoverage) {
+		if (tileMap->getRoadCoverage() < roadConfig.roadMinTotalCoverage) {
 			roadConfig.seed = generateSeed(rng);
-			tilemap = std::make_unique<TileMap>(roadConfig);
+			tileMap = std::make_unique<TileMap>(roadConfig);
 		}
 		else {
 			startPositionInTileSpace = roadGenerator.getStartPosition();
@@ -52,15 +57,15 @@ void  Map::generateRoads() {
 	if constexpr ( isDebugging ) {
 	   std::ofstream roadGenerationLog(String("PG/logs/") + mapConfigToFilename(config, "_road_gen.txt"));
 	   if (roadGenerationLog.is_open()) {
-		   roadGenerationLog << *tilemap;
+		   roadGenerationLog << *tileMap;
 		   roadGenerationLog.close();
 		}
 	}
 	
-	roadTiles = tilemap->loadAsModels(graphics); // GameObject instantiation
-	for ( U16 y = 0;  y < tilemap->height;  ++y ) {
-		for ( U16 x = 0;  x < tilemap->width;  ++x ) {
-			auto& tile = roadTiles[tilemap->index(x,y)];
+	roadTiles = tileMap->loadAsModels(graphics); // GameObject instantiation
+	for ( U16 y = 0;  y < tileMap->height;  ++y ) {
+		for ( U16 x = 0;  x < tileMap->width;  ++x ) {
+			auto& tile = roadTiles[tileMap->index(x,y)];
 			tile.setScale(Vector3{ .0005f * config.tileScaleFactor.x,
 			                       .0005f * config.tileScaleFactor.y,
 			                       .0005f * config.tileScaleFactor.z }); // TODO: scale models instead
@@ -94,7 +99,7 @@ void  Map::generateDistricts() {
 			marker.mesh  = graphics.getMeshPointer("Cube");
 			marker.setColor({ 1, 0,  0, 1 });
 			marker.setScale({ .2f, 4.0f, .2f });
-			marker.setPosition({ tilemap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
+			marker.setPosition({ tileMap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
 			                                                                  static_cast<U16>(cellCentre.y)) });
 			graphics.addToDraw(&marker, true);
 	   }
@@ -113,13 +118,13 @@ V2u Map::generateRoadPositionInTileSpace(RNG& rng) const noexcept {
       y = generateY( rng );
       if ( ++counter > MAX_TRIES )
          assert( false and "No road tile found!" );
-   } while ( tilemap->tileAt(x,y) != Tile::road );
+   } while ( tileMap->tileAt(x,y) != Tile::road );
    return { x, y };
 }
 
 Vector3  Map::generateRoadPositionInWorldSpace(RNG& rng) const noexcept {
 	auto  positionInTileSpace{ generateRoadPositionInTileSpace(rng) };
-	return tilemap->convertTilePositionToWorldPosition( positionInTileSpace );
+	return tileMap->convertTilePositionToWorldPosition( positionInTileSpace );
 }
 
 void  Map::generateBuildings( ) {
@@ -152,7 +157,7 @@ void  Map::generateBuildings( ) {
 	for ( U16 cellId = 0;  cellId < districtMap->noise.size();  ++cellId) {
 		District    districtType{ districtLookupTable[cellId] };
 		Size        currentArea{ 0 };
-		Size const  cellArea{ districtMap->computeCellRealEstateArea(cellId,*tilemap) };
+		Size const  cellArea{ districtMap->computeCellRealEstateArea(cellId,*tileMap) };
 		
 		#ifdef _DEBUG
 		   U64  currrentDistrictBuildingCount { 0 };
@@ -165,9 +170,9 @@ void  Map::generateBuildings( ) {
 			auto        computeCurrentDistrictCoverage { [&currentArea, cellArea]() {
 			                                                return F32(currentArea) / F32(cellArea);
 			                                             } };
-			while (computeCurrentDistrictCoverage() < targetDistrictCoverage) {
-				auto potentialLot = findValidHouseLot(rng, cellId, *districtMap, *tilemap, districtLookupTable);
-				if (potentialLot) {
+			while ( computeCurrentDistrictCoverage() < targetDistrictCoverage ) {
+				auto potentialLot = findValidHouseLot( rng, cellId, *districtMap, *tileMap, districtLookupTable );
+				if ( potentialLot ) {
 					auto &building     = potentialLot.value();
 					auto  buildingSize = building.size();
                #ifdef _DEBUG
@@ -179,20 +184,21 @@ void  Map::generateBuildings( ) {
 						   << (computeCurrentDistrictCoverage() * 100.0f) << "%\n"
 						   << "\t\t\t" "The target coverage is: " << targetDistrictCoverage * 100.0f << "%\n";
 					#endif
-					U16_Dist  generateFloorCount { District_getMinFloorCount(districtType), District_getMaxFloorCount(districtType) };
-					F32       randomFloorCount   { static_cast<F32>(generateFloorCount(rng)) };
+					U16_Dist   generateFloorCount { District_getMinFloorCount(districtType), District_getMaxFloorCount(districtType) };
+					F32        randomFloorCount   { static_cast<F32>(generateFloorCount(rng)) };
+               BuildingID id                 { generateBuildingID() };
 					currentArea += buildingSize;
 					for ( auto &tilePosition : potentialLot.value() ) {
 						houseTiles.emplace_back();
 						auto &houseTile = houseTiles.back();
-						tilemap->tileAt(tilePosition) = Tile::building;
+                  buildingIDs[tileMap->index(tilePosition)] = id;
+						tileMap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
 						houseTile.mesh = graphics.getMeshPointer("Cube");
-						//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
 						houseTile.setScale({ .5f * config.tileScaleFactor.x,
 						                     .5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * randomFloorCount,
 						                     .5f * config.tileScaleFactor.z });
-						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) });
+						houseTile.setPosition({ tileMap->convertTilePositionToWorldPosition(tilePosition) });
 						btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
 						                                               houseTile.getPosition().y,
 						                                               houseTile.getPosition().z ),
@@ -225,6 +231,9 @@ void  Map::generateBuildings( ) {
 // basic proto placement algorithm
 // TODO: refactor out of Game
 Opt<Vector<V2u>>  Map::findValidHouseLot( RNG& rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vector<District> const& districtLookUpTable ) {
+
+   static constexpr auto MAXIMUM_DISTANCE_FROM_ROAD { 3U }; // TODO: refactor into config
+
    DBG_PROBE( Map::findValidHouseLot );
 	using Bounds = Voronoi::Bounds;
 	Bounds    cellBounds      { districtMap.computeCellBounds(cellId) };
@@ -232,8 +241,10 @@ Opt<Vector<V2u>>  Map::findValidHouseLot( RNG& rng, U16 cellId, Voronoi const& d
 	U16_Dist  generateX       { cellBounds.min.x, cellBounds.max.x };
 	U16_Dist  generateY       { cellBounds.min.y, cellBounds.max.y };
 	auto      isValidPosition { [&](V2u const& tilePosition) -> Bool {
-	                               return  (districtMap.diagram[districtMap.diagramIndex(tilePosition)] != cellId)
-	                                   or (map.tileAt(tilePosition) != Tile::ground);
+                              // TODO: verify roadDistanceMap usage
+	                               return ((districtMap.diagram[districtMap.diagramIndex(tilePosition)] != cellId)
+	                                    or (map.tileAt(tilePosition) != Tile::ground))
+                                      and (roadDistanceMap[map.index(tilePosition)] <= MAXIMUM_DISTANCE_FROM_ROAD);
 	                            } };
 
 	District const  districtType       { districtLookUpTable[cellId] }; // TODO: refactor? (and param)
@@ -285,7 +296,7 @@ Opt<Vector<V2u>>  Map::findValidHouseLot( RNG& rng, U16 cellId, Voronoi const& d
 
 
 TileMap const& Map::getTileMap() const noexcept {
-	return *tilemap;
+	return *tileMap;
 }
 
 Voronoi const &Map::getDistrictMap() const noexcept {
@@ -334,10 +345,10 @@ void  Map::setDistrictColorCoding( bool useColorCoding ) noexcept {
 		for ( auto &rgba : districtColorTable )
 			rgba = util::blend( rgba, Vector4{ 1.0f }, config.districtColorCodingBlendFactor );
 		// colour code tiles depending on cell index:
-		for ( U16 y = 0;  y < tilemap->height;  ++y ) {
-			for ( U16 x = 0;  x < tilemap->width;  ++x ) {
-				assert( tilemap->data.size() == districtMap->diagram.size() and "BUG!" );
-				auto       &tile      = roadTiles[ tilemap->index(x, y) ];
+		for ( U16 y = 0;  y < tileMap->height;  ++y ) {
+			for ( U16 x = 0;  x < tileMap->width;  ++x ) {
+				assert( tileMap->data.size() == districtMap->diagram.size() and "BUG!" );
+				auto       &tile      = roadTiles[ tileMap->index(x, y) ];
 				auto        cellIndex = districtMap->diagramIndex(x, y);
 				auto        cellId    = districtMap->diagram[ cellIndex ];
 				auto const &color     = districtColorTable[ cellId % districtColorTable.size() ];
@@ -345,7 +356,7 @@ void  Map::setDistrictColorCoding( bool useColorCoding ) noexcept {
 			}
 		}
 		for ( auto &e : houseTiles ) {
-			auto        cellPosition = tilemap->convertWorldPositionToTilePosition( e.getPosition() );
+			auto        cellPosition = tileMap->convertWorldPositionToTilePosition( e.getPosition() );
 			auto        cellIndex    = districtMap->diagramIndex( cellPosition.x, cellPosition.y );
 			auto        cellID       = districtMap->diagram[ cellIndex ];
 			auto const &color        = districtColorTable[ cellID % districtColorTable.size() ];
@@ -353,7 +364,7 @@ void  Map::setDistrictColorCoding( bool useColorCoding ) noexcept {
 		}
 	}
 	else {
-		static auto const  defaultColor = Vector4{ .5f, .5f, .5f, 1.0f };
+		static auto const  defaultColor = Vector4{ .3f, .3f, .3f, 1.0f };
 		for ( auto &e : roadTiles )
 			e.setColor( defaultColor );
 		for ( auto& e : houseTiles )
@@ -366,5 +377,34 @@ V2u  Map::getStartPositionInTileSpace() const noexcept {
 }
 
 Vector3  Map::getStartPositionInWorldSpace() const noexcept {
-	return tilemap->convertTilePositionToWorldPosition( startPositionInTileSpace );
+	return tileMap->convertTilePositionToWorldPosition( startPositionInTileSpace );
+}
+
+void Map::generateDistanceMap() noexcept {
+   auto const  maxRadius = util::maxValue( config.dimensions.x, config.dimensions.y );
+   auto  getNearestRoad {[=]( auto x, auto y ) {
+      auto  radius { 0 };
+      do {
+         BoundingBox bounds { {x,y}-radius, {x,y}+radius };
+         // TODO: refactor into ensureInBounds()?
+         if ( bounds.min.x < 0 )
+            bounds.min.x = 0;
+         if ( bounds.min.y < 0 )
+            bounds.min.y = 0;
+         if ( bounds.max.x >= config.dimensions.x )
+            bounds.max.x = config.dimensions.x;
+         if ( bounds.max.y >= config.dimensions.y )
+            bounds.max.y = config.dimensions.y;
+         // find nearest road:
+         for ( auto x = bounds.min.x;  x < bounds.max.x; ++x )
+            for ( auto y = bounds.min.y;  x < bounds.max.y; ++y )
+               if ( tileMap->tileAt(x,y) == Tile::road )
+                  { roadDistanceMap[tileMap->index(x,y)] = radius; break; }
+      } while ( ++radius < maxRadius );
+      assert( false and "No road found! Bug!" ); // possible solution: check gen params
+   }};
+}
+
+Map::BuildingID  Map::generateBuildingID() noexcept {
+   return nextBuildingID++;
 }

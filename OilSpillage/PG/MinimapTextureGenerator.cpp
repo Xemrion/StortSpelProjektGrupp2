@@ -6,10 +6,10 @@
 
 #pragma warning( disable : 4715 ) 
 String createMinimapTexture( Map const &map ) {
-   auto const &tilemap = map.getTileMap();
+   auto const &tileMap = map.getTileMap();
    // image data:
-   Size const  TEX_WIDTH          { tilemap.width  * 3 },
-               TEX_HEIGHT         { tilemap.height * 3 };
+   Size const  TEX_WIDTH          { tileMap.width  * 3 },
+               TEX_HEIGHT         { tileMap.height * 3 };
    Vector<RGBA>   pixels             ( TEX_WIDTH * TEX_HEIGHT );
 
    // random number generation:
@@ -40,13 +40,13 @@ String createMinimapTexture( Map const &map ) {
                NW                 {           N + W };
 
    // main loop:
-   for ( U16 tileY = 0;  tileY < tilemap.height;  ++tileY ) {
-      for ( U16 tileX = 0;  tileX < tilemap.width;  ++tileX ) {
+   for ( U16 tileY = 0;  tileY < tileMap.height;  ++tileY ) {
+      for ( U16 tileX = 0;  tileX < tileMap.width;  ++tileX ) {
          // TODO: add district borders?
          auto district            { map.getDistrictMap() };
          Size tileDistrictID      { district.diagram[ district.diagramIndex(tileX,tileY)] };
          RGBA districtColorOffset ( 0x00'040404 * ((tileDistrictID+499)%7) );
-         switch ( tilemap.tileAt(tileX, tileY) ) {
+         switch ( tileMap.tileAt(tileX, tileY) ) {
             case Tile::ground: {
                pixels[centerIndex(tileX,tileY)+NW] = groundColor() + districtColorOffset;
                pixels[centerIndex(tileX,tileY)+N ] = groundColor() + districtColorOffset;
@@ -77,13 +77,13 @@ String createMinimapTexture( Map const &map ) {
                RGBA  roadInnerColor { 0xFF'BBBBBB                       };
                RGBA  roadOuterColor { 0xFF'222222 + districtColorOffset };
                pixels[centerIndex(tileX,tileY)+NW] = roadOuterColor;
-               pixels[centerIndex(tileX,tileY)+N ] = tilemap.neighbourIsRoad(Direction::north,tileX,tileY)? roadInnerColor:roadOuterColor;
+               pixels[centerIndex(tileX,tileY)+N ] = tileMap.neighbourIsRoad(Direction::north,tileX,tileY)? roadInnerColor:roadOuterColor;
                pixels[centerIndex(tileX,tileY)+NE] = roadOuterColor;
-               pixels[centerIndex(tileX,tileY)+ W] = tilemap.neighbourIsRoad(Direction::west, tileX,tileY)? roadInnerColor:roadOuterColor;
+               pixels[centerIndex(tileX,tileY)+ W] = tileMap.neighbourIsRoad(Direction::west, tileX,tileY)? roadInnerColor:roadOuterColor;
                pixels[centerIndex(tileX,tileY)+ C] = roadInnerColor;
-               pixels[centerIndex(tileX,tileY)+ E] = tilemap.neighbourIsRoad(Direction::east, tileX,tileY)? roadInnerColor:roadOuterColor;
+               pixels[centerIndex(tileX,tileY)+ E] = tileMap.neighbourIsRoad(Direction::east, tileX,tileY)? roadInnerColor:roadOuterColor;
                pixels[centerIndex(tileX,tileY)+SW] = roadOuterColor;
-               pixels[centerIndex(tileX,tileY)+S ] = tilemap.neighbourIsRoad(Direction::south,tileX,tileY)? roadInnerColor:roadOuterColor;
+               pixels[centerIndex(tileX,tileY)+S ] = tileMap.neighbourIsRoad(Direction::south,tileX,tileY)? roadInnerColor:roadOuterColor;
                pixels[centerIndex(tileX,tileY)+SE] = roadOuterColor;
             }; break;
 

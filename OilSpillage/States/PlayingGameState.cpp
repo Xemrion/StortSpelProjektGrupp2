@@ -88,9 +88,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
    map->setDistrictColorCoding( isDebugging );
 	initAI();
 	// Minimap stuff
-   auto tilemap = map->getTileMap();
-	topLeft      = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
-	bottomRight  = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+   auto tileMap = map->getTileMap();
+	topLeft      = tileMap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
+	bottomRight  = tileMap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 	// Needs to be loaded before the menues
 	minimap = createMinimapTexture(*map);
 
@@ -326,9 +326,9 @@ void PlayingGameState::ImGui_ProcGen()
 		minimap = createMinimapTexture( *map );
 		aStar->generateTileData( map->getTileMap() );
 		// minimap stuff
-      auto tilemap = map->getTileMap();
-		topLeft      = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
-		bottomRight  = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+      auto tileMap = map->getTileMap();
+		topLeft      = tileMap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
+		bottomRight  = tileMap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 
 		graphics.reloadTexture(minimap);
 	}
