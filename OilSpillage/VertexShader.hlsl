@@ -16,7 +16,6 @@ struct VS_OUT
 	float4 Normal : NORMAL;
 	float4 shadowPos : SHADOWPOS;
 	float4 shadowPosSpot : SHADOWPOSSPOT;
-
 	float4 Tangent : TANGENT;
 	float4 Bitangent : BINORMAL;
 };

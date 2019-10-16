@@ -160,7 +160,6 @@
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="QuadTree.cpp" />
-    <ClCompile Include="PG\Walker.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />

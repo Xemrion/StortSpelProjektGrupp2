@@ -201,7 +201,7 @@ void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float 
 	Vector4 viewDir = DirectX::XMVector4Transform(Vector4(0.0, 0.0, 1.0, 0.0), invView);
 	Vector4 viewUp = DirectX::XMVector4Transform(Vector4(0.0, 1.0, 0.0, 0.0), invView);
 	Vector4 viewRight = DirectX::XMVector4Transform(Vector4(1.0, 0.0, 0.0, 0.0), invView);
-	Vector3 farCenter = camera->getPosition() + viewDir * camera->getFarDistance();
+	Vector3 farCenter = camera->getPosition() + Vector3(viewDir) * camera->getFarDistance();
 
 	Vector3 farTopLeft = farCenter + Vector3(viewUp) * camera->getFarHeight() - Vector3(viewRight) * camera->getFarWidth();
 	Vector3 farBottomLeft = farCenter - Vector3(viewUp) * camera->getFarHeight() - Vector3(viewRight) * camera->getFarWidth();
@@ -258,12 +258,12 @@ void ShadowMapping::setViweProjSpot(Vector3 pos,Vector3 dir, float fov)
 void ShadowMapping::prepare()
 {
 	ID3D11ShaderResourceView* fs = NULL;
-	Game::getGraphics().getDeviceContext()->PSSetShaderResources(4, 1, &fs);
+	Game::getGraphics().getDeviceContext()->PSSetShaderResources(3, 1, &fs);
 	Game::getGraphics().getDeviceContext()->RSSetViewports(1, &this->vp);
 	
 	deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	ID3D11ShaderResourceView* s = NULL;
-	deviceContext->PSSetShaderResources(3, 1, &s);
+	deviceContext->PSSetShaderResources(4, 1, &s);
 	deviceContext->VSSetShader(this->simpleVertexShader.Get(), nullptr, 0);
 }
 

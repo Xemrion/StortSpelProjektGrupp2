@@ -373,7 +373,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 			boundingBox.maxPos += object->getPosition();
 			boundingBox.minPos += object->getPosition();
 
-			if (frustum.intersect(boundingBox, 100.0f)) 
+			if (frustum.intersect(boundingBox, 1000.0f))
 			{
 				UINT vertexCount = object->mesh->getVertexCount();
 				UINT stride = sizeof(Vertex3D);
@@ -390,6 +390,36 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 			}
 		}
 	}
+
+	std::vector<GameObject*> objects;
+	quadTree->getGameObjects(objects, frustum, 10.0f);
+	for (GameObject* o : objects)
+	{
+		/*if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		{*/
+		AABB boundingBox = o->getAABB();
+		boundingBox = boundingBox.scale(o->getScale());
+		boundingBox.maxPos += o->getPosition();
+		boundingBox.minPos += o->getPosition();
+
+		if (frustum.intersect(boundingBox, 100.0f))
+		{
+			UINT vertexCount = o->mesh->getVertexCount();
+			UINT stride = sizeof(Vertex3D);
+			UINT offset = 0;
+			SimpleMath::Matrix world = o->getTransform();
+			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+			shadowMap.setWorld(worldTr);
+			deviceContext->PSSetShader(nullptr, nullptr, 0);
+			deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+			shadowMap.setDSun();
+			deviceContext->Draw(vertexCount, 0);
+			shadowMap.setDSpot();
+			deviceContext->Draw(vertexCount, 0);
+		}
+
+	}
+
 	deviceContext->RSSetState(rasterState.Get());
 
 	ID3D11DepthStencilView* nulDSV = nullptr;
@@ -432,9 +462,8 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
 	deviceContext->PSSetShaderResources(2, 1, this->culledLightBufferSRV.GetAddressOf());
-	deviceContext->PSSetShaderResources(1, 1, this->culledLightBufferSRV.GetAddressOf());
-	deviceContext->PSSetShaderResources(2, 1, this->shadowMap.getShadowMap().GetAddressOf());
-	deviceContext->PSSetShaderResources(3, 1, this->shadowMap.getShadowMapSpot().GetAddressOf());
+	deviceContext->PSSetShaderResources(3, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->PSSetShaderResources(4, 1, this->shadowMap.getShadowMapSpot().GetAddressOf());
 
 	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
 	deviceContext->PSSetConstantBuffers(3, 1, this->indexSpot.GetAddressOf());
