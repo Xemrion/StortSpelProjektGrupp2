@@ -13,8 +13,12 @@ void PlayingGameState::initAI()
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
 	actorManager->createDefender(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 2, map->getStartPositionInWorldSpace().z - 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 3, map->getStartPositionInWorldSpace().z - 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 4, map->getStartPositionInWorldSpace().z - 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 5, map->getStartPositionInWorldSpace().z - 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 6, map->getStartPositionInWorldSpace().z - 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 7, map->getStartPositionInWorldSpace().z - 4);
 	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 1);
 	actorManager->initGroups();
 }
@@ -441,6 +445,7 @@ void  PlayingGameState::update(float deltaTime)
 	
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
+	graphics.setSpotLighShadow(playerLight);
 	graphics.render( camera.get(), deltaTime );
 	
 	// render UI
@@ -449,6 +454,8 @@ void  PlayingGameState::update(float deltaTime)
 		menues[currentMenu]->update( deltaTime );
 	else if ( Input::CheckButton(MENU, PRESSED, 0) )
 		setCurrentMenu( PlayingGameState::MENU_PAUSED );
+	
+	//Render all objects
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	

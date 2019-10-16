@@ -13,7 +13,9 @@ Graphics::Graphics()
 	this->vp = {};
 
 	this->debugger = nullptr;
-
+	/*TA BORT*/
+	this->farZTempShadow = 1000.0f;
+	/* */
 	this->lightList = nullptr;
 	this->window = nullptr;
 
@@ -202,6 +204,16 @@ bool Graphics::init(Window* window)
 	if (FAILED(hr))
 		return false;
 	
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = 16;
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &indexSpot);
+	if (FAILED(hr))
+		return false;
 
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
@@ -247,6 +259,20 @@ bool Graphics::init(Window* window)
 		return false;
 	}
 
+	D3D11_RASTERIZER_DESC rasterizerDesc2;
+	ZeroMemory(&rasterizerDesc2, sizeof(D3D11_RASTERIZER_DESC));
+	rasterizerDesc2.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+	rasterizerDesc2.CullMode = D3D11_CULL_MODE::D3D11_CULL_FRONT;
+
+
+	result = device->CreateRasterizerState(&rasterizerDesc2, &rasterStateShadow);
+	if (FAILED(result))
+	{
+		MessageBox(NULL, "Failed to create rasterizer state.",
+			"D3D11 Initialisation Error", MB_OK);
+		return false;
+	}
+
 	deviceContext->RSSetState(rasterState.Get());
 	// Clear the blend state description.
 	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
@@ -275,6 +301,7 @@ bool Graphics::init(Window* window)
 
 	this->device->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(debug.GetAddressOf()));
 
+	this->shadowMap.initialize(device.Get(), deviceContext.Get());
 
 
 	createShaders();
@@ -326,7 +353,80 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
+	
+	shadowMap.prepare();//clear depth
+	shadowMap.prepareSpot();//clear depth
+	shadowMap.setViewProjSun(camera, Vector3(lightList->getSun().getDirection().x, lightList->getSun().getDirection().y, lightList->getSun().getDirection().z));
+	//Setting the viewprojSpot in playinggamestate cause playerlight is there
+	Frustum frustum = camera->getFrustum();
+	
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//deviceContext->RSSetState(rasterStateShadow.Get());
 
+	for (GameObject* object : drawableObjects)
+	{
+		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		{
+			AABB boundingBox = object->getAABB();
+			boundingBox = boundingBox.scale(object->getScale());
+			boundingBox.maxPos += object->getPosition();
+			boundingBox.minPos += object->getPosition();
+
+			if (frustum.intersect(boundingBox, 1000.0f))
+			{
+				UINT vertexCount = object->mesh->getVertexCount();
+				UINT stride = sizeof(Vertex3D);
+				UINT offset = 0;
+				SimpleMath::Matrix world = object->getTransform();
+				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+				shadowMap.setWorld(worldTr);
+				deviceContext->PSSetShader(nullptr, nullptr, 0);
+				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+				shadowMap.setDSun();
+				deviceContext->Draw(vertexCount, 0);
+				shadowMap.setDSpot();
+				deviceContext->Draw(vertexCount, 0);
+			}
+		}
+	}
+
+	std::vector<GameObject*> objects;
+	quadTree->getGameObjects(objects, frustum, 10.0f);
+	for (GameObject* o : objects)
+	{
+		/*if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		{*/
+		AABB boundingBox = o->getAABB();
+		boundingBox = boundingBox.scale(o->getScale());
+		boundingBox.maxPos += o->getPosition();
+		boundingBox.minPos += o->getPosition();
+
+		if (frustum.intersect(boundingBox, 100.0f))
+		{
+			UINT vertexCount = o->mesh->getVertexCount();
+			UINT stride = sizeof(Vertex3D);
+			UINT offset = 0;
+			SimpleMath::Matrix world = o->getTransform();
+			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+			shadowMap.setWorld(worldTr);
+			deviceContext->PSSetShader(nullptr, nullptr, 0);
+			deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+			shadowMap.setDSun();
+			deviceContext->Draw(vertexCount, 0);
+			shadowMap.setDSpot();
+			deviceContext->Draw(vertexCount, 0);
+		}
+
+	}
+
+	deviceContext->RSSetState(rasterState.Get());
+
+	ID3D11DepthStencilView* nulDSV = nullptr;
+	ID3D11ShaderResourceView* nulSRV = nullptr;
+	deviceContext->OMSetRenderTargets(0,nullptr, nulDSV);
+
+	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	Matrix view = camera->getViewMatrix().Transpose();
 	deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -351,16 +451,26 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	this->particleSystem2.drawAll(camera);
 
 	//set up Shaders
+	deviceContext->RSSetViewports(1, &this->vp);
+
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDefault.ps.getShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDefault.vs.getShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
+	deviceContext->VSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->VSSetConstantBuffers(3, 1, this->shadowMap.getViewProjSpot().GetAddressOf());
+
 	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
 	deviceContext->PSSetShaderResources(2, 1, this->culledLightBufferSRV.GetAddressOf());
+	deviceContext->PSSetShaderResources(3, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->PSSetShaderResources(4, 1, this->shadowMap.getShadowMapSpot().GetAddressOf());
+
+	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
+	deviceContext->PSSetConstantBuffers(3, 1, this->indexSpot.GetAddressOf());
+
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
-
-	Frustum frustum = camera->getFrustum();
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	for (GameObject* object : drawableObjects)
 	{
@@ -406,6 +516,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 			}
 		}
 	}
+	deviceContext->PSSetShaderResources(2, 1, &nulSRV);
 
 	drawStaticGameObjects(camera, frustum, 10.0);
 
@@ -1076,4 +1187,14 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 
 		deviceContext->Draw(static_cast<UINT>(o->mesh->getVertexCount()), 0);
 	}
+}
+
+void Graphics::setSpotLighShadow(SpotLight* spotLight)
+{
+	shadowMap.setViweProjSpot(spotLight->getPos(), spotLight->getDirection(), spotLight->getLuminance());//REMOVE LUMINANCE
+	UINT index = (static_cast<Light*>(spotLight) - lightList->lights.data());
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(indexSpot.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &index, sizeof(UINT));
+	deviceContext->Unmap(indexSpot.Get(), 0);
 }
