@@ -29,6 +29,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testFloor2.get()->regenerateShape(3);
 	testFloor2.get()->rotateDeg(67);
 	testFloor1.get()->unionShapes(*testFloor2.get(), testFloor1.get()->getAVertex(2));
+	testFloor1.get()->getTriangleIndices();
+	testFloor1.get()->testDrawTriangles();
 
 	graphics.createFrustumBuffer(camera.get());
 
@@ -54,8 +56,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
 	lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
-	/*
-	 //Road Network Turtlewalker
+	/*//Road Network Turtlewalker
 	 testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
 	 testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
 	 testNetwork.get()->setAngle(45);
@@ -64,8 +65,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 		 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
 	 }
 	 testNetwork.get()->cleanRoadNetwork();
-	 testNetwork.get()->saveTestNetwork("test-network");
-	*/
+	 testNetwork.get()->saveTestNetwork("test-network");*/
 
 	
 
@@ -365,7 +365,7 @@ Void  PlayingGameState::update(float deltaTime)
 	//Render all objects
 	graphics.render(camera.get(), deltaTime);
 	//testNetwork.get()->drawRoadNetwork(&graphics);
-	testFloor1.get()->testDrawLines(&graphics);
+	testFloor1.get()->testDrawLines();
 	//testFloor2.get()->testDraw(&graphics);
 
 	//Render UI

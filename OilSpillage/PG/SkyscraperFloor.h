@@ -2,7 +2,8 @@
 #include<d3d11.h>
 #include<SimpleMath.h>
 #include<vector>
-#include"..//graphics.h"
+#include"..//Structs.h"
+#include"..//game.h"
 using namespace DirectX::SimpleMath;
 
 class SkyscraperFloor
@@ -19,12 +20,16 @@ public:
 	void translate(Vector3 newCenter);
 	void regenerateShape(int edges);
 
-	void testDrawLines(Graphics* graphics); //Lines
+	void testDrawLines() const; //Lines
+	void getTriangleIndices();
+	std::vector<Vertex3D>& getVertices();
 	void testDrawTriangles();
 private:
 	std::vector<Vector3> verticies;
+	std::vector<int> indices;
 	int nrOfEdges;
 	Vector3 center;
+	GameObject* roof;
 
 	float pi = 3.141592653f;
 

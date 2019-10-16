@@ -568,14 +568,14 @@ void Graphics::loadMesh(std::string fileName)
 				vertex.position.y = vertices[i].y;
 				vertex.position.z = vertices[i].z;
 
-					vertex.normal.x = vertices[i].nx;
-					vertex.normal.y = vertices[i].ny;
-					vertex.normal.z = vertices[i].nz;
+				vertex.normal.x = vertices[i].nx;
+				vertex.normal.y = vertices[i].ny;
+				vertex.normal.z = vertices[i].nz;
 
-					vertex.uv.x = vertices[i].u;
-					vertex.uv.y = vertices[i].v;
+				vertex.uv.x = vertices[i].u;
+				vertex.uv.y = vertices[i].v;
 
-					tempVec.push_back(vertex);
+				tempVec.push_back(vertex);
 				
 			}
 

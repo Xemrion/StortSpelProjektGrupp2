@@ -289,54 +289,165 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 		}
 	}
 }
-void SkyscraperFloor::testDrawLines(Graphics* graphics)
+void SkyscraperFloor::testDrawLines() const
 {
-	for (int i = 0; i < this->nrOfEdges; i++) {
-		if (i == nrOfEdges - 1) {
-			graphics->getdebugger()->DrawLine(XMFLOAT3(this->verticies[i].x, this->center.y, this->verticies[i].z),
-				XMFLOAT3(this->verticies[0].x, this->center.y, this->verticies[0].z),
-				XMFLOAT3(0.0f, 1.0f, 1.0f));
-		}
-		else {
-			graphics->getdebugger()->DrawLine(XMFLOAT3(this->verticies[i].x, this->center.y, this->verticies[i].z),
-				XMFLOAT3(this->verticies[size_t(i) + 1].x, this->center.y, this->verticies[size_t(i) + 1].z),
-				XMFLOAT3(0.0f, 1.0f, 1.0f));
-		}
+	
+	for (int i = 0; i < this->indices.size(); i += 3) {
+		Game::getGraphics().getdebugger()->DrawLine(XMFLOAT3(this->verticies[this->indices[i]].x, this->center.y, this->verticies[this->indices[i]].z),
+			XMFLOAT3(this->verticies[this->indices[(size_t(i) + 1)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 1)]].z),
+			XMFLOAT3(0.0f, 1.0f, 1.0f));
+		Game::getGraphics().getdebugger()->DrawLine(XMFLOAT3(this->verticies[this->indices[(size_t(i) + 1)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 1)]].z),
+			XMFLOAT3(this->verticies[this->indices[(size_t(i) + 2)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 2)]].z),
+			XMFLOAT3(0.0f, 1.0f, 1.0f));
+		Game::getGraphics().getdebugger()->DrawLine(XMFLOAT3(this->verticies[this->indices[(size_t(i) + 2)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 2)]].z),
+			XMFLOAT3(this->verticies[this->indices[i]].x, this->center.y, this->verticies[this->indices[i]].z),
+			XMFLOAT3(0.0f, 1.0f, 1.0f));
 	}
 }
 
-void SkyscraperFloor::testDrawTriangles()
+void SkyscraperFloor::getTriangleIndices()
 {
 	std::vector<int> triangleIndices;
 	std::vector<int> usedIndices;
 	int counter = 1, forwardsOffset = 1, backwardsOffset = 1;
-	int size = this->verticies.size();
+	size_t size = this->verticies.size();
 	bool counterUsed = false, forwardsUsed = false, backwardsUsed = false;
+	bool mainPointLeft = false;
+	int pointsOnMainPointSide = 0;
 
 	while (size - usedIndices.size() > 2) {
-		for (int i = 0; i < size && !counterUsed; i++) {
+		for (int i = 0; i < usedIndices.size() && !counterUsed; i++) {
 			if (counter == usedIndices[i]) {
 				counterUsed = true;
 			}
 		}
 		if (!counterUsed) {
+			Vector3 backToFront, backToMainPoint, backToOther, crossProduct;
+			bool towardsUsed = false;
 			//Check forward until an available is found, save offset from point
-			//do while?
-			//Check backward until an available is found, save offset from point
-			
-			//Make a line from forward/backward to other, then to all other available points
-			//Cross product the start point line first, then others, if any are on the same side as the point line, there cannot be a triangle
-			//Make a line and cross product it together, save a counter of how many positive vs negative y-axis products
+			do {
+				forwardsUsed = false;
+				for (int i = 0; i < usedIndices.size() && !forwardsUsed; i++) {
+					if (usedIndices[i] == (size_t(counter) + size_t(forwardsOffset)) % size) {
+						forwardsUsed = true;
+					}
+				}
+				if (forwardsUsed) {
+					forwardsOffset++;
+				}
+			} while (forwardsUsed);
 
+			//Check backward until an available is found, save offset from point
+			do {
+				backwardsUsed = false;
+				for (int i = 0; i < usedIndices.size() && !backwardsUsed; i++) {
+					if (usedIndices[i] == (size_t(counter) - size_t(backwardsOffset) + size) % size) {
+						backwardsUsed = true;
+					}
+				}
+				if (backwardsUsed) {
+					backwardsOffset++;
+				}
+			} while (backwardsUsed);
+			
+			//Make a line from backward to forward and backward to main point
+			backToFront = this->verticies[(size_t(counter) + size_t(forwardsOffset)) % size] - this->verticies[(size_t(counter) - size_t(backwardsOffset) + size) % size];
+			backToMainPoint = this->verticies[counter] - this->verticies[(size_t(counter) - size_t(backwardsOffset) + size) % size];
+			backToFront.Normalize();
+			backToMainPoint.Normalize();
+			//Cross product the start point line first
+			crossProduct = backToFront.Cross(backToMainPoint);
+			if (crossProduct.y > 0) {
+				mainPointLeft = false;
+				pointsOnMainPointSide++;
+			}
+			else if(crossProduct.y < 0) {
+				mainPointLeft = true;
+				pointsOnMainPointSide++;
+			}
+			//Cross product the start point line first, then others, if any are on the same side as the point line, there cannot be a triangle
+			for (int i = 1; i < size - (size_t(backwardsOffset) + size_t(forwardsOffset)) && pointsOnMainPointSide < 2; i++) {
+				towardsUsed = false;
+				for (int j = 0; j < usedIndices.size() && !towardsUsed; j++) {
+					if ((i + size_t(counter) + size_t(forwardsOffset)) % size == usedIndices[j]) {
+						towardsUsed = true;
+					}
+				}
+				if (!towardsUsed) {
+					backToOther = this->verticies[(i + size_t(counter) + size_t(forwardsOffset)) % size] - this->verticies[(size_t(counter) - size_t(backwardsOffset) + size) % size];
+					backToOther.Normalize();
+					crossProduct = backToFront.Cross(backToOther);
+					if (!mainPointLeft) {
+						if (crossProduct.y > 0) {
+							pointsOnMainPointSide++;
+						}
+					}
+					else {
+						if (crossProduct.y < 0) {
+							pointsOnMainPointSide++;
+						}
+					}
+				}
+			}
+			if (pointsOnMainPointSide < 2) {
+				triangleIndices.push_back(int((size_t(counter) - size_t(backwardsOffset) + size) % size));
+				triangleIndices.push_back(counter);
+				triangleIndices.push_back((size_t(counter) + size_t(forwardsOffset)) % size);
+				usedIndices.push_back(counter);
+			}
+
+			pointsOnMainPointSide = 0;
 		}
 
 		counter++;
 		counterUsed = false;
 		if (counter > size) {
-			counter -= size;
+			counter -= int(size);
 		}
 	}
-	
+	this->indices = triangleIndices;
+}
+
+std::vector<Vertex3D>& SkyscraperFloor::getVertices()
+{
+	std::vector<Vertex3D> meshData;
+	Vertex3D temp;
+	float toNorm = 0.0f;
+	if (this->indices.size() == 0) {
+		this->getTriangleIndices();
+	}
+	for (int i = 0; i < this->indices.size(); i += 3) {
+		temp.position = this->verticies[this->indices[i]];
+		temp.normal = Vector3(0.0f, 1.0f, 0.0f);
+		toNorm = 1.0f / (this->verticies[this->indices[i]].x + this->verticies[this->indices[i]].z);
+		temp.uv = Vector2(this->verticies[this->indices[i]].x * toNorm, this->verticies[this->indices[i]].z * toNorm);
+		meshData.push_back(temp);
+
+		temp.position = this->verticies[this->indices[size_t(i) + 1]];
+		temp.normal = Vector3(0.0f, 1.0f, 0.0f);
+		toNorm = 1.0f / (this->verticies[this->indices[size_t(i) + 1]].x + this->verticies[this->indices[size_t(i) + 1]].z);
+		temp.uv = Vector2(this->verticies[this->indices[size_t(i) + 1]].x * toNorm, this->verticies[this->indices[size_t(i) + 1]].z * toNorm);
+		meshData.push_back(temp);
+
+		temp.position = this->verticies[this->indices[size_t(i) + 2]];
+		temp.normal = Vector3(0.0f, 1.0f, 0.0f);
+		toNorm = 1.0f / (this->verticies[this->indices[size_t(i) + 2]].x + this->verticies[this->indices[size_t(i) + 2]].z);
+		temp.uv = Vector2(this->verticies[this->indices[size_t(i) + 2]].x * toNorm, this->verticies[this->indices[size_t(i) + 2]].z * toNorm);
+		meshData.push_back(temp);
+	}
+	return meshData;
+}
+
+void SkyscraperFloor::testDrawTriangles()
+{
+	/*this->roof = new GameObject();
+	Mesh test;
+	test.insertDataToMesh(this->getVertices());
+	this->roof->mesh = new Mesh(test);
+	Game::getGraphics().addToDraw(this->roof);
+	this->roof->setPosition(this->center);
+	this->roof->setScale(Vector3(1.0f, 1.0f, 1.0f));
+	this->roof->setTexture(Game::getGraphics().getTexturePointer("brickwall"));*/
 }
 
 Vector3 SkyscraperFloor::getAVertex(int vertex)
