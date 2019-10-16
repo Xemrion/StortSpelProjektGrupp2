@@ -445,6 +445,7 @@ void  PlayingGameState::update(float deltaTime)
 	
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
+	graphics.setSpotLighShadow(playerLight);
 	graphics.render( camera.get(), deltaTime );
 	
 	// render UI
@@ -453,6 +454,8 @@ void  PlayingGameState::update(float deltaTime)
 		menues[currentMenu]->update( deltaTime );
 	else if ( Input::CheckButton(MENU, PRESSED, 0) )
 		setCurrentMenu( PlayingGameState::MENU_PAUSED );
+	
+	//Render all objects
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
