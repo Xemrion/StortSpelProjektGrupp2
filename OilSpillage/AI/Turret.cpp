@@ -1,4 +1,4 @@
-#include "..//game.h"
+#include "../States/PlayingGameState.h"
 #include "Turret.h"
 
 Turret::Turret()
@@ -33,9 +33,17 @@ void Turret::update(float dt, Vector3 targetPos)
 
 		if (this->bullets[i].timeLeft > 0.0f)
 		{
-			this->bullets[i].timeLeft -= deltaTime;
-			this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
-			Game::getGraphics().addToDraw(this->bullets[i].obj);
+			if ((this->position - this->targetPos).Length() < 5.0f)
+			{
+				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-20);
+				this->bullets[i].timeLeft = 0;
+			}
+			else
+			{
+				this->bullets[i].timeLeft -= deltaTime;
+				this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
+				Game::getGraphics().addToDraw(this->bullets[i].obj);
+			}
 		}
 	}
 }
