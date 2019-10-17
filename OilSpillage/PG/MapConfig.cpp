@@ -1,6 +1,6 @@
 #include "MapConfig.hpp"
 
-Str  mapConfigToFilename( MapConfig const &config, Str extension ) {
+String  mapConfigToFilename( MapConfig const &config, String extension ) {
    std::ostringstream filename;
    filename << "map_"
             <<  config.seed

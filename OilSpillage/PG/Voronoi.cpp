@@ -7,7 +7,7 @@ Voronoi::Voronoi( RNG &rng, U8 cellSize, U16 width, U16 height, EuclideanDistanc
    cellSize ( cellSize ),
    width    ( width    ),
    height   ( height   ),
-   diagram  ( Size(width) * height * cPow<Size>(cellSize, 2) ),
+   diagram  ( Size(width) * height * util::pow<Size>(cellSize, 2) ),
    noise    ( generateNoise(rng) )
 {  // distance function (NOTE! the result is squared but this isn't an issue!)
    auto euclideanDistance {[]( V2f const &a, V2f const &b ) -> F32 {
@@ -21,7 +21,7 @@ Voronoi::Voronoi( RNG &rng, U8 cellSize, U16 width, U16 height, ManhattanDistanc
    cellSize ( cellSize ),
    width    ( width    ),
    height   ( height   ),
-   diagram  ( Size(width) * height * cPow<Size>(cellSize, 2) ),
+   diagram  ( Size(width) * height * util::pow<Size>(cellSize, 2) ),
    noise    ( generateNoise(rng) )
 {  // distance function
    auto manhattanDistance {[]( V2f const &a, V2f const &b ) -> F32 {
@@ -31,16 +31,16 @@ Voronoi::Voronoi( RNG &rng, U8 cellSize, U16 width, U16 height, ManhattanDistanc
    generateDiagram( rng, manhattanDistance );
 }
 
-Vec<V2f> Voronoi::generateNoise( RNG &rng ) const noexcept {
+Vector<V2f> Voronoi::generateNoise( RNG &rng ) const noexcept {
    F32_Dist  noise( .0f, cellSize );
-   Vec<V2f>  uniform_noise( Size(width)*height );
+   Vector<V2f>  uniform_noise( Size(width)*height );
    for ( I32  y = 0;  y < I32(height);  ++y )
       for ( I32  x = 0;  x < I32(width);  ++x )
          uniform_noise[noiseIndex( x, y )] = { noise(rng)+(x*cellSize), noise(rng)+(y*cellSize) };
    return uniform_noise;
 }
 
-Void  Voronoi::generateDiagram( RNG &rng, std::function<F32(V2f const&, V2f const&)> const &distanceFunction ) noexcept {
+void  Voronoi::generateDiagram( RNG &rng, std::function<F32(V2f const&, V2f const&)> const &distanceFunction ) noexcept {
    V2f   currentPosition;
    Size  bestMatch;
    F32   nearestDistance;

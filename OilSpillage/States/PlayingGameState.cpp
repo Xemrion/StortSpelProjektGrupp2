@@ -4,16 +4,26 @@
 #include "../UI/UIPlaying.h"
 #include "../UI/UIPaused.h"
 #include "../UI/UIOptions.h"
+#include "../PG/MinimapTextureGenerator.hpp"
+#include "../PG/Profiler.hpp"
 
-Void PlayingGameState::initiateAStar() {}
-
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING) {
-	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
-	menues[MENU_PLAYING]->init();
-	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
-	menues[MENU_PAUSED]->init();
-	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
-	menues[MENU_OPTIONS]->init();
+void PlayingGameState::initAI()
+{
+	aStar = new AStar(20, 20, Vector2(-10, 10));
+	actorManager = new ActorManager(aStar);
+	aStar->generateTileData(map->getTileMap());
+	actorManager->createDefender(0 + 1, 0 + 2,
+		Vector3(0 + 9, 0, 0 + 9));
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
+	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 1);
+	actorManager->initGroups();
+}
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
+{
+   #ifdef _DEBUG
+	   pausedTime = false;
+   #endif // _DEBUG
 
 	lightList = std::make_unique<LightList>();
 	player = std::make_unique<Vehicle>();
@@ -21,14 +31,12 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
-	aStar = new AStar(20, 20, Vector2(-10, 10));
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
+	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 
-	actorManager = new ActorManager();
-	actorManager->setAStar(aStar);
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
 	graphics.loadModel("Roads/Road_bend");
@@ -36,30 +44,17 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadModel("Roads/Road_3way");
 	graphics.loadModel("Roads/Road_4way");
 
-#ifdef _DEBUG
-	// light tests
-	lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
-	lightList->addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
-	lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
-	lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
-
-	/*
-	 //Road Network Turtlewalker
-	 testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-	 testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-	 testNetwork.get()->setAngle(45);
-	 for (int i = 0; i < 5; i++) {
-		 testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
-		 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	 }
-	 testNetwork.get()->cleanRoadNetwork();
-	 testNetwork.get()->saveTestNetwork("test-network");
-	*/
+   if constexpr ( isDebugging ) {
+	   // light tests
+	   lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
+	   lightList->addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
+	   lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
+	   lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
 	for (int i = 0; i < 50; ++i) {
-		Vector3 randPos = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
+		Vector3 randPos   = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand() / RAND_MAX));
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
@@ -69,35 +64,70 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 				randColor,
 				1.0f));
 	}
-#endif
+   
+   /*
+	//Road Network Turtlewalker
+	testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
+	testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+	testNetwork.get()->setAngle(45);
+	for (int i = 0; i < 5; i++) {
+		testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
+		testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+	}
+	testNetwork.get()->cleanRoadNetwork();
+	testNetwork.get()->saveTestNetwork("test-network");
+   */
+   }
 	lightList->setSun(Sun(Vector3(0.0f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
 
 	graphics.setLightList(lightList.get());
 
-	map = std::make_unique<Map>(graphics, config);
+	physics = std::make_unique<Physics>();
+	player->init(physics.get());
+	
+	map = std::make_unique<Map>(graphics, config, physics.get());
+   map->setDistrictColorCoding( isDebugging );
+	initAI();
+	// Minimap stuff
+   auto tilemap = map->getTileMap();
+	topLeft      = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
+	bottomRight  = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+	// Needs to be loaded before the menues
+	minimap = createMinimapTexture(*map);
 
-	player->init();
-	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
-	actorManager->createDefender(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
-	actorManager->createTurrent(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 1);
-	actorManager->initGroups();
+	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
+	menues[MENU_PLAYING]->init();
+	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
+	menues[MENU_PAUSED]->init();
+	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
+	menues[MENU_OPTIONS]->init();
 
-	playerLight = lightList->addLight(SpotLight(player->getVehicle()->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+   auto playerVehicle = player->getVehicle();
+	playerVehicle->setPosition(map->getStartPositionInWorldSpace());
+
+	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
 		{
-		 Vector3(0.0f, 30.0f + cameraDistance, -10.0f) + player->getVehicle()->getPosition(),
+		 Vector3(0.0f, 30.0f + cameraDistance, -10.0f) + playerVehicle->getPosition(),
 		 Vector3(0.0f, 0.0f, 0.0f), 0.0f },
 		{
-		 Vector3(0.0f, cameraDistance, 0.0f) + player->getVehicle()->getPosition(),
+		 Vector3(0.0f, cameraDistance, 0.0f) + playerVehicle->getPosition(),
 		 Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
-	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 
 	Input::SetKeyboardPlayerID(0);
+	//Bullet
+	//buildingTest = std::make_unique<GameObject>();
+	//buildingTest->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//Game::getGraphics().addToDraw(buildingTest.get());
+	//btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
+	//buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
+	//buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
+	//buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
+	//buildingTest->setRigidBody(tempo2, physics.get());
 }
 
 PlayingGameState::~PlayingGameState()
@@ -106,12 +136,14 @@ PlayingGameState::~PlayingGameState()
 	delete actorManager;
 }
 
-Void  PlayingGameState::ImGui_Driving() {
+void  PlayingGameState::ImGui_Driving()
+{
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
+	ImGui::Text(("Rotation: " + to_string(player->getRotator())).c_str());
 	ImGui::Text("Driving Mode:");
-	static int radioButtonValue = 0;
+	static int radioButtonValue = 1;
 	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
 	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
 	//ImGui::RadioButton("Directional Smooth", &radioButtonValue, 2);
@@ -157,7 +189,8 @@ void PlayingGameState::ImGui_AI()
 	ImGui::End();
 }
 
-void PlayingGameState::ImGui_Particles() {
+void PlayingGameState::ImGui_Particles()
+{
 	ImGui::Begin("Particle");
 	ImGui::ColorPicker4("Color Slider", colors);
 	ImGui::ColorPicker4("Color 1 Slider", colors2);
@@ -178,51 +211,51 @@ void PlayingGameState::ImGui_Particles() {
 	colorsP[1].w = 1.0f;
 	colorsP[2].w = 1.0f;
 	colorsP[3].w = 1.0f;
-	this->graphics.setVectorField(vectorFieldSize, vectorFieldPower);
-	this->graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-	this->graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
+	graphics.setVectorField(vectorFieldSize, vectorFieldPower);
+	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+	graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
 
 	ImGui::End();
 }
 
 
 #include "../PG/MinimapTextureGenerator.hpp"
-void PlayingGameState::ImGui_ProcGen() {
-	static Bool shouldColorCodeDistricts = true;
-	ImGui::Begin("Map Generation:");
-	if (static bool firstFrame = true; firstFrame) {
-		ImGui::SetWindowPos({ 0,75 });
-		ImGui::SetWindowSize({ 525,475 });
-		firstFrame = false;
-		map->setDistrictColorCoding(shouldColorCodeDistricts);
+void PlayingGameState::ImGui_ProcGen()
+{
+   static Bool shouldColorCodeDistricts { true };
+	ImGui::Begin( "Map Generation:" );
+	if ( static bool isFirstFrame = true;  isFirstFrame ) {
+		ImGui::SetWindowPos({    0,  75 });
+		ImGui::SetWindowSize({ 525, 475 });
+		isFirstFrame = false;
 	}
 
 	ImGui::Separator();
 
 	// debug colors toggle:
 	bool shouldColorCodeDistrictsPrevFrame = shouldColorCodeDistricts;
-	ImGui::Checkbox("Show district colors", &shouldColorCodeDistricts);
-	if (shouldColorCodeDistricts != shouldColorCodeDistrictsPrevFrame)
-		map->setDistrictColorCoding(shouldColorCodeDistricts);
+	ImGui::Checkbox( "Show district colors", &shouldColorCodeDistricts );
+	if ( shouldColorCodeDistricts != shouldColorCodeDistrictsPrevFrame )
+		map->setDistrictColorCoding( shouldColorCodeDistricts );
 
 	ImGui::Separator();
 
 	// map:
-	ImGui::InputInt2("TileMap dimensions", &config.dimensions.data[0]);
-	if (config.dimensions.x < 1)
+	ImGui::InputInt2( "TileMap dimensions", &config.dimensions.data[0] );
+	if ( config.dimensions.x < 1 )
 		config.dimensions.x = 1;
-	if (config.dimensions.y < 1)
+	if ( config.dimensions.y < 1 )
 		config.dimensions.y = 1;
 
 	// (TODO! bugged!) ImGui::InputFloat3( "Tile scale", &config.tileScaleFactor.data[0] );
 
-	ImGui::InputFloat("Floor height factor", &config.buildingFloorHeightFactor);
+	ImGui::InputFloat( "Floor height factor", &config.buildingFloorHeightFactor );
 
-	ImGui::InputInt("Seed", &config.seed);
+	ImGui::InputInt( "Seed", &config.seed );
 
-	ImGui::Checkbox("Use Manhattan distance", &config.isUsingManhattanDistance); // TODO: refactor into config
+	ImGui::Checkbox( "Use Manhattan distance", &config.isUsingManhattanDistance ); // TODO: refactor into config
 
-	ImGui::InputInt("District cell side", &config.districtCellSide);
+	ImGui::InputInt( "District cell side", &config.districtCellSide );
 	static auto cellSidePrev = config.districtCellSide;
 	int stepsCounter = 0;
 	auto constexpr MAX_STEPS = 128;
@@ -286,18 +319,24 @@ void PlayingGameState::ImGui_ProcGen() {
 
 	// regen button:
 	ImGui::NewLine();
-	if (ImGui::Button("Re-generate")) {
+	if ( ImGui::Button("Re-generate") ) {
 		// (TODO: refactor) hacky, but:
-		map = std::make_unique<Map>(graphics, config);
-		player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
-		map->setDistrictColorCoding(shouldColorCodeDistricts);
-		createMinimapTexture(*map);
-	}
+		map = std::make_unique<Map>(graphics, config, physics.get());
+		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
+		map->setDistrictColorCoding( shouldColorCodeDistricts );
+		minimap = createMinimapTexture( *map );
+		aStar->generateTileData( map->getTileMap() );
+		// minimap stuff
+      auto tilemap = map->getTileMap();
+		topLeft      = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
+		bottomRight  = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 
+		graphics.reloadTexture(minimap);
+	}
 	ImGui::End();
 }
 
-Void  PlayingGameState::ImGui_Camera() {
+void  PlayingGameState::ImGui_Camera() {
 	ImGui::Begin("Camera & Culling:");
 	if (static bool firstFrame = true; firstFrame) {
 		ImGui::SetWindowPos({ 0,0 });
@@ -316,7 +355,7 @@ Void  PlayingGameState::ImGui_Camera() {
 	ImGui::End();
 }
 
-Void  PlayingGameState::update(float deltaTime)
+void  PlayingGameState::update(float deltaTime)
 {
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
@@ -325,60 +364,115 @@ Void  PlayingGameState::update(float deltaTime)
 			deltaTime /= 4;
 		}
 
-		if (time > 0.0f)
-			time = max(time - deltaTime, 0.0f);
-
-		player->update(deltaTime);
-
-		Vector3 spotlightDir = Vector3((sin(player->getVehicle()->getRotation().y)), 0, (cos(player->getVehicle()->getRotation().y)));
-		Vector3 spotlightPos = Vector3(player->getVehicle()->getPosition().x, player->getVehicle()->getPosition().y + 1, player->getVehicle()->getPosition().z);
-		spotlightPos += spotlightDir * 1;
-		playerLight->setDirection(spotlightDir);
-		playerLight->setPos(spotlightPos);
-
-		actorManager->update(deltaTime, player->getVehicle()->getPosition());
-		camera->update(deltaTime);
-		camera->setPosition(player->getVehicle()->getPosition() + Vector3(0, 25, 0));
-
-		timerForParticle += deltaTime;
-		if (timerForParticle > 0.01f)
+#ifdef _DEBUG
+		if (Input::CheckButton(ACTION_1, PRESSED, 0))
 		{
-			this->graphics.addParticle(this->player->getVehicle()->getPosition() + Vector3(0, 5, 0), 5 * Vector3(Input::GetDirectionR(0).x, 0, Input::GetDirectionR(0).y), addNrOfParticles, lifeTime, randomPosPower);
+			pausedTime = !pausedTime;
+		}
+
+		if (!pausedTime && time > 0.0f)
+		{
+			time = max(time - deltaTime, 0.0f);
+		}
+		else if (time <= 0.0f)
+		{
+			Game::setState(Game::STATE_MENU);
+		}
+#else
+		if (time > 0.0f)
+		{
+			time = max(time - deltaTime, 0.0f);
+		}
+		else
+		{
+			Game::setState(Game::STATE_MENU);
+		}
+#endif // !_DEBUG
+
+		//Bullet
+		//player->getVehicle()->getRigidBody()->(btVector3(Input::GetDirectionL(0).x * deltaTime * 1000, 0, Input::GetDirectionL(0).y * deltaTime * 1000), btVector3(0, 0, 0));
+
+		//player->getVehicle()->setPosition(Vector3(player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getX(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getY(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getZ()));
+		//player->getVehicle()->updateRigidBody();
+		
+		auto playerVehicle { player->getVehicle() };
+		
+		player->update(       deltaTime );
+		physics->update(      deltaTime );
+		actorManager->update( deltaTime, playerVehicle->getPosition() );
+		camera->update(       deltaTime );
+
+		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
+
+		camera->setPosition( Vector3( positionCam.getX(),
+		                              positionCam.getY(),
+		                              positionCam.getZ() ) + Vector3(.0f, cameraDistance, .0f) );
+
+		Vector3 spotlightDir { sin(playerVehicle->getRotation().y),
+		                       .0f,
+		                       cos(playerVehicle->getRotation().y) };
+
+      playerLight->setDirection( spotlightDir );
+
+		Vector3 spotlightPos { playerVehicle->getPosition().x,
+		                       playerVehicle->getPosition().y + 1,
+		                       playerVehicle->getPosition().z };
+
+		spotlightPos += spotlightDir * 1;
+
+		playerLight->setPos( spotlightPos );
+		
+		timerForParticle += deltaTime;
+		if ( timerForParticle > .01f )
+		{
+			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
+			                      5 * Vector3(Input::GetDirectionR(0).x,
+			                      0,
+			                      Input::GetDirectionR(0).y),
+			                      addNrOfParticles, lifeTime, randomPosPower);
 			timerForParticle = 0;
 		}
+		
+		if ( player->isDead() )
+		{
+			changeTime( -30.0f );
+			player->resetHealth();
+		}
 	}
-
+	
 	/*-------------------------RENDERING-------------------------*/
+	// render all objects
+	graphics.setSpotLighShadow(playerLight);
+	graphics.render( camera.get(), deltaTime );
+	
+	// render UI
+	menues[MENU_PLAYING]->update( deltaTime );
+	if ( currentMenu != MENU_PLAYING )
+		menues[currentMenu]->update( deltaTime );
+	else if ( Input::CheckButton(MENU, PRESSED, 0) )
+		setCurrentMenu( PlayingGameState::MENU_PAUSED );
+	
 	//Render all objects
-	graphics.render(camera.get(), deltaTime);
-
-	//Render UI
-	menues[MENU_PLAYING]->update(deltaTime);
-	if (currentMenu != MENU_PLAYING)
-		menues[currentMenu]->update(deltaTime);
-	else if (Input::CheckButton(MENU, PRESSED, 0))
-		this->setCurrentMenu(PlayingGameState::MENU_PAUSED);
-
+	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
-
-#ifdef _DEBUG
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	ImGui_Driving();
-	ImGui_ProcGen();
-	ImGui_AI();
-	ImGui_Particles();
-	ImGui_Camera();
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-#endif
-
-	// Present scene
+	
+	if constexpr ( isDebugging ) {
+	   ImGui_ImplDX11_NewFrame();
+	   ImGui_ImplWin32_NewFrame();
+	   ImGui::NewFrame();
+	   ImGui_Driving();
+	   ImGui_ProcGen();
+	   ImGui_AI();
+	   ImGui_Particles();
+	   ImGui_Camera();
+	   ImGui::Render();
+	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+   }
+	
 	graphics.presentScene();
 }
 
-F32 const& PlayingGameState::getTimeRef() const noexcept {
+F32 const &PlayingGameState::getTimeRef() const noexcept {
 	return time;
 }
 
@@ -387,11 +481,11 @@ F32 PlayingGameState::getTime() const noexcept {
 }
 
 void PlayingGameState::setTime(float time) noexcept {
-	this->time = max(time, 0.0f);
+	time = max( time, .0f );
 }
 
 void PlayingGameState::changeTime(float timeDiff) noexcept {
-	this->time = max(this->time + timeDiff, .0f);
+	time = max( time + timeDiff, .0f );
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
@@ -400,4 +494,19 @@ void PlayingGameState::setCurrentMenu(Menu menu) {
 
 Vehicle* PlayingGameState::getPlayer() const {
 	return player.get();
+}
+
+std::string PlayingGameState::getMinimap() const
+{
+	return minimap;
+}
+
+Vector3 PlayingGameState::getTopLeft() const
+{
+	return topLeft;
+}
+
+Vector3 PlayingGameState::getBottomRight() const
+{
+	return bottomRight;
 }

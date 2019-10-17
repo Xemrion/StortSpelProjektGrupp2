@@ -183,3 +183,10 @@ void AStar::resetNodes()
 		nodes.at(i)->reset();
 	}
 }
+
+void AStar::generateTileData(TileMap const& map) {
+	int aa = map.width;
+	tileData = std::vector<TileData>{ map.width * map.height };
+	for (auto i = 0; i < map.data.size(); ++i)
+		tileData[i].isTraversible = map.data[i] != Tile::building; // TODO: make sure to add enum changes here
+}

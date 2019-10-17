@@ -4,11 +4,11 @@
 #define  AITURRENT_H
 #include "Actor.h"
 
-class Turrent :public Actor
+class Turret :public Actor
 {
 public:
-	Turrent();
-	Turrent(float x, float z, AStar* aStar);
+	Turret();
+	Turret(float x, float z, AStar* aStar);
 	void update(float dt, Vector3 targetPos);
 private:
 	void setForwardVector(Vector3 forward);
@@ -19,6 +19,7 @@ private:
 	Status rotateToWards();
 	Status inRange();
 	Status idle();
+
 
 	Vector3 vecForward;
 	int sightRange;

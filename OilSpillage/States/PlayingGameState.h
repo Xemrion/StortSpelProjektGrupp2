@@ -21,52 +21,66 @@ public:
 		MENUCOUNT
 	};
 
-	PlayingGameState();
+	             PlayingGameState();
 	virtual     ~PlayingGameState();
 	void         update(float delta);
-	const float& getTimeRef() const noexcept;
+	const float &getTimeRef() const noexcept;
 	float        getTime() const noexcept;
 	void         setTime(float) noexcept;
 	void         changeTime(float delta) noexcept;
 	void         setCurrentMenu(Menu);
-	Vehicle* getPlayer() const;
+	Vehicle     *getPlayer() const;
+	std::string  getMinimap() const;
+	Vector3      getTopLeft() const;
+	Vector3      getBottomRight() const;
 
 private:
 	friend class Game;
+   #ifdef _DEBUG
+	   bool                         pausedTime;
+   #endif // _DEBUG
+	std::string                     minimap;
+	Vector3                         topLeft;
+	Vector3                         bottomRight;
 	int                             currentMenu;
-	bool                            isUsingManhattanDistance{ true };
-	float                           cameraDistance{ 25 };
+	bool                            isUsingManhattanDistance { true };
+	float                           cameraDistance           { 25   };
 	float                           time;
 	MapConfig                       config;
 	Graphics                       &graphics;
-	AStar*				            aStar;
-    std::unique_ptr<Map>             map;
-	ActorManager*				    actorManager;
+	AStar                          *aStar;
+	std::unique_ptr<Map>            map;
+	ActorManager                   *actorManager;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::vector<CinematicPos>       points;
-	SpotLight* playerLight;
-	int                             addNrOfParticles{ 2 };
-	int                             lifeTime{ 2 };
-	float                           timerForParticle{ .0f };
-	float                           vectorFieldPower{ 1.0f };
-	float                           vectorFieldSize{ 1.0f };
-	float                           randomPosPower{ 1.0f };
-	float                           size1{ .020f };
-	float                           size2{ .025f };
-	float                           colors[4]{};
-	float                           colors2[4]{};
-	float                           colors3[4]{};
-	float                           colors4[4]{};
-	Vector4                         colorsP[4]{ Vector4(1.0f, 1.0f, .0f, 1.0f),
-														Vector4(1.0f,  .0f, .0f, 1.0f),
-														Vector4(.0f,  .0f, .0f, 1.0f),
-														Vector4(.1f,  .1f, .1f, 1.0f) };
+	SpotLight                      *playerLight;
 
-	void initiateAStar();
+	//Bullet
+	std::unique_ptr<Physics>		physics;
+	std::unique_ptr<GameObject>		buildingTest;
+
+	int                             addNrOfParticles  {     2 };
+	int                             lifeTime          {     2 };
+	float                           timerForParticle  {   .0f };
+	float                           vectorFieldPower  {  1.0f };
+	float                           vectorFieldSize   {  1.0f };
+	float                           randomPosPower    {  1.0f };
+	float                           size1             { .020f };
+	float                           size2             { .025f };
+	float                           colors  [4]       {};
+	float                           colors2 [4]       {};
+	float                           colors3 [4]       {};
+	float                           colors4 [4]       {};
+	Vector4                         colorsP [4]       { Vector4( 1.0f, 1.0f, .0f, 1.0f ),
+	                                                    Vector4( 1.0f,  .0f, .0f, 1.0f ),
+	                                                    Vector4(  .0f,  .0f, .0f, 1.0f ),
+	                                                    Vector4(  .1f,  .1f, .1f, 1.0f )  };
+  
+    void initAI();
 	void ImGui_ProcGen();
 	void ImGui_Driving();
 	void ImGui_Particles();

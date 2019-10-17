@@ -1,26 +1,27 @@
 #pragma once
 #include "Defender.h"
 #include "Attacker.h"
-#include "Turrent.h"
+#include "Turret.h"
 class ActorManager
 {
 public:
 	ActorManager();
+	ActorManager(AStar* aStar);
 	~ActorManager();
 	void update(float dt, Vector3 targetPos);
-	void createDefender(float x,float z);
+	void createDefender(float x,float z, Vector3 objectivePos = Vector3());
 	void createAttacker(float x, float z);
-	void createTurrent(float x, float z);
-	void setAStar(AStar* aStar);
+	void createTurret(float x, float z);
 	void initGroups();
 	std::vector<std::vector<Actor*>> groups;
 private:
+	float groupRadius = 5.5f;
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
 	int groupInRange(Vector3 actorPos,int currentGroupSize);
 	void joinGroup(Actor* actor,int groupIndex);
 	void leaveGroup(int groupIndex, int where);
-	float groupRadius = 5.5f;
+	void assignPathsToGroups(Vector3 targetPos);
 	void updateGroups();
 	void createGroup(Actor* actor);
 	std::vector<Actor*> actors;
