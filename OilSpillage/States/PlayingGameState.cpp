@@ -51,40 +51,41 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	graphics.loadModel("Houses/testHouse");
 
-   if constexpr ( isDebugging ) {
-	   // light tests
-	   lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
-	   lightList->addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
-	   lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
-	   lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	if constexpr (isDebugging) {
+		// light tests
+		lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
+		lightList->addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
+		lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
+		lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
-	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
+		lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
-	for (int i = 0; i < 1000; ++i) {
-		Vector3 randPos   = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
-		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand()))/ RAND_MAX;
-		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
+		for (int i = 0; i < 1000; ++i) {
+			Vector3 randPos = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
+			Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand())) / RAND_MAX;
+			randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
-		lightList->addLight(
-			PointLight(
-				randPos,
-				randColor,
-			10.0f));
+			lightList->addLight(
+				PointLight(
+					randPos,
+					randColor,
+					10.0f));
+		}
+
+		/*
+		 //Road Network Turtlewalker
+		 testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
+		 testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+		 testNetwork.get()->setAngle(45);
+		 for (int i = 0; i < 5; i++) {
+			 testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
+			 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+		 }
+		 testNetwork.get()->cleanRoadNetwork();
+		 testNetwork.get()->saveTestNetwork("test-network");
+		*/
 	}
 
-   /*
-	//Road Network Turtlewalker
-	testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-	testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-	testNetwork.get()->setAngle(45);
-	for (int i = 0; i < 5; i++) {
-		testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
-		testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	}
-	testNetwork.get()->cleanRoadNetwork();
-	testNetwork.get()->saveTestNetwork("test-network");
-   */
-   //}
 	lightList->setSun(Sun(Vector3(0.5f, -1.0f, 1.0f), Vector3(1.0f, 1.0f, 1.0f)));
 
 	graphics.setLightList(lightList.get());
