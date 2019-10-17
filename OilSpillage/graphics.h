@@ -93,7 +93,8 @@ public:
 	HRESULT createFrustumBuffer(DynamicCamera* camera);
 	Debug* getdebugger();
 	Window* getWindow();
-	void loadMesh(std::string path);
+	void loadMesh(std::string path); //Load a model using filename.
+	void loadMesh(std::string name, std::vector<Vertex3D>& vertices); //Construct mesh from vector of Vertex3D.
 	void loadModel(std::string path);
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
 	bool loadTexture(std::string fileName, bool overridePath=false);

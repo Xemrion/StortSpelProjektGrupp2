@@ -732,6 +732,62 @@ void Graphics::loadMesh(std::string fileName)
 	}
 }
 
+void Graphics::loadMesh(std::string name, std::vector<Vertex3D>& vertices)
+{
+	Mesh newMesh;
+	if (meshes.find(name) == meshes.end())
+	{
+		meshes[name] = newMesh;
+
+		meshes[name].insertDataToMesh(vertices);
+
+		AABB aabb;
+		Vector3 max = vertices[0].position, min = vertices[0].position;
+		for (int i = 1; i < vertices.size(); i++) {
+			if (vertices[i].position.x > max.x) {
+				max.x = vertices[i].position.x;
+			}
+			if (vertices[i].position.x < min.x) {
+				min.x = vertices[i].position.x;
+			}
+			if (vertices[i].position.y > max.y) {
+				max.y = vertices[i].position.y;
+			}
+			if (vertices[i].position.y < min.y) {
+				min.y = vertices[i].position.y;
+			}
+			if (vertices[i].position.z > max.z) {
+				max.z = vertices[i].position.z;
+			}
+			if (vertices[i].position.z < min.z) {
+				min.z = vertices[i].position.z;
+			}
+		}
+		aabb.maxPos = max;
+		aabb.minPos = min;
+		meshes[name].setAABB(aabb);
+
+		int bufferSize = static_cast<int>(meshes[name].vertices.size()) * sizeof(Vertex3D);
+		UINT stride = sizeof(Vertex3D);
+
+		D3D11_BUFFER_DESC vBufferDesc;
+		ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+		vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vBufferDesc.ByteWidth = bufferSize;
+		vBufferDesc.CPUAccessFlags = 0;
+		vBufferDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA subData;
+		ZeroMemory(&subData, sizeof(subData));
+		subData.pSysMem = meshes[name].vertices.data();
+
+		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[name].vertexBuffer.GetAddressOf());
+		//meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+	}
+}
+
 
 void Graphics::loadModel(std::string path)
 {

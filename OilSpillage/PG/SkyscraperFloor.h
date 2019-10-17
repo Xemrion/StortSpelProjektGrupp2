@@ -39,9 +39,6 @@ private:
 	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA);
 };
 
-
-//Sides: n quads
-
 /*	Display a complex shape with triangles
 
 	pick a point
@@ -54,4 +51,22 @@ private:
 	if yes, change start point and repeat
 		if (point - unavailable points) is two or lower, end loop
 	if no, make triangle, set start point to unavailable
+*/
+
+/*
+	Get a lower roof.
+
+	Compare two vectors of points
+	if a point doesn't exist in both, add to a new vector of points
+	save index of the points, compare one below the lowest index, if it exists in both, add it
+	repeat for one after the highest index
+	this vector is the lower roof
+*/
+
+/*
+	Making sides
+
+	compare bottom to top
+	if the point doesn't exist, compare to a lower floor
+	it the point exists, save index of both and the roof it is on
 */

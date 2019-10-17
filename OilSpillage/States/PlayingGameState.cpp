@@ -31,7 +31,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	testFloor1 = std::make_unique<SkyscraperFloor>(4);
-	testFloor1.get()->translate(Vector3(-960.0f, 5.0f, 440.0f));
+	//testFloor1.get()->translate(Vector3(-960.0f, 5.0f, 440.0f));
 	testFloor2 = std::make_unique<SkyscraperFloor>(5);
 	testFloor2.get()->rotateDeg(56);
 	//testFloor2.get()->translate(testFloor1.get()->getAVertex(3));
@@ -457,6 +457,7 @@ void  PlayingGameState::update(float deltaTime)
 	// render all objects
 	graphics.setSpotLighShadow(playerLight);
 	graphics.render( camera.get(), deltaTime );
+	testFloor1.get()->testDrawLines();
 	
 	// render UI
 	menues[MENU_PLAYING]->update( deltaTime );
@@ -464,8 +465,6 @@ void  PlayingGameState::update(float deltaTime)
 		menues[currentMenu]->update( deltaTime );
 	else if ( Input::CheckButton(MENU, PRESSED, 0) )
 		setCurrentMenu( PlayingGameState::MENU_PAUSED );
-	
-	//Render all objects
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	

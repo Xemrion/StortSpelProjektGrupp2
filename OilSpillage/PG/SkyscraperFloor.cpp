@@ -421,18 +421,24 @@ std::vector<Vertex3D> SkyscraperFloor::getVertices()
 		temp.normal = Vector3(0.0f, 1.0f, 0.0f);
 		toNorm = 1.0f / (this->verticies[this->indices[i]].x + this->verticies[this->indices[i]].z);
 		temp.uv = Vector2(this->verticies[this->indices[i]].x * toNorm, this->verticies[this->indices[i]].z * toNorm);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 1]];
 		temp.normal = Vector3(0.0f, 1.0f, 0.0f);
 		toNorm = 1.0f / (this->verticies[this->indices[size_t(i) + 1]].x + this->verticies[this->indices[size_t(i) + 1]].z);
 		temp.uv = Vector2(this->verticies[this->indices[size_t(i) + 1]].x * toNorm, this->verticies[this->indices[size_t(i) + 1]].z * toNorm);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 2]];
 		temp.normal = Vector3(0.0f, 1.0f, 0.0f);
-		toNorm = 1.0f / (this->verticies[this->indices[size_t(i) + 2]].x + this->verticies[this->indices[size_t(i) + 2]].z);
+		toNorm = 1.0f / (this->verticies[this->indices[size_t(i) + 2]].x + abs(this->verticies[this->indices[size_t(i) + 2]].z));
 		temp.uv = Vector2(this->verticies[this->indices[size_t(i) + 2]].x * toNorm, this->verticies[this->indices[size_t(i) + 2]].z * toNorm);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 	}
 	return meshData;
@@ -442,13 +448,13 @@ void SkyscraperFloor::testDrawTriangles()
 {
 	std::vector<Vertex3D> meshData;
 	meshData = this->getVertices();
-	this->roof = new GameObject();
-	Mesh test;
-	test.insertDataToMesh(meshData);
-	this->roof->mesh = new Mesh(test);
+	this->roof = new GameObject;
+	Game::getGraphics().loadMesh("SS-roof", meshData);
+	this->roof->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(this->roof);
 	this->roof->setPosition(this->center);
 	this->roof->setScale(Vector3(1.0f, 1.0f, 1.0f));
+	this->roof->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	Game::getGraphics().loadTexture("brickwall");
 	this->roof->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
 }
