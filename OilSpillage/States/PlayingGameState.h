@@ -58,11 +58,7 @@ private:
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight;
-
-	//Bullet
-	std::unique_ptr<Physics>		physics;
-	std::unique_ptr<GameObject>		buildingTest;
-
+	std::unique_ptr<Physics>        physics;
 	int                             addNrOfParticles  {     2 };
 	int                             lifeTime          {     2 };
 	float                           timerForParticle  {   .0f };
@@ -79,8 +75,7 @@ private:
 	                                                    Vector4( 1.0f,  .0f, .0f, 1.0f ),
 	                                                    Vector4(  .0f,  .0f, .0f, 1.0f ),
 	                                                    Vector4(  .1f,  .1f, .1f, 1.0f )  };
-  
-    void initAI();
+	void initAI();
 	void ImGui_ProcGen();
 	void ImGui_Driving();
 	void ImGui_Particles();

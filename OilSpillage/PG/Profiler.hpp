@@ -9,7 +9,7 @@
 #include "defs.hpp"
 
 // generates a profiler probe (with a scoped RAII lifetime) if in debug mode
-#define DBG_PROBE(x)  UPtr<Profiler::Probe> __generated_profiler_probe__ { nullptr };          \
+#define DBG_PROBE(x)  Unique<Profiler::Probe> __generated_profiler_probe__ { nullptr };          \
                       if constexpr ( isDebugging )                                             \
                          __generated_profiler_probe__ = std::make_unique<Profiler::Probe>(#x); \
 

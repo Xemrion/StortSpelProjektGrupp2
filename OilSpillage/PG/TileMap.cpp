@@ -35,20 +35,21 @@ Bool  TileMap::walk( U16& x, U16& y, Direction d, Tile tile ) {
 	}
 }
 
-Vector<GameObject>  TileMap::loadAsModels(Graphics& graphics) const {
+Vector<Unique<GameObject>>  TileMap::loadAsModels( Graphics &graphics ) const {
    auto const  toReserve { width * height };
-	Vector<GameObject> tiles( toReserve );
+	Vector<Unique<GameObject>> tiles( toReserve );
 	for ( U16 y = 0;  y < height;  ++y ) {
 		for ( U16 x = 0;  x < width;  ++x ) {
 			auto const  tileIndex             { index(x, y)                       };
-			auto       &tile                  { tiles[tileIndex]                  };
+			auto       &tile                  { tiles[tileIndex]                  };     
+         tile = std::make_unique<GameObject>();
 			auto const  graphicsIndex         { getTileLookupIndex(x, y)          };
          auto const &[modelName, rotation] { tileGraphicsTable[graphicsIndex]  };
-			tile.mesh      = graphics.getMeshPointer(    modelName.c_str()        );
-         tile.setTexture( graphics.getTexturePointer( modelName.c_str(), true) );
+			tile->mesh      = graphics.getMeshPointer(    modelName.c_str()        );
+         tile->setTexture( graphics.getTexturePointer( modelName.c_str(), true) );
 			if ( rotation != 0 )
-				tile.setRotation({ .0f, F32(rotation) * 3.1415926535f/180.0f, .0f });
-			tile.setPosition( convertTilePositionToWorldPosition( x, y ) );
+				tile->setRotation({ .0f, F32(rotation) * 3.1415926535f/180.0f, .0f });
+			tile->setPosition( convertTilePositionToWorldPosition( x, y ) );
 		}
 	}
 	return tiles; // RVO/Copy Elision

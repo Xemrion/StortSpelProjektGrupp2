@@ -7,6 +7,7 @@
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
 
+
 void PlayingGameState::initAI()
 {
 	aStar = new AStar(20, 20, Vector2(-10, 10));
@@ -105,17 +106,21 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_OPTIONS]->init();
 
-   auto playerVehicle = player->getVehicle();
-	playerVehicle->setPosition(map->getStartPositionInWorldSpace());
+	auto playerVehicle = player->getVehicle();
+	auto startPos      = map->getStartPositionInWorldSpace();
+	playerVehicle->getRigidBody()->getWorldTransform().setOrigin({ startPos.x, startPos.y, startPos.z });
 
-	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	playerLight = lightList->addLight( SpotLight( startPos,
+	                                              Vector3 { .8f,   .8f,   .8f }, 1.0f,
+	                                              Vector3 { .0f, -1.0f, -2.0f },  .5f ) );
+
 
 	points = {
 		{
-		 Vector3(0.0f, 30.0f + cameraDistance, -10.0f) + playerVehicle->getPosition(),
+		 Vector3(0.0f, 30.0f + cameraDistance, -10.0f) + startPos,
 		 Vector3(0.0f, 0.0f, 0.0f), 0.0f },
 		{
-		 Vector3(0.0f, cameraDistance, 0.0f) + playerVehicle->getPosition(),
+		 Vector3(0.0f, cameraDistance, 0.0f) + startPos,
 		 Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
@@ -325,7 +330,9 @@ void PlayingGameState::ImGui_ProcGen()
 	if ( ImGui::Button("Re-generate") ) {
 		// (TODO: refactor) hacky, but:
 		map = std::make_unique<Map>(graphics, config, physics.get());
-		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
+
+		auto startPos = map->getStartPositionInWorldSpace();
+		player->getVehicle()->getRigidBody()->getWorldTransform().setOrigin({startPos.x, startPos.y, startPos.z});
 		map->setDistrictColorCoding( shouldColorCodeDistricts );
 		minimap = createMinimapTexture( *map );
 		aStar->generateTileData( map->getTileMap() );
@@ -405,11 +412,10 @@ void  PlayingGameState::update(float deltaTime)
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
 		camera->update(       deltaTime );
 
-		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
+		auto btPlayerPos = btVector3 { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
+		auto playerPos   = Vector3   ( btPlayerPos.getX(), btPlayerPos.getY(), btPlayerPos.getZ() );
 
-		camera->setPosition( Vector3( positionCam.getX(),
-		                              positionCam.getY(),
-		                              positionCam.getZ() ) + Vector3(.0f, cameraDistance, .0f) );
+		camera->setPosition( playerPos + Vector3(.0f, cameraDistance, .0f) );
 
 		Vector3 spotlightDir { sin(playerVehicle->getRotation().y),
 		                       .0f,
@@ -417,9 +423,7 @@ void  PlayingGameState::update(float deltaTime)
 
       playerLight->setDirection( spotlightDir );
 
-		Vector3 spotlightPos { playerVehicle->getPosition().x,
-		                       playerVehicle->getPosition().y + 1,
-		                       playerVehicle->getPosition().z };
+		Vector3 spotlightPos { playerPos + Vector3 { .0f, 1.0f, .0f } };
 
 		spotlightPos += spotlightDir * 1;
 
@@ -428,7 +432,7 @@ void  PlayingGameState::update(float deltaTime)
 		timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
 		{
-			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
+			graphics.addParticle( playerPos + Vector3(0, 5, 0),
 			                      5 * Vector3(Input::GetDirectionR(0).x,
 			                      0,
 			                      Input::GetDirectionR(0).y),

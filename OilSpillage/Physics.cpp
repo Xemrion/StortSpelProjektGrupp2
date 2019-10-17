@@ -1,122 +1,114 @@
 #include "Physics.h"
+#include "PG/utils.hpp"
 
-Physics::Physics() :broadphase(new btDbvtBroadphase()),
-collisionConfig(new btDefaultCollisionConfiguration()),
-solver(new btSequentialImpulseConstraintSolver)
+Physics::Physics() :
+	broadphase      { std::make_unique<btDbvtBroadphase>()                              },
+	collisionConfig { std::make_unique<btDefaultCollisionConfiguration>()               },
+	solver          { std::make_unique<btSequentialImpulseConstraintSolver>()           }
 {
+   dispatcher = std::make_unique<btCollisionDispatcher>( collisionConfig.get() );
+
+	world      = new btDiscreteDynamicsWorld ( dispatcher.get(),
+	                                           broadphase.get(),
+	                                           solver.get(),
+	                                           collisionConfig.get() );
+	world->setGravity( btVector3(0, -10, 0) );
 	
-	dispatcher = new btCollisionDispatcher(collisionConfig);
-	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
-	this->world->setGravity(btVector3(0, -10, 0));
-	//temp plane inf
-	btTransform t;
-	t.setIdentity();
-	t.setOrigin(btVector3(0, 0, 0));
+	plane = std::make_unique<btStaticPlaneShape>( btVector3{0, 1, 0}, btScalar{3} );
 
-
-	////set shape for object
-	plane = new btStaticPlaneShape(btVector3(0, 1, 0), 3);
+	// set motionstate aka set position
+	auto transform = btTransform { btQuaternion(0, 0, 0, 1), btVector3(0, -1, 0) };
+	motions.push_back( std::make_unique<btDefaultMotionState>(transform) );
+	auto motion = motions.back().get();
 	
-	//set motionshape aka set postion
-	btMotionState* motion = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -1, 0)));
-	////body definition check doc
-	btRigidBody::btRigidBodyConstructionInfo info(0.0, motion, plane);
+	// body definition check doc
+	auto info = btRigidBody::btRigidBodyConstructionInfo { .0f, motion, plane.get() };
+	bodies.push_back( std::make_unique<btRigidBody>(info) );
+	bodies.back()->setFriction( 1 );
 
-	btRigidBody* body = new btRigidBody(info);
-	body->setFriction(1);
-
-	world->addRigidBody(body);
-	bodies.push_back(body);
-
-	//gContactAddedCallback = callbackFunc;
+//gContactAddedCallback = callbackFunc;
 }
 
 
-Physics::~Physics()
-{
-
-	//osäker på om man deletar på detta sätt
-	for (int i = 0; i < bodies.size(); i++)
-	{
-		this->world->removeRigidBody(bodies[i]);
-		btMotionState* motionState = bodies[i]->getMotionState();
-		btCollisionShape* shape = bodies[i]->getCollisionShape();
-		delete bodies[i];
-		delete shape;
-		delete motionState;
-	}
-	delete dispatcher;
-	delete collisionConfig;
-	delete solver;
-	delete broadphase;
+Physics::~Physics() {
 	delete world;
-	bodies.clear();
-
 }
 
-void Physics::update(float deltaTime)
+void Physics::update( float deltaTime )
 {
-	//this->world->stepSimulation(deltaTime);
-	this->world->stepSimulation(deltaTime, 10000, 1. / 240.);
-	//this->world->stepSimulation(deltaTime, 0);
-	//this->world->stepSimulation(btScalar(deltaTime));
+	//world->stepSimulation( deltaTime );
+	world->stepSimulation( deltaTime, 10000, 1.0f / 240.0f );
+	//world->stepSimulation( deltaTime, 0 );
+	//world->stepSimulation( btScalar(deltaTime) );
 }
 
-btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass)
-{	//add object set transform
-	btTransform t; //
-	t.setIdentity();
-	t.setOrigin(btVector3(Origin));
-	btSphereShape * sphere = new btSphereShape(radius); //raduius
-
+btRigidBody *Physics::addSphere( float radius, btVector3 origin, float mass )
+{
+	spheres.push_back( std::make_unique<btSphereShape>(radius) );
+	auto sphere = spheres.back().get();
+	
 	btVector3 inertia(0, 0, 0);
-	if (mass != 0.0f) {
-		sphere->calculateLocalInertia(mass, inertia);
-	}
-
-	btMotionState* motion = new btDefaultMotionState(t);
-	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
-
-	btRigidBody* body = new btRigidBody(info);
-
-	this->world->addRigidBody(body);
-	bodies.push_back(body);
+	if ( mass != .0f )
+		sphere->calculateLocalInertia( mass, inertia );
+	
+	// add object set transform
+	btTransform transform {};
+	transform.setIdentity();
+	transform.setOrigin( btVector3(origin) );
+	
+	motions.push_back( std::make_unique<btDefaultMotionState>(transform) );
+	auto motion = motions.back().get();
+	
+	auto info = btRigidBody::btRigidBodyConstructionInfo( mass, motion, sphere, inertia );
+	
+	bodies.push_back( std::make_unique<btRigidBody>(info) );
+	auto body = bodies.back().get();
+	
+	world->addRigidBody( body );
+	
 	return body;
 }
 
-//btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass)
+//btRigidBody* Physics::addBox(btVector3 origin, btVector3 size, float mass)
 //{
 //	return nullptr;
 //}
 
-btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass)
+btRigidBody *Physics::addBox( btVector3 origin, btVector3 size, float mass )
 {
-	//add object set transform
-	btTransform t; //
-	t.setIdentity();
-	t.setOrigin(btVector3(Origin));
-	btBoxShape* box = new btBoxShape(size);
+	boxes.push_back( std::make_unique<btBoxShape>(size) );
+	auto box = boxes.back().get();
+	
+	btVector3 inertia { 0, 0, 0 };
+	if ( mass != .0f )
+		box->calculateLocalInertia( mass, inertia );
+	
+	// add object set transform
+	btTransform transform {};
+	transform.setIdentity();
+	transform.setOrigin( btVector3(origin)) ;
 
-	btVector3 inertia(0, 0, 0);
-	if (mass != 0.0f) {
-		box->calculateLocalInertia(mass, inertia);
-	}
-	btMotionState* motion = new btDefaultMotionState(t);
-	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, box, inertia);
-	btRigidBody* body = new btRigidBody(info);
-	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	this->world->addRigidBody(body);
-	bodies.push_back(body);
-	//body->setUserPointer(objects);
+	motions.push_back( std::make_unique<btDefaultMotionState>(transform) );
+	auto motion = motions.back().get();
+	
+	auto info = btRigidBody::btRigidBodyConstructionInfo( mass, motion, box, inertia );
+	
+	bodies.push_back( std::make_unique<btRigidBody>(info) );
+	auto body = bodies.back().get();
+	body->setCollisionFlags( body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK );
+	// body->setUserPointer(objects);
+	
+	world->addRigidBody( body );
+	
 	return body;
 }
 
-//btRigidBody* Physics::addPlayer(btVector3 Origin, btVector3 size, float mass, Player *player)
+//btRigidBody* Physics::addPlayer(btVector3 origin, btVector3 size, float mass, Player *player)
 //{
 //	//add object set transform
 //	btTransform t; //
 //	t.setIdentity();
-//	t.setOrigin(btVector3(Origin));
+//	t.setOrigin(btVector3(origin));
 //	btBoxShape* box = new btBoxShape(size);
 //
 //	btVector3 inertia(0, 0, 0);
@@ -135,24 +127,23 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass)
 //	return body;
 //}
 
-bool Physics::deleteRigidBody(btRigidBody * rb)
+void Physics::deleteRigidBody( btRigidBody *rb )
 {
-	
-		for (int i = 0; i < this->bodies.size(); i++)
-		{
-			if (bodies[i] == rb)
-			{
-				this->world->removeRigidBody(bodies[i]);
-				btMotionState* motionState = bodies[i]->getMotionState();
-				btCollisionShape* shape = bodies[i]->getCollisionShape();
-				this->bodies.erase(this->bodies.begin() + i);
-				//delete bodies[i];
-				delete shape;
-				delete motionState;
-				return true;
-			}
+	//   util::erase_if( bodies, [rb](auto const &p){ return p.get() == rb; } );
+	for ( auto &body : bodies ) {
+		if ( auto e = body.get();  e == rb ) {
+			util::erase_if( motions, [e]( auto &p ) {
+			                            return p.get() == e->getMotionState();
+			                         } );
+			util::erase_if( shapes, [e]( auto &p ) {
+			                           return p.get() == e->getCollisionShape();
+			                        } );
+			util::erase( bodies, body );
+			world->removeRigidBody( e ); // TODO: rearrange?
+			//return true;
 		}
-	return false;
+	}
+	//return false;
 }
 
 //bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
@@ -180,9 +171,9 @@ bool Physics::deleteRigidBody(btRigidBody * rb)
 //	//return false;
 //}
 
-btStaticPlaneShape* Physics::getPlaneRigidBody()
+btStaticPlaneShape *Physics::getPlaneRigidBody()
 {
-	return plane;
+	return plane.get();
 }
 
 //void Physics::renderSphere(btRigidBody* sphere)

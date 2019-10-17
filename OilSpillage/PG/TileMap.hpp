@@ -19,21 +19,21 @@ public:
 	
 	// Used with a cellular automata to beautify the terminal output
 	static Vector<TileEntry> const  tileGraphicsTable;
-	static Vector<String> const        tileTerminalGraphicsTable;
-	static Vector<String> const        tileTerminalColorTable;
-	static char constexpr        terminalColorDefault[6]    { "\033[0m" };
-	Size const                   width,
-	                             height;
-	MapConfig const              config;
+	static Vector<String> const     tileTerminalGraphicsTable;
+	static Vector<String> const     tileTerminalColorTable;
+	static char constexpr           terminalColorDefault[6]    { "\033[0m" };
+	Size const                      width,
+	                                height;
+	MapConfig const                 config;
 	Vector<Tile>                    data;
 
-	                    TileMap( MapConfig const & );
-	F32                 getRoadCoverage() const noexcept;
-	Bool                walk( U16 &tileX, U16 &tileY, Direction, Tile ); // side-effects: mutates tileX/tileY if walk successful
-	Bool                neighbourIsRoad( Direction, U16 tileX, U16 tileY ) const noexcept; // pretends that all out-of-bounds tiles are roads
-	Vector<V2u>         getCardinallyNeighbouringTilePositions( V2u tilePosition ) const noexcept;
-	Vector<V2u>         getNeighbouringTilePositions( V2u tilePosition ) const noexcept;
-	Vector<GameObject>  loadAsModels( Graphics & ) const;
+	                            TileMap( MapConfig const & );
+	F32                         getRoadCoverage() const noexcept;
+	Bool                        walk( U16 &tileX, U16 &tileY, Direction, Tile ); // side-effects: mutates tileX/tileY if walk successful
+	Bool                        neighbourIsRoad( Direction, U16 tileX, U16 tileY ) const noexcept; // pretends that all out-of-bounds tiles are roads
+	Vector<V2u>                 getCardinallyNeighbouringTilePositions( V2u tilePosition ) const noexcept;
+	Vector<V2u>                 getNeighbouringTilePositions( V2u tilePosition ) const noexcept;
+	Vector<Unique<GameObject>>  loadAsModels( Graphics & ) const;
 	
 	// returns the proper look-up index for the tile @ x,y in the graphics table
 	inline Size  getTileLookupIndex( U16 tileX, U16 tileY ) const noexcept {
@@ -64,7 +64,7 @@ public:
 		return tileX < width and tileY < height;
 	}
 	
-	inline Vector3  convertTilePositionToWorldPosition(U16 const tileX, U16 const tileY) const {
+	inline Vector3  convertTilePositionToWorldPosition( U16 const tileX, U16 const tileY ) const {
 		return { tileX * config.tileScaleFactor.x, 
 		         .0f,
 		         tileY * -config.tileScaleFactor.y };

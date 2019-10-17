@@ -3,6 +3,8 @@
 
 // TODO: refactor out building gen into separate header|source
 
+static Bool constexpr isShowingDistrictMarkers { false };
+
 Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	graphics        ( graphics                                                              ),
 	physics         ( physics                                                               ),
@@ -10,8 +12,8 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	tileMap         ( std::make_unique<TileMap>(config)                                     ),
 	districtMarkers ( static_cast<Size>( config.districtCellSide) * config.districtCellSide ),
 	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y     ),
-	buildingIDs     ( config.dimensions.x * config.dimensions.y, 0U                         ),
-	roadDistanceMap ( config.dimensions.x * config.dimensions.y, 0U                         )
+	buildingIDs     ( static_cast<Size>( config.dimensions.x) * config.dimensions.y, 0U     ),
+	roadDistanceMap ( static_cast<Size>( config.dimensions.x) * config.dimensions.y, 0U     )
 {
 	DBG_PROBE(Map::Map);
 	// TODO: generate water etc
@@ -65,12 +67,12 @@ void  Map::generateRoads() {
 	roadTiles = tileMap->loadAsModels(graphics); // GameObject instantiation
 	for ( U16 y = 0;  y < tileMap->height;  ++y ) {
 		for ( U16 x = 0;  x < tileMap->width;  ++x ) {
-			auto& tile = roadTiles[tileMap->index(x,y)];
-			tile.setScale(Vector3{ .0005f * config.tileScaleFactor.x,
+			auto &tile = roadTiles[tileMap->index(x,y)];
+			tile->setScale(Vector3{ .0005f * config.tileScaleFactor.x,
 			                       .0005f * config.tileScaleFactor.y,
 			                       .0005f * config.tileScaleFactor.z }); // TODO: scale models instead
-			tile.setNormalMap(graphics.getTexturePointer("brickwallnormal"));
-			graphics.addToDraw(&tile , true);
+			tile->setNormalMap(graphics.getTexturePointer("brickwallnormal"));
+			graphics.addToDraw( tile.get() , true);
 		}
 	}
 }
@@ -90,18 +92,18 @@ void  Map::generateDistricts() {
 		                                            config.dimensions.x / config.districtCellSide,
 		                                            config.dimensions.y / config.districtCellSide,
 		                                            Voronoi::EuclideanDistanceTag{});
-   if constexpr ( isDebugging ) {
+   if constexpr ( isDebugging and isShowingDistrictMarkers ) {
 	   // display noise centers:
 	   districtMarkers.reserve( districtMap->noise.size() );
 	   for ( auto const &cellCentre : districtMap->noise ) {
-			districtMarkers.emplace_back();
+			districtMarkers.emplace_back( std::make_unique<GameObject>() );
 			auto &marker = districtMarkers.back();
-			marker.mesh  = graphics.getMeshPointer("Cube");
-			marker.setColor({ 1, 0,  0, 1 });
-			marker.setScale({ .2f, 4.0f, .2f });
-			marker.setPosition({ tileMap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
-			                                                                  static_cast<U16>(cellCentre.y)) });
-			graphics.addToDraw(&marker, true);
+			marker->mesh  = graphics.getMeshPointer("Cube");
+			marker->setColor({  1,    0,    0,    1 });
+			marker->setScale({ .2f, 4.0f, .2f });
+			marker->setPosition({ tileMap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
+			                                                                   static_cast<U16>(cellCentre.y)) });
+			graphics.addToDraw( marker.get(), true );
 	   }
    }
 }
@@ -188,25 +190,26 @@ void  Map::generateBuildings( ) {
 					F32        randomFloorCount   { static_cast<F32>(generateFloorCount(rng)) };
                BuildingID id                 { generateBuildingID() };
 					currentArea += buildingSize;
+               houseTiles.reserve( potentialLot.value().size() );
 					for ( auto &tilePosition : potentialLot.value() ) {
-						houseTiles.emplace_back();
-						auto &houseTile = houseTiles.back();
+                  houseTiles.emplace_back( std::make_unique<GameObject>() );
+						auto houseTile = houseTiles.back().get();
                   buildingIDs[tileMap->index(tilePosition)] = id;
 						tileMap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
-						houseTile.mesh = graphics.getMeshPointer("Cube");
-						houseTile.setScale({ .5f * config.tileScaleFactor.x,
-						                     .5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * randomFloorCount,
-						                     .5f * config.tileScaleFactor.z });
-						houseTile.setPosition({ tileMap->convertTilePositionToWorldPosition(tilePosition) });
-						btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
-						                                               houseTile.getPosition().y,
-						                                               houseTile.getPosition().z ),
-						                                    btVector3( houseTile.getScale().x,
-						                                               houseTile.getScale().y,
-						                                               houseTile.getScale().z ),
+						houseTile->mesh = graphics.getMeshPointer("Cube");
+						houseTile->setScale({ .5f * config.tileScaleFactor.x,
+						                      .5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * randomFloorCount,
+						                      .5f * config.tileScaleFactor.z });
+						houseTile->setPosition({ tileMap->convertTilePositionToWorldPosition(tilePosition) });
+						btRigidBody *tmp = physics->addBox( btVector3( houseTile->getPosition().x,
+						                                               houseTile->getPosition().y,
+						                                               houseTile->getPosition().z ),
+						                                    btVector3( houseTile->getScale().x,
+						                                               houseTile->getScale().y,
+						                                               houseTile->getScale().z ),
 						                                    .0f );
-						houseTile.setRigidBody( tmp, physics );
+						houseTile->setRigidBody( tmp, physics );
 
                   #ifdef _DEBUG
 						   ++total_building_tile_count;
@@ -220,7 +223,7 @@ void  Map::generateBuildings( ) {
 
 	// adding all the tiles to draw:
 	for ( auto &e : houseTiles )
-		graphics.addToDraw(&e , true);
+		graphics.addToDraw( e.get(), true );
 
    #ifdef _DEBUG
 	   if (buildingLogs.is_open())
@@ -230,7 +233,7 @@ void  Map::generateBuildings( ) {
 
 // basic proto placement algorithm
 // TODO: refactor out of Game
-Opt<Vector<V2u>>  Map::findValidHouseLot( RNG& rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vector<District> const& districtLookUpTable ) {
+Optional<Vector<V2u>>  Map::findValidHouseLot( RNG& rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vector<District> const& districtLookUpTable ) {
 
    static constexpr auto MAXIMUM_DISTANCE_FROM_ROAD { 3U }; // TODO: refactor into config
 
@@ -352,23 +355,23 @@ void  Map::setDistrictColorCoding( bool useColorCoding ) noexcept {
 				auto        cellIndex = districtMap->diagramIndex(x, y);
 				auto        cellId    = districtMap->diagram[ cellIndex ];
 				auto const &color     = districtColorTable[ cellId % districtColorTable.size() ];
-				tile.setColor( color );
+				tile->setColor( color );
 			}
 		}
 		for ( auto &e : houseTiles ) {
-			auto        cellPosition = tileMap->convertWorldPositionToTilePosition( e.getPosition() );
+			auto        cellPosition = tileMap->convertWorldPositionToTilePosition( e->getPosition() );
 			auto        cellIndex    = districtMap->diagramIndex( cellPosition.x, cellPosition.y );
 			auto        cellID       = districtMap->diagram[ cellIndex ];
 			auto const &color        = districtColorTable[ cellID % districtColorTable.size() ];
-			e.setColor( color );
+			e->setColor( color );
 		}
 	}
 	else {
 		static auto const  defaultColor = Vector4{ .3f, .3f, .3f, 1.0f };
 		for ( auto &e : roadTiles )
-			e.setColor( defaultColor );
-		for ( auto& e : houseTiles )
-			e.setColor( defaultColor );
+			e->setColor( defaultColor );
+		for ( auto &e : houseTiles )
+			e->setColor( defaultColor );
 	}
 }
 

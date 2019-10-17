@@ -4,9 +4,7 @@
 GameObject::~GameObject() noexcept
 {
 	if ( rigidBody ) {
-      // TODO: refactor so UPtrs are used instead?
 		physics->deleteRigidBody( rigidBody );
-		rigidBody = nullptr;
 	}
 }
 
@@ -23,9 +21,7 @@ Matrix GameObject::getTransform()
 		transform *= Matrix::CreateTranslation(position);
 
 		if ( parent )
-		{
 			transform *= parent->getTransform();
-		}
 
 		return transform;
 	} else {
@@ -45,9 +41,7 @@ Matrix GameObject::getTransform()
 		transform *= Matrix::CreateTranslation(position);
 
 		if ( parent )
-		{
 			transform *= parent->getTransform();
-		}
 
 		return transform;
 	}
@@ -55,16 +49,21 @@ Matrix GameObject::getTransform()
 
 void GameObject::setPosition( Vector3 const &p )
 {
-	position = p;
+	if ( rigidBody )
+		rigidBody->getWorldTransform().setOrigin( btVector3{p.x, p.y, p.z} );
+	else position = p;
 }
 
 void GameObject::move( Vector3 const &offset )
 {
-	position += offset;
+	if ( rigidBody )
+		rigidBody->getWorldTransform().getOrigin() += btVector3{offset.x, offset.y, offset.z};
+	else position += offset;
 }
 
 void GameObject::addRotation( Vector3 const &r )
 {
+	if ( rigidBody ); else; // TODO
 	rotation += r;
 	rotation.x = fmod( rotation.x, 2 * DirectX::XM_PI );
 	rotation.y = fmod( rotation.y, 2 * DirectX::XM_PI );
@@ -73,6 +72,7 @@ void GameObject::addRotation( Vector3 const &r )
 
 void GameObject::setRotation( Vector3 const &r )
 {
+	if ( rigidBody ); else; // TODO
 	rotation = r;
 	rotation.x = fmod( rotation.x, 2 * DirectX::XM_PI );
 	rotation.y = fmod( rotation.y, 2 * DirectX::XM_PI );

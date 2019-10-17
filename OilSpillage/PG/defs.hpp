@@ -16,11 +16,11 @@ template <typename T, size_t N> using Array   = std::array<T,N>;
 template <class K, class V>     using HashMap = std::unordered_map<K,V>;
 
 // smart pointers
-template <typename T> using UPtr = std::unique_ptr<T>;
-template <typename T> using SPtr = std::shared_ptr<T>;
+template <typename T> using Unique = std::unique_ptr<T>;
+template <typename T> using Shared = std::shared_ptr<T>;
 
 // optional
-template <typename T> using Opt = std::optional<T>;
+template <typename T> using Optional = std::optional<T>;
 
 // string
 using String = std::basic_string<char>;

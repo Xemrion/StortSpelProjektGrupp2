@@ -6,13 +6,13 @@
 namespace util {
    // constexpr integral power function for computing
    // (main use: base as 2 to compute bit values at compile-time)
-   template <typename Integer> // TODO static_assert( is_integer_v<T_Integer> )
-   inline Integer constexpr  pow(Integer base, Integer exp) noexcept {
-	   static_assert(std::is_integral_v<Integer>, "Template arg Integer must be integral!");
-	   Integer  retval(1);
+   template <typename T_Integer>
+   inline T_Integer constexpr  pow(T_Integer base, T_Integer exp) noexcept {
+	   static_assert(std::is_integral_v<T_Integer>, "Template arg Integer must be integral!");
+	   T_Integer  result(1);
 	   while ( exp --> 0 )
-		   retval *= base;
-	   return retval;
+		   result *= base;
+	   return result;
    }
 
    template <typename T_Vector>
@@ -29,5 +29,17 @@ namespace util {
    template <class T>
    inline T constexpr  maxValue( T const &a, T const &b ) noexcept {
       return (a > b) ? a : b;
+   }
+
+   template <class T_Collection, class T_Predicate>
+   inline void  erase_if( T_Collection &c, T_Predicate p ) noexcept {
+      c.erase( std::remove_if( c.begin(), c.end(), p ),
+               c.end());
+   }
+
+   template <class T_Collection, class T_Element>
+   inline void  erase( T_Collection &c, T_Element &e ) noexcept {
+      c.erase( std::remove( c.begin(), c.end(), e ),
+               c.end());
    }
 };

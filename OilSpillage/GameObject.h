@@ -14,8 +14,8 @@ class GameObject {
 	Texture       *texture    { nullptr };
 	Texture       *normalMap  { nullptr };
 	GameObject    *parent     { nullptr };
-	btRigidBody   *rigidBody  { nullptr }; // TODO: make unique?
-	class Physics *physics;
+	btRigidBody   *rigidBody  { nullptr };
+   class Physics *physics;
 protected:
    Vector4        color      {  .0f,  .0f,  .0f,  1.0f };
 	Vector3        position   {  .0f,  .0f,  .0f };
