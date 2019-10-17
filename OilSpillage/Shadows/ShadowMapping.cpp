@@ -153,7 +153,7 @@ void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float 
 {
 	Vector3 target;
 	Vector3 eye = Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
-	eye += -sunDir * 3.0f*(camera->getPosition().y / -sunDir.y);
+	eye += -sunDir * 6.0f*(camera->getPosition().y / -sunDir.y);
 	target= Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
 	Matrix viewMatrix;
 	Matrix proj;

@@ -13,7 +13,7 @@
     <FxCompile Include="Particle\ParticleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-	<ClCompile Include="physics.cpp" />
+    <ClCompile Include="physics.cpp" />
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\ActorManager.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
@@ -66,12 +66,13 @@
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
-	<ClCompile Include="QuadTree.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="UI\Minimap.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
+    <ClCompile Include="Shadows\ShadowMapping.cpp" />
   </ItemGroup>
   <ItemGroup>
-	<ClInclude Include="physics.h" />
+    <ClInclude Include="physics.h" />
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\ActorManager.h" />
     <ClInclude Include="AI\AStar.h" />
@@ -139,11 +140,12 @@
     <ClInclude Include="VehicleWeapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="AI\Turret.h" />
-	<ClInclude Include="Frustum.h" />
-	<ClInclude Include="QuadTree.h" />
+    <ClInclude Include="Frustum.h" />
+    <ClInclude Include="QuadTree.h" />
     <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="UI\Minimap.h" />
     <ClInclude Include="PG\Profiler.hpp" />
+    <ClInclude Include="Shadows\ShadowMapping.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

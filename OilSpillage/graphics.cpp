@@ -505,7 +505,7 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	}
 
 	std::vector<GameObject*> objects;
-	quadTree->getGameObjects(objects, frustum, 10.0f);
+	quadTree->getGameObjects(objects, frustum, 100.0f);
 	for (GameObject* o : objects)
 	{
 		/*if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
