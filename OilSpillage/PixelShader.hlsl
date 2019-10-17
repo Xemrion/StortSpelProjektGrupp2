@@ -75,6 +75,7 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float biasTemp)
 			visibility += shadowCoord.z - bias > pcfDepth ? 1.0f : 0.0;
 		}
 	}
+	
 	visibility /= 9.0;
 
 	return visibility;

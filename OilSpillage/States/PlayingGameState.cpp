@@ -479,7 +479,7 @@ void  PlayingGameState::update(float deltaTime)
 	   ImGui_Camera();
 	   ImGui::Render();
 	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-   }
+    }
 	
 	graphics.presentScene();
 }
