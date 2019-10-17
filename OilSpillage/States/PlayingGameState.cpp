@@ -44,6 +44,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadModel("Roads/Road_3way");
 	graphics.loadModel("Roads/Road_4way");
 
+	graphics.loadModel("Houses/testHouse");
+
    if constexpr ( isDebugging ) {
 	   // light tests
 	   lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
