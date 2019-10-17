@@ -15,7 +15,7 @@ solver(new btSequentialImpulseConstraintSolver)
 
 
 	////set shape for object
-	plane = new btStaticPlaneShape(btVector3(0, 1, 0), 3);
+	plane = new btStaticPlaneShape(btVector3(0, 1, 0), 2);
 	
 	//set motionshape aka set postion
 	btMotionState* motion = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -1, 0)));

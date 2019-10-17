@@ -82,7 +82,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testNetwork.get()->saveTestNetwork("test-network");
    */
    }
-	lightList->setSun(Sun(Vector3(0.0f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
+	lightList->setSun(Sun(Vector3(0.5f, 1.0f, 1.0f), Vector3(0.0f, 0.0f, 0.0f)));
 
 	graphics.setLightList(lightList.get());
 
@@ -116,7 +116,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
 
 
-	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
 		{
