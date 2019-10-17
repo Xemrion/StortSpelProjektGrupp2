@@ -58,6 +58,7 @@ private:
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight;
+	GameObject*						testObjective; //Test
 
 	//Bullet
 	std::unique_ptr<Physics>		physics;
