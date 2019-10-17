@@ -669,65 +669,78 @@ ID3D11Device* Graphics::getDevice()
 void Graphics::loadMesh(std::string fileName)
 {
 	Mesh newMesh;
-	if (meshes.find(fileName) == meshes.end())
+
+	
+	Importer imp;
+	std::string meshBinPath = fileName + "/mesh.bin";
+	if (imp.loadMesh(meshBinPath.c_str()))
 	{
-		Importer imp;
-		if (imp.loadMesh(fileName.c_str()))
+		for (int j = 0; j < imp.getMeshCount() ; j++)
 		{
-			meshes[fileName] = newMesh;
-			
-			std::vector<Vertex3D> tempVec;
-			Vertex3D vertex;
-			Vertex* vertices = imp.getVertices();
-			for (int i = 0; i < imp.getVertexCount(); i++)
+			std::string meshName = fileName;
+			if (j > 0)
 			{
-				vertex.position.x = vertices[i].x;
-				vertex.position.y = vertices[i].y;
-				vertex.position.z = vertices[i].z;
-
-				vertex.uv.x = vertices[i].u;
-				vertex.uv.y = vertices[i].v;
-
-				vertex.normal.x = vertices[i].nx;
-				vertex.normal.y = vertices[i].ny;
-				vertex.normal.z = vertices[i].nz;
-
-				vertex.tangent.x = vertices[i].tangentX;
-				vertex.tangent.y = vertices[i].tangentY;
-				vertex.tangent.z = vertices[i].tangentZ;
-
-				vertex.bitangent.x = vertices[i].binormalX;
-				vertex.bitangent.y = vertices[i].binormalY;
-				vertex.bitangent.z = vertices[i].binormalZ;
-
-				tempVec.push_back(vertex);
+				meshName += std::to_string(j);
 			}
+			if (meshes.find(meshName) == meshes.end())
+			{
+				meshes[meshName] = newMesh;
+				imp.getMeshCount();
+				std::vector<Vertex3D> tempVec;
+				Vertex3D vertex;
+				Vertex* vertices = imp.getVertices(j);
+				for (int i = 0; i < imp.getVertexCount(j); i++)
+				{
+					vertex.position.x = vertices[i].x;
+					vertex.position.y = vertices[i].y;
+					vertex.position.z = vertices[i].z;
 
-			meshes[fileName].insertDataToMesh(tempVec);
-			AABB aabb;
-			imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z);
-			imp.getMinBBox(aabb.minPos.x, aabb.minPos.y, aabb.minPos.z);
-			meshes[fileName].setAABB(aabb);
-			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
-			UINT stride = sizeof(Vertex3D);
+					vertex.uv.x = vertices[i].u;
+					vertex.uv.y = vertices[i].v;
 
-			D3D11_BUFFER_DESC vBufferDesc;
-			ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+					vertex.normal.x = vertices[i].nx;
+					vertex.normal.y = vertices[i].ny;
+					vertex.normal.z = vertices[i].nz;
 
-			vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			vBufferDesc.ByteWidth = bufferSize;
-			vBufferDesc.CPUAccessFlags = 0;
-			vBufferDesc.MiscFlags = 0;
+					vertex.tangent.x = vertices[i].tangentX;
+					vertex.tangent.y = vertices[i].tangentY;
+					vertex.tangent.z = vertices[i].tangentZ;
 
-			D3D11_SUBRESOURCE_DATA subData;
-			ZeroMemory(&subData, sizeof(subData));
-			subData.pSysMem = meshes[fileName].vertices.data();
+					vertex.bitangent.x = vertices[i].binormalX;
+					vertex.bitangent.y = vertices[i].binormalY;
+					vertex.bitangent.z = vertices[i].binormalZ;
 
-			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[fileName].vertexBuffer.GetAddressOf());
-			//meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+					tempVec.push_back(vertex);
+				}
+
+				meshes[meshName].insertDataToMesh(tempVec);
+				AABB aabb;
+				imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z,j);
+				imp.getMinBBox(aabb.minPos.x, aabb.minPos.y, aabb.minPos.z,j);
+				meshes[meshName].setAABB(aabb);
+				int bufferSize = static_cast<int>(meshes[meshName].vertices.size()) * sizeof(Vertex3D);
+				UINT stride = sizeof(Vertex3D);
+
+				D3D11_BUFFER_DESC vBufferDesc;
+				ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+				vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+				vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+				vBufferDesc.ByteWidth = bufferSize;
+				vBufferDesc.CPUAccessFlags = 0;
+				vBufferDesc.MiscFlags = 0;
+
+				D3D11_SUBRESOURCE_DATA subData;
+				ZeroMemory(&subData, sizeof(subData));
+				subData.pSysMem = meshes[meshName].vertices.data();
+
+				HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[meshName].vertexBuffer.GetAddressOf());
+				//meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+			}
 		}
+
 	}
+	
 }
 
 
@@ -735,7 +748,7 @@ void Graphics::loadModel(std::string path)
 {
    std::string modelDir {MODEL_ROOT_DIR};
                modelDir += path;
-	loadMesh( modelDir+"/mesh.bin" );
+	loadMesh( modelDir );
 	loadTexture( modelDir+"/_diffuse.tga", true );
    // TODO: load other texture channels
 }
@@ -950,7 +963,7 @@ const Mesh* Graphics::getMeshPointer(const char* localPath)
    {
       meshPath = MODEL_ROOT_DIR;
       meshPath += localPath;
-      meshPath += "/mesh.bin";
+      //meshPath += "/mesh.bin";//the meshse in mehses[] wont have the mesh.bin in their name
    }
    else if (localPath != nullptr)
    {
