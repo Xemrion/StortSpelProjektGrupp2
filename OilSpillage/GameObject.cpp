@@ -1,5 +1,12 @@
 #include"GameObject.h"
 #include"game.h"
+GameObject::~GameObject()
+{
+	/*if (rigidBody != nullptr) {
+		physics->DeleteRigidBody(rigidBody);
+		this->rigidBody = nullptr;
+	}*/
+}
 void GameObject::updateRigidBody()
 {
 }
@@ -132,6 +139,17 @@ AABB GameObject::getAABB() const
 	boundingBox.maxPos += this->getPosition();
 	boundingBox.minPos += this->getPosition();
 	return boundingBox;
+}
+
+btRigidBody* GameObject::getRigidBody()
+{
+	return this->rigidBody;
+}
+
+void GameObject::setRigidBody(btRigidBody* body, Physics* physics)
+{
+	this->rigidBody = body;
+	this->physics = physics;
 }
 
 Matrix GameObject::btTransform_to_XMMATRIX(btTransform const& trans)

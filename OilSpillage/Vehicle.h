@@ -62,6 +62,7 @@ private:
 	Vector2 currentDir;
 	float velocitySimple;
 	float velocitySpeed;
+	class Physics* physics;
 public:
 	Vehicle();
 	virtual ~Vehicle();

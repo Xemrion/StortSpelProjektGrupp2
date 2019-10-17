@@ -43,7 +43,8 @@ String createMinimapTexture( Map const &map ) {
    for ( U16 tileY = 0;  tileY < tilemap.height;  ++tileY ) {
       for ( U16 tileX = 0;  tileX < tilemap.width;  ++tileX ) {
          // TODO: add district borders?
-         Size tileDistrictID      { map.districtMap->diagram[ map.districtMap->diagramIndex(tileX,tileY)] };
+         auto district            { map.getDistrictMap() };
+         Size tileDistrictID      { district.diagram[ district.diagramIndex(tileX,tileY)] };
          RGBA districtColorOffset ( 0x00'040404 * ((tileDistrictID+499)%7) );
          switch ( tilemap.tileAt(tileX, tileY) ) {
             case Tile::ground: {

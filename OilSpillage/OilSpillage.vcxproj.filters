@@ -159,6 +159,7 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="ComputeLightCulling.hlsl" />
+    <FxCompile Include="Shadows\SimpleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
