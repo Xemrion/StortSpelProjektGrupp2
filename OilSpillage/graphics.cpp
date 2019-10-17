@@ -21,7 +21,7 @@ Graphics::Graphics()
 
 	lightBufferContents = new LightBufferContents;
 
-	this->quadTree = std::make_unique<QuadTree>(Vector2(-96.f * 10.f, -96.f * 10.f), Vector2(96.f * 10.f, 96.f * 10.f), 4);
+	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
 }
 
 Graphics::~Graphics()
@@ -354,71 +354,11 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
-	
-	shadowMap.prepare();//clear depth
-	shadowMap.prepareSpot();//clear depth
-	shadowMap.setViewProjSun(camera, Vector3(lightList->getSun().getDirection().x, lightList->getSun().getDirection().y, lightList->getSun().getDirection().z));
-	//Setting the viewprojSpot in playinggamestate cause playerlight is there
 	Frustum frustum = camera->getFrustum();
-	
+
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//deviceContext->RSSetState(rasterStateShadow.Get());
 
-	for (GameObject* object : drawableObjects)
-	{
-		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
-		{
-			AABB boundingBox = object->getAABB();
-			boundingBox = boundingBox.scale(object->getScale());
-			boundingBox.maxPos += object->getPosition();
-			boundingBox.minPos += object->getPosition();
-
-			if (frustum.intersect(boundingBox, 1000.0f))
-			{
-				UINT vertexCount = object->mesh->getVertexCount();
-				UINT stride = sizeof(Vertex3D);
-				UINT offset = 0;
-				SimpleMath::Matrix world = object->getTransform();
-				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-				shadowMap.setWorld(worldTr);
-				deviceContext->PSSetShader(nullptr, nullptr, 0);
-				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-				shadowMap.setDSun();
-				deviceContext->Draw(vertexCount, 0);
-				shadowMap.setDSpot();
-				deviceContext->Draw(vertexCount, 0);
-			}
-		}
-	}
-
-	std::vector<GameObject*> objects;
-	quadTree->getGameObjects(objects, frustum, 10.0f);
-	for (GameObject* o : objects)
-	{
-		/*if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
-		{*/
-		AABB boundingBox = o->getAABB();
-		boundingBox = boundingBox.scale(o->getScale());
-		boundingBox.maxPos += o->getPosition();
-		boundingBox.minPos += o->getPosition();
-
-		if (frustum.intersect(boundingBox, 100.0f))
-		{
-			UINT vertexCount = o->mesh->getVertexCount();
-			UINT stride = sizeof(Vertex3D);
-			UINT offset = 0;
-			SimpleMath::Matrix world = o->getTransform();
-			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-			shadowMap.setWorld(worldTr);
-			deviceContext->PSSetShader(nullptr, nullptr, 0);
-			deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-			shadowMap.setDSun();
-			deviceContext->Draw(vertexCount, 0);
-			shadowMap.setDSpot();
-			deviceContext->Draw(vertexCount, 0);
-		}
-
-	}
+	renderShadowmap(camera);
 
 	deviceContext->RSSetState(rasterState.Get());
 
@@ -516,8 +456,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 			}
 		}
 	}
-	deviceContext->PSSetShaderResources(2, 1, &nulSRV);
-
+	
 	drawStaticGameObjects(camera, frustum, 10.0);
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
@@ -530,6 +469,65 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 #endif
 
 	// Present the back buffer to the screen since rendering is complete.
+}
+
+void Graphics::renderShadowmap(DynamicCamera* camera)
+{
+	Frustum frustum = camera->getFrustum();
+	shadowMap.prepare();//clear depth
+	shadowMap.prepareSpot();//clear depth
+	shadowMap.setViewProjSun(camera, Vector3(lightList->getSun().getDirection().x, lightList->getSun().getDirection().y, lightList->getSun().getDirection().z));
+	//Setting the viewprojSpot in playinggamestate cause playerlight is there
+
+
+	for (GameObject* object : drawableObjects)
+	{
+		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		{
+			AABB boundingBox = object->getAABB();
+
+			if (frustum.intersect(boundingBox, 100.0f))
+			{
+				UINT vertexCount = object->mesh->getVertexCount();
+				UINT stride = sizeof(Vertex3D);
+				UINT offset = 0;
+				SimpleMath::Matrix world = object->getTransform();
+				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+				shadowMap.setWorld(worldTr);
+				deviceContext->PSSetShader(nullptr, nullptr, 0);
+				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+				shadowMap.setDSun();
+				deviceContext->Draw(vertexCount, 0);
+				shadowMap.setDSpot();
+				deviceContext->Draw(vertexCount, 0);
+			}
+		}
+	}
+
+	std::vector<GameObject*> objects;
+	quadTree->getGameObjects(objects, frustum, 10.0f);
+	for (GameObject* o : objects)
+	{
+		/*if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		{*/
+		AABB boundingBox = o->getAABB();
+		//if (frustum.intersect(boundingBox, 1000.0f))
+		//{
+		UINT vertexCount = o->mesh->getVertexCount();
+		UINT stride = sizeof(Vertex3D);
+		UINT offset = 0;
+		SimpleMath::Matrix world = o->getTransform().Transpose();
+		SimpleMath::Matrix worldTr = world;
+		shadowMap.setWorld(worldTr);
+		deviceContext->PSSetShader(nullptr, nullptr, 0);
+		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+		shadowMap.setDSun();
+		deviceContext->Draw(vertexCount, 0);
+		shadowMap.setDSpot();
+		deviceContext->Draw(vertexCount, 0);
+		//}
+
+	}
 }
 
 bool Graphics::createShaders()

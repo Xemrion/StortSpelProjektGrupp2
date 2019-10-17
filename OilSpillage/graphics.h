@@ -107,6 +107,7 @@ public:
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera, float deltaTime);
+	void renderShadowmap(DynamicCamera* camera);
 	bool createShaders();
 	void fillLightBuffers();
 	void clearScreen();

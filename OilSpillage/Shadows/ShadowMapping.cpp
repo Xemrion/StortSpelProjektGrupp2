@@ -40,43 +40,6 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 	HRESULT hr = D3DReadFileToBlob(filePath.c_str(), this->vertexShaderBlob.GetAddressOf());
 	hr = device->CreateVertexShader(this->vertexShaderBlob->GetBufferPointer(), this->vertexShaderBlob->GetBufferSize(), NULL, this->simpleVertexShader.GetAddressOf());
 
-	D3D11_INPUT_ELEMENT_DESC inputDesc[] = {
-		{
-			"SV_POSITION",		
-			0,				
-			DXGI_FORMAT_R32G32B32_FLOAT, 
-			0,							 
-			D3D11_APPEND_ALIGNED_ELEMENT,
-			D3D11_INPUT_PER_VERTEX_DATA, 
-			0							 
-		},
-		{
-			"TEXCOORD",
-			0,
-			DXGI_FORMAT_R32G32_FLOAT, 
-			0,
-			D3D11_APPEND_ALIGNED_ELEMENT,
-			D3D11_INPUT_PER_VERTEX_DATA,
-			0
-		},
-
-		{
-			"NORMAL",
-			0,				
-			DXGI_FORMAT_R32G32B32_FLOAT,
-			0,
-			D3D11_APPEND_ALIGNED_ELEMENT,							
-			D3D11_INPUT_PER_VERTEX_DATA,
-			0
-			
-		}
-
-
-
-	};
-
-	
-
 	D3D11_BUFFER_DESC descB = { 0 };
 
 	
@@ -105,8 +68,8 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 
-	depthStencilDesc.Width = 1024;
-	depthStencilDesc.Height = 1024;
+	depthStencilDesc.Width = 2048;
+	depthStencilDesc.Height = 2048;
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.ArraySize = 1;
 	depthStencilDesc.Format = DXGI_FORMAT_R32_TYPELESS;
