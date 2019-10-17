@@ -47,9 +47,11 @@ void Turret::update(float dt, Vector3 targetPos)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-20);
 				this->bullets[i].timeLeft = 0;
+				
 			}
 			else
 			{
+				Game::getGraphics().addParticle(this->position-this->vecForward, Vector3(0, 0, 0), 1, 1,1);
 				this->bullets[i].timeLeft -= deltaTime;
 				this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
 				Game::getGraphics().addToDraw(this->bullets[i].obj);

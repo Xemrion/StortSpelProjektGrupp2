@@ -41,6 +41,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 	graphics.loadModel("Entities/Dummy_Turret");
+	graphics.loadModel("Entities/Dummy_Player_Car");
 
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
@@ -129,7 +130,12 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 		 Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
+	Vector4 colorP2[] = {
+		Vector4(0.3,0.3,0.3,1),
+		Vector4(0.2,0.2,0.2,1)
+	};
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+	graphics.setParticle2ColorNSize(colorP2, 2, size1+0.1f, size2+0.1f);
 
 	Input::SetKeyboardPlayerID(0);
 	//Bullet
@@ -439,11 +445,11 @@ void  PlayingGameState::update(float deltaTime)
 		timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
 		{
-			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
+			/*graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
 			                      5 * Vector3(Input::GetDirectionR(0).x,
 			                      0,
 			                      Input::GetDirectionR(0).y),
-			                      addNrOfParticles, lifeTime, randomPosPower);
+			                      addNrOfParticles, lifeTime, randomPosPower);*/
 			timerForParticle = 0;
 		}
 		

@@ -381,7 +381,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
 
-
+	deviceContext->RSSetViewports(1, &this->vp);
 	this->particleSystem.updateParticles(deltaTime, viewProj);
 
 	this->particleSystem.drawAll(camera);
@@ -391,7 +391,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	this->particleSystem2.drawAll(camera);
 
 	//set up Shaders
-	deviceContext->RSSetViewports(1, &this->vp);
+	
 
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDefault.ps.getShader(), nullptr, 0);
