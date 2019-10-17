@@ -408,7 +408,7 @@ void SkyscraperFloor::getTriangleIndices()
 	this->indices = triangleIndices;
 }
 
-std::vector<Vertex3D>& SkyscraperFloor::getVertices()
+std::vector<Vertex3D> SkyscraperFloor::getVertices()
 {
 	std::vector<Vertex3D> meshData;
 	Vertex3D temp;
@@ -440,14 +440,17 @@ std::vector<Vertex3D>& SkyscraperFloor::getVertices()
 
 void SkyscraperFloor::testDrawTriangles()
 {
-	/*this->roof = new GameObject();
+	std::vector<Vertex3D> meshData;
+	meshData = this->getVertices();
+	this->roof = new GameObject();
 	Mesh test;
-	test.insertDataToMesh(this->getVertices());
+	test.insertDataToMesh(meshData);
 	this->roof->mesh = new Mesh(test);
 	Game::getGraphics().addToDraw(this->roof);
 	this->roof->setPosition(this->center);
 	this->roof->setScale(Vector3(1.0f, 1.0f, 1.0f));
-	this->roof->setTexture(Game::getGraphics().getTexturePointer("brickwall"));*/
+	Game::getGraphics().loadTexture("brickwall");
+	this->roof->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
 }
 
 Vector3 SkyscraperFloor::getAVertex(int vertex)

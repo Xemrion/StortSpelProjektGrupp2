@@ -22,7 +22,7 @@ public:
 
 	void testDrawLines() const; //Lines
 	void getTriangleIndices();
-	std::vector<Vertex3D>& getVertices();
+	std::vector<Vertex3D> getVertices();
 	void testDrawTriangles();
 private:
 	std::vector<Vector3> verticies;
