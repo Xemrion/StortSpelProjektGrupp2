@@ -16,6 +16,7 @@ Turret::Turret(float x, float z)
 	this->sightRange = 10;
 	setUpActor();
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+	vecForward.Normalize();
 }
 
 void Turret::update(float dt, Vector3 targetPos)
@@ -23,6 +24,8 @@ void Turret::update(float dt, Vector3 targetPos)
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 	this->root->func();
+
+	rotateTowards();
 
 	for (int i = 0; i < bulletCount; i++)
 	{
@@ -82,20 +85,17 @@ void Turret::updateBoid(float deltatime)
 
 Status Turret::rotateTowards()
 {
-	Vector3 dir = this->getPosition() - this->targetPos;
+	Vector3 targetToSelf = (targetPos - position);
+	targetToSelf.Normalize();
 
-	if ((dir - this->getPosition()).Length() > 0.01f)
+	if ((targetToSelf).Dot(vecForward) < 0.8)
 	{
-		vecForward = Vector3::Lerp(this->vecForward, dir, deltaTime);
+		vecForward -= (targetToSelf * deltaTime)/1.5;
 		vecForward.Normalize();
-	}
-	else
-	{
-		this->vecForward = dir;
-	}
-	float newRot = atan2(this->vecForward.x, this->vecForward.z);
-	this->setRotation(Vector3(0, newRot, 0));
 
+		float newRot = atan2(this->vecForward.x, this->vecForward.z);
+		this->setRotation(Vector3(0, newRot, 0));
+	}
 	return Status::SUCCESS;
 }
 

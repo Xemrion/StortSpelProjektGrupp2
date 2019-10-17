@@ -18,7 +18,6 @@ private:
 	Status inRange();
 	Status idle();
 
-
 	Vector3 vecForward;
 	int sightRange;
 };

@@ -31,9 +31,9 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	//assignPathsToGroups(targetPos);
 }
 
-void ActorManager::createDefender(float x, float z)
+void ActorManager::createDefender(float x, float z, Vector3 objectivePos)
 {
-	this->actors.emplace_back(new Defender(x, z, this->aStar));
+	this->actors.emplace_back(new Defender(x, z, this->aStar, objectivePos));
 }
 
 void ActorManager::createAttacker(float x, float z)

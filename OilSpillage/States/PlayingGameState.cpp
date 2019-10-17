@@ -12,15 +12,16 @@ void PlayingGameState::initAI()
 	aStar = new AStar(20, 20, Vector2(-10, 10));
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	actorManager->createDefender(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 2, map->getStartPositionInWorldSpace().z - 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 3, map->getStartPositionInWorldSpace().z - 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 4, map->getStartPositionInWorldSpace().z - 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 5, map->getStartPositionInWorldSpace().z - 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 6, map->getStartPositionInWorldSpace().z - 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 7, map->getStartPositionInWorldSpace().z - 4);
-	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 1);
+
+	//actorManager->createDefender(0 + 1, 0 + 2,
+	//	Vector3(0 + 9, 0, 0 + 9));
+
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
+
+	actorManager->createTurret(0 + 2, 0 + 2);
 	actorManager->initGroups();
+
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {
@@ -108,6 +109,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
    auto playerVehicle = player->getVehicle();
 	playerVehicle->setPosition(map->getStartPositionInWorldSpace());
 
+	testObjective = new GameObject();
+	testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(testObjective);
+	testObjective->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
+	testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
+
+
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
@@ -137,6 +145,7 @@ PlayingGameState::~PlayingGameState()
 {
 	delete aStar;
 	delete actorManager;
+	delete testObjective;
 }
 
 void  PlayingGameState::ImGui_Driving()
