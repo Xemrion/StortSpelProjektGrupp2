@@ -22,10 +22,10 @@ public:
    U8  const       cellSize;
    U16 const       width,
                    height;
-   Vec<Size>       diagram;
-   Vec<V2f> const  noise;
+   Vector<Size>       diagram;
+   Vector<V2f> const  noise;
 
  private:
-   Vec<V2f>     generateNoise( RNG & ) const noexcept;
-   Void         generateDiagram( RNG &, std::function<F32(V2f const&, V2f const&)> const &distanceFunction ) noexcept;
+   Vector<V2f>     generateNoise( RNG & ) const noexcept;
+   void         generateDiagram( RNG &, std::function<F32(V2f const&, V2f const&)> const &distanceFunction ) noexcept;
 };

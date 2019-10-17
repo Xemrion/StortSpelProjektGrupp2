@@ -25,4 +25,4 @@ struct MapConfig {
    V3f   tileScaleFactor                { 20.0f, 20.0f, 20.0f }; 
 };
 
-Str  mapConfigToFilename( MapConfig const &, Str extension = "" );
+String  mapConfigToFilename( MapConfig const &, String extension = "" );

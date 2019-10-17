@@ -10,28 +10,31 @@
 
 class Map {
 public:
-   Map( Graphics &, MapConfig const & );
+   Map( Graphics &, MapConfig const &, Physics * );
   ~Map() noexcept;
 
-   Graphics        &graphics;
    MapConfig const &config;
-   V2u              startPositionInTileSpace;
-   UPtr<TileMap>    tilemap;
-   UPtr<Voronoi>    districtMap;
-   Vec<GameObject>  districtMarkers;
-   Vec<GameObject>  roadTiles;
-   Vec<GameObject>  houseTiles;
 
    V2u              generateRoadPositionInTileSpace(  RNG & ) const noexcept;
    Vector3          generateRoadPositionInWorldSpace( RNG & ) const noexcept;
-   Void             setDistrictColorCoding ( Bool useColorCoding ) noexcept;
+   void             setDistrictColorCoding ( Bool useColorCoding ) noexcept;
    V2u              getStartPositionInTileSpace()  const noexcept;
    Vector3          getStartPositionInWorldSpace() const noexcept;
    TileMap const   &getTileMap() const noexcept;
+   Voronoi const   &getDistrictMap() const noexcept;
 
 private:
-   Void             generateDistricts();
-   Void             generateRoads();
-   Void             generateBuildings();
-   Opt<Vec<V2u>>    findValidHouseLot( RNG &, U16 districtCellID, Voronoi const &, TileMap &, Vec<District> const &districtTable );
+   void             generateDistricts();
+   void             generateRoads();
+   void             generateBuildings();
+   Opt<Vector<V2u>> findValidHouseLot( RNG &, U16 districtCellID, Voronoi const &, TileMap &, Vector<District> const &districtTable );
+
+   Graphics           &graphics;
+   V2u                 startPositionInTileSpace;
+   UPtr<TileMap>       tilemap;
+   UPtr<Voronoi>       districtMap;
+   Vector<GameObject>  districtMarkers;
+   Vector<GameObject>  roadTiles;
+   Vector<GameObject>  houseTiles;
+   Physics * const     physics;
 };

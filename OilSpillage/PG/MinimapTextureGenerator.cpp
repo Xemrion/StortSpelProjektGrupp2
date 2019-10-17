@@ -5,16 +5,15 @@
 #include "MapConfig.hpp"
 
 #pragma warning( disable : 4715 ) 
-Str createMinimapTexture( Map const &map ) {
+String createMinimapTexture( Map const &map ) {
    auto const &tilemap = map.getTileMap();
    // image data:
    Size const  TEX_WIDTH          { tilemap.width  * 3 },
                TEX_HEIGHT         { tilemap.height * 3 };
-   Vec<RGBA>   pixels             ( TEX_WIDTH * TEX_HEIGHT );
+   Vector<RGBA>   pixels             ( TEX_WIDTH * TEX_HEIGHT );
 
    // random number generation:
-   RD          rd                 {};
-   RNG         rng                { rd() };
+   RNG         rng{ RD()() };
    F32_Dist    generateSelection  { .0f, 1.0f };
 
    // converts a tile-space XY into a pixel XY:
@@ -44,7 +43,8 @@ Str createMinimapTexture( Map const &map ) {
    for ( U16 tileY = 0;  tileY < tilemap.height;  ++tileY ) {
       for ( U16 tileX = 0;  tileX < tilemap.width;  ++tileX ) {
          // TODO: add district borders?
-         Size tileDistrictID      { map.districtMap->diagram[ map.districtMap->diagramIndex(tileX,tileY)] };
+         auto district            { map.getDistrictMap() };
+         Size tileDistrictID      { district.diagram[ district.diagramIndex(tileX,tileY)] };
          RGBA districtColorOffset ( 0x00'040404 * ((tileDistrictID+499)%7) );
          switch ( tilemap.tileAt(tileX, tileY) ) {
             case Tile::ground: {
@@ -104,7 +104,7 @@ Str createMinimapTexture( Map const &map ) {
       }
    }
 
-   auto path = Str("data/map/") + mapConfigToFilename( map.config, ".tga" );
+   auto path = String("data/textures/map/map.tga");// +mapConfigToFilename(map.config, ".tga");
    stbi_write_tga( path.c_str(), static_cast<I32>(TEX_WIDTH), static_cast<I32>(TEX_HEIGHT), 4, pixels.data() );
-   return path;   
+   return String("map/map");// +mapConfigToFilename(map.config);
 }

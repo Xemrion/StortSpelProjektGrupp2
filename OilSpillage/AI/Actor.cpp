@@ -17,11 +17,9 @@ Actor::Actor()
 	this->position = Vector3(0, 0.0f, 0);
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
-
-	//this->destination = Vector3(20.0f, 0.0f, 20.0f);
 }
 
-Actor::Actor(float x, float z, AStar* aStar)
+Actor::Actor(float x, float z, AStar* aStar = nullptr)
 {
 	this->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(this);
@@ -41,8 +39,6 @@ Actor::Actor(float x, float z, AStar* aStar)
 	this->position = Vector3(x, 0.0f, z);
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
-
-	//this->destination = Vector3(20.0f, 0.0f, 20.0f);
 }
 
 Actor::~Actor()
@@ -229,7 +225,7 @@ void Actor::applyForce(Vector3 force)
 	acceleration += force;
 }
 
-Vector3 Actor::separation(vector<Actor*> boids)
+Vector3 Actor::separation(vector<Actor*> boids, Vector3 targetPos)
 {
 	// Distance of field of vision for separation between boids
 	float desiredSeparationDistance = 3.0f;
@@ -250,6 +246,18 @@ Vector3 Actor::separation(vector<Actor*> boids)
 			direction += difference;
 			nrInProximity++;
 		}
+	}
+	// Calculate distance from current boid to player
+	float distance = (position - targetPos).Length();
+	// If this is a fellow boid and it's too close, move away from it
+	if (distance < desiredSeparationDistance)
+	{
+		Vector3 difference(0.0f);
+		difference = position - targetPos;
+		difference.Normalize();
+		difference /= distance;      // Weight by distance
+		direction += difference;
+		nrInProximity++;
 	}
 	// Adds average difference of location to acceleration
 	if (nrInProximity > 0)
@@ -347,9 +355,9 @@ Vector3 Actor::seek(Vector3 target)
 	return acceleration;
 }
 
-void Actor::run(vector<Actor*> boids, float deltaTime)
+void Actor::run(vector<Actor*> boids, float deltaTime, Vector3 targetPos)
 {
-	flock(boids);
+	flock(boids, targetPos);
 	updateBoid(deltaTime);
 }
 
@@ -370,9 +378,9 @@ void Actor::updateBoid(float deltaTime)
 	acceleration *= 0;
 }
 
-void Actor::flock(vector<Actor*> boids)
+void Actor::flock(vector<Actor*> boids, Vector3 targetPos)
 {
-	Vector3 seperationForce = separation(boids);
+	Vector3 seperationForce = separation(boids, targetPos);
 	Vector3 alignmentForce = alignment(boids);
 	Vector3 cohesionForce = cohesion(boids);
 	// Arbitrarily weight these forces
@@ -393,9 +401,19 @@ float Actor::angle(Vector3 target)
 	return angle;
 }
 
+void Actor::setPath(std::vector<Node*> path)
+{
+	this->path = path;
+}
+
 Vector3 Actor::getDestination()
 {
 	return destination;
+}
+
+bool Actor::hasGroup()
+{
+	return this->isInGroup;
 }
 
 void Actor::setDestination(Vector3 destination)
@@ -403,12 +421,7 @@ void Actor::setDestination(Vector3 destination)
 	this->destination = destination;
 }
 
-int Actor::getGroupNR()
+void Actor::joinGroup()
 {
-	return this->groupNR;
-}
-
-void Actor::joinGroup(int NR)
-{
-	this->groupNR = NR;
+	this->isInGroup = true;
 }

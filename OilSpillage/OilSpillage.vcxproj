@@ -97,9 +97,12 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <FloatingPointModel>Precise</FloatingPointModel>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>BulletSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>BulletSDK\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LinearMath_vs2010_x64_debug.lib;BulletDynamics_vs2010_x64_debug.lib;BulletCollision_vs2010_x64_debug.lib;Bullet3Dynamics_vs2010_x64_debug.lib;Bullet3Common_vs2010_x64_debug.lib;Bullet3Collision_vs2010_x64_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,11 +132,14 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>BulletSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>BulletSDK\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LinearMath_vs2010_x64_release.lib;BulletDynamics_vs2010_x64_release.lib;BulletCollision_vs2010_x64_release.lib;Bullet3Dynamics_vs2010_x64_release.lib;Bullet3Common_vs2010_x64_release.lib;Bullet3Collision_vs2010_x64_release.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -145,13 +151,16 @@
     <ClCompile Include="AI\Boid.cpp" />
     <ClCompile Include="AI\Defender.cpp" />
     <ClCompile Include="AI\Node.cpp" />
-    <ClCompile Include="AI\Turrent.cpp" />
+    <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
     <ClCompile Include="PG\MapConfig.cpp" />
     <ClCompile Include="PG\Map.cpp" />
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
+    <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
+    <ClCompile Include="Shadows\ShadowMapping.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="PG\District.cpp" />
@@ -183,6 +192,7 @@
     </ClCompile>
     <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UI\Minimap.cpp" />
     <ClCompile Include="UI\Slider.cpp" />
     <ClCompile Include="UI\UICredits.cpp" />
     <ClCompile Include="UI\UIMainMenu.cpp" />
@@ -192,6 +202,7 @@
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="window.cpp" />
+    <ClCompile Include="physics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\Actor.h" />
@@ -202,14 +213,19 @@
     <ClInclude Include="AI\Boid.h" />
     <ClInclude Include="AI\Defender.h" />
     <ClInclude Include="AI\Node.h" />
-    <ClInclude Include="AI\Turrent.h" />
+    <ClInclude Include="Shadows\ShadowMapping.h" />
+    <ClInclude Include="AI\Turret.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />
     <ClInclude Include="PG\Map.hpp" />
     <ClInclude Include="PG\MinimapTextureGenerator.hpp" />
+    <ClInclude Include="Frustum.h" />
+    <ClInclude Include="QuadTree.h" />
+    <ClInclude Include="PG\Profiler.hpp" />
     <ClInclude Include="States\GameState.h" />
     <ClInclude Include="States\MenuGameState.h" />
     <ClInclude Include="States\PlayingGameState.h" />
     <ClInclude Include="PG\District.hpp" />
+    <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="STB\stb_image_write.h" />
     <ClInclude Include="UI\Button.h" />
     <ClInclude Include="ConstantBuffer.h" />
@@ -253,6 +269,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="UI\Minimap.h" />
     <ClInclude Include="UI\Slider.h" />
     <ClInclude Include="UI\UICredits.h" />
     <ClInclude Include="UI\UIMainMenu.h" />
@@ -265,6 +282,7 @@
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VehicleWeapon.h" />
     <ClInclude Include="window.h" />
+    <ClInclude Include="physics.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ComputeLightCulling.hlsl">
@@ -324,6 +342,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shadows\SimpleVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>

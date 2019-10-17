@@ -15,10 +15,12 @@
 #include "Graphic/Shaders.h"
 #include "Resources/Debug.h"
 #include "DynamicCamera.h"
+#include "QuadTree.h"
 #include<string>
 #include "Lights.h"
 #include <memory.h>
 #include <array>
+#include"Shadows/ShadowMapping.h"
 #include"Particle/ParticleSystem.h"
 
 char const MODEL_ROOT_DIR[]   { "data/models/" };
@@ -42,6 +44,8 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterStateShadow;
+
 	Microsoft::WRL::ComPtr<ID3D11BlendState> alphaEnableBlendingState;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> worldBuffer;
@@ -50,6 +54,8 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Buffer> lightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> frustumBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> culledLightBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> indexSpot;
+
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> culledLightBufferUAV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> culledLightBufferSRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> frustumBufferSRV;
@@ -66,6 +72,7 @@ class Graphics {
 		PointLight lights[MAX_LIGHTS_TOTAL];
 	};
 	LightBufferContents* lightBufferContents = nullptr;
+	std::unique_ptr<QuadTree> quadTree;
 
 	ParticleSystem particleSystem;
 	ParticleSystem particleSystem2;
@@ -74,9 +81,11 @@ class Graphics {
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
 	Debug* debugger;
+	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
 	void cullLights();
+	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
 public:
 	Graphics();
 	~Graphics();
@@ -88,11 +97,13 @@ public:
 	void loadModel(std::string path);
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
 	bool loadTexture(std::string fileName, bool overridePath=false);
+	bool reloadTexture(std::string fileName, bool overridePath=false);
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path, bool isModel=false);
-	void addToDraw(GameObject* o);
+	void addToDraw(GameObject* o, bool isStatic = false);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
+	void clearStaticObjects();
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera, float deltaTime);
@@ -113,4 +124,6 @@ public:
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
 
 
+	float farZTempShadow;
+	void setSpotLighShadow(SpotLight* spotLight);
 };

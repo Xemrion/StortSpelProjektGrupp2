@@ -41,7 +41,7 @@ RoadGenBranchArgs  createChildArgs( RoadGenBranchArgs const &parentArgs,
    };
 }
 
-Void  Branch::walk( MapConfig const &config ) {
+void  Branch::walk( MapConfig const &config ) {
    auto  steps = config.roadStepSize;
 // main loop:
    while ( (tilesWalked != tilesToWalk) and (steps --> 0) ) {
@@ -99,7 +99,7 @@ Void  Branch::walk( MapConfig const &config ) {
 
 
 
-Void  RoadGenerator::scheduleBranch( RoadGenBranchArgs &&args ) {
+void  RoadGenerator::scheduleBranch( RoadGenBranchArgs &&args ) {
    assert( args.currentDepth < args.map.config.roadDepthMax && "Depth out of bounds!" ); 
    branchTree[args.currentDepth].emplace_back(std::move(args));
 }
@@ -112,7 +112,7 @@ RoadGenerator::RoadGenerator( TileMap &map ):
    branchTree.reserve( map.config.roadDepthMax );
    for ( U8 depth = 0;  depth < map.config.roadDepthMax;  ++depth ) {
 		branchTree.push_back({});
-         branchTree[depth].reserve( cPow<U32>(8U,depth) ); // OPTI
+         branchTree[depth].reserve( util::pow<U32>(8U,depth) ); // OPTI
 	}
    // set up distributions
    U16_Dist  generateX         (   0, static_cast<U16>(map.width  / 2) );
@@ -156,7 +156,7 @@ RoadGenerator::RoadGenerator( TileMap &map ):
 
 
 // generates the tree, one depth at a time, one tile per branch at a time
-Void  RoadGenerator::generate( MapConfig const &config ) {
+void  RoadGenerator::generate( MapConfig const &config ) {
 #ifdef _DEBUG_W_TERM
    U16 _DEBUG_iteration = 0;
 #endif
@@ -188,7 +188,7 @@ Void  RoadGenerator::generate( MapConfig const &config ) {
 }
 
 // clean-up roads:
-Void  RoadGenerator::cleanIsles() noexcept {
+void  RoadGenerator::cleanIsles() noexcept {
    for ( auto y = 1U;  y < map.width-1;  ++y )
       for ( auto x = 1U;  x < map.height-1;  ++x )
          if ( map.tileAt( x,   y-1 ) == Tile::road

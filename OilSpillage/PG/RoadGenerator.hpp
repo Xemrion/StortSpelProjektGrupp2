@@ -38,7 +38,7 @@ public:
                 Branch( Branch && ) noexcept;
                 Branch( Branch const & ) = delete;
    inline Bool  isDone() const noexcept { return isDoneGenerating; };
-   Void         walk( MapConfig const & );
+   void         walk( MapConfig const & );
 
    RoadGenBranchArgs const args;
 
@@ -69,7 +69,7 @@ public:
    // then hands it a reference to the map it's to work on.
          RoadGenerator( TileMap & );
    // generates the tree, one depth at a time, one tile per branch at a time
-   Void  generate( MapConfig const & );
+   void  generate( MapConfig const & );
    V2u   getStartPosition() const noexcept;
 
 private:
@@ -81,5 +81,5 @@ private:
    TileMap          &map;
    RD                rd;
    RNG               rng;
-   Vec<Vec<Branch>>  branchTree;
+   Vector<Vector<Branch>>  branchTree;
 };
