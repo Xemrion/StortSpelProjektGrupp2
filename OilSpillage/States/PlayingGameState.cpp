@@ -108,7 +108,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	menues[MENU_OPTIONS]->init();
 
    auto playerVehicle = player->getVehicle();
-	playerVehicle->setPosition(map->getStartPositionInWorldSpace());
+	playerVehicle->setPosition(Vector3(15,0,-15));
 
 	testObjective = new GameObject();
 	testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");

@@ -10,7 +10,7 @@ Actor::Actor()
 		this->bullets[i].obj = new GameObject;
 		this->bullets[i].obj->mesh = Game::getGraphics().getMeshPointer("Cube");
 		this->bullets[i].obj->setScale(Vector3(0.25f, 0.25f, 0.25f));
-		this->bullets[i].obj->setColor(Vector4(1, 1, 0, 1));
+		this->bullets[i].obj->setColor(Vector4(0.2f, 0.2f, 0.2f, 1));
 	}
 	this->acceleration = Vector3(0.0f);
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
@@ -31,12 +31,12 @@ Actor::Actor(float x, float z, AStar* aStar = nullptr)
 	{
 		this->bullets[i].obj = new GameObject;
 		this->bullets[i].obj->mesh = Game::getGraphics().getMeshPointer("Cube");
-		this->bullets[i].obj->setScale(Vector3(0.25f, 0.25f, 0.25f));
-		this->bullets[i].obj->setColor(Vector4(1, 1, 0, 1));
+		this->bullets[i].obj->setScale(Vector3(0.05f, 0.05f, 0.05f));
+		this->bullets[i].obj->setColor(Vector4(0.2f, 0.2f, 0.2f, 1));
 	}
 	this->acceleration = Vector3(0.0f);
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
-	this->position = Vector3(x, 0.0f, z);
+	this->position = Vector3(x, -1.0f, z);
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
 }

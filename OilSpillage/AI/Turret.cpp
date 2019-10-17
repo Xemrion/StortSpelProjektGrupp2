@@ -12,11 +12,21 @@ Turret::Turret()
 Turret::Turret(float x, float z) 
 	: Actor(x, z, nullptr)
 {
-	this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+	//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 10;
 	setUpActor();
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	vecForward.Normalize();
+	this->body.setPosition(this->position);
+	this->body.setScale(this->scale);
+	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
+	this->setTexture(Game::getGraphics().getTexturePointer("Entities/Dummy_Turret",true));
+	this->body.setTexture(Game::getGraphics().getTexturePointer("Entities/Dummy_Turret", true));
+	Game::getGraphics().addToDraw(&this->body);
+	this->weapon.bulletSpeed = 30.0f;
+	this->weapon.fireSpeed = 0.1f;
 }
 
 void Turret::update(float dt, Vector3 targetPos)
@@ -98,11 +108,11 @@ Status Turret::rotateTowards()
 
 	if ((targetToSelf).Dot(vecForward) < 0.8)
 	{
-		vecForward -= (targetToSelf * deltaTime)/1.5;
+		vecForward -= (targetToSelf * deltaTime)/0.1;
 		vecForward.Normalize();
 
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
-		this->setRotation(Vector3(0, newRot, 0));
+		this->setRotation(Vector3(0, newRot-(XM_PI/2), 0));
 	}
 	return Status::SUCCESS;
 }
