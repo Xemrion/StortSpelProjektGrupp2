@@ -137,7 +137,6 @@
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />
     <ClInclude Include="VertexBuffer.h" />
-    <ClInclude Include="VehicleWeapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="AI\Turret.h" />
     <ClInclude Include="Frustum.h" />
@@ -146,6 +145,7 @@
     <ClInclude Include="UI\Minimap.h" />
     <ClInclude Include="PG\Profiler.hpp" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
+    <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

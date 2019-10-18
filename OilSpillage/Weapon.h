@@ -1,5 +1,5 @@
-#ifndef VEHICLE_WEAPON_H
-#define VEHICLE_WEAPON_H
+#ifndef WEAPON_H
+#define WEAPON_H
 
 struct Weapon
 {
@@ -30,4 +30,4 @@ public:
 	static constexpr Weapon machineGun =	  {		  5,      0.1f,       30.0f,           2.0f };
 };
 
-#endif // !VEHICLE_WEAPON_H
+#endif // !WEAPON_H

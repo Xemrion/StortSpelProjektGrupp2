@@ -2,7 +2,7 @@
 #include "Behaviour.h"
 #include "Boid.h"
 #include "AStar.h"
-#include "../VehicleWeapon.h"
+#include "../Weapon.h"
 
 class Actor : public GameObject
 {
