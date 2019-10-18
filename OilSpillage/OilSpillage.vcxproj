@@ -280,7 +280,7 @@
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />
     <ClInclude Include="VertexBuffer.h" />
-    <ClInclude Include="VehicleWeapon.h" />
+    <ClInclude Include="Weapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="physics.h" />
   </ItemGroup>
