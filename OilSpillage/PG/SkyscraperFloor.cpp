@@ -450,7 +450,7 @@ void SkyscraperFloor::testDrawTriangles()
 	meshData = this->getVertices();
 	this->roof = new GameObject;
 	Game::getGraphics().loadMesh("SS-roof", meshData);
-	this->roof->mesh = Game::getGraphics().getMeshPointer("Cube");
+	this->roof->mesh = Game::getGraphics().getPGMeshPointer("SS-roof");
 	Game::getGraphics().addToDraw(this->roof);
 	this->roof->setPosition(this->center);
 	this->roof->setScale(Vector3(1.0f, 1.0f, 1.0f));

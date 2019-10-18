@@ -1019,6 +1019,22 @@ const Mesh* Graphics::getMeshPointer(const char* localPath)
 	else return &meshes[meshPath];
 }
 
+const Mesh* Graphics::getPGMeshPointer(const char* localPath)
+{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
+	std::string meshPath;
+	if (localPath != nullptr)
+	{
+		meshPath = std::string(localPath);
+	}
+
+	if (meshes.find(meshPath) == meshes.end()) {
+		return nullptr;
+	}
+	else {
+		return &meshes[meshPath];
+	}
+}
+
 Texture* Graphics::getTexturePointer(const char* path, bool isModel )
 {  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
    std::string texturePath;

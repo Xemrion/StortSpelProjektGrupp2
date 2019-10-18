@@ -457,7 +457,6 @@ void  PlayingGameState::update(float deltaTime)
 	// render all objects
 	graphics.setSpotLighShadow(playerLight);
 	graphics.render( camera.get(), deltaTime );
-	testFloor1.get()->testDrawLines();
 	
 	// render UI
 	menues[MENU_PLAYING]->update( deltaTime );
@@ -467,7 +466,8 @@ void  PlayingGameState::update(float deltaTime)
 		setCurrentMenu( PlayingGameState::MENU_PAUSED );
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
-	
+	//testFloor1.get()->testDrawLines();
+
 	if constexpr ( isDebugging ) {
 	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();

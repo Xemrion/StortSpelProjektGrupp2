@@ -100,6 +100,7 @@ public:
 	bool loadTexture(std::string fileName, bool overridePath=false);
 	bool reloadTexture(std::string fileName, bool overridePath=false);
 	const Mesh* getMeshPointer(const char *path);
+	const Mesh* getPGMeshPointer(const char* path);
 	Texture* getTexturePointer(const char *path, bool isModel=false);
 	void addToDraw(GameObject* o, bool isStatic = false);
 	void removeFromDraw(GameObject* o);
