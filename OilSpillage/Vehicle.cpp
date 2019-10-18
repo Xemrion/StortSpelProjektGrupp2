@@ -681,6 +681,7 @@ void Vehicle::resetHealth()
 void Vehicle::changeHealth(int amount)
 {
 	this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
+	Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 }
 
 bool Vehicle::isDead() const
