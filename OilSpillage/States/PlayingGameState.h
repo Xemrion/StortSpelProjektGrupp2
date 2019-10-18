@@ -9,7 +9,6 @@
 #include "../Road Network/RoadNet.h"
 #include "../DynamicCamera.h"
 #include "../PG/Map.hpp"
-#include "../PG/SkyscraperFloor.h"
 #include "../UI/UserInterface.h"
 
 class PlayingGameState : public GameState {
@@ -57,10 +56,9 @@ private:
 	std::unique_ptr<DynamicCamera>  camera;
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
-	std::unique_ptr<SkyscraperFloor> testFloor1;
-	std::unique_ptr<SkyscraperFloor> testFloor2;
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight;
+	GameObject*						testObjective; //Test
 
 	//Bullet
 	std::unique_ptr<Physics>		physics;
@@ -79,8 +77,8 @@ private:
 	float                           colors3 [4]       {};
 	float                           colors4 [4]       {};
 	Vector4                         colorsP [4]       { Vector4( 1.0f, 1.0f, .0f, 1.0f ),
-	                                                    Vector4( 1.0f,  .0f, .0f, 1.0f ),
-	                                                    Vector4(  .0f,  .0f, .0f, 1.0f ),
+	                                                    Vector4( 1.0f,  1.0f, .0f, 1.0f ),
+	                                                    Vector4(  1.0f,  1.0f, .0f, 1.0f ),
 	                                                    Vector4(  .1f,  .1f, .1f, 1.0f )  };
   
     void initAI();

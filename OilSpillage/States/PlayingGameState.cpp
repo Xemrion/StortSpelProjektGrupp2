@@ -12,12 +12,16 @@ void PlayingGameState::initAI()
 	aStar = new AStar(20, 20, Vector2(-10, 10));
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	actorManager->createDefender(0 + 1, 0 + 2,
-		Vector3(0 + 9, 0, 0 + 9));
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
-	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z + 1);
+
+	//actorManager->createDefender(0 + 1, 0 + 2,
+	//	Vector3(0 + 9, 0, 0 + 9));
+
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
+
+	actorManager->createTurret(0 + 2, 0 + 2);
 	actorManager->initGroups();
+
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {
@@ -26,22 +30,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
    #endif // _DEBUG
 
 	lightList = std::make_unique<LightList>();
-	player    = std::make_unique<Vehicle>();
-	camera    = std::make_unique<DynamicCamera>();
-	
+	player = std::make_unique<Vehicle>();
+	camera = std::make_unique<DynamicCamera>();
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
-	testFloor1 = std::make_unique<SkyscraperFloor>(4);
-	//testFloor1.get()->translate(Vector3(-960.0f, 5.0f, 440.0f));
-	testFloor2 = std::make_unique<SkyscraperFloor>(5);
-	testFloor2.get()->rotateDeg(56);
-	//testFloor2.get()->translate(testFloor1.get()->getAVertex(3));
-	testFloor1.get()->unionShapes(*testFloor2.get(), testFloor1.get()->getAVertex(3));
-	testFloor2.get()->regenerateShape(3);
-	testFloor2.get()->rotateDeg(67);
-	testFloor1.get()->unionShapes(*testFloor2.get(), testFloor1.get()->getAVertex(2));
-	testFloor1.get()->getTriangleIndices();
-	testFloor1.get()->testDrawTriangles();
-
 	graphics.createFrustumBuffer(camera.get());
 
 	graphics.loadMesh("Cube");
@@ -49,6 +40,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadTexture("brickwall");
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
+	graphics.loadModel("Entities/Dummy_Turret");
+	graphics.loadModel("Entities/Dummy_Player_Car");
 
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
@@ -56,8 +49,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadModel("Roads/Road_straight");
 	graphics.loadModel("Roads/Road_3way");
 	graphics.loadModel("Roads/Road_4way");
+	graphics.loadModel("Houses/testHouse");
 
-   if constexpr ( isDebugging ) {
+   //if constexpr ( isDebugging ) {
 	   // light tests
 	   lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
 	   lightList->addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
@@ -66,16 +60,16 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
-	for (int i = 0; i < 50; ++i) {
-		Vector3 randPos   = Vector3(static_cast<float>(rand() % 101 - 50), static_cast<float>(rand() % 9 + 1), static_cast<float>(rand() % 101 - 50));
-		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand() / RAND_MAX));
+	for (int i = 0; i < 1000; ++i) {
+		Vector3 randPos   = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
+		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand()))/ RAND_MAX;
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
 		lightList->addLight(
 			PointLight(
 				randPos,
 				randColor,
-				1.0f));
+			10.0f));
 	}
    
    /*
@@ -90,8 +84,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testNetwork.get()->cleanRoadNetwork();
 	testNetwork.get()->saveTestNetwork("test-network");
    */
-   }
-	lightList->setSun(Sun(Vector3(0.0f, -1.0f, 1.0f), Vector3(1.0f, 0.8f, 0.6f)));
+   //}
+	lightList->setSun(Sun(Vector3(0.5f, -1.0f, 1.0f), Vector3(1.0f, 1.0f, 1.0f)));
 
 	graphics.setLightList(lightList.get());
 
@@ -116,9 +110,16 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	menues[MENU_OPTIONS]->init();
 
    auto playerVehicle = player->getVehicle();
-	playerVehicle->setPosition(map->getStartPositionInWorldSpace());
+	playerVehicle->setPosition(Vector3(15,0,-15));
 
-	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	testObjective = new GameObject();
+	testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(testObjective);
+	testObjective->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
+	testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
+
+
+	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
 		{
@@ -129,7 +130,12 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 		 Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, false);
+	Vector4 colorP2[] = {
+		Vector4(0.3,0.3,0.3,1),
+		Vector4(0.2,0.2,0.2,1)
+	};
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
+	graphics.setParticle2ColorNSize(colorP2, 2, size1+0.1f, size2+0.1f);
 
 	Input::SetKeyboardPlayerID(0);
 	//Bullet
@@ -147,6 +153,7 @@ PlayingGameState::~PlayingGameState()
 {
 	delete aStar;
 	delete actorManager;
+	delete testObjective;
 }
 
 void  PlayingGameState::ImGui_Driving()
@@ -438,11 +445,11 @@ void  PlayingGameState::update(float deltaTime)
 		timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
 		{
-			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
+			/*graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
 			                      5 * Vector3(Input::GetDirectionR(0).x,
 			                      0,
 			                      Input::GetDirectionR(0).y),
-			                      addNrOfParticles, lifeTime, randomPosPower);
+			                      addNrOfParticles, lifeTime, randomPosPower);*/
 			timerForParticle = 0;
 		}
 		
@@ -465,9 +472,10 @@ void  PlayingGameState::update(float deltaTime)
 	else if ( Input::CheckButton(MENU, PRESSED, 0) )
 		setCurrentMenu( PlayingGameState::MENU_PAUSED );
 	
+	//Render all objects
+	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
-	//testFloor1.get()->testDrawLines();
-
+	
 	if constexpr ( isDebugging ) {
 	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();
@@ -479,7 +487,7 @@ void  PlayingGameState::update(float deltaTime)
 	   ImGui_Camera();
 	   ImGui::Render();
 	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-   }
+    }
 	
 	graphics.presentScene();
 }
