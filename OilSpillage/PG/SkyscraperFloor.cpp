@@ -2,7 +2,7 @@
 
 SkyscraperFloor::SkyscraperFloor(int edges)
 {
-	this->center = Vector3(0.0f, 10.0f, 0.0f);
+	this->center = Vector3(0.0f, 5.0f, 0.0f);
 	this->verticies.clear();
 	this->nrOfEdges = 0;
 	this->generateShape(edges);
@@ -47,7 +47,7 @@ void SkyscraperFloor::generateShape(int edges)
 {
 	if (edges >= 3) {
 		this->nrOfEdges = edges;
-		Vector3 temp = this->center + Vector3(0.0f, 0.0f, 5.0f);
+		Vector3 temp = this->center + Vector3(0.0f, 0.0f, 3.0f);
 		float angle = ((pi * 2) / float(edges));
 		this->verticies.push_back(temp);
 		for (int i = 1; i < edges; i++) {
@@ -454,9 +454,7 @@ void SkyscraperFloor::testDrawTriangles()
 	Game::getGraphics().addToDraw(this->roof);
 	this->roof->setPosition(this->center);
 	this->roof->setScale(Vector3(1.0f, 1.0f, 1.0f));
-	this->roof->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
-	Game::getGraphics().loadTexture("brickwall");
-	this->roof->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
+	this->roof->setColor(Vector4(0.4f, 0.4f, 0.4f, 1.0f));
 }
 
 Vector3 SkyscraperFloor::getAVertex(int vertex)
