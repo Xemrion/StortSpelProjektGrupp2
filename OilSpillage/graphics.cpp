@@ -848,8 +848,14 @@ const Mesh* Graphics::getMeshPointer(const char* localPath)
 	   meshPath = std::string(localPath);
    }
 
-	if (meshes.find(meshPath) == meshes.end()) return nullptr;
-	else return &meshes[meshPath];
+	if (meshes.find(meshPath) == meshes.end())
+	{
+		return nullptr;
+	}
+	else
+	{
+		return &meshes[meshPath];
+	}
 }
 
 Texture* Graphics::getTexturePointer(const char* path, bool isModel )

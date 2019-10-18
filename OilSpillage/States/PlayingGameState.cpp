@@ -119,14 +119,15 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	Input::SetKeyboardPlayerID(0);
 	//Bullet
-	//buildingTest = std::make_unique<GameObject>();
-	//buildingTest->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//Game::getGraphics().addToDraw(buildingTest.get());
-	//btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
-	//buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
-	//buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
-	//buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
-	//buildingTest->setRigidBody(tempo2, physics.get());
+	/*buildingTest = std::make_unique<GameObject>();
+	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
+	buildingTest->mesh = Game::getGraphics().getMeshPointer("Vehicles/Dummy_Player_Car");
+	Game::getGraphics().addToDraw(buildingTest.get());
+	btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
+	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
+	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
+	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
+	buildingTest->setRigidBody(tempo2, physics.get());*/
 }
 
 PlayingGameState::~PlayingGameState()
@@ -405,7 +406,7 @@ void  PlayingGameState::update(float deltaTime)
 
 		camera->setPosition( Vector3( positionCam.getX(),
 		                              positionCam.getY(),
-		                              positionCam.getZ() ) + Vector3(.0f, cameraDistance, .0f) );
+		                              positionCam.getZ() ) + Vector3(.0f, player->getCameraDistance(deltaTime) + cameraDistance, .0f) );
 
 		Vector3 spotlightDir { sin(playerVehicle->getRotation().y),
 		                       .0f,

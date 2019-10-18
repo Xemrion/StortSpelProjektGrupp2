@@ -193,6 +193,8 @@ void  Map::generateBuildings( ) {
 						                     .5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * randomFloorCount,
 						                     .5f * config.tileScaleFactor.z });
 						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) });
+
+					//#ifndef _DEBUG
 						btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
 						                                               houseTile.getPosition().y,
 						                                               houseTile.getPosition().z ),
@@ -201,6 +203,7 @@ void  Map::generateBuildings( ) {
 						                                               houseTile.getScale().z ),
 						                                    .0f );
 						houseTile.setRigidBody( tmp, physics );
+					//#endif
 
                   #ifdef _DEBUG
 						   ++total_building_tile_count;

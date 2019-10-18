@@ -2,10 +2,10 @@
 #include"game.h"
 GameObject::~GameObject()
 {
-	if (rigidBody != nullptr) {
+	/*if (rigidBody != nullptr) {
 		physics->DeleteRigidBody(rigidBody);
 		this->rigidBody = nullptr;
-	}
+	}*/
 }
 void GameObject::updateRigidBody()
 {
