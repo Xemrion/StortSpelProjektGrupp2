@@ -43,9 +43,9 @@ void Turret::update(float dt, Vector3 targetPos)
 
 		if (this->bullets[i].timeLeft > 0.0f)
 		{
-			if ((this->position - this->targetPos).Length() < 5.0f)
+			if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 0.5f)
 			{
-				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-20);
+				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-5);
 				this->bullets[i].timeLeft = 0;
 				
 			}
