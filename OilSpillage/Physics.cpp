@@ -1,10 +1,12 @@
 #include "Physics.h"
 #include "PG/utils.hpp"
 
+using namespace DirectX::SimpleMath;
+
 Physics::Physics() :
-	broadphase      { std::make_unique<btDbvtBroadphase>()                              },
-	collisionConfig { std::make_unique<btDefaultCollisionConfiguration>()               },
-	solver          { std::make_unique<btSequentialImpulseConstraintSolver>()           }
+	broadphase      { std::make_unique<btDbvtBroadphase>()                    },
+	collisionConfig { std::make_unique<btDefaultCollisionConfiguration>()     },
+	solver          { std::make_unique<btSequentialImpulseConstraintSolver>() }
 {
    dispatcher = std::make_unique<btCollisionDispatcher>( collisionConfig.get() );
 
@@ -14,7 +16,7 @@ Physics::Physics() :
 	                                           collisionConfig.get() );
 	world->setGravity( btVector3(0, -10, 0) );
 	
-	plane = std::make_unique<btStaticPlaneShape>( btVector3{0, 1, 0}, btScalar{3} );
+	plane = std::make_unique<btStaticPlaneShape>( btVector3{0, 1, 0}, 3 );
 
 	// set motionstate aka set position
 	auto transform = btTransform { btQuaternion(0, 0, 0, 1), btVector3(0, -1, 0) };
@@ -24,7 +26,9 @@ Physics::Physics() :
 	// body definition check doc
 	auto info = btRigidBody::btRigidBodyConstructionInfo { .0f, motion, plane.get() };
 	bodies.push_back( std::make_unique<btRigidBody>(info) );
-	bodies.back()->setFriction( 1 );
+	auto body = bodies.back().get();
+	body->setFriction( 1 );
+	world->addRigidBody(body);
 
 //gContactAddedCallback = callbackFunc;
 }

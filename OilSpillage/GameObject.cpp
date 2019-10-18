@@ -3,9 +3,8 @@
 
 GameObject::~GameObject() noexcept
 {
-	if ( rigidBody ) {
+	if ( rigidBody )
 		physics->deleteRigidBody( rigidBody );
-	}
 }
 
 void GameObject::updateRigidBody()
@@ -116,6 +115,7 @@ Vector4 const &GameObject::getColor() const
 
 Vector3 const &GameObject::getPosition() const
 {
+	// TODO: use rigid origin
 	return position;
 }
 
