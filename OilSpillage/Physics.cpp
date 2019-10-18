@@ -15,10 +15,10 @@ solver(new btSequentialImpulseConstraintSolver)
 
 
 	////set shape for object
-	plane = new btStaticPlaneShape(btVector3(0, 1, 0), 3);
+	plane = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
 	
 	//set motionshape aka set postion
-	btMotionState* motion = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -1, 0)));
+	btMotionState* motion = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0)));
 	////body definition check doc
 	btRigidBody::btRigidBodyConstructionInfo info(0.0, motion, plane);
 

@@ -17,8 +17,7 @@ private:
 	Status rotateTowards();
 	Status inRange();
 	Status idle();
-
-
+	GameObject body;
 	Vector3 vecForward;
 	int sightRange;
 };

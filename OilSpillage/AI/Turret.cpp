@@ -1,4 +1,4 @@
-#include "..//game.h"
+#include "../States/PlayingGameState.h"
 #include "Turret.h"
 
 Turret::Turret()
@@ -12,10 +12,21 @@ Turret::Turret()
 Turret::Turret(float x, float z) 
 	: Actor(x, z, nullptr)
 {
-	this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+	//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 10;
 	setUpActor();
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+	vecForward.Normalize();
+	this->body.setPosition(this->position);
+	this->body.setScale(this->scale);
+	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
+	this->setTexture(Game::getGraphics().getTexturePointer("Entities/Dummy_Turret",true));
+	this->body.setTexture(Game::getGraphics().getTexturePointer("Entities/Dummy_Turret", true));
+	Game::getGraphics().addToDraw(&this->body);
+
+	this->weapon = AIWeapon::machineGun;
 }
 
 void Turret::update(float dt, Vector3 targetPos)
@@ -24,15 +35,27 @@ void Turret::update(float dt, Vector3 targetPos)
 	this->targetPos = targetPos;
 	this->root->func();
 
+	rotateTowards();
+
 	for (int i = 0; i < bulletCount; i++)
 	{
 		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
 
 		if (this->bullets[i].timeLeft > 0.0f)
 		{
-			this->bullets[i].timeLeft -= deltaTime;
-			this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
-			Game::getGraphics().addToDraw(this->bullets[i].obj);
+			if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 0.5f)
+			{
+				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-5);
+				this->bullets[i].timeLeft = 0;
+				
+			}
+			else
+			{
+				Game::getGraphics().addParticle(this->position-this->vecForward, Vector3(0, 0, 0), 1, 1,1);
+				this->bullets[i].timeLeft -= deltaTime;
+				this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
+				Game::getGraphics().addToDraw(this->bullets[i].obj);
+			}
 		}
 	}
 }
@@ -82,20 +105,17 @@ void Turret::updateBoid(float deltatime)
 
 Status Turret::rotateTowards()
 {
-	Vector3 dir = this->getPosition() - this->targetPos;
+	Vector3 targetToSelf = (targetPos - position);
+	targetToSelf.Normalize();
 
-	if ((dir - this->getPosition()).Length() > 0.01f)
+	if ((targetToSelf).Dot(vecForward) < 0.8)
 	{
-		vecForward = Vector3::Lerp(this->vecForward, dir, deltaTime);
+		vecForward -= (targetToSelf * deltaTime)/0.1;
 		vecForward.Normalize();
-	}
-	else
-	{
-		this->vecForward = dir;
-	}
-	float newRot = atan2(this->vecForward.x, this->vecForward.z);
-	this->setRotation(Vector3(0, newRot, 0));
 
+		float newRot = atan2(this->vecForward.x, this->vecForward.z);
+		this->setRotation(Vector3(0, newRot-(XM_PI/2), 0));
+	}
 	return Status::SUCCESS;
 }
 

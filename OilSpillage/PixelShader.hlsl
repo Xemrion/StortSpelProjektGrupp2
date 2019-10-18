@@ -75,6 +75,7 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float biasTemp)
 			visibility += shadowCoord.z - bias > pcfDepth ? 1.0f : 0.0;
 		}
 	}
+	
 	visibility /= 9.0;
 
 	return visibility;
@@ -98,7 +99,7 @@ float4 main(VS_OUT input) : SV_Target
 	uint2 lightTileIndex = floor(uint2(input.Pos.x, input.Pos.y) / uint2(16.f, 16.f));
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 
-	float4 ambient = max(-dot(sunDir, normal)*(1- shadowVisible(input.shadowPos, ShadowMap, 0.00025f)), float4(0.1, 0.1, 0.1, 1.0)) * sunColor;
+	float4 ambient = max(-dot(sunDir, normal)*(1- shadowVisible(input.shadowPos, ShadowMap, 0.00025f)), float4(0.2, 0.2, 0.2, 1.0)) * sunColor;
 	float shadowSpotVisible = 1.0f;
 	float4 diffuse = float4(0.0, 0.0, 0.0, 1.0);
 	for (int i = 0; i < lightTileData.numLights; ++i)
@@ -133,5 +134,4 @@ float4 main(VS_OUT input) : SV_Target
 	float4 outColor = (texColor + color) * (diffuse + ambient);
 
 	return outColor;
-	return outColor / (outColor + float4(1.0, 1.0, 1.0, 0.0));
 }
