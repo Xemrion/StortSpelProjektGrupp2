@@ -25,8 +25,8 @@ Turret::Turret(float x, float z)
 	this->setTexture(Game::getGraphics().getTexturePointer("Entities/Dummy_Turret",true));
 	this->body.setTexture(Game::getGraphics().getTexturePointer("Entities/Dummy_Turret", true));
 	Game::getGraphics().addToDraw(&this->body);
-	this->weapon.bulletSpeed = 30.0f;
-	this->weapon.fireSpeed = 0.1f;
+
+	this->weapon = AIWeapon::machineGun;
 }
 
 void Turret::update(float dt, Vector3 targetPos)

@@ -2,6 +2,7 @@
 #include "Behaviour.h"
 #include "Boid.h"
 #include "AStar.h"
+#include "../VehicleWeapon.h"
 
 class Actor : public GameObject
 {
@@ -58,13 +59,6 @@ protected:
 	virtual Status setRoamState();
 	virtual void  followPath();
 
-	struct Weapon
-	{
-		int damage = 100;
-		float fireSpeed = 3.0f;
-		float bulletSpeed = 4.0f;
-		float bulletLifetime = 2.0f;
-	};
 	Weapon weapon;
 
 	struct Bullet

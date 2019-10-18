@@ -21,4 +21,13 @@ public:
 	static constexpr Weapon flameThrower =    {     80,      0.1f,        2.0f,           1.5f };
 };
 
+class AIWeapon
+{
+public:
+	static constexpr Weapon defaultWeapon = Weapon();
+
+											//{  damage, fireSpeed, bulletSpeed, bulletLifetime };
+	static constexpr Weapon machineGun =	  {		  5,      0.1f,       30.0f,           2.0f };
+};
+
 #endif // !VEHICLE_WEAPON_H
