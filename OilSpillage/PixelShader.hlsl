@@ -133,5 +133,6 @@ float4 main(VS_OUT input) : SV_Target
 
 	float4 outColor = (texColor + color) * (diffuse + ambient);
 
+	//return outColor / (outColor + float4(1, 1, 1, 1));
 	return outColor;
 }
