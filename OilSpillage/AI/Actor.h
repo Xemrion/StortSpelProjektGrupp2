@@ -59,6 +59,7 @@ protected:
 	virtual Status setRoamState();
 	virtual void  followPath();
 
+
 	Weapon weapon;
 
 	struct Bullet

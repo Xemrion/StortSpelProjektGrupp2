@@ -17,7 +17,13 @@ private:
 	Status rotateTowards();
 	Status inRange();
 	Status idle();
+	Status lineOfSight();
 	GameObject body;
 	Vector3 vecForward;
 	int sightRange;
+
+	Vector3 idleTarget;
+	float turrentAngle;
+
+	void CalculateTarget(float& angle);
 };

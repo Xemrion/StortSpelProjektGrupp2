@@ -191,6 +191,7 @@ Status Actor::setRoamState()
 	return Status::SUCCESS;
 }
 
+
 void Actor::followPath()
 {
 	if (path.size() > 0)
