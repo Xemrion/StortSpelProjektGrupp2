@@ -411,7 +411,7 @@ void  PlayingGameState::update(float deltaTime)
 		}
 		else if (time <= 0.0f)
 		{
-			//Game::setState(Game::STATE_MENU);
+			Game::setState(Game::STATE_MENU);
 		}
 #else
 		if (time > 0.0f)
