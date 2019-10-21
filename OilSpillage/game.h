@@ -5,6 +5,8 @@
 #include "States/GameState.h"
 #include "physics.h"
 
+#define RELEASE_DEBUG true
+
 class Game
 {
 private:
