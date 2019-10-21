@@ -25,7 +25,7 @@ void PlayingGameState::initAI()
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {
-   #ifdef _DEBUG
+   #if _DEBUG | RELEASE_DEBUG
 	   pausedTime = false;
    #endif // _DEBUG
 
@@ -385,7 +385,7 @@ void  PlayingGameState::update(float deltaTime)
 			deltaTime /= 4;
 		}
 
-#ifdef _DEBUG
+#if _DEBUG | RELEASE_DEBUG
 		if (Input::CheckButton(ACTION_1, PRESSED, 0))
 		{
 			pausedTime = !pausedTime;
@@ -477,7 +477,7 @@ void  PlayingGameState::update(float deltaTime)
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
-	if constexpr ( isDebugging ) {
+#if _DEBUG | RELEASE_DEBUG
 	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();
 	   ImGui::NewFrame();
@@ -488,7 +488,7 @@ void  PlayingGameState::update(float deltaTime)
 	   ImGui_Camera();
 	   ImGui::Render();
 	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-    }
+#endif // !_DEBUG
 	
 	graphics.presentScene();
 }

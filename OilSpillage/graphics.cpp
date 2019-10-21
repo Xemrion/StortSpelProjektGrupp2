@@ -226,6 +226,20 @@ bool Graphics::init(Window* window)
 	if (FAILED(hr))
 		return false;
 
+
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = static_cast<UINT>(sizeof(Vector4));
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &cameraBuffer);
+	if (FAILED(hr))
+		return false;
+
+
+
 	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
 	uavDesc.Buffer.FirstElement = 0;
 	uavDesc.Buffer.NumElements = 80 * 45;
@@ -381,6 +395,11 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
 
+	Vector4 cameraPos = Vector4(camera->getPosition());
+	hr = deviceContext->Map(cameraBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &cameraPos, sizeof(Vector4));
+	deviceContext->Unmap(cameraBuffer.Get(), 0);
+
 	deviceContext->RSSetViewports(1, &this->vp);
 	this->particleSystem.updateParticles(deltaTime, viewProj);
 
@@ -406,10 +425,11 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->PSSetShaderResources(4, 1, this->shadowMap.getShadowMapSpot().GetAddressOf());
 
 	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
-	deviceContext->PSSetConstantBuffers(3, 1, this->indexSpot.GetAddressOf());
 
-	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(3, 1, this->indexSpot.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(4, 1, this->cameraBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	for (GameObject* object : drawableObjects)
@@ -429,15 +449,27 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 				UINT vertexCount = object->mesh->getVertexCount();
 				UINT stride = sizeof(Vertex3D);
 				UINT offset = 0;
+				Material material = object->getMaterial();
+
 				ID3D11ShaderResourceView* textureSRV = nullptr;
-				if (object->getTexture() != nullptr)
+				if (material.diffuse != nullptr)
 				{
-					textureSRV = object->getTexture()->getShaderResView();
+					textureSRV = material.diffuse->getShaderResView();
 				}
 				ID3D11ShaderResourceView* normalSRV = nullptr;
-				if (object->getNormalMap() != nullptr)
+				if (material.normal != nullptr)
 				{
-					normalSRV = object->getNormalMap()->getShaderResView();
+					normalSRV = material.normal->getShaderResView();
+				}
+				ID3D11ShaderResourceView* specularSRV = nullptr;
+				if (material.specular != nullptr)
+				{
+					specularSRV = material.specular->getShaderResView();
+				}
+				ID3D11ShaderResourceView* glossSRV = nullptr;
+				if (material.gloss != nullptr)
+				{
+					glossSRV = material.gloss->getShaderResView();
 				}
 
 				Vector4 modColor = object->getColor();
@@ -450,6 +482,8 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 				deviceContext->PSSetShaderResources(0, 1, &textureSRV);
 				deviceContext->PSSetShaderResources(1, 1, &normalSRV);
+				deviceContext->PSSetShaderResources(5, 1, &specularSRV);
+				deviceContext->PSSetShaderResources(6, 1, &glossSRV);
 				deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
 				deviceContext->Draw(vertexCount, 0);
@@ -688,7 +722,7 @@ void Graphics::loadMesh(std::string fileName)
 				imp.getMeshCount();
 				std::vector<Vertex3D> tempVec;
 				Vertex3D vertex;
-				Vertex* vertices = imp.getVertices(j);
+				Meshformat::Vertex* vertices = imp.getVertices(j);
 				for (int i = 0; i < imp.getVertexCount(j); i++)
 				{
 					vertex.position.x = vertices[i].x;
@@ -749,8 +783,10 @@ void Graphics::loadModel(std::string path)
    std::string modelDir {MODEL_ROOT_DIR};
                modelDir += path;
 	loadMesh( modelDir );
-	loadTexture( modelDir+"/_diffuse.tga", true );
-   // TODO: load other texture channels
+	loadTexture(modelDir+"/_diffuse.tga", true );
+	loadTexture(modelDir + "/_specular.tga", true);
+	loadTexture(modelDir + "/_normal.tga", true);
+	loadTexture(modelDir + "/_gloss.tga", true);
 }
 
 void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
@@ -957,7 +993,7 @@ bool Graphics::reloadTexture(std::string path, bool overridePath)
 }
 
 const Mesh* Graphics::getMeshPointer(const char* localPath)
-{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
+{
    std::string meshPath;
    if (localPath != "Cube") 
    {
@@ -970,30 +1006,68 @@ const Mesh* Graphics::getMeshPointer(const char* localPath)
 	   meshPath = std::string(localPath);
    }
 
-	if (meshes.find(meshPath) == meshes.end())
-	{
+   if (meshes.find(meshPath) == meshes.end())
+   {
+	   return nullptr;
+   }
+
+   return &meshes[meshPath];
+}
+
+Texture* Graphics::getTexturePointer(const char* path)
+{
+	std::string texturePath;
+	texturePath += TEXTURE_ROOT_DIR;
+	texturePath += path;
+	texturePath += ".tga";
+
+	if (textures.find(texturePath) == textures.end()) {
+		assert(false && "Failed to load texture!");
 		return nullptr;
+	}
+	return textures[texturePath];
+}
+
+Material Graphics::getMaterial(const char* modelPath)
+{
+	Material material;
+	std::string texturePath;
+	texturePath = MODEL_ROOT_DIR + std::string(modelPath);
+
+	if (textures.find(texturePath + "/_diffuse.tga") == textures.end())
+	{
+		material.diffuse = nullptr;
 	}
 	else
 	{
-		return &meshes[meshPath];
+		material.diffuse = textures[texturePath + "/_diffuse.tga"];
 	}
-}
 
-Texture* Graphics::getTexturePointer(const char* path, bool isModel )
-{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
-   std::string texturePath;
-   if (!isModel) {
-      texturePath += TEXTURE_ROOT_DIR;
-      texturePath += path;
-      texturePath += ".tga";
-   } else texturePath = MODEL_ROOT_DIR + std::string(path) + "/_diffuse.tga";
+	if (textures.find(texturePath + "/_normal.tga") == textures.end()) {
+		material.normal = nullptr;
+	}
+	else
+	{
+		material.diffuse = textures[texturePath + "/_normal.tga"];
+	}
 
-	if (textures.find(texturePath) == textures.end()) {
-      assert(false && "Failed to load texture!" );
-		return nullptr;
-   }
-	else return textures[texturePath];
+	if (textures.find(texturePath + "/_specular.tga") == textures.end()) {
+		material.specular = nullptr;
+	}
+	else
+	{
+		material.diffuse = textures[texturePath + "/_specular.tga"];
+	}
+
+	if (textures.find(texturePath + "/_gloss.tga") == textures.end()) {
+		material.gloss = nullptr;
+	}
+	else
+	{
+		material.diffuse = textures[texturePath + "/_gloss.tga"];
+	}
+
+	return material;
 }
 
 void Graphics::addToDraw(GameObject* o, bool isStatic)
@@ -1038,7 +1112,7 @@ void Graphics::setLightList(LightList* lightList)
 
 void Graphics::presentScene()
 {
-	swapChain->Present(0, 0);
+	swapChain->Present(1, 0);
 }
 
 void Graphics::fillLightBuffers()
@@ -1057,11 +1131,10 @@ void Graphics::cullLights()
 {
 	deviceContext->CSSetShader(lightCullingShader.getShader(), NULL, 0);
 	ID3D11ShaderResourceView* nullSRV = NULL;
-	deviceContext->PSSetShaderResources(1, 1, &nullSRV);
+	deviceContext->PSSetShaderResources(2, 1, &nullSRV);
 	deviceContext->CSSetConstantBuffers(0, 1, lightBuffer.GetAddressOf());
 	deviceContext->CSSetShaderResources(0, 1, frustumBufferSRV.GetAddressOf());
 	const UINT uavCounter = 0;
-	deviceContext->PSSetShaderResources(2, 1, &nullSRV);
 
 	deviceContext->CSSetUnorderedAccessViews(0, 1, culledLightBufferUAV.GetAddressOf(), &uavCounter);
 
@@ -1172,37 +1245,50 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 	std::vector<GameObject*> objects;
 	quadTree->getGameObjects(objects, frustum, frustumBias);
 
-	for (GameObject* o : objects)
+	for (GameObject* object : objects)
 	{
-		Matrix world = o->getTransform().Transpose();
+		Matrix world = object->getTransform().Transpose();
 		deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &world, sizeof(SimpleMath::Matrix));
 		deviceContext->Unmap(worldBuffer.Get(), 0);
 		deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
 
-		Vector4 modColor = o->getColor();
+		Vector4 modColor = object->getColor();
 		deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
 		deviceContext->Unmap(colorBuffer.Get(), 0);
 
+		Material material = object->getMaterial();
 		ID3D11ShaderResourceView* textureSRV = nullptr;
-		if (o->getTexture() != nullptr)
+		if (material.diffuse != nullptr)
 		{
-			textureSRV = o->getTexture()->getShaderResView();
+			textureSRV = material.diffuse->getShaderResView();
 		}
 		ID3D11ShaderResourceView* normalSRV = nullptr;
-		if (o->getNormalMap() != nullptr)
+		if (material.normal != nullptr)
 		{
-			normalSRV = o->getNormalMap()->getShaderResView();
+			normalSRV = material.normal->getShaderResView();
+		}
+		ID3D11ShaderResourceView* specularSRV = nullptr;
+		if (material.specular != nullptr)
+		{
+			specularSRV = material.specular->getShaderResView();
+		}
+		ID3D11ShaderResourceView* glossSRV = nullptr;
+		if (material.gloss != nullptr)
+		{
+			glossSRV = material.gloss->getShaderResView();
 		}
 
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+		deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		deviceContext->PSSetShaderResources(0, 1, &textureSRV);
 		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
+		deviceContext->PSSetShaderResources(5, 1, &specularSRV);
+		deviceContext->PSSetShaderResources(6, 1, &glossSRV);
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
-		deviceContext->Draw(static_cast<UINT>(o->mesh->getVertexCount()), 0);
+		deviceContext->Draw(static_cast<UINT>(object->mesh->getVertexCount()), 0);
 	}
 }
 
