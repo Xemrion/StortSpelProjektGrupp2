@@ -20,6 +20,9 @@ private:
 	btConstraintSolver* solver;
 	btCollisionConfiguration* collisionConfig;
 	std::vector<btRigidBody*> bodies;
+	std::vector<btGeneric6DofSpring2Constraint*> springs;
+	std::vector<btPoint2PointConstraint*> pointJoints;
+	std::vector<btRaycastVehicle*> vehicles;
 
 	std::vector<btCollisionShape*> shapes;
 
@@ -30,6 +33,9 @@ public:
 	void update(float deltaTime);
 	btRigidBody* addSphere(float radius, btVector3 Origin, float mass);
 	btRigidBody* addBox(btVector3 Origin, btVector3 size, float mass);
+	btGeneric6DofSpring2Constraint* addSpring(btRigidBody*box1, btRigidBody* box2);
+	btPoint2PointConstraint* addPointJoint(btRigidBody* box1, btRigidBody* box2);
+	btRaycastVehicle* addVehicle(btRaycastVehicle* vehicle);
 	/*btRigidBody* addPlayer(btVector3 Origin, btVector3 size, float mass,Player *player);*/
 
 	bool DeleteRigidBody(btRigidBody * rb);

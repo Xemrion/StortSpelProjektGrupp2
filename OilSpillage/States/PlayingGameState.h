@@ -36,7 +36,7 @@ public:
 
 private:
 	friend class Game;
-   #ifdef _DEBUG
+   #if _DEBUG | RELEASE_DEBUG
 	   bool                         pausedTime;
    #endif // _DEBUG
 	std::string                     minimap;

@@ -9,7 +9,7 @@
 
 void PlayingGameState::initAI()
 {
-	aStar = new AStar(20, 20, Vector2(-10, 10));
+	aStar = new AStar(map->getTileMapPtr());
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
 
@@ -20,12 +20,15 @@ void PlayingGameState::initAI()
 	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
 
 	actorManager->createTurret(0 + 2, 0 + 2);
+	actorManager->createTurret(0 + 2, 0 - 2);
+	actorManager->createTurret(0 + 2, 0 + 4);
+	actorManager->createTurret(0 + 2, 0 - 4);
 	actorManager->initGroups();
 
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {
-   #ifdef _DEBUG
+   #if _DEBUG | RELEASE_DEBUG
 	   pausedTime = false;
    #endif // _DEBUG
 
@@ -58,7 +61,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	   lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
 	   lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
-	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
+		lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
 	for (int i = 0; i < 1000; ++i) {
 		Vector3 randPos   = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
@@ -110,7 +113,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	menues[MENU_OPTIONS]->init();
 
    auto playerVehicle = player->getVehicle();
-	playerVehicle->setPosition(Vector3(15,0,-15));
+	playerVehicle->setPosition(Vector3(15,3,-15));
 
 	testObjective = new GameObject();
 	testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -139,14 +142,15 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	Input::SetKeyboardPlayerID(0);
 	//Bullet
-	//buildingTest = std::make_unique<GameObject>();
-	//buildingTest->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//Game::getGraphics().addToDraw(buildingTest.get());
-	//btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
-	//buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
-	//buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
-	//buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
-	//buildingTest->setRigidBody(tempo2, physics.get());
+	/*buildingTest = std::make_unique<GameObject>();
+	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
+	buildingTest->mesh = Game::getGraphics().getMeshPointer("Vehicles/Dummy_Player_Car");
+	Game::getGraphics().addToDraw(buildingTest.get());
+	btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
+	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
+	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
+	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
+	buildingTest->setRigidBody(tempo2, physics.get());*/
 }
 
 PlayingGameState::~PlayingGameState()
@@ -199,13 +203,24 @@ void  PlayingGameState::ImGui_Driving()
 void PlayingGameState::ImGui_AI()
 {
 	ImGui::Begin("AI");
-	ImGui::SetWindowSize({ 100,150 });
+	ImGui::SetWindowSize({ 400,150 });
 
-	ImGui::Text(("Groups: " + std::to_string(actorManager->groups.size())).c_str());
-	for (int i = 0; i < actorManager->groups.size(); i++)
-	{
-		ImGui::Text(("Group " + std::to_string(i) + ":" + std::to_string(actorManager->groups.at(i).size())).c_str());
-	}
+	//ImGui::Text(("Groups: " + std::to_string(actorManager->groups.size())).c_str());
+	//for (int i = 0; i < actorManager->groups.size(); i++)
+	//{
+	//	ImGui::Text(("Group " + std::to_string(i) + ":" + std::to_string(actorManager->groups.at(i).size())).c_str());
+	//}
+	ImGui::Text(("x: " + std::to_string(player->getVehicle()->getPosition().x)).c_str());
+	ImGui::Text(("y: " + std::to_string(player->getVehicle()->getPosition().y)).c_str());
+	ImGui::Text(("z: " + std::to_string(player->getVehicle()->getPosition().z)).c_str());
+
+	Vector3 xzPos = Vector3(player->getVehicle()->getPosition().x, 0, -player->getVehicle()->getPosition().z);
+
+	ImGui::Text(("Tile x: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).x)).c_str());
+	ImGui::Text(("Tile y: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).y)).c_str());
+	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
+							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
+
 	ImGui::End();
 }
 
@@ -339,7 +354,7 @@ void PlayingGameState::ImGui_ProcGen()
 
 	// regen button:
 	ImGui::NewLine();
-	if ( ImGui::Button("Re-generate") ) {
+	if (ImGui::Button("Re-generate")) {
 		// (TODO: refactor) hacky, but:
 		map = std::make_unique<Map>(graphics, config, physics.get());
 		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
@@ -384,7 +399,7 @@ void  PlayingGameState::update(float deltaTime)
 			deltaTime /= 4;
 		}
 
-#ifdef _DEBUG
+#if _DEBUG | RELEASE_DEBUG
 		if (Input::CheckButton(ACTION_1, PRESSED, 0))
 		{
 			pausedTime = !pausedTime;
@@ -396,7 +411,7 @@ void  PlayingGameState::update(float deltaTime)
 		}
 		else if (time <= 0.0f)
 		{
-			Game::setState(Game::STATE_MENU);
+			//Game::setState(Game::STATE_MENU);
 		}
 #else
 		if (time > 0.0f)
@@ -426,7 +441,7 @@ void  PlayingGameState::update(float deltaTime)
 
 		camera->setPosition( Vector3( positionCam.getX(),
 		                              positionCam.getY(),
-		                              positionCam.getZ() ) + Vector3(.0f, cameraDistance, .0f) );
+		                              positionCam.getZ() ) + Vector3(.0f, player->getCameraDistance(deltaTime) + cameraDistance, .0f) );
 
 		Vector3 spotlightDir { sin(playerVehicle->getRotation().y),
 		                       .0f,
@@ -476,7 +491,7 @@ void  PlayingGameState::update(float deltaTime)
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
-	if constexpr ( isDebugging ) {
+#if _DEBUG | RELEASE_DEBUG
 	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();
 	   ImGui::NewFrame();
@@ -487,12 +502,12 @@ void  PlayingGameState::update(float deltaTime)
 	   ImGui_Camera();
 	   ImGui::Render();
 	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-    }
+#endif // !_DEBUG
 	
 	graphics.presentScene();
 }
 
-F32 const &PlayingGameState::getTimeRef() const noexcept {
+F32 const& PlayingGameState::getTimeRef() const noexcept {
 	return time;
 }
 

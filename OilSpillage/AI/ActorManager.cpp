@@ -23,8 +23,18 @@ void ActorManager::update(float dt, Vector3 targetPos)
 {
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		actors.at(i)->update(dt, targetPos);
-		actors.at(i)->run(actors, dt, targetPos);
+		if(!actors.at(i)->isDead())
+		{
+			actors.at(i)->update(dt, targetPos);
+			actors.at(i)->run(actors, dt, targetPos);
+		}
+		else
+		{
+			actors.at(i)->death();
+			delete actors.at(i);
+			actors.erase(actors.begin() + i);
+		}
+
 	}
 	updateGroups();
 	updateAveragePos();
@@ -98,7 +108,11 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 	int returnIndex = -1;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		if ((actorPos - averagePos.at(i)).Length() <= groupRadius &&
+		Vector3 curAveragePos = averagePos.at(i);
+		float deltaX = actorPos.x -curAveragePos.x;
+		float deltaZ = actorPos.z - curAveragePos.z;
+		float distance = sqrt((deltaX* deltaX) + (deltaZ * deltaZ));
+		if (distance <= groupRadius &&
 			groups.at(i).size() >= biggestGroupSize)
 		{
 			biggestGroupSize = groups.at(i).size();
@@ -123,7 +137,7 @@ void ActorManager::leaveGroup(int groupIndex, int where)
 
 void ActorManager::assignPathsToGroups(Vector3 targetPos)
 {
-	std::vector<Node*> path;
+	std::vector<Vector3> path;
 	for (int i = 0; i < groups.size(); i++)
 	{
 		aStar->algorithm(averagePos.at(i), targetPos, path);
@@ -143,37 +157,45 @@ void ActorManager::updateGroups()
 		for (int k = 0; k < groups.at(i).size(); k++)
 		{
 			Actor* current = groups.at(i).at(k);
-			float distanceToOwnGroup = (current->getPosition() - averagePos.at(i)).Length();
-
-			//Actor is outside its own groupRadius, check for other groups or create its own
-			if (distanceToOwnGroup > groupRadius)
+			if(current->isDead())
 			{
-				int groupIndex = groupInRange(current->getPosition(), groups.at(i).size());
-				//Found a group within the groupRadius
-				if (groupIndex != -1)
-				{
-					leaveGroup(i, k);
-					joinGroup(current, groupIndex);
-				}
-				//create its own group
-				else
-				{
-					leaveGroup(i, k);
-					createGroup(current);
-				}
-
+				leaveGroup(i, k);
 			}
-			//If actor is inside its own group radius but is also inside another one that has more actors(encourage bigger groups)
 			else
 			{
-				int groupIndex = groupInRange(current->getPosition(), groups.at(i).size());
-			
-				if (groupIndex != -1 && groupIndex != i)
+				float distanceToOwnGroup = (current->getPosition() - averagePos.at(i)).Length();
+
+				//Actor is outside its own groupRadius, check for other groups or create its own
+				if (distanceToOwnGroup > groupRadius)
 				{
-					leaveGroup(i, k);
-					joinGroup(current, groupIndex);
+					int groupIndex = groupInRange(current->getPosition(), groups.at(i).size());
+					//Found a group within the groupRadius
+					if (groupIndex != -1)
+					{
+						leaveGroup(i, k);
+						joinGroup(current, groupIndex);
+					}
+					//create its own group
+					else
+					{
+						leaveGroup(i, k);
+						createGroup(current);
+					}
+
+				}
+				//If actor is inside its own group radius but is also inside another one that has more actors(encourage bigger groups)
+				else
+				{
+					int groupIndex = groupInRange(current->getPosition(), groups.at(i).size());
+
+					if (groupIndex != -1 && groupIndex != i)
+					{
+						leaveGroup(i, k);
+						joinGroup(current, groupIndex);
+					}
 				}
 			}
+			
 		}
 		if (groups.at(i).empty())
 		{

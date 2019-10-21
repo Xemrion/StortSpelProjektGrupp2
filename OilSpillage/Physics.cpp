@@ -15,7 +15,7 @@ solver(new btSequentialImpulseConstraintSolver)
 
 
 	////set shape for object
-	plane = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
+	plane = new btStaticPlaneShape(btVector3(0, 1, 0), -1);
 	
 	//set motionshape aka set postion
 	btMotionState* motion = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0)));
@@ -96,6 +96,7 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass)
 	t.setIdentity();
 	t.setOrigin(btVector3(Origin));
 	btBoxShape* box = new btBoxShape(size);
+	
 
 	btVector3 inertia(0, 0, 0);
 	if (mass != 0.0f) {
@@ -109,6 +110,39 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass)
 	bodies.push_back(body);
 	//body->setUserPointer(objects);
 	return body;
+}
+
+btGeneric6DofSpring2Constraint* Physics::addSpring(btRigidBody* box1, btRigidBody* box2)
+{
+	btGeneric6DofSpring2Constraint* spring = new btGeneric6DofSpring2Constraint(
+		*box1, *box2,
+		btTransform(btQuaternion::getIdentity(), { 0.0f, -1.5f, 0.0f }),
+		btTransform(btQuaternion::getIdentity(), { 0.0f,  0.0f, 0.0f }));
+	this->world->addConstraint(spring);
+	springs.push_back(spring);
+
+	return spring;
+}
+
+btPoint2PointConstraint* Physics::addPointJoint(btRigidBody* box1, btRigidBody* box2)
+{
+	btPoint2PointConstraint* pointJoint = new btPoint2PointConstraint(*box1,*box2,btVector3(0,0.40f,0),btVector3(0, -0.55f, 0));
+	//pointJoint->enableFeedback(true);
+	/*btJointFeedback* hej = new btJointFeedback;
+	hej->m_appliedForceBodyA = btVector3(1, 0, 1);
+	pointJoint->setJointFeedback(hej);*/
+	this->world->addConstraint(pointJoint);
+	pointJoints.push_back(pointJoint);
+
+	return pointJoint;
+}
+
+btRaycastVehicle* Physics::addVehicle(btRaycastVehicle* vehicle)
+{
+	this->world->addVehicle(vehicle);
+	vehicles.push_back(vehicle);
+
+	return vehicle;
 }
 
 //btRigidBody* Physics::addPlayer(btVector3 Origin, btVector3 size, float mass, Player *player)

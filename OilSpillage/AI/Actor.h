@@ -3,6 +3,7 @@
 #include "Boid.h"
 #include "AStar.h"
 #include "../Weapon.h"
+#include "..//VehicleStats.h"
 
 class Actor : public GameObject
 {
@@ -24,11 +25,22 @@ public:
 	virtual void updateBoid(float deltaTime);
 	void flock(vector<Actor*> boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	float angle(Vector3 target);
-	void setPath(std::vector<Node*> path);
+	void setPath(std::vector<Vector3> path);
 	Vector3 getDestination();
 	bool hasGroup();
 	void setDestination(Vector3 destination);
 	void joinGroup();
+
+	const int& getHealthRef() const;
+	int getHealth() const;
+	int getMaxHealth() const;
+	void setHealth(int health);
+	void setMaxHealth(int maxHealth);
+	void resetHealth();
+	void changeHealth(int amount);
+	bool isDead() const;
+	void death();
+
 private:
 	Vector3 velocity;
 	Vector3 acceleration;
@@ -37,10 +49,14 @@ private:
 	bool isInGroup = false;
 
 protected:
+	int health;
+	Stats defaultStats;
+	Stats updatedStats;
+
 	int nrOfFrames = 0;
 	Vector3 destination;
 	Selector* root;
-	std::vector<Node*> path;
+	std::vector<Vector3> path;
 	AStar* aStar;
 	Vector3 targetNode;
 	enum State { Roaming, Chasing, Returning };

@@ -9,6 +9,11 @@ Turret::Turret()
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	turrentAngle = 90;
 	this->CalculateTarget(turrentAngle);
+
+	this->defaultStats = VehicleStats::AITurret;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
 }
 
 Turret::Turret(float x, float z) 
@@ -26,11 +31,20 @@ Turret::Turret(float x, float z)
 	this->body.setScale(this->scale);
 	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
-	this->setTexture(Game::getGraphics().getTexturePointer("Entities/Dummy_Turret",true));
-	this->body.setTexture(Game::getGraphics().getTexturePointer("Entities/Dummy_Turret", true));
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
+	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
 	Game::getGraphics().addToDraw(&this->body);
 
 	this->weapon = AIWeapon::machineGun;
+
+	this->defaultStats = VehicleStats::AITurret;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
+}
+
+Turret::~Turret()
+{
 }
 
 void Turret::update(float dt, Vector3 targetPos)
@@ -40,6 +54,11 @@ void Turret::update(float dt, Vector3 targetPos)
 	this->root->func();
 
 	//rotateTowards();
+
+	if((this->position - targetPos).Length() <=5 && this->health > 0)
+	{
+		changeHealth(-100);
+	}
 
 	for (int i = 0; i < bulletCount; i++)
 	{
