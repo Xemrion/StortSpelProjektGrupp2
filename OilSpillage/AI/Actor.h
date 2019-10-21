@@ -25,7 +25,7 @@ public:
 	virtual void updateBoid(float deltaTime);
 	void flock(vector<Actor*> boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	float angle(Vector3 target);
-	void setPath(std::vector<Node*> path);
+	void setPath(std::vector<Vector3> path);
 	Vector3 getDestination();
 	bool hasGroup();
 	void setDestination(Vector3 destination);
@@ -56,7 +56,7 @@ protected:
 	int nrOfFrames = 0;
 	Vector3 destination;
 	Selector* root;
-	std::vector<Node*> path;
+	std::vector<Vector3> path;
 	AStar* aStar;
 	Vector3 targetNode;
 	enum State { Roaming, Chasing, Returning };

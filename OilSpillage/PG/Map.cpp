@@ -5,7 +5,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	graphics        ( graphics                                                              ),
 	physics         ( physics                                                               ),
 	config          ( config                                                                ),
-	tilemap         ( std::make_unique<TileMap>(config)                                     ),
+	tilemap         ( new TileMap(config)													),
 	districtMarkers ( static_cast<Size>( config.districtCellSide) * config.districtCellSide ),
 	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y     )
 {
@@ -19,7 +19,8 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 
 Map::~Map() noexcept {
 	graphics.clearStaticObjects();
-	#ifdef _DEBUG
+	delete tilemap;
+   #ifdef _DEBUG
 		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?
 		assert(profilerLogs.is_open());
 		DBG_PROFILE_OUTPUT(profilerLogs); // outputs profiler logs (if in debug mode)
@@ -41,7 +42,8 @@ void  Map::generateRoads() {
 		roadGenerator.generate(roadConfig);
 		if (tilemap->getRoadCoverage() < roadConfig.roadMinTotalCoverage) {
 			roadConfig.seed = generateSeed(rng);
-			tilemap = std::make_unique<TileMap>(roadConfig);
+			delete tilemap;
+			tilemap = new TileMap(roadConfig);
 		}
 		else {
 			startPositionInTileSpace = roadGenerator.getStartPosition();
@@ -193,6 +195,7 @@ void  Map::generateBuildings( ) {
 						                     .025f * config.tileScaleFactor.y /* config.buildingFloorHeightFactor */ * randomFloorCount,
 						                     .025f * config.tileScaleFactor.z });
 						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) } );
+				  #ifndef _DEBUG
 						btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
 						                                               houseTile.getPosition().y,
 						                                               houseTile.getPosition().z ),
@@ -201,7 +204,7 @@ void  Map::generateBuildings( ) {
 						                                               15.5f * houseTile.getScale().z ),
 						                                    .0f );
 						houseTile.setRigidBody( tmp, physics );
-
+				  #endif
                   #ifdef _DEBUG
 						   ++total_building_tile_count;
                   #endif
@@ -292,8 +295,13 @@ Voronoi const &Map::getDistrictMap() const noexcept {
    return *districtMap;
 }
 
-void  Map::setDistrictColorCoding( bool useColorCoding ) noexcept {
-	if ( useColorCoding ) {
+TileMap* Map::getTileMapPtr()
+{
+	return this->tilemap;
+}
+
+void  Map::setDistrictColorCoding(bool useColorCoding) noexcept {
+	if (useColorCoding) {
 		Vector<Vector4> districtColorTable{
 			{ 0.0f, 0.0f, 0.0f, 1.0f },
 			{ 0.0f, 0.0f, 0.5f, 1.0f },
