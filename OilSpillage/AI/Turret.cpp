@@ -7,8 +7,8 @@ Turret::Turret()
 	this->setPosition(Vector3(-15.0f, 0.0f, 0.0f));
 	setUpActor();
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
-	turrentAngle = 90;
-	this->CalculateTarget(turrentAngle);
+	turretAngle = 90;
+	this->calculateTarget(turretAngle);
 
 	this->defaultStats = VehicleStats::AITurret;
 	this->updatedStats = this->defaultStats;
@@ -16,14 +16,14 @@ Turret::Turret()
 	this->health = this->updatedStats.maxHealth;
 }
 
-Turret::Turret(float x, float z) 
+Turret::Turret(float x, float z)
 	: Actor(x, z, nullptr)
 {
 	//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 10.f;
-	turrentAngle = 90;
-	this->CalculateTarget(turrentAngle);
+	turretAngle = 90;
+	this->calculateTarget(turretAngle);
 	setUpActor();
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	vecForward.Normalize();
@@ -55,7 +55,7 @@ void Turret::update(float dt, Vector3 targetPos)
 
 	//rotateTowards();
 
-	if((this->position - targetPos).Length() <=5 && this->health > 0)
+	if ((this->position - targetPos).Length() <= 5 && this->health > 0)
 	{
 		changeHealth(-100);
 	}
@@ -70,11 +70,11 @@ void Turret::update(float dt, Vector3 targetPos)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-5);
 				this->bullets[i].timeLeft = 0;
-				
+
 			}
 			else
 			{
-				Game::getGraphics().addParticle(this->position-this->vecForward, Vector3(0, 0, 0), 1, 1,1);
+				Game::getGraphics().addParticle(this->position - this->vecForward, Vector3(0, 0, 0), 1, 1, 1);
 				this->bullets[i].timeLeft -= deltaTime;
 				this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
 				Game::getGraphics().addToDraw(this->bullets[i].obj);
@@ -137,11 +137,11 @@ Status Turret::rotateTowards()
 
 	if ((targetToSelf).Dot(vecForward) < 0.8)
 	{
-		vecForward -= (targetToSelf * deltaTime)/0.1;
+		vecForward -= (targetToSelf * deltaTime) / 0.1;
 		vecForward.Normalize();
 
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
-		this->setRotation(Vector3(0, newRot-(XM_PI/2), 0));
+		this->setRotation(Vector3(0, newRot - (XM_PI / 2), 0));
 	}
 	return Status::SUCCESS;
 }
@@ -163,9 +163,9 @@ Status Turret::inRange()
 Status Turret::lineOfSight()
 {
 	Status status = Status::FAILURE;
-	Vector3 Dir =this->position- targetPos;
-	Dir.Normalize();
-	float value = Dir.Dot(vecForward);
+	Vector3 dir = this->position - targetPos;
+	dir.Normalize();
+	float value = dir.Dot(vecForward);
 	float angle = std::abs(acos(value));
 	if (angle <= XM_PIDIV2)
 	{
@@ -174,7 +174,7 @@ Status Turret::lineOfSight()
 	return status;
 
 }
-void Turret::CalculateTarget(float& angle)
+void Turret::calculateTarget(float& angle)
 {
 	float radians = angle * (3.14f / 180.f);
 	float x = cos(radians) * vecForward.x + sin(radians) * vecForward.z;
@@ -187,14 +187,17 @@ Status Turret::idle()
 	/*calculate new target position if are getting close to the point*/
 	if (idleTarget.Dot(vecForward) <= 0.0f)
 	{
-		turrentAngle += 90;
-		this->CalculateTarget(turrentAngle);
-	}else
-	vecForward -= (idleTarget * deltaTime) / 1.01;
-	vecForward.Normalize();
+		turretAngle += 90;
+		this->calculateTarget(turretAngle);
+	}
+	else
+	{
+		vecForward -= (idleTarget * deltaTime) / 1.01;
+		vecForward.Normalize();
 
-	float newRot = atan2(this->vecForward.x, this->vecForward.z);
-	this->setRotation(Vector3(0, newRot - (XM_PI / 2), 0));
+		float newRot = atan2(this->vecForward.x, this->vecForward.z);
+		this->setRotation(Vector3(0, newRot - (XM_PIDIV2), 0));
+	}
 
 
 
@@ -220,7 +223,7 @@ Status Turret::idle()
 	}
 	else
 		this->idleTarget = Vector3(9, 0.0f, 0);*/
-	
+
 
 	return Status::SUCCESS;
 }

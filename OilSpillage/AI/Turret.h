@@ -24,7 +24,7 @@ private:
 	int sightRange;
 
 	Vector3 idleTarget;
-	float turrentAngle;
+	float turretAngle;
 
-	void CalculateTarget(float& angle);
+	void calculateTarget(float& angle);
 };
