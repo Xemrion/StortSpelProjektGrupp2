@@ -4,7 +4,7 @@
 Map::Map( Graphics &graphics, MapConfig const &config ):
 	graphics        ( graphics                                                              ),
 	config          ( config                                                                ),
-	tilemap         ( std::make_unique<TileMap>(config)                                     ),
+	tilemap         ( new TileMap(config)													),
 	districtMarkers ( static_cast<Size>( config.districtCellSide) * config.districtCellSide ),
 	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y     )
 {
@@ -18,6 +18,7 @@ Map::Map( Graphics &graphics, MapConfig const &config ):
 
 Map::~Map() noexcept {
 	graphics.clearStaticObjects();
+	delete tilemap;
    #ifdef _DEBUG
 		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?
 		assert(profilerLogs.is_open());
@@ -40,7 +41,8 @@ void  Map::generateRoads() {
 		roadGenerator.generate(roadConfig);
 		if (tilemap->getRoadCoverage() < roadConfig.roadMinTotalCoverage) {
 			roadConfig.seed = generateSeed(rng);
-			tilemap = std::make_unique<TileMap>(roadConfig);
+			delete tilemap;
+			tilemap = new TileMap(roadConfig);
 		}
 		else {
 			startPositionInTileSpace = roadGenerator.getStartPosition();
@@ -277,6 +279,11 @@ Opt<Vector<V2u>>  Map::findValidHouseLot(RNG& rng, U16 cellId, Voronoi const& di
 
 TileMap const& Map::getTileMap() const noexcept {
 	return *tilemap;
+}
+
+TileMap* Map::getTileMapPtr()
+{
+	return this->tilemap;
 }
 
 void  Map::setDistrictColorCoding(bool useColorCoding) noexcept {
