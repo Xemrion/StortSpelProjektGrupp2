@@ -31,6 +31,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		else
 		{
 			actors.at(i)->death();
+			delete actors.at(i);
 			actors.erase(actors.begin() + i);
 		}
 

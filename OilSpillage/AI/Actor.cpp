@@ -45,6 +45,7 @@ Actor::~Actor()
 {
 	for (int i = 0; i < bulletCount; i++)
 	{
+		Game::getGraphics().removeFromDraw(bullets[i].obj);
 		delete this->bullets[i].obj;
 	}
 }
