@@ -13,13 +13,15 @@ Graphics::Graphics()
 	this->vp = {};
 
 	this->debugger = nullptr;
-
+	/*TA BORT*/
+	this->farZTempShadow = 1000.0f;
+	/* */
 	this->lightList = nullptr;
 	this->window = nullptr;
 
 	lightBufferContents = new LightBufferContents;
 
-	this->quadTree = std::make_unique<QuadTree>(Vector2(-96.f * 10.f, -96.f * 10.f), Vector2(96.f * 10.f, 96.f * 10.f), 4);
+	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
 }
 
 Graphics::~Graphics()
@@ -202,6 +204,16 @@ bool Graphics::init(Window* window)
 	if (FAILED(hr))
 		return false;
 	
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = 16;
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &indexSpot);
+	if (FAILED(hr))
+		return false;
 
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
@@ -247,6 +259,20 @@ bool Graphics::init(Window* window)
 		return false;
 	}
 
+	D3D11_RASTERIZER_DESC rasterizerDesc2;
+	ZeroMemory(&rasterizerDesc2, sizeof(D3D11_RASTERIZER_DESC));
+	rasterizerDesc2.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+	rasterizerDesc2.CullMode = D3D11_CULL_MODE::D3D11_CULL_FRONT;
+
+
+	result = device->CreateRasterizerState(&rasterizerDesc2, &rasterStateShadow);
+	if (FAILED(result))
+	{
+		MessageBox(NULL, "Failed to create rasterizer state.",
+			"D3D11 Initialisation Error", MB_OK);
+		return false;
+	}
+
 	deviceContext->RSSetState(rasterState.Get());
 	// Clear the blend state description.
 	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
@@ -275,6 +301,7 @@ bool Graphics::init(Window* window)
 
 	this->device->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(debug.GetAddressOf()));
 
+	this->shadowMap.initialize(device.Get(), deviceContext.Get());
 
 
 	createShaders();
@@ -326,7 +353,20 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
+	Frustum frustum = camera->getFrustum();
 
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	renderShadowmap(camera);
+
+	deviceContext->RSSetState(rasterState.Get());
+
+	ID3D11DepthStencilView* nulDSV = nullptr;
+	ID3D11ShaderResourceView* nulSRV = nullptr;
+	deviceContext->OMSetRenderTargets(0,nullptr, nulDSV);
+
+	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	Matrix view = camera->getViewMatrix().Transpose();
 	deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -341,7 +381,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
 
-
+	deviceContext->RSSetViewports(1, &this->vp);
 	this->particleSystem.updateParticles(deltaTime, viewProj);
 
 	this->particleSystem.drawAll(camera);
@@ -351,16 +391,26 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	this->particleSystem2.drawAll(camera);
 
 	//set up Shaders
+	
+
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDefault.ps.getShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDefault.vs.getShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
+	deviceContext->VSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->VSSetConstantBuffers(3, 1, this->shadowMap.getViewProjSpot().GetAddressOf());
+
 	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
 	deviceContext->PSSetShaderResources(2, 1, this->culledLightBufferSRV.GetAddressOf());
+	deviceContext->PSSetShaderResources(3, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->PSSetShaderResources(4, 1, this->shadowMap.getShadowMapSpot().GetAddressOf());
+
+	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
+	deviceContext->PSSetConstantBuffers(3, 1, this->indexSpot.GetAddressOf());
+
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
-
-	Frustum frustum = camera->getFrustum();
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	for (GameObject* object : drawableObjects)
 	{
@@ -406,7 +456,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 			}
 		}
 	}
-
+	
 	drawStaticGameObjects(camera, frustum, 10.0);
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
@@ -419,6 +469,65 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 #endif
 
 	// Present the back buffer to the screen since rendering is complete.
+}
+
+void Graphics::renderShadowmap(DynamicCamera* camera)
+{
+	Frustum frustum = camera->getFrustum();
+	shadowMap.prepare();//clear depth
+	shadowMap.prepareSpot();//clear depth
+	shadowMap.setViewProjSun(camera, Vector3(lightList->getSun().getDirection().x, lightList->getSun().getDirection().y, lightList->getSun().getDirection().z));
+	//Setting the viewprojSpot in playinggamestate cause playerlight is there
+
+
+	for (GameObject* object : drawableObjects)
+	{
+		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		{
+			AABB boundingBox = object->getAABB();
+
+			if (frustum.intersect(boundingBox, 100.0f))
+			{
+				UINT vertexCount = object->mesh->getVertexCount();
+				UINT stride = sizeof(Vertex3D);
+				UINT offset = 0;
+				SimpleMath::Matrix world = object->getTransform();
+				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+				shadowMap.setWorld(worldTr);
+				deviceContext->PSSetShader(nullptr, nullptr, 0);
+				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+				shadowMap.setDSun();
+				deviceContext->Draw(vertexCount, 0);
+				shadowMap.setDSpot();
+				deviceContext->Draw(vertexCount, 0);
+			}
+		}
+	}
+
+	std::vector<GameObject*> objects;
+	quadTree->getGameObjects(objects, frustum, 100.0f);
+	for (GameObject* o : objects)
+	{
+		/*if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		{*/
+		AABB boundingBox = o->getAABB();
+		//if (frustum.intersect(boundingBox, 1000.0f))
+		//{
+		UINT vertexCount = o->mesh->getVertexCount();
+		UINT stride = sizeof(Vertex3D);
+		UINT offset = 0;
+		SimpleMath::Matrix world = o->getTransform().Transpose();
+		SimpleMath::Matrix worldTr = world;
+		shadowMap.setWorld(worldTr);
+		deviceContext->PSSetShader(nullptr, nullptr, 0);
+		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+		shadowMap.setDSun();
+		deviceContext->Draw(vertexCount, 0);
+		shadowMap.setDSpot();
+		deviceContext->Draw(vertexCount, 0);
+		//}
+
+	}
 }
 
 bool Graphics::createShaders()
@@ -560,65 +669,78 @@ ID3D11Device* Graphics::getDevice()
 void Graphics::loadMesh(std::string fileName)
 {
 	Mesh newMesh;
-	if (meshes.find(fileName) == meshes.end())
+
+	
+	Importer imp;
+	std::string meshBinPath = fileName + "/mesh.bin";
+	if (imp.loadMesh(meshBinPath.c_str()))
 	{
-		Importer imp;
-		if (imp.loadMesh(fileName.c_str()))
+		for (int j = 0; j < imp.getMeshCount() ; j++)
 		{
-			meshes[fileName] = newMesh;
-			
-			std::vector<Vertex3D> tempVec;
-			Vertex3D vertex;
-			Vertex* vertices = imp.getVertices();
-			for (int i = 0; i < imp.getVertexCount(); i++)
+			std::string meshName = fileName;
+			if (j > 0)
 			{
-				vertex.position.x = vertices[i].x;
-				vertex.position.y = vertices[i].y;
-				vertex.position.z = vertices[i].z;
-
-				vertex.uv.x = vertices[i].u;
-				vertex.uv.y = vertices[i].v;
-
-				vertex.normal.x = vertices[i].nx;
-				vertex.normal.y = vertices[i].ny;
-				vertex.normal.z = vertices[i].nz;
-
-				vertex.tangent.x = vertices[i].tangentX;
-				vertex.tangent.y = vertices[i].tangentY;
-				vertex.tangent.z = vertices[i].tangentZ;
-
-				vertex.bitangent.x = vertices[i].binormalX;
-				vertex.bitangent.y = vertices[i].binormalY;
-				vertex.bitangent.z = vertices[i].binormalZ;
-
-				tempVec.push_back(vertex);
+				meshName += std::to_string(j);
 			}
+			if (meshes.find(meshName) == meshes.end())
+			{
+				meshes[meshName] = newMesh;
+				imp.getMeshCount();
+				std::vector<Vertex3D> tempVec;
+				Vertex3D vertex;
+				Vertex* vertices = imp.getVertices(j);
+				for (int i = 0; i < imp.getVertexCount(j); i++)
+				{
+					vertex.position.x = vertices[i].x;
+					vertex.position.y = vertices[i].y;
+					vertex.position.z = vertices[i].z;
 
-			meshes[fileName].insertDataToMesh(tempVec);
-			AABB aabb;
-			imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z);
-			imp.getMinBBox(aabb.minPos.x, aabb.minPos.y, aabb.minPos.z);
-			meshes[fileName].setAABB(aabb);
-			int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
-			UINT stride = sizeof(Vertex3D);
+					vertex.uv.x = vertices[i].u;
+					vertex.uv.y = vertices[i].v;
 
-			D3D11_BUFFER_DESC vBufferDesc;
-			ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+					vertex.normal.x = vertices[i].nx;
+					vertex.normal.y = vertices[i].ny;
+					vertex.normal.z = vertices[i].nz;
 
-			vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			vBufferDesc.ByteWidth = bufferSize;
-			vBufferDesc.CPUAccessFlags = 0;
-			vBufferDesc.MiscFlags = 0;
+					vertex.tangent.x = vertices[i].tangentX;
+					vertex.tangent.y = vertices[i].tangentY;
+					vertex.tangent.z = vertices[i].tangentZ;
 
-			D3D11_SUBRESOURCE_DATA subData;
-			ZeroMemory(&subData, sizeof(subData));
-			subData.pSysMem = meshes[fileName].vertices.data();
+					vertex.bitangent.x = vertices[i].binormalX;
+					vertex.bitangent.y = vertices[i].binormalY;
+					vertex.bitangent.z = vertices[i].binormalZ;
 
-			HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[fileName].vertexBuffer.GetAddressOf());
-			//meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+					tempVec.push_back(vertex);
+				}
+
+				meshes[meshName].insertDataToMesh(tempVec);
+				AABB aabb;
+				imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z,j);
+				imp.getMinBBox(aabb.minPos.x, aabb.minPos.y, aabb.minPos.z,j);
+				meshes[meshName].setAABB(aabb);
+				int bufferSize = static_cast<int>(meshes[meshName].vertices.size()) * sizeof(Vertex3D);
+				UINT stride = sizeof(Vertex3D);
+
+				D3D11_BUFFER_DESC vBufferDesc;
+				ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+				vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+				vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+				vBufferDesc.ByteWidth = bufferSize;
+				vBufferDesc.CPUAccessFlags = 0;
+				vBufferDesc.MiscFlags = 0;
+
+				D3D11_SUBRESOURCE_DATA subData;
+				ZeroMemory(&subData, sizeof(subData));
+				subData.pSysMem = meshes[meshName].vertices.data();
+
+				HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[meshName].vertexBuffer.GetAddressOf());
+				//meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+			}
 		}
+
 	}
+	
 }
 
 
@@ -626,7 +748,7 @@ void Graphics::loadModel(std::string path)
 {
    std::string modelDir {MODEL_ROOT_DIR};
                modelDir += path;
-	loadMesh( modelDir+"/mesh.bin" );
+	loadMesh( modelDir );
 	loadTexture( modelDir+"/_diffuse.tga", true );
    // TODO: load other texture channels
 }
@@ -841,7 +963,7 @@ const Mesh* Graphics::getMeshPointer(const char* localPath)
    {
       meshPath = MODEL_ROOT_DIR;
       meshPath += localPath;
-      meshPath += "/mesh.bin";
+      //meshPath += "/mesh.bin";//the meshse in mehses[] wont have the mesh.bin in their name
    }
    else if (localPath != nullptr)
    {
@@ -1082,4 +1204,14 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 
 		deviceContext->Draw(static_cast<UINT>(o->mesh->getVertexCount()), 0);
 	}
+}
+
+void Graphics::setSpotLighShadow(SpotLight* spotLight)
+{
+	shadowMap.setViweProjSpot(spotLight->getPos(), spotLight->getDirection(), spotLight->getLuminance());//REMOVE LUMINANCE
+	UINT index = (static_cast<Light*>(spotLight) - lightList->lights.data());
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(indexSpot.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &index, sizeof(UINT));
+	deviceContext->Unmap(indexSpot.Get(), 0);
 }

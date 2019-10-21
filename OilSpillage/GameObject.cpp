@@ -1,5 +1,6 @@
 #include"GameObject.h"
 #include"game.h"
+
 GameObject::~GameObject()
 {
 	/*if (rigidBody != nullptr) {
@@ -8,71 +9,94 @@ GameObject::~GameObject()
 	}*/
 }
 void GameObject::updateRigidBody()
-{
+	
 }
-Matrix GameObject::getTransform() {
 
-
-	if (rigidBody == nullptr) {
-		Matrix transform(Matrix::CreateScale(scale));
-		transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
-		transform *= Matrix::CreateTranslation(position);
-
-		if (this->parent != nullptr)
-		{
-			transform *= this->parent->getTransform();
-		}
-
-		return transform;
-	}else {
-
-		//btVector3 pos = btVector3(rigidBody->getWorldTransform().getOrigin());
-		//this->position = Vector3(pos.getX(),pos.getY(),pos.getZ());
-
-		Matrix transform(Matrix::CreateScale(scale));
-
-		position = btTransform_to_XMFLOAT3(rigidBody->getWorldTransform());
-		btQuaternion rot = rigidBody->getWorldTransform().getRotation();
-		Quaternion d3drotation(rot.x(), rot.y(), rot.z(), rot.w());
-
-		this->rotationQt = d3drotation;
-
-		transform *= Matrix::CreateFromQuaternion(d3drotation);
-		transform *= Matrix::CreateTranslation(position);
-
-		if (this->parent != nullptr)
-		{
-			transform *= this->parent->getTransform();
-		}
-
-		return transform;
+Matrix GameObject::getTransform()
+{
+	if (this->rigidBody)
+	{
+		this->position = btTransformGetPosition(rigidBody->getWorldTransform());
+		this->rotation = btTransformGetRotation(rigidBody->getWorldTransform());
 	}
+
+	Matrix transform(Matrix::CreateScale(scale));
+	transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
+	transform *= Matrix::CreateTranslation(position);
+
+	if (this->parent != nullptr)
+	{
+		transform *= this->parent->getTransform();
+	}
+
+	return transform;
 }
 
 void GameObject::setPosition(Vector3 newPos)
 {
-	this->position = newPos;
+	if (this->rigidBody)
+	{
+		this->rigidBody->getWorldTransform().setOrigin(btVector3(newPos.x, newPos.y, newPos.z));
+		this->position = btTransformGetPosition(rigidBody->getWorldTransform());
+	}
+	else
+	{
+		this->position = newPos;
+	}
 }
 
 void GameObject::move(Vector3 addPos)
 {
-	this->position += addPos;
+	if (this->rigidBody)
+	{
+		this->rigidBody->getWorldTransform().getOrigin() += btVector3(addPos.x, addPos.y, addPos.z);
+		this->position = btTransformGetPosition(rigidBody->getWorldTransform());
+	}
+	else
+	{
+		this->position += addPos;
+	}
 }
 
 void GameObject::addRotation(Vector3 addRotaiton)
 {
-	this->rotation += addRotaiton;
-	this->rotation.x = fmod(this->rotation.x, 2 * DirectX::XM_PI);
-	this->rotation.y = fmod(this->rotation.y, 2 * DirectX::XM_PI);
-	this->rotation.z = fmod(this->rotation.z, 2 * DirectX::XM_PI);
+	if (this->rigidBody)
+	{
+		Vector3 newRotation = btTransformGetRotation(this->rigidBody->getWorldTransform());
+
+		newRotation += addRotaiton;
+		newRotation.x = fmod(newRotation.x, 2 * DirectX::XM_PI);
+		newRotation.y = fmod(newRotation.y, 2 * DirectX::XM_PI);
+		newRotation.z = fmod(newRotation.z, 2 * DirectX::XM_PI);
+
+		Quaternion qt = Quaternion::CreateFromYawPitchRoll(newRotation.y, newRotation.x, newRotation.z);
+		this->rigidBody->getWorldTransform().setRotation(btQuaternion(qt.x, qt.y, qt.z, qt.w));
+		this->rotation = newRotation;
+	}
+	else
+	{
+		this->rotation += addRotaiton;
+		this->rotation.x = fmod(this->rotation.x, 2 * DirectX::XM_PI);
+		this->rotation.y = fmod(this->rotation.y, 2 * DirectX::XM_PI);
+		this->rotation.z = fmod(this->rotation.z, 2 * DirectX::XM_PI);
+	}
 }
 
 void GameObject::setRotation(Vector3 newRotation)
 {
-	this->rotation = newRotation;
-	this->rotation.x = fmod(this->rotation.x, 2 * DirectX::XM_PI);
-	this->rotation.y = fmod(this->rotation.y, 2 * DirectX::XM_PI);
-	this->rotation.z = fmod(this->rotation.z, 2 * DirectX::XM_PI);
+	if (this->rigidBody)
+	{
+		Quaternion qt = Quaternion::CreateFromYawPitchRoll(newRotation.y, newRotation.x, newRotation.z);
+		this->rigidBody->getWorldTransform().setRotation(btQuaternion(qt.x, qt.y, qt.z, qt.w));
+		this->rotation = newRotation;
+	}
+	else
+	{
+		this->rotation = newRotation;
+		this->rotation.x = fmod(this->rotation.x, 2 * DirectX::XM_PI);
+		this->rotation.y = fmod(this->rotation.y, 2 * DirectX::XM_PI);
+		this->rotation.z = fmod(this->rotation.z, 2 * DirectX::XM_PI);
+	}
 }
 
 void GameObject::setScale(Vector3 newScale)
@@ -110,30 +134,51 @@ Vector4 GameObject::getColor()const
 	return this->color;
 }
 
-Vector3 GameObject::getPosition() const
+Vector3 GameObject::getPosition()
 {
+	if (this->rigidBody)
+	{
+		this->position = btTransformGetPosition(rigidBody->getWorldTransform());
+	}
+
 	return this->position;
 }
 
-Vector3 & GameObject::getPosition()
+const Vector3 & GameObject::getPositionRef()
 {
+	if (this->rigidBody)
+	{
+		this->position = btTransformGetPosition(rigidBody->getWorldTransform());
+	}
+
 	return this->position;
 }
 
-Vector3 GameObject::getRotation() const
+Vector3 GameObject::getRotation() 
 {
+	if (this->rigidBody)
+	{
+		this->rotation = btTransformGetRotation(rigidBody->getWorldTransform());
+	}
+
 	return this->rotation;
 }
 Quaternion GameObject::getRotationQuaternion() const
 {
-	return this->rotationQt;
+	if (this->rigidBody)
+	{
+		btQuaternion quaternion = rigidBody->getWorldTransform().getRotation();
+		return Quaternion(quaternion.getX(), quaternion.getY(), quaternion.getZ(), quaternion.getW());
+	}
+
+	return XMQuaternionRotationRollPitchYaw(this->rotation.y, this->rotation.x, this->rotation.z);
 }
 Vector3 GameObject::getScale() const
 {
 	return this->scale;
 }
 
-AABB GameObject::getAABB() const
+AABB GameObject::getAABB()
 {
 	AABB boundingBox = this->mesh->getAABB().scale(this->scale);
 	boundingBox.maxPos += this->getPosition();
@@ -141,7 +186,7 @@ AABB GameObject::getAABB() const
 	return boundingBox;
 }
 
-btRigidBody* GameObject::getRigidBody()
+btRigidBody* GameObject::getRigidBody() const
 {
 	return this->rigidBody;
 }
@@ -152,7 +197,7 @@ void GameObject::setRigidBody(btRigidBody* body, Physics* physics)
 	this->physics = physics;
 }
 
-Matrix GameObject::btTransform_to_XMMATRIX(btTransform const& trans)
+/*Matrix GameObject::btTransformToMatrix(btTransform const& trans) const
 {
 	//store btTranform in 4x4 Matrix
 	Matrix matrix;
@@ -175,11 +220,21 @@ Matrix GameObject::btTransform_to_XMMATRIX(btTransform const& trans)
 		matrix.m[3][column] = Position[column];
 	}
 	return matrix;
+}*/
+
+Vector3 GameObject::btTransformGetRotation(btTransform const& trans) const
+{
+	btQuaternion qt = trans.getRotation();
+
+	return Vector3(
+		std::atan2(2 * qt.getX() * qt.getW() + 2 * qt.getY() * qt.getZ(), 1 - 2 * qt.getX() * qt.getX() - 2 * qt.getZ() * qt.getZ()),
+		std::atan2(2 * qt.getY() * qt.getW() + 2 * qt.getX() * qt.getZ(), 1 - 2 * qt.getY() * qt.getY() - 2 * qt.getZ() * qt.getZ()),
+		std::asin(2 * qt.getX() * qt.getY() + 2 * qt.getZ() * qt.getW())
+	);
 }
 
-Vector3 GameObject::btTransform_to_XMFLOAT3(btTransform const& trans)
+Vector3 GameObject::btTransformGetPosition(btTransform const& trans) const
 {
 	btVector3 const Position = trans.getOrigin();
-
 	return Vector3(Position.getX(), Position.getY(), Position.getZ());
 }

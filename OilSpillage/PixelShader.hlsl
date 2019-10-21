@@ -2,10 +2,12 @@
 
 struct VS_OUT
 {
-	float4 Pos: SV_POSITION;
+	float4 Pos : SV_POSITION;
 	float4 wPos: APOS;
 	float2 Tex : TEXCOORD;
 	float4 NormalWS : NORMAL;
+	float4 shadowPos : SHADOWPOS;
+	float4 shadowPosSpot : SHADOWPOSSPOT;
 	float4 TangentWS : TANGENT;
 	float4 BitangentWS : BINORMAL;
 };
@@ -37,12 +39,47 @@ cbuffer SunInfo : register(b2) {
 	float4 sunColor;
 	float4 sunDir;
 };
-
+cbuffer SpotLightIndex : register(b3)
+{
+	uint indexForSpot;
+};
 Texture2D Tex : register(t0);
 Texture2D NormalMap : register(t1);
+Texture2D ShadowMap : register(t3);
+Texture2D ShadowMapSpot : register(t4);
 SamplerState SampSt : register(s0);
+SamplerState ShadowSamp : register(s1);
 StructuredBuffer<TileData> tileData : register(t2);
 
+float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float biasTemp)
+{
+	float4 shadowCoord = shadowPosition;
+	shadowCoord.x = shadowPosition.x / shadowPosition.w / 2.0f + 0.5f;
+	shadowCoord.y = -shadowPosition.y / shadowPosition.w / 2.0f + 0.5f;
+	shadowCoord.z = shadowCoord.z / shadowCoord.w;
+	float visibility = 0.0f;
+	float bias  = 0.0f;
+	bias = biasTemp;
+
+	int width;
+	int height;
+	int nrOfLevels;
+	shadowMap.GetDimensions(0, width, height, nrOfLevels);
+	float2 textureSize = float2(width, height);
+	float2 texelSize = 1.0 / textureSize;
+	for (int x = -1; x <= 1; ++x)
+	{
+		for (int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = shadowMap.Sample(ShadowSamp, shadowCoord.xy + float2(x, y) * texelSize).r;
+			visibility += shadowCoord.z - bias > pcfDepth ? 1.0f : 0.0;
+		}
+	}
+	
+	visibility /= 9.0;
+
+	return visibility;
+};
 float4 main(VS_OUT input) : SV_Target
 {
 	float3 normal = input.NormalWS.xyz;
@@ -62,8 +99,8 @@ float4 main(VS_OUT input) : SV_Target
 	uint2 lightTileIndex = floor(uint2(input.Pos.x, input.Pos.y) / uint2(16.f, 16.f));
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 
-	float4 ambient = max(-dot(sunDir, normal), float4(0.2, 0.2, 0.2, 1.0)) * sunColor;
-	
+	float4 ambient = max(-dot(sunDir, normal)*(1- shadowVisible(input.shadowPos, ShadowMap, 0.00025f)), float4(0.2, 0.2, 0.2, 1.0)) * sunColor;
+	float shadowSpotVisible = 1.0f;
 	float4 diffuse = float4(0.0, 0.0, 0.0, 1.0);
 	for (int i = 0; i < lightTileData.numLights; ++i)
 	{
@@ -73,7 +110,7 @@ float4 main(VS_OUT input) : SV_Target
 		if (attenuation < 0.0005) attenuation = 0;
 		float nDotL = max(dot(normal, normalize(lightVector)), 0.0);
 		float directional = 1.0;
-
+		shadowSpotVisible = 1.0f;
 		//if the light is a spot light
 		if (l.directionWidth.w > 0.0)
 		{
@@ -85,13 +122,16 @@ float4 main(VS_OUT input) : SV_Target
 				directional = (s - umbra) / (penumbra - umbra);
 				directional *= directional;
 			}
+			if (lightTileData.indices[i] == indexForSpot)
+			{
+				shadowSpotVisible = shadowVisible(input.shadowPosSpot, ShadowMapSpot, 0.005f);
+				shadowSpotVisible = 1 - shadowSpotVisible;
+			}
 		}
-
-		diffuse.rgb += max(l.color.xyz * nDotL * attenuation * directional, 0.0);
+		diffuse.rgb += max(l.color.xyz * nDotL * attenuation * directional * shadowSpotVisible, 0.0);
 	}
 
 	float4 outColor = (texColor + color) * (diffuse + ambient);
 
 	return outColor;
-	return outColor / (outColor + float4(1.0, 1.0, 1.0, 0.0));
 }

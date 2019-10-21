@@ -59,7 +59,6 @@ void Vehicle::init(Physics *physics)
 	this->vehicle = new GameObject;
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(vehicle);
-	Game::getGraphics().removeFromDraw(vehicle);
 	vehicle->setPosition(Vector3(0.0f, 0.0f, 0.0f));
 	vehicle->setScale(Vector3(0.5f, 0.32f, 0.9f));
 	Game::getGraphics().loadTexture("brickwall");
@@ -656,6 +655,7 @@ void Vehicle::resetHealth()
 void Vehicle::changeHealth(int amount)
 {
 	this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
+	Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 }
 
 bool Vehicle::isDead() const

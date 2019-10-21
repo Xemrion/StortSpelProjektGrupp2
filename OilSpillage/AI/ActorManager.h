@@ -9,7 +9,7 @@ public:
 	ActorManager(AStar* aStar);
 	~ActorManager();
 	void update(float dt, Vector3 targetPos);
-	void createDefender(float x,float z);
+	void createDefender(float x,float z, Vector3 objectivePos = Vector3());
 	void createAttacker(float x, float z);
 	void createTurret(float x, float z);
 	void initGroups();

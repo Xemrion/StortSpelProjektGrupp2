@@ -48,7 +48,7 @@ Vector<GameObject>  TileMap::loadAsModels(Graphics& graphics) const {
          tile.setTexture( graphics.getTexturePointer( modelName.c_str(), true) );
 			if ( rotation != 0 )
 				tile.setRotation({ .0f, F32(rotation) * 3.1415926535f/180.0f, .0f });
-			tile.setPosition( convertTilePositionToWorldPosition( x, y ) );
+			tile.setPosition(convertTilePositionToWorldPosition(x, y) - Vector3{ .0f, 1.5f, .0f } );
 		}
 	}
 	return tiles; // RVO/Copy Elision

@@ -187,23 +187,20 @@ void  Map::generateBuildings( ) {
 						auto &houseTile = houseTiles.back();
 						tilemap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
-						houseTile.mesh = graphics.getMeshPointer("Cube");
+						houseTile.mesh = graphics.getMeshPointer("Houses/testHouse");
 						//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
-						houseTile.setScale({ .5f * config.tileScaleFactor.x,
-						                     .5f * config.tileScaleFactor.y * config.buildingFloorHeightFactor * randomFloorCount,
-						                     .5f * config.tileScaleFactor.z });
-						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) });
-
-					//#ifndef _DEBUG
+						houseTile.setScale({ .025f * config.tileScaleFactor.x,
+						                     .025f * config.tileScaleFactor.y /* config.buildingFloorHeightFactor */ * randomFloorCount,
+						                     .025f * config.tileScaleFactor.z });
+						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) } );
 						btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
 						                                               houseTile.getPosition().y,
 						                                               houseTile.getPosition().z ),
-						                                    btVector3( houseTile.getScale().x,
-						                                               houseTile.getScale().y,
-						                                               houseTile.getScale().z ),
+						                                    btVector3( 15.5f * houseTile.getScale().x,
+						                                               15.5f * houseTile.getScale().y,
+						                                               15.5f * houseTile.getScale().z ),
 						                                    .0f );
 						houseTile.setRigidBody( tmp, physics );
-					//#endif
 
                   #ifdef _DEBUG
 						   ++total_building_tile_count;

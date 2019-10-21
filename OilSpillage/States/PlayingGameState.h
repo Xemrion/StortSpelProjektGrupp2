@@ -58,6 +58,7 @@ private:
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight;
+	GameObject*						testObjective; //Test
 
 	//Bullet
 	std::unique_ptr<Physics>		physics;
@@ -76,8 +77,8 @@ private:
 	float                           colors3 [4]       {};
 	float                           colors4 [4]       {};
 	Vector4                         colorsP [4]       { Vector4( 1.0f, 1.0f, .0f, 1.0f ),
-	                                                    Vector4( 1.0f,  .0f, .0f, 1.0f ),
-	                                                    Vector4(  .0f,  .0f, .0f, 1.0f ),
+	                                                    Vector4( 1.0f,  1.0f, .0f, 1.0f ),
+	                                                    Vector4(  1.0f,  1.0f, .0f, 1.0f ),
 	                                                    Vector4(  .1f,  .1f, .1f, 1.0f )  };
   
     void initAI();

@@ -2,7 +2,7 @@
 #define VEHICLE_H
 
 #include "GameObject.h"
-#include "VehicleWeapon.h"
+#include "Weapon.h"
 #include "VehicleStats.h"
 
 using namespace DirectX::SimpleMath;

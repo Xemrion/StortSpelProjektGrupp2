@@ -20,6 +20,7 @@
 #include "Lights.h"
 #include <memory.h>
 #include <array>
+#include"Shadows/ShadowMapping.h"
 #include"Particle/ParticleSystem.h"
 
 char const MODEL_ROOT_DIR[]   { "data/models/" };
@@ -43,6 +44,8 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterStateShadow;
+
 	Microsoft::WRL::ComPtr<ID3D11BlendState> alphaEnableBlendingState;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> worldBuffer;
@@ -51,6 +54,8 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Buffer> lightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> frustumBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> culledLightBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> indexSpot;
+
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> culledLightBufferUAV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> culledLightBufferSRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> frustumBufferSRV;
@@ -76,6 +81,7 @@ class Graphics {
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
 	Debug* debugger;
+	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
 	void cullLights();
@@ -101,6 +107,7 @@ public:
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera, float deltaTime);
+	void renderShadowmap(DynamicCamera* camera);
 	bool createShaders();
 	void fillLightBuffers();
 	void clearScreen();
@@ -118,4 +125,6 @@ public:
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
 
 
+	float farZTempShadow;
+	void setSpotLighShadow(SpotLight* spotLight);
 };
