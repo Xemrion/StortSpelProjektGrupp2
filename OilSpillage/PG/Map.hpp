@@ -14,12 +14,6 @@ public:
   ~Map() noexcept;
 
    MapConfig const &config;
-   V2u              startPositionInTileSpace;
-   TileMap*    tilemap;
-   UPtr<Voronoi>    districtMap;
-   Vector<GameObject>  districtMarkers;
-   Vector<GameObject>  roadTiles;
-   Vector<GameObject>  houseTiles;
 
    V2u              generateRoadPositionInTileSpace(  RNG & ) const noexcept;
    Vector3          generateRoadPositionInWorldSpace( RNG & ) const noexcept;
@@ -38,7 +32,7 @@ private:
 
    Graphics           &graphics;
    V2u                 startPositionInTileSpace;
-   UPtr<TileMap>       tilemap;
+   TileMap*       tilemap;
    UPtr<Voronoi>       districtMap;
    Vector<GameObject>  districtMarkers;
    Vector<GameObject>  roadTiles;
