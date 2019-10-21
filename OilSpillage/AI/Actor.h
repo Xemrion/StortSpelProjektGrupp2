@@ -10,7 +10,7 @@ class Actor : public GameObject
 public:
 	Actor();
 	Actor(float x, float z, AStar* aStar);
-	~Actor();
+	virtual ~Actor();
 	virtual void update(float dt, Vector3 targetPos);
 	virtual void setUpActor() = 0 {};
 
