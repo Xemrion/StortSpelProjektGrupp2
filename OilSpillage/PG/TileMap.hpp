@@ -69,11 +69,10 @@ public:
 		return tileX < width and tileY < height;
 	}
 
-	inline Vector3  convertTilePositionToWorldPosition(U16 const tileX, U16 const tileY) const
-	{
-		return { tileX * config.tileScaleFactor.x,
-			   .0f,
-			   tileY * -config.tileScaleFactor.y };
+	inline Vector3  convertTilePositionToWorldPosition(U16 const tileX, U16 const tileY) const {
+		return { tileX * config.tileScaleFactor.x, 
+               .0f,
+               tileY * -config.tileScaleFactor.y };
 	}
 
 	inline Vector3  convertTilePositionToWorldPosition(V2u const& tilePosition) const

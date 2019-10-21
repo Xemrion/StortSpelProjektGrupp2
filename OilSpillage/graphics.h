@@ -20,7 +20,9 @@
 #include "Lights.h"
 #include <memory.h>
 #include <array>
+#include"Shadows/ShadowMapping.h"
 #include"Particle/ParticleSystem.h"
+#include "Structs.h"
 
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
@@ -43,6 +45,8 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterStateShadow;
+
 	Microsoft::WRL::ComPtr<ID3D11BlendState> alphaEnableBlendingState;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> worldBuffer;
@@ -51,6 +55,9 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Buffer> lightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> frustumBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> culledLightBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> indexSpot;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> cameraBuffer;
+
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> culledLightBufferUAV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> culledLightBufferSRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> frustumBufferSRV;
@@ -76,6 +83,7 @@ class Graphics {
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
 	Debug* debugger;
+	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
 	void cullLights();
@@ -93,7 +101,8 @@ public:
 	bool loadTexture(std::string fileName, bool overridePath=false);
 	bool reloadTexture(std::string fileName, bool overridePath=false);
 	const Mesh* getMeshPointer(const char *path);
-	Texture* getTexturePointer(const char *path, bool isModel=false);
+	Texture* getTexturePointer(const char *path);
+	Material getMaterial(const char* modelPath);
 	void addToDraw(GameObject* o, bool isStatic = false);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
@@ -101,6 +110,7 @@ public:
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera, float deltaTime);
+	void renderShadowmap(DynamicCamera* camera);
 	bool createShaders();
 	void fillLightBuffers();
 	void clearScreen();
@@ -118,4 +128,6 @@ public:
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
 
 
+	float farZTempShadow;
+	void setSpotLighShadow(SpotLight* spotLight);
 };

@@ -6,19 +6,21 @@
 #include <math.h>
 
 using namespace DirectX::SimpleMath; 
-class GameObject {
+
+class GameObject
+{
 private:
 	btRigidBody* rigidBody;
+	Physics* physics;
 protected:
    Vector3  position { 1.0f, 1.0f, 1.0f };
 	Vector3  scale    { 1.0f, 1.0f, 1.0f };
 	Vector3  rotation;
-	Quaternion rotationQt;
 	Vector4  color;
-	Texture* texture   = nullptr;
-	Texture* normalMap = nullptr;
+	Material material;
 public:
-	void updateRigidBody();
+	~GameObject();
+
 	const Mesh *mesh   = nullptr;
 	GameObject *parent = nullptr;
 	
@@ -32,17 +34,24 @@ public:
 	void     setTexture(Texture *);
 	Texture* getNormalMap();
 	void     setNormalMap(Texture*);
+	Texture* getSpecularMap();
+	void setSpecularMap(Texture*);
+	Texture* getGlossMap();
+	void setGlossMap(Texture*);
+	Material getMaterial();
+	void setMaterial(Material);
 	void     setColor(Vector4 aColor);
 	Vector4  getColor()    const;
-	Vector3  getPosition() const;
-	Vector3 &getPosition();
-	Vector3  getRotation() const;
+	Vector3  getPosition();
+	const Vector3 &getPositionRef();
+	Vector3  getRotation();
 	Quaternion getRotationQuaternion() const;
 	Vector3  getScale()    const;
-	AABB     getAABB()     const;
-	btRigidBody* getRigidBody() { return this->rigidBody; }
-	void setRigidBody(btRigidBody* body) { this->rigidBody = body; }
-	Matrix btTransform_to_XMMATRIX(btTransform const& trans);
-	//Get Position from btTransform
-	Vector3 btTransform_to_XMFLOAT3(btTransform const& trans);
+	AABB     getAABB();
+	btRigidBody* getRigidBody() const;
+	void setRigidBody(btRigidBody* body, Physics* physics);
+
+	//Matrix btTransformToMatrix(btTransform const& trans) const;
+	Vector3 btTransformGetRotation(btTransform const& trans) const;
+	Vector3 btTransformGetPosition(btTransform const& trans) const;
 };

@@ -45,6 +45,15 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+	
+	if (bpp == 1)
+	{
+		textureDesc.Format = DXGI_FORMAT_R8_UNORM;
+	}
+	else if (bpp == 2)
+	{
+		textureDesc.Format = DXGI_FORMAT_R8G8_UNORM;
+	}
 
 	// Create the empty texture.
 	hResult = device->CreateTexture2D(&textureDesc, NULL, &texture);

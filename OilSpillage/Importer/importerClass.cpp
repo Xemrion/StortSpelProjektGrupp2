@@ -1,5 +1,7 @@
 #include "ImporterClass.h"
 
+using namespace Meshformat;
+
 Importer::Importer()
 {
 	this->header.meshCount = 0;

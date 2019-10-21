@@ -2,7 +2,7 @@
 #define VEHICLE_H
 
 #include "GameObject.h"
-#include "VehicleWeapon.h"
+#include "Weapon.h"
 #include "VehicleStats.h"
 
 using namespace DirectX::SimpleMath;
@@ -23,6 +23,12 @@ private:
 	btGeneric6DofSpring2Constraint* spring2;
 	btGeneric6DofSpring2Constraint* spring3;
 	btGeneric6DofSpring2Constraint* spring4;
+	GameObject* vehicleBody1;
+	btPoint2PointConstraint* pointJoint;
+	//btRaycastVehicle* vehicleBody;
+	btRaycastVehicle::btVehicleTuning	m_tuning;
+	btVehicleRaycaster* m_vehicleRayCaster;
+	btCollisionShape* m_wheelShape;
 
 	int health;
 
@@ -57,11 +63,12 @@ private:
 	float rotationSmoother = 1.0f;
 	float tempTargetRotation;
 	bool rotationDirection;
-
+	float cameraDistance;
 
 	Vector2 currentDir;
 	float velocitySimple;
 	float velocitySpeed;
+	class Physics* physics;
 public:
 	Vehicle();
 	virtual ~Vehicle();
@@ -76,6 +83,7 @@ public:
 	Vector3 getVelocity();
 	float getVelocitySpeed();
 	float getRotator();
+	float getCameraDistance(float deltaTime);
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;
@@ -87,10 +95,10 @@ public:
 	void changeHealth(int amount);
 	bool isDead() const;
 
-
 	float getPitch(DirectX::XMVECTOR Quaternion);
 	float getYaw(DirectX::XMVECTOR Quaternion);
 	float getRoll(DirectX::XMVECTOR Quaternion);
+	float getHeading(Quaternion qt);
 };
 
 #endif // !VEHICLE_H

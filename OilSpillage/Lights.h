@@ -104,6 +104,7 @@ public:
 	void removeLight(PointLight* light);
 	void removeLight(SpotLight* light);
 	void setSun(Sun sun);
+	Sun getSun();
 private:
 	friend class Graphics;
 	std::array<Light, maxSize> lights;
