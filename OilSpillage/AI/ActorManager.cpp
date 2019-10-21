@@ -87,6 +87,25 @@ void ActorManager::initGroups()
 	}
 }
 
+std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
+{
+	int groupNr = 0;
+	int smallestDistance = 1000;
+
+	for(int i = 0; i < this->groups.size(); i++)
+	{
+		float deltaX = position.x - this->averagePos.at(i).x;
+		float deltaZ = position.z - this->averagePos.at(i).z;
+		float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
+		if(distance < smallestDistance)
+		{
+			smallestDistance = distance;
+			groupNr = i;
+		}
+	}
+	return &groups.at(groupNr);
+}
+
 void ActorManager::updateAveragePos()
 {
 	Vector3 totalPos;

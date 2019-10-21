@@ -14,6 +14,7 @@ public:
 	void createTurret(float x, float z);
 	void initGroups();
 	std::vector<std::vector<Actor*>> groups;
+	std::vector<Actor*>* findClosestGroup(Vector3 position);
 private:
 	float groupRadius = 5.5f;
 	void updateAveragePos();
