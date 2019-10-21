@@ -111,7 +111,7 @@ Status Actor::shoot()
 			this->bullets[freeToUse].dir.Normalize();
 			this->bullets[freeToUse].timeLeft = this->weapon.bulletLifetime;
 			this->bullets[freeToUse].speed = this->weapon.bulletSpeed;
-			this->bullets[freeToUse].obj->setPosition(this->getPosition() + Vector3(0, 1.4f, 0));
+			this->bullets[freeToUse].obj->setPosition(this->getPosition() + Vector3(0, 0.5f, 0));
 			this->bullets[freeToUse].obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->bullets[freeToUse].dir)) * Vector3(0, 1, 0));
 		}
 		else
