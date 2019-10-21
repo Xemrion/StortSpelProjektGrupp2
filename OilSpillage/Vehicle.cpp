@@ -44,12 +44,14 @@ Vehicle::~Vehicle()
 	delete vehicle;
 	delete bodyRotation;
 	delete bodyRotationPoint;
+	delete vehicleBody1;
 
 	delete wheel1;
 	delete wheel2;
 	delete wheel3;
 	delete wheel4;
 	delete spring1;
+	delete pointJoint;
 }
 
 void Vehicle::init(Physics *physics)
@@ -60,17 +62,17 @@ void Vehicle::init(Physics *physics)
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(vehicle);
 	vehicle->setPosition(Vector3(0.0f, 0.0f, 0.0f));
-	vehicle->setScale(Vector3(0.5f, 0.32f, 0.9f));
-	Game::getGraphics().loadTexture("brickwall");
-	vehicle->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
+	vehicle->setScale(Vector3(0.5f, 0.12f, 0.9f));
+	Game::getGraphics().loadTexture("CarTemp");
+	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 
-	this->vehicleBody1 = new GameObject;
+	/*this->vehicleBody1 = new GameObject;
 	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(vehicleBody1);
 	vehicleBody1->setPosition(Vector3(0.0f, 0.6f, 0.0f));
 	vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
 	Game::getGraphics().loadTexture("CarTemp");
-	vehicleBody1->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
+	vehicleBody1->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));*/
 
 	/*this->bodyRotation = new GameObject;
 	bodyRotation->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -119,11 +121,11 @@ void Vehicle::init(Physics *physics)
 	this->getVehicle()->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	this->getVehicle()->getRigidBody()->setFriction(0);
 
-	tempo = physics->addBox(btVector3(vehicleBody1->getPosition().x, vehicleBody1->getPosition().y, vehicleBody1->getPosition().z), btVector3(vehicleBody1->getScale().x, vehicleBody1->getScale().y, vehicleBody1->getScale().z), 1.0f);
+	/*tempo = physics->addBox(btVector3(vehicleBody1->getPosition().x, vehicleBody1->getPosition().y, vehicleBody1->getPosition().z), btVector3(vehicleBody1->getScale().x, vehicleBody1->getScale().y, vehicleBody1->getScale().z), 1.0f);
 	vehicleBody1->setRigidBody(tempo, physics);
 	vehicleBody1->getRigidBody()->activate();
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	vehicleBody1->getRigidBody()->setFriction(1);
+	vehicleBody1->getRigidBody()->setFriction(1);*/
 
 	tempo = physics->addSphere(0.2f, btVector3(wheel1->getPosition().x, wheel1->getPosition().y, wheel1->getPosition().z),10.0f);
 	wheel1->setRigidBody(tempo, physics);
@@ -142,7 +144,7 @@ void Vehicle::init(Physics *physics)
 	spring1->setDamping(1, 0.5f);
 	spring1->setEquilibriumPoint();*/
 	
-	pointJoint = physics->addPointJoint(this->vehicle->getRigidBody(), this->vehicleBody1->getRigidBody());
+	//pointJoint = physics->addPointJoint(this->vehicle->getRigidBody(), this->vehicleBody1->getRigidBody());
 	//vehicleBody1->getRigidBody()->setDamping(btScalar(0),3);
 
 	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
@@ -241,9 +243,9 @@ void Vehicle::update(float deltaTime)
 	//Rotate Chassis toward Body
 	Quaternion rotationToBt = DirectX::XMQuaternionRotationRollPitchYaw(0, heading /** 180 / DirectX::XM_PI*/, 0);
 	btQuaternion bt = btQuaternion(rotationToBt.x, rotationToBt.y, rotationToBt.z, rotationToBt.w);
-	vehicleBody1->getRigidBody()->getWorldTransform().setRotation(bt);
-	vehicleBody1->getRigidBody()->applyImpulse(btVector3(0,40*deltaTime,0),btVector3(0,0,0));
-	vehicleBody1->getRigidBody()->setDamping(0,0.99f);
+//	vehicleBody1->getRigidBody()->getWorldTransform().setRotation(bt);
+	//vehicleBody1->getRigidBody()->applyImpulse(btVector3(0,40*deltaTime,0),btVector3(0,10,0));
+//	vehicleBody1->getRigidBody()->setDamping(0,0.99f);
 	/*qt = Vector4(this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getX(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getY(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getZ(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getW());
 	float bodyHeading = getHeading(qt);
 	if (bodyHeading < heading) {
@@ -667,11 +669,14 @@ float Vehicle::getCameraDistance(float deltaTime)
 {
 	float vehicleDistance = 0;
 	Vector3 vehicleCameraDistance = Vector3(this->vehicle->getRigidBody()->getLinearVelocity().getX(), this->vehicle->getRigidBody()->getLinearVelocity().getY(), this->vehicle->getRigidBody()->getLinearVelocity().getZ());
-	vehicleDistance = max(abs(vehicleCameraDistance.x), abs(vehicleCameraDistance.z)) *0.6;
+	vehicleDistance = max(abs(vehicleCameraDistance.x), abs(vehicleCameraDistance.z)) *0.7f;
 
-	vehicleDistance = min(vehicleDistance, 10.0f);
+	if (vehicleDistance < 14.0f) {
+		vehicleDistance = 0.0f;
+	}
+	vehicleDistance = min(vehicleDistance, 20.0f);
 
-	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime + cameraDistance;
+	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime*1.5f + cameraDistance;
 
 	return cameraDistance;
 }

@@ -127,7 +127,7 @@ btGeneric6DofSpring2Constraint* Physics::addSpring(btRigidBody* box1, btRigidBod
 btPoint2PointConstraint* Physics::addPointJoint(btRigidBody* box1, btRigidBody* box2)
 {
 	btPoint2PointConstraint* pointJoint = new btPoint2PointConstraint(*box1,*box2,btVector3(0,0.40f,0),btVector3(0, -0.55f, 0));
-	pointJoint->enableFeedback(true);
+	//pointJoint->enableFeedback(true);
 	/*btJointFeedback* hej = new btJointFeedback;
 	hej->m_appliedForceBodyA = btVector3(1, 0, 1);
 	pointJoint->setJointFeedback(hej);*/

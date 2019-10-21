@@ -8,9 +8,6 @@ GameObject::~GameObject()
 		this->rigidBody = nullptr;
 	}*/
 }
-void GameObject::updateRigidBody()
-	
-}
 
 Matrix GameObject::getTransform()
 {
