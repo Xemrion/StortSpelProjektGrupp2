@@ -433,3 +433,49 @@ void Actor::joinGroup()
 {
 	this->isInGroup = true;
 }
+
+const int& Actor::getHealthRef() const
+{
+	return this->health;
+}
+
+int Actor::getHealth() const
+{
+	return this->health;
+}
+
+int Actor::getMaxHealth() const
+{
+	return this->updatedStats.maxHealth;
+}
+
+void Actor::setHealth(int health)
+{
+	this->health = std::clamp(health, 0, this->updatedStats.maxHealth);
+}
+
+void Actor::setMaxHealth(int maxHealth)
+{
+	this->updatedStats.maxHealth = max(maxHealth, 1);
+}
+
+void Actor::resetHealth()
+{
+	this->health = this->updatedStats.maxHealth;
+}
+
+void Actor::changeHealth(int amount)
+{
+	this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
+	Game::getGraphics().addParticle2(this->getPosition(), Vector3(0, 0, 0), 2, 1);
+}
+
+bool Actor::isDead() const
+{
+	return this->health <= 0;
+}
+
+void Actor::death()
+{
+	Game::getGraphics().removeFromDraw(this);
+}

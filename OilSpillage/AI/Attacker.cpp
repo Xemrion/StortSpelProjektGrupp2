@@ -3,6 +3,11 @@
 Attacker::Attacker()
 {
 	setUpActor();
+
+	this->defaultStats = VehicleStats::AIAttacker;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
 }
 
 Attacker::Attacker(float x, float z, AStar* aStar)
@@ -10,6 +15,11 @@ Attacker::Attacker(float x, float z, AStar* aStar)
 {
 	this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	setUpActor();
+
+	this->defaultStats = VehicleStats::AIAttacker;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
 }
 
 Attacker::~Attacker()

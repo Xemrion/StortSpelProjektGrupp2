@@ -6,6 +6,11 @@ Defender::Defender()
 {
 	setUpActor();
 	objectivePos = Vector3(9.0f,0.0f,9.0f);
+
+	this->defaultStats = VehicleStats::AIDefender;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
 }
 
 Defender::Defender(float x, float z, AStar* aStar,Vector3 objectivePos)
@@ -14,6 +19,11 @@ Defender::Defender(float x, float z, AStar* aStar,Vector3 objectivePos)
 	this->setColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 	setUpActor();
 	this->objectivePos = objectivePos;
+
+	this->defaultStats = VehicleStats::AIDefender;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
 }
 
 Defender::~Defender()

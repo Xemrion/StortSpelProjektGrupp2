@@ -3,6 +3,7 @@
 #include "Boid.h"
 #include "AStar.h"
 #include "../Weapon.h"
+#include "..//VehicleStats.h"
 
 class Actor : public GameObject
 {
@@ -29,6 +30,17 @@ public:
 	bool hasGroup();
 	void setDestination(Vector3 destination);
 	void joinGroup();
+
+	const int& getHealthRef() const;
+	int getHealth() const;
+	int getMaxHealth() const;
+	void setHealth(int health);
+	void setMaxHealth(int maxHealth);
+	void resetHealth();
+	void changeHealth(int amount);
+	bool isDead() const;
+	void death();
+
 private:
 	Vector3 velocity;
 	Vector3 acceleration;
@@ -37,6 +49,10 @@ private:
 	bool isInGroup = false;
 
 protected:
+	int health;
+	Stats defaultStats;
+	Stats updatedStats;
+
 	int nrOfFrames = 0;
 	Vector3 destination;
 	Selector* root;
