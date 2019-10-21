@@ -10,44 +10,44 @@
 
 struct animationKeyFrame
 {
-	animatedJoint* animatedSkeleton;
+	Meshformat::animatedJoint* animatedSkeleton;
 };
 
 struct Animation
 {
-	AnimationHeader animationInfo;
+	Meshformat::AnimationHeader animationInfo;
 	animationKeyFrame* keyFrames;
 };
 
 struct BlendShape
 {
-	BlendShapeHeader blendShapeInfo;
-	Vertex* vertices;
+	Meshformat::BlendShapeHeader blendShapeInfo;
+	Meshformat::Vertex* vertices;
 };
 
 struct LoadedMesh
 {
-	FormatMesh mHeader;
-	Material material;
-	Vertex* vertices;
-	Joint* skeleton;
+	Meshformat::FormatMesh mHeader;
+	Meshformat::Material material;
+	Meshformat::Vertex* vertices;
+	Meshformat::Joint* skeleton;
 	Animation animation;
 	BlendShape* blendShapes;
 };
 
 struct Group
 {
-	GroupHeader header;
-	GroupChildren* children;
+	Meshformat::GroupHeader header;
+	Meshformat::GroupChildren* children;
 };
 
 class Importer {
 private:
 
-	MyFormat header;
+	Meshformat::MyFormat header;
 	LoadedMesh* loadedMeshes;
-	FormatCamera* loadedCameras;
-	DummyLight* loadedLights;
+	Meshformat::FormatCamera* loadedCameras;
+	Meshformat::DummyLight* loadedLights;
 	Group* loadedGroups;
 
 public:
@@ -72,9 +72,9 @@ public:
 	int getVertexCount(const char* meshName) const;
 	int getVertexCount(int meshID) const;
 
-	Vertex* getVertices() const;
-	Vertex* getVertices(const char* meshName) const;
-	Vertex* getVertices(int meshID) const;
+	Meshformat::Vertex* getVertices() const;
+	Meshformat::Vertex* getVertices(const char* meshName) const;
+	Meshformat::Vertex* getVertices(int meshID) const;
 
 	void getMinBBox(float &minX, float &minY, float &minZ);
 	void getMaxBBox(float &maxX, float &maxY, float &maxZ);
@@ -118,8 +118,8 @@ public:
 
 
 	//Skeletal Animations
-	Joint* getJoints() const;
-	animatedJoint* getAnimatedJointsAtKey(int keyFrame);
+	Meshformat::Joint* getJoints() const;
+	Meshformat::animatedJoint* getAnimatedJointsAtKey(int keyFrame);
 	int getJointCount() const;
 	int getAnimationLength();
 	int getNrOfAnimations();

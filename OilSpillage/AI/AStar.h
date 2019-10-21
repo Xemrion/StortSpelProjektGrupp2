@@ -8,27 +8,25 @@
 using namespace DirectX::SimpleMath;
 class AStar
 {
-	struct TileData {
-		int   gCost = 0, fCost = 0;
+	struct TileData 
+	{
+		short int   gCost = 0, fCost = 0, prevIndex = -1;
 		bool  isTraversible;
-		Tile* prev = nullptr;
 	};
 private:
-	int getDistance(Vector2 pos1, Vector2 pos2);
-	void addToVector(std::vector<Node*>& nodes, Node* nodeToAdd);
-	bool isInVector(std::vector<Node*> closed, Node* node);
-	Node* getNode(Vector3 position);
-	void reconstructPath(Node* goal, std::vector<Node*>& path);
-	void resetNodes();
-	std::vector<Node*> nodes;
-	int gridWidth;
-	int gridHeight;
+	int getDistance(Vector3 pos1, Vector3 pos2);
+	void addToVector(std::vector<short>& nodes, short nodeToAdd);
+	bool isInVector(std::vector<short> closed, short node);
+	void reconstructPath(short goal, std::vector<Vector3>& path);
+	void resetTileData();
+	TileMap* map;
 	std::vector<TileData> tileData;
+	std::vector<short> changedTiles;
 public:
 	void generateTileData(TileMap const& map);
-	bool algorithm(Vector3 startPos, Vector3 endPos, std::vector<Node*>& path);
+	bool algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& path);
 	AStar();
 	~AStar();
-	AStar(int gridWidth, int gridHeight, Vector2 topLeftCoord);
+	AStar(TileMap* map);
 
 };

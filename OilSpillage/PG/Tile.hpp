@@ -3,8 +3,8 @@
 #include <iostream>
 #include "defs.hpp"
 
-enum class Tile : U8 {
-   // 2 ints, 1 bool, 1 pekare
+enum class Tile : U8 
+{
    ground,
    road,
    building,

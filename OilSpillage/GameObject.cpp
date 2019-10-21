@@ -103,23 +103,54 @@ void GameObject::setScale(Vector3 newScale)
 
 Texture* GameObject::getTexture()
 {
-	return this->texture;
+	return this->material.diffuse;
 }
 
-void GameObject::setTexture(Texture* aTexture)
+void GameObject::setTexture(Texture* diffuseTexture)
 {
-	this->texture = aTexture;
+	this->material.diffuse = diffuseTexture;
 }
 
 Texture* GameObject::getNormalMap()
 {
-	return this->normalMap;
+	return this->material.normal;
 }
 
 void GameObject::setNormalMap(Texture* normalMap)
 {
-	this->normalMap = normalMap;
+	this->material.normal = normalMap;
 }
+
+Texture* GameObject::getSpecularMap()
+{
+	return this->material.specular;
+}
+
+void GameObject::setSpecularMap(Texture* specularMap)
+{
+	this->material.specular = specularMap;
+}
+
+Texture* GameObject::getGlossMap()
+{
+	return this->material.gloss;
+}
+
+void GameObject::setGlossMap(Texture* glossMap)
+{
+	this->material.gloss = glossMap;
+}
+
+Material GameObject::getMaterial()
+{
+	return material;
+}
+
+void GameObject::setMaterial(Material mat)
+{
+	this->material = mat;
+}
+
 
 void GameObject::setColor(Vector4 aColor)
 {

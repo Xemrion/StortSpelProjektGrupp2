@@ -108,7 +108,11 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 	int returnIndex = -1;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		if ((actorPos - averagePos.at(i)).Length() <= groupRadius &&
+		Vector3 curAveragePos = averagePos.at(i);
+		float deltaX = actorPos.x -curAveragePos.x;
+		float deltaZ = actorPos.z - curAveragePos.z;
+		float distance = sqrt((deltaX* deltaX) + (deltaZ * deltaZ));
+		if (distance <= groupRadius &&
 			groups.at(i).size() >= biggestGroupSize)
 		{
 			biggestGroupSize = groups.at(i).size();
@@ -133,7 +137,7 @@ void ActorManager::leaveGroup(int groupIndex, int where)
 
 void ActorManager::assignPathsToGroups(Vector3 targetPos)
 {
-	std::vector<Node*> path;
+	std::vector<Vector3> path;
 	for (int i = 0; i < groups.size(); i++)
 	{
 		aStar->algorithm(averagePos.at(i), targetPos, path);

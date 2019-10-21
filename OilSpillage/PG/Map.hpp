@@ -21,6 +21,7 @@ public:
    V2u              getStartPositionInTileSpace()  const noexcept;
    Vector3          getStartPositionInWorldSpace() const noexcept;
    TileMap const   &getTileMap() const noexcept;
+   TileMap*			getTileMapPtr();
    Voronoi const   &getDistrictMap() const noexcept;
 
 private:
@@ -31,7 +32,7 @@ private:
 
    Graphics           &graphics;
    V2u                 startPositionInTileSpace;
-   UPtr<TileMap>       tilemap;
+   TileMap*       tilemap;
    UPtr<Voronoi>       districtMap;
    Vector<GameObject>  districtMarkers;
    Vector<GameObject>  roadTiles;
