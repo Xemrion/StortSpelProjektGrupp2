@@ -43,9 +43,10 @@ Vector<GameObject>  TileMap::loadAsModels(Graphics& graphics) const {
 			auto const  tileIndex             { index(x, y)                       };
 			auto       &tile                  { tiles[tileIndex]                  };
 			auto const  graphicsIndex         { getTileLookupIndex(x, y)          };
-         auto const &[modelName, rotation] { tileGraphicsTable[graphicsIndex]  };
+			auto const &[modelName, rotation] { tileGraphicsTable[graphicsIndex]  };
 			tile.mesh      = graphics.getMeshPointer(    modelName.c_str()        );
-         tile.setTexture( graphics.getTexturePointer( modelName.c_str(), true) );
+			tile.setMaterial(graphics.getMaterial(modelName.c_str()));
+
 			if ( rotation != 0 )
 				tile.setRotation({ .0f, F32(rotation) * 3.1415926535f/180.0f, .0f });
 			tile.setPosition(convertTilePositionToWorldPosition(x, y) - Vector3{ .0f, 1.5f, .0f } );
