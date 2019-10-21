@@ -20,6 +20,9 @@ void PlayingGameState::initAI()
 	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
 
 	actorManager->createTurret(0 + 2, 0 + 2);
+	actorManager->createTurret(0 + 2, 0 - 2);
+	actorManager->createTurret(0 + 2, 0 + 4);
+	actorManager->createTurret(0 + 2, 0 - 4);
 	actorManager->initGroups();
 
 }

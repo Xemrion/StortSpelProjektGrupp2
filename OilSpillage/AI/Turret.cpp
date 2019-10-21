@@ -7,6 +7,11 @@ Turret::Turret()
 	this->setPosition(Vector3(-15.0f, 0.0f, 0.0f));
 	setUpActor();
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+
+	this->defaultStats = VehicleStats::AITurret;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
 }
 
 Turret::Turret(float x, float z) 
@@ -27,6 +32,15 @@ Turret::Turret(float x, float z)
 	Game::getGraphics().addToDraw(&this->body);
 
 	this->weapon = AIWeapon::machineGun;
+
+	this->defaultStats = VehicleStats::AITurret;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
+}
+
+Turret::~Turret()
+{
 }
 
 void Turret::update(float dt, Vector3 targetPos)
@@ -36,6 +50,11 @@ void Turret::update(float dt, Vector3 targetPos)
 	this->root->func();
 
 	rotateTowards();
+
+	if((this->position - targetPos).Length() <=5 && this->health > 0)
+	{
+		changeHealth(-100);
+	}
 
 	for (int i = 0; i < bulletCount; i++)
 	{
