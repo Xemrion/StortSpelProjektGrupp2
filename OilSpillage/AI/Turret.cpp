@@ -45,6 +45,7 @@ Turret::Turret(float x, float z)
 
 Turret::~Turret()
 {
+	Game::getGraphics().removeFromDraw(&this->body);
 }
 
 void Turret::update(float dt, Vector3 targetPos)

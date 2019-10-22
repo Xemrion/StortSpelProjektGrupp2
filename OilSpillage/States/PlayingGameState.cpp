@@ -223,6 +223,18 @@ void PlayingGameState::ImGui_AI()
 	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
 							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
 
+
+
+	//if(actorManager->groups.size() != 0)
+	//{
+	//	std::vector<Actor*>* temp = actorManager->findClosestGroup(player->getVehicle()->getPosition());
+	//	for (int i = 0; i < temp->size(); i++)
+	//	{
+	//		ImGui::Text(("AI nr " + to_string(i) + ": " + to_string(temp->at(i)->getPosition().x) + " " + to_string(temp->at(i)->getPosition().y) + " " + to_string(temp->at(i)->getPosition().z) + " ").c_str());
+	//	}
+	//}
+
+	//delete temp;
 	ImGui::End();
 }
 
@@ -413,7 +425,7 @@ void  PlayingGameState::update(float deltaTime)
 		}
 		else if (time <= 0.0f)
 		{
-			//Game::setState(Game::STATE_MENU);
+			Game::setState(Game::STATE_MENU);
 		}
 #else
 		if (time > 0.0f)
