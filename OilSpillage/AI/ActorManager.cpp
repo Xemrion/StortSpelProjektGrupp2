@@ -23,9 +23,8 @@ void ActorManager::update(float dt, Vector3 targetPos)
 {
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		if(!actors.at(i)->isDead())
+		if (!actors.at(i)->isDead())
 		{
-			actors.at(i)->update(dt, targetPos);
 			actors.at(i)->run(actors, dt, targetPos);
 		}
 		else
@@ -36,9 +35,14 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		}
 
 	}
-	updateGroups();
+	if (frameCount % 60 == 0)
+	{
+		updateGroups();
+		assignPathsToGroups(targetPos);
+		frameCount = 0;
+	}
 	updateAveragePos();
-	//assignPathsToGroups(targetPos);
+	frameCount++;
 }
 
 void ActorManager::createDefender(float x, float z, Vector3 objectivePos)
@@ -109,11 +113,12 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 	for (int i = 0; i < groups.size(); i++)
 	{
 		Vector3 curAveragePos = averagePos.at(i);
-		float deltaX = actorPos.x -curAveragePos.x;
+		float deltaX = actorPos.x - curAveragePos.x;
 		float deltaZ = actorPos.z - curAveragePos.z;
-		float distance = sqrt((deltaX* deltaX) + (deltaZ * deltaZ));
-		if (distance <= groupRadius &&
-			groups.at(i).size() >= biggestGroupSize)
+		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+		bool isInRange = distance <= groupRadius;
+		bool isBiggerGroup = groups.at(i).size() >= biggestGroupSize;
+		if (isInRange && isBiggerGroup)
 		{
 			biggestGroupSize = groups.at(i).size();
 			returnIndex = i;
@@ -157,7 +162,7 @@ void ActorManager::updateGroups()
 		for (int k = 0; k < groups.at(i).size(); k++)
 		{
 			Actor* current = groups.at(i).at(k);
-			if(current->isDead())
+			if (current->isDead())
 			{
 				leaveGroup(i, k);
 			}
@@ -195,7 +200,7 @@ void ActorManager::updateGroups()
 					}
 				}
 			}
-			
+
 		}
 		if (groups.at(i).empty())
 		{

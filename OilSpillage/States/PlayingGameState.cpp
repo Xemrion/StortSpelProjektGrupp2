@@ -13,16 +13,18 @@ void PlayingGameState::initAI()
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
 
-	//actorManager->createDefender(0 + 1, 0 + 2,
-	//	Vector3(0 + 9, 0, 0 + 9));
-
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
-
 	actorManager->createTurret(0 + 2, 0 + 2);
 	actorManager->createTurret(0 + 2, 0 - 2);
 	actorManager->createTurret(0 + 2, 0 + 4);
 	actorManager->createTurret(0 + 2, 0 - 4);
+
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 50; j++)
+		{
+			actorManager->createAttacker(i*2, j*2);
+		}
+	}
 	actorManager->initGroups();
 
 }

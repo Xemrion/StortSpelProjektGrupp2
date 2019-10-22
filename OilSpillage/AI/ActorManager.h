@@ -15,7 +15,8 @@ public:
 	void initGroups();
 	std::vector<std::vector<Actor*>> groups;
 private:
-	float groupRadius = 5.5f;
+	int frameCount = 0;
+	float groupRadius = 5.5f * 5.5f; //Compare with distance^2
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
 	int groupInRange(Vector3 actorPos,int currentGroupSize);
