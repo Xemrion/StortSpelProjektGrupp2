@@ -73,7 +73,13 @@ void ActorManager::initGroups()
 			{
 				if (!actors.at(j)->hasGroup())
 				{
-					if ((actors.at(j)->getPosition() - averagePos.at(activeGroup)).Length() < groupRadius)
+					Vector3 curAveragePos = averagePos.at(activeGroup);
+					Vector3 actorPos = actors.at(j)->getPosition();
+					float deltaX = actorPos.x - curAveragePos.x;
+					float deltaZ = actorPos.z - curAveragePos.z;
+					float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+					bool isInRange = distance <= groupRadius;
+					if (isInRange)
 					{
 						groups.at(activeGroup).push_back(actors.at(j));
 						actors.at(j)->joinGroup();
@@ -206,7 +212,12 @@ void ActorManager::updateGroups()
 			}
 			else
 			{
-				float distanceToOwnGroup = (current->getPosition() - averagePos.at(i)).Length();
+				Vector3 curAveragePos = averagePos.at(i);
+				Vector3 actorPos = current->getPosition();
+				float deltaX = actorPos.x - curAveragePos.x;
+				float deltaZ = actorPos.z - curAveragePos.z;
+				float distanceToOwnGroup = (deltaX * deltaX) + (deltaZ * deltaZ);
+				bool isInRange = distanceToOwnGroup <= groupRadius;
 
 				//Actor is outside its own groupRadius, check for other groups or create its own
 				if (distanceToOwnGroup > groupRadius)
