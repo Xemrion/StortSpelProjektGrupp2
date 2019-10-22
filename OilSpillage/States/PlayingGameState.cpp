@@ -23,6 +23,7 @@ void PlayingGameState::initAI()
 	actorManager->createTurret(0 + 2, 0 - 2);
 	actorManager->createTurret(0 + 2, 0 + 4);
 	actorManager->createTurret(0 + 2, 0 - 4);
+	actorManager->createAttacker(0 + 2, 0 - 6);
 	actorManager->initGroups();
 
 }

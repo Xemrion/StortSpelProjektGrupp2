@@ -184,7 +184,6 @@ void Turret::calculateTarget(float& angle)
 }
 Status Turret::idle()
 {
-
 	/*calculate new target position if are getting close to the point*/
 	if (idleTarget.Dot(vecForward) <= 0.0f)
 	{
@@ -192,40 +191,12 @@ Status Turret::idle()
 		this->calculateTarget(turretAngle);
 	}
 	else
-	{
-		vecForward -= (idleTarget * deltaTime) / 1.01;
+	{	vecForward -= (idleTarget * deltaTime) / 1.01;
 		vecForward.Normalize();
 
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
 		this->setRotation(Vector3(0, newRot - (XM_PIDIV2), 0));
 	}
-
-
-
-	/*
-	if (this->idleTarget == Vector3(0, 0, 0))
-	{
-		float degree = 90.0f;
-		float radians = degree * (3.14f / 180.f);
-		float x = cos(degree) * vecForward.x + sin(degree) * vecForward.z;
-		float y = cos(degree) * vecForward.x - sin(degree) * vecForward.z;
-		this->idleTarget = Vector3(x, 0.0f, y);
-	}
-
-	idleTarget = (idleTarget - position);
-
-	if ((idleTarget).Dot(vecForward) < 0.25)
-	{
-		vecForward -= (idleTarget * deltaTime) / 0.1;
-		vecForward.Normalize();
-
-		float newRot = atan2(this->vecForward.x, this->vecForward.z);
-		this->setRotation(Vector3(0, newRot - (XM_PI / 2), 0));
-	}
-	else
-		this->idleTarget = Vector3(9, 0.0f, 0);*/
-
-
 	return Status::SUCCESS;
 }
 
