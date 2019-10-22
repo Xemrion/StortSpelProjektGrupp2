@@ -671,12 +671,12 @@ float Vehicle::getCameraDistance(float deltaTime)
 	Vector3 vehicleCameraDistance = Vector3(this->vehicle->getRigidBody()->getLinearVelocity().getX(), this->vehicle->getRigidBody()->getLinearVelocity().getY(), this->vehicle->getRigidBody()->getLinearVelocity().getZ());
 	vehicleDistance = max(abs(vehicleCameraDistance.x), abs(vehicleCameraDistance.z)) *0.7f;
 
-	if (vehicleDistance < 14.0f) {
+	if (vehicleDistance < 10.0f) {
 		vehicleDistance = 0.0f;
 	}
 	vehicleDistance = min(vehicleDistance, 20.0f);
 
-	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime*1.5f + cameraDistance;
+	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime*1.2f + cameraDistance;
 
 	return cameraDistance;
 }
