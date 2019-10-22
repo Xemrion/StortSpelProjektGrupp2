@@ -9,7 +9,7 @@
 
 void PlayingGameState::initAI()
 {
-	aStar = new AStar(map->getTileMapPtr());
+	aStar = new AStar( map->getTileMap() );
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
 

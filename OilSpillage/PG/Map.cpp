@@ -295,11 +295,6 @@ Voronoi const &Map::getDistrictMap() const noexcept {
    return *districtMap;
 }
 
-TileMap* Map::getTileMapPtr()
-{
-	return this->tilemap;
-}
-
 void  Map::setDistrictColorCoding(bool useColorCoding) noexcept {
 	if (useColorCoding) {
 		Vector<Vector4> districtColorTable{

@@ -9,22 +9,22 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 	//}
 	startPos = Vector3(startPos.x, startPos.y, -startPos.z);
 	endPos = Vector3(endPos.x, endPos.y, -endPos.z);
-	Vector3 startTilePos = Vector3(map->convertWorldPositionToTilePositionXZ(startPos).x,
+	Vector3 startTilePos = Vector3(map.convertWorldPositionToTilePositionXZ(startPos).x,
 		0,
-		map->convertWorldPositionToTilePositionXZ(startPos).y);
-	Vector3 goalTilePos = Vector3(map->convertWorldPositionToTilePositionXZ(endPos).x,
+		map.convertWorldPositionToTilePositionXZ(startPos).y);
+	Vector3 goalTilePos = Vector3(map.convertWorldPositionToTilePositionXZ(endPos).x,
 		0,
-		map->convertWorldPositionToTilePositionXZ(endPos).y);
+		map.convertWorldPositionToTilePositionXZ(endPos).y);
 	path.clear();
 	resetTileData();
-	short startIndex = map->index(startTilePos.x, startTilePos.z);
-	short goalIndex = map->index(goalTilePos.x, goalTilePos.z);
-	std::vector<short> open;
-	std::vector<short> closed;
-	short current;
+	Size startIndex = map.index(startTilePos.x, startTilePos.z);
+	Size goalIndex = map.index(goalTilePos.x, goalTilePos.z);
+	std::vector<Size> open;
+	std::vector<Size> closed;
+	Size current;
 	open.push_back(startIndex);
-	std::vector<short> neighbours;
-	short curNeighbour;
+	std::vector<Size> neighbours;
+	Size curNeighbour;
 	while (!open.empty())
 	{
 		current = open.at(open.size() - 1);
@@ -35,7 +35,7 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 		}
 		open.pop_back();
 		closed.push_back(current);
-		neighbours = map->getNeighbouringIndices(map->getTilePosByIndex(current));
+		neighbours = map.getNeighbouringIndices(map.getTilePosByIndex(current));
 		for (int i = 0; i < neighbours.size(); i++)
 		{
 			curNeighbour = neighbours.at(i);
@@ -43,9 +43,9 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 			if (tileData.at(curNeighbour).isTraversible && !isInVector(closed, curNeighbour))
 			{
 				//Calculate new path
-				short newGCost = tileData.at(curNeighbour).gCost + getDistance(map->getWorldPosByIndex(curNeighbour), map->getWorldPosByIndex(current));
-				short newHCost = getDistance(map->getWorldPosByIndex(curNeighbour), map->getWorldPosByIndex(goalIndex));
-				short newFCost = newHCost + newGCost;
+				Size newGCost = tileData.at(curNeighbour).gCost + getDistance(map.getWorldPosByIndex(curNeighbour), map.getWorldPosByIndex(current));
+				Size newHCost = getDistance(map.getWorldPosByIndex(curNeighbour), map.getWorldPosByIndex(goalIndex));
+				Size newFCost = newHCost + newGCost;
 
 				if (!isInVector(open, curNeighbour) || newFCost < tileData.at(curNeighbour).fCost)
 				{
@@ -65,22 +65,20 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 	}
 	return false;
 }
-AStar::AStar()
-{
-}
+
 AStar::~AStar()
 {
 }
-AStar::AStar(TileMap* map)
+AStar::AStar(TileMap const &map):
+	map ( map )
 {
-	this->map = map;
 }
 int AStar::getDistance(Vector3 pos1, Vector3 pos2)
 {
 	return int((pos2-pos1).Length()) * 10;
 }
 
-void AStar::addToVector(std::vector<short>& nodes, short nodeToAdd)
+void AStar::addToVector(std::vector<Size>& nodes, Size nodeToAdd)
 {
 	for (int i = 0; i < nodes.size(); i++)
 	{
@@ -93,7 +91,7 @@ void AStar::addToVector(std::vector<short>& nodes, short nodeToAdd)
 	nodes.push_back(nodeToAdd);
 }
 
-bool AStar::isInVector(std::vector<short> vector, short node)
+bool AStar::isInVector(std::vector<Size> vector, Size node)
 {
 	for (int i = 0; i < vector.size(); i++)
 	{
@@ -105,13 +103,13 @@ bool AStar::isInVector(std::vector<short> vector, short node)
 	return false;
 }
 
-void AStar::reconstructPath(short goalIndex, std::vector<Vector3>& path)
+void AStar::reconstructPath(Size goalIndex, std::vector<Vector3>& path)
 {
-	short current;
+	Size current;
 	current = goalIndex;
 	while (tileData.at(current).prevIndex != -1)
 	{
-		path.emplace_back(map->getWorldPosByIndex(current));
+		path.emplace_back(map.getWorldPosByIndex(current));
 		current = tileData.at(current).prevIndex;
 	}
 }
