@@ -66,25 +66,25 @@ void Actor::update(float dt, Vector3 targetPos)
 	this->root->func();
 	followPath();
 
-	//for (int i = 0; i < bulletCount; i++)
-	//{
-	//	Game::getGraphics().removeFromDraw(this->bullets[i].obj);
+	for (int i = 0; i < bulletCount; i++)
+	{
+		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
 
-	//	if (this->bullets[i].timeLeft > 0.0f)
-	//	{
-	//		if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 0.5f)
-	//		{
-	//			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-20);
-	//			this->bullets[i].timeLeft = 0;
-	//		}
-	//		else
-	//		{
-	//			this->bullets[i].timeLeft -= deltaTime;
-	//			this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
-	//			Game::getGraphics().addToDraw(this->bullets[i].obj);
-	//		}
-	//	}
-	//}
+		if (this->bullets[i].timeLeft > 0.0f)
+		{
+			if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 0.5f)
+			{
+				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-20);
+				this->bullets[i].timeLeft = 0;
+			}
+			else
+			{
+				this->bullets[i].timeLeft -= deltaTime;
+				this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
+				Game::getGraphics().addToDraw(this->bullets[i].obj);
+			}
+		}
+	}
 	nrOfFrames++;
 }
 

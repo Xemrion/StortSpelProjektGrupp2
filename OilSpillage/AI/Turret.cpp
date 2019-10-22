@@ -84,6 +84,11 @@ void Turret::update(float dt, Vector3 targetPos)
 	}
 }
 
+bool Turret::hasGroup()
+{
+	return true;
+}
+
 void Turret::setForwardVector(Vector3 forward)
 {
 	this->vecForward = forward;

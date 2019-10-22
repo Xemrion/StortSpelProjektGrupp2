@@ -27,7 +27,7 @@ public:
 	float angle(Vector3 target);
 	void setPath(std::vector<Vector3> path);
 	Vector3 getDestination();
-	bool hasGroup();
+	virtual bool hasGroup();
 	void setDestination(Vector3 destination);
 	void joinGroup();
 
