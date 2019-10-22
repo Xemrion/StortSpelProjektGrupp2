@@ -25,22 +25,22 @@ F32  District_getBuildingDensity( District d ) noexcept {
 
 U8 District_getBuildingMinArea( District d ) noexcept {
    U8  result;
-   if      ( d == District::residential  ) { result = 8; }
-   else if ( d == District::park         ) { result = 0; }
-   else if ( d == District::metropolitan ) { result = 3; }
-   else if ( d == District::suburban     ) { result = 1; }
-   else if ( d == District::downtown     ) { result = 4; }
+   if      ( d == District::residential  ) { result = 1; } // if      ( d == District::residential  ) { result = 8; }
+   else if ( d == District::park         ) { result = 0; } // else if ( d == District::park         ) { result = 0; }
+   else if ( d == District::metropolitan ) { result = 1; } // else if ( d == District::metropolitan ) { result = 3; }
+   else if ( d == District::suburban     ) { result = 1; } // else if ( d == District::suburban     ) { result = 1; }
+   else if ( d == District::downtown     ) { result = 1; } // else if ( d == District::downtown     ) { result = 4; }
    else assert( false && "Unaccounted for enum value!" );
    return result;
 }
 
 U8  District_getBuildingMaxArea( District d ) noexcept {
    U8  result;
-   if      ( d == District::residential  ) { result = 16; }
-   else if ( d == District::park         ) { result = 0; }
-   else if ( d == District::metropolitan ) { result = 6; }
-   else if ( d == District::suburban     ) { result = 1; }
-   else if ( d == District::downtown     ) { result = 8; }
+   if      ( d == District::residential  ) { result = 1; } // if      ( d == District::residential  ) { result = 16; }
+   else if ( d == District::park         ) { result = 0; } // else if ( d == District::park         ) { result = 0; }
+   else if ( d == District::metropolitan ) { result = 1; } // else if ( d == District::metropolitan ) { result = 6; }
+   else if ( d == District::suburban     ) { result = 1; } // else if ( d == District::suburban     ) { result = 1; }
+   else if ( d == District::downtown     ) { result = 1; } // else if ( d == District::downtown     ) { result = 8; }
    else assert( false && "Unaccounted for enum value!" );
    return result;
 }

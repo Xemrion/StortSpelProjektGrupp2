@@ -57,6 +57,12 @@ public:
 		return static_cast<Size>(tileY) * width + static_cast<Size>(tileX);
 	}
 
+	// convert an in-bounds 2D coordinate index ( x, y ) into an 1D index (i)
+	inline Size  index( V2u tileXY ) const noexcept
+	{
+		return static_cast<Size>(tileXY.y) * width + static_cast<Size>(tileXY.x);
+	}
+
 	inline Vector3 getWorldPosByIndex( Size index ) const noexcept
 	{
 		return convertTilePositionToWorldPosition( getTilePosByIndex(index) );

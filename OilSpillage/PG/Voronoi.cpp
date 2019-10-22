@@ -117,7 +117,7 @@ Size  Voronoi::computeCellRealEstateArea( U16 const cellId, TileMap const &map )
 }
 
 // TODO: refactor out?
-Voronoi::Bounds  Voronoi::computeCellBounds( U16 const cellId ) const noexcept {
+Bounds  Voronoi::computeCellBounds( U16 const cellId ) const noexcept {
    assert( cellId < (width * height) && "Cell ID is too low!" );
 
    Bounds result {};

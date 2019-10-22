@@ -35,7 +35,7 @@ void  Map::generateRoads() {
 	I32_Dist generateSeed{};
 	rng.seed(config.seed);
 	
-	MapConfig  roadConfig{ config };
+	MapConfig  roadConfig { config };
 	while (true) { // TODO: add MAX_TRIES?
 		RoadGenerator roadGenerator{ *tilemap };
 		roadGenerator.generate(roadConfig);
@@ -102,7 +102,7 @@ void  Map::generateDistricts() {
 }
 
 // TODO: make return value optional later instead of asserting
-V2u Map::generateRoadPositionInTileSpace(RNG& rng) const noexcept {
+V2u Map::generateRoadPositionInTileSpace( RNG &rng ) const noexcept {
    DBG_PROBE(Map::generateRoadPositionInTileSpace);
    static constexpr U16  MAX_TRIES{ 1024 };
    static U16_Dist       generateX(0, config.dimensions.x);
@@ -225,9 +225,8 @@ void  Map::generateBuildings( ) {
 
 // basic proto placement algorithm
 // TODO: refactor out of Game
-Opt<Vector<V2u>>  Map::findValidHouseLot( RNG& rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vector<District> const& districtLookUpTable ) {
+Opt<Vector<V2u>>  Map::findValidHouseLot( RNG &rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vector<District> const& districtLookUpTable ) {
    DBG_PROBE( Map::findValidHouseLot );
-	using Bounds = Voronoi::Bounds;
 	Bounds    cellBounds      { districtMap.computeCellBounds(cellId) };
 	U16_Dist  generateOffset  { 0x0, 0xFF };
 	U16_Dist  generateX       { cellBounds.min.x, cellBounds.max.x };
@@ -293,7 +292,7 @@ Voronoi const &Map::getDistrictMap() const noexcept {
    return *districtMap;
 }
 
-void  Map::setDistrictColorCoding(bool useColorCoding) noexcept {
+void  Map::setDistrictColorCoding( Bool useColorCoding) noexcept {
 	if (useColorCoding) {
 		Vector<Vector4> districtColorTable{
 			{ 0.0f, 0.0f, 0.0f, 1.0f },
@@ -362,10 +361,17 @@ void  Map::setDistrictColorCoding(bool useColorCoding) noexcept {
 	}
 }
 
-V2u  Map::getStartPositionInTileSpace() const noexcept {
+V2u  Map::getStartPositionInTileSpace() const noexcept
+{
 	return startPositionInTileSpace;
 }
 
-Vector3  Map::getStartPositionInWorldSpace() const noexcept {
+Vector3  Map::getStartPositionInWorldSpace() const noexcept
+{
 	return tilemap->convertTilePositionToWorldPosition( startPositionInTileSpace );
+}
+
+Vector<Opt<V2u>> const &Map::getHospitalTable() const noexcept
+{
+	return hospitalTable;
 }
