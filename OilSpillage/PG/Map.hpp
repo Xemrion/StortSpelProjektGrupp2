@@ -31,7 +31,7 @@ private:
 
    Graphics           &graphics;
    V2u                 startPositionInTileSpace;
-   TileMap            *tilemap;
+   UPtr<TileMap>       tilemap;
    UPtr<Voronoi>       districtMap;
    Vector<GameObject>  districtMarkers;
    Vector<GameObject>  roadTiles;
