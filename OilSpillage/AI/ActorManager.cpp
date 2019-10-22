@@ -106,6 +106,25 @@ std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 	return &groups.at(groupNr);
 }
 
+void ActorManager::spawnDefenders(std::vector<Vector3> objectives)
+{
+	for(int i = 0; i < objectives.size(); i++)
+	{
+		createDefender(objectives.at(i).x + 2, objectives.at(i).z, objectives.at(i));
+		createDefender(objectives.at(i).x, objectives.at(i).z - 2, objectives.at(i));
+		createDefender(objectives.at(i).x, objectives.at(i).z + 2, objectives.at(i));
+		createDefender(objectives.at(i).x+2, objectives.at(i).z + 2, objectives.at(i));
+		createDefender(objectives.at(i).x-2, objectives.at(i).z + 2, objectives.at(i));
+	}
+}
+
+void ActorManager::spawnAttackers(Vector3 playerPos)
+{
+	//createAttacker(playerPos.x+20, playerPos.z);
+	//createAttacker(playerPos.x+10, playerPos.z-10);
+	//createAttacker(playerPos.x+10, playerPos.z-20);
+}
+
 void ActorManager::updateAveragePos()
 {
 	Vector3 totalPos;

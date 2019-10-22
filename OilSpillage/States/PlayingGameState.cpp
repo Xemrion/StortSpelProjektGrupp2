@@ -19,14 +19,20 @@ void PlayingGameState::initAI()
 	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
 	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
 
-	actorManager->createTurret(0 + 2, 0 + 2);
-	actorManager->createTurret(0 + 2, 0 - 2);
+	//actorManager->createTurret(0 + 2, 0 + 2);
+	//actorManager->createTurret(0 + 2, 0 - 2);
 
-	actorManager->createTurret(0 - 4, 0 + 4);
-	actorManager->createTurret(0 - 4, 0 - 4);
+	//actorManager->createTurret(0 - 4, 0 + 4);
+	//actorManager->createTurret(0 - 4, 0 - 4);
 
-	actorManager->createTurret(0 - 10, 0 + 4);
-	actorManager->createTurret(0 - 10, 0 - 4);
+	//actorManager->createTurret(0 - 10, 0 + 4);
+	//actorManager->createTurret(0 - 10, 0 - 4);
+
+	std::vector<Vector3> temp;
+	temp.emplace_back(Vector3(9.0f,0.0f,9.0f));
+
+	actorManager->spawnDefenders(temp);
+	//actorManager->spawnAttackers(player->getVehicle()->getPosition());
 
 	actorManager->initGroups();
 
