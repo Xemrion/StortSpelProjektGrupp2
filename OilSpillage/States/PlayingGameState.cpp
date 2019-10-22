@@ -13,10 +13,10 @@ void PlayingGameState::initAI()
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
 
-	actorManager->createTurret(0 + 2, 0 + 2);
-	actorManager->createTurret(0 + 2, 0 - 2);
-	actorManager->createTurret(0 + 2, 0 + 4);
-	actorManager->createTurret(0 + 2, 0 - 4);
+	//actorManager->createTurret(0 + 2, 0 + 2);
+	//actorManager->createTurret(0 + 2, 0 - 2);
+	//actorManager->createTurret(0 + 2, 0 + 4);
+	//actorManager->createTurret(0 + 2, 0 - 4);
 
 	for (int i = 0; i < 10; i++)
 	{
