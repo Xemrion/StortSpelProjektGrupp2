@@ -48,11 +48,13 @@ void ActorManager::update(float dt, Vector3 targetPos)
 void ActorManager::createDefender(float x, float z, Vector3 objectivePos)
 {
 	this->actors.emplace_back(new Defender(x, z, this->aStar, objectivePos));
+	initGroupForActor(actors.at(actors.size() - 1));
 }
 
 void ActorManager::createAttacker(float x, float z)
 {
 	this->actors.emplace_back(new Attacker(x, z, this->aStar));
+	initGroupForActor(actors.at(actors.size()-1));
 }
 
 void ActorManager::createTurret(float x, float z)
@@ -259,6 +261,21 @@ void ActorManager::updateGroups()
 			averagePos.erase(averagePos.begin() + i);
 			i = 0;
 		}
+	}
+}
+
+void ActorManager::initGroupForActor(Actor* actor)
+{
+	//Is there a group nearby? (Join biggest)
+	int groupIndex = groupInRange(actor->getPosition(),1);
+	//else, create new group, join that group
+	if (groupIndex != -1)
+	{
+		joinGroup(actor, groupIndex);
+	}
+	else
+	{
+		createGroup(actor);
 	}
 }
 

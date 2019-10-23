@@ -384,10 +384,6 @@ Vector3 Actor::seek(Vector3 target)
 
 void Actor::run(vector<Actor*> boids, float deltaTime, Vector3 targetPos)
 {
-	/*if (nrOfFrames % 10 == 0)
-	{
-	}
-	flock(boids, targetPos);*/
 	applyForce(separation(boids, targetPos)*4);
 	update(deltaTime, targetPos);
 	updateBoid(deltaTime);

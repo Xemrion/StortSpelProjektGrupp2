@@ -20,7 +20,7 @@ public:
 	void spawnAttackers(Vector3 playerPos);
 private:
 	int frameCount = 0;
-	float groupRadius = 5.5f * 5.5f; //Compare with distance^2
+	float groupRadius = 6.5f * 6.5f; //Compare with distance^2
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
 	int groupInRange(Vector3 actorPos,int currentGroupSize);
@@ -28,6 +28,7 @@ private:
 	void leaveGroup(int groupIndex, int where);
 	void assignPathsToGroups(Vector3 targetPos);
 	void updateGroups();
+	void initGroupForActor(Actor* actor);
 	void createGroup(Actor* actor);
 	std::vector<Actor*> actors;
 	std::vector<Vector3> averagePos;
