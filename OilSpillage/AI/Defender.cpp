@@ -46,17 +46,8 @@ void Defender::update(float dt, Vector3 targetPos)
 		nrOfFrames = 0;
 	}
 
-	for (int i = 0; i < bulletCount; i++)
-	{
-		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
+	updateWeapon(deltaTime);
 
-		if (this->bullets[i].timeLeft > 0.0f)
-		{
-			this->bullets[i].timeLeft -= deltaTime;
-			this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
-			Game::getGraphics().addToDraw(this->bullets[i].obj);
-		}
-	}
 	nrOfFrames++;
 }
 
@@ -148,9 +139,9 @@ void Defender::returning()
 Status Defender::inRange()
 {
 	Status status;
-	float tempDelta = deltaTime + this->leftoverTime;
+	float tempDelta = deltaTime + this->timeSinceLastShot;
 
-	if ((this->getPosition() - targetPos).Length() > 7 && tempDelta <= this->weapon.fireSpeed)
+	if ((this->getPosition() - targetPos).Length() > 7 && tempDelta <= this->weapon.fireRate)
 	{
 		status = Status::FAILURE;
 	}

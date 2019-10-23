@@ -131,11 +131,11 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	};
 	camera->startCinematic(&points, false);
 	Vector4 colorP2[] = {
-		Vector4(0.3,0.3,0.3,1),
-		Vector4(0.2,0.2,0.2,1)
+		Vector4(0.03,0.03,0.03,1),
+		Vector4(0.9, 0.9, 0.05, 1)
 	};
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-	graphics.setParticle2ColorNSize(colorP2, 2, size1+0.1f, size2+0.1f);
+	graphics.setParticle2ColorNSize(colorP2, 2, 0.025, 0.05);
 
 	Input::SetKeyboardPlayerID(0);
 	//Bullet
@@ -476,7 +476,7 @@ void  PlayingGameState::update(float deltaTime)
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
-#if _DEBUG | RELEASE_DEBUG
+#if _DEBUG
 	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();
 	   ImGui::NewFrame();

@@ -13,7 +13,7 @@ private:
 	btRigidBody* rigidBody;
 	Physics* physics;
 protected:
-   Vector3  position { 1.0f, 1.0f, 1.0f };
+    Vector3  position { 0.0f, 0.0f, 0.0f };
 	Vector3  scale    { 1.0f, 1.0f, 1.0f };
 	Vector3  rotation;
 	Vector4  color;

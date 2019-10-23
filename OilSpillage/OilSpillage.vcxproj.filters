@@ -70,6 +70,7 @@
     <ClCompile Include="UI\Minimap.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
+    <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />

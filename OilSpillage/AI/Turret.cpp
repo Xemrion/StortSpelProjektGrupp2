@@ -7,6 +7,7 @@ Turret::Turret()
 	this->setPosition(Vector3(-15.0f, 0.0f, 0.0f));
 	setUpActor();
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
 
 Turret::Turret(float x, float z) 
@@ -26,38 +27,19 @@ Turret::Turret(float x, float z)
 	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
 	Game::getGraphics().addToDraw(&this->body);
 
-	this->weapon = AIWeapon::machineGun;
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
 
 void Turret::update(float dt, Vector3 targetPos)
 {
+	this->velocity = Vector3(0.0, 0.0, 0.0);
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 	this->root->func();
 
 	rotateTowards();
 
-	for (int i = 0; i < bulletCount; i++)
-	{
-		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
-
-		if (this->bullets[i].timeLeft > 0.0f)
-		{
-			if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 0.5f)
-			{
-				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-5);
-				this->bullets[i].timeLeft = 0;
-				
-			}
-			else
-			{
-				Game::getGraphics().addParticle(this->position-this->vecForward, Vector3(0, 0, 0), 1, 1,1);
-				this->bullets[i].timeLeft -= deltaTime;
-				this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
-				Game::getGraphics().addToDraw(this->bullets[i].obj);
-			}
-		}
-	}
+	updateWeapon(deltaTime);
 }
 
 void Turret::setForwardVector(Vector3 forward)

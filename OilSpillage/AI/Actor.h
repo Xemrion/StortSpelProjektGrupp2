@@ -30,13 +30,12 @@ public:
 	void setDestination(Vector3 destination);
 	void joinGroup();
 private:
-	Vector3 velocity;
 	Vector3 acceleration;
 	float maxSpeed;
 	float maxForce;
 	bool isInGroup = false;
-
 protected:
+	Vector3 velocity;
 	int nrOfFrames = 0;
 	Vector3 destination;
 	Selector* root;
@@ -58,17 +57,10 @@ protected:
 	virtual Status setChaseState();
 	virtual Status setRoamState();
 	virtual void  followPath();
+	virtual void  updateWeapon(float deltaTime);
 
 	Weapon weapon;
-
-	struct Bullet
-	{
-		Vector3 dir;
-		float speed = 0.0f;
-		float timeLeft = 0.0f;
-		GameObject* obj = nullptr;
-	};
-	static const int bulletCount = 16;
-	float leftoverTime;
+	static const int bulletCount = 32;
+	float timeSinceLastShot;
 	Bullet bullets[bulletCount];
 };

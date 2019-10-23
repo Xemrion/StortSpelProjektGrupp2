@@ -202,7 +202,7 @@ bool ParticleSystem::addParticle(int nrOf, int lifeTime, Vector3 position, Vecto
 	}
 	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f);
 	pParams.emitterLocation = Vector4(position.x,position.y,position.z, float(lifeTime));
-	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX,1.0f);
+	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, 1.0f);
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &pParams, sizeof(ParticleParams));
@@ -284,7 +284,7 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 	this->deviceContext->CSSetConstantBuffers(1, 1, this->nrOfParticlesCB.GetAddressOf());
 	this->deviceContext->CSSetConstantBuffers(0, 1, this->simParams.GetAddressOf());
 	this->deviceContext->CSSetShader(this->computeShader.Get(), nullptr, 0);
-	this->deviceContext->Dispatch(100, 1, 1);
+	this->deviceContext->Dispatch(capParticle/512, 1, 1);
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
 	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
 }
