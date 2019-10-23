@@ -31,6 +31,7 @@ private:
 	void initGroupForActor(Actor* actor);
 	void createGroup(Actor* actor);
 	std::vector<Actor*> actors;
+	std::vector<Actor*> sendToPlayer;
 	std::vector<Vector3> averagePos;
 	AStar* aStar;
 };
