@@ -55,9 +55,11 @@ void Actor::update(float dt, Vector3 targetPos)
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 
+
 	if (nrOfFrames % 100 == 0)
 	{
-		findPath();
+
+		//findPath();
 		nrOfFrames = 1;
 	}
 
@@ -131,7 +133,7 @@ Status Actor::shoot()
 
 void Actor::chase()
 {
-	findPath();
+	//findPath();
 	//Vector3 dir = targetPos - this->getPosition();
 	//dir.Normalize();
 	//Vector3 newPosition = this->getPosition() + dir * deltaTime;
@@ -147,7 +149,7 @@ void Actor::roam()
 {
 	//Hitta random position och hitta väg till den.
 
-	findPath();
+	//findPath();
 }
 
 Status Actor::inRange()
@@ -197,20 +199,11 @@ void Actor::followPath()
 {
 	if (path.size() > 0)
 	{
-		/*targetNode = DirectX::SimpleMath::Vector3(float(path.at(path.size() - 1)->getXPos()),
-			.0f,
-			float(path.at(path.size() - 1)->getYPos()));
-		Vector3 dir = targetNode - this->getPosition();
-		dir.Normalize();
-*/
 		destination = path.at(path.size() - 1);
-
-
-		if (position.Distance(path.at(path.size() - 1), position) < 1)
+		if (position.Distance(path.at(path.size() - 1), position) < 2)
 		{
 			path.pop_back();
 		}
-
 	}
 	else
 	{
@@ -240,7 +233,7 @@ void Actor::applyForce(Vector3 force)
 Vector3 Actor::separation(vector<Actor*> boids, Vector3 targetPos)
 {
 	// Distance of field of vision for separation between boids
-	float desiredSeparationDistance = 3.0f;
+	float desiredSeparationDistance = 3.0f * 3.0f;
 	Vector3 direction(0.0f);
 	float nrInProximity = 0.0f;
 	// For every boid in the system, check if it's too close
@@ -250,7 +243,7 @@ Vector3 Actor::separation(vector<Actor*> boids, Vector3 targetPos)
 		Vector3 curBoidPos = boids.at(i)->position;
 		float deltaX = position.x - curBoidPos.x;
 		float deltaZ = position.z - curBoidPos.z;
-		float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
+		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		// If this is a fellow boid and it's too close, move away from it
 		if (this != boids.at(i) && (distance < desiredSeparationDistance))
 		{
@@ -266,7 +259,9 @@ Vector3 Actor::separation(vector<Actor*> boids, Vector3 targetPos)
 		}
 	}
 	// Calculate distance from current boid to player
-	float distance = (position - targetPos).Length();
+	float deltaX = position.x - targetPos.x;
+	float deltaZ = position.z - targetPos.z;
+	float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 	// If this is a fellow boid and it's too close, move away from it
 	if (distance < desiredSeparationDistance)
 	{
@@ -302,7 +297,7 @@ Vector3 Actor::separation(vector<Actor*> boids, Vector3 targetPos)
 
 Vector3 Actor::alignment(vector<Actor*> boids)
 {
-	float neighborDistance = 20.0f; // Field of vision
+	float neighborDistance = 20.0f * 20.0f; // Field of vision
 	Vector3 sum(0.0f);
 	float nrInProximity = 0.0f;
 	for (int i = 0; i < boids.size(); i++)
@@ -311,7 +306,7 @@ Vector3 Actor::alignment(vector<Actor*> boids)
 		Vector3 curBoidPos = boids.at(i)->position;
 		float deltaX = position.x - curBoidPos.x;
 		float deltaZ = position.z - curBoidPos.z;
-		float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
+		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		if ((distance > 0.0f) && (distance < neighborDistance))
 		{
 			sum += boids.at(i)->velocity;
@@ -342,7 +337,7 @@ Vector3 Actor::alignment(vector<Actor*> boids)
 
 Vector3 Actor::cohesion(vector<Actor*> boids)
 {
-	float neighborDistance = 2.0f;
+	float neighborDistance = 2.0f * 2.0f;
 	Vector3 sum(0.0f);
 	float nrInProximity = 0.0f;
 	for (int i = 0; i < boids.size(); i++)
@@ -350,7 +345,7 @@ Vector3 Actor::cohesion(vector<Actor*> boids)
 		Vector3 curBoidPos = boids.at(i)->position;
 		float deltaX = position.x - curBoidPos.x;
 		float deltaZ = position.z - curBoidPos.z;
-		float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
+		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		if ((distance > 0.0f) && (distance < neighborDistance))
 		{
 			sum += boids.at(i)->position;
@@ -385,8 +380,12 @@ Vector3 Actor::seek(Vector3 target)
 
 void Actor::run(vector<Actor*> boids, float deltaTime, Vector3 targetPos)
 {
+	/*if (nrOfFrames % 10 == 0)
+	{
+	}
+	flock(boids, targetPos);*/
+	applyForce(separation(boids, targetPos)*4);
 	update(deltaTime, targetPos);
-	flock(boids, targetPos);
 	updateBoid(deltaTime);
 }
 

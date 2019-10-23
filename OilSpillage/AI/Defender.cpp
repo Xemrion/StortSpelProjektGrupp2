@@ -1,4 +1,4 @@
-#include "..//game.h"
+#include "../States/PlayingGameState.h"
 #include "Defender.h"
 
 
@@ -19,6 +19,8 @@ Defender::Defender(float x, float z, AStar* aStar, Vector3 objectivePos)
 	this->setColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 	setUpActor();
 	this->objectivePos = objectivePos;
+
+	this->weapon = AIWeapon::machineGun;
 
 	this->defaultStats = VehicleStats::AIDefender;
 	this->updatedStats = this->defaultStats;
@@ -52,7 +54,6 @@ void Defender::update(float dt, Vector3 targetPos)
 		{
 			roam();
 		}
-
 		nrOfFrames = 0;
 	}
 
@@ -62,9 +63,19 @@ void Defender::update(float dt, Vector3 targetPos)
 
 		if (this->bullets[i].timeLeft > 0.0f)
 		{
-			this->bullets[i].timeLeft -= deltaTime;
-			this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
-			Game::getGraphics().addToDraw(this->bullets[i].obj);
+			if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 0.5f)
+			{
+				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-5);
+				this->bullets[i].timeLeft = 0;
+
+			}
+			else
+			{
+				//Game::getGraphics().addParticle(this->position - this->vecForward, Vector3(0, 0, 0), 1, 1, 1);
+				this->bullets[i].timeLeft -= deltaTime;
+				this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
+				Game::getGraphics().addToDraw(this->bullets[i].obj);
+			}
 		}
 	}
 	nrOfFrames++;
@@ -153,6 +164,7 @@ void Defender::followPath()
 void Defender::returning()
 {
 	targetPos = objectivePos;
+	destination = objectivePos;
 	findPath();
 }
 

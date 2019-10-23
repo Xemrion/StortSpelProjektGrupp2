@@ -13,17 +13,18 @@ void PlayingGameState::initAI()
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
 
-	//actorManager->createDefender(0 + 1, 0 + 2,
-	//	Vector3(0 + 9, 0, 0 + 9));
+	//actorManager->createTurret(0 + 2, 0 + 2);
+	//actorManager->createTurret(0 + 2, 0 - 2);
+	//actorManager->createTurret(0 + 2, 0 + 4);
+	//actorManager->createTurret(0 + 2, 0 - 4);
 
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
-
-	actorManager->createTurret(0 + 2, 0 + 2);
-	actorManager->createTurret(0 + 2, 0 - 2);
-	actorManager->createTurret(0 + 2, 0 + 4);
-	actorManager->createTurret(0 + 2, 0 - 4);
-	actorManager->createAttacker(0 + 2, 0 - 6);
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			actorManager->createAttacker(i*2, j*2);
+		}
+	}
 	actorManager->initGroups();
 
 }
@@ -222,6 +223,18 @@ void PlayingGameState::ImGui_AI()
 	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
 							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
 
+
+
+	//if(actorManager->groups.size() != 0)
+	//{
+	//	std::vector<Actor*>* temp = actorManager->findClosestGroup(player->getVehicle()->getPosition());
+	//	for (int i = 0; i < temp->size(); i++)
+	//	{
+	//		ImGui::Text(("AI nr " + to_string(i) + ": " + to_string(temp->at(i)->getPosition().x) + " " + to_string(temp->at(i)->getPosition().y) + " " + to_string(temp->at(i)->getPosition().z) + " ").c_str());
+	//	}
+	//}
+
+	//delete temp;
 	ImGui::End();
 }
 
@@ -412,7 +425,7 @@ void  PlayingGameState::update(float deltaTime)
 		}
 		else if (time <= 0.0f)
 		{
-			//Game::setState(Game::STATE_MENU);
+			Game::setState(Game::STATE_MENU);
 		}
 #else
 		if (time > 0.0f)
