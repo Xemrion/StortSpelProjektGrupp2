@@ -25,7 +25,6 @@ Turret::Turret(float x, float z)
 	turretAngle = 90;
 	this->calculateTarget(turretAngle);
 	setUpActor();
-	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	vecForward.Normalize();
 	this->body.setPosition(this->position);
 	this->body.setScale(this->scale);
@@ -67,7 +66,7 @@ void Turret::update(float dt, Vector3 targetPos)
 
 		if (this->bullets[i].timeLeft > 0.0f)
 		{
-			if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 0.5f)
+			if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 1.0f)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-5);
 				this->bullets[i].timeLeft = 0;
@@ -82,6 +81,11 @@ void Turret::update(float dt, Vector3 targetPos)
 			}
 		}
 	}
+}
+
+bool Turret::hasGroup()
+{
+	return true;
 }
 
 void Turret::setForwardVector(Vector3 forward)

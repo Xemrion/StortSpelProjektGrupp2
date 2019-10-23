@@ -13,19 +13,17 @@ void PlayingGameState::initAI()
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
 
-	//actorManager->createDefender(0 + 1, 0 + 2,
-	//	Vector3(0 + 9, 0, 0 + 9));
+	//actorManager->createTurret(0 + 2, 0 - 2);
+	//actorManager->createTurret(0 + 2, 0 + 4);
+	//actorManager->createTurret(0 + 2, 0 - 4);
 
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 2);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 1, map->getStartPositionInWorldSpace().z - 4);
-
-	actorManager->createTurret(0 + 2, 0 + 2);
-	actorManager->createTurret(0 + 2, 0 - 2);
-	actorManager->createTurret(0 + 2, 0 + 4);
-	actorManager->createTurret(0 + 2, 0 - 4);
-	actorManager->createAttacker(0 + 2, 0 - 6);
-	actorManager->initGroups();
-
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			actorManager->createAttacker(i*2, j*2);
+		}
+	}
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {
@@ -45,7 +43,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 	graphics.loadModel("Entities/Dummy_Turret");
-	graphics.loadModel("Entities/Dummy_Player_Car");
+	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14 / 2, 0, 0));
 
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
@@ -89,7 +87,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testNetwork.get()->saveTestNetwork("test-network");
    */
    //}
-	lightList->setSun(Sun(Vector3(0.5f, -1.0f, 1.0f), Vector3(1.0f, 1.0f, 1.0f)));
+	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 1.0f, 1.0f)));
 
 	graphics.setLightList(lightList.get());
 
@@ -211,17 +209,29 @@ void PlayingGameState::ImGui_AI()
 	//{
 	//	ImGui::Text(("Group " + std::to_string(i) + ":" + std::to_string(actorManager->groups.at(i).size())).c_str());
 	//}
-	ImGui::Text(("x: " + std::to_string(player->getVehicle()->getPosition().x)).c_str());
-	ImGui::Text(("y: " + std::to_string(player->getVehicle()->getPosition().y)).c_str());
-	ImGui::Text(("z: " + std::to_string(player->getVehicle()->getPosition().z)).c_str());
+	//ImGui::Text(("x: " + std::to_string(player->getVehicle()->getPosition().x)).c_str());
+	//ImGui::Text(("y: " + std::to_string(player->getVehicle()->getPosition().y)).c_str());
+	//ImGui::Text(("z: " + std::to_string(player->getVehicle()->getPosition().z)).c_str());
 
-	Vector3 xzPos = Vector3(player->getVehicle()->getPosition().x, 0, -player->getVehicle()->getPosition().z);
+	//Vector3 xzPos = Vector3(player->getVehicle()->getPosition().x, 0, -player->getVehicle()->getPosition().z);
 
-	ImGui::Text(("Tile x: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).x)).c_str());
-	ImGui::Text(("Tile y: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).y)).c_str());
+	//ImGui::Text(("Tile x: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).x)).c_str());
+	//ImGui::Text(("Tile y: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).y)).c_str());
 	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
 							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
 
+
+
+	if(actorManager->groups.size() != 0)
+	{
+		std::vector<Actor*>* temp = actorManager->findClosestGroup(player->getVehicle()->getPosition());
+		for (int i = 0; i < temp->size(); i++)
+		{
+			ImGui::Text(("AI nr " + to_string(i) + ": " + to_string(temp->at(i)->getPosition().x) + " " + to_string(temp->at(i)->getPosition().y) + " " + to_string(temp->at(i)->getPosition().z) + " ").c_str());
+		}
+	}
+
+	//delete temp;
 	ImGui::End();
 }
 
@@ -412,7 +422,7 @@ void  PlayingGameState::update(float deltaTime)
 		}
 		else if (time <= 0.0f)
 		{
-			//Game::setState(Game::STATE_MENU);
+			Game::setState(Game::STATE_MENU);
 		}
 #else
 		if (time > 0.0f)
@@ -435,9 +445,10 @@ void  PlayingGameState::update(float deltaTime)
 		
 		player->update(       deltaTime );
 		physics->update(      deltaTime );
+		player->updateWeapons(deltaTime);
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
 		camera->update(       deltaTime );
-
+		
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
 		camera->setPosition( Vector3( positionCam.getX(),
