@@ -98,7 +98,7 @@ public:
 	void loadMesh(std::string path);
 	void loadModel(std::string path);
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
-	bool loadTexture(std::string fileName, bool overridePath=false);
+	bool loadTexture(std::string fileName, bool overridePath = false, bool cpuOnly = false);
 	bool reloadTexture(std::string fileName, bool overridePath=false);
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path);

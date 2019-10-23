@@ -10,30 +10,39 @@ Texture::Texture()
 	this->height = 0;
 
 	this->transparent = false;
+
+	this->cpuOnly = false;
+	this->data = nullptr;
+	this->bpp = 0;
 }
 
 Texture::~Texture()
 {
 }
 
-bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceContext, const char* filename, int mipLevels)
+bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceContext, const char* filename, int mipLevels, bool cpuOnly)
 {
-	
+	this->cpuOnly = cpuOnly;
 
-	bool result;
-	D3D11_TEXTURE2D_DESC textureDesc;
-	HRESULT hResult;
-	unsigned int rowPitch;
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	int bpp = 0;
-	unsigned char* targaData = stbi_load(filename, &this->width, &this->height, &bpp, STBI_rgb_alpha);
+	unsigned char* targaData = stbi_load(filename, &this->width, &this->height, &this->bpp, STBI_rgb_alpha);
 
 	if (!targaData)
 	{
 		return false;
 	}
 
+	if (cpuOnly)
+	{
+		long imageSize = this->width * static_cast<long>(this->height)* static_cast<long>(this->bpp);
+		this->data = new unsigned char[imageSize];
+		CopyMemory(this->data, targaData, imageSize);
+
+		stbi_image_free(targaData);
+		return true;
+	}
+
 	// Setup the description of the texture.
+	D3D11_TEXTURE2D_DESC textureDesc;
 	textureDesc.Height = this->height;
 	textureDesc.Width = this->width;
 	textureDesc.MipLevels = 0;
@@ -46,29 +55,30 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 	
-	if (bpp == 1)
+	if (this->bpp == 1)
 	{
 		textureDesc.Format = DXGI_FORMAT_R8_UNORM;
 	}
-	else if (bpp == 2)
+	else if (this->bpp == 2)
 	{
 		textureDesc.Format = DXGI_FORMAT_R8G8_UNORM;
 	}
 
 	// Create the empty texture.
-	hResult = device->CreateTexture2D(&textureDesc, NULL, &texture);
+	HRESULT hResult = device->CreateTexture2D(&textureDesc, NULL, &texture);
 	if (FAILED(hResult))
 	{
 		return false;
 	}
 
 	// Set the row pitch of the targa image data.
-	rowPitch = (width * 4) * sizeof(unsigned char);
+	unsigned int rowPitch = (width * 4) * sizeof(unsigned char);
 
 	// Copy the targa image data into the texture.
 	deviceContext->UpdateSubresource(texture, 0, NULL, targaData, rowPitch, 0);
 
 	// Setup the shader resource view description.
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc.Format = textureDesc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
@@ -102,7 +112,19 @@ void Texture::Shutdown()
 		texture = 0;
 	}
 
+	// Release the data.
+	if (data)
+	{
+		delete data;
+		data = 0;
+	}
+
 	return;
+}
+
+ID3D11Texture2D* Texture::getTexture2D()
+{
+	return texture;
 }
 
 ID3D11ShaderResourceView* Texture::getShaderResView()
@@ -113,6 +135,26 @@ ID3D11ShaderResourceView* Texture::getShaderResView()
 bool Texture::isTransparent()
 {
 	return this->transparent;
+}
+
+bool Texture::isCpuOnly()
+{
+	return this->cpuOnly;
+}
+
+unsigned char* Texture::getData()
+{
+	return this->data;
+}
+
+long Texture::getDataSize()
+{
+	return this->width * static_cast<long>(this->height) * static_cast<long>(this->bpp);
+}
+
+int Texture::getBytesPerPixel()
+{
+	return this->bpp;
 }
 
 unsigned short Texture::getWidth()
