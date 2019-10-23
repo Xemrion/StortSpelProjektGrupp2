@@ -33,6 +33,7 @@ public:
 	std::string  getMinimap() const;
 	Vector3      getTopLeft() const;
 	Vector3      getBottomRight() const;
+	void		 spawnObjects();
 
 private:
 	friend class Game;
@@ -63,6 +64,7 @@ private:
 	//Bullet
 	std::unique_ptr<Physics>		physics;
 	std::unique_ptr<GameObject>		buildingTest;
+	Vector<UPtr<GameObject>>		physicsObjects;
 
 	int                             addNrOfParticles  {     2 };
 	int                             lifeTime          {     2 };
