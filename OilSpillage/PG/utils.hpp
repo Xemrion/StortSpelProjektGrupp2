@@ -23,11 +23,16 @@ namespace util {
 
    template <class T>
    inline T constexpr  minValue( T const &a, T const &b ) noexcept {
-      return (a < b) ? a : b;
+      return a < b ? a : b;
    }
 
    template <class T>
    inline T constexpr  maxValue( T const &a, T const &b ) noexcept {
-      return (a > b) ? a : b;
+      return a > b ? a : b;
    }
+   template <class T>
+   inline T constexpr  abs( T const &x ) noexcept {
+      return x < T(0) ? -x : x;
+   }
+
 };
