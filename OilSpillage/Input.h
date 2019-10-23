@@ -6,7 +6,7 @@
 #include <Keyboard.h>
 #include <Mouse.h>
 #include <GamePad.h>
-
+#include"window.h"
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -24,7 +24,7 @@ enum Keys {
 	R_LEFT, //Right stick left. Keyboard: Left
 	R_RIGHT, //Right stick right. Keyboard: Right
 	R_TRIGGER, //Right trigger button. Keyboard: ?
-	R_SHOULDER, //Right shoulder button. Keyboard: ?
+	R_SHOULDER, //Right shoulder button. Keyboard: Mouse Left Click 
 	R_PRESS, //Right stick pressed. Keyboard: ?
 
 	CONFIRM, //A (PS: X) button. Keyboard: Enter
@@ -48,6 +48,9 @@ private:
 	static const int PLAYER_COUNT = 2;
 	static std::unique_ptr<Input> instance;
 
+	std::unique_ptr<Mouse> mouse;
+	Mouse::State mouseState;
+	Mouse::ButtonStateTracker mouseTracker;
 	int playerKeyboard;
 	Keyboard keyboard;
 	Keyboard::State keyboardState;
@@ -55,17 +58,19 @@ private:
 	GamePad gamePad;
 	GamePad::State gamePadStates[PLAYER_COUNT];
 	GamePad::ButtonStateTracker gamePadTrackers[PLAYER_COUNT];
+	float wHeight;
+	float wWidth;
 
 	static bool CheckButtonKeyboard(Keys key, States state);
 	static bool CheckButtonGamePad(Keys key, GamePad::ButtonStateTracker::ButtonState state, int playerId);
-
+	static bool CheckButtonMouse(Keys key, States state);
 public:
 	Input();
 	virtual ~Input();
 
 	static bool IsKeyDown_DEBUG(Keyboard::Keys key);
 
-	static void Init();
+	static void Init(Window* window);
 	static void Update();
 	static void Reset();
 
