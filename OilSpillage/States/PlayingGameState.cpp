@@ -24,7 +24,6 @@ void PlayingGameState::initAI()
 			actorManager->createAttacker(i*2, j*2);
 		}
 	}
-	actorManager->initGroups();
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {

@@ -61,47 +61,9 @@ void ActorManager::createTurret(float x, float z)
 {
 	this->actors.push_back(new Turret(x, z));
 }
-
-void ActorManager::initGroups()
-{
-	for (int i = 0; i < this->actors.size(); i++)
-	{
-		if (!actors.at(i)->hasGroup())
-		{
-			//Create new group
-			createGroup(actors.at(i));
-			int activeGroup = groups.size() - 1;
-			for (int j = 0; j < actors.size(); j++)
-			{
-				if (!actors.at(j)->hasGroup())
-				{
-					Vector3 curAveragePos = averagePos.at(activeGroup);
-					Vector3 actorPos = actors.at(j)->getPosition();
-					float deltaX = actorPos.x - curAveragePos.x;
-					float deltaZ = actorPos.z - curAveragePos.z;
-					float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-					bool isInRange = distance <= groupRadius;
-					if (isInRange)
-					{
-						groups.at(activeGroup).push_back(actors.at(j));
-						actors.at(j)->joinGroup();
-						Vector3 totalPos;
-						for (int k = 0; k < groups.at(activeGroup).size(); k++)
-						{
-							totalPos += groups.at(activeGroup).at(k)->getPosition();
-						}
-						averagePos.erase(averagePos.begin() + activeGroup);
-						averagePos.insert(averagePos.begin() + activeGroup, totalPos / groups.at(activeGroup).size());
-					}
-				}
-			}
-		}
-	}
-}
-
 std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 {
-	int rangeOfPlayer = 10;
+	int rangeOfPlayer = 10*10;
 	sendToPlayer.clear();
 
 	for(int i = 0; i < this->actors.size(); i++)

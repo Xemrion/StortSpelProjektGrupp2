@@ -12,7 +12,6 @@ public:
 	void createDefender(float x,float z, Vector3 objectivePos = Vector3());
 	void createAttacker(float x, float z);
 	void createTurret(float x, float z);
-	void initGroups();
 	std::vector<std::vector<Actor*>> groups;
 	std::vector<Actor*>* findClosestGroup(Vector3 position);
 
