@@ -111,7 +111,7 @@ std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		if(distance < rangeOfPlayer)
 		{
-			sendToPlayer.emplace_back(actors.at(i));
+			sendToPlayer.push_back(actors.at(i));
 		}
 	}
 	return &sendToPlayer;
