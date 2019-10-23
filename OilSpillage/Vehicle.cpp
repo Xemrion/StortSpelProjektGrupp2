@@ -68,7 +68,7 @@ void Vehicle::init(Physics *physics)
 	Game::getGraphics().loadTexture("CarTemp");
 	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 	mountedWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
-	mountedWeapon->setTexture(Game::getGraphics().getTexturePointer("Entities/Dummy_Turret", true));
+	mountedWeapon->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Turret").diffuse);
 	Game::getGraphics().addToDraw(mountedWeapon);
 	mountedWeapon->setScale(Vector3(0.005f));
 
@@ -606,7 +606,6 @@ void Vehicle::updateWeapons(float deltaTime)
 {
 	this->mountedWeapon->setPosition(this->vehicle->getPosition());
 	Vector2 dir = Input::GetDirectionR(0);
-	//dir.Normalize();
 	dir.Normalize();
 	if ((dir - curDir).Length() > 0.01f)
 	{
@@ -628,9 +627,6 @@ void Vehicle::updateWeapons(float deltaTime)
 	float newRot = atan2(curDir.x, curDir.y) + 3.14 / 2;
 	this->gunRotation = newRot;
 	this->mountedWeapon->setRotation(Vector3(0, newRot, 0));
-
-	//this->mountedWeapon->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1),Vector3(dir.x,0,dir.y))) * Vector3(0, 1, 0)+Vector3(0,3.14/2,0));
-
 }
 
 float Vehicle::getAcceleratorX()
