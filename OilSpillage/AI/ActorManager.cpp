@@ -102,20 +102,21 @@ void ActorManager::initGroups()
 std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 {
 	int groupNr = 0;
-	int smallestDistance = 1000;
+	int rangeOfPlayer = 10;
 
-	for(int i = 0; i < this->groups.size(); i++)
+	std::vector<Actor*>* temp = new std::vector<Actor*>;
+
+	for(int i = 0; i < this->actors.size(); i++)
 	{
-		float deltaX = position.x - this->averagePos.at(i).x;
-		float deltaZ = position.z - this->averagePos.at(i).z;
+		float deltaX = position.x - this->actors.at(i)->getPosition().x;
+		float deltaZ = position.z - this->actors.at(i)->getPosition().z;
 		float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
-		if(distance < smallestDistance)
+		if(distance < rangeOfPlayer)
 		{
-			smallestDistance = distance;
-			groupNr = i;
+			temp->emplace_back(actors.at(i));
 		}
 	}
-	return &groups.at(groupNr);
+	return temp;
 }
 
 void ActorManager::spawnDefenders(std::vector<Vector3> objectives)
