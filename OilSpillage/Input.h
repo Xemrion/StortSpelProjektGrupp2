@@ -16,7 +16,7 @@ enum Keys {
 	L_LEFT, //Left stick left. Keyboard: A
 	L_RIGHT, //Left stick right. Keyboard: D
 	L_TRIGGER, //Left trigger button. Keyboard: ?
-	L_SHOULDER, //Left shoulder button. Keyboard: ?
+	L_SHOULDER, //Left shoulder button. Keyboard: Mouse Right Click
 	L_PRESS, //Left stick pressed. Keyboard: ?
 
 	R_UP, //Right stick up. Keyboard: Up
@@ -63,7 +63,6 @@ private:
 
 	static bool CheckButtonKeyboard(Keys key, States state);
 	static bool CheckButtonGamePad(Keys key, GamePad::ButtonStateTracker::ButtonState state, int playerId);
-	static bool CheckButtonMouse(Keys key, States state);
 public:
 	Input();
 	virtual ~Input();
