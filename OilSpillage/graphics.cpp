@@ -601,7 +601,7 @@ bool Graphics::createShaders()
 	return true;
 }
 
-void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles,  int lifeTime, float randomPower)
+void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles,  float lifeTime, float randomPower)
 {
 	Vector3 randomPos = randomPower*Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
 	Vector3 randomPos2 = -1.0f*randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
@@ -612,7 +612,7 @@ void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfPartic
 	this->particleSystem.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
 }
 
-void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, int lifeTime, float randomPower)
+void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime, float randomPower)
 {
 	Vector3 randomPos = randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
 	Vector3 randomPos2 = -1.0f * randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
@@ -666,7 +666,7 @@ ID3D11Device* Graphics::getDevice()
 	return this->device.Get();
 }
 
-void Graphics::loadMesh(std::string fileName)
+void Graphics::loadMesh(std::string fileName, Vector3 rotation)
 {
 	Mesh newMesh;
 
@@ -688,7 +688,17 @@ void Graphics::loadMesh(std::string fileName)
 				imp.getMeshCount();
 				std::vector<Vertex3D> tempVec;
 				Vertex3D vertex;
+				Vector3 max;
+				Vector3 min;
 				Vertex* vertices = imp.getVertices(j);
+				max.x = vertices[0].x;
+				max.x = vertices[0].y;
+				max.x = vertices[0].z;
+
+				min.x = vertices[0].x;
+				min.y = vertices[0].y;
+				min.z = vertices[0].z;
+
 				for (int i = 0; i < imp.getVertexCount(j); i++)
 				{
 					vertex.position.x = vertices[i].x;
@@ -710,6 +720,49 @@ void Graphics::loadMesh(std::string fileName)
 					vertex.bitangent.y = vertices[i].binormalY;
 					vertex.bitangent.z = vertices[i].binormalZ;
 
+					Vector4 tempPos = Vector4::Transform(Vector4(vertex.position.x, vertex.position.y, vertex.position.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+					vertex.position.x = tempPos.x;
+					vertex.position.y = tempPos.y;
+					vertex.position.z = tempPos.z;
+
+					tempPos = Vector4::Transform(Vector4(vertex.normal.x, vertex.normal.y, vertex.normal.z, 0.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+					vertex.normal.x = tempPos.x;
+					vertex.normal.y = tempPos.y;
+					vertex.normal.z = tempPos.z;
+					tempPos = Vector4::Transform(Vector4(vertex.tangent.x, vertex.tangent.y, vertex.tangent.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+					vertex.tangent.x = tempPos.x;
+					vertex.tangent.y = tempPos.y;
+					vertex.tangent.z = tempPos.z;
+					tempPos = Vector4::Transform(Vector4(vertex.bitangent.x, vertex.bitangent.y, vertex.bitangent.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x,rotation.y,rotation.z));
+					vertex.bitangent.x = tempPos.x;
+					vertex.bitangent.y = tempPos.y;
+					vertex.bitangent.z = tempPos.z;
+					if (max.x < vertex.position.x)
+					{
+						max.x = vertex.position.x;
+					}
+					if (max.y < vertex.position.y)
+					{
+						max.y = vertex.position.y;
+					}
+					if (max.z < vertex.position.z)
+					{
+						max.z = vertex.position.z;
+					}
+
+					if (min.x > vertex.position.x)
+					{
+						min.x = vertex.position.x;
+					}
+					if (min.y > vertex.position.y)
+					{
+						min.y = vertex.position.y;
+					}
+					if (min.z > vertex.position.z)
+					{
+						min.z = vertex.position.z;
+					}
+					
 					tempVec.push_back(vertex);
 				}
 
@@ -717,6 +770,11 @@ void Graphics::loadMesh(std::string fileName)
 				AABB aabb;
 				imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z,j);
 				imp.getMinBBox(aabb.minPos.x, aabb.minPos.y, aabb.minPos.z,j);
+
+				//Calc aabb
+				aabb.minPos = min;
+				aabb.maxPos = max;
+				
 				meshes[meshName].setAABB(aabb);
 				int bufferSize = static_cast<int>(meshes[meshName].vertices.size()) * sizeof(Vertex3D);
 				UINT stride = sizeof(Vertex3D);
@@ -744,11 +802,11 @@ void Graphics::loadMesh(std::string fileName)
 }
 
 
-void Graphics::loadModel(std::string path)
+void Graphics::loadModel(std::string path, Vector3 rotation)
 {
    std::string modelDir {MODEL_ROOT_DIR};
                modelDir += path;
-	loadMesh( modelDir );
+	loadMesh( modelDir ,rotation);
 	loadTexture( modelDir+"/_diffuse.tga", true );
    // TODO: load other texture channels
 }

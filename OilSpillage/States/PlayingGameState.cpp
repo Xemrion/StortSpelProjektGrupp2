@@ -41,7 +41,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 	graphics.loadModel("Entities/Dummy_Turret");
-	graphics.loadModel("Entities/Dummy_Player_Car");
+	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14 / 2, 0, 0));
 
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
@@ -85,7 +85,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testNetwork.get()->saveTestNetwork("test-network");
    */
    //}
-	lightList->setSun(Sun(Vector3(0.5f, -1.0f, 1.0f), Vector3(1.0f, 1.0f, 1.0f)));
+	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 1.0f, 1.0f)));
 
 	graphics.setLightList(lightList.get());
 
@@ -419,9 +419,10 @@ void  PlayingGameState::update(float deltaTime)
 		
 		player->update(       deltaTime );
 		physics->update(      deltaTime );
+		player->updateWeapons(deltaTime);
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
 		camera->update(       deltaTime );
-
+		
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
 		camera->setPosition( Vector3( positionCam.getX(),

@@ -14,7 +14,7 @@ private:
 	GameObject* bodyRotation;
 	GameObject* bodyRotationPoint;
 	btScalar mRotation;
-
+	GameObject* mountedWeapon;//Mounted on top of the car
 	GameObject* wheel1;
 	GameObject* wheel2;
 	GameObject* wheel3;
@@ -26,7 +26,7 @@ private:
 
 	int health;
 
-	static const int bulletCount = 16;
+	static const int bulletCount = 32;
 	float leftoverTime;
 	Weapon weapon;
 	Stats defaultStats;
@@ -39,7 +39,7 @@ private:
 		float timeLeft = 0.0f;
 		GameObject* obj = nullptr;
 	} bullets[bulletCount];
-
+	float gunRotation;
 	Vector3 bodyPivot;
 	DirectX::XMFLOAT2 velocity;
 	float strength;
@@ -58,7 +58,8 @@ private:
 	float tempTargetRotation;
 	bool rotationDirection;
 
-
+	
+	Vector2 curDir;
 	Vector2 currentDir;
 	float velocitySimple;
 	float velocitySpeed;
@@ -69,6 +70,7 @@ public:
 
 	void init(Physics *physics);
 	void update(float deltaTime);
+	void updateWeapons(float deltaTime);
 	GameObject* getVehicle() { return this->vehicle; }
 	float getAcceleratorX();
 

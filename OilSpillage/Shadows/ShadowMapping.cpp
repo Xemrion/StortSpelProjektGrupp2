@@ -199,7 +199,7 @@ void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float 
 void ShadowMapping::setViweProjSpot(Vector3 pos,Vector3 dir, float fov)
 {
 	Vector3 tempPos = pos + Vector3(0, 0, 0);
-	tempPos -= dir;
+	tempPos -= dir*1.0f;
 	Vector3 target = tempPos + dir;
 	Vector3 eye = tempPos;
 
@@ -207,7 +207,7 @@ void ShadowMapping::setViweProjSpot(Vector3 pos,Vector3 dir, float fov)
 	Matrix proj;
 	float fovTemp = 90 * (DirectX::XM_PI / 180);
 	viewMatrix = DirectX::XMMatrixLookAtLH(eye, target, Vector3(0, 1, 0));
-	proj = DirectX::XMMatrixPerspectiveFovLH(fovTemp, 1.0f, 1.0f, 400.0f);
+	proj = DirectX::XMMatrixPerspectiveFovLH(fovTemp, 1.0f, 1.0f, 300.0f);
 	Matrix viewProj = viewMatrix * proj;
 	viewProj = viewProj.Transpose();
 	
