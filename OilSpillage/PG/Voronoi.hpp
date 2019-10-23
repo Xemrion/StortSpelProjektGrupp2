@@ -6,7 +6,6 @@
 
 class Voronoi {
 public:
-   struct Bounds { V2u min, max; };
 // tag dispatch
    struct EuclideanDistanceTag {};
    struct ManhattanDistanceTag {}; 

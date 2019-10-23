@@ -27,7 +27,7 @@ public:
 	static constexpr Weapon defaultWeapon = Weapon();
 
 											//{  damage, fireSpeed, bulletSpeed, bulletLifetime };
-	static constexpr Weapon machineGun =	  {		  5,      0.1f,       30.0f,           2.0f };
+	static constexpr Weapon machineGun =	  {		  2,      0.5f,       30.0f,           2.0f };
 };
 
 #endif // !WEAPON_H

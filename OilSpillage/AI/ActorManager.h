@@ -14,8 +14,13 @@ public:
 	void createTurret(float x, float z);
 	void initGroups();
 	std::vector<std::vector<Actor*>> groups;
+	std::vector<Actor*>* findClosestGroup(Vector3 position);
+
+	void spawnDefenders(std::vector<Vector3> objectives);
+	void spawnAttackers(Vector3 playerPos);
 private:
-	float groupRadius = 5.5f;
+	int frameCount = 0;
+	float groupRadius = 5.5f * 5.5f; //Compare with distance^2
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
 	int groupInRange(Vector3 actorPos,int currentGroupSize);

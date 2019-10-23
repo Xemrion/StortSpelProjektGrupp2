@@ -24,6 +24,8 @@ Vehicle::Vehicle()
 	this->vehicle = nullptr;
 	this->bodyRotation = nullptr;
 	this->bodyRotationPoint = nullptr;
+	this->cameraDistance = 0.0f;
+
 	this->curDir = Vector2(0.0f, 1.0f);//UP
 	this->leftoverTime = 0.0f;
 	this->weapon = VehicleWeapon::machineGun;
@@ -43,12 +45,15 @@ Vehicle::~Vehicle()
 	delete vehicle;
 	delete bodyRotation;
 	delete bodyRotationPoint;
+	delete vehicleBody1;
+
 	delete this->mountedWeapon;
 	delete wheel1;
 	delete wheel2;
 	delete wheel3;
 	delete wheel4;
 	delete spring1;
+	delete pointJoint;
 }
 
 void Vehicle::init(Physics *physics)
@@ -59,13 +64,21 @@ void Vehicle::init(Physics *physics)
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(vehicle);
 	vehicle->setPosition(Vector3(0.0f, 0.0f, 0.0f));
-	vehicle->setScale(Vector3(0.5f, 0.4f, 0.9f));
+	vehicle->setScale(Vector3(0.5f, 0.12f, 0.9f));
 	Game::getGraphics().loadTexture("CarTemp");
 	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 	mountedWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
 	mountedWeapon->setTexture(Game::getGraphics().getTexturePointer("Entities/Dummy_Turret", true));
 	Game::getGraphics().addToDraw(mountedWeapon);
 	mountedWeapon->setScale(Vector3(0.005f));
+
+	/*this->vehicleBody1 = new GameObject;
+	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(vehicleBody1);
+	vehicleBody1->setPosition(Vector3(0.0f, 0.6f, 0.0f));
+	vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
+	Game::getGraphics().loadTexture("CarTemp");
+	vehicleBody1->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));*/
 
 	/*this->bodyRotation = new GameObject;
 	bodyRotation->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -78,7 +91,7 @@ void Vehicle::init(Physics *physics)
 	this->bodyRotationPoint = new GameObject;
 	bodyRotationPoint->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(bodyRotationPoint);
-	bodyRotationPoint->setPosition(Vector3(0.0f, 0.0f, 0.0f));
+	bodyRotationPoint->setPosition(Vector3(0.0f, 2.0f, 0.0f));
 	bodyRotationPoint->setScale(Vector3(0.2f, 0.2f, 0.2f));
 	Game::getGraphics().loadTexture("brickwall");
 	bodyRotationPoint->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
@@ -108,11 +121,17 @@ void Vehicle::init(Physics *physics)
 	wheel3->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f)); //Bottom Left
 	wheel4->setColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f)); //Bottom Right
 
-	btRigidBody* tempo = physics->addBox(btVector3(0, 0, 0), btVector3(this->getVehicle()->getScale().x, this->getVehicle()->getScale().y, this->getVehicle()->getScale().z), 10.0f);
+	btRigidBody* tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y, vehicle->getPosition().z), btVector3(this->getVehicle()->getScale().x, this->getVehicle()->getScale().y, this->getVehicle()->getScale().z), 10.0f);
 	this->getVehicle()->setRigidBody(tempo, physics);
 	this->getVehicle()->getRigidBody()->activate();
 	this->getVehicle()->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	this->getVehicle()->getRigidBody()->setFriction(0);
+
+	/*tempo = physics->addBox(btVector3(vehicleBody1->getPosition().x, vehicleBody1->getPosition().y, vehicleBody1->getPosition().z), btVector3(vehicleBody1->getScale().x, vehicleBody1->getScale().y, vehicleBody1->getScale().z), 1.0f);
+	vehicleBody1->setRigidBody(tempo, physics);
+	vehicleBody1->getRigidBody()->activate();
+	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	vehicleBody1->getRigidBody()->setFriction(1);*/
 
 	tempo = physics->addSphere(0.2f, btVector3(wheel1->getPosition().x, wheel1->getPosition().y, wheel1->getPosition().z),10.0f);
 	wheel1->setRigidBody(tempo, physics);
@@ -123,18 +142,16 @@ void Vehicle::init(Physics *physics)
 	tempo = physics->addSphere(0.2f, btVector3(wheel4->getPosition().x, wheel4->getPosition().y, wheel4->getPosition().z), 10.0f);
 	wheel4->setRigidBody(tempo, physics);
 
-	spring1 = new btGeneric6DofSpring2Constraint(
-		*this->vehicle->getRigidBody(), *wheel1->getRigidBody(), 
-		btTransform(btQuaternion::getIdentity(), { 0.0f, -1.0f, 0.0f }),
-		btTransform(btQuaternion::getIdentity(), { 0.0f,  0.0f, 0.0f })
-	);
-	/*spring1->setLinearLowerLimit(btVector3(0.0f, 1.0f, 0.0f));
-	spring1->setLinearUpperLimit(btVector3(0.0f, 0.0f, 0.0f));*/
+	/*spring1 = physics->addSpring(this->vehicle->getRigidBody(),this->wheel1->getRigidBody());
+	spring1->setLinearLowerLimit(btVector3(0.0f, 0.0f, 0.0f));
+	spring1->setLinearUpperLimit(btVector3(0.0f, 0.56f, 0.0f));
 	spring1->enableSpring(1, true);
-	spring1->setStiffness(1, 35.0f);
+	spring1->setStiffness(1, 65.0f);
 	spring1->setDamping(1, 0.5f);
-	spring1->setEquilibriumPoint();
+	spring1->setEquilibriumPoint();*/
 	
+	//pointJoint = physics->addPointJoint(this->vehicle->getRigidBody(), this->vehicleBody1->getRigidBody());
+	//vehicleBody1->getRigidBody()->setDamping(btScalar(0),3);
 
 	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
 
@@ -145,6 +162,7 @@ void Vehicle::init(Physics *physics)
 		this->bullets[i].obj->setScale(Vector3(0.1f, 0.1f, 0.1f));
 		this->bullets[i].obj->setColor(Vector4(1, 1, 0, 1));
 	}
+
 }
 
 void Vehicle::update(float deltaTime)
@@ -217,63 +235,9 @@ void Vehicle::update(float deltaTime)
 	btScalar n;
 	Quaternion qt = Vector4(this->vehicle->getRigidBody()->getWorldTransform().getRotation().getX(), this->vehicle->getRigidBody()->getWorldTransform().getRotation().getY(), this->vehicle->getRigidBody()->getWorldTransform().getRotation().getZ(), this->vehicle->getRigidBody()->getWorldTransform().getRotation().getW());
 
-	const btVector3 UP(0.0, 1.0, 0.0);
-	const btVector3 RIGHT(1.0, 0.0, 0.0);
-	const btVector3 FORWARD(0.0, 0.0, -1.0);
-
-	btQuaternion finalOrientation;
-	btVector3 forward;
-
-	const btScalar MIN_USEABLE_LENGTH_SQUARED = 1.0e-8;
-	btScalar forward2 = forward.length2();
-	if (forward2 > MIN_USEABLE_LENGTH_SQUARED) {
-		forward /= sqrt(forward2);  // forward is now normalized
-		btScalar upComponent = forward.dot(UP);
-		btScalar pitch = asin(upComponent);
-		btVector3 horizontal = forward - upComponent * UP;
-		btScalar yaw = atan2(horizontal.dot(RIGHT), horizontal.dot(FORWARD));
-
-		// yaw and pitch are only valid in this context, not in the else case below
-		// compute finalOrientation
-		btQuaternion yawRotation(UP,yaw);
-		btQuaternion pitchRotation(RIGHT, pitch);
-		finalOrientation = yawRotation * pitchRotation;
-		qt = Vector4(finalOrientation.getX(), finalOrientation.getY(), finalOrientation.getZ(), finalOrientation.getW());
-	}
-	else {
-		// bad data
-	}
-	XMVECTOR temp3;
-	temp3.m128_f32[0] = this->vehicle->getRotationQuaternion().x;
-	temp3.m128_f32[1] = this->vehicle->getRotationQuaternion().y;
-	temp3.m128_f32[2] = this->vehicle->getRotationQuaternion().z;
-	temp3.m128_f32[3] = this->vehicle->getRotationQuaternion().w;
-
 	qt = this->vehicle->getRotationQuaternion();
 
-	float heading;
-	float attitude;
-	float bank;
-
-	double test = qt.x * qt.y + qt.z * qt.w;
-	if (test > 0.499) { // singularity at north pole
-		heading = 2 * atan2(qt.x, qt.w);
-		attitude = XM_PI / 2;
-		bank = 0;
-	}
-	else if (test < -0.499) { // singularity at south pole
-		heading = -2 * atan2(qt.x, qt.w);
-		attitude = -XM_PI / 2;
-		bank = 0;
-	}
-	else {
-		double sqx = qt.x * qt.x;
-		double sqy = qt.y * qt.y;
-		double sqz = qt.z * qt.z;
-		heading = atan2(2 * qt.y * qt.w - 2 * qt.x * qt.z, 1 - 2 * sqy - 2 * sqz);
-		attitude = asin(2 * test);
-		bank = atan2(2 * qt.x * qt.w - 2 * qt.y * qt.z, 1 - 2 * sqx - 2 * sqz);
-	}
+	float heading = getHeading(qt);
 
 	this->vehicle->getRigidBody()->getWorldTransform().getRotation().getEulerZYX(n,mRotation,m);
 	//if (mRotation < 0) mRotation += 180;
@@ -283,6 +247,22 @@ void Vehicle::update(float deltaTime)
 	if (vehicleRotation < 0)
 		vehicleRotation += 360;
 	mRotation = vehicleRotation;
+
+	//Rotate Chassis toward Body
+	Quaternion rotationToBt = DirectX::XMQuaternionRotationRollPitchYaw(0, heading /** 180 / DirectX::XM_PI*/, 0);
+	btQuaternion bt = btQuaternion(rotationToBt.x, rotationToBt.y, rotationToBt.z, rotationToBt.w);
+//	vehicleBody1->getRigidBody()->getWorldTransform().setRotation(bt);
+	//vehicleBody1->getRigidBody()->applyImpulse(btVector3(0,40*deltaTime,0),btVector3(0,10,0));
+//	vehicleBody1->getRigidBody()->setDamping(0,0.99f);
+	/*qt = Vector4(this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getX(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getY(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getZ(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getW());
+	float bodyHeading = getHeading(qt);
+	if (bodyHeading < heading) {
+		this->vehicleBody1->getRigidBody()->setAngularVelocity(btVector3(vehicleBody1->getRigidBody()->getLinearVelocity().getX(),120*deltaTime, vehicleBody1->getRigidBody()->getLinearVelocity().getZ()));
+	}
+	else if (bodyHeading > heading) {
+		this->vehicleBody1->getRigidBody()->setAngularVelocity(btVector3(vehicleBody1->getRigidBody()->getLinearVelocity().getX(), -120 * deltaTime, vehicleBody1->getRigidBody()->getLinearVelocity().getZ()));
+	}*/
+
 	
 	//Direction of Vehicle in dx & dy
 	float dx = sin((DirectX::XM_PI / 180) * vehicleRotation);
@@ -328,7 +308,7 @@ void Vehicle::update(float deltaTime)
 			this->velocity.y = (velocity.y / (1 + (0.001f * 3000 * deltaTime)));
 
 			rotateAcceleration /= 1.0f + 0.005f * deltaTime * 20;
-			vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 60 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
+			vehicle->getRigidBody()->setAngularVelocity(btVector3(vehicle->getRigidBody()->getAngularVelocity().getX(), ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 60 * ((abs(velocity.x) + abs(velocity.y)) / 3000), vehicle->getRigidBody()->getAngularVelocity().getZ()));
 		}
 
 		rotateAcceleration /= 1.0f + 0.002f*deltaTime*1500;
@@ -342,6 +322,7 @@ void Vehicle::update(float deltaTime)
 			if (velocitySpeed < (5000 * updatedStats.maxSpeed)) {
 				this->velocity.x += dx * deltaTime * 800 * Input::GetStrengthL(0) * updatedStats.accelerationRate;
 				this->velocity.y += dy * deltaTime * 800 * Input::GetStrengthL(0) * updatedStats.accelerationRate;
+				//this->vehicle->getRigidBody()->applyImpulse(btVector3(dx* deltaTime * 800 * Input::GetStrengthL(0) * updatedStats.accelerationRate,0, -(dx* deltaTime * 800 * Input::GetStrengthL(0) * updatedStats.accelerationRate)),btVector3(0,0,0));
 			}
 		}
 		if (Input::GetDirectionL(0).x > 0) {
@@ -356,7 +337,7 @@ void Vehicle::update(float deltaTime)
 				if (rotateAcceleration > 2.6f * Input::GetStrengthL(0)) {
 					rotateAcceleration = 2.6f * Input::GetStrengthL(0);
 				}
-				vehicle->getRigidBody()->setAngularVelocity(btVector3(0, Input::GetStrengthL(0)* ((((0.19f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 8000 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				vehicle->getRigidBody()->setAngularVelocity(btVector3(vehicle->getRigidBody()->getAngularVelocity().getX(), Input::GetStrengthL(0)* ((((0.19f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 8000 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), vehicle->getRigidBody()->getAngularVelocity().getZ()));
 				rotationDirection = false;
 			}
 			else {
@@ -367,7 +348,7 @@ void Vehicle::update(float deltaTime)
 				if (rotateAcceleration < -2.6f * Input::GetStrengthL(0)) {
 					rotateAcceleration = -2.6f * Input::GetStrengthL(0);
 				}
-				vehicle->getRigidBody()->setAngularVelocity(btVector3(0, Input::GetStrengthL(0)* ((((-0.19f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 8000 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				vehicle->getRigidBody()->setAngularVelocity(btVector3(vehicle->getRigidBody()->getAngularVelocity().getX(), Input::GetStrengthL(0)* ((((-0.19f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 8000 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), vehicle->getRigidBody()->getAngularVelocity().getZ()));
 				rotationDirection = false;
 			}
 		}
@@ -383,7 +364,7 @@ void Vehicle::update(float deltaTime)
 				if (rotateAcceleration < -2.6f * Input::GetStrengthL(0)) {
 					rotateAcceleration = -2.6f * Input::GetStrengthL(0);
 				}
-				vehicle->getRigidBody()->setAngularVelocity(btVector3(0, Input::GetStrengthL(0)* ((((-0.19f) + rotateAcceleration * 2) / 3) * DirectX::XM_PI / 180) * deltaTime * 8000 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				vehicle->getRigidBody()->setAngularVelocity(btVector3(vehicle->getRigidBody()->getAngularVelocity().getX(), Input::GetStrengthL(0)* ((((-0.19f) + rotateAcceleration * 2) / 3) * DirectX::XM_PI / 180) * deltaTime * 8000 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), vehicle->getRigidBody()->getAngularVelocity().getZ()));
 				rotationDirection = true;
 			}
 			else {
@@ -394,14 +375,14 @@ void Vehicle::update(float deltaTime)
 				if (rotateAcceleration > 2.6f * Input::GetStrengthL(0)) {
 					rotateAcceleration = 2.6f * Input::GetStrengthL(0);
 				}
-				vehicle->getRigidBody()->setAngularVelocity(btVector3(0, Input::GetStrengthL(0)* ((((0.19f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 8000 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+				vehicle->getRigidBody()->setAngularVelocity(btVector3(vehicle->getRigidBody()->getAngularVelocity().getX(), Input::GetStrengthL(0)* ((((0.19f) + rotateAcceleration * 2) / 3)* DirectX::XM_PI / 180)* deltaTime * 8000 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), vehicle->getRigidBody()->getAngularVelocity().getZ()));
 				rotationDirection = true;
 			}
 		}
 		else {
 			//rotateAcceleration = 0;
 			rotateAcceleration /= 1.0f + 10 * deltaTime;
-			vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 8000 * ((abs(velocity.x) + abs(velocity.y)) / 8000), 0));
+			vehicle->getRigidBody()->setAngularVelocity(btVector3(vehicle->getRigidBody()->getAngularVelocity().getX(), ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 8000 * ((abs(velocity.x) + abs(velocity.y)) / 8000), vehicle->getRigidBody()->getAngularVelocity().getZ()));
 
 		}
 		if (Input::CheckButton(Keys::L_TRIGGER, HELD, 0) || Input::IsKeyDown_DEBUG(Keyboard::S)) {
@@ -553,11 +534,8 @@ void Vehicle::update(float deltaTime)
 			}
 		}
 	}
-
 	//this->vehicle->move(Vector3((velocity.x * deltaTime *0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f)));
-	this->vehicle->getRigidBody()->setLinearVelocity(btVector3((velocity.x* deltaTime * 0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f))*100.0f);
-
-
+	this->vehicle->getRigidBody()->setLinearVelocity(btVector3((velocity.x * deltaTime * 0.002f) * 100.0f, this->vehicle->getRigidBody()->getLinearVelocity().getY(), -(velocity.y * deltaTime * 0.002f) * 100.0f));
 
 	//Body Rotation
 	Vector2 curPos3 = Vector2(bodyPivot.x, bodyPivot.z);
@@ -726,6 +704,22 @@ bool Vehicle::isDead() const
 	return this->health <= 0;
 }
 
+float Vehicle::getCameraDistance(float deltaTime)
+{
+	float vehicleDistance = 0;
+	Vector3 vehicleCameraDistance = Vector3(this->vehicle->getRigidBody()->getLinearVelocity().getX(), this->vehicle->getRigidBody()->getLinearVelocity().getY(), this->vehicle->getRigidBody()->getLinearVelocity().getZ());
+	vehicleDistance = max(abs(vehicleCameraDistance.x), abs(vehicleCameraDistance.z)) *0.7f;
+
+	if (vehicleDistance < 10.0f) {
+		vehicleDistance = 0.0f;
+	}
+	vehicleDistance = min(vehicleDistance, 20.0f);
+
+	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime*1.2f + cameraDistance;
+
+	return cameraDistance;
+}
+
 float Vehicle::getPitch(DirectX::XMVECTOR Quaternion)
 {
 	return atan2(2 * (Quaternion.m128_f32[1] * Quaternion.m128_f32[2] + Quaternion.m128_f32[3] * Quaternion.m128_f32[0]), Quaternion.m128_f32[3] * Quaternion.m128_f32[3] - Quaternion.m128_f32[0] * Quaternion.m128_f32[0] - Quaternion.m128_f32[1] * Quaternion.m128_f32[1] + Quaternion.m128_f32[2] * Quaternion.m128_f32[2]);
@@ -739,4 +733,32 @@ float Vehicle::getYaw(DirectX::XMVECTOR Quaternion)
 float Vehicle::getRoll(DirectX::XMVECTOR Quaternion)
 {
 	return atan2(2 * (Quaternion.m128_f32[0] * Quaternion.m128_f32[1] + Quaternion.m128_f32[3] * Quaternion.m128_f32[2]), Quaternion.m128_f32[3] * Quaternion.m128_f32[3] + Quaternion.m128_f32[0] * Quaternion.m128_f32[0] - Quaternion.m128_f32[1] * Quaternion.m128_f32[1] - Quaternion.m128_f32[2] * Quaternion.m128_f32[2]);
+}
+
+float Vehicle::getHeading(Quaternion qt)
+{
+	float heading;
+	float attitude;
+	float bank;
+
+	double test = qt.x * qt.y + qt.z * qt.w;
+	if (test > 0.499) { // singularity at north pole
+		heading = 2 * atan2(qt.x, qt.w);
+		attitude = XM_PI / 2;
+		bank = 0;
+	}
+	else if (test < -0.499) { // singularity at south pole
+		heading = -2 * atan2(qt.x, qt.w);
+		attitude = -XM_PI / 2;
+		bank = 0;
+	}
+	else {
+		double sqx = qt.x * qt.x;
+		double sqy = qt.y * qt.y;
+		double sqz = qt.z * qt.z;
+		heading = atan2(2 * qt.y * qt.w - 2 * qt.x * qt.z, 1 - 2 * sqy - 2 * sqz);
+		attitude = asin(2 * test);
+		bank = atan2(2 * qt.x * qt.w - 2 * qt.y * qt.z, 1 - 2 * sqx - 2 * sqz);
+	}
+	return heading;
 }

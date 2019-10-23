@@ -22,6 +22,7 @@
 #include <array>
 #include"Shadows/ShadowMapping.h"
 #include"Particle/ParticleSystem.h"
+#include "Structs.h"
 
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
@@ -55,6 +56,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Buffer> frustumBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> culledLightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexSpot;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> cameraBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> culledLightBufferUAV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> culledLightBufferSRV;
@@ -99,7 +101,8 @@ public:
 	bool loadTexture(std::string fileName, bool overridePath=false);
 	bool reloadTexture(std::string fileName, bool overridePath=false);
 	const Mesh* getMeshPointer(const char *path);
-	Texture* getTexturePointer(const char *path, bool isModel=false);
+	Texture* getTexturePointer(const char *path);
+	Material getMaterial(const char* modelPath);
 	void addToDraw(GameObject* o, bool isStatic = false);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();

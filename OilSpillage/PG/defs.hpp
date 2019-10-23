@@ -126,6 +126,8 @@ using V4f = V4<F32>;
 using V4u = V4<U32>;
 using V4i = V4<I32>;
 
+struct Bounds { V2u min, max; };
+
 
 // random number generation
 using RD       = std::random_device;

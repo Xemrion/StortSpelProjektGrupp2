@@ -10,15 +10,14 @@ using namespace DirectX::SimpleMath;
 class GameObject
 {
 private:
-	btRigidBody* rigidBody;
-	Physics* physics;
+	btRigidBody* rigidBody = nullptr;
+	Physics* physics = nullptr;
 protected:
    Vector3  position { 1.0f, 1.0f, 1.0f };
 	Vector3  scale    { 1.0f, 1.0f, 1.0f };
 	Vector3  rotation;
 	Vector4  color;
-	Texture* texture   = nullptr;
-	Texture* normalMap = nullptr;
+	Material material;
 public:
 	~GameObject();
 
@@ -35,6 +34,12 @@ public:
 	void     setTexture(Texture *);
 	Texture* getNormalMap();
 	void     setNormalMap(Texture*);
+	Texture* getSpecularMap();
+	void setSpecularMap(Texture*);
+	Texture* getGlossMap();
+	void setGlossMap(Texture*);
+	Material getMaterial();
+	void setMaterial(Material);
 	void     setColor(Vector4 aColor);
 	Vector4  getColor()    const;
 	Vector3  getPosition();

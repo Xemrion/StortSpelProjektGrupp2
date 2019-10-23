@@ -1,5 +1,7 @@
 #pragma once
 #include<SimpleMath.h>
+#include "texture.h"
+
 struct Vertex3D
 {
 	DirectX::SimpleMath::Vector3 position;
@@ -36,3 +38,12 @@ struct AABB
 		return true;
 	}
 };
+
+struct Material
+{
+	Texture* diffuse = nullptr;
+	Texture* specular = nullptr;
+	Texture* normal = nullptr;
+	Texture* gloss = nullptr;
+};
+
