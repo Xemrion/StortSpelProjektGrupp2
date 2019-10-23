@@ -4,6 +4,7 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <Keyboard.h>
+#include <Mouse.h>
 #include <GamePad.h>
 
 using namespace DirectX;
