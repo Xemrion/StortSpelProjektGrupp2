@@ -26,8 +26,9 @@ Vehicle::Vehicle()
 	this->bodyRotationPoint = nullptr;
 	this->cameraDistance = 0.0f;
 
+	this->curDir = Vector2(0.0f, 1.0f);//UP
 	this->leftoverTime = 0.0f;
-	this->weapon = VehicleWeapon::missileLauncher;
+	this->weapon = VehicleWeapon::machineGun;
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
 
@@ -46,6 +47,7 @@ Vehicle::~Vehicle()
 	delete bodyRotationPoint;
 	delete vehicleBody1;
 
+	delete this->mountedWeapon;
 	delete wheel1;
 	delete wheel2;
 	delete wheel3;
@@ -57,7 +59,7 @@ Vehicle::~Vehicle()
 void Vehicle::init(Physics *physics)
 {
 	this->physics = physics;
-
+	this->mountedWeapon = new GameObject;
 	this->vehicle = new GameObject;
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(vehicle);
@@ -65,6 +67,10 @@ void Vehicle::init(Physics *physics)
 	vehicle->setScale(Vector3(0.5f, 0.4f, 0.9f));
 	Game::getGraphics().loadTexture("CarTemp");
 	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
+	mountedWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
+	mountedWeapon->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Turret").diffuse);
+	Game::getGraphics().addToDraw(mountedWeapon);
+	mountedWeapon->setScale(Vector3(0.005f));
 
 	/*this->vehicleBody1 = new GameObject;
 	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -149,11 +155,11 @@ void Vehicle::init(Physics *physics)
 
 	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < Vehicle::bulletCount; i++)
 	{
 		this->bullets[i].obj = new GameObject;
 		this->bullets[i].obj->mesh = Game::getGraphics().getMeshPointer("Cube");
-		this->bullets[i].obj->setScale(Vector3(0.25f, 0.25f, 0.25f));
+		this->bullets[i].obj->setScale(Vector3(0.1f, 0.1f, 0.1f));
 		this->bullets[i].obj->setColor(Vector4(1, 1, 0, 1));
 	}
 
@@ -162,8 +168,10 @@ void Vehicle::init(Physics *physics)
 void Vehicle::update(float deltaTime)
 {
 	deltaTime *= 2;
-	if (Input::CheckButton(CONFIRM, HELD, 0))
+	if (Input::CheckButton(Keys::R_SHOULDER, HELD, 0))
 	{
+		Game::getGraphics().addParticle(Vector3(this->mountedWeapon->getPosition().x + this->curDir.x*0.75f,0,this->mountedWeapon->getPosition().z + this->curDir.y*0.75f), Vector3(0, 0, 0), 1, 0.5f, 0.25f);
+
 		float tempDelta = deltaTime + this->leftoverTime;
 
 		if (tempDelta <= this->weapon.fireSpeed)
@@ -184,12 +192,12 @@ void Vehicle::update(float deltaTime)
 			if (freeToUse < Vehicle::bulletCount)
 			{
 				Vector2 dir = Input::GetDirectionR(0);
-				this->bullets[freeToUse].dir = Vector3(dir.x, 0, dir.y);
+				this->bullets[freeToUse].dir = Vector3(curDir.x,0,curDir.y);
 				this->bullets[freeToUse].dir.Normalize();
 				this->bullets[freeToUse].timeLeft = this->weapon.bulletLifetime;
 				this->bullets[freeToUse].speed = this->weapon.bulletSpeed + max(abs(velocity.x) , abs(velocity.y));
-				this->bullets[freeToUse].obj->setPosition(this->vehicle->getPosition() + Vector3(0, 2, 0));
-				this->bullets[freeToUse].obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->bullets[freeToUse].dir)) * Vector3(0, 1, 0));
+				this->bullets[freeToUse].obj->setPosition(this->mountedWeapon->getPosition() + Vector3(curDir.x*0.75, 2, curDir.y*0.75));
+				this->bullets[freeToUse].obj->setRotation(Vector3(0, this->gunRotation, 0));
 			}
 			else
 			{
@@ -571,6 +579,33 @@ void Vehicle::update(float deltaTime)
 
 	add += 0.2f * deltaTime;
 
+}
+
+void Vehicle::updateWeapons(float deltaTime)
+{
+	this->mountedWeapon->setPosition(this->vehicle->getPosition());
+	Vector2 dir = Input::GetDirectionR(0);
+	dir.Normalize();
+	if ((dir - curDir).Length() > 0.01f)
+	{
+		float l = dir.Dot(curDir);
+		l = acos(l);
+		if (l < XM_PI+0.1f && l > XM_PI-0.1f)
+		{
+			dir.Normalize();
+			curDir = Vector2(0.5+curDir.x*0.5,0.5+curDir.y*0.5);
+		}
+		curDir = Vector2::Lerp(curDir, dir, deltaTime * 20);
+		curDir.Normalize();
+	}
+	else
+	{
+		curDir = dir;
+	}
+
+	float newRot = atan2(curDir.x, curDir.y) + 3.14 / 2;
+	this->gunRotation = newRot;
+	this->mountedWeapon->setRotation(Vector3(0, newRot, 0));
 }
 
 float Vehicle::getAcceleratorX()

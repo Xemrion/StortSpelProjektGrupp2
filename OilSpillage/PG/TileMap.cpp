@@ -6,23 +6,21 @@ TileMap::TileMap()
 	this->width = 0;
 }
 
-TileMap::TileMap(MapConfig const& config) :
+TileMap::TileMap(MapConfig const& config):
 	config(config),
 	width(static_cast<Size>(config.dimensions.y)),
 	height(static_cast<Size>(config.dimensions.x)),
 	data(Vector<Tile>(width* height, Tile::ground))
-{
-}
+{}
 
-TileMap::~TileMap()
-{
-}
+TileMap::~TileMap() {}
 
 // x = current X (may be mutated if successful)
 // y = current Y (may be mutated if successful)
 // d = direction to walk
 // returns true if successful
-Bool  TileMap::walk(U16& x, U16& y, Direction d, Tile tile) {
+Bool  TileMap::walk( U16 &x, U16 &y, Direction d, Tile tile )
+{
 	U16  targetX{ x },
 		targetY{ y };
 	switch (d) {
@@ -46,7 +44,8 @@ Bool  TileMap::walk(U16& x, U16& y, Direction d, Tile tile) {
 	}
 }
 
-Vector<GameObject>  TileMap::loadAsModels(Graphics& graphics) const {
+Vector<GameObject>  TileMap::loadAsModels( Graphics &graphics ) const
+{
    auto const  toReserve { width * height };
 	Vector<GameObject> tiles( toReserve );
 	for ( U16 y = 0;  y < height;  ++y ) {
@@ -66,19 +65,21 @@ Vector<GameObject>  TileMap::loadAsModels(Graphics& graphics) const {
 	return tiles; // RVO/Copy Elision
 }
 
-Bool  TileMap::neighbourIsRoad(Direction dir, U16 x, U16 y) const noexcept {
-	assert(dir == Direction::north or dir == Direction::east
-		or dir == Direction::south or dir == Direction::west);
+Bool  TileMap::neighbourIsRoad(Direction dir, U16 x, U16 y) const noexcept
+{
+	assert( dir == Direction::north or dir == Direction::east
+	     or dir == Direction::south or dir == Direction::west);
 
-	if (dir == Direction::north)    y--;
-	else if (dir == Direction::east)    x++;
-	else if (dir == Direction::south)    y++;
+	if      ( dir == Direction::north )    y--;
+	else if ( dir == Direction::east  )    x++;
+	else if ( dir == Direction::south )    y++;
 	else /* ( dir == Direction::west  ) */ x--;
 
 	return isInBounds(x, y) and (data[index(x, y)] == Tile::road);
 }
 
-F32  TileMap::getRoadCoverage() const noexcept {
+F32  TileMap::getRoadCoverage() const noexcept
+{
 	Size  roadTileCount{ 0 };
 	for (Size i = 0; i < width * height; ++i)
 		if (data[i] == Tile::road)
@@ -88,103 +89,108 @@ F32  TileMap::getRoadCoverage() const noexcept {
 
 
 // road generator stream outputter implementation
-std::ostream& operator<<(std::ostream& out, TileMap const& map) {
-	if constexpr (isDebugging)
+std::ostream &operator<<( std::ostream &out, TileMap const &map )
+{
+	if constexpr ( isDebugging )
 		out << "  PRINTING " << map.width << 'x' << map.height << " MAP:\n\t";
 	for (U16 y = 0; y < map.height; ++y) {
 		for (U16 x = 0; x < map.width; ++x) {
 			//*[@DEPRECATED]*/  out << ' ' << map.data[map.index( x, y )];
-#ifdef NO_TERMINAL_COLORS
-			out << map.tileTerminalColorTable[map.getTileColorLookupIndex(x, y)]
-				<< map.tileTerminalGraphicsTable[map.getTileLookupIndex(x, y)]
-				<< map.terminalColorDefault;
-#else
-			out << map.tileTerminalGraphicsTable[map.getTileLookupIndex(x, y)];
-#endif
+			#ifdef NO_TERMINAL_COLORS
+				out << map.tileTerminalColorTable[map.getTileColorLookupIndex(x, y)]
+				    << map.tileTerminalGraphicsTable[map.getTileLookupIndex(x, y)]
+				    << map.terminalColorDefault;
+			#else
+				out << map.tileTerminalGraphicsTable[ map.getTileLookupIndex(x, y) ];
+			#endif
 		}
 		out << "\n\t";
 	}
 	return out;
 }
 
-Vector<V2u> TileMap::getCardinallyNeighbouringTilePositions(V2u tilePosition) const noexcept {
+Vector<V2u> TileMap::getCardinallyNeighbouringTilePositions( V2u tilePosition ) const noexcept
+{
 	Vector<V2u>  neighbouringTilePositions{};
 	neighbouringTilePositions.reserve(4);
 
 	// check if any of the neighbouring tile coords are tiles within map bounds:
-	Bool const  isBorderingWest{ tilePosition.x == 0 },
-		isBorderingEast{ tilePosition.x == width - 1 },
-		isBorderingNorth{ tilePosition.y == 0 },
-		isBorderingSouth{ tilePosition.y == height - 1 };
+	Bool const  isBorderingWest { tilePosition.x == 0          },
+		isBorderingEast          { tilePosition.x == width  - 1 },
+		isBorderingNorth         { tilePosition.y == 0          },
+		isBorderingSouth         { tilePosition.y == height - 1 };
 	if (not isBorderingNorth) // N
-		neighbouringTilePositions.emplace_back(tilePosition.x, tilePosition.y - 1);
+		neighbouringTilePositions.emplace_back( tilePosition.x,     tilePosition.y - 1 );
 	if (not isBorderingSouth) // S
-		neighbouringTilePositions.emplace_back(tilePosition.x, tilePosition.y + 1);
+		neighbouringTilePositions.emplace_back( tilePosition.x,     tilePosition.y + 1 );
 	if (not isBorderingWest) // W
-		neighbouringTilePositions.emplace_back(tilePosition.x - 1, tilePosition.y);
+		neighbouringTilePositions.emplace_back( tilePosition.x - 1, tilePosition.y     );
 	if (not isBorderingEast) // E
-		neighbouringTilePositions.emplace_back(tilePosition.x + 1, tilePosition.y);
+		neighbouringTilePositions.emplace_back( tilePosition.x + 1, tilePosition.y     );
 	return neighbouringTilePositions;
 }
 
-std::vector<short int> TileMap::getNeighbouringIndices(V2u tilePosition) const noexcept {
-	//  Vector<V2u>  neighbouringTilePositions {};
-	//  neighbouringTilePositions.reserve(8);
-	std::vector<short int> neighbouringIndex;
+
+Vector<V2u> TileMap::getNeighbouringTilePositions( V2u tilePosition ) const noexcept
+{
+	Vector<V2u>  neighbouringTilePositions {};
+	neighbouringTilePositions.reserve(8);
+	// check if any of the neighbouring tile coords are tiles within map bounds:
+	Bool const  isBorderingWest  = ( tilePosition.x == 0          ),
+	            isBorderingEast  = ( tilePosition.x == width  - 1 ),
+	            isBorderingNorth = ( tilePosition.y == 0          ),
+	            isBorderingSouth = ( tilePosition.y == height - 1 );
+	if ( not isBorderingNorth )
+	{  // N
+		neighbouringTilePositions.emplace_back(    tilePosition.x,   tilePosition.y-1 );
+		if ( not isBorderingWest ) // NW
+			neighbouringTilePositions.emplace_back( tilePosition.x-1, tilePosition.y-1 );
+		if ( not isBorderingEast ) // NE 
+			neighbouringTilePositions.emplace_back( tilePosition.x+1, tilePosition.y-1 );
+	}
+	if ( not isBorderingSouth ) { // S
+		neighbouringTilePositions.emplace_back(    tilePosition.x,   tilePosition.y+1 );
+		if ( not isBorderingWest ) // SW
+			neighbouringTilePositions.emplace_back( tilePosition.x-1, tilePosition.y+1 );
+		if ( not isBorderingEast ) // SE 
+			neighbouringTilePositions.emplace_back( tilePosition.x+1, tilePosition.y+1 );
+	}
+	if ( not isBorderingWest )    // W
+		 neighbouringTilePositions.emplace_back(   tilePosition.x-1, tilePosition.y );
+	if ( not isBorderingEast )    // E
+		neighbouringTilePositions.emplace_back(    tilePosition.x+1, tilePosition.y );
+	return neighbouringTilePositions;
+}
+
+
+Vector<Size> TileMap::getNeighbouringIndices( V2u tilePosition ) const noexcept
+{
+	Vector<Size> neighbouringIndex;
 	neighbouringIndex.reserve(8);
 	// check if any of the neighbouring tile coords are tiles within map bounds:
-	Bool const  isBorderingWest = (tilePosition.x == 0),
-		isBorderingEast = (tilePosition.x == width - 1),
-		isBorderingNorth = (tilePosition.y == 0),
-		isBorderingSouth = (tilePosition.y == height - 1);
-	if (not isBorderingNorth)
+	Bool const  isBorderingWest  = ( tilePosition.x == 0          ),
+	            isBorderingEast  = ( tilePosition.x == width  - 1 ),
+	            isBorderingNorth = ( tilePosition.y == 0          ),
+	            isBorderingSouth = ( tilePosition.y == height - 1 );
+	if ( not isBorderingNorth )
 	{  // N
-		neighbouringIndex.push_back(index(tilePosition.x, tilePosition.y - 1));
-		// neighbouringTilePositions.emplace_back(    tilePosition.x,   tilePosition.y-1 );
-		if (not isBorderingWest) // NW
-		{
-			neighbouringIndex.push_back(index(tilePosition.x -1, tilePosition.y - 1));
-
-		}
-
-		//  neighbouringTilePositions.emplace_back( tilePosition.x-1, tilePosition.y-1 );
-		if (not isBorderingEast) // NE 
-		{
-			neighbouringIndex.push_back(index(tilePosition.x + 1, tilePosition.y - 1));
-
-		}
-
-		//  neighbouringTilePositions.emplace_back( tilePosition.x+1, tilePosition.y-1 );
+		neighbouringIndex.emplace_back(    index(tilePosition.x,     tilePosition.y - 1));
+		if ( not isBorderingWest ) // NW
+			neighbouringIndex.emplace_back( index(tilePosition.x - 1, tilePosition.y - 1));
+		if ( not isBorderingEast ) // NE 
+			neighbouringIndex.emplace_back( index(tilePosition.x + 1, tilePosition.y - 1));
 	}
-	if (not isBorderingSouth) {  // S
-
-		neighbouringIndex.push_back(index(tilePosition.x, tilePosition.y + 1));
-		//  neighbouringTilePositions.emplace_back(    tilePosition.x,   tilePosition.y+1 );
-		if (not isBorderingWest) // SW
-		{
-			neighbouringIndex.push_back(index(tilePosition.x - 1, tilePosition.y + 1));
-
-		}
-		//   neighbouringTilePositions.emplace_back( tilePosition.x-1, tilePosition.y+1 );
-		if (not isBorderingEast) // SE 
-		{
-			neighbouringIndex.push_back(index(tilePosition.x + 1, tilePosition.y + 1));
-
-		}
-		//   neighbouringTilePositions.emplace_back( tilePosition.x+1, tilePosition.y+1 );
+	if ( not isBorderingSouth ) { // S
+		neighbouringIndex.emplace_back(    index(tilePosition.x,     tilePosition.y + 1));
+		if ( not isBorderingWest ) // SW
+			neighbouringIndex.emplace_back( index(tilePosition.x - 1, tilePosition.y + 1));
+		if ( not isBorderingEast ) // SE 
+			neighbouringIndex.emplace_back( index(tilePosition.x + 1, tilePosition.y + 1));
 	}
-	if (not isBorderingWest)    // W
-	{
-		neighbouringIndex.push_back(index(tilePosition.x - 1, tilePosition.y));
-
-	}
-	//   neighbouringTilePositions.emplace_back(    tilePosition.x-1, tilePosition.y );
-	if (not isBorderingEast)    // E
-	{
-		neighbouringIndex.push_back(index(tilePosition.x + 1, tilePosition.y));
-
-	}
-	// neighbouringTilePositions.emplace_back(    tilePosition.x+1, tilePosition.y );
+	if ( not isBorderingWest )    // W
+		neighbouringIndex.emplace_back(    index(tilePosition.x - 1, tilePosition.y    ));
+	if ( not isBorderingEast )    // E
+		neighbouringIndex.emplace_back(    index(tilePosition.x + 1, tilePosition.y    ));
 	return neighbouringIndex;
 }
 
