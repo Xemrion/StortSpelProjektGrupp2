@@ -36,7 +36,8 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 }
 
 
-Map::~Map() noexcept {
+Map::~Map() noexcept
+{
 	graphics.clearStaticObjects();
    #ifdef _DEBUG
 		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?
@@ -48,7 +49,8 @@ Map::~Map() noexcept {
 }
 
 // TODO: ensure Map.config doesn't stays synchronized during re-rolls.
-void  Map::generateRoads() {
+void  Map::generateRoads()
+{
 	DBG_PROBE(Map::generateRoads);
 	RNG      rng{ RD()() };
 	I32_Dist generateSeed{};
@@ -89,7 +91,8 @@ void  Map::generateRoads() {
 	}
 }
 
-void  Map::generateDistricts() {
+void  Map::generateDistricts()
+{
 	DBG_PROBE(Map::generateDistricts);
 	RNG  rng{ RD()() };
 	rng.seed( config.seed );
@@ -121,7 +124,8 @@ void  Map::generateDistricts() {
 }
 
 // TODO: make return value optional later instead of asserting
-V2u Map::generateRoadPositionInTileSpace( RNG &rng ) const noexcept {
+V2u Map::generateRoadPositionInTileSpace( RNG &rng ) const noexcept
+{
    DBG_PROBE(Map::generateRoadPositionInTileSpace);
    static constexpr U16  MAX_TRIES{ 1024 };
    static U16_Dist       generateX(0, config.dimensions.x);
@@ -141,8 +145,9 @@ Vector3  Map::generateRoadPositionInWorldSpace(RNG& rng) const noexcept {
 	return tilemap->convertTilePositionToWorldPosition( positionInTileSpace );
 }
 
-void  Map::generateBuildings( ) {
-	DBG_PROBE( Map::generateBuildings );
+void  Map::generateBuildings( )
+{
+	DBG_PROBE(Map::generateBuildings);
 
 	U16 const maxTries { 25U }; // TODO: refactor out
 
@@ -252,7 +257,7 @@ void  Map::generateBuildings( ) {
 // TODO: refactor out of Game
 Opt<Vector<V2u>>  Map::findValidHouseLot( RNG &rng, U16 cellId, Voronoi const &districtMap, TileMap &map, Vector<District> const &districtLookUpTable )
  {
-   DBG_PROBE( Map::findValidHouseLot );
+   DBG_PROBE(Map::findValidHouseLot);
    U16 const maxTries { 50U }; // TODO: refactor out
 
 	Bounds    cellBounds      { districtMap.computeCellBounds(cellId) };
@@ -408,7 +413,7 @@ Vector3  Map::getStartPositionInWorldSpace() const noexcept
 
 void Map::generateRoadDistanceMap() noexcept
 {
-	DBG_PROBE( Map::generateRoadDistanceMap );
+	DBG_PROBE(Map::generateRoadDistanceMap);
 
 	U16 searchRadius = config.distanceMapSearchRadius;
 
@@ -475,7 +480,8 @@ void Map::generateRoadDistanceMap() noexcept
 	}
 }
 
-Map::BuildingID  Map::generateBuildingID() noexcept {
+Map::BuildingID  Map::generateBuildingID() noexcept
+{
    return nextBuildingID++;
 }
 
