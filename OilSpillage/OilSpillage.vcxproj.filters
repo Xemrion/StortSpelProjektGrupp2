@@ -70,6 +70,8 @@
     <ClCompile Include="UI\Minimap.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
+    <ClCompile Include="Objectives\Objective.cpp" />
+    <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -146,6 +148,8 @@
     <ClInclude Include="PG\Profiler.hpp" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
     <ClInclude Include="Weapon.h" />
+    <ClInclude Include="Objectives\Objective.h" />
+    <ClInclude Include="Objectives\ObjectiveHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
