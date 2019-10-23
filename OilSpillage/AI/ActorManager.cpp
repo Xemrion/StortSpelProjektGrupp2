@@ -133,6 +133,8 @@ void ActorManager::spawnAttackers(Vector3 playerPos)
 	//createAttacker(playerPos.x+20, playerPos.z);
 	//createAttacker(playerPos.x+10, playerPos.z-10);
 	//createAttacker(playerPos.x+10, playerPos.z-20);
+
+	
 }
 
 void ActorManager::updateAveragePos()

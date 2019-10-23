@@ -18,7 +18,7 @@ void PlayingGameState::initAI()
 	//actorManager->createTurret(0 + 2, 0 + 4);
 	//actorManager->createTurret(0 + 2, 0 - 4);
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		for (int j = 0; j < 5; j++)
 		{

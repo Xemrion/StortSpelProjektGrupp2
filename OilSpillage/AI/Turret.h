@@ -21,7 +21,6 @@ private:
 	Status idle();
 	Status lineOfSight();
 	GameObject body;
-	Vector3 vecForward;
 	int sightRange;
 
 	Vector3 idleTarget;
