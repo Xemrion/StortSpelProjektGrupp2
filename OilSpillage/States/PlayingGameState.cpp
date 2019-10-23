@@ -20,7 +20,7 @@ void PlayingGameState::initAI()
 
 	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 50; j++)
+		for (int j = 0; j < 5; j++)
 		{
 			actorManager->createAttacker(i*2, j*2);
 		}
