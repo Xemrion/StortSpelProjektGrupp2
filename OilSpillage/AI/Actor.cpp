@@ -17,6 +17,8 @@ Actor::Actor()
 	this->position = Vector3(0, 0.0f, 0);
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
+
+	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 }
 
 Actor::Actor(float x, float z, AStar* aStar = nullptr)
@@ -39,6 +41,8 @@ Actor::Actor(float x, float z, AStar* aStar = nullptr)
 	this->position = Vector3(x, -1.0f, z);
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
+
+	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 }
 
 Actor::~Actor()
@@ -380,10 +384,6 @@ Vector3 Actor::seek(Vector3 target)
 
 void Actor::run(vector<Actor*> boids, float deltaTime, Vector3 targetPos)
 {
-	/*if (nrOfFrames % 10 == 0)
-	{
-	}
-	flock(boids, targetPos);*/
 	applyForce(separation(boids, targetPos)*4);
 	update(deltaTime, targetPos);
 	updateBoid(deltaTime);

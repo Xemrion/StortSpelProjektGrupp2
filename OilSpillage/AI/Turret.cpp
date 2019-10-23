@@ -25,7 +25,6 @@ Turret::Turret(float x, float z)
 	turretAngle = 90;
 	this->calculateTarget(turretAngle);
 	setUpActor();
-	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	vecForward.Normalize();
 	this->body.setPosition(this->position);
 	this->body.setScale(this->scale);

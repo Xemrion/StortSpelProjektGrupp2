@@ -13,7 +13,6 @@ void PlayingGameState::initAI()
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
 
-	//actorManager->createTurret(0 + 2, 0 + 2);
 	//actorManager->createTurret(0 + 2, 0 - 2);
 	//actorManager->createTurret(0 + 2, 0 + 4);
 	//actorManager->createTurret(0 + 2, 0 - 4);
@@ -25,8 +24,6 @@ void PlayingGameState::initAI()
 			actorManager->createAttacker(i*2, j*2);
 		}
 	}
-	actorManager->initGroups();
-
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
 {
@@ -212,27 +209,27 @@ void PlayingGameState::ImGui_AI()
 	//{
 	//	ImGui::Text(("Group " + std::to_string(i) + ":" + std::to_string(actorManager->groups.at(i).size())).c_str());
 	//}
-	ImGui::Text(("x: " + std::to_string(player->getVehicle()->getPosition().x)).c_str());
-	ImGui::Text(("y: " + std::to_string(player->getVehicle()->getPosition().y)).c_str());
-	ImGui::Text(("z: " + std::to_string(player->getVehicle()->getPosition().z)).c_str());
+	//ImGui::Text(("x: " + std::to_string(player->getVehicle()->getPosition().x)).c_str());
+	//ImGui::Text(("y: " + std::to_string(player->getVehicle()->getPosition().y)).c_str());
+	//ImGui::Text(("z: " + std::to_string(player->getVehicle()->getPosition().z)).c_str());
 
-	Vector3 xzPos = Vector3(player->getVehicle()->getPosition().x, 0, -player->getVehicle()->getPosition().z);
+	//Vector3 xzPos = Vector3(player->getVehicle()->getPosition().x, 0, -player->getVehicle()->getPosition().z);
 
-	ImGui::Text(("Tile x: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).x)).c_str());
-	ImGui::Text(("Tile y: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).y)).c_str());
+	//ImGui::Text(("Tile x: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).x)).c_str());
+	//ImGui::Text(("Tile y: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).y)).c_str());
 	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
 							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
 
 
 
-	//if(actorManager->groups.size() != 0)
-	//{
-	//	std::vector<Actor*>* temp = actorManager->findClosestGroup(player->getVehicle()->getPosition());
-	//	for (int i = 0; i < temp->size(); i++)
-	//	{
-	//		ImGui::Text(("AI nr " + to_string(i) + ": " + to_string(temp->at(i)->getPosition().x) + " " + to_string(temp->at(i)->getPosition().y) + " " + to_string(temp->at(i)->getPosition().z) + " ").c_str());
-	//	}
-	//}
+	if(actorManager->groups.size() != 0)
+	{
+		std::vector<Actor*>* temp = actorManager->findClosestGroup(player->getVehicle()->getPosition());
+		for (int i = 0; i < temp->size(); i++)
+		{
+			ImGui::Text(("AI nr " + to_string(i) + ": " + to_string(temp->at(i)->getPosition().x) + " " + to_string(temp->at(i)->getPosition().y) + " " + to_string(temp->at(i)->getPosition().z) + " ").c_str());
+		}
+	}
 
 	//delete temp;
 	ImGui::End();

@@ -53,6 +53,7 @@ protected:
 	Stats defaultStats;
 	Stats updatedStats;
 
+	Vector3 vecForward;
 	int nrOfFrames = 0;
 	Vector3 destination;
 	Selector* root;
