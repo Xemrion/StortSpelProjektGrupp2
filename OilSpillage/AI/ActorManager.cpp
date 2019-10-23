@@ -48,6 +48,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 void ActorManager::createDefender(float x, float z, Vector3 objectivePos)
 {
 	this->actors.emplace_back(new Defender(x, z, this->aStar, objectivePos));
+	initGroupForActor(actors.at(actors.size() - 1));
 }
 
 void ActorManager::createAttacker(float x, float z)
