@@ -1,10 +1,10 @@
 #include "Input.h"
-
 std::unique_ptr<Input> Input::instance;
 
-Input::Input() : keyboardState(), gamePadStates()
+Input::Input() : keyboardState(), gamePadStates(),mouseState()
 {
 	this->playerKeyboard = -1;
+	this->mouse = std::make_unique<Mouse>();
 }
 
 Input::~Input()
@@ -28,7 +28,7 @@ bool Input::CheckButtonKeyboard(Keys key, States state)
 		case L_TRIGGER:
 			return false;
 		case L_SHOULDER:
-			return false;
+			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::UP;
 		case L_PRESS:
 			return false;
 		case R_UP:
@@ -42,7 +42,7 @@ bool Input::CheckButtonKeyboard(Keys key, States state)
 		case R_TRIGGER:
 			return false;
 		case R_SHOULDER:
-			return false;
+			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::UP;
 		case R_PRESS:
 			return false;
 		case CONFIRM:
@@ -72,7 +72,7 @@ bool Input::CheckButtonKeyboard(Keys key, States state)
 		case L_TRIGGER:
 			return false;
 		case L_SHOULDER:
-			return false;
+			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::HELD;
 		case L_PRESS:
 			return false;
 		case R_UP:
@@ -86,7 +86,7 @@ bool Input::CheckButtonKeyboard(Keys key, States state)
 		case R_TRIGGER:
 			return false;
 		case R_SHOULDER:
-			return false;
+			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::HELD;
 		case R_PRESS:
 			return false;
 		case CONFIRM:
@@ -116,7 +116,7 @@ bool Input::CheckButtonKeyboard(Keys key, States state)
 		case L_TRIGGER:
 			return false;
 		case L_SHOULDER:
-			return false;
+			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::PRESSED;
 		case L_PRESS:
 			return false;
 		case R_UP:
@@ -130,7 +130,7 @@ bool Input::CheckButtonKeyboard(Keys key, States state)
 		case R_TRIGGER:
 			return false;
 		case R_SHOULDER:
-			return false;
+			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::PRESSED;
 		case R_PRESS:
 			return false;
 		case CONFIRM:
@@ -160,7 +160,7 @@ bool Input::CheckButtonKeyboard(Keys key, States state)
 		case L_TRIGGER:
 			return false;
 		case L_SHOULDER:
-			return false;
+			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::RELEASED;
 		case L_PRESS:
 			return false;
 		case R_UP:
@@ -174,7 +174,7 @@ bool Input::CheckButtonKeyboard(Keys key, States state)
 		case R_TRIGGER:
 			return false;
 		case R_SHOULDER:
-			return false;
+			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::RELEASED;
 		case R_PRESS:
 			return false;
 		case CONFIRM:
@@ -245,9 +245,13 @@ bool Input::IsKeyDown_DEBUG(Keyboard::Keys key)
 	return instance->keyboardState.IsKeyDown(key);
 }
 
-void Input::Init()
+void Input::Init(Window* window)
 {
 	instance = std::make_unique<Input>();
+	instance->mouse->SetWindow(window->handle);
+	instance->wHeight = window->height;
+	instance->wWidth = window->width;
+
 }
 
 void Input::Update()
@@ -276,6 +280,10 @@ void Input::Update()
 			instance->gamePadTrackers[i].Reset();
 		}
 	}
+
+	instance->mouseState = instance->mouse->GetState();
+	instance->mouseTracker.Update(instance->mouseState);
+
 }
 
 void Input::Reset()
@@ -342,6 +350,7 @@ Vector2 Input::GetDirectionL(int player)
 		if (CheckButtonKeyboard(L_RIGHT, HELD)) dir.x += 1.0f;
 		if (CheckButtonKeyboard(L_UP, HELD)) dir.y += 1.0f;
 		if (CheckButtonKeyboard(L_DOWN, HELD)) dir.y -= 1.0f;
+		
 	}
 	else 
 	{
@@ -356,7 +365,7 @@ Vector2 Input::GetDirectionL(int player)
 		}
 	}
 
-	dir.Normalize();
+	//dir.Normalize();
 	return dir;
 }
 
@@ -409,6 +418,12 @@ Vector2 Input::GetDirectionR(int player)
 		if (CheckButtonKeyboard(R_RIGHT, HELD)) dir.x += 1.0f;
 		if (CheckButtonKeyboard(R_UP, HELD)) dir.y += 1.0f;
 		if (CheckButtonKeyboard(R_DOWN, HELD)) dir.y -= 1.0f;
+
+		float mX = instance->mouse->GetState().x - (instance->wWidth / 2);
+		float mY = instance->mouse->GetState().y - (instance->wHeight / 2);
+
+		Vector2 mousePos(mX, -mY);
+		dir = mousePos;
 	}
 	else
 	{

@@ -18,7 +18,16 @@ Matrix GameObject::getTransform()
 	}
 
 	Matrix transform(Matrix::CreateScale(scale));
-	transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
+	if (!this->rigidBody) {
+		transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
+	}
+	else {
+		btQuaternion rot = rigidBody->getWorldTransform().getRotation();
+		Quaternion d3drotation(rot.x(), rot.y(), rot.z(), rot.w());
+		this->rotationQt = d3drotation;
+		
+		transform *= Matrix::CreateFromQuaternion(d3drotation);
+	}
 	transform *= Matrix::CreateTranslation(position);
 
 	if (this->parent != nullptr)
@@ -27,6 +36,42 @@ Matrix GameObject::getTransform()
 	}
 
 	return transform;
+
+	//if (rigidBody == nullptr) {
+	//	Matrix transform(Matrix::CreateScale(scale));
+	//	transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
+	//	transform *= Matrix::CreateTranslation(position);
+
+	//	if (this->parent != nullptr)
+	//	{
+	//		transform *= this->parent->getTransform();
+	//	}
+
+	//	return transform;
+	//}
+	//else {
+
+	//	//btVector3 pos = btVector3(rigidBody->getWorldTransform().getOrigin());
+	//	//this->position = Vector3(pos.getX(),pos.getY(),pos.getZ());
+
+	//	Matrix transform(Matrix::CreateScale(scale));
+
+	//	position = Vector3(rigidBody->getWorldTransform().getOrigin());
+	//	btQuaternion rot = rigidBody->getWorldTransform().getRotation();
+	//	Quaternion d3drotation(rot.x(), rot.y(), rot.z(), rot.w());
+
+	//	this->rotationQt = d3drotation;
+
+	//	transform *= Matrix::CreateFromQuaternion(d3drotation);
+	//	transform *= Matrix::CreateTranslation(position);
+
+	//	if (this->parent != nullptr)
+	//	{
+	//		transform *= this->parent->getTransform();
+	//	}
+
+	//	return transform;
+	//}
 }
 
 void GameObject::setPosition(Vector3 newPos)
@@ -257,7 +302,7 @@ Vector3 GameObject::btTransformGetRotation(btTransform const& trans) const
 	return Vector3(
 		std::atan2(2 * qt.getX() * qt.getW() + 2 * qt.getY() * qt.getZ(), 1 - 2 * qt.getX() * qt.getX() - 2 * qt.getZ() * qt.getZ()),
 		std::atan2(2 * qt.getY() * qt.getW() + 2 * qt.getX() * qt.getZ(), 1 - 2 * qt.getY() * qt.getY() - 2 * qt.getZ() * qt.getZ()),
-		std::asin(2 * qt.getX() * qt.getY() + 2 * qt.getZ() * qt.getW())
+		std::asin(-2 * qt.getX() * qt.getY() - qt.getZ() * qt.getW())
 	);
 }
 

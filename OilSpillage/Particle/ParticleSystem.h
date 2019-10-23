@@ -46,7 +46,7 @@ public:
 	ParticleSystem();
 	~ParticleSystem();
 	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, const wchar_t* csUpdate, const wchar_t* csCreate, const wchar_t* gs);
-	bool addParticle(int nrOf, int lifeTime, Vector3 position, Vector3 initialDirection);
+	bool addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection);
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void changeVectorField(float vectorFieldPower, float vectorFieldSize);
