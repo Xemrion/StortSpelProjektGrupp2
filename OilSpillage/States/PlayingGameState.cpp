@@ -139,7 +139,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorP2, 2, size1+0.1f, size2+0.1f);
 
-	Input::SetKeyboardPlayerID(-1);
+	Input::SetKeyboardPlayerID(0);
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
