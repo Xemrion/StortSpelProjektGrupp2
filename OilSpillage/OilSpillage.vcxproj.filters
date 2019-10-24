@@ -30,7 +30,7 @@
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="PG\TileMap.cpp" />
     <ClCompile Include="PG\Voronoi.cpp" />
-	<ClCompile Include="PG\SkyscraperFloor.cpp" />
+    <ClCompile Include="PG\SkyscraperFloor.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="PG\District.cpp" />
@@ -71,6 +71,7 @@
     <ClCompile Include="UI\Minimap.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
+    <ClCompile Include="PG\Skyscraper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -122,8 +123,8 @@
     <ClInclude Include="PG\utils.hpp" />
     <ClInclude Include="PG\Voronoi.hpp" />
     <ClInclude Include="PG\RoadGenerator.hpp" />
-	<ClInclude Include="PG\Skyscraper.h" />
-	<ClInclude Include="PG\SkyscraperFloor.h" />
+    <ClInclude Include="PG\Skyscraper.h" />
+    <ClInclude Include="PG\SkyscraperFloor.h" />
     <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Road Network\RoadNet.h" />

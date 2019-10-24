@@ -72,8 +72,27 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 			10.0f));
 	}
    
-   /*
-	//Road Network Turtlewalker
+	testFloorMain = std::make_unique<SkyscraperFloor>(4);
+	testFloorToAdd = std::make_unique<SkyscraperFloor>(4);
+	testFloorMain.get()->translate(Vector3(15.0f, 7.0f, -15.0f));
+	testFloorToAdd.get()->rotateDeg(90);
+	testFloorMain.get()->getTriangleIndices();
+	testFloorMain.get()->translateBy(Vector3(0.0f, -2.0f, 0.0f));
+	testFloorMain.get()->testDrawTriangles("SS-Top", Vector4(0.0f, 1.0f, 1.0f, 1.0f));
+
+	testFloorMain.get()->unionShapes(*testFloorToAdd, testFloorMain.get()->getAVertex(4));
+	testFloorToAdd.get()->regenerateShape(8);
+	testFloorToAdd.get()->rotateDeg(45);
+	testFloorMain.get()->getTriangleIndices();
+	testFloorMain.get()->translateBy(Vector3(0.0f, -2.0f, 0.0f));
+	testFloorMain.get()->testDrawTriangles("SS-2nd", Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+
+	testFloorMain.get()->unionShapes(*testFloorToAdd, testFloorMain.get()->getAVertex(4));
+	testFloorMain.get()->getTriangleIndices();
+	testFloorMain.get()->translateBy(Vector3(0.0f, -2.0f, 0.0f));
+	testFloorMain.get()->testDrawTriangles("SS-3rd", Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+	
+   /*//Road Network Turtlewalker
 	testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
 	testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
 	testNetwork.get()->setAngle(45);
@@ -82,9 +101,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 		testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
 	}
 	testNetwork.get()->cleanRoadNetwork();
-	testNetwork.get()->saveTestNetwork("test-network");
-   */
-   //}
+	testNetwork.get()->saveTestNetwork("test-network");*/
+
+	//}
 	lightList->setSun(Sun(Vector3(0.5f, -1.0f, 1.0f), Vector3(1.0f, 1.0f, 1.0f)));
 
 	graphics.setLightList(lightList.get());

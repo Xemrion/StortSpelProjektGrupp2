@@ -1,13 +1,15 @@
 #pragma once
+#include"SkyscraperFloor.h"
 
 class Skyscraper
 {
 private:
-
+	std::vector<SkyscraperFloor> floors;
 public:
-	Skyscraper();
+	Skyscraper(int input);
 	~Skyscraper();
 
+	bool generateSkyscraper(int input);
 };
 
 /* Pseudocode

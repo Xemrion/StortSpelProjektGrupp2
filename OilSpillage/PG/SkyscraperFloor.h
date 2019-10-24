@@ -18,12 +18,13 @@ public:
 	void unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter);
 	Vector3 getAVertex(int vertex);
 	void translate(Vector3 newCenter);
+	void translateBy(Vector3 moveBy);
 	void regenerateShape(int edges);
 
 	void testDrawLines() const; //Lines
 	void getTriangleIndices();
 	std::vector<Vertex3D> getVertices();
-	void testDrawTriangles();
+	void testDrawTriangles(std::string name, Vector4 colour);
 private:
 	std::vector<Vector3> verticies;
 	std::vector<int> indices;
