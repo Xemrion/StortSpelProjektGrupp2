@@ -120,13 +120,13 @@ String createMinimapTexture( Map const &map ) {
                pixels[centerIndex(tileX,tileY)+SE] = 0xFF'FF0000; // TODO
             }; break;
 
-            default: assert( false && "Unaccounted for enum value!" );
+            default: assert( false and "Unaccounted for enum value!" );
          }
       }
 	}
 	for ( auto &[tileX,tileY] : hospitalMarkerDrawingSchedule ) {
-		auto hospitalPrimaryColor = 0xFF'0000FF;
-		auto hospitalOutlineColor = 0xFF'FFFFFF;
+		auto hospitalPrimaryColor = 0xFF'FFFFFF;
+		auto hospitalOutlineColor = 0xFF'0000FF;
 		pixels[centerIndex(tileX,tileY)+NW] = hospitalOutlineColor;
 		pixels[centerIndex(tileX,tileY)+N ] = hospitalPrimaryColor;
 		pixels[centerIndex(tileX,tileY)+NE] = hospitalOutlineColor;
