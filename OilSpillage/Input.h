@@ -4,8 +4,9 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <Keyboard.h>
+#include <Mouse.h>
 #include <GamePad.h>
-
+#include"window.h"
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -15,7 +16,7 @@ enum Keys {
 	L_LEFT, //Left stick left. Keyboard: A
 	L_RIGHT, //Left stick right. Keyboard: D
 	L_TRIGGER, //Left trigger button. Keyboard: ?
-	L_SHOULDER, //Left shoulder button. Keyboard: ?
+	L_SHOULDER, //Left shoulder button. Keyboard: Mouse Right Click
 	L_PRESS, //Left stick pressed. Keyboard: ?
 
 	R_UP, //Right stick up. Keyboard: Up
@@ -23,7 +24,7 @@ enum Keys {
 	R_LEFT, //Right stick left. Keyboard: Left
 	R_RIGHT, //Right stick right. Keyboard: Right
 	R_TRIGGER, //Right trigger button. Keyboard: ?
-	R_SHOULDER, //Right shoulder button. Keyboard: ?
+	R_SHOULDER, //Right shoulder button. Keyboard: Mouse Left Click 
 	R_PRESS, //Right stick pressed. Keyboard: ?
 
 	CONFIRM, //A (PS: X) button. Keyboard: Enter
@@ -47,6 +48,9 @@ private:
 	static const int PLAYER_COUNT = 2;
 	static std::unique_ptr<Input> instance;
 
+	std::unique_ptr<Mouse> mouse;
+	Mouse::State mouseState;
+	Mouse::ButtonStateTracker mouseTracker;
 	int playerKeyboard;
 	Keyboard keyboard;
 	Keyboard::State keyboardState;
@@ -54,17 +58,18 @@ private:
 	GamePad gamePad;
 	GamePad::State gamePadStates[PLAYER_COUNT];
 	GamePad::ButtonStateTracker gamePadTrackers[PLAYER_COUNT];
+	float wHeight;
+	float wWidth;
 
 	static bool CheckButtonKeyboard(Keys key, States state);
 	static bool CheckButtonGamePad(Keys key, GamePad::ButtonStateTracker::ButtonState state, int playerId);
-
 public:
 	Input();
 	virtual ~Input();
 
 	static bool IsKeyDown_DEBUG(Keyboard::Keys key);
 
-	static void Init();
+	static void Init(Window* window);
 	static void Update();
 	static void Reset();
 

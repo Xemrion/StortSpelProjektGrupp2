@@ -95,10 +95,10 @@ public:
 	HRESULT createFrustumBuffer(DynamicCamera* camera);
 	Debug* getdebugger();
 	Window* getWindow();
-	void loadMesh(std::string path);
-	void loadModel(std::string path);
+	void loadMesh(std::string path, Vector3 rotation = Vector3(0, 0, 0));
+	void loadModel(std::string path, Vector3 rotation = Vector3(0,0,0));
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
-	bool loadTexture(std::string fileName, bool overridePath=false);
+	bool loadTexture(std::string fileName, bool overridePath = false, bool cpuOnly = false);
 	bool reloadTexture(std::string fileName, bool overridePath=false);
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path);
@@ -120,8 +120,8 @@ public:
 	void setCullingDistance(float dist);
 	float getCullingDistance();
 	//Randompower means hom large the random position area is. 
-	void addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, int lifeTime = 2, float randomPower = 0.5f);
-	void addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, int lifeTime = 2, float randomPower = 0.5f);
+	void addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
+	void addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
 	void setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setVectorField(float vectorFieldSize,float vectorFieldPower);

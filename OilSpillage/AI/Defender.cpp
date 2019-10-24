@@ -1,4 +1,4 @@
-#include "..//game.h"
+#include "../States/PlayingGameState.h"
 #include "Defender.h"
 
 
@@ -6,14 +6,26 @@ Defender::Defender()
 {
 	setUpActor();
 	objectivePos = Vector3(9.0f,0.0f,9.0f);
+
+	this->defaultStats = VehicleStats::AIDefender;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
 }
 
-Defender::Defender(float x, float z, AStar* aStar,Vector3 objectivePos)
+Defender::Defender(float x, float z, AStar* aStar, Vector3 objectivePos)
 	:Actor(x, z, aStar)
 {
 	this->setColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 	setUpActor();
 	this->objectivePos = objectivePos;
+
+	this->weapon = AIWeapon::machineGun;
+
+	this->defaultStats = VehicleStats::AIDefender;
+	this->updatedStats = this->defaultStats;
+
+	this->health = this->updatedStats.maxHealth;
 }
 
 Defender::~Defender()
@@ -30,11 +42,11 @@ void Defender::update(float dt, Vector3 targetPos)
 
 	if (nrOfFrames % 60 == 0)
 	{
-		if(state == State::Returning)
+		if (state == State::Returning)
 		{
 			returning();
 		}
-		else if(state == State::Chasing)
+		else if (state == State::Chasing)
 		{
 			chase();
 		}
@@ -42,7 +54,6 @@ void Defender::update(float dt, Vector3 targetPos)
 		{
 			roam();
 		}
-
 		nrOfFrames = 0;
 	}
 
@@ -104,11 +115,12 @@ void Defender::followPath()
 {
 	if (path.size() > 0)
 	{
-		destination = DirectX::SimpleMath::Vector3(float(path.at(path.size() - 1)->getXPos()),
+		/*destination = DirectX::SimpleMath::Vector3(float(path.at(path.size() - 1)->getXPos()),
 			.0f,
-			float(path.at(path.size() - 1)->getYPos()));
+			float(path.at(path.size() - 1)->getYPos()));*/
 
-		if (position.Distance(destination, position) < 1)
+		destination = path.at(path.size() - 1);
+		if (position.Distance(path.at(path.size() - 1), position) < 1)
 		{
 			path.pop_back();
 		}
@@ -133,6 +145,7 @@ void Defender::followPath()
 void Defender::returning()
 {
 	targetPos = objectivePos;
+	destination = objectivePos;
 	findPath();
 }
 

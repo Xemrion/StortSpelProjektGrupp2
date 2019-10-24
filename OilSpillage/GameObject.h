@@ -10,8 +10,8 @@ using namespace DirectX::SimpleMath;
 class GameObject
 {
 private:
-	btRigidBody* rigidBody;
-	Physics* physics;
+	btRigidBody* rigidBody = nullptr;
+	Physics* physics = nullptr;
 protected:
     Vector3  position { 0.0f, 0.0f, 0.0f };
 	Vector3  scale    { 1.0f, 1.0f, 1.0f };

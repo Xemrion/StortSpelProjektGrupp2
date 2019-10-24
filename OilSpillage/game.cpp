@@ -13,7 +13,7 @@ void Game::start(Window* window)
 	instance->window = window;
 	instance->graphics.init(window);
 
-	Input::Init();
+	Input::Init(instance->window);
 	Sound::Init();
 	UserInterface::initStaticVariables();
 

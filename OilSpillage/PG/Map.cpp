@@ -5,7 +5,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	graphics        ( graphics                                                              ),
 	physics         ( physics                                                               ),
 	config          ( config                                                                ),
-	tilemap         ( std::make_unique<TileMap>(config)                                     ),
+	tilemap         ( std::make_unique<TileMap>( config )                                   ),
 	districtMarkers ( static_cast<Size>( config.districtCellSide) * config.districtCellSide ),
 	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y     )
 {
@@ -19,7 +19,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 
 Map::~Map() noexcept {
 	graphics.clearStaticObjects();
-	#ifdef _DEBUG
+   #ifdef _DEBUG
 		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?
 		assert(profilerLogs.is_open());
 		DBG_PROFILE_OUTPUT(profilerLogs); // outputs profiler logs (if in debug mode)
@@ -35,13 +35,13 @@ void  Map::generateRoads() {
 	I32_Dist generateSeed{};
 	rng.seed(config.seed);
 	
-	MapConfig  roadConfig{ config };
+	MapConfig  roadConfig { config };
 	while (true) { // TODO: add MAX_TRIES?
 		RoadGenerator roadGenerator{ *tilemap };
 		roadGenerator.generate(roadConfig);
 		if (tilemap->getRoadCoverage() < roadConfig.roadMinTotalCoverage) {
 			roadConfig.seed = generateSeed(rng);
-			tilemap = std::make_unique<TileMap>(roadConfig);
+			tilemap = std::make_unique<TileMap>( roadConfig );
 		}
 		else {
 			startPositionInTileSpace = roadGenerator.getStartPosition();
@@ -102,7 +102,7 @@ void  Map::generateDistricts() {
 }
 
 // TODO: make return value optional later instead of asserting
-V2u Map::generateRoadPositionInTileSpace(RNG& rng) const noexcept {
+V2u Map::generateRoadPositionInTileSpace( RNG &rng ) const noexcept {
    DBG_PROBE(Map::generateRoadPositionInTileSpace);
    static constexpr U16  MAX_TRIES{ 1024 };
    static U16_Dist       generateX(0, config.dimensions.x);
@@ -193,15 +193,16 @@ void  Map::generateBuildings( ) {
 						                     .025f * config.tileScaleFactor.y /* config.buildingFloorHeightFactor */ * randomFloorCount,
 						                     .025f * config.tileScaleFactor.z });
 						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) } );
-						//btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
-						//                                               houseTile.getPosition().y,
-						//                                               houseTile.getPosition().z ),
-						//                                    btVector3( 15.5f * houseTile.getScale().x,
-						//                                               15.5f * houseTile.getScale().y,
-						//                                               15.5f * houseTile.getScale().z ),
-						//                                    .0f );
-						//houseTile.setRigidBody( tmp, physics );
-
+				  #ifndef _DEBUG
+						btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
+						                                               houseTile.getPosition().y,
+						                                               houseTile.getPosition().z ),
+						                                    btVector3( 15.5f * houseTile.getScale().x,
+						                                               15.5f * houseTile.getScale().y,
+						                                               15.5f * houseTile.getScale().z ),
+						                                    .0f );
+						houseTile.setRigidBody( tmp, physics );
+				  #endif
                   #ifdef _DEBUG
 						   ++total_building_tile_count;
                   #endif
@@ -224,9 +225,8 @@ void  Map::generateBuildings( ) {
 
 // basic proto placement algorithm
 // TODO: refactor out of Game
-Opt<Vector<V2u>>  Map::findValidHouseLot( RNG& rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vector<District> const& districtLookUpTable ) {
+Opt<Vector<V2u>>  Map::findValidHouseLot( RNG &rng, U16 cellId, Voronoi const& districtMap, TileMap& map, Vector<District> const& districtLookUpTable ) {
    DBG_PROBE( Map::findValidHouseLot );
-	using Bounds = Voronoi::Bounds;
 	Bounds    cellBounds      { districtMap.computeCellBounds(cellId) };
 	U16_Dist  generateOffset  { 0x0, 0xFF };
 	U16_Dist  generateX       { cellBounds.min.x, cellBounds.max.x };
@@ -284,7 +284,7 @@ Opt<Vector<V2u>>  Map::findValidHouseLot( RNG& rng, U16 cellId, Voronoi const& d
 }
 
 
-TileMap const& Map::getTileMap() const noexcept {
+TileMap const &Map::getTileMap() const noexcept {
 	return *tilemap;
 }
 
@@ -292,8 +292,8 @@ Voronoi const &Map::getDistrictMap() const noexcept {
    return *districtMap;
 }
 
-void  Map::setDistrictColorCoding( bool useColorCoding ) noexcept {
-	if ( useColorCoding ) {
+void  Map::setDistrictColorCoding( Bool useColorCoding) noexcept {
+	if (useColorCoding) {
 		Vector<Vector4> districtColorTable{
 			{ 0.0f, 0.0f, 0.0f, 1.0f },
 			{ 0.0f, 0.0f, 0.5f, 1.0f },
@@ -361,10 +361,17 @@ void  Map::setDistrictColorCoding( bool useColorCoding ) noexcept {
 	}
 }
 
-V2u  Map::getStartPositionInTileSpace() const noexcept {
+V2u  Map::getStartPositionInTileSpace() const noexcept
+{
 	return startPositionInTileSpace;
 }
 
-Vector3  Map::getStartPositionInWorldSpace() const noexcept {
+Vector3  Map::getStartPositionInWorldSpace() const noexcept
+{
 	return tilemap->convertTilePositionToWorldPosition( startPositionInTileSpace );
+}
+
+Vector<Opt<V2u>> const &Map::getHospitalTable() const noexcept
+{
+	return hospitalTable;
 }

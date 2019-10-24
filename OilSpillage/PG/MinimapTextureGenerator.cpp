@@ -4,13 +4,15 @@
 #include "MinimapTextureGenerator.hpp"
 #include "MapConfig.hpp"
 
+// TODO (low prio) scanlines & gauss effects on map?
+
 #pragma warning( disable : 4715 ) 
 String createMinimapTexture( Map const &map ) {
    auto const &tilemap = map.getTileMap();
    // image data:
-   Size const  TEX_WIDTH          { tilemap.width  * 3 },
-               TEX_HEIGHT         { tilemap.height * 3 };
-   Vector<RGBA>   pixels             ( TEX_WIDTH * TEX_HEIGHT );
+   Size const    TEX_WIDTH          { tilemap.width  * 3 },
+                 TEX_HEIGHT         { tilemap.height * 3 };
+   Vector<RGBA>  pixels( TEX_WIDTH * TEX_HEIGHT );
 
    // random number generation:
    RNG         rng{ RD()() };
@@ -28,6 +30,10 @@ String createMinimapTexture( Map const &map ) {
                                      else                                       return 0xFF'3B3B3B;
                                   }};
 
+	// 
+	Vector<std::pair<U16,U16>> hospitalMarkerDrawingSchedule {};
+	hospitalMarkerDrawingSchedule.reserve( map.getDistrictMap().noise.size() );
+
    // sub-tile pixel offsets:
    I32 const   C                  {               0 },
                N                  { -(I32)TEX_WIDTH },
@@ -38,7 +44,7 @@ String createMinimapTexture( Map const &map ) {
                SE                 {           S + E },
                SW                 {           S + W },
                NW                 {           N + W };
-
+	auto const &hospitals = map.getHospitalTable();
    // main loop:
    for ( U16 tileY = 0;  tileY < tilemap.height;  ++tileY ) {
       for ( U16 tileX = 0;  tileX < tilemap.width;  ++tileX ) {
@@ -62,15 +68,30 @@ String createMinimapTexture( Map const &map ) {
             // TODO: add building ID or floor influence
             // TODO: add 3D parallax effect?
             case Tile::building: {
-               pixels[centerIndex(tileX,tileY)+NW] = 0xFF'777777 + districtColorOffset;
-               pixels[centerIndex(tileX,tileY)+N ] = 0xFF'777777 + districtColorOffset;
-               pixels[centerIndex(tileX,tileY)+NE] = 0xFF'777777 + districtColorOffset;
-               pixels[centerIndex(tileX,tileY)+ W] = 0xFF'777777 + districtColorOffset;
-               pixels[centerIndex(tileX,tileY)+ C] = 0xFF'777777 + districtColorOffset;
-               pixels[centerIndex(tileX,tileY)+ E] = 0xFF'777777 + districtColorOffset;
-               pixels[centerIndex(tileX,tileY)+SW] = 0xFF'777777 + districtColorOffset;
-               pixels[centerIndex(tileX,tileY)+S ] = 0xFF'777777 + districtColorOffset;
-               pixels[centerIndex(tileX,tileY)+SE] = 0xFF'777777 + districtColorOffset;
+
+					bool isHospital = false;
+					for ( auto const possibleHospitalLocation : hospitals ) {
+						if ( possibleHospitalLocation ) {
+							auto hospitalXY = possibleHospitalLocation.value();
+							if ( (hospitalXY.x == tileX) and (hospitalXY.y == tileY) )
+								isHospital = true;
+						}
+					}
+
+					if ( isHospital ) // if hospital, defer drawing until later
+						hospitalMarkerDrawingSchedule.push_back({ tileX, tileY });
+					else {
+						auto buildingColor = 0xFF'777777 + districtColorOffset;
+						pixels[centerIndex(tileX,tileY)+NW] = buildingColor;
+						pixels[centerIndex(tileX,tileY)+N ] = buildingColor;
+						pixels[centerIndex(tileX,tileY)+NE] = buildingColor;
+						pixels[centerIndex(tileX,tileY)+ W] = buildingColor;
+						pixels[centerIndex(tileX,tileY)+ C] = buildingColor;
+						pixels[centerIndex(tileX,tileY)+ E] = buildingColor;
+						pixels[centerIndex(tileX,tileY)+SW] = buildingColor;
+						pixels[centerIndex(tileX,tileY)+S ] = buildingColor;
+						pixels[centerIndex(tileX,tileY)+SE] = buildingColor;
+					}
             }; break;
 
             case Tile::road: {
@@ -102,6 +123,42 @@ String createMinimapTexture( Map const &map ) {
             default: assert( false && "Unaccounted for enum value!" );
          }
       }
+	}
+	for ( auto &[tileX,tileY] : hospitalMarkerDrawingSchedule ) {
+		auto hospitalPrimaryColor = 0xFF'0000FF;
+		auto hospitalOutlineColor = 0xFF'FFFFFF;
+		pixels[centerIndex(tileX,tileY)+NW] = hospitalOutlineColor;
+		pixels[centerIndex(tileX,tileY)+N ] = hospitalPrimaryColor;
+		pixels[centerIndex(tileX,tileY)+NE] = hospitalOutlineColor;
+		pixels[centerIndex(tileX,tileY)+ W] = hospitalPrimaryColor;
+		pixels[centerIndex(tileX,tileY)+ C] = hospitalPrimaryColor;
+		pixels[centerIndex(tileX,tileY)+ E] = hospitalPrimaryColor;
+		pixels[centerIndex(tileX,tileY)+SW] = hospitalOutlineColor;
+		pixels[centerIndex(tileX,tileY)+S ] = hospitalPrimaryColor;
+		pixels[centerIndex(tileX,tileY)+SE] = hospitalOutlineColor;
+
+		auto setPixelIfInBounds =	[&]( U16 pixelIndex, RGBA color ) {
+												if ( pixelIndex < TEX_WIDTH * TEX_HEIGHT )
+													pixels[ pixelIndex ] = color;
+											};
+
+		// border:
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ NW,   hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ NW+W, hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ NW+N, hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ NE,   hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ NE+E, hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ NE+N, hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ SE,   hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ SE+E, hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ SE+S, hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ SW,   hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ SW+W, hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ SW+S, hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ N+N,  hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ S+S,  hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ W+W,  hospitalOutlineColor );
+		setPixelIfInBounds( centerIndex(tileX, tileY)+ E+E,  hospitalOutlineColor );
    }
 
    auto path = String("data/textures/map/map.tga");// +mapConfigToFilename(map.config, ".tga");
