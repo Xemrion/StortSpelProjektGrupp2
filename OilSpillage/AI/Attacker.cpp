@@ -9,6 +9,7 @@ Attacker::Attacker()
 	this->updatedStats = this->defaultStats;
 
 	this->health = this->updatedStats.maxHealth;
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
 
 Attacker::Attacker(float x, float z, AStar* aStar)
@@ -25,7 +26,7 @@ Attacker::Attacker(float x, float z, AStar* aStar)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Roller_Melee"));
 
-	weapon = AIWeapon::machineGun;
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
 
 Attacker::~Attacker()
@@ -47,25 +48,7 @@ void Attacker::update(float dt, Vector3 targetPos)
 	followPath();
 	this->rotateTowards();
 
-	for (int i = 0; i < bulletCount; i++)
-	{
-		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
-
-		if (this->bullets[i].timeLeft > 0.0f)
-		{
-			if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 0.5f)
-			{
-				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-20);
-				this->bullets[i].timeLeft = 0;
-			}
-			else
-			{
-				this->bullets[i].timeLeft -= deltaTime;
-				this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
-				Game::getGraphics().addToDraw(this->bullets[i].obj);
-			}
-		}
-	}
+	updateWeapon(dt);
 	nrOfFrames++;
 }
 

@@ -11,6 +11,7 @@ Defender::Defender()
 	this->updatedStats = this->defaultStats;
 
 	this->health = this->updatedStats.maxHealth;
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
 
 Defender::Defender(float x, float z, AStar* aStar, Vector3 objectivePos)
@@ -20,7 +21,7 @@ Defender::Defender(float x, float z, AStar* aStar, Vector3 objectivePos)
 	setUpActor();
 	this->objectivePos = objectivePos;
 
-	this->weapon = AIWeapon::machineGun;
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 
 	this->defaultStats = VehicleStats::AIDefender;
 	this->updatedStats = this->defaultStats;

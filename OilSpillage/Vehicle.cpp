@@ -526,10 +526,10 @@ void Vehicle::update(float deltaTime)
 	
 	
 	//bodyRotationPoint->setPosition(Vector3(bodyPivot.x,bodyPivot.y,bodyPivot.z));
-	updateWeapons(deltaTime * 0.5);
+	updateWeapon(deltaTime * 0.5f);
 }
 
-void Vehicle::updateWeapons(float deltaTime)
+void Vehicle::updateWeapon(float deltaTime)
 {
 	this->mountedWeapon->setPosition(this->vehicle->getPosition());
 	Vector2 dir = Input::GetDirectionR(0);
@@ -557,7 +557,7 @@ void Vehicle::updateWeapons(float deltaTime)
 
 	this->timeSinceLastShot += deltaTime;
 
-	if (Input::CheckButton(CONFIRM, HELD, 0))
+	if (Input::CheckButton(R_SHOULDER, HELD, 0))
 	{
 		if (this->timeSinceLastShot >= this->weapon.fireRate)
 		{
@@ -565,12 +565,12 @@ void Vehicle::updateWeapons(float deltaTime)
 			
 			for (int i = 0; i < Vehicle::bulletCount; ++i)
 			{
-				if (bullets[i].getTimeLeft() == 0.0)
+				if (bullets[i].getWeaponType() == WeaponType::None)
 				{
 					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
 					this->bullets[i].setWeaponType(this->weapon.type);
-					this->bullets[i].shoot(this->vehicle->getPosition() + Vector3(0, 2, 0),
+					this->bullets[i].shoot(this->vehicle->getPosition() + Vector3(0, 0, 0),
 						                   Vector3(curDir.x, 0.0, curDir.y),
 						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
 					break;
@@ -578,16 +578,11 @@ void Vehicle::updateWeapons(float deltaTime)
 			}
 		}
 	}
-	
+
 	for (int i = 0; i < Vehicle::bulletCount; i++)
 	{
 		bullets[i].update(deltaTime);
 	}
-}
-
-void Vehicle::updateWeapons(float deltaTime)
-{
-
 }
 
 float Vehicle::getAcceleratorX()
@@ -718,4 +713,10 @@ float Vehicle::getHeading(Quaternion qt)
 		bank = atan2(2 * qt.x * qt.w - 2 * qt.y * qt.z, 1 - 2 * sqx - 2 * sqz);
 	}
 	return heading;
+}
+
+Bullet* Vehicle::getBulletArray(size_t& count)
+{
+	count = bulletCount;
+	return bullets;
 }

@@ -43,6 +43,11 @@ Turret::Turret(float x, float z)
 	this->health = this->updatedStats.maxHealth;
 }
 
+Turret::~Turret()
+{
+
+}
+
 void Turret::update(float dt, Vector3 targetPos)
 {
 	this->velocity = Vector3(0.0, 0.0, 0.0);

@@ -78,6 +78,8 @@ void Bullet::flamethrowerShoot(Vector3& position, Vector3& direction, Vector3& a
 	this->obj->setPosition(position);
 	this->obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->dir)) * Vector3(0, 1, 0));
 
+	Game::getGraphics().addToDraw(this->obj);
+
 	Game::getGraphics().addParticle(obj->getPosition(),
 		this->dir,
 		1,
@@ -113,6 +115,11 @@ void Bullet::update(float deltaTime)
 	else
 	{
 		defaultUpdate(deltaTime);
+	}
+
+	if (timeLeft == 0.0)
+	{
+		this->weaponType = WeaponType::None;
 	}
 }
 
@@ -153,7 +160,27 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 	}
 }
 
-float Bullet::getTimeLeft()
+float Bullet::getTimeLeft() const
 {
 	return timeLeft;
+}
+
+void Bullet::setWeaponType(WeaponType type) 
+{
+	this->weaponType = type;
+}
+
+WeaponType Bullet::getWeaponType() const
+{
+	return this->weaponType;
+}
+
+int Bullet::getDamage() const
+{
+	return WeaponHandler::weapons[(int)this->weaponType].damage;
+}
+
+GameObject* Bullet::getGameObject()
+{
+	return obj;
 }
