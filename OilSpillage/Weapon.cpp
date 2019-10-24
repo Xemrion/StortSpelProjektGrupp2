@@ -78,7 +78,9 @@ void Bullet::flamethrowerShoot(Vector3& position, Vector3& direction, Vector3& a
 	this->obj->setPosition(position);
 	this->obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->dir)) * Vector3(0, 1, 0));
 
+#ifdef _DEBUG
 	Game::getGraphics().addToDraw(this->obj);
+#endif
 
 	Game::getGraphics().addParticle(obj->getPosition(),
 		this->dir,
