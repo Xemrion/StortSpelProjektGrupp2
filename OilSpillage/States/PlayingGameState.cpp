@@ -32,7 +32,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
    #endif // _DEBUG
 
 	lightList = std::make_unique<LightList>();
-	player = std::make_unique<Vehicle>();
 	camera = std::make_unique<DynamicCamera>();
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
@@ -52,6 +51,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadModel("Roads/Road_3way");
 	graphics.loadModel("Roads/Road_4way");
 	graphics.loadModel("Houses/testHouse");
+
+	player = std::make_unique<Vehicle>();
 
    //if constexpr ( isDebugging ) {
 	   // light tests
@@ -133,11 +134,11 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	};
 	camera->startCinematic(&points, false);
 	Vector4 colorP2[] = {
-		Vector4(0.3,0.3,0.3,1),
-		Vector4(0.2,0.2,0.2,1)
+		Vector4(0.03,0.03,0.03,1),
+		Vector4(0.9, 0.9, 0.05, 1)
 	};
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-	graphics.setParticle2ColorNSize(colorP2, 2, size1+0.1f, size2+0.1f);
+	graphics.setParticle2ColorNSize(colorP2, 2, 0.025, 0.05);
 
 	Input::SetKeyboardPlayerID(0);
 	//Bullet
@@ -445,8 +446,10 @@ void  PlayingGameState::update(float deltaTime)
 		
 		player->update(       deltaTime );
 		physics->update(      deltaTime );
-		player->updateWeapons(deltaTime);
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
+		size_t playerBulletCount;
+		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
+		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(       deltaTime );
 		
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
@@ -459,7 +462,7 @@ void  PlayingGameState::update(float deltaTime)
 		                       .0f,
 		                       cos(playerVehicle->getRotation().y) };
 
-      playerLight->setDirection( spotlightDir );
+        playerLight->setDirection( spotlightDir );
 
 		Vector3 spotlightPos { playerVehicle->getPosition().x,
 		                       playerVehicle->getPosition().y + 1,
@@ -503,7 +506,7 @@ void  PlayingGameState::update(float deltaTime)
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
-#if _DEBUG | RELEASE_DEBUG
+#if _DEBUG
 	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();
 	   ImGui::NewFrame();

@@ -32,19 +32,14 @@ private:
 
 	int health;
 
-	static const int bulletCount = 32;
-	float leftoverTime;
+	float timeSinceLastShot;
 	Weapon weapon;
 	Stats defaultStats;
 	Stats updatedStats;
 
-	struct Bullet
-	{
-		Vector3 dir;
-		float speed = 0.0f;
-		float timeLeft = 0.0f;
-		GameObject* obj = nullptr;
-	} bullets[bulletCount];
+	static const int bulletCount = 128;
+	Bullet bullets[bulletCount];
+
 	float gunRotation;
 	Vector3 bodyPivot;
 	DirectX::XMFLOAT2 velocity;
@@ -72,13 +67,15 @@ private:
 	float velocitySimple;
 	float velocitySpeed;
 	class Physics* physics;
+
 public:
 	Vehicle();
 	virtual ~Vehicle();
 
 	void init(Physics *physics);
 	void update(float deltaTime);
-	void updateWeapons(float deltaTime);
+	void updateWeapon(float deltaTime);
+	
 	GameObject* getVehicle() { return this->vehicle; }
 	float getAcceleratorX();
 
@@ -103,6 +100,8 @@ public:
 	float getYaw(DirectX::XMVECTOR Quaternion);
 	float getRoll(DirectX::XMVECTOR Quaternion);
 	float getHeading(Quaternion qt);
+
+	Bullet* getBulletArray(size_t& count);
 };
 
 #endif // !VEHICLE_H

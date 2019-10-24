@@ -200,6 +200,7 @@
     <ClCompile Include="UI\UIPlaying.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
+    <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="physics.cpp" />
   </ItemGroup>

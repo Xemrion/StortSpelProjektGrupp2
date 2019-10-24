@@ -109,7 +109,7 @@ void AStar::reconstructPath(Size goalIndex, std::vector<Vector3>& path)
 	current = goalIndex;
 	while (tileData.at(current).prevIndex != -1)
 	{
-		path.emplace_back(map.getWorldPosByIndex(current));
+		path.push_back(map.getWorldPosByIndex(current));
 		current = tileData.at(current).prevIndex;
 	}
 }

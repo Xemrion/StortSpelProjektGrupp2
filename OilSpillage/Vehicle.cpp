@@ -27,8 +27,8 @@ Vehicle::Vehicle()
 	this->cameraDistance = 0.0f;
 
 	this->curDir = Vector2(0.0f, 1.0f);//UP
-	this->leftoverTime = 0.0f;
-	this->weapon = VehicleWeapon::machineGun;
+	this->timeSinceLastShot = 0.0f;
+	this->weapon = WeaponHandler::getWeapon(WeaponType::Flamethrower);
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
 
@@ -37,11 +37,6 @@ Vehicle::Vehicle()
 
 Vehicle::~Vehicle()
 {
-	for (int i = 0; i < Vehicle::bulletCount; i++)
-	{
-		delete this->bullets[i].obj;
-	}
-
 	delete vehicle;
 	delete bodyRotation;
 	delete bodyRotationPoint;
@@ -154,79 +149,11 @@ void Vehicle::init(Physics *physics)
 	//vehicleBody1->getRigidBody()->setDamping(btScalar(0),3);
 
 	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
-
-	for (int i = 0; i < Vehicle::bulletCount; i++)
-	{
-		this->bullets[i].obj = new GameObject;
-		this->bullets[i].obj->mesh = Game::getGraphics().getMeshPointer("Cube");
-		this->bullets[i].obj->setScale(Vector3(0.1f, 0.1f, 0.1f));
-		this->bullets[i].obj->setColor(Vector4(1, 1, 0, 1));
-	}
-
 }
 
 void Vehicle::update(float deltaTime)
 {
 	deltaTime *= 2;
-	if (Input::CheckButton(Keys::R_SHOULDER, HELD, 0))
-	{
-		Game::getGraphics().addParticle(Vector3(this->mountedWeapon->getPosition().x + this->curDir.x*0.75f,0,this->mountedWeapon->getPosition().z + this->curDir.y*0.75f), Vector3(0, 0, 0), 1, 0.5f, 0.25f);
-
-		float tempDelta = deltaTime + this->leftoverTime;
-
-		if (tempDelta <= this->weapon.fireSpeed)
-		{
-			this->leftoverTime = tempDelta;
-		}
-
-		while (tempDelta > this->weapon.fireSpeed)
-		{
-			tempDelta -= this->weapon.fireSpeed;
-			int freeToUse = 0;
-
-			while (freeToUse < Vehicle::bulletCount && this->bullets[freeToUse].timeLeft > 0.0f)
-			{
-				freeToUse++;
-			}
-
-			if (freeToUse < Vehicle::bulletCount)
-			{
-				Vector2 dir = Input::GetDirectionR(0);
-				this->bullets[freeToUse].dir = Vector3(curDir.x,0,curDir.y);
-				this->bullets[freeToUse].dir.Normalize();
-				this->bullets[freeToUse].timeLeft = this->weapon.bulletLifetime;
-				this->bullets[freeToUse].speed = this->weapon.bulletSpeed + max(abs(velocity.x) , abs(velocity.y));
-				this->bullets[freeToUse].obj->setPosition(this->mountedWeapon->getPosition() + Vector3(curDir.x*0.75, 2, curDir.y*0.75));
-				this->bullets[freeToUse].obj->setRotation(Vector3(0, this->gunRotation, 0));
-			}
-			else
-			{
-				this->leftoverTime = 0.0f;
-				break;
-			}
-
-			if (tempDelta <= this->weapon.fireSpeed)
-			{
-				this->leftoverTime = tempDelta;
-			}
-		}
-	}
-	else
-	{
-		this->leftoverTime = 0.0f;
-	}
-
-	for (int i = 0; i < Vehicle::bulletCount; i++)
-	{
-		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
-
-		if (this->bullets[i].timeLeft > 0.0f)
-		{
-			this->bullets[i].timeLeft -= deltaTime;
-			this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
-			Game::getGraphics().addToDraw(this->bullets[i].obj);
-		}
-	}
 
 	tempTargetRotation = targetRotation;
 
@@ -598,11 +525,11 @@ void Vehicle::update(float deltaTime)
 	//this->bodyRotation->setRotation(-Vector3(0, -vehicle->getRotation().y, 0));
 	
 	
-
 	//bodyRotationPoint->setPosition(Vector3(bodyPivot.x,bodyPivot.y,bodyPivot.z));
+	updateWeapon(deltaTime * 0.5f);
 }
 
-void Vehicle::updateWeapons(float deltaTime)
+void Vehicle::updateWeapon(float deltaTime)
 {
 	this->mountedWeapon->setPosition(this->vehicle->getPosition());
 	Vector2 dir = Input::GetDirectionR(0);
@@ -611,10 +538,10 @@ void Vehicle::updateWeapons(float deltaTime)
 	{
 		float l = dir.Dot(curDir);
 		l = acos(l);
-		if (l < XM_PI+0.1f && l > XM_PI-0.1f)
+		if (l < XM_PI + 0.1f && l > XM_PI - 0.1f)
 		{
 			dir.Normalize();
-			curDir = Vector2(0.5+curDir.x*0.5,0.5+curDir.y*0.5);
+			curDir = Vector2(0.5 + curDir.x * 0.5, 0.5 + curDir.y * 0.5);
 		}
 		curDir = Vector2::Lerp(curDir, dir, deltaTime * 20);
 		curDir.Normalize();
@@ -627,6 +554,35 @@ void Vehicle::updateWeapons(float deltaTime)
 	float newRot = atan2(curDir.x, curDir.y) + 3.14 / 2;
 	this->gunRotation = newRot;
 	this->mountedWeapon->setRotation(Vector3(0, newRot, 0));
+
+	this->timeSinceLastShot += deltaTime;
+
+	if (Input::CheckButton(R_SHOULDER, HELD, 0))
+	{
+		if (this->timeSinceLastShot >= this->weapon.fireRate)
+		{
+			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+			
+			for (int i = 0; i < Vehicle::bulletCount; ++i)
+			{
+				if (bullets[i].getWeaponType() == WeaponType::None)
+				{
+					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+					this->bullets[i].setWeaponType(this->weapon.type);
+					this->bullets[i].shoot(this->vehicle->getPosition() + Vector3(0, 0, 0),
+						                   Vector3(curDir.x, 0.0, curDir.y),
+						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
+					break;
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < Vehicle::bulletCount; i++)
+	{
+		bullets[i].update(deltaTime);
+	}
 }
 
 float Vehicle::getAcceleratorX()
@@ -757,4 +713,10 @@ float Vehicle::getHeading(Quaternion qt)
 		bank = atan2(2 * qt.x * qt.w - 2 * qt.y * qt.z, 1 - 2 * sqx - 2 * sqz);
 	}
 	return heading;
+}
+
+Bullet* Vehicle::getBulletArray(size_t& count)
+{
+	count = bulletCount;
+	return bullets;
 }

@@ -14,6 +14,7 @@ public:
 	void createTurret(float x, float z);
 	std::vector<std::vector<Actor*>> groups;
 	std::vector<Actor*>* findClosestGroup(Vector3 position);
+	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
 
 	void spawnDefenders(std::vector<Vector3> objectives);
 	void spawnAttackers(Vector3 playerPos);

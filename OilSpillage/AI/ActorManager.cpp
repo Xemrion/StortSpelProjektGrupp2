@@ -79,6 +79,24 @@ std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 	return &sendToPlayer;
 }
 
+void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
+{
+	for (int i = 0; i < this->actors.size(); i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			if (!this->actors[i]->isDead())
+			{
+				if (bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
+				{
+					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
+					bulletArray[j].setWeaponType(WeaponType::None);
+				}
+			}
+		}
+	}
+}
+
 void ActorManager::spawnDefenders(std::vector<Vector3> objectives)
 {
 	for(int i = 0; i < objectives.size(); i++)
@@ -160,7 +178,6 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 		{
 			groups.at(i).at(j)->setPath(path);
 		}
-
 	}
 }
 
