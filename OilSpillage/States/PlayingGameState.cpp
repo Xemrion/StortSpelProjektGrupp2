@@ -125,7 +125,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	objTestPickUp->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(objTestPickUp);
 	objTestPickUp->setColor(Vector4(0.7f, 1.0f, 0.3f, 1.0f));
-	objTestPickUp->setPosition(Vector3(10.0f, 0.0f, -50.0f));
+	objTestPickUp->setPosition(Vector3(30.0f, 0.0f, -50.0f));
 
 	objTestPickUp2 = new GameObject();
 	objTestPickUp2->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -142,7 +142,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	objArray[0] = objTestPickUp;
 	objArray[1] = objTestPickUp2;
 	objArray[2] = objTestPickUp3;
-	objectives.addObjective(TypeOfMission::FindAndCollect,10,3,"Pick up the powerplant that we need to support the republic",objArray);
+	objectives.addObjective(TypeOfMission::FindAndCollect,10,3,"Find and pick up the boxes",objArray);
 
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
@@ -479,6 +479,7 @@ void  PlayingGameState::update(float deltaTime)
 		if (objectives.isAllDone())
 		{
 			graphics.addParticle(player->getVehicle()->getPosition(), Vector3(0, 0, 0));
+
 		}
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 

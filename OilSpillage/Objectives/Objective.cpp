@@ -147,7 +147,7 @@ void Objective::update(Vector3 playerPosition)
 			if (this->mission->target[i] != nullptr)
 			{
 				Vector3 vecPlayerToObj = playerPosition - this->mission->target[i]->getPosition();
-				if (vecPlayerToObj.Length() < 1.0f)
+				if (vecPlayerToObj.Length() < 2.0f)
 				{
 					this->mission->target[i]->setPosition(Vector3(1000, 1000, 1000));
 					GameObject* temp = this->mission->target[nrOfMax -1];
