@@ -10,7 +10,7 @@
 #include "../DynamicCamera.h"
 #include "../PG/Map.hpp"
 #include "../UI/UserInterface.h"
-
+#include"..////Objectives/ObjectiveHandler.h"
 class PlayingGameState : public GameState {
 	friend class Game;
 public:
@@ -33,7 +33,7 @@ public:
 	std::string  getMinimap() const;
 	Vector3      getTopLeft() const;
 	Vector3      getBottomRight() const;
-
+	ObjectiveHandler& getObjHandler();
 private:
 	friend class Game;
    #if _DEBUG | RELEASE_DEBUG
@@ -59,6 +59,11 @@ private:
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
+	GameObject* objTestPickUp;
+	GameObject* objTestPickUp2;
+	GameObject* objTestPickUp3;
+	GameObject** objArray = new GameObject * [3];
+	ObjectiveHandler objectives;
 
 	//Bullet
 	std::unique_ptr<Physics>		physics;

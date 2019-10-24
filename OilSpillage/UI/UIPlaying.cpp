@@ -37,13 +37,19 @@ void UIPlaying::updateUI(float deltaTime)
 
 void UIPlaying::drawUI()
 {
+	this->objHandlerPtr = &static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler();
 	std::string timeStr = this->getFormattedTime();
 	Vector2 textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
 	Vehicle* player = static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer();
 	this->healthBar->setAmount(player->getHealth() / static_cast<float>(player->getMaxHealth()));
+	
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 10), Colors::LightPink);
+	
+	Vector2 textSize2 = UserInterface::getFontArial()->MeasureString(objHandlerPtr->getObjective(0)->getInfo().c_str());
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), objHandlerPtr->getObjective(0)->getInfo().c_str(), Vector2(0, 40), Colors::Blue,0,Vector3(0,0,0),Vector3(0.2,0.2,0.2));
+
 	this->healthBar->draw(false);
 	this->minimap->draw(false);
 	UserInterface::getSpriteBatch()->End();

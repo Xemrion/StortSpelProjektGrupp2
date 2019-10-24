@@ -4,7 +4,7 @@
 #include "UserInterface.h"
 #include "Slider.h"
 #include "Minimap.h"
-
+#include"..///Objectives/ObjectiveHandler.h"
 class UIPlaying : public UserInterface
 {
 private:
@@ -13,8 +13,10 @@ private:
 	void drawUI();
 
 	bool initMinimap;
+
 	std::unique_ptr<Slider> healthBar;
 	std::unique_ptr<Minimap> minimap;
+	const ObjectiveHandler* objHandlerPtr;
 public:
 	UIPlaying();
 	virtual ~UIPlaying();

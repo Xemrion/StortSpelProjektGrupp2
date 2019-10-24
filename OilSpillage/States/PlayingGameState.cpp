@@ -121,6 +121,29 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
 
 
+	objTestPickUp = new GameObject();
+	objTestPickUp->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(objTestPickUp);
+	objTestPickUp->setColor(Vector4(0.7f, 1.0f, 0.3f, 1.0f));
+	objTestPickUp->setPosition(Vector3(10.0f, 0.0f, -50.0f));
+
+	objTestPickUp2 = new GameObject();
+	objTestPickUp2->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(objTestPickUp2);
+	objTestPickUp2->setColor(Vector4(0.7f, 1.0f, 0.3f, 1.0f));
+	objTestPickUp2->setPosition(Vector3(10.0f, 0.0f, -60.0f));
+
+	objTestPickUp3 = new GameObject();
+	objTestPickUp3->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(objTestPickUp3);
+	objTestPickUp3->setColor(Vector4(0.7f, 1.0f, 0.3f, 1.0f));
+	objTestPickUp3->setPosition(Vector3(7.0f, 0.0f, -55.0f));
+	
+	objArray[0] = objTestPickUp;
+	objArray[1] = objTestPickUp2;
+	objArray[2] = objTestPickUp3;
+	objectives.addObjective(TypeOfMission::FindAndCollect,10,3,"Pick up the powerplant that we need to support the republic",objArray);
+
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
@@ -157,6 +180,11 @@ PlayingGameState::~PlayingGameState()
 	delete aStar;
 	delete actorManager;
 	delete testObjective;
+	delete this->objTestPickUp;
+	delete this->objTestPickUp2;
+	delete this->objTestPickUp3;
+
+	delete[] this->objArray;
 }
 
 void  PlayingGameState::ImGui_Driving()
@@ -442,13 +470,16 @@ void  PlayingGameState::update(float deltaTime)
 		//player->getVehicle()->updateRigidBody();
 		
 		auto playerVehicle { player->getVehicle() };
-		
 		player->update(       deltaTime );
 		physics->update(      deltaTime );
 		player->updateWeapons(deltaTime);
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
 		camera->update(       deltaTime );
-		
+		objectives.update(player->getVehicle()->getPosition());
+		if (objectives.isAllDone())
+		{
+			graphics.addParticle(player->getVehicle()->getPosition(), Vector3(0, 0, 0));
+		}
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
 		camera->setPosition( Vector3( positionCam.getX(),
@@ -556,4 +587,9 @@ Vector3 PlayingGameState::getTopLeft() const
 Vector3 PlayingGameState::getBottomRight() const
 {
 	return bottomRight;
+}
+
+ObjectiveHandler& PlayingGameState::getObjHandler()
+{
+	return this->objectives;
 }

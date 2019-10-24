@@ -11,9 +11,18 @@ Objective::Objective()
 
 Objective::~Objective()
 {
-	delete this->mission->target;
-	delete this->mission->enemies;
+	if (this->mission->typeMission==TypeOfMission::FindAndCollect)
+	{
+		delete[] this->mission->target;
+	}
+	if (!(this->mission->typeMission==TypeOfMission::FindAndCollect))
+	{
+		delete[] this->mission->enemies;
+	}
+	delete this->mission;
 }
+
+
 
 void Objective::setTarget(GameObject* *target, int nrOfTargets)
 {
@@ -87,7 +96,7 @@ int Objective::getRewardTime() const
 
 std::string Objective::getInfo() const
 {
-	return this->mission->info;
+	return this->mission->info + " " + std::to_string(this->nrOfMax - this->nrOfTargets) + " / " + std::to_string(this->nrOfMax);
 }
 
 Vector3 Objective::getAveragePosition() const
@@ -133,16 +142,18 @@ void Objective::update(Vector3 playerPosition)
 	{
 		//collision check
 		int nrOfDone = 0;
-		for (int i = 0; i < nrOfTargets; i++)
+		for (int i = 0; i < nrOfMax; i++)
 		{
 			if (this->mission->target[i] != nullptr)
 			{
 				Vector3 vecPlayerToObj = playerPosition - this->mission->target[i]->getPosition();
-				if (vecPlayerToObj.Length() < 0.5f)
+				if (vecPlayerToObj.Length() < 1.0f)
 				{
-					GameObject* temp = this->mission->target[nrOfTargets-1];
+					this->mission->target[i]->setPosition(Vector3(1000, 1000, 1000));
+					GameObject* temp = this->mission->target[nrOfMax -1];
 					this->mission->target[i] = temp;//
-					this->mission->target[nrOfTargets-1] = nullptr;
+					this->mission->target[nrOfMax -1] = nullptr;
+					this->nrOfTargets--;
 				}
 			}
 			else
