@@ -1,5 +1,6 @@
 #include"ObjectiveHandler.h"
 #include"..////game.h"
+#include"..//States/PlayingGameState.h"
 ObjectiveHandler::ObjectiveHandler()
 {
 	this->types.types[0] = " Boxes ";
@@ -54,7 +55,7 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 			Vector3 pos(rand() % 10 + 10, 0, rand() % 10 - 20);
 			pos.x += i * 10;
 			pos.z += i * -10;
-			pos.y -= this->types.getColor(TypeOfTarget(typeInt)).z;
+			pos.y -= 1 - this->types.getColor(TypeOfTarget(typeInt)).z;
 			targets[i]->setPosition(pos);
 			targets[i]->mesh = Game::getGraphics().getMeshPointer("Cube");
 			targets[i]->setColor(this->types.getColor(TypeOfTarget(typeInt)));
@@ -103,10 +104,12 @@ void ObjectiveHandler::update(Vector3 playerPos)
 						Game::getGraphics().removeFromDraw(this->pickUpArrs.at(i)[j]);
 					}
 				}
-				delete this->objectiveVec.at(0);
-				this->objectiveVec.erase(this->objectiveVec.begin());
+				
 			
 			}
+			static_cast<PlayingGameState*>(Game::getCurrentState())->addTime(this->objectiveVec.at(0)->getRewardTime());
+			delete this->objectiveVec.at(0);
+			this->objectiveVec.erase(this->objectiveVec.begin());
 			this->eventNewObj = true;
 		}
 	}

@@ -34,6 +34,7 @@ public:
 	Vector3      getTopLeft() const;
 	Vector3      getBottomRight() const;
 	ObjectiveHandler& getObjHandler();
+	void addTime(float time);
 private:
 	friend class Game;
    #if _DEBUG | RELEASE_DEBUG

@@ -576,3 +576,8 @@ ObjectiveHandler& PlayingGameState::getObjHandler()
 {
 	return this->objectives;
 }
+
+void PlayingGameState::addTime(float time)
+{
+	this->time += time;
+}

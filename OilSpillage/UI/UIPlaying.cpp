@@ -60,9 +60,10 @@ void UIPlaying::drawUI()
 		infoUI = objHandlerPtr->getObjective(0)->getInfo();
 		color = Colors::White;
 	}
-
+	std::string rewardInfo = "Reward: " + std::to_string(objHandlerPtr->getObjective(0)->getRewardTime()) + " extra seconds ";
 	
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(),infoUI.c_str(), Vector2(0, 40), color,0,Vector3(0,0,0),Vector3(0.2,0.2,0.2));
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), rewardInfo.c_str(), Vector2(0, 60), color, 0, Vector3(0, 0, 0), Vector3(0.2, 0.2, 0.2));
 
 	this->healthBar->draw(false);
 	this->minimap->draw(false);
