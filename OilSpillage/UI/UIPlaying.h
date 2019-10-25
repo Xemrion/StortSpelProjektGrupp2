@@ -22,6 +22,7 @@ public:
 	virtual ~UIPlaying();
 
 	void init();
+	void resetMinimapFog();
 };
 
 #endif // !UI_PLAYING_H

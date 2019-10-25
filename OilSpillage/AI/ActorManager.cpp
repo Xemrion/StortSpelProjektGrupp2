@@ -22,23 +22,28 @@ ActorManager::~ActorManager()
 
 void ActorManager::update(float dt, Vector3 targetPos)
 {
+	int posOfDeadAI = -5;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		if (!actors.at(i)->isDead())
+		if (!actors.at(i)->isDead() && actors.at(i) != nullptr)
 		{
 			actors.at(i)->run(actors, dt, targetPos);
 		}
-		else
+		else if (actors.at(i)->isDead() && actors.at(i) != nullptr)
 		{
 			actors.at(i)->death();
-			delete actors.at(i);
-			actors.erase(actors.begin() + i);
+			posOfDeadAI = i;
 		}
-
+	}
+	updateGroups();
+	if(posOfDeadAI != -5)
+	{
+		delete actors.at(posOfDeadAI);
+		actors.erase(actors.begin() + posOfDeadAI);
+		posOfDeadAI = -5;
 	}
 	if (frameCount % 60 == 0)
 	{
-		updateGroups();
 		assignPathsToGroups(targetPos);
 		frameCount = 0;
 	}
@@ -78,6 +83,24 @@ std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 		}
 	}
 	return &sendToPlayer;
+}
+
+void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
+{
+	for (int i = 0; i < this->actors.size(); i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			if (!this->actors[i]->isDead())
+			{
+				if (bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
+				{
+					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
+					bulletArray[j].setWeaponType(WeaponType::None);
+				}
+			}
+		}
+	}
 }
 
 void ActorManager::spawnDefenders(std::vector<Vector3> objectives)
@@ -147,7 +170,6 @@ void ActorManager::joinGroup(Actor* actor, int groupIndex)
 void ActorManager::leaveGroup(int groupIndex, int where)
 {
 	groups.at(groupIndex).erase(groups.at(groupIndex).begin() + where);
-
 }
 
 void ActorManager::assignPathsToGroups(Vector3 targetPos)
@@ -161,7 +183,6 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 		{
 			groups.at(i).at(j)->setPath(path);
 		}
-
 	}
 }
 
@@ -201,7 +222,6 @@ void ActorManager::updateGroups()
 						leaveGroup(i, k);
 						createGroup(current);
 					}
-
 				}
 				//If actor is inside its own group radius but is also inside another one that has more actors(encourage bigger groups)
 				else

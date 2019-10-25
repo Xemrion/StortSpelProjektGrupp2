@@ -161,6 +161,7 @@
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
+    <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
@@ -188,9 +189,6 @@
     <ClCompile Include="PG\Voronoi.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="Sound.cpp" />
-    <ClCompile Include="TestAI.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UI\Minimap.cpp" />
@@ -202,6 +200,7 @@
     <ClCompile Include="UI\UIPlaying.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
+    <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="physics.cpp" />
   </ItemGroup>
@@ -214,6 +213,7 @@
     <ClInclude Include="AI\Boid.h" />
     <ClInclude Include="AI\Defender.h" />
     <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
@@ -266,9 +266,6 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Road Network\RoadNet.h" />
     <ClInclude Include="Structs.h" />
-    <ClInclude Include="TestAI.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="Texture.h" />
     <ClInclude Include="UI\Minimap.h" />
     <ClInclude Include="UI\Slider.h" />
@@ -366,11 +363,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="ShaderDefines.hlsli" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="brickwall.tga" />
-    <Image Include="CarTemp.tga" />
-    <Image Include="CarTest.tga" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
