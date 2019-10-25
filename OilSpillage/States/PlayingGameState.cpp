@@ -21,7 +21,7 @@ void PlayingGameState::initAI()
 	{
 		for (int j = 0; j < 5; j++)
 		{
-			actorManager->createAttacker(i*2, j*2);
+			actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
 		}
 	}
 }
@@ -42,7 +42,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 	graphics.loadModel("Entities/Dummy_Turret");
-	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14 / 2, 0, 0));
+	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
 
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
@@ -134,13 +134,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	};
 	camera->startCinematic(&points, false);
 	Vector4 colorP2[] = {
-		Vector4(0.03,0.03,0.03,1),
-		Vector4(0.9, 0.9, 0.05, 1)
+		Vector4(0.03f,0.03f,0.03f,1),
+		Vector4(0.9f, 0.9f, 0.05f, 1)
 	};
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-	graphics.setParticle2ColorNSize(colorP2, 2, 0.025, 0.05);
+	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
-	Input::SetKeyboardPlayerID(0);
+	//Input::setKeyboardPlayerID(0);
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
@@ -184,14 +184,14 @@ void  PlayingGameState::ImGui_Driving()
 
 	Vector3 camPos = camera->getPosition();
 	Vector3 camRot = camera->getRotation();
-	Vector2 lDir = Input::GetDirectionL(0);
-	Vector2 rDir = Input::GetDirectionR(0);
-	float lStr = Input::GetStrengthL(0);
-	float rStr = Input::GetStrengthR(0);
-	bool status[4] = { Input::CheckButton(CONFIRM, UP, 0), Input::CheckButton(CONFIRM, HELD, 0), Input::CheckButton(CONFIRM, RELEASED, 0), Input::CheckButton(CONFIRM, PRESSED, 0) };
+	Vector2 lDir = Input::getDirectionL();
+	Vector2 rDir = Input::getDirectionR();
+	float lStr = Input::getStrengthL();
+	float rStr = Input::getStrengthR();
+	bool status[4] = { Input::checkButton(Keys::CONFIRM, States::UP), Input::checkButton(Keys::CONFIRM, States::HELD), Input::checkButton(Keys::CONFIRM, States::RELEASED), Input::checkButton(Keys::CONFIRM, States::PRESSED) };
 	ImGui::Text(("Cam Pos: " + std::to_string(camPos.x) + " " + std::to_string(camPos.y) + " " + std::to_string(camPos.z)).c_str());
 	ImGui::Text(("Cam Rot: " + std::to_string(camRot.x) + " " + std::to_string(camRot.y) + " " + std::to_string(camRot.z)).c_str());
-	ImGui::Text(("\n-- PLAYER 0 --\nConfirm Status - Up: " + std::to_string(status[0]) + " Held: " + std::to_string(status[1]) + " Released: " + std::to_string(status[2]) + " Pressed: " + std::to_string(status[3])).c_str());
+	ImGui::Text(("\nConfirm Status - Up: " + std::to_string(status[0]) + " Held: " + std::to_string(status[1]) + " Released: " + std::to_string(status[2]) + " Pressed: " + std::to_string(status[3])).c_str());
 	ImGui::Text(("L Dir: " + std::to_string(lDir.x) + " " + std::to_string(lDir.y)).c_str());
 	ImGui::Text(("L Str: " + std::to_string(lStr)).c_str());
 	ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
@@ -380,6 +380,7 @@ void PlayingGameState::ImGui_ProcGen()
 		bottomRight  = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 
 		graphics.reloadTexture(minimap);
+		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
 	}
 	ImGui::End();
 }
@@ -408,12 +409,12 @@ void  PlayingGameState::update(float deltaTime)
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{
-		if (Input::IsKeyDown_DEBUG(Keyboard::E)) {
+		if (Input::isKeyDown_DEBUG(Keyboard::E)) {
 			deltaTime /= 4;
 		}
 
 #if _DEBUG | RELEASE_DEBUG
-		if (Input::CheckButton(ACTION_1, PRESSED, 0))
+		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
 		{
 			pausedTime = !pausedTime;
 		}
@@ -452,7 +453,7 @@ void  PlayingGameState::update(float deltaTime)
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(       deltaTime );
-		
+		player->updateWeapon(deltaTime);
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
 		camera->setPosition( Vector3( positionCam.getX(),
@@ -503,14 +504,14 @@ void  PlayingGameState::update(float deltaTime)
 	menues[MENU_PLAYING]->update( deltaTime );
 	if ( currentMenu != MENU_PLAYING )
 		menues[currentMenu]->update( deltaTime );
-	else if ( Input::CheckButton(MENU, PRESSED, 0) )
+	else if ( Input::checkButton(Keys::MENU, States::PRESSED) )
 		setCurrentMenu( PlayingGameState::MENU_PAUSED );
 	
 	//Render all objects
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
-#if _DEBUG
+#if _DEBUG | RELEASE_DEBUG //Set RELEASE_DEBUG to false to deactivate imgui in release!
 	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();
 	   ImGui::NewFrame();
@@ -577,7 +578,7 @@ void PlayingGameState::spawnObjects()
 		tempo2 = physics->addBox(btVector3(20, 0.2f + i, -20), btVector3(0.5f, 0.5f, 0.5f), 0.01f);
 		objPtr->setPosition(Vector3(20, 0.2f + i, -20));
 		objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
-		objPtr->setColor(Vector4(0.7, 0.7, 0.3, 1));
+		objPtr->setColor(Vector4(0.7f, 0.7f, 0.3f, 1));
 		objPtr->setRigidBody(tempo2, physics.get());
 		objPtr->getRigidBody()->setFriction(1);
 		objPtr->getRigidBody()->setActivationState(0);
@@ -592,7 +593,7 @@ void PlayingGameState::spawnObjects()
 	tempo2 = physics->addBox(btVector3(20, 0.2f, -20), btVector3(5.5f, 12.5f, 5.5f), 0);
 	objPtr->setPosition(Vector3(20, 0.2f, -20));
 	objPtr->setScale(Vector3(5.5f, 12.5f, 5.5f));
-	objPtr->setColor(Vector4(0.3, 0.3, 0.9, 1));
+	objPtr->setColor(Vector4(0.3f, 0.3f, 0.9f, 1));
 	objPtr->setRigidBody(tempo2, physics.get());
 	Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(XM_PI / 3, 0, 0));
 	btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);
