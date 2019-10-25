@@ -65,3 +65,8 @@ void UIPlaying::init()
 	this->healthBar = std::make_unique<Slider>(Vector2(10, 10));
 	this->minimap = std::make_unique<Minimap>(0.25f, 20.0f, Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
 }
+
+void UIPlaying::resetMinimapFog()
+{
+	this->minimap->resetFog();
+}

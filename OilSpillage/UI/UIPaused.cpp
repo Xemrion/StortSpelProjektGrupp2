@@ -7,7 +7,7 @@ void UIPaused::updateUI(float deltaTime)
 {
 	this->selected = this->changeSelected(this->selected);
 
-	if (Input::CheckButton(CONFIRM, PRESSED, 0))
+	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
 		if (this->selected == this->buttonUnpause.get())
 		{
@@ -22,7 +22,7 @@ void UIPaused::updateUI(float deltaTime)
 			Game::setState(Game::STATE_MENU);
 		}
 	}
-	else if (Input::CheckButton(CANCEL, PRESSED, 0) || Input::CheckButton(MENU, PRESSED, 0))
+	else if (Input::checkButton(Keys::CANCEL, States::PRESSED) || Input::checkButton(Keys::MENU, States::PRESSED))
 	{
 		static_cast<PlayingGameState*>(Game::getCurrentState())->setCurrentMenu(PlayingGameState::MENU_PLAYING);
 	}
@@ -47,9 +47,9 @@ UIPaused::~UIPaused()
 
 void UIPaused::init()
 {
-	this->buttonUnpause = std::make_unique<Button>(Text("Unpause", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2));
-	this->buttonOptions = std::make_unique<Button>(Text("Options", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y / 2));
-	this->buttonMainMenu = std::make_unique<Button>(Text("Main Menu", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y));
+	this->buttonUnpause = std::make_unique<Button>(Text("Unpause", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2));
+	this->buttonOptions = std::make_unique<Button>(Text("Options", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y / 2));
+	this->buttonMainMenu = std::make_unique<Button>(Text("Main Menu", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y));
 
 	this->buttonUnpause->setNeighbours(nullptr, nullptr, this->buttonMainMenu.get(), this->buttonOptions.get());
 	this->buttonOptions->setNeighbours(nullptr, nullptr, this->buttonUnpause.get(), this->buttonMainMenu.get());
