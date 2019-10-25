@@ -6,7 +6,7 @@
 
 void UICredits::updateUI(float deltaTime)
 {
-	if (Input::CheckButton(CONFIRM, PRESSED, 0))
+	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
 		static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(MenuGameState::MENU_MAIN);
 	}
@@ -47,5 +47,5 @@ void UICredits::init()
 
 	creditsFile.close();
 
-	this->buttonBack = std::make_unique<Button>(Text("Back", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH - Button::size.x - 10, SCREEN_HEIGHT - Button::size.y - 10));
+	this->buttonBack = std::make_unique<Button>(Text("Back", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH - Button::size.x - 10, SCREEN_HEIGHT - Button::size.y - 10));
 }

@@ -30,7 +30,7 @@ void UserInterface::initStaticVariables()
 
 Element* UserInterface::changeSelected(Element* selected) const
 {
-	if (Input::CheckButton(L_DOWN, PRESSED, 0))
+	if (Input::checkButton(Keys::L_DOWN, States::PRESSED))
 	{
 		if (selected->getDown() != nullptr)
 		{
@@ -38,7 +38,7 @@ Element* UserInterface::changeSelected(Element* selected) const
 		}
 	}
 
-	if (Input::CheckButton(L_UP, PRESSED, 0))
+	if (Input::checkButton(Keys::L_UP, States::PRESSED))
 	{
 		if (selected->getUp() != nullptr)
 		{
@@ -46,7 +46,7 @@ Element* UserInterface::changeSelected(Element* selected) const
 		}
 	}
 
-	if (Input::CheckButton(L_LEFT, PRESSED, 0))
+	if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 	{
 		if (selected->getLeft() != nullptr)
 		{
@@ -54,7 +54,7 @@ Element* UserInterface::changeSelected(Element* selected) const
 		}
 	}
 
-	if (Input::CheckButton(L_RIGHT, PRESSED, 0))
+	if (Input::checkButton(Keys::L_RIGHT, States::PRESSED))
 	{
 		if (selected->getRight() != nullptr)
 		{
