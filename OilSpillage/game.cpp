@@ -13,11 +13,11 @@ void Game::start(Window* window)
 	instance->window = window;
 	instance->graphics.init(window);
 
-	Input::Init(instance->window);
+	Input::init(instance->window);
 	Sound::Init();
 	UserInterface::initStaticVariables();
 
-	Input::SetKeyboardPlayerID(0);
+	//Input::setKeyboardPlayerID(0);
 	instance->running = true;
 	instance->run();
 }
@@ -77,7 +77,7 @@ void Game::run()
 		//Calculate deltaTime
 		deltaTime = (curTime - prevTime) * secPerCount;
 
-		Input::Update();
+		Input::update();
 		Sound::Update(deltaTime);
 		state->update(deltaTime);
 

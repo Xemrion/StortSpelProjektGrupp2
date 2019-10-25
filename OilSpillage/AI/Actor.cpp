@@ -4,14 +4,7 @@
 Actor::Actor()
 {
 	this->setUpActor();
-	this->leftoverTime = 0;
-	for (int i = 0; i < bulletCount; i++)
-	{
-		this->bullets[i].obj = new GameObject;
-		this->bullets[i].obj->mesh = Game::getGraphics().getMeshPointer("Cube");
-		this->bullets[i].obj->setScale(Vector3(0.25f, 0.25f, 0.25f));
-		this->bullets[i].obj->setColor(Vector4(0.2f, 0.2f, 0.2f, 1));
-	}
+	this->timeSinceLastShot = 0;
 	this->acceleration = Vector3(0.0f);
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(0, 0.0f, 0);
@@ -19,6 +12,7 @@ Actor::Actor()
 	this->maxForce = 0.5f;
 
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
 
 Actor::Actor(float x, float z, AStar* aStar = nullptr)
@@ -28,30 +22,20 @@ Actor::Actor(float x, float z, AStar* aStar = nullptr)
 
 	this->aStar = aStar;
 	this->setUpActor();
-	this->leftoverTime = 0;
-	for (int i = 0; i < bulletCount; i++)
-	{
-		this->bullets[i].obj = new GameObject;
-		this->bullets[i].obj->mesh = Game::getGraphics().getMeshPointer("Cube");
-		this->bullets[i].obj->setScale(Vector3(0.05f, 0.05f, 0.05f));
-		this->bullets[i].obj->setColor(Vector4(0.2f, 0.2f, 0.2f, 1));
-	}
+	this->timeSinceLastShot = 0;
 	this->acceleration = Vector3(0.0f);
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, -1.0f, z);
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 }
 
 Actor::~Actor()
 {
-	for (int i = 0; i < bulletCount; i++)
-	{
-		Game::getGraphics().removeFromDraw(bullets[i].obj);
-		delete this->bullets[i].obj;
-	}
+
 }
 
 void Actor::update(float dt, Vector3 targetPos)
@@ -70,68 +54,44 @@ void Actor::update(float dt, Vector3 targetPos)
 	this->root->func();
 	followPath();
 
-	for (int i = 0; i < bulletCount; i++)
-	{
-		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
+	nrOfFrames++;
+}
 
-		if (this->bullets[i].timeLeft > 0.0f)
+void Actor::updateWeapon(float deltaTime)
+{
+	this->timeSinceLastShot += deltaTime;
+
+	if (this->timeSinceLastShot >= this->weapon.fireRate)
+	{
+		this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+
+		for (int i = 0; i < Actor::bulletCount; i++)
 		{
-			if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 0.5f)
+			if (bullets[i].getTimeLeft() == 0.0)
 			{
-				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-20);
-				this->bullets[i].timeLeft = 0;
-			}
-			else
-			{
-				this->bullets[i].timeLeft -= deltaTime;
-				this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
-				Game::getGraphics().addToDraw(this->bullets[i].obj);
+				Vector3 dir = (targetPos - this->position);
+				dir.Normalize();
+				Vector3 bulletOrigin = this->position + dir;
+				dir = (targetPos - bulletOrigin);
+
+				this->bullets[i].setWeaponType(this->weapon.type);
+				this->bullets[i].shoot(bulletOrigin,
+					dir,
+					this->velocity);
+				break;
 			}
 		}
 	}
-	nrOfFrames++;
+
+	for (int i = 0; i < Actor::bulletCount; i++)
+	{
+		bullets[i].update(deltaTime);
+	}
 }
 
 Status Actor::shoot()
 {
-	float tempDelta = deltaTime + this->leftoverTime;
-
-	if (tempDelta <= this->weapon.fireSpeed)
-	{
-		this->leftoverTime = tempDelta;
-	}
-
-	while (tempDelta > this->weapon.fireSpeed)
-	{
-		tempDelta -= this->weapon.fireSpeed;
-		int freeToUse = 0;
-
-		while (freeToUse < bulletCount && this->bullets[freeToUse].timeLeft > 0.0f)
-		{
-			freeToUse++;
-		}
-
-		if (freeToUse < bulletCount)
-		{
-			Vector3 dir = (targetPos - this->getPosition());
-			this->bullets[freeToUse].dir = Vector3(dir.x, 0, dir.z);
-			this->bullets[freeToUse].dir.Normalize();
-			this->bullets[freeToUse].timeLeft = this->weapon.bulletLifetime;
-			this->bullets[freeToUse].speed = this->weapon.bulletSpeed;
-			this->bullets[freeToUse].obj->setPosition(this->getPosition() + Vector3(0, 0.5f, 0));
-			this->bullets[freeToUse].obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->bullets[freeToUse].dir)) * Vector3(0, 1, 0));
-		}
-		else
-		{
-			this->leftoverTime = 0.0f;
-			break;
-		}
-
-		if (tempDelta <= this->weapon.fireSpeed)
-		{
-			this->leftoverTime = tempDelta;
-		}
-	}
+	
 	return Status::SUCCESS;
 }
 

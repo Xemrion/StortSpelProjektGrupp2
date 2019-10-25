@@ -146,10 +146,10 @@ float4 main(VS_OUT input) : SV_Target
 			}
 		}
 
-		diffuseLight.rgb += max(l.color.rgb * nDotL * attenuation * directional, 0.0);
+		diffuseLight.rgb += max(l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible, 0.0);
 		float3 cameraVector = normalize(cameraPos.xyz - input.wPos.xyz);
 		float3 halfway = normalize(normalize(lightVector) + cameraVector);
-		specularLight.rgb += l.color.rgb * pow(max(dot(normal, halfway), 0.0), gloss) * attenuation * directional;
+		specularLight.rgb += l.color.rgb * pow(max(dot(normal, halfway), 0.0), gloss) * attenuation * directional * shadowSpotVisible;
 	}
 
 	float4 outColor = (texColor + color) * (diffuseLight + ambient);

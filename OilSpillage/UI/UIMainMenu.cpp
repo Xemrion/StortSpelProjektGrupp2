@@ -7,7 +7,7 @@ void UIMainMenu::updateUI(float deltaTime)
 {
 	this->selected = this->changeSelected(this->selected);
 
-	if (Input::CheckButton(CONFIRM, PRESSED, 0))
+	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
 		if (this->selected == this->buttonPlay.get())
 		{
@@ -65,10 +65,10 @@ UIMainMenu::~UIMainMenu()
 
 void UIMainMenu::init()
 {
-	this->buttonPlay = std::make_unique<Button>(Text("Play", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2.75f));
-	this->buttonOptions = std::make_unique<Button>(Text("Options", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 1.25f));
-	this->buttonCredits = std::make_unique<Button>(Text("Credits", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y * 0.25f));
-	this->buttonQuit = std::make_unique<Button>(Text("Quit", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y * 1.75f));
+	this->buttonPlay = std::make_unique<Button>(Text("Play", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2.75f));
+	this->buttonOptions = std::make_unique<Button>(Text("Options", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 1.25f));
+	this->buttonCredits = std::make_unique<Button>(Text("Credits", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y * 0.25f));
+	this->buttonQuit = std::make_unique<Button>(Text("Quit", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y * 1.75f));
 	this->checkBoxTest = std::make_unique<CheckBox>(Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2 - 10 - CheckBox::size.x, SCREEN_HEIGHT / 2 - Button::size.y * 2.75f));
 	this->sliderTest = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y * 3.25f));
 
