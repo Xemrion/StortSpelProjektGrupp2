@@ -31,7 +31,6 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		else if (actors.at(i)->isDead() && actors.at(i) != nullptr)
 		{
 			actors.at(i)->death();
-			//posOfDeadAI.push_back(i);
 			posOfDeadAI = i;
 		}
 	}
@@ -41,15 +40,6 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		actors.erase(actors.begin() + posOfDeadAI);
 		posOfDeadAI = -5;
 	}
-	//for (int i = 0; i < posOfDeadAI.size(); i++)
-	//{
-	//	delete actors.at(posOfDeadAI.at(i));
-	//	actors.erase(actors.begin() + posOfDeadAI.at(i));
-	//}
-	//for (int i = 0; i < posOfDeadAI.size(); i++)
-	//{
-	//	posOfDeadAI.pop_back();
-	//}
 	updateGroups();
 	if (frameCount % 60 == 0)
 	{
