@@ -21,23 +21,28 @@ ActorManager::~ActorManager()
 
 void ActorManager::update(float dt, Vector3 targetPos)
 {
+	int posOfDeadAI = -5;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		if (!actors.at(i)->isDead())
+		if (!actors.at(i)->isDead() && actors.at(i) != nullptr)
 		{
 			actors.at(i)->run(actors, dt, targetPos);
 		}
-		else
+		else if (actors.at(i)->isDead() && actors.at(i) != nullptr)
 		{
 			actors.at(i)->death();
-			delete actors.at(i);
-			actors.erase(actors.begin() + i);
+			posOfDeadAI = i;
 		}
-
 	}
+	if(posOfDeadAI != -5)
+	{
+		delete actors.at(posOfDeadAI);
+		actors.erase(actors.begin() + posOfDeadAI);
+		posOfDeadAI = -5;
+	}
+	updateGroups();
 	if (frameCount % 60 == 0)
 	{
-		updateGroups();
 		assignPathsToGroups(targetPos);
 		frameCount = 0;
 	}
@@ -164,7 +169,6 @@ void ActorManager::joinGroup(Actor* actor, int groupIndex)
 void ActorManager::leaveGroup(int groupIndex, int where)
 {
 	groups.at(groupIndex).erase(groups.at(groupIndex).begin() + where);
-
 }
 
 void ActorManager::assignPathsToGroups(Vector3 targetPos)
@@ -217,7 +221,6 @@ void ActorManager::updateGroups()
 						leaveGroup(i, k);
 						createGroup(current);
 					}
-
 				}
 				//If actor is inside its own group radius but is also inside another one that has more actors(encourage bigger groups)
 				else
