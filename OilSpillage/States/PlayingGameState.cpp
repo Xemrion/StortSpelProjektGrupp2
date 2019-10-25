@@ -452,7 +452,7 @@ void  PlayingGameState::update(float deltaTime)
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(       deltaTime );
-		
+		player->updateWeapon(deltaTime);
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
 		camera->setPosition( Vector3( positionCam.getX(),

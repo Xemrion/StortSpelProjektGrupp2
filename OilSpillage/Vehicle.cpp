@@ -506,7 +506,7 @@ void Vehicle::update(float deltaTime)
 
 	add += 0.2f * deltaTime;
 
-	updateWeapon(deltaTime * 0.5f);
+	//updateWeapon(deltaTime * 0.5f);
 }
 
 void Vehicle::updateWeapon(float deltaTime)
