@@ -34,13 +34,13 @@ void ActorManager::update(float dt, Vector3 targetPos)
 			posOfDeadAI = i;
 		}
 	}
+	updateGroups();
 	if(posOfDeadAI != -5)
 	{
 		delete actors.at(posOfDeadAI);
 		actors.erase(actors.begin() + posOfDeadAI);
 		posOfDeadAI = -5;
 	}
-	updateGroups();
 	if (frameCount % 60 == 0)
 	{
 		assignPathsToGroups(targetPos);
