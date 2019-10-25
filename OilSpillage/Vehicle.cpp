@@ -154,6 +154,22 @@ void Vehicle::init(Physics *physics)
 
 void Vehicle::update(float deltaTime)
 {
+
+	for (int i = 0; i < (int)PowerUpType::Length; ++i)
+	{
+		powerUpTimers[i] = max(powerUpTimers[i] - deltaTime, 0.0f);
+	}
+	if (powerUpTimers[(int)PowerUpType::Speed] > 0.0)
+	{
+		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate * 3.0f;
+		this->vehicle->setColor(Vector4(1.0, 0.0, 0.0, 1.0));
+	}
+	else
+	{
+		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate;
+		this->vehicle->setColor(Vector4(0.0, 0.0, 0.0, 1.0));
+	}
+
 	deltaTime *= 2;
 
 	tempTargetRotation = targetRotation;
@@ -707,5 +723,14 @@ void Vehicle::powerUp(PowerUpType type)
 	if (type == PowerUpType::Time)
 	{
 		dynamic_cast<PlayingGameState*>(Game::getCurrentState())->changeTime(30);
+	}
+	else if (type == PowerUpType::Health)
+	{
+		this->changeHealth(100);
+	}
+	else if (type == PowerUpType::Speed)
+	{
+		this->powerUpTimers[(int)PowerUpType::Speed] += 30.0;
+
 	}
 }

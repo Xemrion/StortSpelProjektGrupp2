@@ -144,7 +144,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
 
-	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100)));
+	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
 
 	//Bullet
