@@ -52,7 +52,7 @@ public:
 	void changeVectorField(float vectorFieldPower, float vectorFieldSize);
 	void drawAll(DynamicCamera* camera);
 private:
-	const int capParticle = 51200;//100*512
+	const int capParticle = 51200 * 2.0;//100*512
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
 	int nrOfParticles = 0;
