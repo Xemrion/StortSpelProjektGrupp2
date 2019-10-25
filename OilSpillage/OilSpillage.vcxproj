@@ -186,9 +186,6 @@
     <ClCompile Include="PG\Voronoi.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="Sound.cpp" />
-    <ClCompile Include="TestAI.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UI\Minimap.cpp" />
@@ -263,9 +260,6 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Road Network\RoadNet.h" />
     <ClInclude Include="Structs.h" />
-    <ClInclude Include="TestAI.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="Texture.h" />
     <ClInclude Include="UI\Minimap.h" />
     <ClInclude Include="UI\Slider.h" />
@@ -363,11 +357,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="ShaderDefines.hlsli" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="brickwall.tga" />
-    <Image Include="CarTemp.tga" />
-    <Image Include="CarTest.tga" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

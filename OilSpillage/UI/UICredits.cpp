@@ -37,7 +37,9 @@ UICredits::~UICredits()
 void UICredits::init()
 {
 	std::string temp;
-	std::ifstream creditsFile("credits.txt");
+	std::ifstream creditsFile("data/credits.txt");
+
+	this->creditsText.clear();
 
 	while (!creditsFile.eof())
 	{
