@@ -23,7 +23,8 @@ public:
 
 	void testDrawLines() const; //Lines
 	void getTriangleIndices();
-	std::vector<Vertex3D> getVertices();
+	std::vector<Vertex3D> getWallVertices(const SkyscraperFloor& other);
+	std::vector<Vertex3D> getRoofVertices();
 	void testDrawTriangles(std::string name, Vector4 colour);
 private:
 	std::vector<Vector3> verticies;

@@ -5,6 +5,8 @@ class Skyscraper
 {
 private:
 	std::vector<SkyscraperFloor> floors;
+	std::vector<Vertex3D> mesh;
+	GameObject* building;
 public:
 	Skyscraper(int input);
 	~Skyscraper();

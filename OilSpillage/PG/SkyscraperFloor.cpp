@@ -80,11 +80,7 @@ Vector3 SkyscraperFloor::intersectingLines(Vector3& pointA1, Vector3& pointA2, V
 			/ divider;
 
 		if (t1 > 0 && t2 > 0 && t1 <= 1 && t2 <= 1) {
-			Vector3 aResult = Vector3(pointA1.x + (pointA2.x - pointA1.x) * t1, pointA1.y, pointA1.z + (pointA2.z - pointA1.z) * t1);
-			Vector3 bResult = Vector3(pointB1.x + (pointB2.x - pointB1.x) * t2, pointB1.y, pointB1.z + (pointB2.z - pointB1.z) * t2);
-			if (aResult == bResult) {
-				result = aResult;
-			}
+			result = Vector3(pointA1.x + (pointA2.x - pointA1.x) * t1, pointA1.y, pointA1.z + (pointA2.z - pointA1.z) * t1);
 		}
 	}
 	return result;
@@ -392,35 +388,93 @@ void SkyscraperFloor::getTriangleIndices()
 	this->indices = triangleIndices;
 }
 
-std::vector<Vertex3D> SkyscraperFloor::getVertices()
+std::vector<Vertex3D> SkyscraperFloor::getWallVertices(const SkyscraperFloor &other)
 {
 	std::vector<Vertex3D> meshData;
 	Vertex3D temp;
-	float toNorm = 0.0f;
+	Vector3 normal(0.0f), line1(0.0f), line2(0.0f);
+	SkyscraperFloor wallDifference(*this);
+	wallDifference.translate(other.center);
+	for (size_t i = 0; i < this->indices.size(); i++) {
+		line1 = wallDifference.verticies[(i + 1) % wallDifference.nrOfEdges] - this->verticies[i];
+		line2 = wallDifference.verticies[i] - this->verticies[i];
+		normal = line1.Cross(line2);
+
+		temp.position = this->verticies[i];
+		temp.normal = normal;
+		temp.uv = Vector2(0, 0);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = wallDifference.verticies[(i + 1) % wallDifference.nrOfEdges];
+		temp.normal = normal;
+		temp.uv = Vector2(1, 1);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = wallDifference.verticies[i];
+		temp.normal = normal;
+		temp.uv = Vector2(0, 1);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = this->verticies[(i + 1) % this->nrOfEdges];
+		temp.normal = normal;
+		temp.uv = Vector2(1, 0);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = wallDifference.verticies[(i + 1) % wallDifference.nrOfEdges];
+		temp.normal = normal;
+		temp.uv = Vector2(1, 1);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = this->verticies[i];
+		temp.normal = normal;
+		temp.uv = Vector2(0, 0);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+	}
+	return meshData;
+}
+
+std::vector<Vertex3D> SkyscraperFloor::getRoofVertices()
+{
+	std::vector<Vertex3D> meshData;
+	Vertex3D temp;
+	Vector3 normal(0.0f), line1(0.0f), line2(0.0f);
 	if (this->indices.size() == 0) {
 		this->getTriangleIndices();
 	}
-	for (int i = 0; i < this->indices.size(); i += 3) {
+	for (size_t i = 0; i < this->indices.size(); i += 3) {
+		line1 = this->verticies[this->indices[i + 1]] - this->verticies[this->indices[i]];
+		line2 = this->verticies[this->indices[i + 2]] - this->verticies[this->indices[i]];
+		normal = line1.Cross(line2);
+
 		temp.position = this->verticies[this->indices[i]];
-		temp.normal = Vector3(0.0f, 1.0f, 0.0f);
-		toNorm = 1.0f / (this->verticies[this->indices[i]].x + this->verticies[this->indices[i]].z);
-		temp.uv = Vector2(this->verticies[this->indices[i]].x * toNorm, this->verticies[this->indices[i]].z * toNorm);
+		temp.normal = normal;
+		temp.uv = Vector2(0.0f, 0.0f);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 1]];
-		temp.normal = Vector3(0.0f, 1.0f, 0.0f);
-		toNorm = 1.0f / (this->verticies[this->indices[size_t(i) + 1]].x + this->verticies[this->indices[size_t(i) + 1]].z);
-		temp.uv = Vector2(this->verticies[this->indices[size_t(i) + 1]].x * toNorm, this->verticies[this->indices[size_t(i) + 1]].z * toNorm);
+		temp.normal = normal;
+		temp.uv = Vector2(0.0f, 0.0f);;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 2]];
-		temp.normal = Vector3(0.0f, 1.0f, 0.0f);
-		toNorm = 1.0f / (this->verticies[this->indices[size_t(i) + 2]].x + abs(this->verticies[this->indices[size_t(i) + 2]].z));
-		temp.uv = Vector2(this->verticies[this->indices[size_t(i) + 2]].x * toNorm, this->verticies[this->indices[size_t(i) + 2]].z * toNorm);
+		temp.normal = normal;
+		temp.uv = Vector2(0.0f, 0.0f);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
@@ -431,17 +485,17 @@ std::vector<Vertex3D> SkyscraperFloor::getVertices()
 void SkyscraperFloor::testDrawTriangles(std::string name, Vector4 colour)
 {
 	std::vector<Vertex3D> meshData;
-	meshData = this->getVertices();
+	meshData = this->getRoofVertices();
 	this->roof = new GameObject;
 	Game::getGraphics().loadMesh(name.c_str(), meshData);
 	this->roof->mesh = Game::getGraphics().getPGMeshPointer(name.c_str());
 	Game::getGraphics().addToDraw(this->roof);
 	this->roof->setPosition(this->center);
-	this->roof->setScale(Vector3(1.0f, 1.0f, 1.0f));
+	this->roof->setScale(Vector3(2.50f, 1.0f, 2.50f));
 	this->roof->setColor(colour);
 }
 
-Vector3 SkyscraperFloor::getAVertex(int vertex)
+Vector3 SkyscraperFloor::getAVertex(int vertex) //Returns the vertex in the index - 1
 {
 	Vector3 returnVertex;
 	returnVertex = this->verticies[(size_t(vertex) - 1) % this->nrOfEdges];

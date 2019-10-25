@@ -74,24 +74,30 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
    
 	testFloorMain = std::make_unique<SkyscraperFloor>(4);
 	testFloorToAdd = std::make_unique<SkyscraperFloor>(4);
-	testFloorMain.get()->translate(Vector3(15.0f, 7.0f, -15.0f));
+	testFloorMain.get()->translate(Vector3(15.0f, 13.0f, -15.0f));
 	testFloorToAdd.get()->rotateDeg(90);
+	testFloorMain.get()->unionShapes(*testFloorToAdd, testFloorMain.get()->getAVertex(4));
 	testFloorMain.get()->getTriangleIndices();
 	testFloorMain.get()->translateBy(Vector3(0.0f, -2.0f, 0.0f));
 	testFloorMain.get()->testDrawTriangles("SS-Top", Vector4(0.0f, 1.0f, 1.0f, 1.0f));
-
-	testFloorMain.get()->unionShapes(*testFloorToAdd, testFloorMain.get()->getAVertex(4));
+	
+	testFloorToAdd.get()->regenerateShape(5);
+	testFloorToAdd.get()->rotateDeg(88);
+	testFloorMain.get()->unionShapes(*testFloorToAdd, testFloorMain.get()->getAVertex(2));
+	testFloorMain.get()->getTriangleIndices();
+	testFloorMain.get()->translateBy(Vector3(0.0f, -3.0f, 0.0f));
+	testFloorMain.get()->testDrawTriangles("SS-2nd", Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+	
 	testFloorToAdd.get()->regenerateShape(8);
 	testFloorToAdd.get()->rotateDeg(45);
+	testFloorMain.get()->unionShapes(*testFloorToAdd, testFloorMain.get()->getAVertex(8));
 	testFloorMain.get()->getTriangleIndices();
-	testFloorMain.get()->translateBy(Vector3(0.0f, -2.0f, 0.0f));
-	testFloorMain.get()->testDrawTriangles("SS-2nd", Vector4(0.0f, 1.0f, 0.0f, 1.0f));
-
-	testFloorMain.get()->unionShapes(*testFloorToAdd, testFloorMain.get()->getAVertex(4));
-	testFloorMain.get()->getTriangleIndices();
-	testFloorMain.get()->translateBy(Vector3(0.0f, -2.0f, 0.0f));
+	testFloorMain.get()->translateBy(Vector3(0.0f, -3.0f, 0.0f));
 	testFloorMain.get()->testDrawTriangles("SS-3rd", Vector4(1.0f, 0.0f, 1.0f, 1.0f));
 	
+	testFloorMain.get()->translateBy(Vector3(0.0f, -4.0f, 0.0f));
+	testFloorMain.get()->testDrawTriangles("SS-floor", Vector4(0.5f, 0.5f, 0.0f, 1.0f));
+
    /*//Road Network Turtlewalker
 	testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
 	testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
