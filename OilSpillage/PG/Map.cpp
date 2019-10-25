@@ -81,12 +81,12 @@ void  Map::generateRoads()
 	roadTiles = tilemap->loadAsModels(graphics); // GameObject instantiation
 	for ( U16 y = 0;  y < tilemap->height;  ++y ) {
 		for ( U16 x = 0;  x < tilemap->width;  ++x ) {
-			auto& tile = roadTiles[tilemap->index(x,y)];
+			auto &tile = roadTiles[tilemap->index(x,y)];
 			tile.setScale(Vector3{ .0005f * config.tileScaleFactor.x,
 			                       .0005f * config.tileScaleFactor.y,
 			                       .0005f * config.tileScaleFactor.z }); // TODO: scale models instead
 			tile.setNormalMap(graphics.getTexturePointer("brickwallnormal"));
-			graphics.addToDraw(&tile , true);
+			graphics.addToDraw( &tile , true );
 		}
 	}
 }
