@@ -124,7 +124,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the important ");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important ");
 
-	objectives.addObjective(TypeOfMission::KillingSpree,10,20,"Kill the enemies ");
+	objectives.addObjective(TypeOfMission::KillingSpree, 10, 20, "Kill the enemies ");
 
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
