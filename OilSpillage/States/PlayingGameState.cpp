@@ -52,6 +52,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadModel("Roads/Road_3way");
 	graphics.loadModel("Roads/Road_4way");
 	graphics.loadModel("Houses/testHouse");
+	graphics.loadModel("Houses/testHouse2");
+	graphics.loadModel("Houses/testHouse3");
+	graphics.loadModel("Houses/testHouse4");
 
    //if constexpr ( isDebugging ) {
 	   // light tests
