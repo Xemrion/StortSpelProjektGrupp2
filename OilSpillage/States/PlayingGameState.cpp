@@ -21,7 +21,7 @@ void PlayingGameState::initAI()
 	{
 		for (int j = 0; j < 5; j++)
 		{
-			actorManager->createAttacker(i*2, j*2);
+			actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
 		}
 	}
 }
@@ -42,7 +42,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 	graphics.loadModel("Entities/Dummy_Turret");
-	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14 / 2, 0, 0));
+	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
 
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
@@ -134,11 +134,11 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	};
 	camera->startCinematic(&points, false);
 	Vector4 colorP2[] = {
-		Vector4(0.03,0.03,0.03,1),
-		Vector4(0.9, 0.9, 0.05, 1)
+		Vector4(0.03f,0.03f,0.03f,1),
+		Vector4(0.9f, 0.9f, 0.05f, 1)
 	};
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-	graphics.setParticle2ColorNSize(colorP2, 2, 0.025, 0.05);
+	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
 	//Input::setKeyboardPlayerID(0);
 	//Bullet
@@ -510,7 +510,7 @@ void  PlayingGameState::update(float deltaTime)
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
-#if _DEBUG
+#if _DEBUG | RELEASE_DEBUG //Set RELEASE_DEBUG to false to deactivate imgui in release!
 	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();
 	   ImGui::NewFrame();
@@ -577,7 +577,7 @@ void PlayingGameState::spawnObjects()
 		tempo2 = physics->addBox(btVector3(20, 0.2f + i, -20), btVector3(0.5f, 0.5f, 0.5f), 0.01f);
 		objPtr->setPosition(Vector3(20, 0.2f + i, -20));
 		objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
-		objPtr->setColor(Vector4(0.7, 0.7, 0.3, 1));
+		objPtr->setColor(Vector4(0.7f, 0.7f, 0.3f, 1));
 		objPtr->setRigidBody(tempo2, physics.get());
 		objPtr->getRigidBody()->setFriction(1);
 		objPtr->getRigidBody()->setActivationState(0);
@@ -592,7 +592,7 @@ void PlayingGameState::spawnObjects()
 	tempo2 = physics->addBox(btVector3(20, 0.2f, -20), btVector3(5.5f, 12.5f, 5.5f), 0);
 	objPtr->setPosition(Vector3(20, 0.2f, -20));
 	objPtr->setScale(Vector3(5.5f, 12.5f, 5.5f));
-	objPtr->setColor(Vector4(0.3, 0.3, 0.9, 1));
+	objPtr->setColor(Vector4(0.3f, 0.3f, 0.9f, 1));
 	objPtr->setRigidBody(tempo2, physics.get());
 	Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(XM_PI / 3, 0, 0));
 	btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);

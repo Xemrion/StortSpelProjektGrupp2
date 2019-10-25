@@ -32,11 +32,11 @@ class WeaponHandler
 public:
 	static constexpr Weapon weapons[] = {
 		Weapon(),																				   //default gun
-		{     20,      0.15f,        55.0f,          2.0f,		Vector3(0.02, 0.02, 0.02),	0.16f, WeaponType::MachineGun },
-		{    200,      1.5f,        13.0f,           3.0f,		Vector3(1.0, 1.0, 1.0),		1.0f, WeaponType::MissileLauncher },
-		{    160,      1.0f,         0.0f,           0.5f,		Vector3(1.0, 1.0, 10.0),	1.0f, WeaponType::Laser },
-		{     40,      0.01f,        16.0f,          1.0f,		Vector3(1.0, 1.0, 1.0),		0.2f, WeaponType::Flamethrower },
-		{	   5,      0.3f,         12.0f,          1.0f,	    Vector3(0.2, 0.2, 0.2),     0.2f, WeaponType::aiMachineGun }
+		{     20,      0.15f,        55.0f,          2.0f,		Vector3(0.02f, 0.02f, 0.02f),	0.16f, WeaponType::MachineGun },
+		{    200,      1.5f,        13.0f,           3.0f,		Vector3(1.0f, 1.0f, 1.0f),		1.0f, WeaponType::MissileLauncher },
+		{    160,      1.0f,         0.0f,           0.5f,		Vector3(1.0f, 1.0f, 10.0f),	1.0f, WeaponType::Laser },
+		{     40,      0.01f,        16.0f,          1.0f,		Vector3(1.0f, 1.0f, 1.0f),		0.2f, WeaponType::Flamethrower },
+		{	   5,      0.3f,         12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),     0.2f, WeaponType::aiMachineGun }
 	};
 
 	static Weapon getWeapon(WeaponType type) { 

@@ -142,7 +142,7 @@ void Minimap::update(float deltaTime)
 	{
 		for (int y = static_cast<int>(topLeft.y); y < static_cast<int>(std::roundf(bottomRight.y)); y++)
 		{
-			if ((playerMapPos - Vector3(x, 0, y)).Length() < this->fogClearRadius)
+			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius)
 			{
 				this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] = 0;
 			}

@@ -521,7 +521,7 @@ void Vehicle::updateWeapon(float deltaTime)
 		if (l < XM_PI + 0.1f && l > XM_PI - 0.1f)
 		{
 			dir.Normalize();
-			curDir = Vector2(0.5 + curDir.x * 0.5, 0.5 + curDir.y * 0.5);
+			curDir = Vector2(0.5f + curDir.x * 0.5f, 0.5f + curDir.y * 0.5f);
 		}
 		curDir = Vector2::Lerp(curDir, dir, deltaTime * 20);
 		curDir.Normalize();
@@ -531,7 +531,7 @@ void Vehicle::updateWeapon(float deltaTime)
 		curDir = dir;
 	}
 
-	float newRot = atan2(curDir.x, curDir.y) + 3.14 / 2;
+	float newRot = atan2(curDir.x, curDir.y) + 3.14f / 2;
 	this->gunRotation = newRot;
 	this->mountedWeapon->setRotation(Vector3(0, newRot, 0));
 
@@ -673,7 +673,7 @@ float Vehicle::getHeading(Quaternion qt)
 	float attitude;
 	float bank;
 
-	double test = qt.x * qt.y + qt.z * qt.w;
+	float test = qt.x * qt.y + qt.z * qt.w;
 	if (test > 0.499) { // singularity at north pole
 		heading = 2 * atan2(qt.x, qt.w);
 		attitude = XM_PI / 2;
@@ -685,9 +685,9 @@ float Vehicle::getHeading(Quaternion qt)
 		bank = 0;
 	}
 	else {
-		double sqx = qt.x * qt.x;
-		double sqy = qt.y * qt.y;
-		double sqz = qt.z * qt.z;
+		float sqx = qt.x * qt.x;
+		float sqy = qt.y * qt.y;
+		float sqz = qt.z * qt.z;
 		heading = atan2(2 * qt.y * qt.w - 2 * qt.x * qt.z, 1 - 2 * sqy - 2 * sqz);
 		attitude = asin(2 * test);
 		bank = atan2(2 * qt.x * qt.w - 2 * qt.y * qt.z, 1 - 2 * sqx - 2 * sqz);
