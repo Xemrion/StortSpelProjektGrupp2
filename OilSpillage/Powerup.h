@@ -3,7 +3,8 @@
 
 enum class PowerUpType
 {
-	Time
+	Time,
+	Length
 };
 
 class PowerUp : public GameObject

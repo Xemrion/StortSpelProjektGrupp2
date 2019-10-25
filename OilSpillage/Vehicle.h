@@ -33,6 +33,8 @@ private:
 
 	int health;
 
+	float powerUpTimers[(int)PowerUpType::Length];
+
 	float timeSinceLastShot;
 	Weapon weapon;
 	Stats defaultStats;
