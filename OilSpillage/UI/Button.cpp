@@ -23,20 +23,20 @@ void Button::draw(bool selected)
 	Vector2 textSize(UserInterface::getFontArial()->MeasureString(this->text.text.c_str()) * 0.4f);
 	Vector2 pos(this->position);
 
-	if (this->text.alignment == TopMiddle || this->text.alignment == Center || this->text.alignment == BottomMiddle)
+	if (this->text.alignment == TextAlignment::TopMiddle || this->text.alignment == TextAlignment::Center || this->text.alignment == TextAlignment::BottomMiddle)
 	{
 		pos.x += Button::size.x / 2 - textSize.x / 2;
 	}
-	else if (this->text.alignment == TopRight || this->text.alignment == MiddleRight || this->text.alignment == BottomRight)
+	else if (this->text.alignment == TextAlignment::TopRight || this->text.alignment == TextAlignment::MiddleRight || this->text.alignment == TextAlignment::BottomRight)
 	{
 		pos.x += Button::size.x - textSize.x;
 	}
 
-	if (this->text.alignment == MiddleLeft || this->text.alignment == Center || this->text.alignment == MiddleRight)
+	if (this->text.alignment == TextAlignment::MiddleLeft || this->text.alignment == TextAlignment::Center || this->text.alignment == TextAlignment::MiddleRight)
 	{
 		pos.y += Button::size.y / 2 - textSize.y / 2;
 	}
-	else if (this->text.alignment == BottomLeft || this->text.alignment == BottomMiddle || this->text.alignment == BottomRight)
+	else if (this->text.alignment == TextAlignment::BottomLeft || this->text.alignment == TextAlignment::BottomMiddle || this->text.alignment == TextAlignment::BottomRight)
 	{
 		pos.y += Button::size.y - textSize.y;
 	}

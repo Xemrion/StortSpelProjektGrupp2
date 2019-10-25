@@ -4,7 +4,7 @@
 #include "Element.h"
 #include "..//Texture.h"
 
-enum TextAlignment
+enum class TextAlignment
 {
 	TopLeft,
 	TopMiddle,
@@ -21,9 +21,9 @@ struct Text
 {
 	std::string text;
 	Color colour = Color(0, 0, 0);
-	TextAlignment alignment = TopLeft;
+	TextAlignment alignment = TextAlignment::TopLeft;
 
-	Text(std::string text, Color colour = Color(0, 0, 0), TextAlignment alignment = TopLeft) : text(text), colour(colour), alignment(alignment) { }
+	Text(std::string text, Color colour = Color(0, 0, 0), TextAlignment alignment = TextAlignment::TopLeft) : text(text), colour(colour), alignment(alignment) { }
 };
 
 class Button : public Element
