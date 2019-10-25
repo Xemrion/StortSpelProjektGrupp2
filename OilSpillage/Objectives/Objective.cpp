@@ -17,7 +17,7 @@ Objective::~Objective()
 	}
 	if (!(this->mission->typeMission==TypeOfMission::FindAndCollect))
 	{
-		delete[] this->mission->enemies;
+		//delete[] this->mission->enemies;
 	}
 	delete this->mission;
 }
@@ -39,11 +39,11 @@ void Objective::setTarget(GameObject* *target, int nrOfTargets)
 void Objective::setEnemies(Actor* *enemies, int nrOfEnemies)
 {
 	started = true;
-	mission->enemies = new Actor*[nrOfEnemies];
+	/*mission->enemies = new Actor*[nrOfEnemies];
 	for (int i = 0; i < nrOfEnemies; i++)
 	{
 		this->mission->target[i] = enemies[i];
-	}
+	}*/
 	this->nrOfMax = nrOfEnemies;
 	this->nrOfTargets = nrOfEnemies;
 }
@@ -63,7 +63,7 @@ void Objective::setInfo(std::string info)
 	this->mission->info = info;
 }
 
-void Objective::killEnemy(Actor* enemy)
+void Objective::killEnemy()
 {
 	//int found = -1;
 	//for (int i = 0; i < nrOfTargets && found==-1; i++)
@@ -104,11 +104,11 @@ std::string Objective::getInfo() const
 Vector3 Objective::getAveragePosition() const
 {
 	Vector3 avPos = Vector3(0, 0, 0);
-	for (int i = 0; i < nrOfTargets; i++)
+	/*for (int i = 0; i < nrOfTargets; i++)
 	{
 		avPos += this->mission->enemies[i]->getPosition();
 	} 
-	avPos /= float(nrOfTargets);
+	avPos /= float(nrOfTargets);*/
 	return avPos;
 }
 

@@ -121,27 +121,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
 
 
-	/*objTestPickUp = new GameObject();
-	objTestPickUp->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(objTestPickUp);
-	objTestPickUp->setColor(Vector4(0.7f, 1.0f, 0.3f, 1.0f));
-	objTestPickUp->setPosition(Vector3(30.0f, 0.0f, -50.0f));
-	objTestPickUp2 = new GameObject();
-	objTestPickUp2->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(objTestPickUp2);
-	objTestPickUp2->setColor(Vector4(0.7f, 1.0f, 0.3f, 1.0f));
-	objTestPickUp2->setPosition(Vector3(10.0f, 0.0f, -60.0f));
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the important ");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important ");
 
-	objTestPickUp3 = new GameObject();
-	objTestPickUp3->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(objTestPickUp3);
-	objTestPickUp3->setColor(Vector4(0.7f, 1.0f, 0.3f, 1.0f));
-	objTestPickUp3->setPosition(Vector3(7.0f, 0.0f, -55.0f));
-	
-	objArray[0] = objTestPickUp;
-	objArray[1] = objTestPickUp2;
-	objArray[2] = objTestPickUp3;*/
-	objectives.addObjective(TypeOfMission::FindAndCollect,10,2,"Find and pick up the",objArray);
+	objectives.addObjective(TypeOfMission::KillingSpree,10,20,"Kill the enemies ");
 
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 

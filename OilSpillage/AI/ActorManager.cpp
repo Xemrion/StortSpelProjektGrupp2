@@ -1,5 +1,6 @@
 #include "ActorManager.h"
-
+#include "../game.h"
+#include "../States/PlayingGameState.h"
 ActorManager::ActorManager()
 {
 	this->aStar = nullptr;
@@ -29,6 +30,11 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		}
 		else
 		{
+			ObjectiveHandler *ptr = &static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler();
+			if (ptr->getObjective(0)->getType() == TypeOfMission::KillingSpree)
+			{
+				ptr->getObjective(0)->killEnemy();
+			}
 			actors.at(i)->death();
 			delete actors.at(i);
 			actors.erase(actors.begin() + i);

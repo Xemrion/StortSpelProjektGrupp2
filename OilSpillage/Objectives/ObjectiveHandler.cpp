@@ -19,7 +19,7 @@ ObjectiveHandler::~ObjectiveHandler()
 	for (int i = 0; i < this->pickUpArrs.size(); i++)
 	{
 		int max = 0;
-		for (int j = 0; j < this->nrOfPickupsVec.at(0); j++)
+		for (int j = 0; j < this->nrOfPickupsVec.at(i); j++)
 		{
 			delete this->pickUpArrs.at(i)[j];
 		}
@@ -39,31 +39,34 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 	temp->setType(type);
 	int typeInt = rand() % int(TypeOfTarget::Size);
 	std::string typeInfo = this->types.getType(TypeOfTarget(typeInt));
-	temp->setInfo(info+typeInfo);
+	
 	temp->setReward(rewardTime);
-	this->nrOfPickups.push_back(nrOfTargets);
-	GameObject** targets;
-	targets = new GameObject *[nrOfTargets];
-	for (int i = 0; i < nrOfTargets; i++)
-	{
-		targets[i] = new GameObject;
-		Vector3 pos(rand() % 10 + 10, 0, rand() % 10 - 20);
-		pos.x += i * 10;
-		pos.z += i * -10;
-		pos.y -= this->types.getColor(TypeOfTarget(typeInt)).z;
-		targets[i]->setPosition(pos);
-		targets[i]->mesh = Game::getGraphics().getMeshPointer("Cube");
-		targets[i]->setColor(this->types.getColor(TypeOfTarget(typeInt)));
-		targets[i]->setScale(Vector3(this->types.getColor(TypeOfTarget(typeInt)).z));
-		Game::getGraphics().addToDraw(targets[i]);
-	}
-	this->pickUpArrs.push_back(targets);
+	
 	if (type == TypeOfMission::FindAndCollect)
 	{
+		temp->setInfo(info + typeInfo);
+		this->nrOfPickupsVec.push_back(nrOfTargets);
+		GameObject** targets;
+		targets = new GameObject * [nrOfTargets];
+		for (int i = 0; i < nrOfTargets; i++)
+		{
+			targets[i] = new GameObject;
+			Vector3 pos(rand() % 10 + 10, 0, rand() % 10 - 20);
+			pos.x += i * 10;
+			pos.z += i * -10;
+			pos.y -= this->types.getColor(TypeOfTarget(typeInt)).z;
+			targets[i]->setPosition(pos);
+			targets[i]->mesh = Game::getGraphics().getMeshPointer("Cube");
+			targets[i]->setColor(this->types.getColor(TypeOfTarget(typeInt)));
+			targets[i]->setScale(Vector3(this->types.getColor(TypeOfTarget(typeInt)).z));
+			Game::getGraphics().addToDraw(targets[i]);
+		}
+		this->pickUpArrs.push_back(targets);
 		temp->setTarget(this->pickUpArrs.at(this->pickUpArrs.size()-1), nrOfTargets);
 	}
 	else
 	{
+		temp->setInfo(info);
 		temp->setEnemies(enemies, nrOfTargets);
 	}
 	this->objectiveVec.push_back(temp);
@@ -87,22 +90,23 @@ void ObjectiveHandler::update(Vector3 playerPos)
 {
 	if (this->objectiveVec.size() != 0)
 	{
-		for (Objective* object : this->objectiveVec)
-		{
-			object->update(playerPos);
-
-		}
+		this->objectiveVec.at(0)->update(playerPos);
 		if (this->objectiveVec.at(0)->isDone())
 		{
-			for (int i = 0; i < 1; i++)
+			if (this->objectiveVec.at(0)->getType()==TypeOfMission::FindAndCollect)
 			{
-				for (int j = 0; j < this->objectiveVec.at(i)->getNrOfMax(); j++)
+			
+				for (int i = 0; i < 1; i++)
 				{
-					Game::getGraphics().removeFromDraw(this->pickUpArrs.at(i)[j]);
+					for (int j = 0; j < this->objectiveVec.at(i)->getNrOfMax(); j++)
+					{
+						Game::getGraphics().removeFromDraw(this->pickUpArrs.at(i)[j]);
+					}
 				}
+				delete this->objectiveVec.at(0);
+				this->objectiveVec.erase(this->objectiveVec.begin());
+			
 			}
-			delete this->objectiveVec.at(0);
-			this->objectiveVec.erase(this->objectiveVec.begin());
 			this->eventNewObj = true;
 		}
 	}

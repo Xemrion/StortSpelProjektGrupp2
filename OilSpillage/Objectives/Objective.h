@@ -30,7 +30,7 @@ public:
 	void setType(TypeOfMission type);
 	void setReward(int time);
 	void setInfo(std::string info);
-	void killEnemy(Actor* enemy);
+	void killEnemy();
 	GameObject* getTarget(int id)const;
 	TypeOfMission getType()const;
 	int getRewardTime()const;
