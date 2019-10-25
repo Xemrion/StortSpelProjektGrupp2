@@ -25,12 +25,12 @@ void UserInterface::initStaticVariables()
 {
 	UserInterface::commonStates = std::make_unique<CommonStates>(Game::getGraphics().getDevice());
 	UserInterface::spriteBatch = std::make_unique<SpriteBatch>(Game::getGraphics().getDeviceContext());
-	UserInterface::fontArial = std::make_unique<SpriteFont>(Game::getGraphics().getDevice(), L"arial.spritefont");
+	UserInterface::fontArial = std::make_unique<SpriteFont>(Game::getGraphics().getDevice(), L"data/arial.spritefont");
 }
 
 Element* UserInterface::changeSelected(Element* selected) const
 {
-	if (Input::CheckButton(L_DOWN, PRESSED, 0))
+	if (Input::checkButton(Keys::L_DOWN, States::PRESSED))
 	{
 		if (selected->getDown() != nullptr)
 		{
@@ -38,7 +38,7 @@ Element* UserInterface::changeSelected(Element* selected) const
 		}
 	}
 
-	if (Input::CheckButton(L_UP, PRESSED, 0))
+	if (Input::checkButton(Keys::L_UP, States::PRESSED))
 	{
 		if (selected->getUp() != nullptr)
 		{
@@ -46,7 +46,7 @@ Element* UserInterface::changeSelected(Element* selected) const
 		}
 	}
 
-	if (Input::CheckButton(L_LEFT, PRESSED, 0))
+	if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 	{
 		if (selected->getLeft() != nullptr)
 		{
@@ -54,7 +54,7 @@ Element* UserInterface::changeSelected(Element* selected) const
 		}
 	}
 
-	if (Input::CheckButton(L_RIGHT, PRESSED, 0))
+	if (Input::checkButton(Keys::L_RIGHT, States::PRESSED))
 	{
 		if (selected->getRight() != nullptr)
 		{

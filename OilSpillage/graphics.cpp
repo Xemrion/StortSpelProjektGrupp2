@@ -999,7 +999,7 @@ void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
 	}
 }
 
-bool Graphics::loadTexture(std::string path, bool overridePath )
+bool Graphics::loadTexture(std::string path, bool overridePath, bool cpuOnly)
 {
 	std::string texturePath;
 	if (!overridePath) {
@@ -1012,7 +1012,7 @@ bool Graphics::loadTexture(std::string path, bool overridePath )
 	if (textures.find(texturePath) == textures.end()) {
 		Texture* newTexture = new Texture();
 
-		if (!newTexture->Initialize(this->device.Get(), this->deviceContext.Get(), texturePath.c_str(), -1)) {
+		if (!newTexture->Initialize(this->device.Get(), this->deviceContext.Get(), texturePath.c_str(), -1, cpuOnly)) {
 			delete newTexture;
 			return false;
 		}
@@ -1037,15 +1037,24 @@ bool Graphics::reloadTexture(std::string path, bool overridePath)
 		Texture* oldTexture = texture->second;
 		Texture newTexture;
 
-		if (newTexture.Initialize(this->device.Get(), this->deviceContext.Get(), texturePath.c_str(), -1))
+		if (newTexture.Initialize(this->device.Get(), this->deviceContext.Get(), texturePath.c_str(), -1, oldTexture->isCpuOnly()))
 		{
 			oldTexture->Shutdown();
 
 			oldTexture->width = newTexture.width;
 			oldTexture->height = newTexture.height;
-			//oldTexture->m_targaData = newTexture.m_targaData;
-			oldTexture->texture = newTexture.texture;
-			oldTexture->textureView = newTexture.textureView;
+
+			if (oldTexture->isCpuOnly())
+			{
+				oldTexture->data = newTexture.data;
+				oldTexture->bpp = newTexture.bpp;
+			}
+			else
+			{
+				oldTexture->texture = newTexture.texture;
+				oldTexture->textureView = newTexture.textureView;
+			}
+			
 			return true;
 		}
 	}

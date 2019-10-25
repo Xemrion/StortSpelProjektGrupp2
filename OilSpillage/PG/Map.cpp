@@ -126,6 +126,13 @@ void  Map::generateBuildings( ) {
 	DBG_PROBE( Map::generateBuildings );
 	RNG  rng{ RD()() };
 	rng.seed( config.seed );
+
+	//Array of possible buildings
+	std::string buildingArr[4];
+	buildingArr[0] = "Houses/testHouse";
+	buildingArr[1] = "Houses/testHouse2";
+	buildingArr[2] = "Houses/testHouse3";
+	buildingArr[3] = "Houses/testHouse4";
 	
 	#ifdef _DEBUG
 	   U32            total_building_count{ 0 };
@@ -187,11 +194,12 @@ void  Map::generateBuildings( ) {
 						auto &houseTile = houseTiles.back();
 						tilemap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
-						houseTile.mesh = graphics.getMeshPointer("Houses/testHouse");
+						int randomHouse = rand() % 4; //decides the house
+						houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
 						//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
-						houseTile.setScale({ .025f * config.tileScaleFactor.x,
-						                     .025f * config.tileScaleFactor.y /* config.buildingFloorHeightFactor */ * randomFloorCount,
-						                     .025f * config.tileScaleFactor.z });
+						houseTile.setScale({ .0322f * config.tileScaleFactor.x,
+						                     .015f * config.tileScaleFactor.y + (.25f * randomFloorCount) /* config.buildingFloorHeightFactor * randomFloorCount */,
+						                     .0322f * config.tileScaleFactor.z });
 						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) } );
 				  #ifndef _DEBUG
 						btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,

@@ -8,7 +8,7 @@ void UIOptions::updateUI(float deltaTime)
 {
 	this->selected = this->changeSelected(this->selected);
 
-	if (Input::CheckButton(CONFIRM, PRESSED, 0))
+	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
 		if (this->selected == this->buttonBack.get())
 		{
@@ -44,7 +44,7 @@ void UIOptions::updateUI(float deltaTime)
 			}
 		}
 	}
-	else if (Input::CheckButton(CANCEL, PRESSED, 0))
+	else if (Input::checkButton(Keys::CANCEL, States::PRESSED))
 	{
 		MenuGameState* state = dynamic_cast<MenuGameState*>(Game::getCurrentState());
 
@@ -83,7 +83,7 @@ UIOptions::~UIOptions()
 
 void UIOptions::init()
 {
-	this->buttonBack = std::make_unique<Button>(Text("Back", Color(Colors::Black), Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2.75f));
+	this->buttonBack = std::make_unique<Button>(Text("Back", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2.75f));
 	this->checkBoxTest = std::make_unique<CheckBox>(Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2 - 10 - CheckBox::size.x, SCREEN_HEIGHT / 2 - Button::size.y * 2.75f));
 	this->sliderTest = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 1.25f));
 

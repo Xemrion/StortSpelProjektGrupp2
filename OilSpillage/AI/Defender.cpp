@@ -11,6 +11,7 @@ Defender::Defender()
 	this->updatedStats = this->defaultStats;
 
 	this->health = this->updatedStats.maxHealth;
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
 
 Defender::Defender(float x, float z, AStar* aStar, Vector3 objectivePos)
@@ -20,7 +21,7 @@ Defender::Defender(float x, float z, AStar* aStar, Vector3 objectivePos)
 	setUpActor();
 	this->objectivePos = objectivePos;
 
-	this->weapon = AIWeapon::machineGun;
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 
 	this->defaultStats = VehicleStats::AIDefender;
 	this->updatedStats = this->defaultStats;
@@ -57,27 +58,8 @@ void Defender::update(float dt, Vector3 targetPos)
 		nrOfFrames = 0;
 	}
 
-	for (int i = 0; i < bulletCount; i++)
-	{
-		Game::getGraphics().removeFromDraw(this->bullets[i].obj);
+	updateWeapon(deltaTime);
 
-		if (this->bullets[i].timeLeft > 0.0f)
-		{
-			if ((this->bullets[i].obj->getPosition() - this->targetPos).Length() < 0.5f)
-			{
-				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-5);
-				this->bullets[i].timeLeft = 0;
-
-			}
-			else
-			{
-				//Game::getGraphics().addParticle(this->position - this->vecForward, Vector3(0, 0, 0), 1, 1, 1);
-				this->bullets[i].timeLeft -= deltaTime;
-				this->bullets[i].obj->move(this->bullets[i].dir * this->bullets[i].speed * deltaTime);
-				Game::getGraphics().addToDraw(this->bullets[i].obj);
-			}
-		}
-	}
 	nrOfFrames++;
 }
 
@@ -171,9 +153,9 @@ void Defender::returning()
 Status Defender::inRange()
 {
 	Status status;
-	float tempDelta = deltaTime + this->leftoverTime;
+	float tempDelta = deltaTime + this->timeSinceLastShot;
 
-	if ((this->getPosition() - targetPos).Length() > 7 && tempDelta <= this->weapon.fireSpeed)
+	if ((this->getPosition() - targetPos).Length() > 7 && tempDelta <= this->weapon.fireRate)
 	{
 		status = Status::FAILURE;
 	}

@@ -33,6 +33,8 @@ void UIPlaying::updateUI(float deltaTime)
 		this->minimap->init();
 		this->initMinimap = false;
 	}
+
+	this->minimap->update(deltaTime);
 }
 
 void UIPlaying::drawUI()
@@ -40,6 +42,7 @@ void UIPlaying::drawUI()
 	std::string timeStr = this->getFormattedTime();
 	Vector2 textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
 	Vehicle* player = static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer();
+
 	this->healthBar->setAmount(player->getHealth() / static_cast<float>(player->getMaxHealth()));
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
@@ -60,5 +63,10 @@ UIPlaying::~UIPlaying()
 void UIPlaying::init()
 {
 	this->healthBar = std::make_unique<Slider>(Vector2(10, 10));
-	this->minimap = std::make_unique<Minimap>(0.25f, Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
+	this->minimap = std::make_unique<Minimap>(0.25f, 20.0f, Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
+}
+
+void UIPlaying::resetMinimapFog()
+{
+	this->minimap->resetFog();
 }
