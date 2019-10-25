@@ -8,7 +8,7 @@ void UIOptions::updateUI(float deltaTime)
 {
 	this->selected = this->changeSelected(this->selected);
 
-	if (Input::CheckButton(CONFIRM, PRESSED, 0))
+	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
 		if (this->selected == this->buttonBack.get())
 		{
@@ -44,7 +44,7 @@ void UIOptions::updateUI(float deltaTime)
 			}
 		}
 	}
-	else if (Input::CheckButton(CANCEL, PRESSED, 0))
+	else if (Input::checkButton(Keys::CANCEL, States::PRESSED))
 	{
 		MenuGameState* state = dynamic_cast<MenuGameState*>(Game::getCurrentState());
 

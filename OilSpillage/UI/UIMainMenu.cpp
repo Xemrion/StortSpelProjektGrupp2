@@ -7,7 +7,7 @@ void UIMainMenu::updateUI(float deltaTime)
 {
 	this->selected = this->changeSelected(this->selected);
 
-	if (Input::CheckButton(CONFIRM, PRESSED, 0))
+	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
 		if (this->selected == this->buttonPlay.get())
 		{

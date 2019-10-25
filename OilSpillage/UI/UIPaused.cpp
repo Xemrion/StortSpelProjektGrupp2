@@ -7,7 +7,7 @@ void UIPaused::updateUI(float deltaTime)
 {
 	this->selected = this->changeSelected(this->selected);
 
-	if (Input::CheckButton(CONFIRM, PRESSED, 0))
+	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
 		if (this->selected == this->buttonUnpause.get())
 		{
@@ -22,7 +22,7 @@ void UIPaused::updateUI(float deltaTime)
 			Game::setState(Game::STATE_MENU);
 		}
 	}
-	else if (Input::CheckButton(CANCEL, PRESSED, 0) || Input::CheckButton(MENU, PRESSED, 0))
+	else if (Input::checkButton(Keys::CANCEL, States::PRESSED) || Input::checkButton(Keys::MENU, States::PRESSED))
 	{
 		static_cast<PlayingGameState*>(Game::getCurrentState())->setCurrentMenu(PlayingGameState::MENU_PLAYING);
 	}

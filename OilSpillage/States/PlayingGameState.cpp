@@ -139,7 +139,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorP2, 2, size1+0.1f, size2+0.1f);
 
-	Input::SetKeyboardPlayerID(0);
+	//Input::setKeyboardPlayerID(0);
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
@@ -183,14 +183,14 @@ void  PlayingGameState::ImGui_Driving()
 
 	Vector3 camPos = camera->getPosition();
 	Vector3 camRot = camera->getRotation();
-	Vector2 lDir = Input::GetDirectionL(0);
-	Vector2 rDir = Input::GetDirectionR(0);
-	float lStr = Input::GetStrengthL(0);
-	float rStr = Input::GetStrengthR(0);
-	bool status[4] = { Input::CheckButton(CONFIRM, UP, 0), Input::CheckButton(CONFIRM, HELD, 0), Input::CheckButton(CONFIRM, RELEASED, 0), Input::CheckButton(CONFIRM, PRESSED, 0) };
+	Vector2 lDir = Input::getDirectionL();
+	Vector2 rDir = Input::getDirectionR();
+	float lStr = Input::getStrengthL();
+	float rStr = Input::getStrengthR();
+	bool status[4] = { Input::checkButton(Keys::CONFIRM, States::UP), Input::checkButton(Keys::CONFIRM, States::HELD), Input::checkButton(Keys::CONFIRM, States::RELEASED), Input::checkButton(Keys::CONFIRM, States::PRESSED) };
 	ImGui::Text(("Cam Pos: " + std::to_string(camPos.x) + " " + std::to_string(camPos.y) + " " + std::to_string(camPos.z)).c_str());
 	ImGui::Text(("Cam Rot: " + std::to_string(camRot.x) + " " + std::to_string(camRot.y) + " " + std::to_string(camRot.z)).c_str());
-	ImGui::Text(("\n-- PLAYER 0 --\nConfirm Status - Up: " + std::to_string(status[0]) + " Held: " + std::to_string(status[1]) + " Released: " + std::to_string(status[2]) + " Pressed: " + std::to_string(status[3])).c_str());
+	ImGui::Text(("\nConfirm Status - Up: " + std::to_string(status[0]) + " Held: " + std::to_string(status[1]) + " Released: " + std::to_string(status[2]) + " Pressed: " + std::to_string(status[3])).c_str());
 	ImGui::Text(("L Dir: " + std::to_string(lDir.x) + " " + std::to_string(lDir.y)).c_str());
 	ImGui::Text(("L Str: " + std::to_string(lStr)).c_str());
 	ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
@@ -407,12 +407,12 @@ void  PlayingGameState::update(float deltaTime)
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{
-		if (Input::IsKeyDown_DEBUG(Keyboard::E)) {
+		if (Input::isKeyDown_DEBUG(Keyboard::E)) {
 			deltaTime /= 4;
 		}
 
 #if _DEBUG | RELEASE_DEBUG
-		if (Input::CheckButton(ACTION_1, PRESSED, 0))
+		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
 		{
 			pausedTime = !pausedTime;
 		}
@@ -500,7 +500,7 @@ void  PlayingGameState::update(float deltaTime)
 	menues[MENU_PLAYING]->update( deltaTime );
 	if ( currentMenu != MENU_PLAYING )
 		menues[currentMenu]->update( deltaTime );
-	else if ( Input::CheckButton(MENU, PRESSED, 0) )
+	else if ( Input::checkButton(Keys::MENU, States::PRESSED) )
 		setCurrentMenu( PlayingGameState::MENU_PAUSED );
 	
 	//Render all objects
