@@ -121,12 +121,11 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
 
 
-	objTestPickUp = new GameObject();
+	/*objTestPickUp = new GameObject();
 	objTestPickUp->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(objTestPickUp);
 	objTestPickUp->setColor(Vector4(0.7f, 1.0f, 0.3f, 1.0f));
 	objTestPickUp->setPosition(Vector3(30.0f, 0.0f, -50.0f));
-
 	objTestPickUp2 = new GameObject();
 	objTestPickUp2->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(objTestPickUp2);
@@ -141,8 +140,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	
 	objArray[0] = objTestPickUp;
 	objArray[1] = objTestPickUp2;
-	objArray[2] = objTestPickUp3;
-	objectives.addObjective(TypeOfMission::FindAndCollect,10,3,"Find and pick up the boxes",objArray);
+	objArray[2] = objTestPickUp3;*/
+	objectives.addObjective(TypeOfMission::FindAndCollect,10,2,"Find and pick up the",objArray);
 
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 

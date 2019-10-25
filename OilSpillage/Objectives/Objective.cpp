@@ -65,17 +65,19 @@ void Objective::setInfo(std::string info)
 
 void Objective::killEnemy(Actor* enemy)
 {
-	int found = -1;
-	for (int i = 0; i < nrOfTargets && found==-1; i++)
-	{
-		if (this->mission->enemies[i] == enemy)
-		{
-			found = i;
-		}
-	}
-	Actor* temp = this->mission->enemies[nrOfTargets - 1];
-	this->mission->enemies[found] = temp;//
-	this->mission->enemies[nrOfTargets - 1] = nullptr;
+	//int found = -1;
+	//for (int i = 0; i < nrOfTargets && found==-1; i++)
+	//{
+	//	if (this->mission->enemies[i] == enemy)
+	//	{
+	//		found = i;
+	//	}
+	//}
+	//Actor* temp = this->mission->enemies[nrOfTargets - 1];
+	//this->mission->enemies[found] = temp;//
+	//this->mission->enemies[nrOfTargets - 1] = nullptr;
+
+
 	this->nrOfTargets--;
 }
 
@@ -120,7 +122,7 @@ bool Objective::isDone()
 	{
 		if (started)
 		{
-			if (this->nrOfTargets<=0)
+			if (this->nrOfTargets<=10)
 			{
 				return true;
 			}
@@ -147,7 +149,7 @@ void Objective::update(Vector3 playerPosition)
 			if (this->mission->target[i] != nullptr)
 			{
 				Vector3 vecPlayerToObj = playerPosition - this->mission->target[i]->getPosition();
-				if (vecPlayerToObj.Length() < 2.0f)
+				if (vecPlayerToObj.Length() < this->mission->target[i]->getScale().x*2.0f)
 				{
 					this->mission->target[i]->setPosition(Vector3(1000, 1000, 1000));
 					GameObject* temp = this->mission->target[nrOfMax -1];
@@ -166,4 +168,9 @@ void Objective::update(Vector3 playerPosition)
 			done = true;
 		}
 	}
+}
+
+int Objective::getNrOfMax() const
+{
+	return this->nrOfMax;
 }

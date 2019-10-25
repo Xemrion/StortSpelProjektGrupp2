@@ -47,17 +47,22 @@ void UIPlaying::drawUI()
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 10), Colors::LightPink);
 	
-	Vector2 textSize2 = UserInterface::getFontArial()->MeasureString(objHandlerPtr->getObjective(0)->getInfo().c_str());
+	
 	Color color;
-	if (objHandlerPtr->getObjective(0)->isDone())
+	std::string infoUI;
+	if (objHandlerPtr->getObjective(0)==nullptr)
 	{
+		infoUI = " You did it. Get out now!!! ";
 		color = Colors::Yellow;
 	}
 	else
 	{
+		infoUI = objHandlerPtr->getObjective(0)->getInfo();
 		color = Colors::White;
 	}
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), objHandlerPtr->getObjective(0)->getInfo().c_str(), Vector2(0, 40), color,0,Vector3(0,0,0),Vector3(0.2,0.2,0.2));
+
+	
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(),infoUI.c_str(), Vector2(0, 40), color,0,Vector3(0,0,0),Vector3(0.2,0.2,0.2));
 
 	this->healthBar->draw(false);
 	this->minimap->draw(false);

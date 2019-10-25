@@ -38,6 +38,7 @@ public:
 	Vector3 getAveragePosition()const;
 	bool isDone();
 	void update(Vector3 playerPosition);
+	int getNrOfMax()const;
 private:
 	Mission* mission;
 	bool done;
