@@ -159,6 +159,7 @@
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
+    <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="AI\Boid.h" />
     <ClInclude Include="AI\Defender.h" />
     <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="Powerup.h" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
     <ClInclude Include="AI\Turret.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />

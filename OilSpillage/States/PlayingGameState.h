@@ -10,6 +10,7 @@
 #include "../DynamicCamera.h"
 #include "../PG/Map.hpp"
 #include "../UI/UserInterface.h"
+#include "../Powerup.h"
 
 class PlayingGameState : public GameState {
 	friend class Game;
@@ -58,6 +59,7 @@ private:
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::vector<CinematicPos>       points;
+	std::vector<PowerUp>		    powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
 

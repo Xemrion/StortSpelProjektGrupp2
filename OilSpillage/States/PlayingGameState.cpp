@@ -141,6 +141,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025, 0.05);
 
 	Input::SetKeyboardPlayerID(0);
+
+	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100)));
+	Game::getGraphics().addToDraw(&*powerUps.begin());
+
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
@@ -444,14 +448,36 @@ void  PlayingGameState::update(float deltaTime)
 		//player->getVehicle()->updateRigidBody();
 		
 		auto playerVehicle { player->getVehicle() };
+		size_t playerBulletCount;
+		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		
+
+		powerUps.erase(
+			std::remove_if(
+				powerUps.begin(),
+				powerUps.end(),
+				[&](PowerUp& p) {
+					p.update(time);
+					if (p.getAABB().intersect(player->getVehicle()->getAABB()))
+					{
+						player->powerUp(p.getPowerUpType());
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
+			),
+			powerUps.end()
+		);
+
 		player->update(       deltaTime );
 		physics->update(      deltaTime );
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
-		size_t playerBulletCount;
-		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(       deltaTime );
+		
 		
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 

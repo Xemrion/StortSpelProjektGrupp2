@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "Weapon.h"
 #include "VehicleStats.h"
+#include "Powerup.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -102,6 +103,7 @@ public:
 	float getHeading(Quaternion qt);
 
 	Bullet* getBulletArray(size_t& count);
+	void powerUp(PowerUpType p);
 };
 
 #endif // !VEHICLE_H

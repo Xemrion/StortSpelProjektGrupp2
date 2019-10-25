@@ -1,6 +1,7 @@
 #include "Vehicle.h"
 #include"game.h"
 #include "Input.h"
+#include "States/PlayingGameState.h"
 
 Vehicle::Vehicle()
 {
@@ -699,4 +700,12 @@ Bullet* Vehicle::getBulletArray(size_t& count)
 {
 	count = bulletCount;
 	return bullets;
+}
+
+void Vehicle::powerUp(PowerUpType type)
+{
+	if (type == PowerUpType::Time)
+	{
+		dynamic_cast<PlayingGameState*>(Game::getCurrentState())->changeTime(30);
+	}
 }
