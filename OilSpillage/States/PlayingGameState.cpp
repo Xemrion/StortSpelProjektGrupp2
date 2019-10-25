@@ -151,6 +151,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
 	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
 	buildingTest->setRigidBody(tempo2, physics.get());*/
+	//spawnObjects();
 }
 
 PlayingGameState::~PlayingGameState()
@@ -455,20 +456,23 @@ void  PlayingGameState::update(float deltaTime)
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
 		camera->setPosition( Vector3( positionCam.getX(),
-		                              positionCam.getY(),
+		                              positionCam.getY()/3,
 		                              positionCam.getZ() ) + Vector3(.0f, player->getCameraDistance(deltaTime) + cameraDistance, .0f) );
 
-		Vector3 spotlightDir { sin(playerVehicle->getRotation().y),
-		                       .0f,
-		                       cos(playerVehicle->getRotation().y) };
-
-        playerLight->setDirection( spotlightDir );
+		btVector3 spotlightDir { 0,
+								 0,
+		                         1 };
+		playerVehicle->getRotationQuaternion();
+		btQuaternion bt5 = btQuaternion(playerVehicle->getRigidBody()->getWorldTransform().getRotation());
+		btTransform transform(bt5,btVector3(0, 0,0));
+		spotlightDir = transform * spotlightDir;
+		playerLight->setDirection( Vector3(spotlightDir.getX(), spotlightDir.getY(), spotlightDir.getZ()));
 
 		Vector3 spotlightPos { playerVehicle->getPosition().x,
 		                       playerVehicle->getPosition().y + 1,
 		                       playerVehicle->getPosition().z };
 
-		spotlightPos += spotlightDir * 1;
+		spotlightPos += Vector3(spotlightDir.getX(), spotlightDir.getY(), spotlightDir.getZ()) * 1;
 
 		playerLight->setPos( spotlightPos );
 		
@@ -559,4 +563,71 @@ Vector3 PlayingGameState::getTopLeft() const
 Vector3 PlayingGameState::getBottomRight() const
 {
 	return bottomRight;
+}
+
+void PlayingGameState::spawnObjects()
+{
+	btRigidBody* tempo2;
+	for (int i = 0; i < 400; i++) {
+		physicsObjects.emplace_back(std::make_unique<GameObject>());
+		auto objPtr = physicsObjects.back().get();
+		Game::getGraphics().loadModel("Cube");
+		objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+		Game::getGraphics().addToDraw(objPtr);
+		tempo2 = physics->addBox(btVector3(20, 0.2f + i, -20), btVector3(0.5f, 0.5f, 0.5f), 0.01f);
+		objPtr->setPosition(Vector3(20, 0.2f + i, -20));
+		objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
+		objPtr->setColor(Vector4(0.7, 0.7, 0.3, 1));
+		objPtr->setRigidBody(tempo2, physics.get());
+		objPtr->getRigidBody()->setFriction(1);
+		objPtr->getRigidBody()->setActivationState(0);
+		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+
+	}
+	physicsObjects.emplace_back(std::make_unique<GameObject>());
+	auto objPtr = physicsObjects.back().get();
+	Game::getGraphics().loadModel("Cube");
+	objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+	Game::getGraphics().addToDraw(objPtr);
+	tempo2 = physics->addBox(btVector3(20, 0.2f, -20), btVector3(5.5f, 12.5f, 5.5f), 0);
+	objPtr->setPosition(Vector3(20, 0.2f, -20));
+	objPtr->setScale(Vector3(5.5f, 12.5f, 5.5f));
+	objPtr->setColor(Vector4(0.3, 0.3, 0.9, 1));
+	objPtr->setRigidBody(tempo2, physics.get());
+	Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(XM_PI / 3, 0, 0));
+	btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);
+	objPtr->getRigidBody()->getWorldTransform().setRotation(qt);
+	objPtr->getRigidBody()->setFriction(1);
+
+	physicsObjects.reserve(2000);
+	auto tilemap = map->getTileMap();
+	for (int tileY = 0; tileY < tilemap.width; ++tileY ) {
+		for (int tileX = 0; tileX < tilemap.height; ++tileX) {
+			if (tilemap.tileAt(tileX, tileY) == Tile::road) {
+				Vector3 min{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) - Vector3 { config.tileScaleFactor.x / 2,
+																								 config.tileScaleFactor.y / 2,
+																								 config.tileScaleFactor.x / 2 } };
+
+				Vector3 max{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) + Vector3 { config.tileScaleFactor.x / 2,
+																								 config.tileScaleFactor.y / 2,
+																								 config.tileScaleFactor.x / 2 } };
+				/*for (int i = 0; i < 4; i++) {
+					physicsObjects.emplace_back(std::make_unique<GameObject>());
+					auto objPtr = physicsObjects.back().get();
+					Game::getGraphics().loadModel("Cube");
+					objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+					Game::getGraphics().addToDraw(objPtr);
+					tempo2 = physics->addBox(btVector3(min.x, 0.2f+i, min.z), btVector3(0.5f, 0.5f, 0.5f), 3.0f);
+					objPtr->setPosition(Vector3(min.x, 0.2f+i, min.z));
+					objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
+					objPtr->setColor(Vector4(0.7, 0.7, 0.3, 1));
+					objPtr->setRigidBody(tempo2, physics.get());
+					objPtr->getRigidBody()->setFriction(2);
+					objPtr->getRigidBody()->setActivationState(0);
+					
+				}*/
+			}
+		}
+	}
+
 }
