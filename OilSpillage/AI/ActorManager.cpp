@@ -31,6 +31,11 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		}
 		else if (actors.at(i)->isDead() && actors.at(i) != nullptr)
 		{
+			ObjectiveHandler* ptr = &static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler();
+			if (ptr->getObjective(0)->getType() == TypeOfMission::KillingSpree)
+			{
+				ptr->getObjective(0)->killEnemy();
+			}
 			actors.at(i)->death();
 			posOfDeadAI = i;
 		}

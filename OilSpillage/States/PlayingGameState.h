@@ -38,7 +38,7 @@ public:
 	ObjectiveHandler& getObjHandler();
 	void addTime(float time);
 	void		 spawnObjects();
-
+	Vector3 generateObjectivePos(float minDistance, float maxDistance) noexcept;
 private:
 	friend class Game;
    #if _DEBUG | RELEASE_DEBUG
@@ -70,7 +70,8 @@ private:
 	GameObject* objTestPickUp3;
 	GameObject** objArray = new GameObject * [3];
 	ObjectiveHandler objectives;
-
+	RNG rng{ RD()() };        // gör privat klassmedlem istället
+	
 	//Bullet
 	std::unique_ptr<Physics>		physics;
 	std::unique_ptr<GameObject>		buildingTest;

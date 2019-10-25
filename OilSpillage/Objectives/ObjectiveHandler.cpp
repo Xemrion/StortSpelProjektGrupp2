@@ -36,6 +36,7 @@ ObjectiveHandler::~ObjectiveHandler()
 
 void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfTargets, std::string info, GameObject** target, Actor** enemies)
 {
+	PlayingGameState* ptrState = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Objective *temp = new Objective;
 	temp->setType(type);
 	int typeInt = rand() % int(TypeOfTarget::Size);
@@ -56,6 +57,8 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 			pos.x += i * 10;
 			pos.z += i * -10;
 			pos.y -= 1 - this->types.getColor(TypeOfTarget(typeInt)).z;
+			pos += ptrState->generateObjectivePos(20, 50);
+
 			targets[i]->setPosition(pos);
 			targets[i]->mesh = Game::getGraphics().getMeshPointer("Cube");
 			targets[i]->setColor(this->types.getColor(TypeOfTarget(typeInt)));

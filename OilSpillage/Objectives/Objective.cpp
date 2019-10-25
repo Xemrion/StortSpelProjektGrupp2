@@ -122,7 +122,7 @@ bool Objective::isDone()
 	{
 		if (started)
 		{
-			if (this->nrOfTargets<=10)
+			if (this->nrOfTargets<=0)
 			{
 				return true;
 			}

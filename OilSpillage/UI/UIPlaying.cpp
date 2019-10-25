@@ -50,20 +50,22 @@ void UIPlaying::drawUI()
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 10), Colors::LightPink);
 	
-	
+	std::string rewardInfo;
 	Color color;
 	std::string infoUI;
 	if (objHandlerPtr->getObjective(0)==nullptr)
 	{
 		infoUI = " You did it. Get out now!!! ";
 		color = Colors::Yellow;
+		rewardInfo = "";
+		
 	}
 	else
 	{
 		infoUI = objHandlerPtr->getObjective(0)->getInfo();
+		rewardInfo = "Reward: " + std::to_string(objHandlerPtr->getObjective(0)->getRewardTime()) + " extra seconds ";
 		color = Colors::White;
 	}
-	std::string rewardInfo = "Reward: " + std::to_string(objHandlerPtr->getObjective(0)->getRewardTime()) + " extra seconds ";
 	
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(),infoUI.c_str(), Vector2(0, 40), color,0,Vector3(0,0,0),Vector3(0.2,0.2,0.2));
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), rewardInfo.c_str(), Vector2(0, 60), color, 0, Vector3(0, 0, 0), Vector3(0.2, 0.2, 0.2));

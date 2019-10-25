@@ -19,7 +19,7 @@ void PlayingGameState::initAI()
 
 	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 5; j++)
+		for (int j = 0; j < 2; j++)
 		{
 			actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
 		}
@@ -31,6 +31,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	   pausedTime = false;
    #endif // _DEBUG
 
+	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
 	camera = std::make_unique<DynamicCamera>();
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
@@ -66,7 +67,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 		lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
-	for (int i = 0; i < 1000; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		Vector3 randPos   = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand()))/ RAND_MAX;
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
@@ -75,7 +76,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 			PointLight(
 				randPos,
 				randColor,
-			10.0f));
+			1000.0f));
 	}
    
    /*
@@ -124,11 +125,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testObjective->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
 	testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
 
+	
 
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the important ");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important ");
-
-	objectives.addObjective(TypeOfMission::KillingSpree, 10, 20, "Kill the enemies ");
 
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
@@ -151,7 +149,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
+	objectives.addObjective(TypeOfMission::KillingSpree, 10, 20, "Kill the enemies ");
 
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the important ");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important ");
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
@@ -671,7 +672,24 @@ void PlayingGameState::spawnObjects()
 	}
 
 }
+
+Vector3 PlayingGameState::generateObjectivePos(float minDistance, float maxDistance) noexcept
+{
+	DBG_PROBE(generateObjectivePosition);
+
+	for (;;) {
+		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
+		float distance = (position - player->getVehicle()->getPosition()).Length();
+		if (distance <= maxDistance and distance >= minDistance)
+		{
+			return position;
+		}
+	}
+	assert(false and "BUG: Shouldn't be possible!");
+	return { -1.0f, -1.0f, -1.0f }; //  silences a warning
+	
 }
+
 
 ObjectiveHandler& PlayingGameState::getObjHandler()
 {
