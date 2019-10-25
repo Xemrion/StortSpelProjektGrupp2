@@ -161,3 +161,8 @@ void Minimap::update(float deltaTime)
 	CopyMemory(mappedResource.pData, this->pixels, this->textureFogTemp->getDataSize());
 	deviceContext->Unmap(this->textureFog, 0);
 }
+
+void Minimap::resetFog()
+{
+	CopyMemory(this->pixels, this->textureFogTemp->getData(), this->textureFogTemp->getDataSize());
+}

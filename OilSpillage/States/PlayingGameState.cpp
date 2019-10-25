@@ -380,6 +380,7 @@ void PlayingGameState::ImGui_ProcGen()
 		bottomRight  = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 
 		graphics.reloadTexture(minimap);
+		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
 	}
 	ImGui::End();
 }
