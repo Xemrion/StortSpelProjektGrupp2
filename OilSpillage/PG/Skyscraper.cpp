@@ -1,6 +1,6 @@
 #include "Skyscraper.h"
 
-Skyscraper::Skyscraper(int input = 0)
+Skyscraper::Skyscraper(int input)
 {
 	generateSkyscraper(input);
 }

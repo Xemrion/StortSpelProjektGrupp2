@@ -467,7 +467,7 @@ std::vector<Vertex3D> SkyscraperFloor::getRoofVertices()
 
 		temp.position = this->verticies[this->indices[size_t(i) + 1]];
 		temp.normal = normal;
-		temp.uv = Vector2(0.0f, 0.0f);;
+		temp.uv = Vector2(0.0f, 0.0f);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
@@ -520,6 +520,16 @@ void SkyscraperFloor::translateBy(Vector3 moveBy)
 		this->verticies[i] = this->verticies[i] + translation;
 	}
 
+}
+
+void SkyscraperFloor::scale(Vector3 scaleBy)
+{
+	Vector3 newPoint(0.0f);
+	for (int i = 0; i < this->nrOfEdges; i++) {
+		newPoint = this->verticies[i] - this->center;
+		newPoint *= scaleBy;
+		this->verticies[i] = newPoint;
+	}
 }
 
 void SkyscraperFloor::regenerateShape(int edges)

@@ -19,6 +19,7 @@ public:
 	Vector3 getAVertex(int vertex);
 	void translate(Vector3 newCenter);
 	void translateBy(Vector3 moveBy);
+	void scale(Vector3 scaleBy);
 	void regenerateShape(int edges);
 
 	void testDrawLines() const; //Lines
