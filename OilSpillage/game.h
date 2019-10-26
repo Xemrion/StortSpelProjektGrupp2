@@ -5,7 +5,7 @@
 #include "States/GameState.h"
 #include "physics.h"
 
-#define RELEASE_DEBUG true
+#define RELEASE_DEBUG false
 
 class Game
 {

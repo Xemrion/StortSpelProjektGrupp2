@@ -149,10 +149,11 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
-	objectives.addObjective(TypeOfMission::KillingSpree, 10, 20, "Kill the enemies ");
+	//objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the important");
 
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the important ");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important ");
+	objectives.addObjective(TypeOfMission::KillingSpree, 10, 20, "Kill the enemies that is protecting the anvil");
+
+	//objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important");
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
