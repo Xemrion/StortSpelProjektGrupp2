@@ -13,6 +13,7 @@ struct Type
 {
 	std::string types[int(TypeOfTarget::Size)];
 	Vector4 colors[int(TypeOfTarget::Size)];
+	std::string texture[int(TypeOfTarget::Size)];
 	std::string getType(TypeOfTarget type)
 	{
 		return types[int(type)];
@@ -20,6 +21,10 @@ struct Type
 	Vector4 getColor(TypeOfTarget type)
 	{
 		return colors[int(type)];
+	};
+	std::string getTexture(TypeOfTarget type)
+	{
+		return texture[int(type)];
 	};
 };
 class ObjectiveHandler

@@ -17,6 +17,7 @@ private:
 	std::unique_ptr<Slider> healthBar;
 	std::unique_ptr<Minimap> minimap;
 	const ObjectiveHandler* objHandlerPtr;
+	Texture* quest;
 public:
 	UIPlaying();
 	virtual ~UIPlaying();

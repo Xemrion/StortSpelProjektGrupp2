@@ -67,8 +67,12 @@ void UIPlaying::drawUI()
 		color = Colors::White;
 	}
 	
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(),infoUI.c_str(), Vector2(0, 40), color,0,Vector3(0,0,0),Vector3(0.2,0.2,0.2));
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), rewardInfo.c_str(), Vector2(0, 60), color, 0, Vector3(0, 0, 0), Vector3(0.2, 0.2, 0.2));
+	RECT rc = { 0, 0, quest->getWidth(), quest->getHeight() };
+	Vector2 questPos(0.0f, 50);
+	//void XM_CALLCONV Draw(_In_ ID3D11ShaderResourceView * texture, XMFLOAT2 const& position, _In_opt_ RECT const* sourceRectangle, FXMVECTOR color = Colors::White, float rotation = 0, XMFLOAT2 const& origin = Float2Zero, float scale = 1, SpriteEffects effects = SpriteEffects_None, float layerDepth = 0);
+	UserInterface::getSpriteBatch()->Draw(this->quest->getShaderResView(), questPos, &rc, Colors::White, 0.0f, Vector2(0, 0), 0.4f);// , & rc, Vector3(1, 1, 1), 0.0f, Vector2(1, 1), 1.0f);
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(),infoUI.c_str(), Vector2(questPos.x+60.0f,questPos.y+60.0f), color,0,Vector3(0,0,0),Vector3(0.2,0.2,0.2));
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), rewardInfo.c_str(), Vector2(questPos.x + 60.0f, questPos.y + 100.0f), color, 0, Vector3(0, 0, 0), Vector3(0.2, 0.2, 0.2));
 
 	this->healthBar->draw(false);
 	this->minimap->draw(false);
@@ -77,6 +81,8 @@ void UIPlaying::drawUI()
 
 UIPlaying::UIPlaying() : initMinimap(true)
 {
+	Game::getGraphics().loadTexture("UI/quest");
+	this->quest = Game::getGraphics().getTexturePointer("UI/quest");
 }
 
 UIPlaying::~UIPlaying()

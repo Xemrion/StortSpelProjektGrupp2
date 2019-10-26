@@ -128,7 +128,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	
 
 
-	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
 		{
@@ -678,7 +678,7 @@ Vector3 PlayingGameState::generateObjectivePos(float minDistance, float maxDista
 	DBG_PROBE(generateObjectivePosition);
 
 	for (;;) {
-		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
+		Vector3 position = Vector3(rand() % 200 + 10,0,20);
 		float distance = (position - player->getVehicle()->getPosition()).Length();
 		if (distance <= maxDistance and distance >= minDistance)
 		{
