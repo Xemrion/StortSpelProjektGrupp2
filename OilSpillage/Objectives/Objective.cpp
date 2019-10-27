@@ -26,7 +26,7 @@ Objective::~Objective()
 
 void Objective::setTarget(GameObject* *target, int nrOfTargets)
 {
-	started = true;
+	//started = true;
 	mission->target = new GameObject*[nrOfTargets];
 	for (int i = 0; i < nrOfTargets; i++)
 	{
@@ -142,30 +142,44 @@ void Objective::update(Vector3 playerPosition)
 {
 	if (this->mission->typeMission == TypeOfMission::FindAndCollect)
 	{
-		//collision check
-		int nrOfDone = 0;
-		for (int i = 0; i < nrOfMax; i++)
+		if (started)
 		{
-			if (this->mission->target[i] != nullptr)
+			//collision check
+			int nrOfDone = 0;
+			for (int i = 0; i < nrOfMax; i++)
 			{
-				Vector3 vecPlayerToObj = playerPosition - this->mission->target[i]->getPosition();
-				if (vecPlayerToObj.Length() < this->mission->target[i]->getScale().x*2.0f)
+				if (this->mission->target[i] != nullptr)
 				{
-					this->mission->target[i]->setPosition(Vector3(1000, 1000, 1000));
-					GameObject* temp = this->mission->target[nrOfMax -1];
-					this->mission->target[i] = temp;//
-					this->mission->target[nrOfMax -1] = nullptr;
-					this->nrOfTargets--;
+					Vector3 vecPlayerToObj = playerPosition - this->mission->target[i]->getPosition();
+					if (vecPlayerToObj.Length() < this->mission->target[i]->getScale().x * 2.0f)
+					{
+						this->mission->target[i]->setPosition(Vector3(1000, 1000, 1000));
+						GameObject* temp = this->mission->target[nrOfMax - 1];
+						this->mission->target[i] = temp;//
+						this->mission->target[nrOfMax - 1] = nullptr;
+						this->nrOfTargets--;
+					}
+				}
+				else
+				{
+					nrOfDone++;
 				}
 			}
-			else
+			if (nrOfDone == nrOfMax)
 			{
-				nrOfDone++;
+				done = true;
 			}
 		}
-		if (nrOfDone == nrOfMax)
+		else
 		{
-			done = true;
+			started = true;
+			GameObject* GOptr;
+			for (int i = 0; i < nrOfMax; i++)
+			{
+				GOptr = this->mission->target[i];
+				GOptr->setPosition(GOptr->getPosition() + Vector3(rand()%100+42.12, 0, -rand()%100+2.14) );
+				Game::getGraphics().addToDraw(GOptr);
+			}
 		}
 	}
 }

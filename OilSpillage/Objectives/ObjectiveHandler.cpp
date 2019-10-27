@@ -81,7 +81,7 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 			{
 				targets[i]->setColor(this->types.getColor(TypeOfTarget(typeInt)));
 			}
-			Game::getGraphics().addToDraw(targets[i]);
+			
 		}
 		this->pickUpArrs.push_back(targets);
 		temp->setTarget(this->pickUpArrs.at(this->pickUpArrs.size()-1), nrOfTargets);
@@ -117,7 +117,6 @@ void ObjectiveHandler::update(Vector3 playerPos)
 		{
 			if (this->objectiveVec.at(0)->getType()==TypeOfMission::FindAndCollect)
 			{
-			
 				for (int i = 0; i < 1; i++)
 				{
 					for (int j = 0; j < this->objectiveVec.at(i)->getNrOfMax(); j++)
@@ -125,8 +124,6 @@ void ObjectiveHandler::update(Vector3 playerPos)
 						Game::getGraphics().removeFromDraw(this->pickUpArrs.at(i)[j]);
 					}
 				}
-				
-			
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->addTime(this->objectiveVec.at(0)->getRewardTime());
 			delete this->objectiveVec.at(0);

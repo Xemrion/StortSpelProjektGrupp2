@@ -447,7 +447,7 @@ void Actor::resetHealth()
 void Actor::changeHealth(int amount)
 {
 	this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
-	Game::getGraphics().addParticle2(this->getPosition(), Vector3(0, 0, 0), 2, 1);
+	Game::getGraphics().addParticle2(this->getPosition() + Vector3(0, 3, 0), Vector3(0, 0, 0), 2, 1);
 }
 
 bool Actor::isDead() const
