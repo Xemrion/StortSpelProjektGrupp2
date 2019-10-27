@@ -1117,7 +1117,7 @@ Material Graphics::getMaterial(const char* modelPath)
 	}
 	else
 	{
-		material.diffuse = textures[texturePath + "/_normal.tga"];
+		material.normal = textures[texturePath + "/_normal.tga"];
 	}
 
 	if (textures.find(texturePath + "/_specular.tga") == textures.end()) {
@@ -1125,7 +1125,7 @@ Material Graphics::getMaterial(const char* modelPath)
 	}
 	else
 	{
-		material.diffuse = textures[texturePath + "/_specular.tga"];
+		material.specular = textures[texturePath + "/_specular.tga"];
 	}
 
 	if (textures.find(texturePath + "/_gloss.tga") == textures.end()) {
@@ -1133,7 +1133,7 @@ Material Graphics::getMaterial(const char* modelPath)
 	}
 	else
 	{
-		material.diffuse = textures[texturePath + "/_gloss.tga"];
+		material.gloss = textures[texturePath + "/_gloss.tga"];
 	}
 
 	return material;

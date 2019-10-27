@@ -10,6 +10,7 @@
 #include "../DynamicCamera.h"
 #include "../PG/Map.hpp"
 #include "../UI/UserInterface.h"
+#include "../Powerup.h"
 
 class PlayingGameState : public GameState {
 	friend class Game;
@@ -60,6 +61,7 @@ private:
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::vector<CinematicPos>       points;
+	std::vector<PowerUp>		    powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
 
@@ -73,21 +75,21 @@ private:
 	Vector3 accelForce;
 
 	int                             addNrOfParticles  {     2 };
-	int                             lifeTime          {     2 };
+	int                             lifeTime          {     1 };
 	float                           timerForParticle  {   .0f };
-	float                           vectorFieldPower  {  1.0f };
-	float                           vectorFieldSize   {  1.0f };
-	float                           randomPosPower    {  1.0f };
-	float                           size1             { .020f };
-	float                           size2             { .025f };
+	float                           vectorFieldPower  {  4.0f };
+	float                           vectorFieldSize   {  2.2f };
+	float                           randomPosPower    {  0.5f };
+	float                           size1             { .069f };
+	float                           size2             { .233f };
 	float                           colors  [4]       {};
 	float                           colors2 [4]       {};
 	float                           colors3 [4]       {};
 	float                           colors4 [4]       {};
-	Vector4                         colorsP [4]       { Vector4( 1.0f, 1.0f, .0f, 1.0f ),
-	                                                    Vector4( 1.0f,  1.0f, .0f, 1.0f ),
-	                                                    Vector4(  1.0f,  1.0f, .0f, 1.0f ),
-	                                                    Vector4(  .1f,  .1f, .1f, 1.0f )  };
+	Vector4                         colorsP [4]       { Vector4( 0.98f, 0.88f, 0.0f, 1.0f ),
+	                                                    Vector4( 0.99f,  0.13f, .0f, 1.0f ),
+	                                                    Vector4( 0.0f,  0.0f, .0f, 1.0f ),
+	                                                    Vector4( 0.0f,  0.0f, .0f, 1.0f )  };
   
     void initAI();
 	void ImGui_ProcGen();

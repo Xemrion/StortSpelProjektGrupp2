@@ -284,7 +284,7 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 	this->deviceContext->CSSetConstantBuffers(1, 1, this->nrOfParticlesCB.GetAddressOf());
 	this->deviceContext->CSSetConstantBuffers(0, 1, this->simParams.GetAddressOf());
 	this->deviceContext->CSSetShader(this->computeShader.Get(), nullptr, 0);
-	this->deviceContext->Dispatch(100, 1, 1);
+	this->deviceContext->Dispatch(capParticle/512, 1, 1);
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
 	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
 }

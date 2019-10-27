@@ -53,7 +53,6 @@
     <ClCompile Include="PG\Voronoi.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="Sound.cpp" />
-    <ClCompile Include="TestAI.cpp" />
     <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UI\Slider.cpp" />
@@ -70,6 +69,8 @@
     <ClCompile Include="UI\Minimap.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
+    <ClCompile Include="Weapon.cpp" />
+    <ClCompile Include="PowerUp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -125,7 +126,6 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Road Network\RoadNet.h" />
     <ClInclude Include="Structs.h" />
-    <ClInclude Include="TestAI.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="UI\Slider.h" />
     <ClInclude Include="UI\UICredits.h" />
@@ -146,6 +146,7 @@
     <ClInclude Include="PG\Profiler.hpp" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
     <ClInclude Include="Weapon.h" />
+    <ClInclude Include="Powerup.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
@@ -166,10 +167,5 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="ShaderDefines.hlsli" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="brickwall.tga" />
-    <Image Include="CarTemp.tga" />
-    <Image Include="CarTest.tga" />
   </ItemGroup>
 </Project>

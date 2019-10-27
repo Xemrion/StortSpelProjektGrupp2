@@ -142,7 +142,7 @@ void Minimap::update(float deltaTime)
 	{
 		for (int y = static_cast<int>(topLeft.y); y < static_cast<int>(std::roundf(bottomRight.y)); y++)
 		{
-			if ((playerMapPos - Vector3(x, 0, y)).Length() < this->fogClearRadius)
+			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius)
 			{
 				this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] = 0;
 			}
@@ -160,4 +160,9 @@ void Minimap::update(float deltaTime)
 
 	CopyMemory(mappedResource.pData, this->pixels, this->textureFogTemp->getDataSize());
 	deviceContext->Unmap(this->textureFog, 0);
+}
+
+void Minimap::resetFog()
+{
+	CopyMemory(this->pixels, this->textureFogTemp->getData(), this->textureFogTemp->getDataSize());
 }
