@@ -34,6 +34,8 @@ public:
 	Vector3      getTopLeft() const;
 	Vector3      getBottomRight() const;
 	void		 spawnObjects();
+	void		 moveObjects();
+	void		 updateObjects();
 
 private:
 	friend class Game;
@@ -65,6 +67,10 @@ private:
 	std::unique_ptr<Physics>		physics;
 	std::unique_ptr<GameObject>		buildingTest;
 	Vector<UPtr<GameObject>>		physicsObjects;
+	int physicsObjID;
+	int count;
+	Vector3 prevAccelForce;
+	Vector3 accelForce;
 
 	int                             addNrOfParticles  {     2 };
 	int                             lifeTime          {     2 };
