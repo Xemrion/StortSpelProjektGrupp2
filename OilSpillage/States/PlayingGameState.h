@@ -9,7 +9,7 @@
 #include "../Road Network/RoadNet.h"
 #include "../DynamicCamera.h"
 #include "../PG/Map.hpp"
-#include "../PG/SkyscraperFloor.h"
+#include "../PG/Skyscraper.h"
 #include "../UI/UserInterface.h"
 
 class PlayingGameState : public GameState {
@@ -57,9 +57,7 @@ private:
 	std::unique_ptr<DynamicCamera>  camera;
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
-	std::unique_ptr<SkyscraperFloor>testFloorMain;
-	std::unique_ptr<SkyscraperFloor>testFloorToAdd;
-	std::unique_ptr<SkyscraperFloor>testFloorToCompare;
+	std::unique_ptr<Skyscraper>		testFloorMain;
 	std::vector<CinematicPos>       points;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
