@@ -44,6 +44,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadModel("Entities/Dummy_Turret");
 	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
 
+
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
 	graphics.loadModel("Roads/Road_bend");
@@ -117,6 +118,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
    auto playerVehicle = player->getVehicle();
 	playerVehicle->setPosition(Vector3(15,3,-15));
+	player->getVehicleBody1()->setPosition(Vector3(15, 3.65f, -15));
 
 	testObjective = new GameObject();
 	testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -157,7 +159,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
 	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
 	buildingTest->setRigidBody(tempo2, physics.get());*/
-	//spawnObjects();
+	spawnObjects();
+	count = 0;
+	prevAccelForce = Vector3(0,0,0);
+	accelForce = Vector3(0, 0, 0);
 }
 
 PlayingGameState::~PlayingGameState()
@@ -475,11 +480,17 @@ void  PlayingGameState::update(float deltaTime)
 			powerUps.end()
 		);
 
+		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
 		player->update(       deltaTime );
 		physics->update(      deltaTime );
+		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
+		player->setAccelForce(accelForce, deltaTime);
+		player->updateWeapons(deltaTime);
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(       deltaTime );
+		updateObjects();
+		
 		player->updateWeapon(deltaTime);
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
@@ -491,7 +502,7 @@ void  PlayingGameState::update(float deltaTime)
 								 0,
 		                         1 };
 		playerVehicle->getRotationQuaternion();
-		btQuaternion bt5 = btQuaternion(playerVehicle->getRigidBody()->getWorldTransform().getRotation());
+		btQuaternion bt5 = btQuaternion(this->player->getVehicleBody1()->getRigidBody()->getWorldTransform().getRotation());
 		btTransform transform(bt5,btVector3(0, 0,0));
 		spotlightDir = transform * spotlightDir;
 		playerLight->setDirection( Vector3(spotlightDir.getX(), spotlightDir.getY(), spotlightDir.getZ()));
@@ -507,11 +518,9 @@ void  PlayingGameState::update(float deltaTime)
 		timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
 		{
-			/*graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
-			                      5 * Vector3(Input::GetDirectionR(0).x,
-			                      0,
-			                      Input::GetDirectionR(0).y),
-			                      addNrOfParticles, lifeTime, randomPosPower);*/
+			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
+			                      5 * Vector3(0,0,0),
+			                      addNrOfParticles, lifeTime, randomPosPower);
 			timerForParticle = 0;
 		}
 		
@@ -595,67 +604,197 @@ Vector3 PlayingGameState::getBottomRight() const
 
 void PlayingGameState::spawnObjects()
 {
+	Game::getGraphics().loadModel("Entities/Barrel");
+	Game::getGraphics().loadModel("Entities/Garbage_Bag");
+	physicsObjID = 0;
+	physicsObjects.reserve(50);
 	btRigidBody* tempo2;
-	for (int i = 0; i < 400; i++) {
+	float randomValue;
+	for (int i = 0; i < 12; i++) {
+		physicsObjects.emplace_back(std::make_unique<GameObject>());
+		auto objPtr = physicsObjects.back().get();
+		Game::getGraphics().loadModel("Cube");
+		objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+		graphics.loadTexture("brownPaperCardboard");
+		objPtr->setTexture(Game::getGraphics().getTexturePointer("brownPaperCardboard"));
+		Game::getGraphics().addToDraw(objPtr);
+		randomValue = rand() % 3 + 8;
+		randomValue *= 0.125f;
+		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue), 0.01f);
+		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
+		objPtr->setScale(Vector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue));
+		//objPtr->setColor(Vector4(0.8, 0.6, 0.38, 1));
+		objPtr->setRigidBody(tempo2, physics.get());
+		objPtr->getRigidBody()->setFriction(0.7f);
+		objPtr->getRigidBody()->setActivationState(0);
+		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+	}
+	float size = 1.3f*0.38f;
+		  randomValue  = 0;
+	float randomValue2 = 0;
+	float randomValue3 = 0;
+	for (int i = 0; i < 8; i++) {
+		physicsObjects.emplace_back(std::make_unique<GameObject>());
+		auto objPtr = physicsObjects.back().get();
+		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
+		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Barrel").diffuse);
+		Game::getGraphics().addToDraw(objPtr);
+		tempo2 = physics->addCylinder(btVector3(-200, 0.2f + i, -200), btVector3(size,size,size), 0.01f);
+		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
+		objPtr->setScale(Vector3(size,size,size));
+		randomValue = (rand() % 5) * 0.03f;
+		randomValue2 = (rand() % 5) * 0.03f;
+		randomValue3 = (rand() % 5) * 0.03f;
+		objPtr->setColor(Vector4(randomValue, randomValue2, 0, 1));
+		objPtr->setRigidBody(tempo2, physics.get());
+		objPtr->getRigidBody()->setFriction(0.7f);
+		objPtr->getRigidBody()->setActivationState(0);
+		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+	}
+	for (int i = 0; i < 8; i++) {
+		physicsObjects.emplace_back(std::make_unique<GameObject>());
+		auto objPtr = physicsObjects.back().get();
+		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Garbage_Bag");
+		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Garbage_Bag").diffuse);
+		Game::getGraphics().addToDraw(objPtr);
+		objPtr->setPosition(Vector3(0, 0, 0));
+		randomValue = rand() % 3 + 8;
+		randomValue *= 0.125f;
+		size = 0.30f *randomValue;
+		objPtr->setScale(Vector3(size, size, size));
+		tempo2 = physics->addSphere(size, btVector3(0, 0.0f, 0), 0.01f);
+		objPtr->setPosition(Vector3(0, 0, 0));
+		//objPtr->setColor(Vector4(0.8, 0.6, 0.38, 1));
+		objPtr->setRigidBody(tempo2, physics.get());
+		objPtr->getRigidBody()->setDamping(0,0.98f);
+		objPtr->getRigidBody()->setFriction(0.7f);
+		objPtr->getRigidBody()->setActivationState(0);
+		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+	}
+	for (int i = 0; i < 22; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
 		Game::getGraphics().loadModel("Cube");
 		objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
 		Game::getGraphics().addToDraw(objPtr);
-		tempo2 = physics->addBox(btVector3(20, 0.2f + i, -20), btVector3(0.5f, 0.5f, 0.5f), 0.01f);
-		objPtr->setPosition(Vector3(20, 0.2f + i, -20));
-		objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
-		objPtr->setColor(Vector4(0.7f, 0.7f, 0.3f, 1));
+		objPtr->setScale(Vector3(0.12f, 0.01f, 0.19f));
+		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.12f, 0.08f, 0.19f), 0.01f);
+		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
+		objPtr->setColor(Vector4(1, 1, 1, 1));
 		objPtr->setRigidBody(tempo2, physics.get());
-		objPtr->getRigidBody()->setFriction(1);
+		objPtr->getRigidBody()->setDamping(0.93f, 0.94f);
+		objPtr->getRigidBody()->setFriction(0.8f);
+		objPtr->getRigidBody()->setGravity(btVector3(0,-2.5f,0));
+		objPtr->getRigidBody()->setRestitution(0.8f);
 		objPtr->getRigidBody()->setActivationState(0);
 		objPtr->getRigidBody()->setDeactivationTime(0.1f);
-
 	}
-	physicsObjects.emplace_back(std::make_unique<GameObject>());
-	auto objPtr = physicsObjects.back().get();
-	Game::getGraphics().loadModel("Cube");
-	objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(objPtr);
-	tempo2 = physics->addBox(btVector3(20, 0.2f, -20), btVector3(5.5f, 12.5f, 5.5f), 0);
-	objPtr->setPosition(Vector3(20, 0.2f, -20));
-	objPtr->setScale(Vector3(5.5f, 12.5f, 5.5f));
-	objPtr->setColor(Vector4(0.3f, 0.3f, 0.9f, 1));
-	objPtr->setRigidBody(tempo2, physics.get());
-	Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(XM_PI / 3, 0, 0));
-	btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);
-	objPtr->getRigidBody()->getWorldTransform().setRotation(qt);
-	objPtr->getRigidBody()->setFriction(1);
 
-	physicsObjects.reserve(2000);
+	//physicsObjects.emplace_back(std::make_unique<GameObject>());
+	//auto objPtr = physicsObjects.back().get();
+	//Game::getGraphics().loadModel("Cube");
+	//objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//Game::getGraphics().addToDraw(objPtr);
+	//tempo2 = physics->addBox(btVector3(20, 0.2f, -20), btVector3(5.5f, 12.5f, 5.5f), 0);
+	//objPtr->setPosition(Vector3(20, 0.2f, -20));
+	//objPtr->setScale(Vector3(5.5f, 12.5f, 5.5f));
+	//objPtr->setColor(Vector4(0.3, 0.3, 0.9, 1));
+	//objPtr->setRigidBody(tempo2, physics.get());
+	//Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(XM_PI / 3, 0, 0));
+	//btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);
+	//objPtr->getRigidBody()->getWorldTransform().setRotation(qt);
+	//objPtr->getRigidBody()->setFriction(1);
+
+	//physicsObjects.reserve(2000);
+	//auto tilemap = map->getTileMap();
+	//for (int tileY = 0; tileY < tilemap.width; ++tileY ) {
+	//	for (int tileX = 0; tileX < tilemap.height; ++tileX) {
+	//		if (tilemap.tileAt(tileX, tileY) == Tile::road) {
+	//			Vector3 min{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) - Vector3 { config.tileScaleFactor.x / 2,
+	//																							 config.tileScaleFactor.y / 2,
+	//																							 config.tileScaleFactor.x / 2 } };
+
+	//			Vector3 max{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) + Vector3 { config.tileScaleFactor.x / 2,
+	//																							 config.tileScaleFactor.y / 2,
+	//																							 config.tileScaleFactor.x / 2 } };
+	//			/*for (int i = 0; i < 4; i++) {
+	//				physicsObjects.emplace_back(std::make_unique<GameObject>());
+	//				auto objPtr = physicsObjects.back().get();
+	//				Game::getGraphics().loadModel("Cube");
+	//				objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//				Game::getGraphics().addToDraw(objPtr);
+	//				tempo2 = physics->addBox(btVector3(min.x, 0.2f+i, min.z), btVector3(0.5f, 0.5f, 0.5f), 3.0f);
+	//				objPtr->setPosition(Vector3(min.x, 0.2f+i, min.z));
+	//				objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
+	//				objPtr->setColor(Vector4(0.7, 0.7, 0.3, 1));
+	//				objPtr->setRigidBody(tempo2, physics.get());
+	//				objPtr->getRigidBody()->setFriction(2);
+	//				objPtr->getRigidBody()->setActivationState(0);
+	//				
+	//			}*/
+	//		}
+	//	}
+	//}
+
+}
+
+void PlayingGameState::moveObjects()
+{
+	GameObject* object = physicsObjects.at(physicsObjID).get();
 	auto tilemap = map->getTileMap();
-	for (int tileY = 0; tileY < tilemap.width; ++tileY ) {
-		for (int tileX = 0; tileX < tilemap.height; ++tileX) {
-			if (tilemap.tileAt(tileX, tileY) == Tile::road) {
-				Vector3 min{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) - Vector3 { config.tileScaleFactor.x / 2,
-																								 config.tileScaleFactor.y / 2,
-																								 config.tileScaleFactor.x / 2 } };
+	if (object->getPosition().x > (player->getVehicle()->getPosition().x + 50) ||
+		object->getPosition().x < (player->getVehicle()->getPosition().x - 50) ||
+		object->getPosition().z > (player->getVehicle()->getPosition().z + 25) ||
+		object->getPosition().z < (player->getVehicle()->getPosition().z - 25)) {
+		object->getRigidBody()->setActivationState(0);
+		int randomValue = rand() % 2+1;
+		if (randomValue == 1) {
+			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getZ() > 0) {
+				//Top
+				randomValue = rand() % 100 + 1 - 50;
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z + 25));
+			}
+			else {
+				//Bottom
+				randomValue = rand() % 100 + 1 - 50;
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z - 25));
+			}
+		}else if(randomValue == 2){
+			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getX() < 0) {
+				//Left
+				randomValue = rand() % 50 + 1 - 25;
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x - 50, -0.5f, player->getVehicle()->getPosition().z + randomValue));
+			}
+			else {
+				//Right
+				randomValue = rand() % 50 + 1 - 25;
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + 50, -0.5f, player->getVehicle()->getPosition().z + randomValue));
+			}
+		}
+		randomValue = rand() % 360 + 1;
+		int randomValue2 = 0;
+		if (object->getScale().x != 0.12f) {
+			randomValue2 = rand() % 2;
+		}
+		Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(randomValue2 * 90 * XM_PI / 180, randomValue * XM_PI/180, 0));
+		btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);
+		object->getRigidBody()->getWorldTransform().setRotation(qt);
+	}
+	physicsObjID++;
+	if (physicsObjID >= physicsObjects.size()) {
+		physicsObjID = 0;
+	}
+}
 
-				Vector3 max{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) + Vector3 { config.tileScaleFactor.x / 2,
-																								 config.tileScaleFactor.y / 2,
-																								 config.tileScaleFactor.x / 2 } };
-				/*for (int i = 0; i < 4; i++) {
-					physicsObjects.emplace_back(std::make_unique<GameObject>());
-					auto objPtr = physicsObjects.back().get();
-					Game::getGraphics().loadModel("Cube");
-					objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
-					Game::getGraphics().addToDraw(objPtr);
-					tempo2 = physics->addBox(btVector3(min.x, 0.2f+i, min.z), btVector3(0.5f, 0.5f, 0.5f), 3.0f);
-					objPtr->setPosition(Vector3(min.x, 0.2f+i, min.z));
-					objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
-					objPtr->setColor(Vector4(0.7, 0.7, 0.3, 1));
-					objPtr->setRigidBody(tempo2, physics.get());
-					objPtr->getRigidBody()->setFriction(2);
-					objPtr->getRigidBody()->setActivationState(0);
-					
-				}*/
+void PlayingGameState::updateObjects()
+{
+	if (abs(player->getVelocitySpeed()) > 1.0f) {
+		moveObjects();
+		if (abs(player->getVelocitySpeed()) > 10.0f) {
+			moveObjects();
+			if (abs(player->getVelocitySpeed()) > 20.0f) {
+				moveObjects();
 			}
 		}
 	}
-
 }

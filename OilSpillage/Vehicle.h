@@ -63,7 +63,7 @@ private:
 	float tempTargetRotation;
 	bool rotationDirection;
 	float cameraDistance;
-
+	Vector3 accelForce;
 
 	
 	Vector2 curDir;
@@ -81,6 +81,7 @@ public:
 	void updateWeapon(float deltaTime);
 	
 	GameObject* getVehicle() { return this->vehicle; }
+	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
 
 	void setDrivingMode(int i);
@@ -89,6 +90,7 @@ public:
 	float getVelocitySpeed();
 	float getRotator();
 	float getCameraDistance(float deltaTime);
+	void setAccelForce(Vector3 accelForce, float deltaTime);
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;
