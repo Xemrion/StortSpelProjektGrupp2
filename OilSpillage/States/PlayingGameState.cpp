@@ -860,6 +860,7 @@ ObjectiveHandler& PlayingGameState::getObjHandler()
 void PlayingGameState::addTime(float time)
 {
 	this->time += time;
+}
 void PlayingGameState::updateObjects()
 {
 	if (abs(player->getVelocitySpeed()) > 1.0f) {
