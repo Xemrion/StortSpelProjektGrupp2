@@ -12,8 +12,6 @@ class Vehicle
 {
 private:
 	GameObject* vehicle;
-	GameObject* bodyRotation;
-	GameObject* bodyRotationPoint;
 	btScalar mRotation;
 	GameObject* mountedWeapon;//Mounted on top of the car
 	GameObject* wheel1;
@@ -45,7 +43,6 @@ private:
 	Bullet bullets[bulletCount];
 
 	float gunRotation;
-	Vector3 bodyPivot;
 	DirectX::XMFLOAT2 velocity;
 	float strength;
 	float add;
@@ -64,6 +61,9 @@ private:
 	bool rotationDirection;
 	float cameraDistance;
 	Vector3 accelForce;
+	float reverseTimer;
+	float reverseTimer2;
+	bool dmg;
 
 	
 	Vector2 curDir;
