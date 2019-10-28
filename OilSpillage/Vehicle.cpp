@@ -30,7 +30,7 @@ Vehicle::Vehicle()
 
 	this->curDir = Vector2(0.0f, 1.0f);//UP
 	this->timeSinceLastShot = 0.0f;
-	this->weapon = WeaponHandler::getWeapon(WeaponType::Flamethrower);
+	this->weapon = WeaponHandler::getWeapon(WeaponType::MachineGun);
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
 
@@ -544,8 +544,6 @@ void Vehicle::update(float deltaTime)
 	bodyPivot += Vector3(-accelerator.x * deltaTime, 0.00f * 0.0000f, -accelerator.z * deltaTime);
 
 	add += 0.2f * deltaTime;
-
-	//updateWeapon(deltaTime * 0.5f);
 }
 
 void Vehicle::updateWeapon(float deltaTime)
@@ -575,6 +573,8 @@ void Vehicle::updateWeapon(float deltaTime)
 	this->mountedWeapon->setRotation(Vector3(0, newRot, 0));
 
 	this->timeSinceLastShot += deltaTime;
+	// recoil goes from 100% to 0% in half a second
+	this->weapon.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
 
 	if (Input::checkButton(Keys::R_SHOULDER, States::HELD))
 	{
@@ -588,8 +588,8 @@ void Vehicle::updateWeapon(float deltaTime)
 				{
 					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
-					this->bullets[i].setWeaponType(this->weapon.type);
-					this->bullets[i].shoot(this->vehicleBody1->getPosition() + Vector3(curDir.x,0,curDir.y)*0.5f,
+					this->bullets[i].shoot(weapon,
+										   this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
 						                   Vector3(curDir.x, 0.0, curDir.y),
 						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
 					break;
