@@ -16,7 +16,8 @@ public:
 	void rotateDeg(float degrees);
 	void rotateRad(float radians);
 	void unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter);
-	Vector3 getAVertex(int vertex);
+	Vector3 getAVertex(int vertex) const;
+	Vector3 getCenter() const;
 	void translate(Vector3 newCenter);
 	void translateBy(Vector3 moveBy);
 	void scale(Vector3 scaleBy);
@@ -24,7 +25,7 @@ public:
 
 	void testDrawLines() const; //Lines
 	void getTriangleIndices();
-	std::vector<Vertex3D> getWallVertices(const SkyscraperFloor& other);
+	std::vector<Vertex3D> getWallVertices(Vector3 otherCenter);
 	std::vector<Vertex3D> getRoofVertices();
 	void testDrawTriangles(std::string name, Vector4 colour);
 private:
@@ -38,8 +39,8 @@ private:
 
 
 	void generateShape(int edges);
-	Vector3 intersectingLines(Vector3& pointA1, Vector3& pointA2, Vector3& pointB1, Vector3& pointB2);
-	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA);
+	Vector3 intersectingLines(Vector3& pointA1, Vector3& pointA2, Vector3& pointB1, Vector3& pointB2) const;
+	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA) const;
 };
 
 /*	Display a complex shape with triangles

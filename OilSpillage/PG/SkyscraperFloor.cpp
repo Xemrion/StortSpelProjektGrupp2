@@ -61,7 +61,7 @@ void SkyscraperFloor::generateShape(int edges)
 	}
 }
 
-Vector3 SkyscraperFloor::intersectingLines(Vector3& pointA1, Vector3& pointA2, Vector3& pointB1, Vector3& pointB2)
+Vector3 SkyscraperFloor::intersectingLines(Vector3& pointA1, Vector3& pointA2, Vector3& pointB1, Vector3& pointB2) const
 {
 	float divider, t1, t2;
 	Vector3 result(0.0f, -1.0f, 0.0f);
@@ -86,7 +86,7 @@ Vector3 SkyscraperFloor::intersectingLines(Vector3& pointA1, Vector3& pointA2, V
 	return result;
 }
 
-bool SkyscraperFloor::evenOddCheck( Vector3 pointB1,Vector3 pointB2, Vector3 pointA)
+bool SkyscraperFloor::evenOddCheck( Vector3 pointB1,Vector3 pointB2, Vector3 pointA) const
 {
 	bool intersect = false;
 	
@@ -388,59 +388,75 @@ void SkyscraperFloor::getTriangleIndices()
 	this->indices = triangleIndices;
 }
 
-std::vector<Vertex3D> SkyscraperFloor::getWallVertices(const SkyscraperFloor &other)
+std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
 {
 	std::vector<Vertex3D> meshData;
 	Vertex3D temp;
+	int uDistance = this->center.y - otherCenter.y;
+	int vDistance = -1, counter = 0;
+	float counterPow = 0.0f, distSquared = 0.0f;
+	Vector3 lowerFirst(0.0f), lowerSecond(0.0f);
 	Vector3 normal(0.0f), line1(0.0f), line2(0.0f);
-	SkyscraperFloor wallDifference(*this);
-	wallDifference.translate(other.center);
 	for (size_t i = 0; i < this->indices.size(); i++) {
-		line1 = wallDifference.verticies[(i + 1) % wallDifference.nrOfEdges] - this->verticies[i];
-		line2 = wallDifference.verticies[i] - this->verticies[i];
+		lowerFirst = Vector3(this->verticies[i].x, otherCenter.y, this->verticies[i].z);
+		lowerSecond = Vector3(this->verticies[(i + 1) % this->nrOfEdges].x, otherCenter.y, this->verticies[(i + 1) % this->nrOfEdges].z);
+	
+		line1 = this->verticies[(i + 1) % this->nrOfEdges] - this->verticies[i];
+		line2 = lowerSecond - this->verticies[i];
 		normal = line1.Cross(line2);
+
+		distSquared = (pow(line1.x, 2) + pow(line1.z, 2));
+		counter = 1;
+		while (vDistance == -1) {
+			counterPow = pow(counter, 2);
+			if (counterPow >= distSquared) {
+				vDistance = counter - 1;
+			}
+			counter++;
+		}
 
 		temp.position = this->verticies[i];
 		temp.normal = normal;
-		temp.uv = Vector2(0, 0);
+		temp.uv = Vector2(0, vDistance);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
-		temp.position = wallDifference.verticies[(i + 1) % wallDifference.nrOfEdges];
+		temp.position = lowerFirst;
 		temp.normal = normal;
-		temp.uv = Vector2(1, 1);
+		temp.uv = Vector2(uDistance, vDistance);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
-		temp.position = wallDifference.verticies[i];
+		temp.position = lowerSecond;
 		temp.normal = normal;
-		temp.uv = Vector2(0, 1);
+		temp.uv = Vector2(uDistance, 0);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[(i + 1) % this->nrOfEdges];
 		temp.normal = normal;
-		temp.uv = Vector2(1, 0);
-		temp.tangent = temp.normal;
-		temp.bitangent = temp.normal;
-		meshData.push_back(temp);
-
-		temp.position = wallDifference.verticies[(i + 1) % wallDifference.nrOfEdges];
-		temp.normal = normal;
-		temp.uv = Vector2(1, 1);
+		temp.uv = Vector2(0, 0);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[i];
 		temp.normal = normal;
-		temp.uv = Vector2(0, 0);
+		temp.uv = Vector2(0, vDistance);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
+
+		temp.position = lowerSecond;
+		temp.normal = normal;
+		temp.uv = Vector2(uDistance, 0);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
 	}
 	return meshData;
 }
@@ -495,11 +511,16 @@ void SkyscraperFloor::testDrawTriangles(std::string name, Vector4 colour)
 	this->roof->setColor(colour);
 }
 
-Vector3 SkyscraperFloor::getAVertex(int vertex) //Returns the vertex in the index - 1
+Vector3 SkyscraperFloor::getAVertex(int vertex) const //Returns the vertex in the index - 1
 {
 	Vector3 returnVertex;
 	returnVertex = this->verticies[(size_t(vertex) - 1) % this->nrOfEdges];
 	return returnVertex;
+}
+
+Vector3 SkyscraperFloor::getCenter() const
+{
+	return this->center;
 }
 
 void SkyscraperFloor::translate(Vector3 newCenter)

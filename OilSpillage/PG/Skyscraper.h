@@ -12,6 +12,8 @@ public:
 	~Skyscraper();
 
 	bool generateSkyscraper(int input);
+	void generateSkyscraperMesh();
+	void saveSkyscraper(std::string name);
 };
 
 /* Pseudocode
