@@ -691,7 +691,7 @@ Vector3 PlayingGameState::generateObjectivePos(float minDistance, float maxDista
 	for (;;) {
 		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
 		float distance = (position - player->getVehicle()->getPosition()).Length();
-		if (distance <= maxDistance and distance >= minDistance)
+		if ( (distance <= maxDistance) and (distance >= minDistance) )
 		{
 			return position;
 		}
@@ -707,7 +707,7 @@ Vector3 PlayingGameState::generateObjectivePos(Vector3 origin, float minDistance
 	for (;;) {
 		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
 		float distance = (position - origin).Length();
-		if (distance <= maxDistance and distance >= minDistance)
+		if ( (distance <= maxDistance) and (distance >= minDistance) )
 		{
 			return position;
 		}
@@ -726,8 +726,6 @@ void PlayingGameState::removeLight(PointLight* theLight)
 {
 	this->lightList->removeLight(theLight);
 }
-
-
 
 ObjectiveHandler& PlayingGameState::getObjHandler()
 {
