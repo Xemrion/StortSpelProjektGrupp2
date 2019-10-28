@@ -466,7 +466,7 @@ void  PlayingGameState::update(float deltaTime)
 				powerUps.end(),
 				[&](PowerUp& p) {
 					p.update(time);
-					if (p.getAABB().intersect(player->getVehicle()->getAABB()))
+					if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
 					{
 						player->powerUp(p.getPowerUpType());
 						return true;
@@ -514,14 +514,14 @@ void  PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos( spotlightPos );
 		
-		timerForParticle += deltaTime;
-		if ( timerForParticle > .01f )
-		{
-			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
-			                      5 * Vector3(0,0,0),
-			                      addNrOfParticles, lifeTime, randomPosPower);
-			timerForParticle = 0;
-		}
+		//timerForParticle += deltaTime;
+		//if ( timerForParticle > .01f )
+		//{
+		//	graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
+		//	                      5 * Vector3(0,0,0),
+		//	                      addNrOfParticles, lifeTime, randomPosPower);
+		//	timerForParticle = 0;
+		//}
 		
 		if ( player->isDead() )
 		{
@@ -547,16 +547,16 @@ void  PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
 #if _DEBUG | RELEASE_DEBUG //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   ImGui_ImplDX11_NewFrame();
-	   ImGui_ImplWin32_NewFrame();
-	   ImGui::NewFrame();
-	   ImGui_Driving();
-	   ImGui_ProcGen();
-	   ImGui_AI();
-	   ImGui_Particles();
-	   ImGui_Camera();
-	   ImGui::Render();
-	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	   //ImGui_ImplDX11_NewFrame();
+	   //ImGui_ImplWin32_NewFrame();
+	   //ImGui::NewFrame();
+	   //ImGui_Driving();
+	   //ImGui_ProcGen();
+	   //ImGui_AI();
+	   //ImGui_Particles();
+	   //ImGui_Camera();
+	   //ImGui::Render();
+	   //ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #endif // !_DEBUG
 	
 	graphics.presentScene();
