@@ -112,6 +112,28 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass)
 	return body;
 }
 
+btRigidBody* Physics::addCylinder(btVector3 Origin, btVector3 size, float mass)
+{
+	btTransform t; //
+	t.setIdentity();
+	t.setOrigin(btVector3(Origin));
+	btCylinderShape* cylinder = new btCylinderShape(size); //raduius
+
+	btVector3 inertia(0, 0, 0);
+	if (mass != 0.0f) {
+		cylinder->calculateLocalInertia(mass, inertia);
+	}
+
+	btMotionState* motion = new btDefaultMotionState(t);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, cylinder, inertia);
+
+	btRigidBody* body = new btRigidBody(info);
+
+	this->world->addRigidBody(body);
+	bodies.push_back(body);
+	return body;
+}
+
 btGeneric6DofSpring2Constraint* Physics::addSpring(btRigidBody* box1, btRigidBody* box2)
 {
 	btGeneric6DofSpring2Constraint* spring = new btGeneric6DofSpring2Constraint(
@@ -126,7 +148,7 @@ btGeneric6DofSpring2Constraint* Physics::addSpring(btRigidBody* box1, btRigidBod
 
 btPoint2PointConstraint* Physics::addPointJoint(btRigidBody* box1, btRigidBody* box2)
 {
-	btPoint2PointConstraint* pointJoint = new btPoint2PointConstraint(*box1,*box2,btVector3(0,0.40f,0),btVector3(0, -0.55f, 0));
+	btPoint2PointConstraint* pointJoint = new btPoint2PointConstraint(*box1,*box2,btVector3(0,0.00f,0),btVector3(0, -0.65f, 0));
 	//pointJoint->enableFeedback(true);
 	/*btJointFeedback* hej = new btJointFeedback;
 	hej->m_appliedForceBodyA = btVector3(1, 0, 1);

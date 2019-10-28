@@ -28,6 +28,8 @@ public:
 	void init();
 	void draw(bool selected);
 	void update(float deltaTime);
+
+	void resetFog();
 };
 
 #endif // !MINIMAP_H

@@ -10,6 +10,7 @@
 #include "../DynamicCamera.h"
 #include "../PG/Map.hpp"
 #include "../UI/UserInterface.h"
+#include "../Powerup.h"
 
 class PlayingGameState : public GameState {
 	friend class Game;
@@ -33,6 +34,9 @@ public:
 	std::string  getMinimap() const;
 	Vector3      getTopLeft() const;
 	Vector3      getBottomRight() const;
+	void		 spawnObjects();
+	void		 moveObjects();
+	void		 updateObjects();
 
 private:
 	friend class Game;
@@ -57,12 +61,18 @@ private:
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::vector<CinematicPos>       points;
+	std::vector<PowerUp>		    powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
 
 	//Bullet
 	std::unique_ptr<Physics>		physics;
 	std::unique_ptr<GameObject>		buildingTest;
+	Vector<UPtr<GameObject>>		physicsObjects;
+	int physicsObjID;
+	int count;
+	Vector3 prevAccelForce;
+	Vector3 accelForce;
 
 	int                             addNrOfParticles  {     2 };
 	int                             lifeTime          {     1 };

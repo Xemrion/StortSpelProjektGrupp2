@@ -27,54 +27,55 @@ Bullet::~Bullet()
 	delete obj;
 }
 
-void Bullet::shoot(Vector3 position, Vector3 direction, Vector3 additionalVelocity)
+void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity)
 {
+	this->weaponType = weapon.type;
 	if (this->weaponType == WeaponType::None)
 	{
 
 	}
 	else if (this->weaponType == WeaponType::Flamethrower)
 	{
-		flamethrowerShoot(position, direction, additionalVelocity);
+		flamethrowerShoot(weapon, position, direction, additionalVelocity);
 	}
 	else
 	{
-		defaultShoot(position, direction, additionalVelocity);
+		defaultShoot(weapon, position, direction, additionalVelocity);
 	}
 }
 
-void Bullet::defaultShoot(Vector3& position, Vector3& direction, Vector3& additionalVelocity)
+void Bullet::defaultShoot(Weapon& weapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity)
 {
 	direction.Normalize();
 	this->dir = direction;
 
 	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
-	float spread = randomNumber * WeaponHandler::weapons[(int)this->weaponType].spreadRadians * 0.5f;
+	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
+	weapon.currentSpreadIncrease = min(weapon.currentSpreadIncrease + weapon.spreadIncreasePerShot, weapon.maxSpread);
 	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
 	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
-	this->dir *= WeaponHandler::weapons[(int)this->weaponType].bulletSpeed;
+	this->dir *= weapon.bulletSpeed;
 
 	this->dir += additionalVelocity;
-	this->timeLeft = WeaponHandler::weapons[(int)this->weaponType].bulletLifetime;
+	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
 	this->obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->dir)) * Vector3(0, 1, 0));
-
 	Game::getGraphics().addToDraw(this->obj);
 }
 
-void Bullet::flamethrowerShoot(Vector3& position, Vector3& direction, Vector3& additionalVelocity)
+void Bullet::flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity)
 {
 	direction.Normalize();
 	this->dir = direction;
 
 	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
-	float spread = randomNumber * WeaponHandler::weapons[(int)this->weaponType].spreadRadians * 0.5f;
+	float spread = randomNumber * weapon.spreadRadians * 0.5f;
 	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
 	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
-	this->dir *= WeaponHandler::weapons[(int)this->weaponType].bulletSpeed;
+	this->dir *= weapon.bulletSpeed;
 
 	this->dir += additionalVelocity;
-	this->timeLeft = WeaponHandler::weapons[(int)this->weaponType].bulletLifetime;
+	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
 	this->obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->dir)) * Vector3(0, 1, 0));
 
@@ -85,22 +86,22 @@ void Bullet::flamethrowerShoot(Vector3& position, Vector3& direction, Vector3& a
 	Game::getGraphics().addParticle(obj->getPosition(),
 		this->dir,
 		1,
-		WeaponHandler::weapons[(int)this->weaponType].bulletLifetime + 0.5f,
+		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition(),
 		this->dir,
 		1,
-		WeaponHandler::weapons[(int)this->weaponType].bulletLifetime + 0.5f,
+		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition(),
 		this->dir,
 		1,
-		WeaponHandler::weapons[(int)this->weaponType].bulletLifetime + 0.5f,
+		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition(),
 		this->dir,
 		1,
-		WeaponHandler::weapons[(int)this->weaponType].bulletLifetime + 0.5f,
+		weapon.bulletLifetime + 0.5f,
 		0.25f);
 }
 

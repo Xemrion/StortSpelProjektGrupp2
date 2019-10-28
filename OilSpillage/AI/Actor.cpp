@@ -75,9 +75,12 @@ void Actor::updateWeapon(float deltaTime)
 				dir = (targetPos - bulletOrigin);
 
 				this->bullets[i].setWeaponType(this->weapon.type);
-				this->bullets[i].shoot(bulletOrigin,
+				this->bullets[i].shoot(
+					weapon,
+					bulletOrigin,
 					dir,
-					this->velocity);
+					this->velocity
+				);
 				break;
 			}
 		}
