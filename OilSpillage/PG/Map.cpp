@@ -103,7 +103,7 @@ void  Map::generateDistricts() {
 
 // TODO: make return value optional later instead of asserting
 V2u Map::generateRoadPositionInTileSpace( RNG &rng ) const noexcept {
-   DBG_PROBE(Map::generateRoadPositionInTileSpace);
+   //DBG_PROBE(Map::generateRoadPositionInTileSpace);
    static constexpr U16  MAX_TRIES{ 1024 };
    static U16_Dist       generateX(0, config.dimensions.x);
    static U16_Dist       generateY(0, config.dimensions.y);

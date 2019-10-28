@@ -1,5 +1,6 @@
 #include"Objective.h"
 #include"..///game.h"
+#include"..//States/PlayingGameState.h"
 Objective::Objective()
 {
 	this->mission = new Mission;
@@ -39,11 +40,6 @@ void Objective::setTarget(GameObject* *target, int nrOfTargets)
 void Objective::setEnemies(Actor* *enemies, int nrOfEnemies)
 {
 	started = true;
-	/*mission->enemies = new Actor*[nrOfEnemies];
-	for (int i = 0; i < nrOfEnemies; i++)
-	{
-		this->mission->target[i] = enemies[i];
-	}*/
 	this->nrOfMax = nrOfEnemies;
 	this->nrOfTargets = nrOfEnemies;
 }
@@ -51,6 +47,11 @@ void Objective::setEnemies(Actor* *enemies, int nrOfEnemies)
 void Objective::setType(TypeOfMission type)
 {
 	this->mission->typeMission = type;
+}
+
+void Objective::setTargetType(TypeOfTarget targetType)
+{
+	this->mission->typeOfTarget = targetType;
 }
 
 void Objective::setReward(int time)
@@ -65,19 +66,6 @@ void Objective::setInfo(std::string info)
 
 void Objective::killEnemy()
 {
-	//int found = -1;
-	//for (int i = 0; i < nrOfTargets && found==-1; i++)
-	//{
-	//	if (this->mission->enemies[i] == enemy)
-	//	{
-	//		found = i;
-	//	}
-	//}
-	//Actor* temp = this->mission->enemies[nrOfTargets - 1];
-	//this->mission->enemies[found] = temp;//
-	//this->mission->enemies[nrOfTargets - 1] = nullptr;
-
-
 	this->nrOfTargets--;
 }
 
@@ -89,6 +77,11 @@ GameObject* Objective::getTarget(int id) const
 TypeOfMission Objective::getType() const
 {
 	return this->mission->typeMission;
+}
+
+TypeOfTarget Objective::getTargetType() const
+{
+	return this->mission->typeOfTarget;
 }
 
 int Objective::getRewardTime() const
@@ -104,11 +97,10 @@ std::string Objective::getInfo() const
 Vector3 Objective::getAveragePosition() const
 {
 	Vector3 avPos = Vector3(0, 0, 0);
-	/*for (int i = 0; i < nrOfTargets; i++)
+	if (this->mission->typeMission != TypeOfMission::KillingSpree)
 	{
-		avPos += this->mission->enemies[i]->getPosition();
-	} 
-	avPos /= float(nrOfTargets);*/
+
+	}
 	return avPos;
 }
 
@@ -140,6 +132,8 @@ bool Objective::isDone()
 
 void Objective::update(Vector3 playerPosition)
 {
+	PlayingGameState* ptrState = static_cast<PlayingGameState*>(Game::getCurrentState());
+
 	if (this->mission->typeMission == TypeOfMission::FindAndCollect)
 	{
 		if (started)
@@ -150,6 +144,12 @@ void Objective::update(Vector3 playerPosition)
 			{
 				if (this->mission->target[i] != nullptr)
 				{
+					float time = ptrState->getTime();
+					float sine = sin((time-0) / 0.3f) - 0.5f;
+					float color = max(sine, 0.0f);
+					this->mission->target[i]->setColor(Vector4(color, color, color, 0.0));
+					//this->mission->target[i]->setColor(Vector4(0,0,0, 0.0));
+
 					Vector3 vecPlayerToObj = playerPosition - this->mission->target[i]->getPosition();
 					if (vecPlayerToObj.Length() < this->mission->target[i]->getScale().x * 2.0f)
 					{
@@ -174,10 +174,18 @@ void Objective::update(Vector3 playerPosition)
 		{
 			started = true;
 			GameObject* GOptr;
+			Vector2 randOrigin(rand() % 1000, -(rand() % 1000));
+			randOrigin += Vector2(playerPosition.x, playerPosition.y);
 			for (int i = 0; i < nrOfMax; i++)
 			{
 				GOptr = this->mission->target[i];
-				GOptr->setPosition(GOptr->getPosition() + Vector3(rand()%100+42.12, 0, -rand()%100+2.14) );
+				float yPos = GOptr->getPosition().y;
+				Vector3 randPos(0, 0, 0);
+				float distance = 0.0f;
+
+				randPos = ptrState->generateObjectivePos(Vector3(randOrigin.x, 0.0f, randOrigin.y), 40, 1000.0f);
+
+				GOptr->setPosition(Vector3(randPos.x,yPos,randPos.z));
 				Game::getGraphics().addToDraw(GOptr);
 			}
 		}

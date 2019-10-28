@@ -25,7 +25,7 @@ void PlayingGameState::initAI()
 		}
 	}
 }
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0f), currentMenu(MENU_PLAYING)
 {
    #if _DEBUG | RELEASE_DEBUG
 	   pausedTime = false;
@@ -40,6 +40,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
+	graphics.loadTexture("grass3");
+
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 	graphics.loadModel("Entities/Dummy_Turret");
@@ -154,6 +156,15 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	objectives.addObjective(TypeOfMission::KillingSpree, 10, 20, "Kill the enemies that is protecting the anvil");
 
 	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the trash");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 3, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 6, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 1, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 8, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 7, "Pick up the important");
+
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
@@ -676,10 +687,9 @@ void PlayingGameState::spawnObjects()
 
 Vector3 PlayingGameState::generateObjectivePos(float minDistance, float maxDistance) noexcept
 {
-	DBG_PROBE(generateObjectivePosition);
 
 	for (;;) {
-		Vector3 position = Vector3(rand() % 200 + 10,0,20);
+		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
 		float distance = (position - player->getVehicle()->getPosition()).Length();
 		if (distance <= maxDistance and distance >= minDistance)
 		{
@@ -690,6 +700,33 @@ Vector3 PlayingGameState::generateObjectivePos(float minDistance, float maxDista
 	return { -1.0f, -1.0f, -1.0f }; //  silences a warning
 	
 }
+
+Vector3 PlayingGameState::generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept
+{
+
+	for (;;) {
+		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
+		float distance = (position - origin).Length();
+		if (distance <= maxDistance and distance >= minDistance)
+		{
+			return position;
+		}
+	}
+	assert(false and "BUG: Shouldn't be possible!");
+	return { -1.0f, -1.0f, -1.0f }; //  silences a warning
+
+}
+
+PointLight* PlayingGameState::addPointLight(PointLight& light)
+{
+	return this->lightList->addLight(light);
+}
+
+void PlayingGameState::removeLight(PointLight* theLight)
+{
+	this->lightList->removeLight(theLight);
+}
+
 
 
 ObjectiveHandler& PlayingGameState::getObjHandler()

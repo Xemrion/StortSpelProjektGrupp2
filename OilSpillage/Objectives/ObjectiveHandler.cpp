@@ -58,6 +58,7 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 		this->nrOfPickupsVec.push_back(nrOfTargets);
 		GameObject** targets;
 		targets = new GameObject * [nrOfTargets];
+		temp->setTargetType(TypeOfTarget(typeInt));
 		for (int i = 0; i < nrOfTargets; i++)
 		{
 			targets[i] = new GameObject;
@@ -65,12 +66,11 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 			pos.x += i * 10;
 			pos.z += i * -10;
 			pos.y -= 1 - this->types.getColor(TypeOfTarget(typeInt)).z;
-			//pos += ptrState->generateObjectivePos(20, 50);
-
 			targets[i]->setPosition(pos);
 			targets[i]->mesh = Game::getGraphics().getMeshPointer("Cube");
 			targets[i]->setRotation(Vector3(0, (23 + 0.3f * 3.14 * (rand() % 200))-(23+0.3f*3.14*(rand()%400)),0));
 			targets[i]->setScale(Vector3(this->types.getColor(TypeOfTarget(typeInt)).z));
+			
 			if (TypeOfTarget(typeInt) == TypeOfTarget::Crate)
 			{
 				targets[i]->setTexture(Game::getGraphics().getTexturePointer("crate"));
@@ -113,16 +113,14 @@ void ObjectiveHandler::update(Vector3 playerPos)
 	if (this->objectiveVec.size() != 0)
 	{
 		this->objectiveVec.at(0)->update(playerPos);
+
 		if (this->objectiveVec.at(0)->isDone())
 		{
 			if (this->objectiveVec.at(0)->getType()==TypeOfMission::FindAndCollect)
 			{
-				for (int i = 0; i < 1; i++)
+				for (int j = 0; j < this->objectiveVec.at(0)->getNrOfMax(); j++)
 				{
-					for (int j = 0; j < this->objectiveVec.at(i)->getNrOfMax(); j++)
-					{
-						Game::getGraphics().removeFromDraw(this->pickUpArrs.at(i)[j]);
-					}
+					Game::getGraphics().removeFromDraw(this->pickUpArrs.at(0)[j]);
 				}
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->addTime(this->objectiveVec.at(0)->getRewardTime());

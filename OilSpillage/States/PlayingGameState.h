@@ -39,6 +39,10 @@ public:
 	void addTime(float time);
 	void		 spawnObjects();
 	Vector3 generateObjectivePos(float minDistance, float maxDistance) noexcept;
+	Vector3 generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept;
+	PointLight* addPointLight(PointLight& light);
+	void removeLight(PointLight* theLight);
+
 private:
 	friend class Game;
    #if _DEBUG | RELEASE_DEBUG

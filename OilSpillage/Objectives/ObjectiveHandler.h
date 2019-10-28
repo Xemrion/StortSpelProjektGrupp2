@@ -1,14 +1,6 @@
 #pragma once
 #include"Objective.h"
-enum class TypeOfTarget
-{
-	Box,
-	Reactor,
-	Crate,
-	Scrap,
-	Size
 
-};
 struct Type
 {
 	std::string types[int(TypeOfTarget::Size)];
@@ -43,7 +35,6 @@ private:
 	std::vector<Objective*> objectiveVec;
 	std::vector<GameObject**> pickUpArrs;
 	std::vector<int> nrOfPickupsVec;
-	std::pair<TypeOfTarget, Vector3> grunka;
 	bool eventNewObj;
 
 };
