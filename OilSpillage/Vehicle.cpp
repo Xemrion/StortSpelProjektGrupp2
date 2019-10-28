@@ -548,7 +548,7 @@ void Vehicle::update(float deltaTime)
 
 void Vehicle::updateWeapon(float deltaTime)
 {
-	this->mountedWeapon->setPosition(this->vehicle->getPosition());
+	this->mountedWeapon->setPosition(this->vehicleBody1->getPosition());
 	Vector2 dir = Input::getDirectionR();
 	dir.Normalize();
 	if ((dir - curDir).Length() > 0.01f)
@@ -589,7 +589,7 @@ void Vehicle::updateWeapon(float deltaTime)
 					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
 					this->bullets[i].shoot(weapon,
-										   this->vehicle->getPosition() + Vector3(0, 0, 0),
+										   this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
 						                   Vector3(curDir.x, 0.0, curDir.y),
 						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
 					break;
