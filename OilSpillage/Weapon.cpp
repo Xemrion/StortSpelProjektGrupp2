@@ -82,22 +82,22 @@ void Bullet::flamethrowerShoot(Vector3& position, Vector3& direction, Vector3& a
 	Game::getGraphics().addToDraw(this->obj);
 #endif
 
-	Game::getGraphics().addParticle(obj->getPosition(),
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
 		WeaponHandler::weapons[(int)this->weaponType].bulletLifetime + 0.5f,
 		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition(),
+	Game::getGraphics().addParticle(obj->getPosition()+Vector3(0,1,0),
 		this->dir,
 		1,
 		WeaponHandler::weapons[(int)this->weaponType].bulletLifetime + 0.5f,
 		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition(),
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
 		WeaponHandler::weapons[(int)this->weaponType].bulletLifetime + 0.5f,
 		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition(),
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
 		WeaponHandler::weapons[(int)this->weaponType].bulletLifetime + 0.5f,

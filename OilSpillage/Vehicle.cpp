@@ -292,7 +292,7 @@ void Vehicle::update(float deltaTime)
 									Input::getStrengthL() * /*deltaTime*/0.035f * 80 * max(velocitySpeed * 0.15f, -1),
 									vehicle->getRigidBody()->getAngularVelocity().getZ());
 
-		if (Input::CheckButton(Keys::R_TRIGGER, HELD, 0) || Input::IsKeyDown_DEBUG(Keyboard::W)) {
+		if (Input::checkButton(Keys::R_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::W)) {
 			if (velocitySpeed < (40 * updatedStats.maxSpeed)) {
 				this->vehicle->getRigidBody()->applyImpulse(btVector3(dx* deltaTime * 80.0f * updatedStats.accelerationRate, 0, -(dy * deltaTime * 80.0f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
 			}
@@ -351,7 +351,7 @@ void Vehicle::update(float deltaTime)
 			vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, vehicle->getRigidBody()->getAngularVelocity().getY()/ (1 + (3.5f * deltaTime)), steering.z));
 
 		}
-		if ((Input::CheckButton(Keys::L_TRIGGER, HELD, 0) || Input::IsKeyDown_DEBUG(Keyboard::S)) && velocitySpeed > (-40 * updatedStats.maxSpeed)) {
+		if ((Input::checkButton(Keys::L_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S)) && velocitySpeed > (-40 * updatedStats.maxSpeed)) {
 			this->vehicle->getRigidBody()->applyImpulse(btVector3(-(dx* deltaTime * 80.0f * 0.7f * updatedStats.accelerationRate), 0, (dy * deltaTime * 80.0f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
 
 			if (velocitySpeed > 0.0f) {
@@ -550,7 +550,7 @@ void Vehicle::update(float deltaTime)
 
 void Vehicle::updateWeapon(float deltaTime)
 {
-	this->mountedWeapon->setPosition(this->vehicle->getPosition());
+	this->mountedWeapon->setPosition(this->vehicleBody1->getPosition());
 	Vector2 dir = Input::getDirectionR();
 	dir.Normalize();
 	if ((dir - curDir).Length() > 0.01f)
@@ -589,7 +589,7 @@ void Vehicle::updateWeapon(float deltaTime)
 					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
 					this->bullets[i].setWeaponType(this->weapon.type);
-					this->bullets[i].shoot(this->vehicle->getPosition() + Vector3(0, 0, 0),
+					this->bullets[i].shoot(this->vehicleBody1->getPosition() + Vector3(curDir.x,0,curDir.y)*0.5f,
 						                   Vector3(curDir.x, 0.0, curDir.y),
 						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
 					break;

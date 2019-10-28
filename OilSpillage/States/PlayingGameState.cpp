@@ -159,7 +159,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
 	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
 	buildingTest->setRigidBody(tempo2, physics.get());*/
+
+#ifndef _DEBUG
 	spawnObjects();
+#endif
 	count = 0;
 	prevAccelForce = Vector3(0,0,0);
 	accelForce = Vector3(0, 0, 0);
@@ -485,13 +488,13 @@ void  PlayingGameState::update(float deltaTime)
 		physics->update(      deltaTime );
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
-		player->updateWeapons(deltaTime);
+		player->updateWeapon(deltaTime);
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(       deltaTime );
+#ifndef _DEBUG
 		updateObjects();
-		
-		player->updateWeapon(deltaTime);
+#endif
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
 		camera->setPosition( Vector3( positionCam.getX(),
@@ -515,14 +518,14 @@ void  PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos( spotlightPos );
 		
-		timerForParticle += deltaTime;
+		/*timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
 		{
 			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
 			                      5 * Vector3(0,0,0),
 			                      addNrOfParticles, lifeTime, randomPosPower);
 			timerForParticle = 0;
-		}
+		}*/
 		
 		if ( player->isDead() )
 		{
