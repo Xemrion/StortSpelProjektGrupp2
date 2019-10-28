@@ -37,6 +37,13 @@ struct AABB
 		if (minPos.z > other.maxPos.z || maxPos.z < other.minPos.z) return false;
 		return true;
 	}
+
+	bool intersectXZ(AABB other)
+	{
+		if (minPos.x > other.maxPos.x || maxPos.x < other.minPos.x) return false;
+		if (minPos.z > other.maxPos.z || maxPos.z < other.minPos.z) return false;
+		return true;
+	}
 };
 
 struct Material

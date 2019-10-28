@@ -1,4 +1,4 @@
-prefix=D:/StoraSpel/OilSpillage/glm/out/install/x64-Debug
+prefix=C:/Users/xfac11/Source/Repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/install/x64-Debug
 includedir=${prefix}/include
 
 Name: GLM

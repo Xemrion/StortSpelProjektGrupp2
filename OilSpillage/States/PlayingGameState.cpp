@@ -25,12 +25,13 @@ void PlayingGameState::initAI()
 		}
 	}
 }
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0f), currentMenu(MENU_PLAYING)
 {
    #if _DEBUG | RELEASE_DEBUG
 	   pausedTime = false;
    #endif // _DEBUG
 
+	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
 	camera = std::make_unique<DynamicCamera>();
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
@@ -39,6 +40,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
+	graphics.loadTexture("grass3");
+
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 	graphics.loadModel("Entities/Dummy_Turret");
@@ -126,8 +129,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	testObjective->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
 	testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
 
+	
 
-	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+
+	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
 		{
@@ -148,6 +153,19 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
 	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the important");
+
+	objectives.addObjective(TypeOfMission::KillingSpree, 10, 20, "Kill the enemies that is protecting the anvil");
+
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the trash");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 3, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 6, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 1, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 8, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 7, "Pick up the important");
 
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
@@ -173,6 +191,11 @@ PlayingGameState::~PlayingGameState()
 	delete aStar;
 	delete actorManager;
 	delete testObjective;
+	delete this->objTestPickUp;
+	delete this->objTestPickUp2;
+	delete this->objTestPickUp3;
+
+	delete[] this->objArray;
 }
 
 void  PlayingGameState::ImGui_Driving()
@@ -464,7 +487,7 @@ void  PlayingGameState::update(float deltaTime)
 				powerUps.end(),
 				[&](PowerUp& p) {
 					p.update(time);
-					if (p.getAABB().intersect(player->getVehicle()->getAABB()))
+					if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
 					{
 						player->powerUp(p.getPowerUpType());
 						return true;
@@ -487,6 +510,9 @@ void  PlayingGameState::update(float deltaTime)
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(       deltaTime );
+		player->updateWeapon(deltaTime);
+		objectives.update(player->getVehicle()->getPosition());
+		
 #ifndef _DEBUG
 		updateObjects();
 #endif
@@ -546,16 +572,16 @@ void  PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
 #if _DEBUG | RELEASE_DEBUG //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   ImGui_ImplDX11_NewFrame();
-	   ImGui_ImplWin32_NewFrame();
-	   ImGui::NewFrame();
-	   ImGui_Driving();
-	   ImGui_ProcGen();
-	   ImGui_AI();
-	   ImGui_Particles();
-	   ImGui_Camera();
-	   ImGui::Render();
-	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	   //ImGui_ImplDX11_NewFrame();
+	   //ImGui_ImplWin32_NewFrame();
+	   //ImGui::NewFrame();
+	   //ImGui_Driving();
+	   //ImGui_ProcGen();
+	   //ImGui_AI();
+	   //ImGui_Particles();
+	   //ImGui_Camera();
+	   //ImGui::Render();
+	   //ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #endif // !_DEBUG
 	
 	graphics.presentScene();
@@ -784,6 +810,56 @@ void PlayingGameState::moveObjects()
 	}
 }
 
+Vector3 PlayingGameState::generateObjectivePos(float minDistance, float maxDistance) noexcept
+{
+
+	for (;;) {
+		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
+		float distance = (position - player->getVehicle()->getPosition()).Length();
+		if ( (distance <= maxDistance) and (distance >= minDistance) )
+		{
+			return position;
+		}
+	}
+	assert(false and "BUG: Shouldn't be possible!");
+	return { -1.0f, -1.0f, -1.0f }; //  silences a warning
+	
+}
+
+Vector3 PlayingGameState::generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept
+{
+
+	for (;;) {
+		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
+		float distance = (position - origin).Length();
+		if ( (distance <= maxDistance) and (distance >= minDistance) )
+		{
+			return position;
+		}
+	}
+	assert(false and "BUG: Shouldn't be possible!");
+	return { -1.0f, -1.0f, -1.0f }; //  silences a warning
+
+}
+
+PointLight* PlayingGameState::addPointLight(PointLight& light)
+{
+	return this->lightList->addLight(light);
+}
+
+void PlayingGameState::removeLight(PointLight* theLight)
+{
+	this->lightList->removeLight(theLight);
+}
+
+ObjectiveHandler& PlayingGameState::getObjHandler()
+{
+	return this->objectives;
+}
+
+void PlayingGameState::addTime(float time)
+{
+	this->time += time;
 void PlayingGameState::updateObjects()
 {
 	if (abs(player->getVelocitySpeed()) > 1.0f) {

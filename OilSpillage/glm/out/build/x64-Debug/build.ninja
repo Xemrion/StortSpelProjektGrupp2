@@ -39,7 +39,7 @@ build uninstall: phony CMakeFiles\uninstall
 # Utility command for rebuild_cache
 
 build CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:\StoraSpel\OilSpillage\glm -BD:\StoraSpel\OilSpillage\glm\out\build\x64-Debug"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm -BC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -49,7 +49,7 @@ build rebuild_cache: phony CMakeFiles\rebuild_cache.util
 # Utility command for test
 
 build CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -59,7 +59,7 @@ build test: phony CMakeFiles\test.util
 # Utility command for install/local
 
 build CMakeFiles\install\local.util: CUSTOM_COMMAND all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -69,7 +69,7 @@ build install\local: phony CMakeFiles\install\local.util
 # Utility command for install
 
 build CMakeFiles\install.util: CUSTOM_COMMAND all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -79,7 +79,7 @@ build install: phony CMakeFiles\install.util
 # Utility command for edit_cache
 
 build CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
 build edit_cache: phony CMakeFiles\edit_cache.util
@@ -93,10 +93,10 @@ build list_install_components: phony
 # Custom command for CMakeFiles\uninstall
 
 build CMakeFiles\uninstall: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P D:/StoraSpel/OilSpillage/glm/out/build/x64-Debug/cmake_uninstall.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/build/x64-Debug/cmake_uninstall.cmake"
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# D:/StoraSpel/OilSpillage/glm/CMakeLists.txt
+# C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/CMakeLists.txt
 # =============================================================================
 
 
@@ -104,7 +104,7 @@ build CMakeFiles\uninstall: CUSTOM_COMMAND
 # Utility command for install/local
 
 build glm\CMakeFiles\install\local.util: CUSTOM_COMMAND glm\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\glm && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\glm && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -114,7 +114,7 @@ build glm\install\local: phony glm\CMakeFiles\install\local.util
 # Utility command for install
 
 build glm\CMakeFiles\install.util: CUSTOM_COMMAND glm\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\glm && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\glm && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -124,7 +124,7 @@ build glm\install: phony glm\CMakeFiles\install.util
 # Utility command for edit_cache
 
 build glm\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\glm && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\glm && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
 build glm\edit_cache: phony glm\CMakeFiles\edit_cache.util
@@ -202,7 +202,7 @@ build glm\glm_shared.dll glm\glm_shared.lib: CXX_SHARED_LIBRARY_LINKER__glm_shar
 # Utility command for rebuild_cache
 
 build glm\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\glm && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:\StoraSpel\OilSpillage\glm -BD:\StoraSpel\OilSpillage\glm\out\build\x64-Debug"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\glm && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm -BC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -212,7 +212,7 @@ build glm\rebuild_cache: phony glm\CMakeFiles\rebuild_cache.util
 # Utility command for test
 
 build glm\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\glm && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\glm && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -224,7 +224,7 @@ build glm\test: phony glm\CMakeFiles\test.util
 build glm\list_install_components: phony
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# D:/StoraSpel/OilSpillage/glm/CMakeLists.txt
+# C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/CMakeLists.txt
 # =============================================================================
 
 
@@ -232,7 +232,7 @@ build glm\list_install_components: phony
 # Utility command for rebuild_cache
 
 build test\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:\StoraSpel\OilSpillage\glm -BD:\StoraSpel\OilSpillage\glm\out\build\x64-Debug"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm -BC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -242,7 +242,7 @@ build test\rebuild_cache: phony test\CMakeFiles\rebuild_cache.util
 # Utility command for test
 
 build test\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -252,7 +252,7 @@ build test\test: phony test\CMakeFiles\test.util
 # Utility command for install/local
 
 build test\CMakeFiles\install\local.util: CUSTOM_COMMAND test\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -262,7 +262,7 @@ build test\install\local: phony test\CMakeFiles\install\local.util
 # Utility command for install
 
 build test\CMakeFiles\install.util: CUSTOM_COMMAND test\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -272,7 +272,7 @@ build test\install: phony test\CMakeFiles\install.util
 # Utility command for edit_cache
 
 build test\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
 build test\edit_cache: phony test\CMakeFiles\edit_cache.util
@@ -283,7 +283,7 @@ build test\edit_cache: phony test\CMakeFiles\edit_cache.util
 build test\list_install_components: phony
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# D:/StoraSpel/OilSpillage/glm/test/CMakeLists.txt
+# C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/test/CMakeLists.txt
 # =============================================================================
 
 
@@ -291,7 +291,7 @@ build test\list_install_components: phony
 # Utility command for rebuild_cache
 
 build test\bug\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\bug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:\StoraSpel\OilSpillage\glm -BD:\StoraSpel\OilSpillage\glm\out\build\x64-Debug"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\bug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm -BC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -301,7 +301,7 @@ build test\bug\rebuild_cache: phony test\bug\CMakeFiles\rebuild_cache.util
 # Utility command for test
 
 build test\bug\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\bug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\bug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -346,7 +346,7 @@ build test\bug\test-bug_ms_vec_static.exe: CXX_EXECUTABLE_LINKER__test-bug_ms_ve
 # Utility command for install/local
 
 build test\bug\CMakeFiles\install\local.util: CUSTOM_COMMAND test\bug\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\bug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\bug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -356,7 +356,7 @@ build test\bug\install\local: phony test\bug\CMakeFiles\install\local.util
 # Utility command for install
 
 build test\bug\CMakeFiles\install.util: CUSTOM_COMMAND test\bug\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\bug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\bug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -366,7 +366,7 @@ build test\bug\install: phony test\bug\CMakeFiles\install.util
 # Utility command for edit_cache
 
 build test\bug\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\bug && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\bug && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
 build test\bug\edit_cache: phony test\bug\CMakeFiles\edit_cache.util
@@ -377,7 +377,7 @@ build test\bug\edit_cache: phony test\bug\CMakeFiles\edit_cache.util
 build test\bug\list_install_components: phony
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# D:/StoraSpel/OilSpillage/glm/test/CMakeLists.txt
+# C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/test/CMakeLists.txt
 # =============================================================================
 
 # =============================================================================
@@ -1965,7 +1965,7 @@ build test\core\test-core_setup_force_size_t_length.exe: CXX_EXECUTABLE_LINKER__
 # Utility command for test
 
 build test\core\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\core && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\core && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -1975,7 +1975,7 @@ build test\core\test: phony test\core\CMakeFiles\test.util
 # Utility command for edit_cache
 
 build test\core\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\core && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\core && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
 build test\core\edit_cache: phony test\core\CMakeFiles\edit_cache.util
@@ -1984,7 +1984,7 @@ build test\core\edit_cache: phony test\core\CMakeFiles\edit_cache.util
 # Utility command for rebuild_cache
 
 build test\core\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\core && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:\StoraSpel\OilSpillage\glm -BD:\StoraSpel\OilSpillage\glm\out\build\x64-Debug"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\core && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm -BC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -1994,7 +1994,7 @@ build test\core\rebuild_cache: phony test\core\CMakeFiles\rebuild_cache.util
 # Utility command for install
 
 build test\core\CMakeFiles\install.util: CUSTOM_COMMAND test\core\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\core && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\core && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -2004,14 +2004,14 @@ build test\core\install: phony test\core\CMakeFiles\install.util
 # Utility command for install/local
 
 build test\core\CMakeFiles\install\local.util: CUSTOM_COMMAND test\core\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\core && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\core && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 build test\core\install\local: phony test\core\CMakeFiles\install\local.util
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# D:/StoraSpel/OilSpillage/glm/test/CMakeLists.txt
+# C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/test/CMakeLists.txt
 # =============================================================================
 
 # =============================================================================
@@ -2299,7 +2299,7 @@ build test\ext\test-ext_quaternion_relational.exe: CXX_EXECUTABLE_LINKER__test-e
 # Utility command for edit_cache
 
 build test\ext\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\ext && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\ext && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
 build test\ext\edit_cache: phony test\ext\CMakeFiles\edit_cache.util
@@ -2658,7 +2658,7 @@ build test\ext\test-ext_scalar_relational.exe: CXX_EXECUTABLE_LINKER__test-ext_s
 # Utility command for test
 
 build test\ext\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\ext && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\ext && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -2843,7 +2843,7 @@ build test\ext\test-ext_vector_relational.exe: CXX_EXECUTABLE_LINKER__test-ext_v
 # Utility command for rebuild_cache
 
 build test\ext\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\ext && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:\StoraSpel\OilSpillage\glm -BD:\StoraSpel\OilSpillage\glm\out\build\x64-Debug"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\ext && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm -BC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -2858,7 +2858,7 @@ build test\ext\list_install_components: phony
 # Utility command for install
 
 build test\ext\CMakeFiles\install.util: CUSTOM_COMMAND test\ext\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\ext && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\ext && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -2868,14 +2868,14 @@ build test\ext\install: phony test\ext\CMakeFiles\install.util
 # Utility command for install/local
 
 build test\ext\CMakeFiles\install\local.util: CUSTOM_COMMAND test\ext\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\ext && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\ext && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 build test\ext\install\local: phony test\ext\CMakeFiles\install\local.util
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# D:/StoraSpel/OilSpillage/glm/test/CMakeLists.txt
+# C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/test/CMakeLists.txt
 # =============================================================================
 
 # =============================================================================
@@ -3408,7 +3408,7 @@ build test\gtc\test-gtc_round.exe: CXX_EXECUTABLE_LINKER__test-gtc_round test\gt
 # Utility command for test
 
 build test\gtc\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\gtc && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\gtc && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -3598,7 +3598,7 @@ build test\gtc\test-gtc_ulp.exe: CXX_EXECUTABLE_LINKER__test-gtc_ulp test\gtc\CM
 # Utility command for edit_cache
 
 build test\gtc\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\gtc && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\gtc && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
 build test\gtc\edit_cache: phony test\gtc\CMakeFiles\edit_cache.util
@@ -3607,7 +3607,7 @@ build test\gtc\edit_cache: phony test\gtc\CMakeFiles\edit_cache.util
 # Utility command for rebuild_cache
 
 build test\gtc\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\gtc && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:\StoraSpel\OilSpillage\glm -BD:\StoraSpel\OilSpillage\glm\out\build\x64-Debug"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\gtc && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm -BC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -3617,7 +3617,7 @@ build test\gtc\rebuild_cache: phony test\gtc\CMakeFiles\rebuild_cache.util
 # Utility command for install
 
 build test\gtc\CMakeFiles\install.util: CUSTOM_COMMAND test\gtc\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\gtc && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\gtc && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -3627,14 +3627,14 @@ build test\gtc\install: phony test\gtc\CMakeFiles\install.util
 # Utility command for install/local
 
 build test\gtc\CMakeFiles\install\local.util: CUSTOM_COMMAND test\gtc\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\gtc && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\gtc && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 build test\gtc\install\local: phony test\gtc\CMakeFiles\install\local.util
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# D:/StoraSpel/OilSpillage/glm/test/CMakeLists.txt
+# C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/test/CMakeLists.txt
 # =============================================================================
 
 # =============================================================================
@@ -5567,7 +5567,7 @@ build test\gtx\test-gtx_string_cast.exe: CXX_EXECUTABLE_LINKER__test-gtx_string_
 # Utility command for rebuild_cache
 
 build test\gtx\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\gtx && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:\StoraSpel\OilSpillage\glm -BD:\StoraSpel\OilSpillage\glm\out\build\x64-Debug"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\gtx && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm -BC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -5682,7 +5682,7 @@ build test\gtx\test-gtx_vector_query.exe: CXX_EXECUTABLE_LINKER__test-gtx_vector
 # Utility command for test
 
 build test\gtx\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\gtx && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\gtx && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -5692,7 +5692,7 @@ build test\gtx\test: phony test\gtx\CMakeFiles\test.util
 # Utility command for edit_cache
 
 build test\gtx\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\gtx && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\gtx && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
 build test\gtx\edit_cache: phony test\gtx\CMakeFiles\edit_cache.util
@@ -5706,7 +5706,7 @@ build test\gtx\list_install_components: phony
 # Utility command for install
 
 build test\gtx\CMakeFiles\install.util: CUSTOM_COMMAND test\gtx\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\gtx && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\gtx && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -5716,14 +5716,14 @@ build test\gtx\install: phony test\gtx\CMakeFiles\install.util
 # Utility command for install/local
 
 build test\gtx\CMakeFiles\install\local.util: CUSTOM_COMMAND test\gtx\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\gtx && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\gtx && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 build test\gtx\install\local: phony test\gtx\CMakeFiles\install\local.util
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# D:/StoraSpel/OilSpillage/glm/test/CMakeLists.txt
+# C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/test/CMakeLists.txt
 # =============================================================================
 
 # =============================================================================
@@ -5801,7 +5801,7 @@ build test\perf\test-perf_matrix_inverse.exe: CXX_EXECUTABLE_LINKER__test-perf_m
 # Utility command for edit_cache
 
 build test\perf\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\perf && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\perf && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
 build test\perf\edit_cache: phony test\perf\CMakeFiles\edit_cache.util
@@ -5915,7 +5915,7 @@ build test\perf\test-perf_matrix_mul_vector.exe: CXX_EXECUTABLE_LINKER__test-per
 # Utility command for rebuild_cache
 
 build test\perf\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\perf && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:\StoraSpel\OilSpillage\glm -BD:\StoraSpel\OilSpillage\glm\out\build\x64-Debug"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\perf && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm -BC:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -5925,7 +5925,7 @@ build test\perf\rebuild_cache: phony test\perf\CMakeFiles\rebuild_cache.util
 # Utility command for test
 
 build test\perf\CMakeFiles\test.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\perf && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\perf && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process "
   DESC = Running tests...
   pool = console
   restat = 1
@@ -5975,7 +5975,7 @@ build test\perf\list_install_components: phony
 # Utility command for install
 
 build test\perf\CMakeFiles\install.util: CUSTOM_COMMAND test\perf\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\perf && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\perf && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -P cmake_install.cmake"
   DESC = Install the project...
   pool = console
   restat = 1
@@ -5985,7 +5985,7 @@ build test\perf\install: phony test\perf\CMakeFiles\install.util
 # Utility command for install/local
 
 build test\perf\CMakeFiles\install\local.util: CUSTOM_COMMAND test\perf\all
-  COMMAND = cmd.exe /C "cd /D D:\StoraSpel\OilSpillage\glm\out\build\x64-Debug\test\perf && "D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
+  COMMAND = cmd.exe /C "cd /D C:\Users\xfac11\source\repos\Xemrion\StortSpelProjektGrupp2\OilSpillage\glm\out\build\x64-Debug\test\perf && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake"
   DESC = Installing only the local directory...
   pool = console
   restat = 1
@@ -6310,49 +6310,49 @@ build test-perf_vector_mul_matrix.exe: phony test\perf\test-perf_vector_mul_matr
 # =============================================================================
 
 #############################################
-# Folder: D:/StoraSpel/OilSpillage/glm/out/build/x64-Debug/glm
+# Folder: C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/build/x64-Debug/glm
 
 build  glm\all: phony glm_static glm_shared
 # =============================================================================
 
 #############################################
-# Folder: D:/StoraSpel/OilSpillage/glm/out/build/x64-Debug/test
+# Folder: C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/build/x64-Debug/test
 
 build  test\all: phony test\bug\all test\core\all test\ext\all test\gtc\all test\gtx\all test\perf\all
 # =============================================================================
 
 #############################################
-# Folder: D:/StoraSpel/OilSpillage/glm/out/build/x64-Debug/test/bug
+# Folder: C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/build/x64-Debug/test/bug
 
 build  test\bug\all: phony test-bug_ms_vec_static
 # =============================================================================
 
 #############################################
-# Folder: D:/StoraSpel/OilSpillage/glm/out/build/x64-Debug/test/core
+# Folder: C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/build/x64-Debug/test/core
 
 build  test\core\all: phony test-core_func_integer_find_msb test-core_force_pure test-core_setup_precision test-core_func_common test-core_force_aligned_gentypes test-core_cpp_constexpr test-core_type_mat4x2 test-core_force_inline test-core_force_ctor_init test-core_cpp_defaulted_ctor test-core_force_xyzw_only test-core_type_mat2x2 test-core_force_unrestricted_gentype test-core_type_ctor test-core_type_aligned test-core_force_explicit_ctor test-core_func_exponential test-core_type_cast test-core_type_mat4x3 test-core_type_int test-core_func_integer_find_lsb test-core_type_length test-core_type_mat2x3 test-core_type_mat2x4 test-core_type_mat3x2 test-core_type_mat3x3 test-core_type_mat3x4 test-core_type_mat4x4 test-core_type_vec1 test-core_setup_message test-core_type_vec2 test-core_type_vec3 test-core_type_vec4 test-core_func_geometric test-core_func_swizzle test-core_func_integer test-core_func_noise test-core_func_integer_bit_count test-core_func_matrix test-core_func_packing test-core_func_trigonometric test-core_setup_platform_unknown test-core_func_vector_relational test-core_setup_force_cxx98 test-core_setup_force_size_t_length
 # =============================================================================
 
 #############################################
-# Folder: D:/StoraSpel/OilSpillage/glm/out/build/x64-Debug/test/ext
+# Folder: C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/build/x64-Debug/test/ext
 
 build  test\ext\all: phony test-ext_quaternion_trigonometric test-ext_matrix_relational test-ext_matrix_transform test-ext_quaternion_transform test-ext_vector_ulp test-ext_vector_bool1 test-ext_matrix_common test-ext_quaternion_relational test-ext_quaternion_common test-ext_quaternion_exponential test-ext_quaternion_geometric test-ext_quaternion_type test-ext_scalar_common test-ext_scalar_int_sized test-ext_scalar_constants test-ext_scalar_uint_sized test-ext_scalar_ulp test-ext_scalar_relational test-ext_vec1 test-ext_vector_common test-ext_vector_iec559 test-ext_vector_integer test-ext_vector_relational
 # =============================================================================
 
 #############################################
-# Folder: D:/StoraSpel/OilSpillage/glm/out/build/x64-Debug/test/gtc
+# Folder: C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/build/x64-Debug/test/gtc
 
 build  test\gtc\all: phony test-gtc_vec1 test-gtc_bitfield test-gtc_color_space test-gtc_integer test-gtc_epsilon test-gtc_random test-gtc_constants test-gtc_matrix_inverse test-gtc_matrix_transform test-gtc_matrix_access test-gtc_matrix_integer test-gtc_noise test-gtc_packing test-gtc_quaternion test-gtc_round test-gtc_reciprocal test-gtc_type_aligned test-gtc_type_precision test-gtc_type_ptr test-gtc_ulp
 # =============================================================================
 
 #############################################
-# Folder: D:/StoraSpel/OilSpillage/glm/out/build/x64-Debug/test/gtx
+# Folder: C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/build/x64-Debug/test/gtx
 
 build  test\gtx\all: phony test-gtx_matrix_operation test-gtx test-gtx_component_wise test-gtx_compatibility test-gtx_scalar_relational test-gtx_io test-gtx_associated_min_max test-gtx_closest_point test-gtx_euler_angle test-gtx_color_encoding test-gtx_log_base test-gtx_color_space test-gtx_color_space_YCoCg test-gtx_intersect test-gtx_common test-gtx_easing test-gtx_extend test-gtx_extended_min_max test-gtx_exterior_product test-gtx_fast_exponential test-gtx_fast_square_root test-gtx_fast_trigonometry test-gtx_functions test-gtx_vec_swizzle test-gtx_gradient_paint test-gtx_handed_coordinate_space test-gtx_norm test-gtx_integer test-gtx_load test-gtx_number_precision test-gtx_matrix_factorisation test-gtx_matrix_cross_product test-gtx_texture test-gtx_dual_quaternion test-gtx_matrix_decompose test-gtx_wrap test-gtx_matrix_interpolation test-gtx_matrix_major_storage test-gtx_matrix_query test-gtx_range test-gtx_matrix_transform_2d test-gtx_vector_angle test-gtx_normal test-gtx_normalize_dot test-gtx_orthonormalize test-gtx_optimum_pow test-gtx_perpendicular test-gtx_polar_coordinates test-gtx_projection test-gtx_quaternion test-gtx_rotate_normalized_axis test-gtx_rotate_vector test-gtx_scalar_multiplication test-gtx_spline test-gtx_string_cast test-gtx_type_aligned test-gtx_type_trait test-gtx_vector_query
 # =============================================================================
 
 #############################################
-# Folder: D:/StoraSpel/OilSpillage/glm/out/build/x64-Debug/test/perf
+# Folder: C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/build/x64-Debug/test/perf
 
 build  test\perf\all: phony test-perf_matrix_div test-perf_matrix_inverse test-perf_matrix_mul test-perf_vector_mul_matrix test-perf_matrix_mul_vector test-perf_matrix_transpose
 # =============================================================================
@@ -6377,13 +6377,13 @@ default all
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | ..\..\..\CMakeLists.txt ..\..\..\cmake\glm.pc.in ..\..\..\cmake\glmBuildConfig.cmake.in ..\..\..\cmake\glmConfig.cmake.in ..\..\..\cmake_uninstall.cmake.in ..\..\..\glm\CMakeLists.txt ..\..\..\test\CMakeLists.txt ..\..\..\test\bug\CMakeLists.txt ..\..\..\test\core\CMakeLists.txt ..\..\..\test\ext\CMakeLists.txt ..\..\..\test\gtc\CMakeLists.txt ..\..\..\test\gtx\CMakeLists.txt ..\..\..\test\perf\CMakeLists.txt CMakeCache.txt CMakeFiles\3.14.19060802-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.14.19060802-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.14.19060802-MSVC_2\CMakeSystem.cmake CMakeFiles\feature_tests.cxx D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXCompiler.cmake.in D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXCompilerABI.cpp D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXInformation.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCommonLanguageInclude.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCompilerIdDetection.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCXXCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompileFeatures.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompilerABI.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompilerId.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineRCCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineSystem.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeFindBinUtils.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeGenericSystem.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeInitializeConfigs.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeLanguageInformation.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakePackageConfigHelpers.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeParseImplicitIncludeInfo.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeParseImplicitLinkInfo.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeRCCompiler.cmake.in D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeRCInformation.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystem.cmake.in D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystemSpecificInformation.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystemSpecificInitialize.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestCXXCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestCompilerCommon.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestRCCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\ADSP-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\ARMCC-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\AppleClang-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Borland-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\CMakeCommonCompilerMacros.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Clang-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Clang-DetermineCompilerInternal.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Cray-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Embarcadero-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Fujitsu-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\GHS-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\HP-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\IAR-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Intel-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MIPSpro-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-CXX-FeatureTests.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-CXX.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\NVIDIA-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\PGI-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\PathScale-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\SCO-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\TI-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Watcom-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\XL-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\GNUInstallDirs.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Internal\FeatureTesting.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-Determine-CXX.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-MSVC-CXX.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-MSVC.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\WindowsPaths.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\WriteBasicConfigVersionFile.cmake
+build build.ninja: RERUN_CMAKE | ..\..\..\CMakeLists.txt ..\..\..\cmake\glm.pc.in ..\..\..\cmake\glmBuildConfig.cmake.in ..\..\..\cmake\glmConfig.cmake.in ..\..\..\cmake_uninstall.cmake.in ..\..\..\glm\CMakeLists.txt ..\..\..\test\CMakeLists.txt ..\..\..\test\bug\CMakeLists.txt ..\..\..\test\core\CMakeLists.txt ..\..\..\test\ext\CMakeLists.txt ..\..\..\test\gtc\CMakeLists.txt ..\..\..\test\gtx\CMakeLists.txt ..\..\..\test\perf\CMakeLists.txt C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXCompiler.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXCompilerABI.cpp C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCompilerIdDetection.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCXXCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompileFeatures.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompilerABI.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompilerId.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineRCCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeFindBinUtils.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeGenericSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakePackageConfigHelpers.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeParseImplicitIncludeInfo.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeParseImplicitLinkInfo.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeRCCompiler.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeRCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystem.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestCXXCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestCompilerCommon.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestRCCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\ADSP-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\ARMCC-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\AppleClang-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Borland-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Clang-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Clang-DetermineCompilerInternal.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Cray-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Embarcadero-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Fujitsu-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\GHS-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\HP-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\IAR-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Intel-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MIPSpro-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-CXX-FeatureTests.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\NVIDIA-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\PGI-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\PathScale-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\SCO-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\TI-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Watcom-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\XL-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\GNUInstallDirs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Internal\FeatureTesting.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-Determine-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\WindowsPaths.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles\3.14.19060802-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.14.19060802-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.14.19060802-MSVC_2\CMakeSystem.cmake CMakeFiles\feature_tests.cxx
   pool = console
 
 #############################################
 # A missing CMake input file is not an error.
 
-build ..\..\..\CMakeLists.txt ..\..\..\cmake\glm.pc.in ..\..\..\cmake\glmBuildConfig.cmake.in ..\..\..\cmake\glmConfig.cmake.in ..\..\..\cmake_uninstall.cmake.in ..\..\..\glm\CMakeLists.txt ..\..\..\test\CMakeLists.txt ..\..\..\test\bug\CMakeLists.txt ..\..\..\test\core\CMakeLists.txt ..\..\..\test\ext\CMakeLists.txt ..\..\..\test\gtc\CMakeLists.txt ..\..\..\test\gtx\CMakeLists.txt ..\..\..\test\perf\CMakeLists.txt CMakeCache.txt CMakeFiles\3.14.19060802-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.14.19060802-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.14.19060802-MSVC_2\CMakeSystem.cmake CMakeFiles\feature_tests.cxx D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXCompiler.cmake.in D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXCompilerABI.cpp D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXInformation.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCommonLanguageInclude.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCompilerIdDetection.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCXXCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompileFeatures.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompilerABI.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompilerId.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineRCCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineSystem.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeFindBinUtils.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeGenericSystem.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeInitializeConfigs.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeLanguageInformation.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakePackageConfigHelpers.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeParseImplicitIncludeInfo.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeParseImplicitLinkInfo.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeRCCompiler.cmake.in D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeRCInformation.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystem.cmake.in D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystemSpecificInformation.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystemSpecificInitialize.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestCXXCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestCompilerCommon.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestRCCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\ADSP-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\ARMCC-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\AppleClang-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Borland-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\CMakeCommonCompilerMacros.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Clang-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Clang-DetermineCompilerInternal.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Cray-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Embarcadero-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Fujitsu-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\GHS-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\HP-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\IAR-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Intel-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MIPSpro-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-CXX-FeatureTests.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-CXX.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\NVIDIA-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\PGI-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\PathScale-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\SCO-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\TI-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Watcom-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\XL-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\GNUInstallDirs.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Internal\FeatureTesting.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-Determine-CXX.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-MSVC-CXX.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-MSVC.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\WindowsPaths.cmake D$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\WriteBasicConfigVersionFile.cmake: phony
+build ..\..\..\CMakeLists.txt ..\..\..\cmake\glm.pc.in ..\..\..\cmake\glmBuildConfig.cmake.in ..\..\..\cmake\glmConfig.cmake.in ..\..\..\cmake_uninstall.cmake.in ..\..\..\glm\CMakeLists.txt ..\..\..\test\CMakeLists.txt ..\..\..\test\bug\CMakeLists.txt ..\..\..\test\core\CMakeLists.txt ..\..\..\test\ext\CMakeLists.txt ..\..\..\test\gtc\CMakeLists.txt ..\..\..\test\gtx\CMakeLists.txt ..\..\..\test\perf\CMakeLists.txt C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXCompiler.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXCompilerABI.cpp C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCXXInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeCompilerIdDetection.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCXXCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompileFeatures.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompilerABI.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineCompilerId.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineRCCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeDetermineSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeFindBinUtils.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeGenericSystem.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakePackageConfigHelpers.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeParseImplicitIncludeInfo.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeParseImplicitLinkInfo.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeRCCompiler.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeRCInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystem.cmake.in C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestCXXCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestCompilerCommon.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\CMakeTestRCCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\ADSP-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\ARMCC-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\AppleClang-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Borland-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Clang-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Clang-DetermineCompilerInternal.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Cray-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Embarcadero-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Fujitsu-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\GHS-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\HP-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\IAR-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Intel-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MIPSpro-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-CXX-FeatureTests.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\MSVC-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\NVIDIA-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\PGI-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\PathScale-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\SCO-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\TI-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\Watcom-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\XL-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\GNUInstallDirs.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Internal\FeatureTesting.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-Determine-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\Windows.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\Platform\WindowsPaths.cmake C$:\Program$ Files$ (x86)\Microsoft$ Visual$ Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.14\Modules\WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles\3.14.19060802-MSVC_2\CMakeCXXCompiler.cmake CMakeFiles\3.14.19060802-MSVC_2\CMakeRCCompiler.cmake CMakeFiles\3.14.19060802-MSVC_2\CMakeSystem.cmake CMakeFiles\feature_tests.cxx: phony
 
 #############################################
 # Clean all the built files.

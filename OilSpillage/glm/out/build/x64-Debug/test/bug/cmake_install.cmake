@@ -1,8 +1,8 @@
-# Install script for directory: D:/StoraSpel/OilSpillage/glm/test/bug
+# Install script for directory: C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/test/bug
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "D:/StoraSpel/OilSpillage/glm/out/install/x64-Debug")
+  set(CMAKE_INSTALL_PREFIX "C:/Users/xfac11/Source/Repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm/out/install/x64-Debug")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 

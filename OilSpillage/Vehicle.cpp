@@ -34,7 +34,6 @@ Vehicle::Vehicle()
 	this->weapon = WeaponHandler::getWeapon(WeaponType::MachineGun);
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
-
 	this->health = this->updatedStats.maxHealth;
 }
 

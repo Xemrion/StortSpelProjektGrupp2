@@ -49,7 +49,7 @@ unset(_expectedTargets)
 add_library(glm INTERFACE IMPORTED)
 
 set_target_properties(glm PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "D:/StoraSpel/OilSpillage/glm"
+  INTERFACE_INCLUDE_DIRECTORIES "C:/Users/xfac11/source/repos/Xemrion/StortSpelProjektGrupp2/OilSpillage/glm"
 )
 
 # This file does not depend on other imported targets which have
