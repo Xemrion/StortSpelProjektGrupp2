@@ -12,6 +12,7 @@
 #include "../UI/UserInterface.h"
 #include "../Powerup.h"
 
+#include"..////Objectives/ObjectiveHandler.h"
 class PlayingGameState : public GameState {
 	friend class Game;
 public:
@@ -34,7 +35,13 @@ public:
 	std::string  getMinimap() const;
 	Vector3      getTopLeft() const;
 	Vector3      getBottomRight() const;
+	ObjectiveHandler& getObjHandler();
+	void addTime(float time);
 	void		 spawnObjects();
+	Vector3 generateObjectivePos(float minDistance, float maxDistance) noexcept;
+	Vector3 generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept;
+	PointLight* addPointLight(PointLight& light);
+	void removeLight(PointLight* theLight);
 	void		 moveObjects();
 	void		 updateObjects();
 
@@ -64,7 +71,13 @@ private:
 	std::vector<PowerUp>		    powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
-
+	GameObject* objTestPickUp;
+	GameObject* objTestPickUp2;
+	GameObject* objTestPickUp3;
+	GameObject** objArray = new GameObject * [3];
+	ObjectiveHandler objectives;
+	RNG rng{ RD()() };        // gör privat klassmedlem istället
+	
 	//Bullet
 	std::unique_ptr<Physics>		physics;
 	std::unique_ptr<GameObject>		buildingTest;

@@ -153,6 +153,8 @@
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
+    <ClCompile Include="Objectives\Objective.cpp" />
+    <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
     <ClCompile Include="PG\MapConfig.cpp" />
     <ClCompile Include="PG\Map.cpp" />
@@ -212,6 +214,8 @@
     <ClInclude Include="AI\Defender.h" />
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="Powerup.h" />
+    <ClInclude Include="Objectives\Objective.h" />
+    <ClInclude Include="Objectives\ObjectiveHandler.h" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
     <ClInclude Include="AI\Turret.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />

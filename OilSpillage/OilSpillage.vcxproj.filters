@@ -69,6 +69,8 @@
     <ClCompile Include="UI\Minimap.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
+    <ClCompile Include="Objectives\Objective.cpp" />
+    <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="PowerUp.cpp" />
   </ItemGroup>
@@ -147,6 +149,8 @@
     <ClInclude Include="Shadows\ShadowMapping.h" />
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="Powerup.h" />
+    <ClInclude Include="Objectives\Objective.h" />
+    <ClInclude Include="Objectives\ObjectiveHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

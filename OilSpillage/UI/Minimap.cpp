@@ -12,9 +12,13 @@ Minimap::Minimap(float zoom, float fogClearRadius, Vector2 position)
 {
 	Game::getGraphics().loadTexture("UI/mapOutline");
 	Game::getGraphics().loadTexture("UI/mapPlayerMarker");
+	Game::getGraphics().loadTexture("UI/mapObjective");
+
 	Game::getGraphics().loadTexture("UI/mapFog", false, true);
 	this->textureOutline = Game::getGraphics().getTexturePointer("UI/mapOutline");
 	this->texturePlayerMarker = Game::getGraphics().getTexturePointer("UI/mapPlayerMarker");
+	this->textureObjectiveMarker = Game::getGraphics().getTexturePointer("UI/mapObjective");
+
 	this->textureFogTemp = Game::getGraphics().getTexturePointer("UI/mapFog");
 	assert(textureOutline && "Texture failed to load!");
 	assert(texturePlayerMarker && "Texture failed to load!");
@@ -87,6 +91,7 @@ void Minimap::init()
 
 void Minimap::draw(bool selected)
 {
+
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
 	float playerRot = state->getPlayer()->getVehicle()->getRotation().y;
 	Vector3 playerPos(state->getPlayer()->getVehicle()->getPosition() * Vector3(1, 0, 1));
@@ -102,6 +107,7 @@ void Minimap::draw(bool selected)
 	Vector3 playerZoomedPos = (playerMapPos - mapCamPos) * zoomedMinimapScale;
 	playerZoomedPos.Clamp(Vector3(), Vector3(Minimap::size.x, 0, Minimap::size.y));
 
+	
 	RECT zoomedRect = SimpleMath::Rectangle(
 		static_cast<long>(mapCamPos.x), static_cast<long>(mapCamPos.z),
 		static_cast<long>(zoomedMinimapSize.x), static_cast<long>(zoomedMinimapSize.z)
@@ -118,12 +124,46 @@ void Minimap::draw(bool selected)
 		static_cast<long>(this->position.x + playerZoomedPos.x), static_cast<long>(this->position.y + playerZoomedPos.z),
 		static_cast<long>(this->texturePlayerMarker->getWidth() * zoomedMinimapScale.x), static_cast<long>(this->texturePlayerMarker->getHeight() * zoomedMinimapScale.z)
 	);
+	
 
 	SpriteBatch* sb = UserInterface::getSpriteBatch();
 	sb->Draw(this->textureMap->getShaderResView(), mapRect, &zoomedRect);
+	//<test
+	Vector3 targetPos;
+	Vector3 targetMapPos;
+	Vector3 targetZoomedPos;
+	RECT targetRect;
+	if (state->getObjHandler().getObjective(0) != nullptr)
+	{
+		for (int i = 0; i < state->getObjHandler().getObjective(0)->getNrOfMax(); i++)
+		{
+			if (state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree)
+			{
+				if (state->getObjHandler().getObjective(0)->getTarget(i) != nullptr)
+				{
+					targetPos = state->getObjHandler().getObjective(0)->getTarget(i)->getPosition();
+					if ((targetPos - playerPos).Length() < 150.0f)
+					{
+						targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
+						targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
+						targetMapPos.z = this->textureMap->getHeight() - targetMapPos.z;
+						targetZoomedPos = (targetMapPos - mapCamPos) * zoomedMinimapScale;
+						targetZoomedPos.Clamp(Vector3(), Vector3(Minimap::size.x, 0, Minimap::size.y));
+						targetRect = SimpleMath::Rectangle(
+							static_cast<long>(this->position.x + targetZoomedPos.x), static_cast<long>(this->position.y + targetZoomedPos.z),
+							static_cast<long>(this->texturePlayerMarker->getWidth() * zoomedMinimapScale.x), static_cast<long>(this->texturePlayerMarker->getHeight() * zoomedMinimapScale.z)
+						);
+
+						sb->Draw(this->textureObjectiveMarker->getShaderResView(), targetRect, nullptr, Colors::White, playerRot, this->texturePlayerMarker->getCenter());
+					}
+				}
+			}
+		}
+	}
+	//test>
+	sb->Draw(this->textureOutline->getShaderResView(), this->position - Vector2(5, 5));
 	sb->Draw(this->resourceFog, mapRect, &zoomedRect);
 	sb->Draw(this->texturePlayerMarker->getShaderResView(), markerRect, nullptr, Colors::White, playerRot, this->texturePlayerMarker->getCenter());
-	sb->Draw(this->textureOutline->getShaderResView(), this->position - Vector2(5, 5));
 }
 
 void Minimap::update(float deltaTime)
