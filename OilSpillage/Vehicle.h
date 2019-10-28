@@ -37,10 +37,11 @@ private:
 
 	float timeSinceLastShot;
 	Weapon weapon;
+	Weapon mountedWeaponData;
 	Stats defaultStats;
 	Stats updatedStats;
 
-	static const int bulletCount = 128;
+	static const int bulletCount = 256;
 	Bullet bullets[bulletCount];
 
 	float gunRotation;
