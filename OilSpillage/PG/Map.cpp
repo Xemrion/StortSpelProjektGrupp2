@@ -126,6 +126,9 @@ void  Map::generateBuildings( ) {
 	DBG_PROBE( Map::generateBuildings );
 	RNG  rng{ RD()() };
 	rng.seed( config.seed );
+	F32_Dist randomSizeDist { .6f, .7f };
+	F32 constexpr smallProbability{ .20f };
+	F32_Dist smallProbabilityDist {};
 
 	//Array of possible buildings
 	std::string buildingArr[4];
@@ -197,9 +200,12 @@ void  Map::generateBuildings( ) {
 						int randomHouse = rand() % 4; //decides the house
 						houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
 						//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
-						houseTile.setScale({ .0322f * config.tileScaleFactor.x,
+
+						F32 randomSize = smallProbabilityDist(rng) < smallProbability ? randomSizeDist(rng) : 1.0f;
+
+						houseTile.setScale({ randomSize * .0322f * config.tileScaleFactor.x,
 						                     .015f * config.tileScaleFactor.y + (.25f * randomFloorCount) /* config.buildingFloorHeightFactor * randomFloorCount */,
-						                     .0322f * config.tileScaleFactor.z });
+											 randomSize * .0322f * config.tileScaleFactor.z });
 						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) } );
 				  #ifndef _DEBUG
 						btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
@@ -207,7 +213,7 @@ void  Map::generateBuildings( ) {
 						                                               houseTile.getPosition().z ),
 						                                    btVector3( 15.5f * houseTile.getScale().x,
 						                                               15.5f * houseTile.getScale().y,
-						                                               15.5f * houseTile.getScale().z ),
+																       15.5f * houseTile.getScale().z ),
 						                                    .0f );
 						houseTile.setRigidBody( tmp, physics );
 				  #endif
