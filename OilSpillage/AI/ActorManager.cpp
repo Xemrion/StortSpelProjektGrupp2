@@ -119,16 +119,13 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 	}
 }
 
-void ActorManager::spawnDefenders(std::vector<Vector3> objectives)
+void ActorManager::spawnDefenders(Vector3 objective)
 {
-	for(int i = 0; i < objectives.size(); i++)
-	{
-		createDefender(objectives.at(i).x + 2, objectives.at(i).z, objectives.at(i));
-		createDefender(objectives.at(i).x, objectives.at(i).z - 2, objectives.at(i));
-		createDefender(objectives.at(i).x, objectives.at(i).z + 2, objectives.at(i));
-		createDefender(objectives.at(i).x+2, objectives.at(i).z + 2, objectives.at(i));
-		createDefender(objectives.at(i).x-2, objectives.at(i).z + 2, objectives.at(i));
-	}
+	createDefender(objective.x + 2, objective.z, objective);
+	createDefender(objective.x, objective.z - 2, objective);
+	createDefender(objective.x, objective.z + 2, objective);
+	createDefender(objective.x+2, objective.z + 2, objective);
+	createDefender(objective.x-2, objective.z + 2, objective);
 }
 
 void ActorManager::spawnAttackers(Vector3 targetPos)

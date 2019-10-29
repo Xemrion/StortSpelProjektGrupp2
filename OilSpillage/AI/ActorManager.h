@@ -16,7 +16,7 @@ public:
 	std::vector<Actor*>* findClosestGroup(Vector3 position);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
 
-	void spawnDefenders(std::vector<Vector3> objectives);
+	void spawnDefenders(Vector3 objective);
 	void spawnAttackers(Vector3 playerPos);
 	void spawnTurrets(Vector3 playerPos);
 private:

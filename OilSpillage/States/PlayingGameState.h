@@ -45,6 +45,8 @@ public:
 	void		 moveObjects();
 	void		 updateObjects();
 
+	ActorManager* actorManager;
+
 private:
 	friend class Game;
    #if _DEBUG | RELEASE_DEBUG
@@ -61,7 +63,6 @@ private:
 	Graphics                       &graphics;
 	AStar                          *aStar;
 	std::unique_ptr<Map>            map;
-	ActorManager                   *actorManager;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
