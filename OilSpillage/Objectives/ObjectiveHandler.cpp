@@ -15,7 +15,7 @@ ObjectiveHandler::ObjectiveHandler()
 
 	this->types.colors[0] = Vector4(0.7f, 1.0f, 0.3f, 1.0f);
 	this->types.colors[1] = Vector4(0.3f, 0.7f, 1.0f, 1.0f);
-	this->types.colors[2] = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+	this->types.colors[2] = Vector4(0.0f, 0.0f, 0.0f, 1.0f);
 	this->types.colors[3] = Vector4(1.0f, 0.7f, 1.0f, 1.0f);
 	Game::getGraphics().loadTexture("crate");
 	Game::getGraphics().loadTexture("crateSpec");
@@ -73,7 +73,7 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 			targets[i]->setPosition(pos);
 			targets[i]->mesh = Game::getGraphics().getMeshPointer("Cube");
 			targets[i]->setRotation(Vector3(0, (23 + 0.3f * 3.14 * (rand() % 200))-(23+0.3f*3.14*(rand()%400)),0));
-			targets[i]->setScale(Vector3(this->types.getColor(TypeOfTarget(typeInt)).z));
+			targets[i]->setScale(Vector3(min((rand()%10+1)*0.1f,0.4f)));
 			
 			if (TypeOfTarget(typeInt) == TypeOfTarget::Crate)
 			{
