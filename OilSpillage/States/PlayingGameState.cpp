@@ -148,6 +148,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0
 		Vector4(0.03f,0.03f,0.03f,1),
 		Vector4(0.9f, 0.9f, 0.05f, 1)
 	};
+
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
@@ -559,8 +560,8 @@ void  PlayingGameState::update(float deltaTime)
 		
 		if ( player->isDead() )
 		{
-			changeTime( -30.0f );
-			player->resetHealth();
+			//changeTime( -30.0f );
+			//player->resetHealth();
 		}
 	}
 	

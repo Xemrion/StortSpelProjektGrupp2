@@ -30,7 +30,7 @@ private:
 	btCollisionShape* m_wheelShape;
 
 	int health;
-
+	bool deadImpulse;
 	float powerUpTimers[(int)PowerUpType::Length];
 
 	float timeSinceLastShot;
