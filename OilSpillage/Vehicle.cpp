@@ -31,7 +31,10 @@ Vehicle::Vehicle()
 
 	this->curDir = Vector2(0.0f, 1.0f);//UP
 	this->timeSinceLastShot = 0.0f;
+	this->timeSinceLastShot2 = 0.0f;
+
 	this->weapon = WeaponHandler::getWeapon(WeaponType::MachineGun);
+	this->weapon2 = WeaponHandler::getWeapon(WeaponType::Flamethrower);
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
 	this->health = this->updatedStats.maxHealth;
@@ -419,15 +422,18 @@ void Vehicle::updateWeapon(float deltaTime)
 	this->mountedWeapon->setRotation(Vector3(0, newRot, 0));
 
 	this->timeSinceLastShot += deltaTime;
+	this->timeSinceLastShot2 += deltaTime;
+
 	// recoil goes from 100% to 0% in half a second
 	this->weapon.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
+	this->weapon2.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
 
 	if (Input::checkButton(Keys::R_SHOULDER, States::HELD) || Input::getStrengthR() > 0.01f)
 	{
 		if (this->timeSinceLastShot >= this->weapon.fireRate)
 		{
 			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
-			
+
 			for (int i = 0; i < Vehicle::bulletCount; ++i)
 			{
 				if (bullets[i].getWeaponType() == WeaponType::None)
@@ -435,9 +441,31 @@ void Vehicle::updateWeapon(float deltaTime)
 					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
 					this->bullets[i].shoot(weapon,
+						this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
+						Vector3(curDir.x, 0.0, curDir.y),
+						Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ())*0.5f);
+					break;
+				}
+			}
+		}
+	}
+
+	if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
+	{
+		if (this->timeSinceLastShot2 >= this->weapon2.fireRate)
+		{
+			this->timeSinceLastShot2 = fmod(this->timeSinceLastShot2, this->weapon2.fireRate);
+			
+			for (int i = 0; i < Vehicle::bulletCount; ++i)
+			{
+				if (bullets[i].getWeaponType() == WeaponType::None)
+				{
+					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+					this->bullets[i].shoot(weapon2,
 										   this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
-						                   Vector3(curDir.x, 0.0, curDir.y),
-						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
+						                   Vector3(cos(this->vehicleBody1->getRotation().y - 3.14/2),0,-sin(this->vehicleBody1->getRotation().y - 3.14/2)),
+						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ())*0.5f);
 					break;
 				}
 			}

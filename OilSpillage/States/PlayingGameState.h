@@ -96,7 +96,7 @@ private:
 	float                           vectorFieldSize   {  2.2f };
 	float                           randomPosPower    {  0.5f };
 	float                           size1             { .069f };
-	float                           size2             { .233f };
+	float                           size2             { .133f };
 	float                           colors  [4]       {};
 	float                           colors2 [4]       {};
 	float                           colors3 [4]       {};

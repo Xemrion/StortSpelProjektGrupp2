@@ -151,6 +151,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
+	graphics.setVectorField(4.5f, 13.0f);
 
 	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());

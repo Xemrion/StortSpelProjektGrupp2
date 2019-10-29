@@ -7,6 +7,8 @@ using namespace DirectX::SimpleMath;
 Bullet::Bullet()
 {
 	this->obj = new GameObject;
+	this->obj->setSunShadow(false);
+	this->obj->setSpotShadow(false);
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
 	this->obj->setScale(Vector3(0.25f, 0.25f, 0.25f));
 	this->obj->setColor(Vector4(1, 1, 0, 1));
@@ -15,6 +17,8 @@ Bullet::Bullet()
 Bullet::Bullet(WeaponType type)
 {
 	this->obj = new GameObject;
+	this->obj->setSunShadow(false);
+	this->obj->setSpotShadow(false);
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
 	this->obj->setScale(WeaponHandler::weapons[(int)this->weaponType].bulletScale);
 	this->obj->setColor(Vector4(1, 1, 0, 1));
@@ -79,27 +83,27 @@ void Bullet::flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direc
 	this->obj->setPosition(position);
 	this->obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->dir)) * Vector3(0, 1, 0));
 
-#ifdef _DEBUG
+
 	Game::getGraphics().addToDraw(this->obj);
-#endif
+
 
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
+		this->dir*2,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition()+Vector3(0,1,0),
-		this->dir,
+		this->dir*2,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
+		this->dir*2,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
+		this->dir*2,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
@@ -123,6 +127,7 @@ void Bullet::update(float deltaTime)
 	if (timeLeft == 0.0)
 	{
 		this->weaponType = WeaponType::None;
+		this->obj->setPosition(Vector3(1000, 1000, 0));
 	}
 }
 
