@@ -130,7 +130,9 @@ void AStar::generateTileData(TileMap const& map) {
 	tileData = std::vector<TileData>{ map.width * map.height };
 	for (auto i = 0; i < map.data.size(); ++i)
 	{
-		tileData[i].isTraversible = true;
-			//map.data[i] != Tile::building; // TODO: make sure to add enum change+s here
+		if (map.data[i] == Tile::building)
+		{
+			tileData[i].isTraversible = false;
+		}
 	}
 }
