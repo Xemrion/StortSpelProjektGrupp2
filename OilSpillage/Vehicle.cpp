@@ -12,6 +12,9 @@ Vehicle::Vehicle()
 	strength = 0;
 	this->dmg = false;
 	this->deadImpulse = false;
+	this->respawnTimer = 0.0f;
+	this->immortalTimer = 0.0f;
+	this->immortal = false;
 	targetRotation = 0.0f;
 	drivingMode = 0;
 	topSpeed = 4700;
@@ -145,15 +148,19 @@ void Vehicle::update(float deltaTime)
 {
 	if (this->deadImpulse == true && this->health <= 0)
 	{
-		if(Input::checkButton(Keys::CONFIRM,States::PRESSED))
+		this->respawnTimer += deltaTime;
+		if(this->respawnTimer>5)
 		{
 			this->resetHealth();
+			this->immortal = true;
 			this->vehicle->setPosition(Vector3(15, 2, -15));
 			this->vehicleBody1->setPosition(Vector3(15, 2+0.65f, -15));
 
 			this->deadImpulse = false;
+			this->respawnTimer = 0.0f;
 		}
 	}
+	
 	for (int i = 0; i < (int)PowerUpType::Length; ++i)
 	{
 		powerUpTimers[i] = max(powerUpTimers[i] - deltaTime, 0.0f);
@@ -168,7 +175,7 @@ void Vehicle::update(float deltaTime)
 		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate;
 		this->vehicle->setColor(Vector4(0.0, 0.0, 0.0, 1.0));
 	}
-
+	
 	tempTargetRotation = targetRotation;
 
 	//Quaternion Rotation to Euler
@@ -412,6 +419,19 @@ void Vehicle::update(float deltaTime)
 			dmg = false;
 		}
 	}
+
+	if (this->immortal)
+	{
+		this->immortalTimer += deltaTime;
+		float sine = sin((this->immortalTimer - 0) / 0.3f) - 0.5f;
+		float color = max(sine, 0.0f);
+		this->vehicleBody1->setColor(Vector4(color, color, color, color));
+		if (this->immortalTimer > 5)
+		{
+			this->immortalTimer = 0.0f;
+			this->immortal = false;
+		}
+	}
 }
 
 void Vehicle::updateWeapon(float deltaTime)
@@ -559,18 +579,21 @@ void Vehicle::resetHealth()
 
 void Vehicle::changeHealth(int amount)
 {
-	if (amount < 0) {
-		dmg = true;
-	}
-	vehicleBody1->setColor(Vector4(max(vehicleBody1->getColor().x + -amount*0.1f,0), 0, 0, 1));
-	this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
-	Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
-	if (this->deadImpulse == false && this->health <= 0)
+	if (!this->immortal)
 	{
-		this->deadImpulse = true;
-		vehicle->getRigidBody()->applyImpulse(btVector3(this->vehicle->getRigidBody()->getLinearVelocity().getX() *6.3f,0, this->vehicle->getRigidBody()->getLinearVelocity().getY() *6.3f),btVector3(0,0,0));
-		//vehicle->getRigidBody()->setAngularVelocity(btVector3(0,2000.0f,0));
-		Game::getGraphics().addParticle(this->vehicle->getPosition()+Vector3(0,2,0), Vector3(0, 0, 0), 200, 10);
+		if (amount < 0) {
+			dmg = true;
+		}
+		vehicleBody1->setColor(Vector4(max(vehicleBody1->getColor().x + -amount * 0.1f, 0), 0, 0, 1));
+		this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
+		Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
+		if (this->deadImpulse == false && this->health <= 0)
+		{
+			this->deadImpulse = true;
+			vehicle->getRigidBody()->applyImpulse(btVector3(this->vehicle->getRigidBody()->getLinearVelocity().getX() * 6.3f, 0, this->vehicle->getRigidBody()->getLinearVelocity().getY() * 6.3f), btVector3(0, 0, 0));
+			//vehicle->getRigidBody()->setAngularVelocity(btVector3(0,2000.0f,0));
+			Game::getGraphics().addParticle(this->vehicle->getPosition() + Vector3(0, 2, 0), Vector3(0, 0, 0), 200, 10);
+		}
 	}
 }
 

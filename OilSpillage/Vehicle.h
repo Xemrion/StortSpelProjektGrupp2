@@ -31,6 +31,9 @@ private:
 
 	int health;
 	bool deadImpulse;
+	bool immortal;
+	float immortalTimer;
+	float respawnTimer;
 	float powerUpTimers[(int)PowerUpType::Length];
 
 	float timeSinceLastShot;
