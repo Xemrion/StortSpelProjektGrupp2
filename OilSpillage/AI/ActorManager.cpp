@@ -22,7 +22,7 @@ ActorManager::~ActorManager()
 
 void ActorManager::update(float dt, Vector3 targetPos)
 {
-	int posOfDeadAI = -5;
+	bool hasDied = false;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
 		if (!actors.at(i)->isDead() && actors.at(i) != nullptr)
@@ -31,25 +31,24 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		}
 		else if (actors.at(i)->isDead() && actors.at(i) != nullptr)
 		{
-			Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
-			if (ptr != nullptr)
-			{
-				if (ptr->getType() == TypeOfMission::KillingSpree)
-				{
-					ptr->killEnemy();
-				}
-			}
-			actors.at(i)->death();
-			posOfDeadAI = i;
+			hasDied = true;
 		}
 	}
-	updateGroups();
-	if(posOfDeadAI != -5)
+	if(hasDied = true)
 	{
-		delete actors.at(posOfDeadAI);
-		actors.erase(actors.begin() + posOfDeadAI);
-		posOfDeadAI = -5;
+		for (int i = this->actors.size() - 1; i >= 0; i--)
+		{
+			if (actors.at(i)->isDead())
+			{
+				actors.at(i)->death();
+				delete actors.at(i);
+				actors.erase(actors.begin() + i);
+			}
+		}
+		hasDied = false;
 	}
+
+	updateGroups();
 	if (frameCount % 60 == 0)
 	{
 		assignPathsToGroups(targetPos);
@@ -140,7 +139,10 @@ void ActorManager::updateAveragePos()
 	{
 		for (int j = 0; j < groups.at(i).size(); j++)
 		{
-			totalPos += groups.at(i).at(j)->getPosition();
+			if(groups[i][j] != nullptr)
+			{
+				totalPos += groups.at(i).at(j)->getPosition();
+			}
 		}
 
 		averagePos.push_back(totalPos / groups.at(i).size());
@@ -201,7 +203,7 @@ void ActorManager::updateGroups()
 		for (int k = 0; k < groups.at(i).size(); k++)
 		{
 			Actor* current = groups.at(i).at(k);
-			if (current->isDead())
+			if (current->isDead() or current == nullptr)
 			{
 				leaveGroup(i, k);
 			}

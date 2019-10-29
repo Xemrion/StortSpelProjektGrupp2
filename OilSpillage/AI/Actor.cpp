@@ -364,7 +364,19 @@ void Actor::updateBoid(float deltaTime)
 	{
 		velocity /= velocity.Length();
 	}
-	position += Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 3;
+	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 3;
+	Vector3 targetToSelf = (temp - position);
+	//Rotate
+	if ((targetToSelf).Dot(vecForward) < 0.8)
+	{
+		vecForward -= (targetToSelf * deltaTime) / 0.02f;
+		vecForward.Normalize();
+
+		float newRot = atan2(this->vecForward.x, this->vecForward.z);
+		this->setRotation(Vector3(0, newRot - (XM_PI / 2), 0));
+	}
+
+	position = temp;
 	// Reset accelertion to 0 each cycle
 	acceleration *= 0;
 }
