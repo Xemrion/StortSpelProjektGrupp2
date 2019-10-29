@@ -18,11 +18,11 @@ F32  District_getRoadCoverage( District d ) noexcept {
 
 F32  District_getBuildingDensity( District d ) noexcept {
    F32  result;
-   if      ( d == District::residential  ) { result = .5f; } // { result = .6f; }
-   else if ( d == District::park         ) { result = .0f; } // { result = .0f; }
-   else if ( d == District::metropolitan ) { result = .8f; } // { result = .9f; }
-   else if ( d == District::suburban     ) { result = .1f; } // { result = .1f; }
-   else if ( d == District::downtown     ) { result = .4f; } // { result = .4f; }
+   if      ( d == District::residential  ) { result = .8f; } // { result = .6f; }
+   else if ( d == District::park         ) { result = .8f; } // { result = .0f; }
+   else if ( d == District::metropolitan ) { result = .9f; } // { result = .9f; }
+   else if ( d == District::suburban     ) { result = .8f; } // { result = .1f; }
+   else if ( d == District::downtown     ) { result = .8f; } // { result = .4f; }
    else assert( false && "Unaccounted for enum value!" );
    return result;
 }
@@ -30,7 +30,7 @@ F32  District_getBuildingDensity( District d ) noexcept {
 U8 District_getBuildingMinArea( District d ) noexcept {
    U8  result;
    if      ( d == District::residential  ) { result = 1; } // { result = 8; }
-   else if ( d == District::park         ) { result = 0; } // { result = 0; }
+   else if ( d == District::park         ) { result = 1; } // { result = 0; }
    else if ( d == District::metropolitan ) { result = 1; } // { result = 3; }
    else if ( d == District::suburban     ) { result = 1; } // { result = 1; }
    else if ( d == District::downtown     ) { result = 1; } // { result = 4; }
@@ -41,7 +41,7 @@ U8 District_getBuildingMinArea( District d ) noexcept {
 U8  District_getBuildingMaxArea( District d ) noexcept {
    U8  result;
    if      ( d == District::residential  ) { result = 1; } //{ result = 16; }
-   else if ( d == District::park         ) { result = 0; } //{ result = 0; }
+   else if ( d == District::park         ) { result = 1; } //{ result = 0; }
    else if ( d == District::metropolitan ) { result = 1; } //{ result = 6; }
    else if ( d == District::suburban     ) { result = 1; } //{ result = 1; }
    else if ( d == District::downtown     ) { result = 1; } //{ result = 8; }
@@ -52,8 +52,8 @@ U8  District_getBuildingMaxArea( District d ) noexcept {
 U8  District_getMinFloorCount( District d ) noexcept {
    U8  result;
    if      ( d == District::residential  ) { result = 4;  }
-   else if ( d == District::park         ) { result = 0;  }
-   else if ( d == District::metropolitan ) { result = 16; }
+   else if ( d == District::park         ) { result = 1;  }
+   else if ( d == District::metropolitan ) { result = 8; }
    else if ( d == District::suburban     ) { result = 1;  }
    else if ( d == District::downtown     ) { result = 3;  }
    else assert( false && "Unaccounted for enum value!" );
@@ -64,8 +64,8 @@ U8  District_getMinFloorCount( District d ) noexcept {
 U8  District_getMaxFloorCount( District d ) noexcept {
    U8  result;
    if      ( d == District::residential  ) { result = 6;  }
-   else if ( d == District::park         ) { result = 0;  }
-   else if ( d == District::metropolitan ) { result = 32; }
+   else if ( d == District::park         ) { result = 1;  }
+   else if ( d == District::metropolitan ) { result = 16; }
    else if ( d == District::suburban     ) { result = 2;  }
    else if ( d == District::downtown     ) { result = 4;  }
    else assert( false && "Unaccounted for enum value!" );

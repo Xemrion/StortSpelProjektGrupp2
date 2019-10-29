@@ -126,8 +126,6 @@ void  Map::generateDistricts()
 // TODO: make return value optional later instead of asserting
 V2u Map::generateRoadPositionInTileSpace( RNG &rng ) const noexcept {
    //DBG_PROBE(Map::generateRoadPositionInTileSpace);
-V2u Map::generateRoadPositionInTileSpace( RNG &rng ) const noexcept
-{
    DBG_PROBE(Map::generateRoadPositionInTileSpace);
    static constexpr U16  MAX_TRIES{ 1024 };
    static U16_Dist       generateX(0, config.dimensions.x-1);
@@ -197,7 +195,7 @@ void  Map::generateBuildings( )
 		                << cellId << " (TYPE: \"" << stringify(districtType) << "\")\n";
 		#endif
 		
-		if ( (cellArea != 0) and (districtType != District::park) ) {
+		if ( (cellArea != 0) ) { //and (districtType != District::park) ) {
 			F32  const  targetDistrictCoverage         { District_getBuildingDensity(districtType) };
 			auto        computeCurrentDistrictCoverage { [&currentArea, cellArea]() {
 			                                                return F32(currentArea) / F32(cellArea);
