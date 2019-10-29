@@ -9,6 +9,16 @@ GameObject::~GameObject()
 	}*/
 }
 
+bool GameObject::getSpotShadow() const
+{
+	return this->spotShadow;
+}
+
+bool GameObject::getSunShadow() const
+{
+	return this->sunShadow;
+}
+
 Matrix GameObject::getTransform()
 {
 	if (this->rigidBody)
@@ -72,6 +82,16 @@ Matrix GameObject::getTransform()
 
 	//	return transform;
 	//}
+}
+
+void GameObject::setSunShadow(bool arg)
+{
+	this->sunShadow = arg;
+}
+
+void GameObject::setSpotShadow(bool arg)
+{
+	this->spotShadow = arg;
 }
 
 void GameObject::setPosition(Vector3 newPos)

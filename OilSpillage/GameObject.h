@@ -12,6 +12,8 @@ class GameObject
 private:
 	btRigidBody* rigidBody = nullptr;
 	Physics* physics = nullptr;
+	bool spotShadow = true;
+	bool sunShadow = true;
 protected:
    Vector3  position { 1.0f, 1.0f, 1.0f };
 	Vector3  scale    { 1.0f, 1.0f, 1.0f };
@@ -25,7 +27,12 @@ public:
 	const Mesh *mesh   = nullptr;
 	GameObject *parent = nullptr;
 	
+
+	bool getSpotShadow()const;
+	bool getSunShadow()const;
 	Matrix   getTransform();
+	void setSunShadow(bool arg);
+	void setSpotShadow(bool arg);
 	void     setPosition(Vector3);
 	void     move(Vector3 offset);
 	void     addRotation(Vector3);

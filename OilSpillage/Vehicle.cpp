@@ -71,6 +71,7 @@ void Vehicle::init(Physics *physics)
 
 	this->vehicleBody1 = new GameObject;
 	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
+	vehicleBody1->setSpotShadow(false);
 	Game::getGraphics().addToDraw(vehicleBody1);
 	vehicleBody1->setScale(Vector3(0.005f, 0.005f, 0.005f));	
 	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
