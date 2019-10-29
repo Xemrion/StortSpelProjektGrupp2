@@ -34,6 +34,7 @@ private:
 	bool immortal;
 	float immortalTimer;
 	float respawnTimer;
+	float totRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
 
 	float timeSinceLastShot;
@@ -106,6 +107,8 @@ public:
 	void resetHealth();
 	void changeHealth(int amount);
 	bool isDead() const;
+	float getTotRespawnTime()const;
+	float getRespawnTimer()const;
 
 	float getPitch(DirectX::XMVECTOR Quaternion);
 	float getYaw(DirectX::XMVECTOR Quaternion);

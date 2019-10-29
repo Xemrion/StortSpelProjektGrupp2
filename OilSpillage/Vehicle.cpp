@@ -13,8 +13,10 @@ Vehicle::Vehicle()
 	this->dmg = false;
 	this->deadImpulse = false;
 	this->respawnTimer = 0.0f;
+	this->totRespawnTime = 5.0f;
 	this->immortalTimer = 0.0f;
 	this->immortal = false;
+
 	targetRotation = 0.0f;
 	drivingMode = 0;
 	topSpeed = 4700;
@@ -593,6 +595,7 @@ void Vehicle::changeHealth(int amount)
 			vehicle->getRigidBody()->applyImpulse(btVector3(this->vehicle->getRigidBody()->getLinearVelocity().getX() * 6.3f, 0, this->vehicle->getRigidBody()->getLinearVelocity().getY() * 6.3f), btVector3(0, 0, 0));
 			//vehicle->getRigidBody()->setAngularVelocity(btVector3(0,2000.0f,0));
 			Game::getGraphics().addParticle(this->vehicle->getPosition() + Vector3(0, 2, 0), Vector3(0, 0, 0), 200, 10);
+			dynamic_cast<PlayingGameState*>(Game::getCurrentState())->changeTime(-30);
 		}
 	}
 }
@@ -600,6 +603,16 @@ void Vehicle::changeHealth(int amount)
 bool Vehicle::isDead() const
 {
 	return this->health <= 0;
+}
+
+float Vehicle::getTotRespawnTime() const
+{
+	return this->totRespawnTime;
+}
+
+float Vehicle::getRespawnTimer() const
+{
+	return respawnTimer;
 }
 
 float Vehicle::getCameraDistance(float deltaTime)
