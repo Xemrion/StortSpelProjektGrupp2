@@ -18,6 +18,7 @@ public:
 
 	void spawnDefenders(std::vector<Vector3> objectives);
 	void spawnAttackers(Vector3 playerPos);
+	void spawnTurrets(Vector3 playerPos);
 private:
 	int frameCount = 0;
 	float groupRadius = 6.5f * 6.5f; //Compare with distance^2

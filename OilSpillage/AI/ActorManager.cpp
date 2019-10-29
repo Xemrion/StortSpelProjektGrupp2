@@ -74,6 +74,7 @@ void ActorManager::createTurret(float x, float z)
 {
 	this->actors.push_back(new Turret(x, z));
 }
+
 std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 {
 	int rangeOfPlayer = 10*10;
@@ -122,7 +123,17 @@ void ActorManager::spawnDefenders(std::vector<Vector3> objectives)
 	}
 }
 
-void ActorManager::spawnAttackers(Vector3 playerPos)
+void ActorManager::spawnAttackers(Vector3 targetPos)
+{
+	for(int i = 0; i < 2; i++)
+	{
+		createAttacker(targetPos.x+i, targetPos.y);
+		createAttacker(targetPos.x, targetPos.y+1);
+		createAttacker(targetPos.x-i, targetPos.y);
+	}
+}
+
+void ActorManager::spawnTurrets(Vector3 playerPos)
 {
 	//createAttacker(playerPos.x+20, playerPos.z);
 	//createAttacker(playerPos.x+10, playerPos.z-10);
