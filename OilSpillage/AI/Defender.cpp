@@ -33,21 +33,19 @@ Defender::~Defender()
 {
 
 }
+
 void Defender::update(float dt, Vector3 targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 
-	this->root->func();
-	followPath();
-
-	if (nrOfFrames % 60 == 0)
+	if (nrOfFrames % 20 == 0)
 	{
-		if (state == State::Returning)
+		if (inObjectiveRange() == Status::FAILURE)
 		{
 			returning();
 		}
-		else if (state == State::Chasing)
+		else if (enemyWithinObjective() == Status::FAILURE) 
 		{
 			chase();
 		}
@@ -57,6 +55,9 @@ void Defender::update(float dt, Vector3 targetPos)
 		}
 		nrOfFrames = 0;
 	}
+	//this->root->func();
+	followPath();
+
 
 	updateWeapon(deltaTime);
 
@@ -73,7 +74,7 @@ void Defender::setUpActor()
 	Sequence& sequence3 = bt.getSequence();
 
 	Behavior& enemyNear = bt.getAction();
-	enemyNear.addAction(std::bind(&Defender::enemyWhithinObjective, std::ref(*this)));
+	enemyNear.addAction(std::bind(&Defender::enemyWithinObjective, std::ref(*this)));
 
 	Behavior& chase = bt.getAction();
 	chase.addAction(std::bind(&Defender::setChaseState, std::ref(*this)));
@@ -192,7 +193,7 @@ Status Defender::setReturnState()
 	return Status::SUCCESS;
 }
 
-Status Defender::enemyWhithinObjective()
+Status Defender::enemyWithinObjective()
 {
 	Status status;
 

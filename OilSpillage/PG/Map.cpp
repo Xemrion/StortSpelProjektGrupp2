@@ -124,12 +124,14 @@ void  Map::generateDistricts()
 }
 
 // TODO: make return value optional later instead of asserting
+V2u Map::generateRoadPositionInTileSpace( RNG &rng ) const noexcept {
+   //DBG_PROBE(Map::generateRoadPositionInTileSpace);
 V2u Map::generateRoadPositionInTileSpace( RNG &rng ) const noexcept
 {
    DBG_PROBE(Map::generateRoadPositionInTileSpace);
    static constexpr U16  MAX_TRIES{ 1024 };
-   static U16_Dist       generateX(0, config.dimensions.x);
-   static U16_Dist       generateY(0, config.dimensions.y);
+   static U16_Dist       generateX(0, config.dimensions.x-1);
+   static U16_Dist       generateY(0, config.dimensions.y-1);
    U16                   x, y, counter{ 0 };
    do {
       x = generateX( rng );
@@ -153,6 +155,9 @@ void  Map::generateBuildings( )
 
 	RNG  rng{ RD()() };
 	rng.seed( config.seed );
+	F32_Dist randomSizeDist { .6f, .7f };
+	F32 constexpr smallProbability{ .20f };
+	F32_Dist smallProbabilityDist {};
 
 	//Array of possible buildings
 	std::string buildingArr[4];
@@ -228,22 +233,26 @@ void  Map::generateBuildings( )
 						int randomHouse = rand() % 4; //decides the house
 						houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
 						//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
-						houseTile.setScale({ .0322f * config.tileScaleFactor.x,
+
+						F32 randomSize = smallProbabilityDist(rng) < smallProbability ? randomSizeDist(rng) : 1.0f;
+
+						houseTile.setScale({ randomSize * .0322f * config.tileScaleFactor.x,
 						                     .015f * config.tileScaleFactor.y + (.25f * randomFloorCount) /* config.buildingFloorHeightFactor * randomFloorCount */,
-						                     .0322f * config.tileScaleFactor.z });
-						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) } );
-						#ifndef _DEBUG
-							btRigidBody *tmp = physics->addBox(	 btVector3( houseTile.getPosition().x,
-																			            houseTile.getPosition().y,
-																			            houseTile.getPosition().z ),
-																			 btVector3( 15.5f * houseTile.getScale().x,
-																			            15.5f * houseTile.getScale().y,
-																			            15.5f * houseTile.getScale().z ),
-																			 .0f );
-							houseTile.setRigidBody( tmp, physics );
-						#else
-							++total_building_tile_count;
-						#endif
+											 randomSize * .0322f * config.tileScaleFactor.z });
+						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) - Vector3(0,1,0) } );
+				  #ifndef _DEBUG
+						btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
+						                                               houseTile.getPosition().y,
+						                                               houseTile.getPosition().z ),
+						                                    btVector3( 15.5f * houseTile.getScale().x,
+						                                               15.5f * houseTile.getScale().y,
+																       15.5f * houseTile.getScale().z ),
+						                                    .0f );
+						houseTile.setRigidBody( tmp, physics );
+				  #endif
+                  #ifdef _DEBUG
+						   ++total_building_tile_count;
+                  #endif
 					}
 				}
 				else break; // TODO?

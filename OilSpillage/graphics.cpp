@@ -531,9 +531,15 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 				deviceContext->PSSetShader(nullptr, nullptr, 0);
 				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 				shadowMap.setDSun();
-				deviceContext->Draw(vertexCount, 0);
+				if (object->getSunShadow())
+				{
+					deviceContext->Draw(vertexCount, 0);
+				}
 				shadowMap.setDSpot();
-				deviceContext->Draw(vertexCount, 0);
+				if (object->getSpotShadow())
+				{
+					deviceContext->Draw(vertexCount, 0);
+				}
 			}
 		}
 	}
@@ -556,9 +562,15 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 		deviceContext->PSSetShader(nullptr, nullptr, 0);
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		shadowMap.setDSun();
-		deviceContext->Draw(vertexCount, 0);
+		if (o->getSunShadow())
+		{
+			deviceContext->Draw(vertexCount, 0);
+		}
 		shadowMap.setDSpot();
-		deviceContext->Draw(vertexCount, 0);
+		if (o->getSpotShadow())
+		{
+			deviceContext->Draw(vertexCount, 0);
+		}
 		//}
 
 	}
@@ -1117,7 +1129,7 @@ Material Graphics::getMaterial(const char* modelPath)
 	}
 	else
 	{
-		material.diffuse = textures[texturePath + "/_normal.tga"];
+		material.normal = textures[texturePath + "/_normal.tga"];
 	}
 
 	if (textures.find(texturePath + "/_specular.tga") == textures.end()) {
@@ -1125,7 +1137,7 @@ Material Graphics::getMaterial(const char* modelPath)
 	}
 	else
 	{
-		material.diffuse = textures[texturePath + "/_specular.tga"];
+		material.specular = textures[texturePath + "/_specular.tga"];
 	}
 
 	if (textures.find(texturePath + "/_gloss.tga") == textures.end()) {
@@ -1133,7 +1145,7 @@ Material Graphics::getMaterial(const char* modelPath)
 	}
 	else
 	{
-		material.diffuse = textures[texturePath + "/_gloss.tga"];
+		material.gloss = textures[texturePath + "/_gloss.tga"];
 	}
 
 	return material;

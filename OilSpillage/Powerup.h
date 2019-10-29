@@ -4,6 +4,8 @@
 enum class PowerUpType
 {
 	Time,
+	Health,
+	Speed,
 	Length
 };
 

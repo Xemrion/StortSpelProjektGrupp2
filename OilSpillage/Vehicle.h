@@ -12,8 +12,6 @@ class Vehicle
 {
 private:
 	GameObject* vehicle;
-	GameObject* bodyRotation;
-	GameObject* bodyRotationPoint;
 	btScalar mRotation;
 	GameObject* mountedWeapon;//Mounted on top of the car
 	GameObject* wheel1;
@@ -32,19 +30,24 @@ private:
 	btCollisionShape* m_wheelShape;
 
 	int health;
-
+	bool deadImpulse;
+	bool immortal;
+	float immortalTimer;
+	float respawnTimer;
 	float powerUpTimers[(int)PowerUpType::Length];
 
 	float timeSinceLastShot;
+	float timeSinceLastShot2;
 	Weapon weapon;
+	Weapon weapon2;
+	Weapon mountedWeaponData;
 	Stats defaultStats;
 	Stats updatedStats;
 
-	static const int bulletCount = 128;
+	static const int bulletCount = 512;
 	Bullet bullets[bulletCount];
 
 	float gunRotation;
-	Vector3 bodyPivot;
 	DirectX::XMFLOAT2 velocity;
 	float strength;
 	float add;
@@ -62,7 +65,10 @@ private:
 	float tempTargetRotation;
 	bool rotationDirection;
 	float cameraDistance;
-
+	Vector3 accelForce;
+	float reverseTimer;
+	float reverseTimer2;
+	bool dmg;
 
 	
 	Vector2 curDir;
@@ -80,6 +86,7 @@ public:
 	void updateWeapon(float deltaTime);
 	
 	GameObject* getVehicle() { return this->vehicle; }
+	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
 
 	void setDrivingMode(int i);
@@ -88,6 +95,7 @@ public:
 	float getVelocitySpeed();
 	float getRotator();
 	float getCameraDistance(float deltaTime);
+	void setAccelForce(Vector3 accelForce, float deltaTime);
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;

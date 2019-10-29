@@ -17,20 +17,22 @@ void PlayingGameState::initAI()
 	//actorManager->createTurret(0 + 2, 0 + 4);
 	//actorManager->createTurret(0 + 2, 0 - 4);
 
-	for (int i = 0; i < 10; i++)
-	{
-		for (int j = 0; j < 5; j++)
-		{
-			actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
-		}
-	}
+	//for (int i = 0; i < 10; i++)
+	//{
+	//	for (int j = 0; j < 5; j++)
+	//	{
+	//		actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
+	//	}
+	//}
+	//actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 }
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0f), currentMenu(MENU_PLAYING)
 {
    #if _DEBUG | RELEASE_DEBUG
 	   pausedTime = false;
    #endif // _DEBUG
 
+	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
 	camera = std::make_unique<DynamicCamera>();
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
@@ -39,10 +41,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
+	graphics.loadTexture("grass3");
+
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 	graphics.loadModel("Entities/Dummy_Turret");
 	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
+
 
 	graphics.loadModel("Roads/Road_pavement");
 	graphics.loadModel("Roads/Road_deadend");
@@ -117,15 +122,18 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 
    auto playerVehicle = player->getVehicle();
 	playerVehicle->setPosition(Vector3(15,3,-15));
+	player->getVehicleBody1()->setPosition(Vector3(15, 3.65f, -15));
 
-	testObjective = new GameObject();
-	testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(testObjective);
-	testObjective->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
-	testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
+	//testObjective = new GameObject();
+	//testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//Game::getGraphics().addToDraw(testObjective);
+	//testObjective->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
+	//testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
+
+	
 
 
-	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 10.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
 		{
@@ -140,12 +148,28 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 		Vector4(0.03f,0.03f,0.03f,1),
 		Vector4(0.9f, 0.9f, 0.05f, 1)
 	};
+
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
+	graphics.setVectorField(4.5f, 13.0f);
 
-	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100)));
+	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
+
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies that is protecting the anvil");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the important" ,TypeOfTarget::Crate);
+
+
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the trash");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 3, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 6, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 1, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 8, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 7, "Pick up the important");
 
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
@@ -157,7 +181,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
 	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
 	buildingTest->setRigidBody(tempo2, physics.get());*/
-	//spawnObjects();
+
+#ifndef _DEBUG
+	spawnObjects();
+#endif
+	count = 0;
+	prevAccelForce = Vector3(0,0,0);
+	accelForce = Vector3(0, 0, 0);
 }
 
 PlayingGameState::~PlayingGameState()
@@ -165,6 +195,11 @@ PlayingGameState::~PlayingGameState()
 	delete aStar;
 	delete actorManager;
 	delete testObjective;
+	delete this->objTestPickUp;
+	delete this->objTestPickUp2;
+	delete this->objTestPickUp3;
+
+	delete[] this->objArray;
 }
 
 void  PlayingGameState::ImGui_Driving()
@@ -174,19 +209,14 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text("Time Left: %f", time);
 	ImGui::Text(("Rotation: " + to_string(player->getRotator())).c_str());
 	ImGui::Text("Driving Mode:");
-	static int radioButtonValue = 1;
+	static int radioButtonValue = 0;
 	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
 	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
-	//ImGui::RadioButton("Directional Smooth", &radioButtonValue, 2);
-	ImGui::RadioButton("Old Directional Semi-Realistic", &radioButtonValue, 3);
 	if (radioButtonValue == 0)
-		player->setDrivingMode(0);
-	else if (radioButtonValue == 1)
 		player->setDrivingMode(1);
-	/*else if (radioButtonValue == 2)
-		player->setDrivingMode(2);*/
-	else if (radioButtonValue == 3)
-		player->setDrivingMode(3);
+	else if (radioButtonValue == 1)
+		player->setDrivingMode(0);
+
 
 	Vector3 camPos = camera->getPosition();
 	Vector3 camRot = camera->getRotation();
@@ -454,6 +484,12 @@ void  PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		
+		if(spawnTimer % 100 == 0)
+		{
+			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+			spawnTimer = 0;
+		}
+		spawnTimer++;
 
 		powerUps.erase(
 			std::remove_if(
@@ -461,7 +497,7 @@ void  PlayingGameState::update(float deltaTime)
 				powerUps.end(),
 				[&](PowerUp& p) {
 					p.update(time);
-					if (p.getAABB().intersect(player->getVehicle()->getAABB()))
+					if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
 					{
 						player->powerUp(p.getPowerUpType());
 						return true;
@@ -475,12 +511,21 @@ void  PlayingGameState::update(float deltaTime)
 			powerUps.end()
 		);
 
+		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
 		player->update(       deltaTime );
 		physics->update(      deltaTime );
+		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
+		player->setAccelForce(accelForce, deltaTime);
+		player->updateWeapon(deltaTime);
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(       deltaTime );
 		player->updateWeapon(deltaTime);
+		objectives.update(player->getVehicle()->getPosition());
+		
+#ifndef _DEBUG
+		updateObjects();
+#endif
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
 		camera->setPosition( Vector3( positionCam.getX(),
@@ -491,7 +536,7 @@ void  PlayingGameState::update(float deltaTime)
 								 0,
 		                         1 };
 		playerVehicle->getRotationQuaternion();
-		btQuaternion bt5 = btQuaternion(playerVehicle->getRigidBody()->getWorldTransform().getRotation());
+		btQuaternion bt5 = btQuaternion(this->player->getVehicleBody1()->getRigidBody()->getWorldTransform().getRotation());
 		btTransform transform(bt5,btVector3(0, 0,0));
 		spotlightDir = transform * spotlightDir;
 		playerLight->setDirection( Vector3(spotlightDir.getX(), spotlightDir.getY(), spotlightDir.getZ()));
@@ -504,21 +549,19 @@ void  PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos( spotlightPos );
 		
-		timerForParticle += deltaTime;
+		/*timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
 		{
-			/*graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
-			                      5 * Vector3(Input::GetDirectionR(0).x,
-			                      0,
-			                      Input::GetDirectionR(0).y),
-			                      addNrOfParticles, lifeTime, randomPosPower);*/
+			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
+			                      5 * Vector3(0,0,0),
+			                      addNrOfParticles, lifeTime, randomPosPower);
 			timerForParticle = 0;
-		}
+		}*/
 		
 		if ( player->isDead() )
 		{
-			changeTime( -30.0f );
-			player->resetHealth();
+			//changeTime( -30.0f );
+			//player->resetHealth();
 		}
 	}
 	
@@ -539,16 +582,16 @@ void  PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
 #if _DEBUG | RELEASE_DEBUG //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   ImGui_ImplDX11_NewFrame();
-	   ImGui_ImplWin32_NewFrame();
-	   ImGui::NewFrame();
-	   ImGui_Driving();
-	   ImGui_ProcGen();
-	   ImGui_AI();
-	   ImGui_Particles();
-	   ImGui_Camera();
-	   ImGui::Render();
-	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	   //ImGui_ImplDX11_NewFrame();
+	   //ImGui_ImplWin32_NewFrame();
+	   //ImGui::NewFrame();
+	   //ImGui_Driving();
+	   //ImGui_ProcGen();
+	   //ImGui_AI();
+	   //ImGui_Particles();
+	   //ImGui_Camera();
+	   //ImGui::Render();
+	   //ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #endif // !_DEBUG
 	
 	graphics.presentScene();
@@ -595,67 +638,248 @@ Vector3 PlayingGameState::getBottomRight() const
 
 void PlayingGameState::spawnObjects()
 {
+	Game::getGraphics().loadModel("Entities/Barrel");
+	Game::getGraphics().loadModel("Entities/Garbage_Bag");
+	physicsObjID = 0;
+	physicsObjects.reserve(50);
 	btRigidBody* tempo2;
-	for (int i = 0; i < 400; i++) {
+	float randomValue;
+	for (int i = 0; i < 12; i++) {
+		physicsObjects.emplace_back(std::make_unique<GameObject>());
+		auto objPtr = physicsObjects.back().get();
+		Game::getGraphics().loadModel("Cube");
+		objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+		graphics.loadTexture("brownPaperCardboard");
+		objPtr->setTexture(Game::getGraphics().getTexturePointer("brownPaperCardboard"));
+		Game::getGraphics().addToDraw(objPtr);
+		randomValue = rand() % 3 + 8;
+		randomValue *= 0.125f;
+		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue), 0.01f);
+		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
+		objPtr->setScale(Vector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue));
+		//objPtr->setColor(Vector4(0.8, 0.6, 0.38, 1));
+		objPtr->setRigidBody(tempo2, physics.get());
+		objPtr->getRigidBody()->setFriction(0.7f);
+		objPtr->getRigidBody()->setActivationState(0);
+		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+	}
+	float size = 1.3f*0.38f;
+		  randomValue  = 0;
+	float randomValue2 = 0;
+	float randomValue3 = 0;
+	for (int i = 0; i < 8; i++) {
+		physicsObjects.emplace_back(std::make_unique<GameObject>());
+		auto objPtr = physicsObjects.back().get();
+		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
+		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Barrel").diffuse);
+		Game::getGraphics().addToDraw(objPtr);
+		tempo2 = physics->addCylinder(btVector3(-200, 0.2f + i, -200), btVector3(size,size,size), 0.01f);
+		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
+		objPtr->setScale(Vector3(size,size,size));
+		randomValue = (rand() % 5) * 0.03f;
+		randomValue2 = (rand() % 5) * 0.03f;
+		randomValue3 = (rand() % 5) * 0.03f;
+		objPtr->setColor(Vector4(randomValue, randomValue2, 0, 1));
+		objPtr->setRigidBody(tempo2, physics.get());
+		objPtr->getRigidBody()->setFriction(0.7f);
+		objPtr->getRigidBody()->setActivationState(0);
+		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+	}
+	for (int i = 0; i < 8; i++) {
+		physicsObjects.emplace_back(std::make_unique<GameObject>());
+		auto objPtr = physicsObjects.back().get();
+		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Garbage_Bag");
+		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Garbage_Bag").diffuse);
+		Game::getGraphics().addToDraw(objPtr);
+		objPtr->setPosition(Vector3(0, 0, 0));
+		randomValue = rand() % 3 + 8;
+		randomValue *= 0.125f;
+		size = 0.30f *randomValue;
+		objPtr->setScale(Vector3(size, size, size));
+		tempo2 = physics->addSphere(size, btVector3(0, 0.0f, 0), 0.01f);
+		objPtr->setPosition(Vector3(0, 0, 0));
+		//objPtr->setColor(Vector4(0.8, 0.6, 0.38, 1));
+		objPtr->setRigidBody(tempo2, physics.get());
+		objPtr->getRigidBody()->setDamping(0,0.98f);
+		objPtr->getRigidBody()->setFriction(0.7f);
+		objPtr->getRigidBody()->setActivationState(0);
+		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+	}
+	for (int i = 0; i < 22; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
 		Game::getGraphics().loadModel("Cube");
 		objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
 		Game::getGraphics().addToDraw(objPtr);
-		tempo2 = physics->addBox(btVector3(20, 0.2f + i, -20), btVector3(0.5f, 0.5f, 0.5f), 0.01f);
-		objPtr->setPosition(Vector3(20, 0.2f + i, -20));
-		objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
-		objPtr->setColor(Vector4(0.7f, 0.7f, 0.3f, 1));
+		objPtr->setScale(Vector3(0.12f, 0.01f, 0.19f));
+		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.12f, 0.08f, 0.19f), 0.01f);
+		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
+		objPtr->setColor(Vector4(1, 1, 1, 1));
 		objPtr->setRigidBody(tempo2, physics.get());
-		objPtr->getRigidBody()->setFriction(1);
+		objPtr->getRigidBody()->setDamping(0.93f, 0.94f);
+		objPtr->getRigidBody()->setFriction(0.8f);
+		objPtr->getRigidBody()->setGravity(btVector3(0,-2.5f,0));
+		objPtr->getRigidBody()->setRestitution(0.8f);
 		objPtr->getRigidBody()->setActivationState(0);
 		objPtr->getRigidBody()->setDeactivationTime(0.1f);
-
 	}
-	physicsObjects.emplace_back(std::make_unique<GameObject>());
-	auto objPtr = physicsObjects.back().get();
-	Game::getGraphics().loadModel("Cube");
-	objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(objPtr);
-	tempo2 = physics->addBox(btVector3(20, 0.2f, -20), btVector3(5.5f, 12.5f, 5.5f), 0);
-	objPtr->setPosition(Vector3(20, 0.2f, -20));
-	objPtr->setScale(Vector3(5.5f, 12.5f, 5.5f));
-	objPtr->setColor(Vector4(0.3f, 0.3f, 0.9f, 1));
-	objPtr->setRigidBody(tempo2, physics.get());
-	Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(XM_PI / 3, 0, 0));
-	btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);
-	objPtr->getRigidBody()->getWorldTransform().setRotation(qt);
-	objPtr->getRigidBody()->setFriction(1);
 
-	physicsObjects.reserve(2000);
+	//physicsObjects.emplace_back(std::make_unique<GameObject>());
+	//auto objPtr = physicsObjects.back().get();
+	//Game::getGraphics().loadModel("Cube");
+	//objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//Game::getGraphics().addToDraw(objPtr);
+	//tempo2 = physics->addBox(btVector3(20, 0.2f, -20), btVector3(5.5f, 12.5f, 5.5f), 0);
+	//objPtr->setPosition(Vector3(20, 0.2f, -20));
+	//objPtr->setScale(Vector3(5.5f, 12.5f, 5.5f));
+	//objPtr->setColor(Vector4(0.3, 0.3, 0.9, 1));
+	//objPtr->setRigidBody(tempo2, physics.get());
+	//Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(XM_PI / 3, 0, 0));
+	//btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);
+	//objPtr->getRigidBody()->getWorldTransform().setRotation(qt);
+	//objPtr->getRigidBody()->setFriction(1);
+
+	//physicsObjects.reserve(2000);
+	//auto tilemap = map->getTileMap();
+	//for (int tileY = 0; tileY < tilemap.width; ++tileY ) {
+	//	for (int tileX = 0; tileX < tilemap.height; ++tileX) {
+	//		if (tilemap.tileAt(tileX, tileY) == Tile::road) {
+	//			Vector3 min{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) - Vector3 { config.tileScaleFactor.x / 2,
+	//																							 config.tileScaleFactor.y / 2,
+	//																							 config.tileScaleFactor.x / 2 } };
+
+	//			Vector3 max{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) + Vector3 { config.tileScaleFactor.x / 2,
+	//																							 config.tileScaleFactor.y / 2,
+	//																							 config.tileScaleFactor.x / 2 } };
+	//			/*for (int i = 0; i < 4; i++) {
+	//				physicsObjects.emplace_back(std::make_unique<GameObject>());
+	//				auto objPtr = physicsObjects.back().get();
+	//				Game::getGraphics().loadModel("Cube");
+	//				objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//				Game::getGraphics().addToDraw(objPtr);
+	//				tempo2 = physics->addBox(btVector3(min.x, 0.2f+i, min.z), btVector3(0.5f, 0.5f, 0.5f), 3.0f);
+	//				objPtr->setPosition(Vector3(min.x, 0.2f+i, min.z));
+	//				objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
+	//				objPtr->setColor(Vector4(0.7, 0.7, 0.3, 1));
+	//				objPtr->setRigidBody(tempo2, physics.get());
+	//				objPtr->getRigidBody()->setFriction(2);
+	//				objPtr->getRigidBody()->setActivationState(0);
+	//				
+	//			}*/
+	//		}
+	//	}
+	//}
+
+}
+
+void PlayingGameState::moveObjects()
+{
+	GameObject* object = physicsObjects.at(physicsObjID).get();
 	auto tilemap = map->getTileMap();
-	for (int tileY = 0; tileY < tilemap.width; ++tileY ) {
-		for (int tileX = 0; tileX < tilemap.height; ++tileX) {
-			if (tilemap.tileAt(tileX, tileY) == Tile::road) {
-				Vector3 min{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) - Vector3 { config.tileScaleFactor.x / 2,
-																								 config.tileScaleFactor.y / 2,
-																								 config.tileScaleFactor.x / 2 } };
+	if (object->getPosition().x > (player->getVehicle()->getPosition().x + 50) ||
+		object->getPosition().x < (player->getVehicle()->getPosition().x - 50) ||
+		object->getPosition().z > (player->getVehicle()->getPosition().z + 25) ||
+		object->getPosition().z < (player->getVehicle()->getPosition().z - 25)) {
+		object->getRigidBody()->setActivationState(0);
+		int randomValue = rand() % 2+1;
+		if (randomValue == 1) {
+			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getZ() > 0) {
+				//Top
+				randomValue = rand() % 100 + 1 - 50;
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z + 25));
+			}
+			else {
+				//Bottom
+				randomValue = rand() % 100 + 1 - 50;
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z - 25));
+			}
+		}else if(randomValue == 2){
+			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getX() < 0) {
+				//Left
+				randomValue = rand() % 50 + 1 - 25;
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x - 50, -0.5f, player->getVehicle()->getPosition().z + randomValue));
+			}
+			else {
+				//Right
+				randomValue = rand() % 50 + 1 - 25;
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + 50, -0.5f, player->getVehicle()->getPosition().z + randomValue));
+			}
+		}
+		randomValue = rand() % 360 + 1;
+		int randomValue2 = 0;
+		if (object->getScale().x != 0.12f) {
+			randomValue2 = rand() % 2;
+		}
+		Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(randomValue2 * 90 * XM_PI / 180, randomValue * XM_PI/180, 0));
+		btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);
+		object->getRigidBody()->getWorldTransform().setRotation(qt);
+	}
+	physicsObjID++;
+	if (physicsObjID >= physicsObjects.size()) {
+		physicsObjID = 0;
+	}
+}
 
-				Vector3 max{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) + Vector3 { config.tileScaleFactor.x / 2,
-																								 config.tileScaleFactor.y / 2,
-																								 config.tileScaleFactor.x / 2 } };
-				/*for (int i = 0; i < 4; i++) {
-					physicsObjects.emplace_back(std::make_unique<GameObject>());
-					auto objPtr = physicsObjects.back().get();
-					Game::getGraphics().loadModel("Cube");
-					objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
-					Game::getGraphics().addToDraw(objPtr);
-					tempo2 = physics->addBox(btVector3(min.x, 0.2f+i, min.z), btVector3(0.5f, 0.5f, 0.5f), 3.0f);
-					objPtr->setPosition(Vector3(min.x, 0.2f+i, min.z));
-					objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
-					objPtr->setColor(Vector4(0.7, 0.7, 0.3, 1));
-					objPtr->setRigidBody(tempo2, physics.get());
-					objPtr->getRigidBody()->setFriction(2);
-					objPtr->getRigidBody()->setActivationState(0);
-					
-				}*/
+Vector3 PlayingGameState::generateObjectivePos(float minDistance, float maxDistance) noexcept
+{
+
+	for (;;) {
+		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
+		float distance = (position - player->getVehicle()->getPosition()).Length();
+		if ( (distance <= maxDistance) and (distance >= minDistance) )
+		{
+			return position;
+		}
+	}
+	assert(false and "BUG: Shouldn't be possible!");
+	return { -1.0f, -1.0f, -1.0f }; //  silences a warning
+	
+}
+
+Vector3 PlayingGameState::generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept
+{
+
+	for (;;) {
+		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
+		float distance = (position - origin).Length();
+		if ( (distance <= maxDistance) and (distance >= minDistance) )
+		{
+			return position;
+		}
+	}
+	assert(false and "BUG: Shouldn't be possible!");
+	return { -1.0f, -1.0f, -1.0f }; //  silences a warning
+
+}
+
+PointLight* PlayingGameState::addPointLight(PointLight& light)
+{
+	return this->lightList->addLight(light);
+}
+
+void PlayingGameState::removeLight(PointLight* theLight)
+{
+	this->lightList->removeLight(theLight);
+}
+
+ObjectiveHandler& PlayingGameState::getObjHandler()
+{
+	return this->objectives;
+}
+
+void PlayingGameState::addTime(float time)
+{
+	this->time += time;
+}
+void PlayingGameState::updateObjects()
+{
+	if (abs(player->getVelocitySpeed()) > 1.0f) {
+		moveObjects();
+		if (abs(player->getVelocitySpeed()) > 10.0f) {
+			moveObjects();
+			if (abs(player->getVelocitySpeed()) > 20.0f) {
+				moveObjects();
 			}
 		}
 	}
-
 }

@@ -12,6 +12,7 @@
 #include "../UI/UserInterface.h"
 #include "../Powerup.h"
 
+#include"..////Objectives/ObjectiveHandler.h"
 class PlayingGameState : public GameState {
 	friend class Game;
 public:
@@ -34,7 +35,17 @@ public:
 	std::string  getMinimap() const;
 	Vector3      getTopLeft() const;
 	Vector3      getBottomRight() const;
+	ObjectiveHandler& getObjHandler();
+	void addTime(float time);
 	void		 spawnObjects();
+	Vector3 generateObjectivePos(float minDistance, float maxDistance) noexcept;
+	Vector3 generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept;
+	PointLight* addPointLight(PointLight& light);
+	void removeLight(PointLight* theLight);
+	void		 moveObjects();
+	void		 updateObjects();
+
+	ActorManager* actorManager;
 
 private:
 	friend class Game;
@@ -52,7 +63,6 @@ private:
 	Graphics                       &graphics;
 	AStar                          *aStar;
 	std::unique_ptr<Map>            map;
-	ActorManager                   *actorManager;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
@@ -62,12 +72,23 @@ private:
 	std::vector<PowerUp>		    powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
-
+	GameObject* objTestPickUp;
+	GameObject* objTestPickUp2;
+	GameObject* objTestPickUp3;
+	GameObject** objArray = new GameObject * [3];
+	ObjectiveHandler objectives;
+	RNG rng{ RD()() };        // gör privat klassmedlem istället
+	
 	//Bullet
 	std::unique_ptr<Physics>		physics;
 	std::unique_ptr<GameObject>		buildingTest;
 	Vector<UPtr<GameObject>>		physicsObjects;
+	int physicsObjID;
+	int count;
+	Vector3 prevAccelForce;
+	Vector3 accelForce;
 
+	int								spawnTimer = 0;
 	int                             addNrOfParticles  {     2 };
 	int                             lifeTime          {     1 };
 	float                           timerForParticle  {   .0f };
@@ -75,7 +96,7 @@ private:
 	float                           vectorFieldSize   {  2.2f };
 	float                           randomPosPower    {  0.5f };
 	float                           size1             { .069f };
-	float                           size2             { .233f };
+	float                           size2             { .133f };
 	float                           colors  [4]       {};
 	float                           colors2 [4]       {};
 	float                           colors3 [4]       {};

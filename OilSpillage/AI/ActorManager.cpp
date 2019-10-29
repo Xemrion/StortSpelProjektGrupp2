@@ -1,5 +1,6 @@
 #include "ActorManager.h"
-
+#include "../game.h"
+#include "../States/PlayingGameState.h"
 ActorManager::ActorManager()
 {
 	this->aStar = nullptr;
@@ -21,7 +22,7 @@ ActorManager::~ActorManager()
 
 void ActorManager::update(float dt, Vector3 targetPos)
 {
-	int posOfDeadAI = -5;
+	bool hasDied = false;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
 		if (!actors.at(i)->isDead() && actors.at(i) != nullptr)
@@ -30,17 +31,32 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		}
 		else if (actors.at(i)->isDead() && actors.at(i) != nullptr)
 		{
-			actors.at(i)->death();
-			posOfDeadAI = i;
+			Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+			if (ptr != nullptr)
+			{
+				if (ptr->getType() == TypeOfMission::KillingSpree)
+				{
+					ptr->killEnemy();
+				}
+			}
+			hasDied = true;
 		}
 	}
-	updateGroups();
-	if(posOfDeadAI != -5)
+	if(hasDied = true)
 	{
-		delete actors.at(posOfDeadAI);
-		actors.erase(actors.begin() + posOfDeadAI);
-		posOfDeadAI = -5;
+		for (int i = this->actors.size() - 1; i >= 0; i--)
+		{
+			if (actors.at(i)->isDead())
+			{
+				actors.at(i)->death();
+				delete actors.at(i);
+				actors.erase(actors.begin() + i);
+			}
+		}
+		hasDied = false;
 	}
+
+	updateGroups();
 	if (frameCount % 60 == 0)
 	{
 		assignPathsToGroups(targetPos);
@@ -66,6 +82,7 @@ void ActorManager::createTurret(float x, float z)
 {
 	this->actors.push_back(new Turret(x, z));
 }
+
 std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 {
 	int rangeOfPlayer = 10*10;
@@ -102,19 +119,26 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 	}
 }
 
-void ActorManager::spawnDefenders(std::vector<Vector3> objectives)
+void ActorManager::spawnDefenders(Vector3 objective)
 {
-	for(int i = 0; i < objectives.size(); i++)
+	createDefender(objective.x + 2, objective.z, objective);
+	createDefender(objective.x, objective.z - 2, objective);
+	createDefender(objective.x, objective.z + 2, objective);
+	createDefender(objective.x+2, objective.z + 2, objective);
+	createDefender(objective.x-2, objective.z + 2, objective);
+}
+
+void ActorManager::spawnAttackers(Vector3 originPos)
+{
+	for(int i = 0; i < 2; i++)
 	{
-		createDefender(objectives.at(i).x + 2, objectives.at(i).z, objectives.at(i));
-		createDefender(objectives.at(i).x, objectives.at(i).z - 2, objectives.at(i));
-		createDefender(objectives.at(i).x, objectives.at(i).z + 2, objectives.at(i));
-		createDefender(objectives.at(i).x+2, objectives.at(i).z + 2, objectives.at(i));
-		createDefender(objectives.at(i).x-2, objectives.at(i).z + 2, objectives.at(i));
+		createAttacker(originPos.x+i, originPos.z);
+		createAttacker(originPos.x, originPos.z+1);
+		createAttacker(originPos.x-i, originPos.z);
 	}
 }
 
-void ActorManager::spawnAttackers(Vector3 playerPos)
+void ActorManager::spawnTurrets(Vector3 playerPos)
 {
 	//createAttacker(playerPos.x+20, playerPos.z);
 	//createAttacker(playerPos.x+10, playerPos.z-10);
@@ -131,7 +155,10 @@ void ActorManager::updateAveragePos()
 	{
 		for (int j = 0; j < groups.at(i).size(); j++)
 		{
-			totalPos += groups.at(i).at(j)->getPosition();
+			if(groups[i][j] != nullptr)
+			{
+				totalPos += groups.at(i).at(j)->getPosition();
+			}
 		}
 
 		averagePos.push_back(totalPos / groups.at(i).size());
@@ -192,7 +219,7 @@ void ActorManager::updateGroups()
 		for (int k = 0; k < groups.at(i).size(); k++)
 		{
 			Actor* current = groups.at(i).at(k);
-			if (current->isDead())
+			if (current->isDead() or current == nullptr)
 			{
 				leaveGroup(i, k);
 			}

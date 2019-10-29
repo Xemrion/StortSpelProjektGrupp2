@@ -19,6 +19,8 @@ private:
 	Texture* textureFogTemp;
 	Texture* textureOutline;
 	Texture* texturePlayerMarker;
+	Texture* textureObjectiveMarker;
+
 public:
 	static Vector2 size;
 

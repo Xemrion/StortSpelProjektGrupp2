@@ -485,13 +485,13 @@ float Input::getStrengthR(/*int player*/)
 		}
 	//}
 
-	if (strength == 0.0f)
+	/*if (strength == 0.0f)
 	{
 		float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
 		float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
 
 		strength = min(Vector2(mX, -mY).Length() / 300.0f, 1.0f);
-	}
+	}*/
 
 	return strength;
 }

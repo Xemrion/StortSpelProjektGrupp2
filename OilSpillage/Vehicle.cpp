@@ -10,9 +10,13 @@ Vehicle::Vehicle()
 	acceleratorTempX = 0;
 	acceleratorTempZ = 0;
 	strength = 0;
-
+	this->dmg = false;
+	this->deadImpulse = false;
+	this->respawnTimer = 0.0f;
+	this->immortalTimer = 0.0f;
+	this->immortal = false;
 	targetRotation = 0.0f;
-	drivingMode = 1;
+	drivingMode = 0;
 	topSpeed = 4700;
 	this->add = 0.0f;
 	this->counter = 0.0f;
@@ -23,24 +27,25 @@ Vehicle::Vehicle()
 	this->velocitySpeed = 0.0f;
 	this->rotationDirection = true;
 	this->vehicle = nullptr;
-	this->bodyRotation = nullptr;
-	this->bodyRotationPoint = nullptr;
 	this->cameraDistance = 0.0f;
+	this->accelForce = Vector3(0,0,0);
+	this->reverseTimer = 0;
+	this->reverseTimer2 = 0;
 
 	this->curDir = Vector2(0.0f, 1.0f);//UP
 	this->timeSinceLastShot = 0.0f;
-	this->weapon = WeaponHandler::getWeapon(WeaponType::Flamethrower);
+	this->timeSinceLastShot2 = 0.0f;
+
+	this->weapon = WeaponHandler::getWeapon(WeaponType::MachineGun);
+	this->weapon2 = WeaponHandler::getWeapon(WeaponType::Flamethrower);
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
-
 	this->health = this->updatedStats.maxHealth;
 }
 
 Vehicle::~Vehicle()
 {
 	delete vehicle;
-	delete bodyRotation;
-	delete bodyRotationPoint;
 	delete vehicleBody1;
 
 	delete this->mountedWeapon;
@@ -58,39 +63,27 @@ void Vehicle::init(Physics *physics)
 	this->mountedWeapon = new GameObject;
 	this->vehicle = new GameObject;
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(vehicle);
-	vehicle->setPosition(Vector3(0.0f, 0.0f, 0.0f));
-	vehicle->setScale(Vector3(0.5f, 0.4f, 0.9f));
+	//Game::getGraphics().addToDraw(vehicle);
+	vehicle->setPosition(Vector3(0.0f, 10.0f, 0.0f));
+	vehicle->setScale(Vector3(0.5f, 0.14f, 0.9f));
 	Game::getGraphics().loadTexture("CarTemp");
 	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
+
 	mountedWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
-	mountedWeapon->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Turret").diffuse);
+	Material mountedWPMaterial = Game::getGraphics().getMaterial("Entities/Dummy_Turret");
+	mountedWeapon->setTexture(mountedWPMaterial.diffuse);
 	Game::getGraphics().addToDraw(mountedWeapon);
 	mountedWeapon->setScale(Vector3(0.005f));
 
-	/*this->vehicleBody1 = new GameObject;
-	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Cube");
+	this->vehicleBody1 = new GameObject;
+	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
+	vehicleBody1->setSpotShadow(false);
 	Game::getGraphics().addToDraw(vehicleBody1);
-	vehicleBody1->setPosition(Vector3(0.0f, 0.6f, 0.0f));
-	vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
-	Game::getGraphics().loadTexture("CarTemp");
-	vehicleBody1->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));*/
+	vehicleBody1->setScale(Vector3(0.005f, 0.005f, 0.005f));	
+	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
+	//vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
 
-	/*this->bodyRotation = new GameObject;
-	bodyRotation->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(bodyRotation);
-	bodyRotation->setPosition(Vector3(0.0f, 0.2f, 0.0f));
-	bodyRotation->setScale(Vector3(0.5f, 0.12f, 0.9f));
-	Game::getGraphics().loadTexture("CarTemp");
-	bodyRotation->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));*/
-
-	this->bodyRotationPoint = new GameObject;
-	bodyRotationPoint->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(bodyRotationPoint);
-	bodyRotationPoint->setPosition(Vector3(0.0f, 2.0f, 0.0f));
-	bodyRotationPoint->setScale(Vector3(0.2f, 0.2f, 0.2f));
-	Game::getGraphics().loadTexture("brickwall");
-	bodyRotationPoint->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
+	vehicleBody1->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
 
 	this->wheel1 = new GameObject;
 	this->wheel2 = new GameObject;
@@ -117,17 +110,17 @@ void Vehicle::init(Physics *physics)
 	wheel3->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f)); //Bottom Left
 	wheel4->setColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f)); //Bottom Right
 
-	btRigidBody* tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y, vehicle->getPosition().z), btVector3(this->getVehicle()->getScale().x, this->getVehicle()->getScale().y, this->getVehicle()->getScale().z), 10.0f);
+	btRigidBody* tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y, vehicle->getPosition().z), btVector3(vehicle->getScale().x, vehicle->getScale().y, vehicle->getScale().z), 10.0f);
 	this->getVehicle()->setRigidBody(tempo, physics);
 	this->getVehicle()->getRigidBody()->activate();
 	this->getVehicle()->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	this->getVehicle()->getRigidBody()->setFriction(0);
 
-	/*tempo = physics->addBox(btVector3(vehicleBody1->getPosition().x, vehicleBody1->getPosition().y, vehicleBody1->getPosition().z), btVector3(vehicleBody1->getScale().x, vehicleBody1->getScale().y, vehicleBody1->getScale().z), 1.0f);
+	tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y + 0.65f, vehicle->getPosition().z), -btVector3(this->vehicleBody1->getAABB().minPos.x - this->vehicleBody1->getAABB().maxPos.x, (this->vehicleBody1->getAABB().minPos.y - this->vehicleBody1->getAABB().maxPos.y) * 0.2f, this->vehicleBody1->getAABB().minPos.z - this->vehicleBody1->getAABB().maxPos.z) * 0.5f, 1.0f);
 	vehicleBody1->setRigidBody(tempo, physics);
 	vehicleBody1->getRigidBody()->activate();
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	vehicleBody1->getRigidBody()->setFriction(1);*/
+	vehicleBody1->getRigidBody()->setFriction(1);
 
 	tempo = physics->addSphere(0.2f, btVector3(wheel1->getPosition().x, wheel1->getPosition().y, wheel1->getPosition().z),10.0f);
 	wheel1->setRigidBody(tempo, physics);
@@ -146,16 +139,43 @@ void Vehicle::init(Physics *physics)
 	spring1->setDamping(1, 0.5f);
 	spring1->setEquilibriumPoint();*/
 	
-	//pointJoint = physics->addPointJoint(this->vehicle->getRigidBody(), this->vehicleBody1->getRigidBody());
+	pointJoint = physics->addPointJoint(this->vehicle->getRigidBody(), this->vehicleBody1->getRigidBody());
 	//vehicleBody1->getRigidBody()->setDamping(btScalar(0),3);
 
-	bodyPivot = Vector3(0.0f, 1.2f, 0.0f);
 }
 
 void Vehicle::update(float deltaTime)
 {
-	deltaTime *= 2;
+	if (this->deadImpulse == true && this->health <= 0)
+	{
+		this->respawnTimer += deltaTime;
+		if(this->respawnTimer>5)
+		{
+			this->resetHealth();
+			this->immortal = true;
+			this->vehicle->setPosition(Vector3(15, 2, -15));
+			this->vehicleBody1->setPosition(Vector3(15, 2+0.65f, -15));
 
+			this->deadImpulse = false;
+			this->respawnTimer = 0.0f;
+		}
+	}
+	
+	for (int i = 0; i < (int)PowerUpType::Length; ++i)
+	{
+		powerUpTimers[i] = max(powerUpTimers[i] - deltaTime, 0.0f);
+	}
+	if (powerUpTimers[(int)PowerUpType::Speed] > 0.0)
+	{
+		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate * 3.0f;
+		this->vehicle->setColor(Vector4(1.0, 0.0, 0.0, 1.0));
+	}
+	else
+	{
+		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate;
+		this->vehicle->setColor(Vector4(0.0, 0.0, 0.0, 1.0));
+	}
+	
 	tempTargetRotation = targetRotation;
 
 	//Quaternion Rotation to Euler
@@ -168,7 +188,6 @@ void Vehicle::update(float deltaTime)
 	float heading = getHeading(qt);
 
 	this->vehicle->getRigidBody()->getWorldTransform().getRotation().getEulerZYX(n,mRotation,m);
-	//if (mRotation < 0) mRotation += 180;
 
 	//Current rotation of vehicle
 	float vehicleRotation = fmod((/*(getYaw(qt)*/heading * 180 / DirectX::XM_PI), 360.0f);
@@ -177,21 +196,28 @@ void Vehicle::update(float deltaTime)
 	mRotation = vehicleRotation;
 
 	//Rotate Chassis toward Body
-	Quaternion rotationToBt = DirectX::XMQuaternionRotationRollPitchYaw(0, heading /** 180 / DirectX::XM_PI*/, 0);
-	btQuaternion bt = btQuaternion(rotationToBt.x, rotationToBt.y, rotationToBt.z, rotationToBt.w);
-//	vehicleBody1->getRigidBody()->getWorldTransform().setRotation(bt);
-	//vehicleBody1->getRigidBody()->applyImpulse(btVector3(0,40*deltaTime,0),btVector3(0,10,0));
-//	vehicleBody1->getRigidBody()->setDamping(0,0.99f);
-	/*qt = Vector4(this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getX(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getY(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getZ(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getW());
+	vehicleBody1->getRigidBody()->applyImpulse(btVector3(0,80*deltaTime,0),btVector3(0,10,0));
+	vehicleBody1->getRigidBody()->setDamping(0,0.99f);
+	qt = Vector4(this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getX(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getY(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getZ(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getW());
 	float bodyHeading = getHeading(qt);
-	if (bodyHeading < heading) {
-		this->vehicleBody1->getRigidBody()->setAngularVelocity(btVector3(vehicleBody1->getRigidBody()->getLinearVelocity().getX(),120*deltaTime, vehicleBody1->getRigidBody()->getLinearVelocity().getZ()));
-	}
-	else if (bodyHeading > heading) {
-		this->vehicleBody1->getRigidBody()->setAngularVelocity(btVector3(vehicleBody1->getRigidBody()->getLinearVelocity().getX(), -120 * deltaTime, vehicleBody1->getRigidBody()->getLinearVelocity().getZ()));
-	}*/
 
-	
+	bodyHeading = fmod((bodyHeading * 180 / DirectX::XM_PI), 360.0f);
+	heading = fmod((heading * 180 / DirectX::XM_PI), 360.0f);
+	float difference = (180 - abs(abs(bodyHeading - heading) - 180))*0.25f; ;
+	if (bodyHeading < heading) {
+		if (abs(bodyHeading - heading) < 180) {
+			vehicleBody1->getRigidBody()->setAngularVelocity(btVector3(vehicleBody1->getRigidBody()->getAngularVelocity().getX(), difference, vehicleBody1->getRigidBody()->getAngularVelocity().getZ()));
+		}else {
+			vehicleBody1->getRigidBody()->setAngularVelocity(btVector3(vehicleBody1->getRigidBody()->getAngularVelocity().getX(), -difference, vehicleBody1->getRigidBody()->getAngularVelocity().getZ()));
+		}
+	}else {
+		if (abs(bodyHeading - heading) < 180) {
+			vehicleBody1->getRigidBody()->setAngularVelocity(btVector3(vehicleBody1->getRigidBody()->getAngularVelocity().getX(), -difference, vehicleBody1->getRigidBody()->getAngularVelocity().getZ()));
+		}else {
+			vehicleBody1->getRigidBody()->setAngularVelocity(btVector3(vehicleBody1->getRigidBody()->getAngularVelocity().getX(), difference, vehicleBody1->getRigidBody()->getAngularVelocity().getZ()));
+		}
+	}
+
 	//Direction of Vehicle in dx & dy
 	float dx = sin((DirectX::XM_PI / 180) * vehicleRotation);
 	float dy = -cos((DirectX::XM_PI / 180)* vehicleRotation);
@@ -200,72 +226,27 @@ void Vehicle::update(float deltaTime)
 	targetRotation = (atan2(-Input::getDirectionL().x, -Input::getDirectionL().y) * 180 / DirectX::XM_PI) + 180;
 	velocitySpeed = (this->vehicle->getRigidBody()->getLinearVelocity().getX() * (dx)) + (-this->vehicle->getRigidBody()->getLinearVelocity().getZ() * (dy));
 	
-	//Driving mode: Turn towards direction, semi-realistic
-	if (drivingMode == 0) {	
-		if (Input::getStrengthL() > 0) {
-			if (velocitySpeed < (5000 * updatedStats.maxSpeed)) {
-				this->velocity.x += dx *deltaTime* 800 * Input::getStrengthL() * updatedStats.accelerationRate;
-				this->velocity.y += dy *deltaTime* 800 * Input::getStrengthL() * updatedStats.accelerationRate;
-			}
+	Vector3 steering = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
+		Input::getStrengthL() * /*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.15f, 1),
+		vehicle->getRigidBody()->getAngularVelocity().getZ());
 
-			if (strength < Input::getStrengthL()) {
-				strength = Input::getStrengthL();
-			}
-			else {
-				strength -= 0.01f * deltaTime;
-			}
-
-			Vector2 targetDir(Input::getDirectionL());
-
-			if ((targetDir - this->currentDir).Length() > 0.01f)
-			{
-				this->currentDir = Vector2::Lerp(this->currentDir, targetDir, deltaTime * min(4* min(velocitySpeed*0.0003f,1),2));
-				this->currentDir.Normalize();
-			}
-			else
-			{
-				this->currentDir = targetDir;
-			}
-
-			float newRot = atan2(this->currentDir.x, this->currentDir.y);
-			vehicle->getRigidBody()->setAngularVelocity(btVector3(0, newRot, 0));
-
-		}
-		else {
-			this->velocity.x = (velocity.x / (1 + (0.001f * 3000 * deltaTime)));
-			this->velocity.y = (velocity.y / (1 + (0.001f * 3000 * deltaTime)));
-
-			rotateAcceleration /= 1.0f + 0.005f * deltaTime * 20;
-			vehicle->getRigidBody()->setAngularVelocity(btVector3(vehicle->getRigidBody()->getAngularVelocity().getX(), ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 60 * ((abs(velocity.x) + abs(velocity.y)) / 3000), vehicle->getRigidBody()->getAngularVelocity().getZ()));
-		}
-
-		rotateAcceleration /= 1.0f + 0.002f*deltaTime*1500;
-		/*if (abs(rotateAcceleration) < 0.5) {
-			rotateAcceleration = 0;
-		}*/
-	}
+	Vector3 steering2 = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
+		Input::getStrengthL() * /*deltaTime*/0.035f * 80 * max(velocitySpeed * 0.15f, -1),
+		vehicle->getRigidBody()->getAngularVelocity().getZ());
+	
 	//Driving mode: Throttle and turning, realistic
-	else if (drivingMode == 1) {
-
-		Vector3 steering = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
-								   Input::getStrengthL() * /*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.15f, 1),
-								   vehicle->getRigidBody()->getAngularVelocity().getZ());
-
-		Vector3 steering2 = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
-									Input::getStrengthL() * /*deltaTime*/0.035f * 80 * max(velocitySpeed * 0.15f, -1),
-									vehicle->getRigidBody()->getAngularVelocity().getZ());
-
-		if (Input::checkButton(Keys::R_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::W)) {
-			if (velocitySpeed < (5000 * updatedStats.maxSpeed)) {
-				this->vehicle->getRigidBody()->applyImpulse(btVector3(dx* deltaTime * 80.0f * updatedStats.accelerationRate, 0, -(dy * deltaTime * 80.0f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
+	if (drivingMode == 0) {
+		if ((Input::checkButton(Keys::R_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::W))&&this->health>0) {
+			if (velocitySpeed < (40 * updatedStats.maxSpeed)) {
+				this->vehicle->getRigidBody()->applyImpulse(btVector3(dx* deltaTime * 160.0f * updatedStats.accelerationRate, 0, -(dy * deltaTime * 160.0f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
 			}
 		}
-		if (Input::getDirectionL().x > 0) {
+		if (Input::getDirectionL().x > 0 && this->health > 0) {
 			if (velocitySpeed > 0.0f) {
 				if (rotationDirection == true) {
 					rotateAcceleration = 0;
 				}
-				rotateAcceleration += deltaTime * 5 * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
+				rotateAcceleration += deltaTime * 10 * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
 				if (rotateAcceleration > 3.04f * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL()) {
 					rotateAcceleration = 3.04f * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
 				}
@@ -276,20 +257,20 @@ void Vehicle::update(float deltaTime)
 				if (rotationDirection == false) {
 					rotateAcceleration = 0;
 				}
-				rotateAcceleration += deltaTime * 5 * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
+				rotateAcceleration += deltaTime * 10 * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
 				if (rotateAcceleration > 3.04f * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL()) {
 					rotateAcceleration = 3.04f * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
 				}
-				vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, -steering2.y/* * min(rotateAcceleration, 1)*/, steering.z));
+				vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, steering2.y/* * min(rotateAcceleration, 1)*/, steering.z));
 				rotationDirection = true;
 			}
 		}
-		else if (Input::getDirectionL().x < 0) {
+		else if (Input::getDirectionL().x < 0 && this->health>0) {
 			if (velocitySpeed > 0.0f) {
 				if (rotationDirection == true) {
 					rotateAcceleration = 0;
 				}
-				rotateAcceleration += deltaTime * 5 * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
+				rotateAcceleration += deltaTime * 10 * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
 				if (rotateAcceleration > 3.04f * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL()) {
 					rotateAcceleration = 3.04f * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
 				}
@@ -300,143 +281,109 @@ void Vehicle::update(float deltaTime)
 				if (rotationDirection == false) {
 					rotateAcceleration = 0;
 				}
-				rotateAcceleration += deltaTime * 5 * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
+				rotateAcceleration += deltaTime * 10 * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
 				if (rotateAcceleration > 3.04f * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL()) {
 					rotateAcceleration = 3.04f * min(velocitySpeed * 0.15f, 1) * Input::getStrengthL();
 				}
-				vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, steering2.y/* min(rotateAcceleration,1)*/, steering.z));
+				vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, -steering2.y/* min(rotateAcceleration,1)*/, steering.z));
 				rotationDirection = true;
 			}
 		}
 		else {
 			rotateAcceleration = 0;
-			rotateAcceleration /= 1.0f + 10 * deltaTime;
-			vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, vehicle->getRigidBody()->getAngularVelocity().getY()/ (1 + (3.5f * deltaTime)), steering.z));
+			rotateAcceleration /= 1.0f + 20 * deltaTime;
+			vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, vehicle->getRigidBody()->getAngularVelocity().getY()/ (1 + (7.0f * deltaTime)), steering.z));
 
 		}
-		if (Input::checkButton(Keys::L_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S)) {
-			this->vehicle->getRigidBody()->applyImpulse(btVector3(-(dx* deltaTime * 80.0f * 0.7f * updatedStats.accelerationRate), 0, (dy * deltaTime * 80.0f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
+		if ((Input::checkButton(Keys::L_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S)) && velocitySpeed > (-40 * updatedStats.maxSpeed) && this->health>0) {
+			this->vehicle->getRigidBody()->applyImpulse(btVector3(-(dx* deltaTime * 160.0f * 0.7f * updatedStats.accelerationRate), 0, (dy * deltaTime * 160.0f * 0.7f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
 
 			if (velocitySpeed > 0.0f) {
-				vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (0.9f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (0.9f * deltaTime))));
+				vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (1.8f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (1.8f * deltaTime))));
 			}
 		}
 		if (!Input::checkButton(Keys::R_TRIGGER, States::HELD) && !Input::isKeyDown_DEBUG(Keyboard::S) && !Input::checkButton(Keys::L_TRIGGER, States::HELD) && !Input::isKeyDown_DEBUG(Keyboard::W)) {
-			vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (0.3f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (0.3f * deltaTime))));
+			vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (0.6f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (0.6f * deltaTime))));
 		}
 	}
-	//Driving Mode: Directional Smooth
-	else if (drivingMode == 2)
-	{
-		if (Input::getDirectionL() != Vector2())
-		{
-			Vector2 targetDir(Input::getDirectionL());
-
-			if ((targetDir - this->currentDir).Length() > 0.01f)
-			{
-				this->currentDir = Vector2::Lerp(this->currentDir, targetDir, deltaTime*2);
-				this->currentDir.Normalize();
+	//Driving Mode: Turn towards direction, semi-realistic
+	else if (drivingMode == 1) {
+		if (Input::getStrengthL() > 0 && this->health>0) {
+			if (velocitySpeed < 0.5f) {
+				reverseTimer += 10.0f * deltaTime;
 			}
-			else
-			{
-				this->currentDir = targetDir;
+			else {
+				reverseTimer = 0;
+				reverseTimer2 = 0;
 			}
-
-			float newRot = atan2(this->currentDir.x, this->currentDir.y);
-			this->vehicle->setRotation(Vector3(0, newRot, 0));
-
-			//v = v0 + a * t
-			this->velocitySimple = this->velocitySimple + 1.2f/*accelerationSimple*/ * deltaTime;
-		}
-		else
-		{
-			if (this->velocitySimple < 0.05f)
-			{
-				this->velocitySimple = 0;
+			if ((reverseTimer > 10.0f) && !(reverseTimer2 > 10.0f)) {
+				this->vehicle->getRigidBody()->applyImpulse(btVector3(-dx* deltaTime * 160.0f * updatedStats.accelerationRate, 0, (dy * deltaTime * 160.0f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
+				reverseTimer2 += 10.0f * deltaTime;
+				if (reverseTimer2 > 10.0f) {
+					reverseTimer = 0;
+					reverseTimer2 = 0;
+				}
 			}
-			else
-			{
-				this->velocitySimple /= 1 + (1.0f * deltaTime);
-			}
-		}
-		//OutputDebugStringA((std::to_string(this->velocitySimple) + "\n").c_str());
-		Vector3 direction(this->currentDir.x, 0, this->currentDir.y);
-		//s = s0 + v * t
-		this->vehicle->move(direction* this->velocitySimple* deltaTime);
-	}
-	//Driving Mode: Old Turn towards direction, semi-realistic
-	else if (drivingMode == 3) {
-		if (Input::getStrengthL() > 0) {
-			if (velocitySpeed < (5000* updatedStats.maxSpeed)) {
-				this->velocity.x += dx * deltaTime * 800 * Input::getStrengthL() * updatedStats.accelerationRate;
-				this->velocity.y += dy * deltaTime * 800 * Input::getStrengthL() * updatedStats.accelerationRate;
+			else {
+				reverseTimer2 = 0;
+				if (velocitySpeed < (40 * updatedStats.maxSpeed)) {
+					this->vehicle->getRigidBody()->applyImpulse(btVector3(dx * deltaTime * 160.0f * updatedStats.accelerationRate, 0, -(dy * deltaTime * 160.0f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
+				}
 			}
 
 			if (strength < Input::getStrengthL()) {
 				strength = Input::getStrengthL();
 			}
 			else {
-				strength -= 0.01f * deltaTime;
+				strength -= 0.02f * deltaTime;
 			}
 
-
+			float difference2 = min((180 - abs(abs(vehicleRotation - targetRotation) - 180)) * 0.05f,1.0f);
 
 			if (vehicleRotation < targetRotation) {
 				if (abs(vehicleRotation - targetRotation) < 180) {
-					rotateAcceleration += deltaTime*5;
-					if (rotateAcceleration > 30.4f) {
-						rotateAcceleration = 30.4f;						
-					}
-					vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((((0.076f) + rotateAcceleration * 1) / 2) * DirectX::XM_PI / 180)*deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+					vehicle->getRigidBody()->setAngularVelocity(btVector3(0, steering.y* difference2, 0));
 				}
 				else {
-					rotateAcceleration += deltaTime*-5;
-					if (rotateAcceleration < -30.4f) {
-						rotateAcceleration = -30.4f;						
-					}
-					vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((((-0.076f) + rotateAcceleration * 1 ) / 2)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+					vehicle->getRigidBody()->setAngularVelocity(btVector3(0, -steering.y * difference2, 0));
 				}
 			}
-
 			else {
 				if (abs(vehicleRotation - targetRotation) < 180) {
-					rotateAcceleration += deltaTime*-5;
-					if (rotateAcceleration < -30.4f) {
-						rotateAcceleration = -30.4f;						
-					}
-					vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((((-0.076f) + rotateAcceleration * 1) / 2)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+					vehicle->getRigidBody()->setAngularVelocity(btVector3(0, -steering.y * difference2, 0));
 				}
 				else {
-					rotateAcceleration += deltaTime*5;
-					if (rotateAcceleration > 30.4f) {
-						rotateAcceleration = 30.4f;						
-					}
-					vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((((0.076f) + rotateAcceleration * 1) / 2)* DirectX::XM_PI / 180)* deltaTime * 60 * min(((abs(velocity.x) + abs(velocity.y)) / 3000), 1), 0));
+					vehicle->getRigidBody()->setAngularVelocity(btVector3(0, steering.y* difference2, 0));
 				}
 			}
 		}
-		else {
-			this->velocity.x = (velocity.x / (1 + (3 * deltaTime)));
-			this->velocity.y = (velocity.y / (1 + (3 * deltaTime)));
+		else if(health > 0) {
+			vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (1.8f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (1.8f * deltaTime))));
 
-			rotateAcceleration /= 1.0f + 0.005f * deltaTime * 20;
-			//vehicle->addRotation(Vector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 60 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
-			vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 60 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
+			rotateAcceleration /= 1.0f + 0.005f * deltaTime * 40;
+			//vehicle->addRotation(Vector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime*2 * 60 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
+			vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 120 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
+		}
+		else {
+			vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (0.6f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (0.6f * deltaTime))));
+			rotateAcceleration /= 1.0f + 0.005f * deltaTime * 40;
+			
+			vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 120 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
 		}
 
-		rotateAcceleration /= 1.0f + 3*deltaTime;
-		/*if (abs(rotateAcceleration) < 0.5) {
-			rotateAcceleration = 0;
-		}*/
+		rotateAcceleration /= 1.0f + 6*deltaTime;
 	}
 
 
 	//Drifting
 	float hypoC = sqrt(pow(dx, 2) + (pow(dy, 2)));
 	float driftForce = this->vehicle->getRigidBody()->getLinearVelocity().getX() * (dy / hypoC) + -this->vehicle->getRigidBody()->getLinearVelocity().getZ() * -(dx / hypoC);
-	Vector2 driftResistance = Vector2(-((dy / hypoC) * 2000 * deltaTime) * updatedStats.handlingRate, -(-((dx / hypoC) * 2000 * deltaTime)) * updatedStats.handlingRate);
+	Vector2 driftResistance = Vector2(-((dy / hypoC) * 4000 * deltaTime) * updatedStats.handlingRate, -(-((dx / hypoC) * 4000 * deltaTime)) * updatedStats.handlingRate);
 	if (abs(driftForce) < 250) {
 		driftResistance = driftResistance * (abs(driftForce)*0.005f);
+	}
+	if (!(health > 0)) {
+		driftResistance /= 2;
 	}
 	if (drivingMode != 2) {
 		if (Input::getStrengthL() > 0) {
@@ -460,59 +407,36 @@ void Vehicle::update(float deltaTime)
 			}
 		}
 	}
-	//this->vehicle->move(Vector3((velocity.x * deltaTime *0.002f), 0.00f, -(velocity.y * deltaTime * 0.002f)));
-	//this->vehicle->getRigidBody()->setLinearVelocity(btVector3((velocity.x * deltaTime * 0.002f) * 100.0f, this->vehicle->getRigidBody()->getLinearVelocity().getY(), -(velocity.y * deltaTime * 0.002f) * 100.0f));
-
-	//Body Rotation
-	Vector2 curPos3 = Vector2(bodyPivot.x, bodyPivot.z);
-	Vector2 position3 = Vector2(vehicle->getPosition().x, vehicle->getPosition().z);
-
-	float dx3 = (curPos3.x - position3.x);
-	float dy3 = (curPos3.y - position3.y);
-
-	float hypoC3 = sqrt(pow(dx3, 2) + (pow(dy3, 2)));
+	//this->vehicle->getRigidBody()->setLinearVelocity(btVector3((velocity.x * deltaTime*2 * 0.002f) * 100.0f, this->vehicle->getRigidBody()->getLinearVelocity().getY(), -(velocity.y * deltaTime*2 * 0.002f) * 100.0f));
+	vehicle->getRigidBody()->setAngularVelocity(btVector3(0, vehicle->getRigidBody()->getAngularVelocity().getY(), 0));
 
 
-	float springValue = 8.2f;
-	Vector2 currentToTarget = Vector2(dx3 / hypoC3, dy3 / hypoC3);
-	Vector2 springForce = currentToTarget * springValue;
-	Vector2 dampingForce = Vector2(((-accelerator.x)) * 0.2f * sqrt(springValue), ((-accelerator.z)) * 0.2f * sqrt(springValue));
-	Vector2 force = springForce + dampingForce;
+	add += 0.4f * deltaTime;
 
-
-	if ((bodyPivot.x - vehicle->getPosition().x) > 3 && vehicle->getPosition().x < bodyPivot.x) {
-		this->accelerator.x += 10 * deltaTime * 2.0f;
-	}
-	if ((bodyPivot.x - vehicle->getPosition().x) < -3 && vehicle->getPosition().x > bodyPivot.x) {
-		this->accelerator.x -= 10 * deltaTime * 2.0f;
-	}
-	if ((bodyPivot.z - vehicle->getPosition().z) > 3 && vehicle->getPosition().z < bodyPivot.z) {
-		this->accelerator.z += 10 * deltaTime * 2.0f;
-	}
-	if ((bodyPivot.z - vehicle->getPosition().z) < -3 && vehicle->getPosition().z > bodyPivot.z) {
-		this->accelerator.z -= 10 * deltaTime * 2.0f;
-	}
-	
-	if (!(dx3 == 0 && hypoC3 == 0) && !(dy3 == 0 && hypoC3 == 0)) {
-		this->accelerator.x += force.x * deltaTime * 2.0f;
-		this->accelerator.z += force.y * deltaTime * 2.0f;
+	if (dmg == true) {
+		vehicleBody1->setColor(Vector4(vehicleBody1->getColor().x / (1 + 15.0f * deltaTime), vehicleBody1->getColor().y / (1 + 15.0f * deltaTime), vehicleBody1->getColor().z / (1 + 15.0f * deltaTime), 1));
+		if (vehicleBody1->getColor().x <= 0.01f) {
+			dmg = false;
+		}
 	}
 
-	Vector3 rotationVec = vehicle->getPosition() - bodyPivot;
-	
-	float angle = acos(Vector3(0, 1, 0).Dot(DirectX::XMVector3Normalize(rotationVec)));
-	Vector3 axis = Vector3(0, 1, 0).Cross(DirectX::XMVector3Normalize(rotationVec));
-
-	bodyPivot += Vector3(-accelerator.x * deltaTime, 0.00f * 0.0000f, -accelerator.z * deltaTime);
-
-	add += 0.2f * deltaTime;
-
-	//updateWeapon(deltaTime * 0.5f);
+	if (this->immortal)
+	{
+		this->immortalTimer += deltaTime;
+		float sine = sin((this->immortalTimer - 0) / 0.3f) - 0.5f;
+		float color = max(sine, 0.0f);
+		this->vehicleBody1->setColor(Vector4(color, color, color, color));
+		if (this->immortalTimer > 5)
+		{
+			this->immortalTimer = 0.0f;
+			this->immortal = false;
+		}
+	}
 }
 
 void Vehicle::updateWeapon(float deltaTime)
 {
-	this->mountedWeapon->setPosition(this->vehicle->getPosition());
+	this->mountedWeapon->setPosition(this->vehicleBody1->getPosition());
 	Vector2 dir = Input::getDirectionR();
 	dir.Normalize();
 	if ((dir - curDir).Length() > 0.01f)
@@ -537,12 +461,39 @@ void Vehicle::updateWeapon(float deltaTime)
 	this->mountedWeapon->setRotation(Vector3(0, newRot, 0));
 
 	this->timeSinceLastShot += deltaTime;
+	this->timeSinceLastShot2 += deltaTime;
 
-	if (Input::checkButton(Keys::R_SHOULDER, States::HELD))
+	// recoil goes from 100% to 0% in half a second
+	this->weapon.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
+	this->weapon2.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
+
+	if (Input::checkButton(Keys::R_SHOULDER, States::HELD) || Input::getStrengthR() > 0.01f)
 	{
 		if (this->timeSinceLastShot >= this->weapon.fireRate)
 		{
 			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+
+			for (int i = 0; i < Vehicle::bulletCount; ++i)
+			{
+				if (bullets[i].getWeaponType() == WeaponType::None)
+				{
+					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+					this->bullets[i].shoot(weapon,
+						this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
+						Vector3(curDir.x, 0.0, curDir.y),
+						Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ())*0.5f);
+					break;
+				}
+			}
+		}
+	}
+
+	if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
+	{
+		if (this->timeSinceLastShot2 >= this->weapon2.fireRate)
+		{
+			this->timeSinceLastShot2 = fmod(this->timeSinceLastShot2, this->weapon2.fireRate);
 			
 			for (int i = 0; i < Vehicle::bulletCount; ++i)
 			{
@@ -550,10 +501,10 @@ void Vehicle::updateWeapon(float deltaTime)
 				{
 					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
-					this->bullets[i].setWeaponType(this->weapon.type);
-					this->bullets[i].shoot(this->vehicle->getPosition() + Vector3(0, 0, 0),
-						                   Vector3(curDir.x, 0.0, curDir.y),
-						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
+					this->bullets[i].shoot(weapon2,
+										   this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
+						                   Vector3(cos(this->vehicleBody1->getRotation().y - 3.14/2),0,-sin(this->vehicleBody1->getRotation().y - 3.14/2)),
+						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ())*0.5f);
 					break;
 				}
 			}
@@ -628,8 +579,22 @@ void Vehicle::resetHealth()
 
 void Vehicle::changeHealth(int amount)
 {
-	this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
-	Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
+	if (!this->immortal)
+	{
+		if (amount < 0) {
+			dmg = true;
+		}
+		vehicleBody1->setColor(Vector4(max(vehicleBody1->getColor().x + -amount * 0.1f, 0), 0, 0, 1));
+		this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
+		Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
+		if (this->deadImpulse == false && this->health <= 0)
+		{
+			this->deadImpulse = true;
+			vehicle->getRigidBody()->applyImpulse(btVector3(this->vehicle->getRigidBody()->getLinearVelocity().getX() * 6.3f, 0, this->vehicle->getRigidBody()->getLinearVelocity().getY() * 6.3f), btVector3(0, 0, 0));
+			//vehicle->getRigidBody()->setAngularVelocity(btVector3(0,2000.0f,0));
+			Game::getGraphics().addParticle(this->vehicle->getPosition() + Vector3(0, 2, 0), Vector3(0, 0, 0), 200, 10);
+		}
+	}
 }
 
 bool Vehicle::isDead() const
@@ -651,6 +616,22 @@ float Vehicle::getCameraDistance(float deltaTime)
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime*1.2f + cameraDistance;
 
 	return cameraDistance;
+}
+
+void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
+{
+	//AccelForce
+	if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
+		Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
+		changeHealth(-20.0f);
+	}
+	else if (max(abs(accelForce.x), abs(accelForce.z)) > 5.0f) {
+		Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
+		changeHealth(-10.0f);
+	}
+	/*else {
+		vehicleBody1->setColor(Vector4(vehicleBody1->getColor().x/(1 + 20.0f*deltaTime), vehicleBody1->getColor().y / (1 + 20.0f * deltaTime), vehicleBody1->getColor().z / (1 + 20.0f * deltaTime), 1));
+	}*/
 }
 
 float Vehicle::getPitch(DirectX::XMVECTOR Quaternion)
@@ -707,5 +688,14 @@ void Vehicle::powerUp(PowerUpType type)
 	if (type == PowerUpType::Time)
 	{
 		dynamic_cast<PlayingGameState*>(Game::getCurrentState())->changeTime(30);
+	}
+	else if (type == PowerUpType::Health)
+	{
+		this->changeHealth(100);
+	}
+	else if (type == PowerUpType::Speed)
+	{
+		this->powerUpTimers[(int)PowerUpType::Speed] += 30.0;
+
 	}
 }
