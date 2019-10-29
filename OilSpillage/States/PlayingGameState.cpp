@@ -156,7 +156,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0
 	Game::getGraphics().addToDraw(&*powerUps.begin());
 
 	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies that is protecting the anvil");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the important",TypeOfTarget::Crate);
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the important" ,TypeOfTarget::Crate);
 
 
 	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");

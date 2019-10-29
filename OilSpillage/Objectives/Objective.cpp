@@ -148,7 +148,7 @@ void Objective::update(Vector3 playerPosition)
 					float sine = sin((time-0) / 0.3f) - 0.5f;
 					float color = max(sine, 0.0f);
 					
-					Vector4 combineColor(color, color, color, 0.0);
+					Vector4 combineColor(color, color, color, 1.0);
 					combineColor += ptrState->getObjHandler().getTypes().getColor(this->mission->typeOfTarget);
 					this->mission->target[i]->setColor(combineColor);
 					//this->mission->target[i]->setColor(Vector4(0,0,0, 0.0));
