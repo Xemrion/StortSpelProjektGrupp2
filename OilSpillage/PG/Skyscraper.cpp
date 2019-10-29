@@ -61,9 +61,7 @@ bool Skyscraper::generateSkyscraper(int input)
 			this->floors[i].translateBy(modifyBy);
 		}
 		
-		SkyscraperFloor temp2(roof);
-		temp2.scale(Vector3(0.9f, 1.0f, 0.9f));
-		this->floors.push_back(temp2);
+		this->floors.push_back(roof);
 
 		modifyBy.y = 1;
 		for (int i = 0; i < this->floors.size(); i++) {
@@ -82,14 +80,14 @@ void Skyscraper::generateSkyscraperMesh()
 	for (size_t i = 0; i < this->floors.size() - 1; i++) {
 		this->floors[i].getTriangleIndices();
 		temp = this->floors[i].getRoofVertices();
-		this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());/*
+		this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());
 		temp = this->floors[i].getWallVertices(this->floors[i + 1].getCenter());
-		this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());*/
+		this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());
 	}
-	/*Vector3 center = this->floors.back().getCenter();
+	Vector3 center = this->floors.back().getCenter();
 	center.y = 0;
 	temp = this->floors.back().getWallVertices(center);
-	this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());*/
+	this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());
 	this->floors.back().getTriangleIndices();
 	temp = this->floors.back().getRoofVertices();
 	this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());
@@ -107,7 +105,8 @@ void Skyscraper::testDraw(std::string name)
 	this->building = new GameObject;
 	this->building->mesh = Game::getGraphics().getPGMeshPointer(name.c_str());
 	Game::getGraphics().addToDraw(this->building);
-	this->building->setPosition(Vector3(30.0f, 0.0f, 0.0f));
+	this->building->setPosition(Vector3(30.0f, -13.50f, 0.0f));
 	this->building->setScale(Vector3(2.0f, 1.0f, 2.0f));
-	this->building->setColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+	this->building->setColor(Vector4(1.0f, 0.20f, 0.20f, 1.0f));
+	this->building->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
 }

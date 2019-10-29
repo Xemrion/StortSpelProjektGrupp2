@@ -397,7 +397,7 @@ std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
 	float counterPow = 0.0f, distSquared = 0.0f;
 	Vector3 lowerFirst(0.0f), lowerSecond(0.0f);
 	Vector3 normal(0.0f), line1(0.0f), line2(0.0f);
-	for (size_t i = 0; i < this->indices.size(); i++) {
+	for (size_t i = 0; i < this->verticies.size(); i++) {
 		lowerFirst = Vector3(this->verticies[i].x, otherCenter.y, this->verticies[i].z);
 		lowerSecond = Vector3(this->verticies[(i + 1) % this->nrOfEdges].x, otherCenter.y, this->verticies[(i + 1) % this->nrOfEdges].z);
 	
@@ -418,7 +418,7 @@ std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
 
 		temp.position = this->verticies[i];
 		temp.normal = normal;
-		temp.uv = Vector2(0, vDistance);
+		temp.uv = Vector2(uDistance, 0);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
@@ -432,7 +432,7 @@ std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
 
 		temp.position = lowerSecond;
 		temp.normal = normal;
-		temp.uv = Vector2(uDistance, 0);
+		temp.uv = Vector2(0, vDistance);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
@@ -446,14 +446,14 @@ std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
 
 		temp.position = this->verticies[i];
 		temp.normal = normal;
-		temp.uv = Vector2(0, vDistance);
+		temp.uv = Vector2(uDistance, 0);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = lowerSecond;
 		temp.normal = normal;
-		temp.uv = Vector2(uDistance, 0);
+		temp.uv = Vector2(0, vDistance);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
@@ -484,14 +484,14 @@ std::vector<Vertex3D> SkyscraperFloor::getRoofVertices()
 
 		temp.position = this->verticies[this->indices[size_t(i) + 1]];
 		temp.normal = normal;
-		temp.uv = Vector2(0.0f, 0.0f);
+		temp.uv = Vector2(1.0f, 0.0f);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 2]];
 		temp.normal = normal;
-		temp.uv = Vector2(0.0f, 0.0f);
+		temp.uv = Vector2(1.0f, 1.0f);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
