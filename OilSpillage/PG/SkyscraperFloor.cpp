@@ -389,11 +389,11 @@ void SkyscraperFloor::getTriangleIndices()
 }
 
 std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
-{
+{	//Strange triangles
 	std::vector<Vertex3D> meshData;
 	Vertex3D temp;
-	int uDistance = this->center.y - otherCenter.y;
-	int vDistance = -1, counter = 0;
+	int uDistance = 1;
+	int vDistance = 1, counter = 0;
 	float counterPow = 0.0f, distSquared = 0.0f;
 	Vector3 lowerFirst(0.0f), lowerSecond(0.0f);
 	Vector3 normal(0.0f), line1(0.0f), line2(0.0f);
@@ -405,15 +405,16 @@ std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
 		line2 = lowerSecond - this->verticies[i];
 		normal = line1.Cross(line2);
 
-		distSquared = (pow(line1.x, 2) + pow(line1.z, 2));
+		/*distSquared = (pow(line1.x, 2) + pow(line1.z, 2));
 		counter = 1;
+		vDistance = -1;
 		while (vDistance == -1) {
 			counterPow = pow(counter, 2);
 			if (counterPow >= distSquared) {
 				vDistance = counter - 1;
 			}
 			counter++;
-		}
+		}*/
 
 		temp.position = this->verticies[i];
 		temp.normal = normal;

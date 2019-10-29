@@ -7,13 +7,15 @@ private:
 	std::vector<SkyscraperFloor> floors;
 	std::vector<Vertex3D> mesh;
 	GameObject* building;
+
+	void generateSkyscraperMesh();
 public:
 	Skyscraper(int input);
 	~Skyscraper();
 
 	bool generateSkyscraper(int input);
-	void generateSkyscraperMesh();
 	void saveSkyscraper(std::string name);
+	void testDraw(std::string name);
 };
 
 /* Pseudocode

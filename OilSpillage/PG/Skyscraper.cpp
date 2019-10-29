@@ -26,7 +26,7 @@ bool Skyscraper::generateSkyscraper(int input)
 		roof.unionShapes(toAdd, roof.getAVertex(2));
 
 		SkyscraperFloor temp(roof);
-		temp.scale(Vector3(0.9f, 1.0f, 0.9f));
+		temp.scale(Vector3(0.8f, 1.0f, 0.8f));
 		this->floors.push_back(temp);
 		this->floors[0].translateBy(modifyBy);
 		this->floors.push_back(roof);
@@ -44,7 +44,7 @@ bool Skyscraper::generateSkyscraper(int input)
 		this->floors.push_back(roof);
 
 		//Random
-		modifyBy.y = 3;
+		modifyBy.y = 5;
 		for (int i = 0; i < this->floors.size(); i++) {
 			this->floors[i].translateBy(modifyBy);
 		}
@@ -56,15 +56,16 @@ bool Skyscraper::generateSkyscraper(int input)
 		this->floors.push_back(roof);
 
 		//Random
-		modifyBy.y = 4;
+		modifyBy.y = 6;
 		for (int i = 0; i < this->floors.size(); i++) {
 			this->floors[i].translateBy(modifyBy);
 		}
+		
+		SkyscraperFloor temp2(roof);
+		temp2.scale(Vector3(0.9f, 1.0f, 0.9f));
+		this->floors.push_back(temp2);
 
-		this->floors.push_back(roof);
-
-		//Random
-		modifyBy.y = 3;
+		modifyBy.y = 1;
 		for (int i = 0; i < this->floors.size(); i++) {
 			this->floors[i].translateBy(modifyBy);
 		}
@@ -78,16 +79,35 @@ void Skyscraper::generateSkyscraperMesh()
 {
 	std::vector<Vertex3D> temp;
 	this->mesh.clear();
-	for (int i = 0; i < this->floors.size() - 1; i++) {
+	for (size_t i = 0; i < this->floors.size() - 1; i++) {
 		this->floors[i].getTriangleIndices();
 		temp = this->floors[i].getRoofVertices();
-		this->mesh.insert(this->mesh.cend() + 1, temp.begin(), temp.end());
+		this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());/*
 		temp = this->floors[i].getWallVertices(this->floors[i + 1].getCenter());
-		this->mesh.insert(this->mesh.cend() + 1, temp.begin(), temp.end());
+		this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());*/
 	}
+	/*Vector3 center = this->floors.back().getCenter();
+	center.y = 0;
+	temp = this->floors.back().getWallVertices(center);
+	this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());*/
+	this->floors.back().getTriangleIndices();
+	temp = this->floors.back().getRoofVertices();
+	this->mesh.insert(this->mesh.cend(), temp.begin(), temp.end());
 }
 
 void Skyscraper::saveSkyscraper(std::string name)
 {
-	Game::getGraphics().loadMesh(name.c_str(), this->mesh);
+	generateSkyscraperMesh();
+	Game::getGraphics().loadMesh(name, this->mesh);
+}
+
+void Skyscraper::testDraw(std::string name)
+{
+	saveSkyscraper(name);
+	this->building = new GameObject;
+	this->building->mesh = Game::getGraphics().getPGMeshPointer(name.c_str());
+	Game::getGraphics().addToDraw(this->building);
+	this->building->setPosition(Vector3(30.0f, 0.0f, 0.0f));
+	this->building->setScale(Vector3(2.0f, 1.0f, 2.0f));
+	this->building->setColor(Vector4(0.0f, 1.0f, 0.0f, 1.0f));
 }

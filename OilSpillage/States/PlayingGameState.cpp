@@ -72,7 +72,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 			10.0f));
 	}
    
-	
+	testFloorMain = std::make_unique<Skyscraper>(5);
+	testFloorMain.get()->testDraw("test");
    /*//Road Network Turtlewalker
 	testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
 	testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");

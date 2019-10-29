@@ -735,7 +735,7 @@ void Graphics::loadMesh(std::string fileName)
 				subData.pSysMem = meshes[meshName].vertices.data();
 
 				HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[meshName].vertexBuffer.GetAddressOf());
-				//meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+				meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
 			}
 		}
 
@@ -795,7 +795,7 @@ void Graphics::loadMesh(std::string name, std::vector<Vertex3D>& vertices)
 		subData.pSysMem = meshes[name].vertices.data();
 
 		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[name].vertexBuffer.GetAddressOf());
-		//meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+		meshes[name].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
 	}
 }
 
