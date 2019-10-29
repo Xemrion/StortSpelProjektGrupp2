@@ -128,13 +128,13 @@ void ActorManager::spawnDefenders(Vector3 objective)
 	createDefender(objective.x-2, objective.z + 2, objective);
 }
 
-void ActorManager::spawnAttackers(Vector3 targetPos)
+void ActorManager::spawnAttackers(Vector3 originPos)
 {
 	for(int i = 0; i < 2; i++)
 	{
-		createAttacker(targetPos.x+i, targetPos.y);
-		createAttacker(targetPos.x, targetPos.y+1);
-		createAttacker(targetPos.x-i, targetPos.y);
+		createAttacker(originPos.x+i, originPos.z);
+		createAttacker(originPos.x, originPos.z+1);
+		createAttacker(originPos.x-i, originPos.z);
 	}
 }
 

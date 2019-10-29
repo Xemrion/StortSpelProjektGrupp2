@@ -17,7 +17,7 @@ public:
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
 
 	void spawnDefenders(Vector3 objective);
-	void spawnAttackers(Vector3 playerPos);
+	void spawnAttackers(Vector3 originPos);
 	void spawnTurrets(Vector3 playerPos);
 private:
 	int frameCount = 0;

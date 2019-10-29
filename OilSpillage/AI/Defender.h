@@ -21,7 +21,7 @@ private:
 	Status inObjectiveRange();
 	Status idle();
 	Status setReturnState();
-	Status enemyWhithinObjective();
+	Status enemyWithinObjective();
 	//Status setChaseState();
 	//Status setRoamState();
 };
