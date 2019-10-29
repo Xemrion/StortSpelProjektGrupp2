@@ -24,9 +24,10 @@ class ObjectiveHandler
 public:
 	ObjectiveHandler();
 	~ObjectiveHandler();
-	void addObjective(TypeOfMission type, int rewardTime, int nrOfTargets, std::string info, GameObject** target = nullptr, Actor** enemies = nullptr);
+	void addObjective(TypeOfMission type, int rewardTime, int nrOfTargets, std::string info, TypeOfTarget targetType=TypeOfTarget::Size, GameObject** target = nullptr, Actor** enemies = nullptr);
 	bool isAllDone();
 	void update(Vector3 playerPos);
+	Type getTypes()const;
 	void reset();
 	Objective* getObjective(int id)const;
 	bool& getEventNewObj();
