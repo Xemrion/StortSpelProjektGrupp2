@@ -188,8 +188,7 @@ void Actor::followPath()
 
 void Actor::findPath()
 {
-	aStar->algorithm(this->getPosition(), targetPos, path);
-
+	aStar->algorithm(this->getPosition(), destination, path);
 }
 
 void Actor::applyForce(Vector3 force)
@@ -347,6 +346,7 @@ Vector3 Actor::seek(Vector3 target)
 
 void Actor::run(vector<Actor*> boids, float deltaTime, Vector3 targetPos)
 {
+	seek(targetPos);
 	applyForce(separation(boids, targetPos)*4);
 	update(deltaTime, targetPos);
 	updateBoid(deltaTime);

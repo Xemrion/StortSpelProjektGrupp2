@@ -31,6 +31,14 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		}
 		else if (actors.at(i)->isDead() && actors.at(i) != nullptr)
 		{
+			Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+			if (ptr != nullptr)
+			{
+				if (ptr->getType() == TypeOfMission::KillingSpree)
+				{
+					ptr->killEnemy();
+				}
+			}
 			hasDied = true;
 		}
 	}
@@ -74,6 +82,7 @@ void ActorManager::createTurret(float x, float z)
 {
 	this->actors.push_back(new Turret(x, z));
 }
+
 std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 {
 	int rangeOfPlayer = 10*10;
@@ -110,19 +119,26 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 	}
 }
 
-void ActorManager::spawnDefenders(std::vector<Vector3> objectives)
+void ActorManager::spawnDefenders(Vector3 objective)
 {
-	for(int i = 0; i < objectives.size(); i++)
+	createDefender(objective.x + 2, objective.z, objective);
+	createDefender(objective.x, objective.z - 2, objective);
+	createDefender(objective.x, objective.z + 2, objective);
+	createDefender(objective.x+2, objective.z + 2, objective);
+	createDefender(objective.x-2, objective.z + 2, objective);
+}
+
+void ActorManager::spawnAttackers(Vector3 targetPos)
+{
+	for(int i = 0; i < 2; i++)
 	{
-		createDefender(objectives.at(i).x + 2, objectives.at(i).z, objectives.at(i));
-		createDefender(objectives.at(i).x, objectives.at(i).z - 2, objectives.at(i));
-		createDefender(objectives.at(i).x, objectives.at(i).z + 2, objectives.at(i));
-		createDefender(objectives.at(i).x+2, objectives.at(i).z + 2, objectives.at(i));
-		createDefender(objectives.at(i).x-2, objectives.at(i).z + 2, objectives.at(i));
+		createAttacker(targetPos.x+i, targetPos.y);
+		createAttacker(targetPos.x, targetPos.y+1);
+		createAttacker(targetPos.x-i, targetPos.y);
 	}
 }
 
-void ActorManager::spawnAttackers(Vector3 playerPos)
+void ActorManager::spawnTurrets(Vector3 playerPos)
 {
 	//createAttacker(playerPos.x+20, playerPos.z);
 	//createAttacker(playerPos.x+10, playerPos.z-10);

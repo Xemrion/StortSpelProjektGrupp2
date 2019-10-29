@@ -170,7 +170,7 @@ Status Defender::inObjectiveRange()
 {
 	Status status;
 
-	if ((getPosition() - objectivePos).Length() > 4)
+	if ((getPosition() - objectivePos).Length() > 10)
 	{
 		status = Status::FAILURE;
 	}

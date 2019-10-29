@@ -17,13 +17,14 @@ void PlayingGameState::initAI()
 	//actorManager->createTurret(0 + 2, 0 + 4);
 	//actorManager->createTurret(0 + 2, 0 - 4);
 
-	for (int i = 0; i < 10; i++)
-	{
-		for (int j = 0; j < 5; j++)
-		{
-			actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
-		}
-	}
+	//for (int i = 0; i < 10; i++)
+	//{
+	//	for (int j = 0; j < 5; j++)
+	//	{
+	//		actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
+	//	}
+	//}
+	//actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0f), currentMenu(MENU_PLAYING)
 {
@@ -123,11 +124,11 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0
 	playerVehicle->setPosition(Vector3(15,3,-15));
 	player->getVehicleBody1()->setPosition(Vector3(15, 3.65f, -15));
 
-	testObjective = new GameObject();
-	testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(testObjective);
-	testObjective->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
-	testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
+	//testObjective = new GameObject();
+	//testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//Game::getGraphics().addToDraw(testObjective);
+	//testObjective->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
+	//testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
 
 	
 
@@ -153,19 +154,20 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0
 
 	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the important");
 
-	objectives.addObjective(TypeOfMission::KillingSpree, 10, 20, "Kill the enemies that is protecting the anvil");
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies that is protecting the anvil");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the important");
 
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 5, "Pick up the trash");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 3, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 6, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 1, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 8, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 10, 7, "Pick up the important");
+
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the trash");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 3, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 6, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 1, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 8, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 7, "Pick up the important");
 
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
@@ -480,6 +482,12 @@ void  PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		
+		if(spawnTimer % 100 == 0)
+		{
+			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+			spawnTimer = 0;
+		}
+		spawnTimer++;
 
 		powerUps.erase(
 			std::remove_if(
