@@ -15,7 +15,7 @@ void PlayingGameState::initAI()
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
 {
-   #if _DEBUG | RELEASE_DEBUG
+   #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	   pausedTime = false;
    #endif // _DEBUG
 
@@ -450,6 +450,17 @@ void  PlayingGameState::ImGui_Camera() {
 	ImGui::End();
 }
 
+Vector3 PlayingGameState::getRespawnPosition() const noexcept
+{
+	auto ui = static_cast<UIPlaying const *>( menues[Menu::MENU_PLAYING].get() );
+	auto maybeHospitalTilePos = map->getNearestFoundHospitalTilePos( player->getVehicle()->getPosition(), *ui );
+	if ( maybeHospitalTilePos ) {
+		return map->getHospitalFrontPosition( maybeHospitalTilePos.value() );
+		// TODO: rotate player
+	}
+	else return map->getStartPositionInWorldSpace();
+}
+
 void  PlayingGameState::update(float deltaTime)
 {
 	/*-------------------------UPDATING-------------------------*/
@@ -459,7 +470,7 @@ void  PlayingGameState::update(float deltaTime)
 			deltaTime /= 4;
 		}
 
-#if _DEBUG | RELEASE_DEBUG
+#if defined(_DEBUG) || defined(RELEASE_DEBUG)
 		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
 		{
 			pausedTime = !pausedTime;
@@ -905,9 +916,4 @@ void PlayingGameState::updateObjects()
 			}
 		}
 	}
-}
-
-Vector3 PlayingGameState::getSpawnLocation() const
-{
-	return this->map->getStartPositionInWorldSpace();
 }

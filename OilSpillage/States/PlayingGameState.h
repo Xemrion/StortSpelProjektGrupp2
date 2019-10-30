@@ -44,12 +44,14 @@ public:
 	void removeLight(PointLight* theLight);
 	void		 moveObjects();
 	void		 updateObjects();
+	Vector3   getRespawnPosition() const noexcept;
+
+
 	ActorManager* actorManager;
-	Vector3 getSpawnLocation()const;
 
 private:
 	friend class Game;
-   #if _DEBUG | RELEASE_DEBUG
+   #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	   bool                         pausedTime;
    #endif // _DEBUG
 	std::string                     minimap;
