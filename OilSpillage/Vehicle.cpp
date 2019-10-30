@@ -118,6 +118,7 @@ void Vehicle::init(Physics *physics)
 	this->getVehicle()->getRigidBody()->activate();
 	this->getVehicle()->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	this->getVehicle()->getRigidBody()->setFriction(0);
+	this->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1,0,1));
 
 	tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y + 0.65f, vehicle->getPosition().z), -btVector3(this->vehicleBody1->getAABB().minPos.x - this->vehicleBody1->getAABB().maxPos.x, (this->vehicleBody1->getAABB().minPos.y - this->vehicleBody1->getAABB().maxPos.y) * 0.2f, this->vehicleBody1->getAABB().minPos.z - this->vehicleBody1->getAABB().maxPos.z) * 0.5f, 1.0f);
 	vehicleBody1->setRigidBody(tempo, physics);
@@ -289,7 +290,12 @@ void Vehicle::update(float deltaTime)
 		else {
 			rotateAcceleration = 0;
 			rotateAcceleration /= 1.0f + 20 * deltaTime;
-			vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, vehicle->getRigidBody()->getAngularVelocity().getY()/ (1 + (7.0f * deltaTime)), steering.z));
+			if (health > 0) {
+				vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, vehicle->getRigidBody()->getAngularVelocity().getY() / (1 + (7.0f * deltaTime)), steering.z));
+			}
+			else {
+				vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, (vehicle->getRigidBody()->getAngularVelocity().getY() / (1 + (0.8f * deltaTime)))/** min(abs(velocitySpeed), 1)*/, steering.z));
+			}
 
 		}
 		if ((Input::checkButton(Keys::L_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S)) && velocitySpeed > (-40 * updatedStats.maxSpeed) && this->health>0) {
@@ -370,7 +376,7 @@ void Vehicle::update(float deltaTime)
 			vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (0.6f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (0.6f * deltaTime))));
 			rotateAcceleration /= 1.0f + 0.005f * deltaTime * 40;
 			
-			vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 120 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
+			vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, (vehicle->getRigidBody()->getAngularVelocity().getY() / (1 + (0.8f * deltaTime)))/** min(abs(velocitySpeed), 1)*/, steering.z));
 		}
 
 		rotateAcceleration /= 1.0f + 6*deltaTime;
@@ -385,7 +391,7 @@ void Vehicle::update(float deltaTime)
 		driftResistance = driftResistance * (abs(driftForce)*0.005f);
 	}
 	if (!(health > 0)) {
-		driftResistance /= 2;
+		//driftResistance /= 2;
 	}
 	if (drivingMode != 2) {
 		if (Input::getStrengthL() > 0) {
@@ -513,6 +519,13 @@ void Vehicle::updateWeapon(float deltaTime)
 
 		if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
 		{
+			if (flameBool == true) {
+				int randomSound = rand() % 2 + 1;
+				std::wstring soundEffect = L"data/sound/FlameLoop" + to_wstring(randomSound) + L".wav";
+				Sound::PlayLoopingSound(soundEffect);
+				Sound::PlaySoundEffect(L"data/sound/FlameStart.wav");
+				flameBool = false;
+			}
 			if (this->timeSinceLastShot2 >= this->weapon2.fireRate)
 			{
 				this->timeSinceLastShot2 = fmod(this->timeSinceLastShot2, this->weapon2.fireRate);
@@ -522,8 +535,6 @@ void Vehicle::updateWeapon(float deltaTime)
 					if (bullets[i].getWeaponType() == WeaponType::None)
 					{
 						auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
-
-
 						this->bullets[i].shoot(weapon2,
 							this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
 							Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2)),
@@ -532,6 +543,11 @@ void Vehicle::updateWeapon(float deltaTime)
 					}
 				}
 			}
+		}
+		else {
+			flameBool = true;
+			Sound::StopLoopingSound(L"data/sound/FlameLoop1.wav",true);
+			Sound::StopLoopingSound(L"data/sound/FlameLoop2.wav", true);
 		}
 	}
 	for (int i = 0; i < Vehicle::bulletCount; i++)
@@ -661,18 +677,23 @@ void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 	if ((max(abs(accelForce.x), abs(accelForce.z)) > 5.0f)) {
 		int randomSound = rand() % 3 + 1;
 		std::wstring soundEffect = L"data/sound/CarImpact" + to_wstring(randomSound) + L".wav";
+		int randomSound2 = rand() % 3 + 1;
+		std::wstring soundEffect2 = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
 			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-20.0f);
 			Sound::PlaySoundEffect(L"data/sound/CarCrash.wav");
+			Sound::PlaySoundEffect(soundEffect2);
 		}
 		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
 			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-10.0f);
 			Sound::PlaySoundEffect(soundEffect);
+			Sound::PlaySoundEffect(soundEffect2);
 		}
 		else {
 			Sound::PlaySoundEffect(L"data/sound/CarImpactSoft.wav");
+			Sound::PlaySoundEffect(soundEffect2);
 		}
 	}
 	/*else {

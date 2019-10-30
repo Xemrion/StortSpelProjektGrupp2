@@ -127,8 +127,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	auto startPos = map->getStartPositionInWorldSpace();
    auto playerVehicle = player->getVehicle();
-	playerVehicle->setPosition(             startPos + Vector3( .0f, 3.00f, .0f) );
-	player->getVehicleBody1()->setPosition( startPos + Vector3( .0f, 3.65f, .0f) );
+	playerVehicle->setPosition(             getSpawnLocation() + Vector3( .0f, 0.00f, .0f) );
+	player->getVehicleBody1()->setPosition( getSpawnLocation() + Vector3( .0f, 0.65f, .0f) );
 
 	initAI();
 
@@ -907,5 +907,5 @@ void PlayingGameState::updateObjects()
 
 Vector3 PlayingGameState::getSpawnLocation() const
 {
-	return this->map->getStartPositionInWorldSpace();
+	return this->map->getStartPositionInWorldSpace() + Vector3(0,-1.25f,0);
 }

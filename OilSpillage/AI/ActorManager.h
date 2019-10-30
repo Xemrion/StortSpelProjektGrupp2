@@ -19,6 +19,7 @@ public:
 	void spawnAttackers(Vector3 originPos);
 	void spawnTurrets(Vector3 playerPos);
 private:
+	float soundTimer;
 	int frameCount = 0;
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members

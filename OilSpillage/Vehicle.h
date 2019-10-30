@@ -72,6 +72,7 @@ private:
 	float reverseTimer;
 	float reverseTimer2;
 	float soundTimer;
+	bool flameBool;
 	bool dmg;
 
 	
