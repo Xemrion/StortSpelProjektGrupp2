@@ -15,7 +15,7 @@ ActorManager::~ActorManager()
 {
 	for (int i = 0; i < actors.size(); i++)
 	{
-		delete actors.at(i);
+		delete actors[i];
 	}
 	actors.clear();
 }
@@ -25,11 +25,11 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	bool hasDied = false;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		if (!actors.at(i)->isDead() && actors.at(i) != nullptr)
+		if (!actors[i]->isDead() && actors[i] != nullptr)
 		{
-			actors.at(i)->run(actors, dt, targetPos);
+			actors[i]->run(actors, dt, targetPos);
 		}
-		else if (actors.at(i)->isDead() && actors.at(i) != nullptr)
+		else if (actors[i]->isDead() && actors[i] != nullptr)
 		{
 			Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
 			if (ptr != nullptr)
@@ -46,10 +46,10 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	{
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
-			if (actors.at(i)->isDead())
+			if (actors[i]->isDead())
 			{
-				actors.at(i)->death();
-				delete actors.at(i);
+				actors[i]->death();
+				delete actors[i];
 				actors.erase(actors.begin() + i);
 			}
 		}
@@ -90,12 +90,12 @@ std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 
 	for(int i = 0; i < this->actors.size(); i++)
 	{
-		float deltaX = position.x - this->actors.at(i)->getPosition().x;
-		float deltaZ = position.z - this->actors.at(i)->getPosition().z;
+		float deltaX = position.x - this->actors[i]->getPosition().x;
+		float deltaZ = position.z - this->actors[i]->getPosition().z;
 		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		if(distance < rangeOfPlayer)
 		{
-			sendToPlayer.push_back(actors.at(i));
+			sendToPlayer.push_back(actors[i]);
 		}
 	}
 	return &sendToPlayer;
@@ -106,8 +106,8 @@ float ActorManager::distanceToPlayer(Vector3 position)
 	float distance=0;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		float deltaX = position.x - this->actors.at(i)->getPosition().x;
-		float deltaZ = position.z - this->actors.at(i)->getPosition().z;
+		float deltaX = position.x - this->actors[i]->getPosition().x;
+		float deltaZ = position.z - this->actors[i]->getPosition().z;
 		/*if (distance > abs(max((deltaX * deltaX), (deltaZ * deltaZ)))) {*/
 			distance = max(abs(deltaX),abs(deltaZ));
 		/*}*/
@@ -126,7 +126,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 				if (bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
 				{
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
-					bulletArray[j].setWeaponType(WeaponType::None);
+					bulletArray[j].destroy();
 				}
 			}
 		}

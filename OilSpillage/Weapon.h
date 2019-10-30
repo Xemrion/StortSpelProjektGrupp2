@@ -67,6 +67,7 @@ public:
 	void shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity);
 	void update(float deltaTime);
 	float getTimeLeft() const;
+	void destroy();
 	GameObject* getGameObject();
 };
 
