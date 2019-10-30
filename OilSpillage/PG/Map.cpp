@@ -228,6 +228,8 @@ void  Map::generateBuildings( )
 						if ( not isHospital ) {
 							int randomHouse = rand() % 4; // decides the house
 							houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
+							houseTile.setMaterial(graphics.getMaterial("Houses/testHouse"));
+
 							//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
 
 							F32 randomSize = smallProbabilityDist(rng) < smallProbability ? randomSizeDist(rng) : 1.0f;
