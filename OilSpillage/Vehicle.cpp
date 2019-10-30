@@ -520,7 +520,7 @@ void Vehicle::updateWeapon(float deltaTime)
 					this->bullets[i].shoot(weapon2,
 										   this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
 						                   Vector3(cos(this->vehicleBody1->getRotation().y - 3.14/2),0,-sin(this->vehicleBody1->getRotation().y - 3.14/2)),
-						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ())*0.5f);
+						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
 					break;
 				}
 			}

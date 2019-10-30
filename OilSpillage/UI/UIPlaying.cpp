@@ -46,27 +46,36 @@ void UIPlaying::drawUI()
 	this->objHandlerPtr = &static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler();
 	std::string timeStr = this->getFormattedTime();
 	Vector2 textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
+	Vector2 timeScale(1.0f, 1.0f);
+	Vector2 shake(0, 0);
+	if (time < 11)
+	{
+		shake.x = rand() % 10 + 1;
+		shake.y = rand() % 10 + 1;
+		shake += Vector2(11 - time);
+	}
+	Vector2 position(Vector2(SCREEN_WIDTH / 2, textSize.y) + shake);
 	Vehicle* player = static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer();
 
 	this->healthBar->setAmount(player->getHealth() / static_cast<float>(player->getMaxHealth()));
 	
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	Vector2 shake(0,0);
-	if (time < 11)
-	{
-		shake.x = rand() % 10 + 1;
-		shake.y = rand() % 10 + 1;
-		shake += Vector2(11-time);
-	}
+	
 	
 	Vector4 colorOverTime = Vector4::Lerp(Vector4(Colors::Yellow), Vector4(Colors::Red), (20.0f-time)/20.0f);
 	if (time > 20.0f)
 	{
 		colorOverTime = Colors::Yellow;
 	}
-	
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 10) + shake, colorOverTime, 0, Vector3(0, 0, 0), Vector3(1,1,1));
+	if (time <= 0)
+	{
+		timeStr = "Game Over Press Enter to Continue";
+		textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
+		timeScale = Vector2(0.7f, 0.7f);
+		position = Vector2(SCREEN_WIDTH / 2 , 720 / 2);
+	}
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position, colorOverTime, 0, Vector2(textSize.x / 2, textSize.y / 2), timeScale);
 	
 	std::string rewardInfo;
 	Color color;
@@ -135,13 +144,9 @@ void UIPlaying::drawUI()
 	if (player->getRespawnTimer() > 0)
 	{
 		Vector2 textSize = UserInterface::getFontArial()->MeasureString(respawnTime.c_str());
-		/*
-		a + f * (b - a);
-		fadedColor.x = lerp(startColor.x, endColor.x, time / totTime);
-		*/
 		float sizeOverT = 0.1f + ((1 - this->respawnTimer) / 1)* (1.0f - 0.1f);
 		Vector3 sizeLerp(sizeOverT);
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), respawnTime.c_str(), Vector2( (SCREEN_WIDTH / 2 - textSize.x / 2),  (720 / 2 - textSize.y/2)), Colors::White, 0, Vector2(0, 0), sizeLerp);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), respawnTime.c_str(), Vector2( (SCREEN_WIDTH / 2 - textSize.x / 2),  (720 / 2 - textSize.y/2)), Colors::White, 0, Vector2(textSize.x / 2, textSize.y / 2), sizeLerp);
 	}
 	this->healthBar->draw(false);
 	this->minimap->draw(false);
