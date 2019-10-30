@@ -542,7 +542,6 @@ void  PlayingGameState::update(float deltaTime)
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(       deltaTime );
-		player->updateWeapon(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		
 #ifndef _DEBUG
