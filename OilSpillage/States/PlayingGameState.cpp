@@ -898,3 +898,8 @@ void PlayingGameState::updateObjects()
 		}
 	}
 }
+
+Vector3 PlayingGameState::getSpawnLocation() const
+{
+	return this->map->getStartPositionInWorldSpace();
+}

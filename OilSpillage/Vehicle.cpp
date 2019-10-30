@@ -147,8 +147,8 @@ void Vehicle::update(float deltaTime)
 		{
 			this->resetHealth();
 			this->immortal = true;
-			this->vehicle->setPosition(Vector3(15, 2, -15));
-			this->vehicleBody1->setPosition(Vector3(15, 2+0.65f, -15));
+			this->vehicle->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getSpawnLocation());
+			this->vehicleBody1->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getSpawnLocation() + Vector3(0.0f, 0.65f, 0.0f));
 
 			this->deadImpulse = false;
 			this->respawnTimer = 0.0f;

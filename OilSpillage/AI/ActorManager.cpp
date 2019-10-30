@@ -126,7 +126,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 				if (bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
 				{
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
-					bulletArray[j].setWeaponType(WeaponType::None);
+					bulletArray[j].destroy();
 				}
 			}
 		}
