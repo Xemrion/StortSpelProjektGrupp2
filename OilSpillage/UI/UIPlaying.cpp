@@ -47,29 +47,20 @@ void UIPlaying::updateUI(float deltaTime)
 
 void UIPlaying::drawUI()
 {
-	float time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
+	Vehicle* player = static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer();
+	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
 	std::string timeStr = this->getFormattedTime();
 	Vector2 textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
 	Vector2 timeScale(1.0f, 1.0f);
-	Vector2 shake(0, 0);
+	Vector2 shake;
 	if (time < 11)
 	{
-		shake.x = rand() % 10 + 1;
-		shake.y = rand() % 10 + 1;
-		shake += Vector2(11 - time);
+		shake.x = rand() % 10 + 1.0f;
+		shake.y = rand() % 10 + 1.0f;
+		shake += Vector2(11.0f - time);
 	}
+
 	Vector2 position(Vector2(SCREEN_WIDTH / 2, textSize.y) + shake);
-	Vehicle* player = static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer();
-
-	this->healthBar->setAmount(player->getHealth() / static_cast<float>(player->getMaxHealth()));
-	
-	if (time < 11)
-	{
-		shake.x = rand() % 10 + 1;
-		shake.y = rand() % 10 + 1;
-		shake += Vector2(11 - time);
-	}
-
 	Vector4 colorOverTime = Vector4(Colors::Yellow);
 	if (time <= 20.0f)
 	{
@@ -80,8 +71,10 @@ void UIPlaying::drawUI()
 		timeStr = "Game Over Press Enter to Continue";
 		textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
 		timeScale = Vector2(0.7f, 0.7f);
-		position = Vector2(SCREEN_WIDTH / 2, 720 / 2);
+		position = Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 	}
+
+	this->healthBar->setAmount(player->getHealth() / static_cast<float>(player->getMaxHealth()));
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position, colorOverTime, 0, Vector2(textSize.x / 2, textSize.y / 2), timeScale);
@@ -118,4 +111,9 @@ void UIPlaying::init()
 void UIPlaying::resetMinimapFog()
 {
 	this->minimap->resetFog();
+}
+
+bool UIPlaying::hasExploredOnMinimap(Vector3 worldPosition) const
+{
+	return this->minimap->hasExplored(worldPosition);
 }

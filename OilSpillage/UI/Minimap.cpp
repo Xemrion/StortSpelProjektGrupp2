@@ -222,3 +222,16 @@ void Minimap::resetFog()
 {
 	CopyMemory(this->pixels, this->textureFogTemp->getData(), this->textureFogTemp->getDataSize());
 }
+
+bool Minimap::hasExplored(Vector3 worldPosition) const
+{
+	Vector3 posOnMap = Vector3::Transform(worldPosition, this->mapMatrix);
+
+	if (posOnMap.x < 0 || posOnMap.x > this->textureFogTemp->getWidth() || posOnMap.z < 0 || posOnMap.z > this->textureFogTemp->getHeight())
+	{
+		return false;
+	}
+
+	posOnMap.z = this->textureFogTemp->getHeight() - posOnMap.z;
+	return this->pixels[(static_cast<int>(posOnMap.z) * this->textureFogTemp->getWidth() + static_cast<int>(posOnMap.x)) * 4 + 3] != 255;
+}

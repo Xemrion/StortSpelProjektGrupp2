@@ -1,6 +1,5 @@
 #include "AStar.h"
 
-
 bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& path)
 {
 	//if (!map->isInBounds(startPos.x, startPos.z) || !map->isInBounds(endPos.x, endPos.z))
@@ -57,11 +56,9 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 					{
 						addToVector(open, curNeighbour);
 					}
-
 				}
 			}
 		}
-
 	}
 	return false;
 }
@@ -69,13 +66,13 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 AStar::~AStar()
 {
 }
-AStar::AStar(TileMap const &map):
-	map ( map )
+AStar::AStar(TileMap const& map) :
+	map(map)
 {
 }
 int AStar::getDistance(Vector3 pos1, Vector3 pos2)
 {
-	return int((pos2-pos1).Length()) * 10;
+	return int((pos2 - pos1).Length()) * 10;
 }
 
 void AStar::addToVector(std::vector<Size>& nodes, Size nodeToAdd)
@@ -91,7 +88,7 @@ void AStar::addToVector(std::vector<Size>& nodes, Size nodeToAdd)
 	nodes.push_back(nodeToAdd);
 }
 
-bool AStar::isInVector(std::vector<Size> vector, Size node)
+bool AStar::isInVector(std::vector<Size>& vector, Size node)
 {
 	for (int i = 0; i < vector.size(); i++)
 	{
@@ -109,7 +106,7 @@ void AStar::reconstructPath(Size goalIndex, std::vector<Vector3>& path)
 	current = goalIndex;
 	while (tileData.at(current).prevIndex != -1)
 	{
-		path.push_back(map.getWorldPosByIndex(current));
+		path.emplace_back(map.getWorldPosByIndex(current));
 		current = tileData.at(current).prevIndex;
 	}
 }
@@ -123,10 +120,10 @@ void AStar::resetTileData()
 		tileData.at(changedTiles.at(i)).prevIndex = -1;
 	}
 	changedTiles.clear();
-	changedTiles.shrink_to_fit();
 }
 
-void AStar::generateTileData(TileMap const& map) {
+void AStar::generateTileData(TileMap const& map)
+{
 	tileData = std::vector<TileData>{ map.width * map.height };
 	for (auto i = 0; i < map.data.size(); ++i)
 	{
