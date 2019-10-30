@@ -93,6 +93,20 @@ std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 	return &sendToPlayer;
 }
 
+float ActorManager::distanceToPlayer(Vector3 position)
+{
+	float distance=0;
+	for (int i = 0; i < this->actors.size(); i++)
+	{
+		float deltaX = position.x - this->actors.at(i)->getPosition().x;
+		float deltaZ = position.z - this->actors.at(i)->getPosition().z;
+		/*if (distance > abs(max((deltaX * deltaX), (deltaZ * deltaZ)))) {*/
+			distance = max(abs(deltaX),abs(deltaZ));
+		/*}*/
+	}
+	return abs(distance);
+}
+
 void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 {
 	for (int i = 0; i < this->actors.size(); i++)

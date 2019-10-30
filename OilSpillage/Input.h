@@ -86,6 +86,7 @@ public:
 	static float getStrengthL(/*int player*/);
 	static Vector2 getDirectionR(/*int player*/);
 	static float getStrengthR(/*int player*/);
+	static float getStrengthRnoMouse(/*int player*/);
 
 	static bool checkButtonMouse(MouseKeys key, States state);
 	static Vector2 getMousePosition();

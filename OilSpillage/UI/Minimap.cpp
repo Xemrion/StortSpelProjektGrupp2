@@ -182,9 +182,25 @@ void Minimap::update(float deltaTime)
 	{
 		for (int y = static_cast<int>(topLeft.y); y < static_cast<int>(std::roundf(bottomRight.y)); y++)
 		{
+			float shade = 255;
 			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius)
 			{
-				this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] = 0;
+				shade = 150;
+			}
+			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius - 5.0f)
+			{
+				shade = 100;
+			}
+			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius - 10.0f)
+			{
+				shade = 50;
+			}
+			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius-15.0f)
+			{
+				shade = 0;
+			}
+			if (this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] > shade) {
+				this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] = shade;
 			}
 		}
 	}

@@ -25,11 +25,12 @@ void PlayingGameState::initAI()
 		}
 	}
 }
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(600.0f), currentMenu(MENU_PLAYING)
 {
    #if _DEBUG | RELEASE_DEBUG
 	   pausedTime = false;
    #endif // _DEBUG
+
 
 	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
@@ -184,6 +185,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0
 	count = 0;
 	prevAccelForce = Vector3(0,0,0);
 	accelForce = Vector3(0, 0, 0);
+	soundAggro = 0;
 }
 
 PlayingGameState::~PlayingGameState()
@@ -507,6 +509,7 @@ void  PlayingGameState::update(float deltaTime)
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->updateWeapon(deltaTime);
+		player->setWheelRotation();
 		actorManager->update( deltaTime, playerVehicle->getPosition() );
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(       deltaTime );
@@ -518,9 +521,10 @@ void  PlayingGameState::update(float deltaTime)
 #endif
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
+		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
 		camera->setPosition( Vector3( positionCam.getX(),
 		                              positionCam.getY()/3,
-		                              positionCam.getZ() ) + Vector3(.0f, player->getCameraDistance(deltaTime) + cameraDistance, .0f) );
+		                              positionCam.getZ() ) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z) );
 
 		btVector3 spotlightDir { 0,
 								 0,
@@ -539,6 +543,14 @@ void  PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos( spotlightPos );
 		
+		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 50.0f && soundAggro < 1.0f) {
+			soundAggro += 0.2f * deltaTime;
+		}
+		else if(soundAggro > 0.0f) {
+			soundAggro -= 0.15f * deltaTime;
+		}
+		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);
+
 		/*timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
 		{
@@ -572,16 +584,16 @@ void  PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
 #if _DEBUG | RELEASE_DEBUG //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   //ImGui_ImplDX11_NewFrame();
-	   //ImGui_ImplWin32_NewFrame();
-	   //ImGui::NewFrame();
-	   //ImGui_Driving();
-	   //ImGui_ProcGen();
-	   //ImGui_AI();
-	   //ImGui_Particles();
-	   //ImGui_Camera();
-	   //ImGui::Render();
-	   //ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	   ImGui_ImplDX11_NewFrame();
+	   ImGui_ImplWin32_NewFrame();
+	   ImGui::NewFrame();
+	   ImGui_Driving();
+	   ImGui_ProcGen();
+	   ImGui_AI();
+	   ImGui_Particles();
+	   ImGui_Camera();
+	   ImGui::Render();
+	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #endif // !_DEBUG
 	
 	graphics.presentScene();
@@ -768,20 +780,20 @@ void PlayingGameState::moveObjects()
 	auto tilemap = map->getTileMap();
 	if (object->getPosition().x > (player->getVehicle()->getPosition().x + 50) ||
 		object->getPosition().x < (player->getVehicle()->getPosition().x - 50) ||
-		object->getPosition().z > (player->getVehicle()->getPosition().z + 25) ||
-		object->getPosition().z < (player->getVehicle()->getPosition().z - 25)) {
+		object->getPosition().z > (player->getVehicle()->getPosition().z + 35) ||
+		object->getPosition().z < (player->getVehicle()->getPosition().z - 35)) {
 		object->getRigidBody()->setActivationState(0);
 		int randomValue = rand() % 2+1;
 		if (randomValue == 1) {
 			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getZ() > 0) {
 				//Top
 				randomValue = rand() % 100 + 1 - 50;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z + 25));
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z + 35));
 			}
 			else {
 				//Bottom
 				randomValue = rand() % 100 + 1 - 50;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z - 25));
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z - 35));
 			}
 		}else if(randomValue == 2){
 			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getX() < 0) {
