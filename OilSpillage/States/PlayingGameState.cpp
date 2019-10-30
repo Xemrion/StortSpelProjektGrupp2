@@ -679,8 +679,7 @@ void PlayingGameState::spawnObjects()
 		graphics.loadTexture("brownPaperCardboard");
 		objPtr->setTexture(Game::getGraphics().getTexturePointer("brownPaperCardboard"));
 		Game::getGraphics().addToDraw(objPtr);
-		randomValue = rand() % 3 + 8;
-		randomValue *= 0.125f;
+		randomValue = (rand() % 3 + 8) * 0.125f;
 		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue), 0.01f);
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
 		objPtr->setScale(Vector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue));
@@ -719,8 +718,7 @@ void PlayingGameState::spawnObjects()
 		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Garbage_Bag").diffuse);
 		Game::getGraphics().addToDraw(objPtr);
 		objPtr->setPosition(Vector3(0, 0, 0));
-		randomValue = rand() % 3 + 8;
-		randomValue *= 0.125f;
+		randomValue = (rand() % 3 + 8) * 0.125f;
 		size = 0.30f *randomValue;
 		objPtr->setScale(Vector3(size, size, size));
 		tempo2 = physics->addSphere(size, btVector3(0, 0.0f, 0), 0.01f);

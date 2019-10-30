@@ -32,6 +32,7 @@ public:
 	void update(float deltaTime);
 
 	void resetFog();
+	bool hasExplored(Vector3 worldPosition) const;
 };
 
 #endif // !MINIMAP_H

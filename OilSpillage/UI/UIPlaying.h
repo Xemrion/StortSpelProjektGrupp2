@@ -25,6 +25,7 @@ public:
 
 	void init();
 	void resetMinimapFog();
+	bool hasExploredOnMinimap(Vector3 worldPosition) const;
 };
 
 #endif // !UI_PLAYING_H
