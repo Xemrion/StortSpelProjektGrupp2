@@ -6,7 +6,7 @@
 
 void UICredits::updateUI(float deltaTime)
 {
-	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
+	if (Input::checkButton(Keys::CONFIRM, States::PRESSED) || Input::checkButton(Keys::CANCEL, States::PRESSED))
 	{
 		static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(MenuGameState::MENU_MAIN);
 	}
@@ -19,7 +19,7 @@ void UICredits::drawUI()
 	for (size_t i = 0; i < this->creditsText.size(); i++)
 	{
 		Vector2 textSize(UserInterface::getFontArial()->MeasureString(this->creditsText[i].c_str()) * 0.4f);
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), this->creditsText[i].c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 5 + 80 * 0.4f * i), Colors::White, 0.0f, Vector2(), 0.4f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), this->creditsText[i].c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 5 + 80 * 0.4f * i), Colors::Yellow, 0.0f, Vector2(), 0.4f);
 	}
 
 	this->buttonBack->draw(true);

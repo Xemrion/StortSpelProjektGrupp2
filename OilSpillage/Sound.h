@@ -34,6 +34,7 @@ public:
 	static void PlaySoundEffect(std::wstring fileName);
 	static void PlayLoopingSound(std::wstring fileName);
 	static void StopLoopingSound(std::wstring fileName, bool immediate);
+	static void changeVolume(std::wstring fileName, float volume);
 	static void StopAllLoops(bool immediate);
 	static void PauseSound(bool isPaused);
 };

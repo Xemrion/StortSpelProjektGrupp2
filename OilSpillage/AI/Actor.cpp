@@ -51,7 +51,7 @@ void Actor::update(float dt, Vector3 targetPos)
 		nrOfFrames = 1;
 	}
 
-	this->root->func();
+	//this->root->func();
 	followPath();
 
 	nrOfFrames++;

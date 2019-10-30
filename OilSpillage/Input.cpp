@@ -485,14 +485,26 @@ float Input::getStrengthR(/*int player*/)
 		}
 	//}
 
-	/*if (strength == 0.0f)
+	if (strength == 0.0f)
 	{
 		float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
 		float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
 
 		strength = min(Vector2(mX, -mY).Length() / 300.0f, 1.0f);
-	}*/
+	}
 
+	return strength;
+}
+
+float Input::getStrengthRnoMouse()
+{
+	float strength = 0.0f;
+	GamePad::State gamepadState = instance->gamePad.GetState(/*player*/0);
+
+	if (gamepadState.IsConnected())
+	{
+		strength = min(Vector2(gamepadState.thumbSticks.rightX, gamepadState.thumbSticks.rightY).Length(), 1.0f);
+	}
 	return strength;
 }
 

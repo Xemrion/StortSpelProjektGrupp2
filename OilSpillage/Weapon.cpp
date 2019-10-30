@@ -82,28 +82,28 @@ void Bullet::flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direc
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
 	this->obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->dir)) * Vector3(0, 1, 0));
-
+	this->dir.y = 0.0f;
 
 	Game::getGraphics().addToDraw(this->obj);
 
 
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir*2,
+		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition()+Vector3(0,1,0),
-		this->dir*2,
+		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir*2,
+		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir*2,
+		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);

@@ -5,7 +5,7 @@
 #include "Weapon.h"
 #include "VehicleStats.h"
 #include "Powerup.h"
-
+#include "Sound.h"
 using namespace DirectX::SimpleMath;
 
 class Vehicle
@@ -66,9 +66,12 @@ private:
 	float tempTargetRotation;
 	bool rotationDirection;
 	float cameraDistance;
+	float cameraDistanceX;
+	float cameraDistanceZ;
 	Vector3 accelForce;
 	float reverseTimer;
 	float reverseTimer2;
+	float soundTimer;
 	bool dmg;
 
 	
@@ -95,8 +98,9 @@ public:
 	Vector3 getVelocity();
 	float getVelocitySpeed();
 	float getRotator();
-	float getCameraDistance(float deltaTime);
+	Vector3 getCameraDistance(float deltaTime);
 	void setAccelForce(Vector3 accelForce, float deltaTime);
+	void setWheelRotation();
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;

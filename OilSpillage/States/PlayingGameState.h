@@ -89,6 +89,8 @@ private:
 	Vector3 accelForce;
 
 	int								spawnTimer = 0;
+	float							soundAggro;
+
 	int                             addNrOfParticles  {     2 };
 	int                             lifeTime          {     1 };
 	float                           timerForParticle  {   .0f };

@@ -123,6 +123,14 @@ void Sound::StopLoopingSound(std::wstring fileName, bool immediate)
 	}
 }
 
+void Sound::changeVolume(std::wstring fileName, float volume)
+{
+	if (instance->soundEffects.find(fileName) != instance->soundEffects.end())
+	{
+		instance->soundEffects[fileName].effectInstance->SetVolume(volume);
+	}
+}
+
 void Sound::StopAllLoops(bool immediate)
 {
 	for (auto i = instance->soundEffects.begin(); i != instance->soundEffects.end(); i++)

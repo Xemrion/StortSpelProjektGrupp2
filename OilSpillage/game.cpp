@@ -17,6 +17,13 @@ void Game::start(Window* window)
 	Sound::Init();
 	UserInterface::initStaticVariables();
 
+	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
+	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");
+
+	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
+	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");
+	Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav",0);
+
 	//Input::setKeyboardPlayerID(0);
 	instance->running = true;
 	instance->run();

@@ -24,13 +24,16 @@ void PlayingGameState::initAI()
 	//		actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
 	//	}
 	//}
-	//actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 }
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
 {
    #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	   pausedTime = false;
    #endif // _DEBUG
+
 
 	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
@@ -123,7 +126,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0
 	
 	map = std::make_unique<Map>(graphics, config, physics.get());
    map->setDistrictColorCoding( isDebugging );
-	initAI();
 	// Minimap stuff
    auto tilemap = map->getTileMap();
 	topLeft      = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
@@ -142,6 +144,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0
    auto playerVehicle = player->getVehicle();
 	playerVehicle->setPosition(             startPos + Vector3( .0f, 3.00f, .0f) );
 	player->getVehicleBody1()->setPosition( startPos + Vector3( .0f, 3.65f, .0f) );
+
+	initAI();
 
 	//testObjective = new GameObject();
 	//testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -207,6 +211,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0
 	count = 0;
 	prevAccelForce = Vector3(0,0,0);
 	accelForce = Vector3(0, 0, 0);
+	soundAggro = 0;
 }
 
 PlayingGameState::~PlayingGameState()
@@ -487,7 +492,7 @@ void  PlayingGameState::update(float deltaTime)
 		{
 			time = max(time - deltaTime, 0.0f);
 		}
-		else
+		else if(Input::checkButton(Keys::CONFIRM,States::PRESSED))
 		{
 			Game::setState(Game::STATE_MENU);
 		}
@@ -503,12 +508,12 @@ void  PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		
-		if(spawnTimer % 100 == 0)
-		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-			spawnTimer = 0;
-		}
-		spawnTimer++;
+		//if(spawnTimer % 100 == 0)
+		//{
+		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+		//	spawnTimer = 0;
+		//}
+		//spawnTimer++;
 
 		powerUps.erase(
 			std::remove_if(
@@ -530,26 +535,29 @@ void  PlayingGameState::update(float deltaTime)
 			powerUps.end()
 		);
 
-		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
-		player->update(       deltaTime );
-		physics->update(      deltaTime );
-		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
-		player->setAccelForce(accelForce, deltaTime);
-		player->updateWeapon(deltaTime);
-		actorManager->update( deltaTime, playerVehicle->getPosition() );
-		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
-		camera->update(       deltaTime );
-		player->updateWeapon(deltaTime);
-		objectives.update(player->getVehicle()->getPosition());
-		
+		if (time != 0)
+		{
+			prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
+			player->update(deltaTime);
+			physics->update(deltaTime);
+			accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
+			player->setAccelForce(accelForce, deltaTime);
+			player->updateWeapon(deltaTime);
+			player->setWheelRotation();
+			actorManager->update(deltaTime, playerVehicle->getPosition());
+			actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
+			camera->update(deltaTime);
+			objectives.update(player->getVehicle()->getPosition());
+		}
 #ifndef _DEBUG
 		updateObjects();
 #endif
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
+		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
 		camera->setPosition( Vector3( positionCam.getX(),
 		                              positionCam.getY()/3,
-		                              positionCam.getZ() ) + Vector3(.0f, player->getCameraDistance(deltaTime) + cameraDistance, .0f) );
+		                              positionCam.getZ() ) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z) );
 
 		btVector3 spotlightDir { 0,
 								 0,
@@ -568,6 +576,14 @@ void  PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos( spotlightPos );
 		
+		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 50.0f && soundAggro < 1.0f) {
+			soundAggro += 0.2f * deltaTime;
+		}
+		else if(soundAggro > 0.0f) {
+			soundAggro -= 0.15f * deltaTime;
+		}
+		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);
+
 		/*timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
 		{
@@ -666,8 +682,7 @@ void PlayingGameState::spawnObjects()
 		graphics.loadTexture("brownPaperCardboard");
 		objPtr->setTexture(Game::getGraphics().getTexturePointer("brownPaperCardboard"));
 		Game::getGraphics().addToDraw(objPtr);
-		randomValue = rand() % 3 + 8;
-		randomValue *= 0.125f;
+		randomValue = (rand() % 3 + 8) * 0.125f;
 		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue), 0.01f);
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
 		objPtr->setScale(Vector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue));
@@ -706,8 +721,7 @@ void PlayingGameState::spawnObjects()
 		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Garbage_Bag").diffuse);
 		Game::getGraphics().addToDraw(objPtr);
 		objPtr->setPosition(Vector3(0, 0, 0));
-		randomValue = rand() % 3 + 8;
-		randomValue *= 0.125f;
+		randomValue = (rand() % 3 + 8) * 0.125f;
 		size = 0.30f *randomValue;
 		objPtr->setScale(Vector3(size, size, size));
 		tempo2 = physics->addSphere(size, btVector3(0, 0.0f, 0), 0.01f);
@@ -792,20 +806,20 @@ void PlayingGameState::moveObjects()
 	auto tilemap = map->getTileMap();
 	if (object->getPosition().x > (player->getVehicle()->getPosition().x + 50) ||
 		object->getPosition().x < (player->getVehicle()->getPosition().x - 50) ||
-		object->getPosition().z > (player->getVehicle()->getPosition().z + 25) ||
-		object->getPosition().z < (player->getVehicle()->getPosition().z - 25)) {
+		object->getPosition().z > (player->getVehicle()->getPosition().z + 35) ||
+		object->getPosition().z < (player->getVehicle()->getPosition().z - 35)) {
 		object->getRigidBody()->setActivationState(0);
 		int randomValue = rand() % 2+1;
 		if (randomValue == 1) {
 			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getZ() > 0) {
 				//Top
 				randomValue = rand() % 100 + 1 - 50;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z + 25));
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z + 35));
 			}
 			else {
 				//Bottom
 				randomValue = rand() % 100 + 1 - 50;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z - 25));
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z - 35));
 			}
 		}else if(randomValue == 2){
 			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getX() < 0) {
