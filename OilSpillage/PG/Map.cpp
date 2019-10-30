@@ -249,6 +249,15 @@ void  Map::generateBuildings( )
 						}
 						else { // is hospital
 							// TODO: check which neighbouring tile is the road and rotate the hospital accordingly!
+							auto orientation = getHospitalOrientation( tilePosition );
+							F32 yRotation = .0f;
+							switch ( orientation ) {
+								case Direction::south: { break; }
+								case Direction::west:  { break; }
+								case Direction::east:  { break; }
+								case Direction::north: { break; }
+								default: assert( false and "BUG! Unaccounted for direction" );
+							}
 							houseTile.mesh       = graphics.getMeshPointer( "Hospital" );
 							houseTile.setMaterial( graphics.getMaterial(    "Hospital" ) );
 							houseTile.setScale({ .048f * config.tileScaleFactor.x,
@@ -469,7 +478,11 @@ void Map::generateRoadDistanceMap() noexcept
 		return F32(a.x) * a.x * b.x * b.x * a.y * a.y * b.y * b.y;
 	};
 
-	auto &distance_f = manhattanDistance;
+	auto euclideanDistance = []( V2u const &a, V2u const &b ) {
+		return std::sqrt( F32(a.x) * a.x * b.x * b.x * a.y * a.y * b.y * b.y);
+	};
+
+	auto &distance_f = euclideanDistance;
 
 	V2u centerPos;
 	for ( centerPos.x = 0;  centerPos.x < static_cast<U16>(config.dimensions.x);  ++centerPos.x ) {
@@ -535,8 +548,8 @@ Opt<V2u> Map::getNearestFoundHospitalTilePos( Vector3 const &sourceWorldPos, UIP
    for ( auto const &maybeHospitalTilePos : hospitalTable ) {
       if ( maybeHospitalTilePos ) {
          auto hospitalTilePos  = maybeHospitalTilePos.value();
-         if ( /* minimap.hasExplored(hospitalTilePos) */ ) {
-            auto hospitalWorldPos    = tilemap->convertTilePositionToWorldPosition(hospitalTilePos);
+         auto hospitalWorldPos    = tilemap->convertTilePositionToWorldPosition(hospitalTilePos);
+         if ( ui.hasExploredOnMinimap(hospitalWorldPos) ) {
             auto hospitalDistanceSqr = Vector3::DistanceSquared( sourceWorldPos, hospitalWorldPos );
             if ( !bestMatch ) { // first match case
                bestMatch       = maybeHospitalTilePos;
@@ -552,16 +565,15 @@ Opt<V2u> Map::getNearestFoundHospitalTilePos( Vector3 const &sourceWorldPos, UIP
    return bestMatch;
 }
 
-Direction Map::getHospitalOrientation( V2u const hospitalTilePos ) const noexcept
+Direction Map::getHospitalOrientation( V2u const xy ) const noexcept
 {
-	auto const &[x,y] = hospitalTilePos;
-   if      ( hospitalTilePos.y < tilemap->height-1 and tilemap->tileAt(x,y+1) == Tile::road )
+   if      ( (xy.y < tilemap->height-1) and (tilemap->tileAt(xy.x, xy.y+1) == Tile::road) )
       return Direction::south;
-   else if ( hospitalTilePos.x < tilemap->width-1  and tilemap->tileAt(x+1,y) == Tile::road )
+   else if ( (xy.x < tilemap->width-1)  and (tilemap->tileAt(xy.x+1, xy.y) == Tile::road) )
       return Direction::east;
-   else if ( hospitalTilePos.x > 0 and tilemap->tileAt(x-1,y) == Tile::road )
+   else if ( (xy.x > 0) and (tilemap->tileAt(xy.x-1, xy.y) == Tile::road) )
       return Direction::west;
-   else if ( hospitalTilePos.y > 0 and tilemap->tileAt(x,y-1) == Tile::road )
+   else if ( (xy.y > 0) and (tilemap->tileAt(xy.x, xy.y-1) == Tile::road) )
       return Direction::north;
    else assert( false and "Invalid hospital position!" );
 }

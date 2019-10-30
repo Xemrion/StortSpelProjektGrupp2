@@ -25,17 +25,15 @@ public:
 	Voronoi const   &getDistrictMap() const noexcept;
 // TODO: refactor out
 	Vector<Opt<V2u>> const &getHospitalTable() const noexcept;
+	Opt<V2u>         getNearestFoundHospitalTilePos( Vector3 const &sourceWorldPos, UIPlaying const & ) const noexcept;
+	Direction        getHospitalOrientation(   V2u const hospitalTilePos ) const noexcept;
+	Vector3          getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept;
 
 private:
 	void             generateDistricts();
 	void             generateRoads();
 	void             generateBuildings();
 	Opt<Vector<V2u>> findValidHouseLot( RNG &, U16 districtCellID, Voronoi const &, TileMap &, Vector<District> const &districtTable );
-	Opt<V2u>         getNearestFoundHospitalTilePos( Vector3 const &sourceWorldPos, UIPlaying const & ) const noexcept;
-	Direction        getHospitalOrientation(   V2u const hospitalTilePos ) const noexcept;
-	Vector3          getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept;
-
-
 
 	Graphics              &graphics;
 	V2u                    startPositionInTileSpace;

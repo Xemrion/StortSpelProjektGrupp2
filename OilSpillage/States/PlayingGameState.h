@@ -44,6 +44,8 @@ public:
 	void removeLight(PointLight* theLight);
 	void		 moveObjects();
 	void		 updateObjects();
+	Vector3   getRespawnPosition() const noexcept;
+
 
 	ActorManager* actorManager;
 

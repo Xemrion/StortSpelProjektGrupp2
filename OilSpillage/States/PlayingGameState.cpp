@@ -464,6 +464,15 @@ void  PlayingGameState::ImGui_Camera() {
 	ImGui::End();
 }
 
+Vector3 PlayingGameState::getRespawnPosition() const noexcept
+{
+	auto ui = static_cast<UIPlaying const *>( menues[Menu::MENU_PLAYING].get() );
+	auto maybeHospitalTilePos = map->getNearestFoundHospitalTilePos( player->getVehicle()->getPosition(), *ui );
+	if ( maybeHospitalTilePos )
+		return map->getHospitalFrontPosition( maybeHospitalTilePos.value() );
+	else return map->getStartPositionInWorldSpace();
+}
+
 void  PlayingGameState::update(float deltaTime)
 {
 	/*-------------------------UPDATING-------------------------*/
