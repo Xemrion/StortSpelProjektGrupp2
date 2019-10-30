@@ -526,3 +526,57 @@ Vector<Opt<V2u>> const &Map::getHospitalTable() const noexcept
 {
 	return hospitalTable;
 }
+
+
+Opt<V2u> Map::getNearestFoundHospitalTilePos( Vector3 const &sourceWorldPos, UIPlaying const &ui ) const noexcept
+{
+   Opt<V2u> bestMatch;
+   F32      bestDistanceSqr;
+   for ( auto const &maybeHospitalTilePos : hospitalTable ) {
+      if ( maybeHospitalTilePos ) {
+         auto hospitalTilePos  = maybeHospitalTilePos.value();
+         if ( /* minimap.hasExplored(hospitalTilePos) */ ) {
+            auto hospitalWorldPos    = tilemap->convertTilePositionToWorldPosition(hospitalTilePos);
+            auto hospitalDistanceSqr = Vector3::DistanceSquared( sourceWorldPos, hospitalWorldPos );
+            if ( !bestMatch ) { // first match case
+               bestMatch       = maybeHospitalTilePos;
+               bestDistanceSqr = hospitalDistanceSqr;
+            }
+            else if ( hospitalDistanceSqr < bestDistanceSqr ) {
+               bestDistanceSqr = hospitalDistanceSqr;
+               bestMatch       = maybeHospitalTilePos;
+            }
+         }
+      }
+   }
+   return bestMatch;
+}
+
+Direction Map::getHospitalOrientation( V2u const hospitalTilePos ) const noexcept
+{
+	auto const &[x,y] = hospitalTilePos;
+   if      ( hospitalTilePos.y < tilemap->height-1 and tilemap->tileAt(x,y+1) == Tile::road )
+      return Direction::south;
+   else if ( hospitalTilePos.x < tilemap->width-1  and tilemap->tileAt(x+1,y) == Tile::road )
+      return Direction::east;
+   else if ( hospitalTilePos.x > 0 and tilemap->tileAt(x-1,y) == Tile::road )
+      return Direction::west;
+   else if ( hospitalTilePos.y > 0 and tilemap->tileAt(x,y-1) == Tile::road )
+      return Direction::north;
+   else assert( false and "Invalid hospital position!" );
+}
+
+Vector3 Map::getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept
+{
+   // TODO: bryt ut tileScaleFactor x/z till en float tileSideScaleFactor i MapConfig
+   F32 offsetDistance { config.tileScaleFactor.x / 3 }; 
+   auto orientation = getHospitalOrientation( hospitalTilePos );
+   auto result = tilemap->convertTilePositionToWorldPosition( hospitalTilePos );
+   switch ( orientation ) { 
+      case Direction::south: result += Vector3(  .0f, .0f,  offsetDistance ); break;
+      case Direction::west:  result += Vector3( -offsetDistance, .0f, .0f  ); break;
+      case Direction::east:  result += Vector3(  offsetDistance, .0f, .0f  ); break;
+      case Direction::north: result += Vector3(  .0f, .0f, -offsetDistance ); break;
+   }
+   return result;
+}
