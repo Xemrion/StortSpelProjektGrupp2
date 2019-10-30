@@ -79,16 +79,8 @@ void  Map::generateRoads()
 	}
 	
 	roadTiles = tilemap->loadAsModels(graphics); // GameObject instantiation
-	for ( U16 y = 0;  y < tilemap->height;  ++y ) {
-		for ( U16 x = 0;  x < tilemap->width;  ++x ) {
-			auto &tile = roadTiles[tilemap->index(x,y)];
-			tile.setScale(Vector3{ .0005f * config.tileScaleFactor.x,
-			                       .0005f * config.tileScaleFactor.y,
-			                       .0005f * config.tileScaleFactor.z }); // TODO: scale models instead
-			tile.setNormalMap(graphics.getTexturePointer("brickwallnormal"));
-			graphics.addToDraw( &tile , true );
-		}
-	}
+	for ( auto &e : roadTiles )
+		graphics.addToDraw( &e , true );
 }
 
 void  Map::generateDistricts()
@@ -204,8 +196,6 @@ void  Map::generateBuildings( )
 			while ( computeCurrentDistrictCoverage() < targetDistrictCoverage and ++currentTries < maxTries ) {
 				auto potentialLot = findValidHouseLot(rng, cellId, *districtMap, *tilemap, districtLookupTable);
 				if ( potentialLot ) {
-					if ( not hospitalTable[cellId] )
-						hospitalTable[cellId] = potentialLot.value()[0];
                currentTries = 0; // reset try counter
 					auto &building     = potentialLot.value();
 					auto  buildingSize = building.size();
@@ -223,34 +213,61 @@ void  Map::generateBuildings( )
 					BuildingID id                 { generateBuildingID() };
 					currentArea += buildingSize;
 					for ( auto &tilePosition : potentialLot.value() ) {
+						bool isHospital;
+						if ( not hospitalTable[cellId] and (roadDistanceMap[tilemap->index(tilePosition)] == 1.0f) ) {
+							hospitalTable[cellId] = tilePosition;
+							isHospital = true;
+						}
+						else isHospital = false;
+
 						houseTiles.emplace_back();
 						auto &houseTile = houseTiles.back();
 						buildingIDs[tilemap->index(tilePosition)] = id;
 						tilemap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
-						int randomHouse = rand() % 4; //decides the house
-						houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
-						//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
+						if ( not isHospital ) {
+							int randomHouse = rand() % 4; // decides the house
+							houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
+							//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
 
-						F32 randomSize = smallProbabilityDist(rng) < smallProbability ? randomSizeDist(rng) : 1.0f;
+							F32 randomSize = smallProbabilityDist(rng) < smallProbability ? randomSizeDist(rng) : 1.0f;
 
-						houseTile.setScale({ randomSize * .0322f * config.tileScaleFactor.x,
-						                     .015f * config.tileScaleFactor.y + (.25f * randomFloorCount) /* config.buildingFloorHeightFactor * randomFloorCount */,
-											 randomSize * .0322f * config.tileScaleFactor.z });
-						houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) - Vector3(0,1,0) } );
-				  #ifndef _DEBUG
-						btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
-						                                               houseTile.getPosition().y,
-						                                               houseTile.getPosition().z ),
-						                                    btVector3( 15.5f * houseTile.getScale().x,
-						                                               15.5f * houseTile.getScale().y,
-																       15.5f * houseTile.getScale().z ),
-						                                    .0f );
-						houseTile.setRigidBody( tmp, physics );
-				  #endif
-                  #ifdef _DEBUG
-						   ++total_building_tile_count;
-                  #endif
+							houseTile.setScale({ randomSize * .0322f * config.tileScaleFactor.x,
+							                     .015f * config.tileScaleFactor.y + (.25f * randomFloorCount) /* config.buildingFloorHeightFactor * randomFloorCount */,
+							                     randomSize * .0322f * config.tileScaleFactor.z });
+							houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) - Vector3(0,1,0) } );
+							#ifndef _DEBUG
+								btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
+																							  houseTile.getPosition().y,
+																							  houseTile.getPosition().z ),
+																				btVector3( 15.5f * houseTile.getScale().x,
+																							  15.5f * houseTile.getScale().y,
+																							  15.5f * houseTile.getScale().z ),
+																				.0f );
+								houseTile.setRigidBody( tmp, physics );
+							#endif
+						}
+						else { // is hospital
+							houseTile.mesh       = graphics.getMeshPointer( "Hospital" );
+							houseTile.setMaterial( graphics.getMaterial(    "Hospital" ) );
+							houseTile.setScale({ .048f * config.tileScaleFactor.x,
+							                     .048f * config.tileScaleFactor.y,
+							                     .048f * config.tileScaleFactor.z });
+							houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) } );
+							#ifndef _DEBUG
+								btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
+																							  houseTile.getPosition().y,
+																							  houseTile.getPosition().z ),
+																				btVector3( 10.5f * houseTile.getScale().x,
+																							  10.5f * houseTile.getScale().y,
+																							  10.5f * houseTile.getScale().z ),
+																				.0f );
+								houseTile.setRigidBody( tmp, physics );
+							#endif
+						}
+						#ifdef _DEBUG
+							++total_building_tile_count;
+						#endif
 					}
 				}
 				else break; // TODO?
@@ -348,7 +365,7 @@ Voronoi const &Map::getDistrictMap() const noexcept
 
 void  Map::setDistrictColorCoding( Bool useColorCoding ) noexcept
 {
-	if ( useColorCoding ) {
+	if ( false ) { // TEMP HACK, TODO // useColorCoding ) { 
 		Vector<Vector4> districtColorTable{
 			{ 0.0f, 0.0f, 0.0f, 1.0f },
 			{ 0.0f, 0.0f, 0.5f, 1.0f },
@@ -400,11 +417,15 @@ void  Map::setDistrictColorCoding( Bool useColorCoding ) noexcept
 			}
 		}
 		for ( auto &e : houseTiles ) {
+			//assert( e.getPosition().x >= .0f );
+			//assert( e.getPosition().z >= .0f );
 			auto        cellPosition = tilemap->convertWorldPositionToTilePosition( e.getPosition() );
 			auto        cellIndex    = districtMap->diagramIndex( cellPosition.x, cellPosition.y );
-			auto        cellID       = districtMap->diagram[ cellIndex ];
-			auto const &color        = districtColorTable[ cellID % districtColorTable.size() ];
-			e.setColor( color );
+			if ( cellIndex < districtMap->diagram.size() ) { // TEMP hack due to coordinate issues
+				auto        cellID       = districtMap->diagram[ cellIndex ];
+				auto const &color        = districtColorTable[ cellID % districtColorTable.size() ];
+				e.setColor( color );
+			}
 		}
 	}
 	else {

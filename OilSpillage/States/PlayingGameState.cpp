@@ -38,6 +38,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0
 	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
+
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
@@ -48,13 +49,30 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0
 	graphics.loadModel("Entities/Dummy_Turret");
 	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
 
+	graphics.loadModel("Roads/Metro/0000");
+	graphics.loadModel("Roads/Metro/0001");
+	graphics.loadModel("Roads/Metro/0010");
+	graphics.loadModel("Roads/Metro/0011");
+	graphics.loadModel("Roads/Metro/0100");
+	graphics.loadModel("Roads/Metro/0101");
+	graphics.loadModel("Roads/Metro/0110");
+	graphics.loadModel("Roads/Metro/0111");
+	graphics.loadModel("Roads/Metro/1000");
+	graphics.loadModel("Roads/Metro/1001");
+	graphics.loadModel("Roads/Metro/1010");
+	graphics.loadModel("Roads/Metro/1011");
+	graphics.loadModel("Roads/Metro/1100");
+	graphics.loadModel("Roads/Metro/1101");
+	graphics.loadModel("Roads/Metro/1110");
+	graphics.loadModel("Roads/Metro/1111");
 
-	graphics.loadModel("Roads/Road_pavement");
-	graphics.loadModel("Roads/Road_deadend");
-	graphics.loadModel("Roads/Road_bend");
-	graphics.loadModel("Roads/Road_straight");
-	graphics.loadModel("Roads/Road_3way");
-	graphics.loadModel("Roads/Road_4way");
+	graphics.loadModel("Hospital");
+	//graphics.loadModel("Roads/Road_pavement");
+	//graphics.loadModel("Roads/Road_deadend");
+	//graphics.loadModel("Roads/Road_bend");
+	//graphics.loadModel("Roads/Road_straight");
+	//graphics.loadModel("Roads/Road_3way");
+	//graphics.loadModel("Roads/Road_4way");
 	graphics.loadModel("Houses/testHouse");
 	graphics.loadModel("Houses/testHouse2");
 	graphics.loadModel("Houses/testHouse3");
@@ -120,9 +138,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_OPTIONS]->init();
 
+	auto startPos = map->getStartPositionInWorldSpace();
    auto playerVehicle = player->getVehicle();
-	playerVehicle->setPosition(Vector3(15,3,-15));
-	player->getVehicleBody1()->setPosition(Vector3(15, 3.65f, -15));
+	playerVehicle->setPosition(             startPos + Vector3( .0f, 3.00f, .0f) );
+	player->getVehicleBody1()->setPosition( startPos + Vector3( .0f, 3.65f, .0f) );
 
 	//testObjective = new GameObject();
 	//testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -581,18 +600,18 @@ void  PlayingGameState::update(float deltaTime)
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
-#if _DEBUG | RELEASE_DEBUG //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   //ImGui_ImplDX11_NewFrame();
-	   //ImGui_ImplWin32_NewFrame();
-	   //ImGui::NewFrame();
-	   //ImGui_Driving();
-	   //ImGui_ProcGen();
-	   //ImGui_AI();
-	   //ImGui_Particles();
-	   //ImGui_Camera();
-	   //ImGui::Render();
-	   //ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-#endif // !_DEBUG
+//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+//	   ImGui_ImplDX11_NewFrame();
+//	   ImGui_ImplWin32_NewFrame();
+//	   ImGui::NewFrame();
+//	   ImGui_Driving();
+//	   ImGui_ProcGen();
+//	   ImGui_AI();
+//	   ImGui_Particles();
+//	   ImGui_Camera();
+//	   ImGui::Render();
+//	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+//#endif // !_DEBUG
 	
 	graphics.presentScene();
 }

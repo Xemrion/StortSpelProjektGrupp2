@@ -81,9 +81,12 @@ public:
 	}
 
 	inline Vector3  convertTilePositionToWorldPosition( U16 const tileX, U16 const tileY ) const {
-		return { tileX * config.tileScaleFactor.x, 
-		         .0f,
-		         tileY * -config.tileScaleFactor.y };
+		Vector3 result { tileX * config.tileScaleFactor.x, 
+		                 .0f,
+		                 tileY * -config.tileScaleFactor.y };
+		//assert( result.x >= .0f );
+		//assert( result.z >= .0f );
+		return result;
 	}
 
 	inline Vector3  convertTilePositionToWorldPosition( V2u const &tilePosition ) const
@@ -93,15 +96,21 @@ public:
 
 	inline V2u  convertWorldPositionToTilePosition( Vector3 const &worldPosition ) const
 	{
-		return { static_cast<U32>( std::floor(worldPosition.x / config.tileScaleFactor.x) ),
-		         static_cast<U32>( std::floor(worldPosition.y / config.tileScaleFactor.y) ) };
+		V2u result { static_cast<U32>( std::floor(worldPosition.x /  config.tileScaleFactor.x) ),
+		             static_cast<U32>( std::floor(worldPosition.z / -config.tileScaleFactor.y) ) };
+		//assert( result.x <  width );
+		//assert( result.y < height );
+		return result;
 	}
 
 	//  uses the inputs x and z values
 	inline V2u  convertWorldPositionToTilePositionXZ( Vector3 const &worldPosition ) const
 	{
-		return { static_cast<U32>( std::floor(worldPosition.x / config.tileScaleFactor.x) ),
-		         static_cast<U32>( std::floor(worldPosition.z / config.tileScaleFactor.y) ) };
+		V2u result { static_cast<U32>( std::floor(worldPosition.x /  config.tileScaleFactor.x) ),
+		             static_cast<U32>( std::floor(worldPosition.z / -config.tileScaleFactor.y) ) };
+		//assert( result.x <  width );
+		//assert( result.y < height );
+		return result;
 	}
 
 	inline Tile const &tileAt( U16 x, U16 y ) const noexcept
