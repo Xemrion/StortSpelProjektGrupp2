@@ -259,11 +259,12 @@ void  Map::generateBuildings( )
 							// TODO: check which neighbouring tile is the road and rotate the hospital accordingly!
 							auto orientation = getHospitalOrientation( tilePosition );
 							F32 yRotation = .0f;
+							F32 constexpr pi{ 3.14156926535f };
 							switch ( orientation ) {
-								case Direction::south: { break; }
-								case Direction::west:  { break; }
-								case Direction::east:  { break; }
-								case Direction::north: { break; }
+								case Direction::south: { houseTile.setRotation({.0f, pi/2,   .0f}); break; } //  90 klockvis Y
+								case Direction::west:  { houseTile.setRotation({.0f, pi,     .0f}); break; } // 180 klockvis Y
+								case Direction::north: { houseTile.setRotation({.0f, pi/2*3, .0f}); break; } // 270 klockvis Y
+								case Direction::east: { break; } // no need to rotate
 								default: assert( false and "BUG! Unaccounted for direction" );
 							}
 							houseTile.mesh       = graphics.getMeshPointer( "Hospital" );
@@ -591,10 +592,10 @@ Vector3 Map::getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcep
    auto orientation = getHospitalOrientation( hospitalTilePos );
    auto result = tilemap->convertTilePositionToWorldPosition( hospitalTilePos );
    switch ( orientation ) { 
-      case Direction::south: result += Vector3(  .0f, .0f,  offsetDistance ); break;
+      case Direction::south: result += Vector3(  .0f, .0f,  -offsetDistance ); break;
       case Direction::west:  result += Vector3( -offsetDistance, .0f, .0f  ); break;
       case Direction::east:  result += Vector3(  offsetDistance, .0f, .0f  ); break;
-      case Direction::north: result += Vector3(  .0f, .0f, -offsetDistance ); break;
+      case Direction::north: result += Vector3(  .0f, .0f, offsetDistance ); break;
    }
    return result;
 }

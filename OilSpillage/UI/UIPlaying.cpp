@@ -47,7 +47,7 @@ void UIPlaying::drawUI()
 	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
 	std::string timeStr = this->getFormattedTime();
 	Vector2 textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
-	Vector2 timeScale(1.0f, 1.0f);
+	Vector2 timeScale(0.5f, 0.5f);
 	Vector2 shake;
 	if (time < 11)
 	{
@@ -81,7 +81,7 @@ void UIPlaying::drawUI()
 	}
 	else
 	{
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position, colorOverTime, 0, Vector2(textSize.x / 2, textSize.y / 2), timeScale);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position, colorOverTime, 0, Vector2(textSize.x / 2, (textSize.y / 2)+60), timeScale);
 	}
 	
 	if (player->getRespawnTimer() > 0 && time > 0)
@@ -118,7 +118,7 @@ void UIPlaying::init()
 {
 	this->healthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 20));
 	this->minimap = std::make_unique<Minimap>(0.25f, 25.0f, Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
-	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(0, 50));
+	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(-10, 15));
 }
 
 void UIPlaying::resetMinimapFog()

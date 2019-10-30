@@ -77,7 +77,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 		lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
-	for (int i = 0; i < 1000; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		Vector3 randPos   = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand()))/ RAND_MAX;
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
@@ -166,15 +166,15 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
 
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies that is protecting the anvil");
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the important" ,TypeOfTarget::Crate);
 
 
 	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the trash");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 3, "Pick up the important");
+	objectives.addObjective(TypeOfMission::KillingSpree, 240, 75, "Kill the enemies");
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 50, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 6, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 1, "Pick up the important");
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 25, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 8, "Pick up the important");
