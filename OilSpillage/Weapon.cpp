@@ -3,7 +3,7 @@
 #include "States/PlayingGameState.h"
 
 using namespace DirectX::SimpleMath;
-
+float Bullet::soundTimer = 0;
 Bullet::Bullet()
 {
 	this->obj = new GameObject;
@@ -154,7 +154,13 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 
 		if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition()).Length() < 1.5f)
 		{
-		
+			if (soundTimer > 0.05f) {
+				int randomSound = rand() % 4 + 1;
+				std::wstring soundEffect = L"data/sound/CarGlass" + to_wstring(randomSound) + L".wav";
+				Sound::PlaySoundEffect(soundEffect);
+				Sound::PlaySoundEffect(L"data/sound/CarImpactSoft.wav");
+				soundTimer = 0;
+			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-WeaponHandler::weapons[(int)weaponType].damage);
 			this->timeLeft = 0.f;
 		}
@@ -191,4 +197,9 @@ int Bullet::getDamage() const
 GameObject* Bullet::getGameObject()
 {
 	return obj;
+}
+
+void Bullet::updateSoundTimer(float deltaTime)
+{
+	soundTimer +=  deltaTime;
 }

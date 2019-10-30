@@ -57,6 +57,7 @@ class Bullet
 	Vector3 dir;
 	float timeLeft = 0.0f;
 	WeaponType weaponType = WeaponType::None;
+	static float soundTimer;
 public:
 	Bullet();
 	Bullet(WeaponType type);
@@ -68,6 +69,7 @@ public:
 	void update(float deltaTime);
 	float getTimeLeft() const;
 	GameObject* getGameObject();
+	static void updateSoundTimer(float deltaTime);
 };
 
 #endif // !WEAPON_H

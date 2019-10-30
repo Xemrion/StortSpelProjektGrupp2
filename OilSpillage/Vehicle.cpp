@@ -162,7 +162,7 @@ void Vehicle::update(float deltaTime)
 	if (powerUpTimers[(int)PowerUpType::Speed] > 0.0)
 	{
 		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate * 3.0f;
-		this->vehicle->setColor(Vector4(1.0, 0.0, 0.0, 1.0));
+		this->vehicle->setColor(Vector4(0.0, 1.0, 0.0, 1.0));
 	}
 	else
 	{
@@ -420,7 +420,7 @@ void Vehicle::update(float deltaTime)
 	add += 0.4f * deltaTime;
 
 	if (dmg == true) {
-		vehicleBody1->setColor(Vector4(vehicleBody1->getColor().x / (1 + 15.0f * deltaTime), vehicleBody1->getColor().y / (1 + 15.0f * deltaTime), vehicleBody1->getColor().z / (1 + 15.0f * deltaTime), 1));
+		vehicleBody1->setColor(Vector4(vehicleBody1->getColor().x / (1 + 15.0f * deltaTime), vehicleBody1->getColor().y , vehicleBody1->getColor().z, 1));
 		if (vehicleBody1->getColor().x <= 0.01f) {
 			dmg = false;
 		}
@@ -600,7 +600,7 @@ void Vehicle::changeHealth(int amount)
 		if (amount < 0) {
 			dmg = true;
 		}
-		vehicleBody1->setColor(Vector4(max(vehicleBody1->getColor().x + -amount * 0.1f, 0), 0, 0, 1));
+		vehicleBody1->setColor(Vector4(max(vehicleBody1->getColor().x + -amount * 0.1f, 0), vehicleBody1->getColor().y, vehicleBody1->getColor().z, 1));
 		this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
 		Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 		if (this->deadImpulse == false && this->health <= 0)
@@ -649,14 +649,24 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 
 void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 {
+
 	//AccelForce
-	if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
-		Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
-		changeHealth(-20.0f);
-	}
-	else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
-		Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
-		changeHealth(-10.0f);
+	if ((max(abs(accelForce.x), abs(accelForce.z)) > 5.0f)) {
+		int randomSound = rand() % 3 + 1;
+		std::wstring soundEffect = L"data/sound/CarImpact" + to_wstring(randomSound) + L".wav";
+		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
+			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
+			changeHealth(-20.0f);
+			Sound::PlaySoundEffect(L"data/sound/CarCrash.wav");
+		}
+		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
+			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
+			changeHealth(-10.0f);
+			Sound::PlaySoundEffect(soundEffect);
+		}
+		else {
+			Sound::PlaySoundEffect(L"data/sound/CarImpactSoft.wav");
+		}
 	}
 	/*else {
 		vehicleBody1->setColor(Vector4(vehicleBody1->getColor().x/(1 + 20.0f*deltaTime), vehicleBody1->getColor().y / (1 + 20.0f * deltaTime), vehicleBody1->getColor().z / (1 + 20.0f * deltaTime), 1));
