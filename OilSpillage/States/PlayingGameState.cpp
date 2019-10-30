@@ -12,21 +12,6 @@ void PlayingGameState::initAI()
 	aStar = new AStar( map->getTileMap() );
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-
-	//actorManager->createTurret(0 + 2, 0 - 2);
-	//actorManager->createTurret(0 + 2, 0 + 4);
-	//actorManager->createTurret(0 + 2, 0 - 4);
-
-	//for (int i = 0; i < 10; i++)
-	//{
-	//	for (int j = 0; j < 5; j++)
-	//	{
-	//		actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
-	//	}
-	//}
-	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
 {
@@ -508,12 +493,12 @@ void  PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		
-		//if(spawnTimer % 100 == 0)
-		//{
-		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-		//	spawnTimer = 0;
-		//}
-		//spawnTimer++;
+		if(spawnTimer % 200 == 0)
+		{
+			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+			spawnTimer = 0;
+		}
+		spawnTimer++;
 
 		powerUps.erase(
 			std::remove_if(
