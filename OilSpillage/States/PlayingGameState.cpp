@@ -26,7 +26,7 @@ void PlayingGameState::initAI()
 	//}
 	//actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 }
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(300.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0f), currentMenu(MENU_PLAYING)
 {
    #if _DEBUG | RELEASE_DEBUG
 	   pausedTime = false;
@@ -577,11 +577,6 @@ void  PlayingGameState::update(float deltaTime)
 			timerForParticle = 0;
 		}*/
 		
-		if ( player->isDead() )
-		{
-			//changeTime( -30.0f );
-			//player->resetHealth();
-		}
 	}
 	
 	/*-------------------------RENDERING-------------------------*/

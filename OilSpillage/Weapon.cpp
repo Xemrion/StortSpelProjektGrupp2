@@ -11,7 +11,7 @@ Bullet::Bullet()
 	this->obj->setSpotShadow(false);
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
 	this->obj->setScale(Vector3(0.25f, 0.25f, 0.25f));
-	this->obj->setColor(Vector4(1, 1, 0, 1));
+	this->obj->setColor(Vector4(0, 0, 0, 1));
 }
 
 Bullet::Bullet(WeaponType type)
@@ -20,9 +20,9 @@ Bullet::Bullet(WeaponType type)
 	this->obj->setSunShadow(false);
 	this->obj->setSpotShadow(false);
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
-	this->obj->setScale(WeaponHandler::weapons[(int)this->weaponType].bulletScale);
-	this->obj->setColor(Vector4(1, 1, 0, 1));
 	this->weaponType = type;
+	this->obj->setScale(WeaponHandler::weapons[(int)this->weaponType].bulletScale);
+	this->obj->setColor(Vector4(0, 0, 0, 1));
 }
 
 Bullet::~Bullet()

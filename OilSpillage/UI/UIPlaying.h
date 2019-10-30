@@ -14,6 +14,8 @@ private:
 
 	bool initMinimap;
 
+	float respawnTimer;
+
 	std::unique_ptr<Slider> healthBar;
 	std::unique_ptr<Minimap> minimap;
 	const ObjectiveHandler* objHandlerPtr;
