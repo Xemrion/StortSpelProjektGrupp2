@@ -128,8 +128,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	auto startPos = map->getStartPositionInWorldSpace();
    auto playerVehicle = player->getVehicle();
-	playerVehicle->setPosition(             getSpawnLocation() + Vector3( .0f, 0.00f, .0f) );
-	player->getVehicleBody1()->setPosition( getSpawnLocation() + Vector3( .0f, 0.65f, .0f) );
+	playerVehicle->setPosition(				startPos + Vector3( .0f, 0.00f -1.2f, .0f) );
+	player->getVehicleBody1()->setPosition(	startPos + Vector3( .0f, 0.65f -1.2f, .0f) );
 
 	initAI();
 
@@ -455,10 +455,10 @@ Vector3 PlayingGameState::getRespawnPosition() const noexcept
 	auto ui = static_cast<UIPlaying const *>( menues[Menu::MENU_PLAYING].get() );
 	auto maybeHospitalTilePos = map->getNearestFoundHospitalTilePos( player->getVehicle()->getPosition(), *ui );
 	if ( maybeHospitalTilePos ) {
-		return map->getHospitalFrontPosition( maybeHospitalTilePos.value() );
+		return map->getHospitalFrontPosition( maybeHospitalTilePos.value() )+Vector3(0,-1.2f,0);
 		// TODO: rotate player
 	}
-	else return map->getStartPositionInWorldSpace();
+	else return map->getStartPositionInWorldSpace() + Vector3(0, -1.2f, 0);
 }
 
 void  PlayingGameState::update(float deltaTime)
