@@ -66,6 +66,11 @@ template <typename T> union V2 {
       }
       return *this;
    }
+
+   inline V2<T> operator+( V2<T> const &other ) const noexcept {
+      return { x + other.x,   y + other.y };
+   }
+
 };
 using V2f = V2<F32>;
 using V2u = V2<U32>;
@@ -94,6 +99,10 @@ template <typename T> union V3 {
       return *this;
    }
 
+	inline V3<T> operator+( V3<T> const &other ) const noexcept {
+      return { x + other.x,   y + other.y,   z + other.z };
+   }
+
 };
 using V3f = V3<F32>;
 using V3u = V3<U32>;
@@ -120,6 +129,10 @@ template <typename T> union V4 {
          w = other.w;
       }
       return *this;
+   }
+
+	inline V4<T> operator+( V4<T> const &other ) const noexcept {
+      return { x + other.x,   y + other.y,   z + other.z,   w + other.w };
    }
 };
 using V4f = V4<F32>;

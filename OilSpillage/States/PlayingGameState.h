@@ -37,7 +37,7 @@ public:
 	Vector3      getBottomRight() const;
 	ObjectiveHandler& getObjHandler();
 	void addTime(float time);
-	void		 spawnObjects();
+	void spawnObjects();
 	Vector3 generateObjectivePos(float minDistance, float maxDistance) noexcept;
 	Vector3 generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept;
 	PointLight* addPointLight(PointLight& light);

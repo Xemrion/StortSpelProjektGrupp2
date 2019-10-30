@@ -46,6 +46,29 @@ Bool  TileMap::walk( U16 &x, U16 &y, Direction d, Tile tile )
 
 Vector<GameObject>  TileMap::loadAsModels( Graphics &graphics ) const
 {
+	Vector<GameObject> tiles( width * height ); // reserve
+	for ( U16 y = 0;  y < height;  ++y ) {
+		for ( U16 x = 0;  x < width;  ++x ) {
+			String currentTileType = "Roads/Metro/";
+			if ( tileAt(x,y) != Tile::road )
+				currentTileType += "0000";
+			else {
+				currentTileType += ((y < height-1) and (tileAt(x,y+1) == Tile::road))? '1' : '0'; // S
+				currentTileType += ((x <  width-1) and (tileAt(x+1,y) == Tile::road))? '1' : '0'; // E
+				currentTileType += ((y >        0) and (tileAt(x,y-1) == Tile::road))? '1' : '0'; // N
+				currentTileType += ((x >        0) and (tileAt(x-1,y) == Tile::road))? '1' : '0'; // W
+			}
+			auto  &tile        { tiles[ index(x, y)] };
+			tile.mesh        = graphics.getMeshPointer( currentTileType.c_str() );
+			tile.setMaterial(  graphics.getMaterial(    currentTileType.c_str() ) );
+			tile.setScale(Vector3{ 1.0f * config.tileScaleFactor.x,
+			                       1.0f * config.tileScaleFactor.y,
+			                       1.0f * config.tileScaleFactor.z }); // TODO: scale models instead
+			tile.setPosition(convertTilePositionToWorldPosition(x, y) - Vector3{ .0f, 1.5f, .0f } );
+		}
+	}
+	return tiles; // RVO/Copy Elision
+/*
    auto const  toReserve { width * height };
 	Vector<GameObject> tiles( toReserve );
 	for ( U16 y = 0;  y < height;  ++y ) {
@@ -63,6 +86,7 @@ Vector<GameObject>  TileMap::loadAsModels( Graphics &graphics ) const
 		}
 	}
 	return tiles; // RVO/Copy Elision
+*/
 }
 
 Bool  TileMap::neighbourIsRoad(Direction dir, U16 x, U16 y) const noexcept

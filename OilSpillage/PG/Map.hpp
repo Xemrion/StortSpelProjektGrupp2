@@ -44,8 +44,8 @@ private:
 	using BuildingID = U16;                    // 0 = unused tile
 	BuildingID          nextBuildingID { 1U }; // 1 = first valid ID
 	Vector<BuildingID>  buildingIDs;
-	Vector<U16>         roadDistanceMap;
-	BuildingID          generateBuildingID()  noexcept;
-	void                generateDistanceMap() noexcept;
+	Vector<F32>         roadDistanceMap;
+	BuildingID          generateBuildingID()      noexcept;
+	void                generateRoadDistanceMap() noexcept;
 	Vector<Opt<V2u>>    hospitalTable;
 };
