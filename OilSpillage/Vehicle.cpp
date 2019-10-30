@@ -629,7 +629,7 @@ float Vehicle::getRespawnTimer() const
 	return respawnTimer;
 }
 
-float Vehicle::getCameraDistance(float deltaTime)
+Vector3 Vehicle::getCameraDistance(float deltaTime)
 {
 	float vehicleDistance = 0;
 	Vector3 vehicleCameraDistance = Vector3(this->vehicle->getRigidBody()->getLinearVelocity().getX(), this->vehicle->getRigidBody()->getLinearVelocity().getY(), this->vehicle->getRigidBody()->getLinearVelocity().getZ());
