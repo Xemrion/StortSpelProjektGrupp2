@@ -535,20 +535,22 @@ void  PlayingGameState::update(float deltaTime)
 			powerUps.end()
 		);
 
-		if (time != 0)
+		if (time == 0)
 		{
-			prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
-			player->update(deltaTime);
-			physics->update(deltaTime);
-			accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
-			player->setAccelForce(accelForce, deltaTime);
-			player->updateWeapon(deltaTime);
-			player->setWheelRotation();
-			actorManager->update(deltaTime, playerVehicle->getPosition());
-			actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
-			camera->update(deltaTime);
-			objectives.update(player->getVehicle()->getPosition());
+			deltaTime /= 4;
 		}
+		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
+		player->update(deltaTime);
+		physics->update(deltaTime);
+		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
+		player->setAccelForce(accelForce, deltaTime);
+		player->updateWeapon(deltaTime);
+		player->setWheelRotation();
+		actorManager->update(deltaTime, playerVehicle->getPosition());
+		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
+		camera->update(deltaTime);
+		objectives.update(player->getVehicle()->getPosition());
+		
 #ifndef _DEBUG
 		updateObjects();
 #endif

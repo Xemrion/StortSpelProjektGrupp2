@@ -154,7 +154,10 @@ void Vehicle::update(float deltaTime)
 			this->respawnTimer = 0.0f;
 		}
 	}
-	
+	if (dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime() == 0)
+	{
+		this->respawnTimer = 0.0f;
+	}
 	for (int i = 0; i < (int)PowerUpType::Length; ++i)
 	{
 		powerUpTimers[i] = max(powerUpTimers[i] - deltaTime, 0.0f);
