@@ -117,7 +117,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	testNetwork.get()->saveTestNetwork("test-network");
    */
    //}
-	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 1.0f, 1.0f)));
+	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(0.76f, 0.76f, 0.76f)));
 
 	graphics.setLightList(lightList.get());
 
@@ -175,7 +175,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
-	graphics.setVectorField(4.5f, 13.0f);
+	graphics.setVectorField(4.5f, 3.0f);
 
 	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
@@ -544,20 +544,22 @@ void  PlayingGameState::update(float deltaTime)
 			powerUps.end()
 		);
 
-		if (time != 0)
+		if (time == 0)
 		{
-			prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
-			player->update(deltaTime);
-			physics->update(deltaTime);
-			accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
-			player->setAccelForce(accelForce, deltaTime);
-			player->updateWeapon(deltaTime);
-			player->setWheelRotation();
-			actorManager->update(deltaTime, playerVehicle->getPosition());
-			actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
-			camera->update(deltaTime);
-			objectives.update(player->getVehicle()->getPosition());
+			deltaTime /= 4;
 		}
+		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
+		player->update(deltaTime);
+		physics->update(deltaTime);
+		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
+		player->setAccelForce(accelForce, deltaTime);
+		player->updateWeapon(deltaTime);
+		player->setWheelRotation();
+		actorManager->update(deltaTime, playerVehicle->getPosition());
+		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
+		camera->update(deltaTime);
+		objectives.update(player->getVehicle()->getPosition());
+		
 #ifndef _DEBUG
 		updateObjects();
 #endif
