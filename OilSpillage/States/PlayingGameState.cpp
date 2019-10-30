@@ -28,7 +28,7 @@ void PlayingGameState::initAI()
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0f), currentMenu(MENU_PLAYING)
 {
-   #if _DEBUG | RELEASE_DEBUG
+   #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	   pausedTime = false;
    #endif // _DEBUG
 
@@ -468,7 +468,7 @@ void  PlayingGameState::update(float deltaTime)
 			deltaTime /= 4;
 		}
 
-#if _DEBUG | RELEASE_DEBUG
+#if defined(_DEBUG) || defined(RELEASE_DEBUG)
 		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
 		{
 			pausedTime = !pausedTime;

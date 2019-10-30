@@ -49,7 +49,7 @@ public:
 
 private:
 	friend class Game;
-   #if _DEBUG | RELEASE_DEBUG
+   #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	   bool                         pausedTime;
    #endif // _DEBUG
 	std::string                     minimap;
