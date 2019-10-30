@@ -10,7 +10,7 @@ Bullet::Bullet()
 	this->obj->setSunShadow(false);
 	this->obj->setSpotShadow(false);
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
-	this->obj->setScale(Vector3(0.25f, 0.25f, 0.25f));
+	this->obj->setScale(Vector3(0.05f, 0.25f, 0.35f));
 	this->obj->setColor(Vector4(0, 0, 0, 1));
 }
 
@@ -63,7 +63,9 @@ void Bullet::defaultShoot(Weapon& weapon, Vector3& position, Vector3& direction,
 	this->dir += additionalVelocity;
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
-	this->obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->dir)) * Vector3(0, 1, 0));
+	Vector3 tempDir = this->dir;
+	tempDir.Normalize();
+	this->obj->setRotation(Vector3(XMVector3AngleBetweenVectors(tempDir, Vector3(0.0f, 0.0f, 1.0f)) * Vector3(0, 1, 0)));
 	Game::getGraphics().addToDraw(this->obj);
 }
 
