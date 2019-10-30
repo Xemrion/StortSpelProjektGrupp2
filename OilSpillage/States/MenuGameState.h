@@ -4,6 +4,7 @@
 #include "GameState.h"
 #include "../game.h"
 #include "../UI/UserInterface.h"
+#include "../Texture.h"
 
 class MenuGameState : public GameState
 {
@@ -19,6 +20,7 @@ private:
 	Graphics& graphics;
 	std::unique_ptr<UserInterface> menues[MENUCOUNT];
 	int currentMenu;
+	Texture* textureBG;
 public:
 	MenuGameState();
 	virtual ~MenuGameState();
