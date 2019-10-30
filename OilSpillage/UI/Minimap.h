@@ -20,6 +20,7 @@ private:
 	Texture* textureOutline;
 	Texture* texturePlayerMarker;
 	Texture* textureObjectiveMarker;
+	Texture* textureEnemyMarker;
 
 public:
 	static Vector2 size;
