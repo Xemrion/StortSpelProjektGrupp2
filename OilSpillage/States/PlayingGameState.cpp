@@ -105,7 +105,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(0.76f, 0.76f, 0.76f)));
 
 	graphics.setLightList(lightList.get());
-
+	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.4f);
+	this->player->setSpotLight(lightList->addLight(tempLight));
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
 	
@@ -523,6 +524,7 @@ void  PlayingGameState::update(float deltaTime)
 		if (time == 0)
 		{
 			deltaTime /= 4;
+			this->player->setHealth(0);
 		}
 		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
 		player->update(deltaTime);

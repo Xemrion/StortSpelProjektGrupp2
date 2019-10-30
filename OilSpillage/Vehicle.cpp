@@ -43,6 +43,7 @@ Vehicle::Vehicle()
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
 	this->health = this->updatedStats.maxHealth;
+	
 }
 
 Vehicle::~Vehicle()
@@ -61,6 +62,8 @@ Vehicle::~Vehicle()
 
 void Vehicle::init(Physics *physics)
 {
+	
+
 	this->physics = physics;
 	this->mountedWeapon = new GameObject;
 	this->vehicle = new GameObject;
@@ -538,11 +541,18 @@ void Vehicle::updateWeapon(float deltaTime)
 	{
 		bullets[i].update(deltaTime);
 	}
+	this->spotLight->setPos(this->mountedWeapon->getPosition()-Vector3(curDir.x,-1,curDir.y));
+	this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
 }
 
 float Vehicle::getAcceleratorX()
 {
 	return accelerator.x;
+}
+
+void Vehicle::setSpotLight(SpotLight* theLight)
+{
+	this->spotLight = theLight;
 }
 
 void Vehicle::setDrivingMode(int i)
