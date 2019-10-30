@@ -115,7 +115,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0
 	testNetwork.get()->saveTestNetwork("test-network");
    */
    //}
-	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 1.0f, 1.0f)));
+	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(0.76f, 0.76f, 0.76f)));
 
 	graphics.setLightList(lightList.get());
 
