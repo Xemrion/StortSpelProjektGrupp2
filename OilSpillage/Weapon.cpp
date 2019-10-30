@@ -93,7 +93,6 @@ void Bullet::flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direc
 	float newRot = atan2(tempDir.x, tempDir.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
 
-
 	//Game::getGraphics().addToDraw(this->obj);
 	this->dir.y = 0.0f;
 
@@ -156,8 +155,7 @@ void Bullet::update(float deltaTime)
 
 	if (timeLeft == 0)
 	{
-		this->weaponType = WeaponType::None;
-		Game::getGraphics().removeFromDraw(this->obj);
+		destroy();
 	}
 }
 
@@ -167,11 +165,6 @@ void Bullet::defaultUpdate(float& deltaTime)
 	if (timeLeft > 0.0f)
 	{
 		obj->move(dir * min(deltaTime, timeLeft));
-		
-		if (timeLeft < deltaTime)
-		{
-			Game::getGraphics().removeFromDraw(this->obj);
-		}
 		timeLeft = max(timeLeft - deltaTime, 0.0f);
 	}
 }
@@ -187,11 +180,6 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 		
 			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-WeaponHandler::weapons[(int)weaponType].damage);
 			this->timeLeft = 0.f;
-		}
-
-		if (timeLeft < deltaTime)
-		{
-			Game::getGraphics().removeFromDraw(this->obj);
 		}
 
 		timeLeft = max(timeLeft - deltaTime, 0.0f);
@@ -221,4 +209,10 @@ int Bullet::getDamage() const
 GameObject* Bullet::getGameObject()
 {
 	return obj;
+}
+
+void Bullet::destroy()
+{
+	setWeaponType(WeaponType::None);
+	Game::getGraphics().removeFromDraw(obj);
 }
