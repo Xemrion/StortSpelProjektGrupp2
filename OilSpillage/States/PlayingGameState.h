@@ -44,8 +44,8 @@ public:
 	void removeLight(PointLight* theLight);
 	void		 moveObjects();
 	void		 updateObjects();
-
 	ActorManager* actorManager;
+	Vector3 getSpawnLocation()const;
 
 private:
 	friend class Game;
