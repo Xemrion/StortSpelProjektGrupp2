@@ -151,7 +151,6 @@ void Objective::update(Vector3 playerPosition)
 					Vector4 combineColor(color, color, color, 1.0);
 					combineColor += ptrState->getObjHandler().getTypes().getColor(this->mission->typeOfTarget);
 					this->mission->target[i]->setColor(combineColor);
-					//this->mission->target[i]->setColor(Vector4(0,0,0, 0.0));
 
 					Vector3 vecPlayerToObj = playerPosition - this->mission->target[i]->getPosition();
 					if (vecPlayerToObj.Length() < this->mission->target[i]->getScale().x * 2.0f)

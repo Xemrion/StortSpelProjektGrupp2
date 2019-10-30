@@ -24,9 +24,11 @@ void PlayingGameState::initAI()
 	//		actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
 	//	}
 	//}
-	//actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 }
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
 {
    #if _DEBUG | RELEASE_DEBUG
 	   pausedTime = false;
@@ -124,7 +126,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0
 	
 	map = std::make_unique<Map>(graphics, config, physics.get());
    map->setDistrictColorCoding( isDebugging );
-	initAI();
 	// Minimap stuff
    auto tilemap = map->getTileMap();
 	topLeft      = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
@@ -143,6 +144,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0
    auto playerVehicle = player->getVehicle();
 	playerVehicle->setPosition(             startPos + Vector3( .0f, 3.00f, .0f) );
 	player->getVehicleBody1()->setPosition( startPos + Vector3( .0f, 3.65f, .0f) );
+
+	initAI();
 
 	//testObjective = new GameObject();
 	//testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
@@ -172,7 +175,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(120.0
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
-	graphics.setVectorField(4.5f, 13.0f);
+	graphics.setVectorField(4.5f, 3.0f);
 
 	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
@@ -489,7 +492,7 @@ void  PlayingGameState::update(float deltaTime)
 		{
 			time = max(time - deltaTime, 0.0f);
 		}
-		else
+		else if(Input::checkButton(Keys::CONFIRM,States::PRESSED))
 		{
 			Game::setState(Game::STATE_MENU);
 		}
@@ -505,12 +508,12 @@ void  PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		
-		if(spawnTimer % 100 == 0)
-		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-			spawnTimer = 0;
-		}
-		spawnTimer++;
+		//if(spawnTimer % 100 == 0)
+		//{
+		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+		//	spawnTimer = 0;
+		//}
+		//spawnTimer++;
 
 		powerUps.erase(
 			std::remove_if(
@@ -532,17 +535,20 @@ void  PlayingGameState::update(float deltaTime)
 			powerUps.end()
 		);
 
+		if (time == 0)
+		{
+			deltaTime /= 4;
+		}
 		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
-		player->update(       deltaTime );
-		physics->update(      deltaTime );
+		player->update(deltaTime);
+		physics->update(deltaTime);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->updateWeapon(deltaTime);
 		player->setWheelRotation();
-		actorManager->update( deltaTime, playerVehicle->getPosition() );
+		actorManager->update(deltaTime, playerVehicle->getPosition());
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
-		camera->update(       deltaTime );
-		player->updateWeapon(deltaTime);
+		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		
 #ifndef _DEBUG
@@ -678,8 +684,7 @@ void PlayingGameState::spawnObjects()
 		graphics.loadTexture("brownPaperCardboard");
 		objPtr->setTexture(Game::getGraphics().getTexturePointer("brownPaperCardboard"));
 		Game::getGraphics().addToDraw(objPtr);
-		randomValue = rand() % 3 + 8;
-		randomValue *= 0.125f;
+		randomValue = (rand() % 3 + 8) * 0.125f;
 		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue), 0.01f);
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
 		objPtr->setScale(Vector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue));
@@ -718,8 +723,7 @@ void PlayingGameState::spawnObjects()
 		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Garbage_Bag").diffuse);
 		Game::getGraphics().addToDraw(objPtr);
 		objPtr->setPosition(Vector3(0, 0, 0));
-		randomValue = rand() % 3 + 8;
-		randomValue *= 0.125f;
+		randomValue = (rand() % 3 + 8) * 0.125f;
 		size = 0.30f *randomValue;
 		objPtr->setScale(Vector3(size, size, size));
 		tempo2 = physics->addSphere(size, btVector3(0, 0.0f, 0), 0.01f);
