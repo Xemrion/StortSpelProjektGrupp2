@@ -468,8 +468,10 @@ Vector3 PlayingGameState::getRespawnPosition() const noexcept
 {
 	auto ui = static_cast<UIPlaying const *>( menues[Menu::MENU_PLAYING].get() );
 	auto maybeHospitalTilePos = map->getNearestFoundHospitalTilePos( player->getVehicle()->getPosition(), *ui );
-	if ( maybeHospitalTilePos )
+	if ( maybeHospitalTilePos ) {
 		return map->getHospitalFrontPosition( maybeHospitalTilePos.value() );
+		// TODO: rotate player
+	}
 	else return map->getStartPositionInWorldSpace();
 }
 
@@ -921,9 +923,4 @@ void PlayingGameState::updateObjects()
 			}
 		}
 	}
-}
-
-Vector3 PlayingGameState::getSpawnLocation() const
-{
-	return this->map->getStartPositionInWorldSpace();
 }

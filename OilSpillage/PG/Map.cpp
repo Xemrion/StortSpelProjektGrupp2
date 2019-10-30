@@ -213,12 +213,18 @@ void  Map::generateBuildings( )
 					BuildingID id                 { generateBuildingID() };
 					currentArea += buildingSize;
 					for ( auto &tilePosition : potentialLot.value() ) {
-						bool isHospital;
-						if ( not hospitalTable[cellId] and (roadDistanceMap[tilemap->index(tilePosition)] == 1.0f) ) {
-							hospitalTable[cellId] = tilePosition;
-							isHospital = true;
+
+						bool isHospital = false;
+						if ( not hospitalTable[cellId] ) {
+							if (    (tilePosition.x >                   0) and (tilemap->tileAt(tilePosition.x-1, tilePosition.y   ) == Tile::road)
+							     or (tilePosition.y >                   0) and (tilemap->tileAt(tilePosition.x,   tilePosition.y-1 ) == Tile::road) 
+							     or (tilePosition.x < tilemap->width  - 1) and (tilemap->tileAt(tilePosition.x+1, tilePosition.y   ) == Tile::road) 
+							     or (tilePosition.y < tilemap->height - 1) and (tilemap->tileAt(tilePosition.x,   tilePosition.y+1 ) == Tile::road) )
+							{
+								hospitalTable[cellId] = tilePosition;
+								isHospital = true;
+							}
 						}
-						else isHospital = false;
 
 						houseTiles.emplace_back();
 						auto &houseTile = houseTiles.back();
@@ -310,7 +316,7 @@ Opt<Vector<V2u>>  Map::findValidHouseLot( RNG &rng, U16 cellId, Voronoi const &d
 	auto      isValidPosition { [&](V2u const &tilePosition ) -> Bool {
 	                               return  (districtMap.diagram[districtMap.diagramIndex(tilePosition)] != cellId)
 	                                   or (map.tileAt(tilePosition) != Tile::ground)
-                                      or (roadDistanceMap[map.index(tilePosition)] > District_getBuildingMaxDistanceFromRoad(districtType)); // TODO: refactor into config or district
+                                      or (roadDistanceMap[map.index(tilePosition)] < District_getBuildingMaxDistanceFromRoad(districtType)); // TODO: refactor into config or district
 	                            } };
 
 	U16_Dist        generateTargetSize { District_getBuildingMinArea(districtType), District_getBuildingMaxArea(districtType) };
@@ -579,7 +585,7 @@ Direction Map::getHospitalOrientation( V2u const xy ) const noexcept
 Vector3 Map::getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept
 {
    // TODO: bryt ut tileScaleFactor x/z till en float tileSideScaleFactor i MapConfig
-   F32 offsetDistance { config.tileScaleFactor.x / 3 }; 
+   F32 offsetDistance { config.tileScaleFactor.x / 1.6f }; // TODO: tune!
    auto orientation = getHospitalOrientation( hospitalTilePos );
    auto result = tilemap->convertTilePositionToWorldPosition( hospitalTilePos );
    switch ( orientation ) { 
