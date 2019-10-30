@@ -248,6 +248,7 @@ void  Map::generateBuildings( )
 							#endif
 						}
 						else { // is hospital
+							// TODO: check which neighbouring tile is the road and rotate the hospital accordingly!
 							houseTile.mesh       = graphics.getMeshPointer( "Hospital" );
 							houseTile.setMaterial( graphics.getMaterial(    "Hospital" ) );
 							houseTile.setScale({ .048f * config.tileScaleFactor.x,
