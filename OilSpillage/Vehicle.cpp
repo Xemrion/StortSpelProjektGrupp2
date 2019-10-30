@@ -75,7 +75,7 @@ void Vehicle::init(Physics *physics)
 	Material mountedWPMaterial = Game::getGraphics().getMaterial("Entities/Dummy_Turret");
 	mountedWeapon->setTexture(mountedWPMaterial.diffuse);
 	Game::getGraphics().addToDraw(mountedWeapon);
-	mountedWeapon->setScale(Vector3(0.005f));
+	mountedWeapon->setScale(Vector3(0.010f,0.007f, 0.007f));
 
 	this->vehicleBody1 = new GameObject;
 	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
@@ -492,7 +492,7 @@ void Vehicle::updateWeapon(float deltaTime)
 						auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
 						this->bullets[i].shoot(weapon,
-							this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
+							this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
 							Vector3(curDir.x, 0.0, curDir.y),
 							Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 0.5f);
 						if (soundTimer > 4.0f) {
@@ -523,10 +523,10 @@ void Vehicle::updateWeapon(float deltaTime)
 					{
 						auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
-
+						Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
 						this->bullets[i].shoot(weapon2,
-							this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
-							Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2)),
+							this->vehicleBody1->getPosition() + Vector3(tempDir*0.8f) + Vector3(0.0f,-0.5f,0.0f),
+							tempDir,
 							Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
 						break;
 					}
