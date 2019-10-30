@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AI\AIGroup.cpp" />
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\ActorManager.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
@@ -206,6 +207,7 @@
     <ClCompile Include="physics.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AI\AIGroup.h" />
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\ActorManager.h" />
     <ClInclude Include="AI\AStar.h" />

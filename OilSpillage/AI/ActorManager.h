@@ -1,7 +1,5 @@
 #pragma once
-#include "Defender.h"
-#include "Attacker.h"
-#include "Turret.h"
+#include "AIGroup.h"
 class ActorManager
 {
 public:
@@ -12,7 +10,7 @@ public:
 	void createDefender(float x,float z, Vector3 objectivePos = Vector3());
 	void createAttacker(float x, float z);
 	void createTurret(float x, float z);
-	std::vector<std::vector<Actor*>> groups;
+	std::vector<AIGroup> groups;
 	std::vector<Actor*>* findClosestGroup(Vector3 position);
 	float distanceToPlayer(Vector3 position);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
@@ -22,7 +20,6 @@ public:
 	void spawnTurrets(Vector3 playerPos);
 private:
 	int frameCount = 0;
-	float groupRadius = 6.5f * 6.5f; //Compare with distance^2
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
 	int groupInRange(Vector3 actorPos,int currentGroupSize);
@@ -34,6 +31,6 @@ private:
 	void createGroup(Actor* actor);
 	std::vector<Actor*> actors;
 	std::vector<Actor*> sendToPlayer;
-	std::vector<Vector3> averagePos;
+	std::vector<Vector3> path;
 	AStar* aStar;
 };
