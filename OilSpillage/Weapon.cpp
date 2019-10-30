@@ -59,7 +59,6 @@ void Bullet::defaultShoot(Weapon& weapon, Vector3& position, Vector3& direction,
 	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
 	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
 	this->dir *= weapon.bulletSpeed;
-	this->dir.y = 0.0f;
 
 	this->dir += additionalVelocity;
 	this->timeLeft = weapon.bulletLifetime;
@@ -94,10 +93,9 @@ void Bullet::flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direc
 	float newRot = atan2(tempDir.x, tempDir.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
 
+
+	//Game::getGraphics().addToDraw(this->obj);
 	this->dir.y = 0.0f;
-
-	Game::getGraphics().addToDraw(this->obj);
-
 
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
@@ -105,6 +103,26 @@ void Bullet::flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direc
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition()+Vector3(0,1,0),
+		this->dir,
+		1,
+		weapon.bulletLifetime + 0.5f,
+		0.25f);
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
+		this->dir,
+		1,
+		weapon.bulletLifetime + 0.5f,
+		0.25f);
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
+		this->dir,
+		1,
+		weapon.bulletLifetime + 0.5f,
+		0.25f);
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
+		this->dir,
+		1,
+		weapon.bulletLifetime + 0.5f,
+		0.25f);
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
@@ -139,6 +157,7 @@ void Bullet::update(float deltaTime)
 	if (timeLeft == 0)
 	{
 		this->weaponType = WeaponType::None;
+		Game::getGraphics().removeFromDraw(this->obj);
 	}
 }
 

@@ -520,6 +520,7 @@ void Vehicle::updateWeapon(float deltaTime)
 					{
 						auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
+
 						this->bullets[i].shoot(weapon2,
 							this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
 							Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2)),
