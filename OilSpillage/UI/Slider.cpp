@@ -3,7 +3,7 @@
 #include "..//game.h"
 #include <cassert>
 
-Vector2 Slider::size = Vector2(128, 32);
+Vector2 Slider::size = Vector2(256, 32);
 
 Slider::Slider(Vector2 position) : Element(position, 0.0f), amount(0.0f)
 {

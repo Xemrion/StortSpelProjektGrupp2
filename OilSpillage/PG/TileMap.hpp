@@ -80,6 +80,12 @@ public:
 		return tileX < width and tileY < height;
 	}
 
+	// returns true if the x,y coordinate is in-bounds
+	inline Bool  isInBounds(V2u tilePos)  const noexcept
+	{
+		return tilePos.x < width and tilePos.y < height;
+	}
+
 	inline Vector3  convertTilePositionToWorldPosition( U16 const tileX, U16 const tileY ) const {
 		Vector3 result { tileX * config.tileScaleFactor.x, 
 		                 .0f,

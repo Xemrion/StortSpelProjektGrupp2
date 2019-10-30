@@ -1,14 +1,11 @@
 #include "AStar.h"
 
-
 bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& path)
 {
-	//if (!map->isInBounds(startPos.x, startPos.z) || !map->isInBounds(endPos.x, endPos.z))
-	//{
-	//	return false;
-	//}
-	startPos = Vector3(startPos.x, startPos.y, -startPos.z);
-	endPos = Vector3(endPos.x, endPos.y, -endPos.z);
+	if (!map.isInBounds(map.convertWorldPositionToTilePositionXZ(startPos)) || !map.isInBounds(map.convertWorldPositionToTilePositionXZ(endPos)))
+	{
+		return false;
+	}
 	Vector3 startTilePos = Vector3(map.convertWorldPositionToTilePositionXZ(startPos).x,
 		0,
 		map.convertWorldPositionToTilePositionXZ(startPos).y);
@@ -25,7 +22,7 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 	open.push_back(startIndex);
 	std::vector<Size> neighbours;
 	Size curNeighbour;
-	while (!open.empty())
+	while (!open.empty() && closed.size() < 1000)
 	{
 		current = open.at(open.size() - 1);
 		if (current == goalIndex)
@@ -38,7 +35,7 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 		neighbours = map.getNeighbouringIndices(map.getTilePosByIndex(current));
 		for (int i = 0; i < neighbours.size(); i++)
 		{
-			curNeighbour = neighbours.at(i);
+			curNeighbour = neighbours[i];
 			//If it is traversable and isn't in closed
 			if (tileData.at(curNeighbour).isTraversible && !isInVector(closed, curNeighbour))
 			{
@@ -57,11 +54,9 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 					{
 						addToVector(open, curNeighbour);
 					}
-
 				}
 			}
 		}
-
 	}
 	return false;
 }
@@ -69,20 +64,20 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 AStar::~AStar()
 {
 }
-AStar::AStar(TileMap const &map):
-	map ( map )
+AStar::AStar(TileMap const& map) :
+	map(map)
 {
 }
 int AStar::getDistance(Vector3 pos1, Vector3 pos2)
 {
-	return int((pos2-pos1).Length()) * 10;
+	return int((pos2 - pos1).Length()) * 10;
 }
 
 void AStar::addToVector(std::vector<Size>& nodes, Size nodeToAdd)
 {
 	for (int i = 0; i < nodes.size(); i++)
 	{
-		if (tileData.at(nodeToAdd).fCost >= tileData.at(nodes.at(i)).fCost)
+		if (tileData.at(nodeToAdd).fCost >= tileData.at(nodes[i]).fCost)
 		{
 			nodes.insert(nodes.begin() + i, nodeToAdd);
 			return;
@@ -91,11 +86,11 @@ void AStar::addToVector(std::vector<Size>& nodes, Size nodeToAdd)
 	nodes.push_back(nodeToAdd);
 }
 
-bool AStar::isInVector(std::vector<Size> vector, Size node)
+bool AStar::isInVector(std::vector<Size>& vector, Size node)
 {
 	for (int i = 0; i < vector.size(); i++)
 	{
-		if (vector.at(i) == node)
+		if (vector[i] == node)
 		{
 			return true;
 		}
@@ -109,7 +104,7 @@ void AStar::reconstructPath(Size goalIndex, std::vector<Vector3>& path)
 	current = goalIndex;
 	while (tileData.at(current).prevIndex != -1)
 	{
-		path.push_back(map.getWorldPosByIndex(current));
+		path.emplace_back(map.getWorldPosByIndex(current));
 		current = tileData.at(current).prevIndex;
 	}
 }
@@ -118,16 +113,15 @@ void AStar::resetTileData()
 {
 	for (int i = 0; i < changedTiles.size(); i++)
 	{
-		tileData.at(changedTiles.at(i)).fCost = 0;
-		tileData.at(changedTiles.at(i)).gCost = 0;
-		tileData.at(changedTiles.at(i)).prevIndex = -1;
+		tileData.at(changedTiles[i]).fCost = 0;
+		tileData.at(changedTiles[i]).gCost = 0;
+		tileData.at(changedTiles[i]).prevIndex = -1;
 	}
 	changedTiles.clear();
-	changedTiles.shrink_to_fit();
 }
 
 void AStar::generateTileData(TileMap const& map) {
-	tileData = std::vector<TileData>{ map.width * map.height };
+	tileData = std::vector<TileData>(map.width * map.height);
 	for (auto i = 0; i < map.data.size(); ++i)
 	{
 		if (map.data[i] == Tile::building)

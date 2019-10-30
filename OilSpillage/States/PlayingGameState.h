@@ -44,8 +44,8 @@ public:
 	void removeLight(PointLight* theLight);
 	void		 moveObjects();
 	void		 updateObjects();
-
 	ActorManager* actorManager;
+	Vector3 getSpawnLocation()const;
 
 private:
 	friend class Game;
@@ -97,8 +97,8 @@ private:
 	float                           vectorFieldPower  {  4.0f };
 	float                           vectorFieldSize   {  2.2f };
 	float                           randomPosPower    {  0.5f };
-	float                           size1             { .069f };
-	float                           size2             { .133f };
+	float                           size1             { .039f };
+	float                           size2             { .063f };
 	float                           colors  [4]       {};
 	float                           colors2 [4]       {};
 	float                           colors3 [4]       {};

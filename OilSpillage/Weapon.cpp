@@ -10,8 +10,8 @@ Bullet::Bullet()
 	this->obj->setSunShadow(false);
 	this->obj->setSpotShadow(false);
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
-	this->obj->setScale(Vector3(0.25f, 0.25f, 0.25f));
-	this->obj->setColor(Vector4(0, 0, 0, 1));
+	this->obj->setScale(Vector3(0.05f, 0.25f, 0.35f));
+	this->obj->setColor(Vector4(1.2f, 1.2f, 0, 1));
 }
 
 Bullet::Bullet(WeaponType type)
@@ -63,7 +63,12 @@ void Bullet::defaultShoot(Weapon& weapon, Vector3& position, Vector3& direction,
 	this->dir += additionalVelocity;
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
-	this->obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->dir)) * Vector3(0, 1, 0));
+	Vector3 tempDir = this->dir;
+	tempDir.Normalize();
+
+	float newRot = atan2(tempDir.x, tempDir.z);
+	this->obj->setRotation(Vector3(0, newRot, 0));
+
 	Game::getGraphics().addToDraw(this->obj);
 }
 
@@ -81,29 +86,53 @@ void Bullet::flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direc
 	this->dir += additionalVelocity;
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
-	this->obj->setRotation(Vector3(XMVector3AngleBetweenVectors(Vector3(0, 0, 1), this->dir)) * Vector3(0, 1, 0));
 
+	Vector3 tempDir = this->dir;
+	tempDir.Normalize();
 
-	Game::getGraphics().addToDraw(this->obj);
+	float newRot = atan2(tempDir.x, tempDir.z);
+	this->obj->setRotation(Vector3(0, newRot, 0));
 
+	//Game::getGraphics().addToDraw(this->obj);
+	this->dir.y = 0.0f;
 
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir*2,
+		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition()+Vector3(0,1,0),
-		this->dir*2,
+		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir*2,
+		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir*2,
+		this->dir,
+		1,
+		weapon.bulletLifetime + 0.5f,
+		0.25f);
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
+		this->dir,
+		1,
+		weapon.bulletLifetime + 0.5f,
+		0.25f);
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
+		this->dir,
+		1,
+		weapon.bulletLifetime + 0.5f,
+		0.25f);
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
+		this->dir,
+		1,
+		weapon.bulletLifetime + 0.5f,
+		0.25f);
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
+		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
@@ -113,7 +142,7 @@ void Bullet::update(float deltaTime)
 {
 	if (this->weaponType == WeaponType::None)
 	{
-
+		this->obj->setPosition(Vector3(1000, 1000, 1000));
 	}
 	else if (this->weaponType == WeaponType::aiMachineGun)
 	{
@@ -124,24 +153,18 @@ void Bullet::update(float deltaTime)
 		defaultUpdate(deltaTime);
 	}
 
-	if (timeLeft == 0.0)
+	if (timeLeft == 0)
 	{
-		this->weaponType = WeaponType::None;
-		this->obj->setPosition(Vector3(1000, 1000, 0));
+		destroy();
 	}
 }
 
 void Bullet::defaultUpdate(float& deltaTime)
 {
+	this->obj->setScale(WeaponHandler::weapons[(int)this->weaponType].bulletScale);
 	if (timeLeft > 0.0f)
 	{
 		obj->move(dir * min(deltaTime, timeLeft));
-
-		if (timeLeft < deltaTime)
-		{
-			Game::getGraphics().removeFromDraw(this->obj);
-		}
-
 		timeLeft = max(timeLeft - deltaTime, 0.0f);
 	}
 }
@@ -163,11 +186,6 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-WeaponHandler::weapons[(int)weaponType].damage);
 			this->timeLeft = 0.f;
-		}
-
-		if (timeLeft < deltaTime)
-		{
-			Game::getGraphics().removeFromDraw(this->obj);
 		}
 
 		timeLeft = max(timeLeft - deltaTime, 0.0f);
@@ -202,4 +220,10 @@ GameObject* Bullet::getGameObject()
 void Bullet::updateSoundTimer(float deltaTime)
 {
 	soundTimer +=  deltaTime;
+}
+
+void Bullet::destroy()
+{
+	setWeaponType(WeaponType::None);
+	Game::getGraphics().removeFromDraw(obj);
 }

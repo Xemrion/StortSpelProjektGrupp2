@@ -13,16 +13,19 @@ Minimap::Minimap(float zoom, float fogClearRadius, Vector2 position)
 	Game::getGraphics().loadTexture("UI/mapOutline");
 	Game::getGraphics().loadTexture("UI/mapPlayerMarker");
 	Game::getGraphics().loadTexture("UI/mapObjective");
+	Game::getGraphics().loadTexture("UI/mapEnemy");
 
 	Game::getGraphics().loadTexture("UI/mapFog", false, true);
 	this->textureOutline = Game::getGraphics().getTexturePointer("UI/mapOutline");
 	this->texturePlayerMarker = Game::getGraphics().getTexturePointer("UI/mapPlayerMarker");
 	this->textureObjectiveMarker = Game::getGraphics().getTexturePointer("UI/mapObjective");
+	this->textureEnemyMarker = Game::getGraphics().getTexturePointer("UI/mapEnemy");
 
 	this->textureFogTemp = Game::getGraphics().getTexturePointer("UI/mapFog");
 	assert(textureOutline && "Texture failed to load!");
 	assert(texturePlayerMarker && "Texture failed to load!");
 	assert(textureFogTemp && "Texture failed to load!");
+	assert(textureEnemyMarker && "Texture failed to load!");
 
 	ID3D11Device* device = Game::getGraphics().getDevice();
 	ID3D11DeviceContext* deviceContext = Game::getGraphics().getDeviceContext();
@@ -133,6 +136,28 @@ void Minimap::draw(bool selected)
 	Vector3 targetMapPos;
 	Vector3 targetZoomedPos;
 	RECT targetRect;
+
+
+
+	for (int i = 0; i < static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->groups.size(); i++)
+	{
+		targetPos = static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->groups[i].getAvaragePos();
+		if ((targetPos - playerPos).Length() < 150.0f)
+		{
+			targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
+			targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
+			targetMapPos.z = this->textureMap->getHeight() - targetMapPos.z;
+			targetZoomedPos = (targetMapPos - mapCamPos) * zoomedMinimapScale;
+			targetZoomedPos.Clamp(Vector3(), Vector3(Minimap::size.x, 0, Minimap::size.y));
+			targetRect = SimpleMath::Rectangle(
+				static_cast<long>(this->position.x + targetZoomedPos.x), static_cast<long>(this->position.y + targetZoomedPos.z),
+				static_cast<long>(this->textureEnemyMarker->getWidth() * zoomedMinimapScale.x), static_cast<long>(this->textureEnemyMarker->getHeight() * zoomedMinimapScale.z)
+			);
+
+			sb->Draw(this->textureEnemyMarker->getShaderResView(), targetRect, nullptr, Colors::White, 0, this->textureEnemyMarker->getCenter());
+		}
+	}
+
 	if (state->getObjHandler().getObjective(0) != nullptr)
 	{
 		for (int i = 0; i < state->getObjHandler().getObjective(0)->getNrOfMax(); i++)
@@ -151,16 +176,16 @@ void Minimap::draw(bool selected)
 						targetZoomedPos.Clamp(Vector3(), Vector3(Minimap::size.x, 0, Minimap::size.y));
 						targetRect = SimpleMath::Rectangle(
 							static_cast<long>(this->position.x + targetZoomedPos.x), static_cast<long>(this->position.y + targetZoomedPos.z),
-							static_cast<long>(this->texturePlayerMarker->getWidth() * zoomedMinimapScale.x), static_cast<long>(this->texturePlayerMarker->getHeight() * zoomedMinimapScale.z)
+							static_cast<long>(this->textureObjectiveMarker->getWidth() * zoomedMinimapScale.x), static_cast<long>(this->textureObjectiveMarker->getHeight() * zoomedMinimapScale.z)
 						);
 
-						sb->Draw(this->textureObjectiveMarker->getShaderResView(), targetRect, nullptr, Colors::White, playerRot, this->texturePlayerMarker->getCenter());
+						sb->Draw(this->textureObjectiveMarker->getShaderResView(), targetRect, nullptr, Colors::White, 0, this->textureObjectiveMarker->getCenter());
 					}
 				}
 			}
 		}
 	}
-	//test>
+	
 	sb->Draw(this->textureOutline->getShaderResView(), this->position - Vector2(5, 5));
 	sb->Draw(this->resourceFog, mapRect, &zoomedRect);
 	sb->Draw(this->texturePlayerMarker->getShaderResView(), markerRect, nullptr, Colors::White, playerRot, this->texturePlayerMarker->getCenter());
@@ -221,4 +246,17 @@ void Minimap::update(float deltaTime)
 void Minimap::resetFog()
 {
 	CopyMemory(this->pixels, this->textureFogTemp->getData(), this->textureFogTemp->getDataSize());
+}
+
+bool Minimap::hasExplored(Vector3 worldPosition) const
+{
+	Vector3 posOnMap = Vector3::Transform(worldPosition, this->mapMatrix);
+
+	if (posOnMap.x < 0 || posOnMap.x > this->textureFogTemp->getWidth() || posOnMap.z < 0 || posOnMap.z > this->textureFogTemp->getHeight())
+	{
+		return false;
+	}
+
+	posOnMap.z = this->textureFogTemp->getHeight() - posOnMap.z;
+	return this->pixels[(static_cast<int>(posOnMap.z) * this->textureFogTemp->getWidth() + static_cast<int>(posOnMap.x)) * 4 + 3] != 255;
 }
