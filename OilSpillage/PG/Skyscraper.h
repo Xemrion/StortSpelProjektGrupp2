@@ -1,20 +1,22 @@
 #pragma once
 #include"SkyscraperFloor.h"
+#include"defs.hpp"
 
 class Skyscraper
 {
 private:
 	std::vector<SkyscraperFloor> floors;
 	std::vector<Vertex3D> mesh;
+	RNG rng { RD() () };
 	GameObject* building;
 
-	void generateSkyscraperMesh();
+	bool generateSkyscraperMesh();
 public:
-	Skyscraper(int input);
+	Skyscraper(I32 input = -1);
 	~Skyscraper();
 
-	bool generateSkyscraper(int input);
-	void saveSkyscraper(std::string name);
+	void generateSkyscraper();
+	bool saveSkyscraper(std::string name);
 	void testDraw(std::string name);
 };
 

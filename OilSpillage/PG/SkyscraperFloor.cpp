@@ -242,7 +242,7 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 				}
 			}
 		}
-		this->nrOfEdges = this->verticies.size();
+		this->nrOfEdges = int(this->verticies.size());
 
 	}
 	else {
@@ -329,6 +329,8 @@ void SkyscraperFloor::getTriangleIndices()
 			} while (backwardsUsed);
 
 			if (forwardsOffset !=  size && backwardsOffset != size) {
+				/**/
+				
 				//Make a line from backward to forward and backward to main point
 				backToFront = this->verticies[(counter + forwardsOffset) % size] - this->verticies[(counter - backwardsOffset + size) % size];
 				backToOther = this->verticies[counter] - this->verticies[(counter - backwardsOffset + size) % size];
@@ -367,9 +369,9 @@ void SkyscraperFloor::getTriangleIndices()
 					}
 				}
 				if (pointsOnMainPointSide < 2) {
-					triangleIndices.push_back((counter - backwardsOffset + int(size)) % int(size));
-					triangleIndices.push_back(counter);
-					triangleIndices.push_back((counter + forwardsOffset) % int(size));
+					triangleIndices.push_back(int(counter - backwardsOffset + int(size)) % int(size));
+					triangleIndices.push_back(int(counter));
+					triangleIndices.push_back(int(counter + forwardsOffset) % int(size));
 					usedIndices[counter] = true;
 					pointsUsed++;
 				}
@@ -392,8 +394,8 @@ std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
 {	//Strange triangles
 	std::vector<Vertex3D> meshData;
 	Vertex3D temp;
-	int uDistance = 1;
-	int vDistance = 1, counter = 0;
+	Vector2 topLeft(0, 0), topRight(1, 0), botLeft(0, 1), botRight(1, 1);
+	int counter = 0;
 	float counterPow = 0.0f, distSquared = 0.0f;
 	Vector3 lowerFirst(0.0f), lowerSecond(0.0f);
 	Vector3 normal(0.0f), line1(0.0f), line2(0.0f);
@@ -403,57 +405,46 @@ std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
 	
 		line1 = this->verticies[(i + 1) % this->nrOfEdges] - this->verticies[i];
 		line2 = lowerSecond - this->verticies[i];
-		normal = line1.Cross(line2);
-
-		/*distSquared = (pow(line1.x, 2) + pow(line1.z, 2));
-		counter = 1;
-		vDistance = -1;
-		while (vDistance == -1) {
-			counterPow = pow(counter, 2);
-			if (counterPow >= distSquared) {
-				vDistance = counter - 1;
-			}
-			counter++;
-		}*/
+		normal = line2.Cross(line1);
 
 		temp.position = this->verticies[i];
 		temp.normal = normal;
-		temp.uv = Vector2(uDistance, 0);
+		temp.uv = topRight;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = lowerFirst;
 		temp.normal = normal;
-		temp.uv = Vector2(uDistance, vDistance);
+		temp.uv = botRight;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = lowerSecond;
 		temp.normal = normal;
-		temp.uv = Vector2(0, vDistance);
+		temp.uv = botLeft;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[(i + 1) % this->nrOfEdges];
 		temp.normal = normal;
-		temp.uv = Vector2(0, 0);
+		temp.uv = topLeft;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[i];
 		temp.normal = normal;
-		temp.uv = Vector2(uDistance, 0);
+		temp.uv = topRight;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = lowerSecond;
 		temp.normal = normal;
-		temp.uv = Vector2(0, vDistance);
+		temp.uv = botLeft;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
@@ -466,6 +457,7 @@ std::vector<Vertex3D> SkyscraperFloor::getRoofVertices()
 {
 	std::vector<Vertex3D> meshData;
 	Vertex3D temp;
+	//float minUV = 1.0f / 24.0f * 3.0f, maxUV = 1.0f / 24.0f * 6.0f;
 	Vector3 normal(0.0f), line1(0.0f), line2(0.0f);
 	if (this->indices.size() == 0) {
 		this->getTriangleIndices();
@@ -477,21 +469,21 @@ std::vector<Vertex3D> SkyscraperFloor::getRoofVertices()
 
 		temp.position = this->verticies[this->indices[i]];
 		temp.normal = normal;
-		temp.uv = Vector2(0.0f, 0.0f);
+		temp.uv = Vector2(temp.position.x, 0.2);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 1]];
 		temp.normal = normal;
-		temp.uv = Vector2(1.0f, 0.0f);
+		temp.uv = Vector2(temp.position.x, 0);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 2]];
 		temp.normal = normal;
-		temp.uv = Vector2(1.0f, 1.0f);
+		temp.uv = Vector2(temp.position.x,0.2);
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
@@ -522,6 +514,11 @@ Vector3 SkyscraperFloor::getAVertex(int vertex) const //Returns the vertex in th
 Vector3 SkyscraperFloor::getCenter() const
 {
 	return this->center;
+}
+
+int SkyscraperFloor::getNrOfEdges() const
+{
+	return this->nrOfEdges;
 }
 
 void SkyscraperFloor::translate(Vector3 newCenter)

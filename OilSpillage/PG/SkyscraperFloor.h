@@ -18,6 +18,7 @@ public:
 	void unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter);
 	Vector3 getAVertex(int vertex) const;
 	Vector3 getCenter() const;
+	int getNrOfEdges() const;
 	void translate(Vector3 newCenter);
 	void translateBy(Vector3 moveBy);
 	void scale(Vector3 scaleBy);
