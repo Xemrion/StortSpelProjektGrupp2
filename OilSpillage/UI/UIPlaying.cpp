@@ -63,7 +63,6 @@ void UIPlaying::drawUI()
 
 	this->healthBar->setAmount(player->getHealth() / static_cast<float>(player->getMaxHealth()));
 	
-	Vector2 shake;
 	if (time < 11)
 	{
 		shake.x = rand() % 10 + 1;
@@ -85,9 +84,9 @@ void UIPlaying::drawUI()
 	}
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 10) + shake, colorOverTime);
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position, colorOverTime, 0, Vector2(textSize.x / 2, textSize.y / 2), timeScale);
 	
-	if (player->getRespawnTimer() > 0)
+	if (player->getRespawnTimer() > 0 && time > 0)
 	{
 		std::string respawnTime = std::to_string(int(player->getTotRespawnTime() - player->getRespawnTimer()));
 		Vector2 textSize = UserInterface::getFontArial()->MeasureString(respawnTime.c_str());
