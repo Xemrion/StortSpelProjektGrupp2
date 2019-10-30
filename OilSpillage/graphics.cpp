@@ -531,9 +531,15 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 				deviceContext->PSSetShader(nullptr, nullptr, 0);
 				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 				shadowMap.setDSun();
-				deviceContext->Draw(vertexCount, 0);
+				if (object->getSunShadow())
+				{
+					deviceContext->Draw(vertexCount, 0);
+				}
 				shadowMap.setDSpot();
-				deviceContext->Draw(vertexCount, 0);
+				if (object->getSpotShadow())
+				{
+					deviceContext->Draw(vertexCount, 0);
+				}
 			}
 		}
 	}
@@ -556,9 +562,15 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 		deviceContext->PSSetShader(nullptr, nullptr, 0);
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		shadowMap.setDSun();
-		deviceContext->Draw(vertexCount, 0);
+		if (o->getSunShadow())
+		{
+			deviceContext->Draw(vertexCount, 0);
+		}
 		shadowMap.setDSpot();
-		deviceContext->Draw(vertexCount, 0);
+		if (o->getSpotShadow())
+		{
+			deviceContext->Draw(vertexCount, 0);
+		}
 		//}
 
 	}

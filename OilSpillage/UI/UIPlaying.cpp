@@ -3,7 +3,6 @@
 #include "../game.h"
 #include "../States/PlayingGameState.h"
 #include <sstream>
-
 std::string UIPlaying::getFormattedTime()
 {
 	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
@@ -33,12 +32,17 @@ void UIPlaying::updateUI(float deltaTime)
 		this->minimap->init();
 		this->initMinimap = false;
 	}
-
+	if (this->respawnTimer >= 1.0f)
+	{
+		this->respawnTimer = 0.0f;
+	}
+	this->respawnTimer += deltaTime;
 	this->minimap->update(deltaTime);
 }
 
 void UIPlaying::drawUI()
 {
+	float time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
 	this->objHandlerPtr = &static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler();
 	std::string timeStr = this->getFormattedTime();
 	Vector2 textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
@@ -48,7 +52,21 @@ void UIPlaying::drawUI()
 	
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 10), Colors::LightPink);
+	Vector2 shake(0,0);
+	if (time < 11)
+	{
+		shake.x = rand() % 10 + 1;
+		shake.y = rand() % 10 + 1;
+		shake += Vector2(11-time);
+	}
+	
+	Vector4 colorOverTime = Vector4::Lerp(Vector4(Colors::Yellow), Vector4(Colors::Red), (20.0f-time)/20.0f);
+	if (time > 20.0f)
+	{
+		colorOverTime = Colors::Yellow;
+	}
+	
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 10) + shake, colorOverTime, 0, Vector3(0, 0, 0), Vector3(1,1,1));
 	
 	std::string rewardInfo;
 	Color color;
@@ -113,7 +131,18 @@ void UIPlaying::drawUI()
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), vecToShow.at(i).c_str(), Vector2(questPos.x + 60.0f, questPos.y + 60.0f + i*15.0f), color, 0, Vector3(0, 0, 0), Vector3(0.2, 0.2, 0.2));
 	}
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), rewardInfo.c_str(), Vector2(questPos.x + 60.0f, questPos.y + 120.0f), color, 0, Vector3(0, 0, 0), Vector3(0.2, 0.2, 0.2));
-
+	std::string respawnTime = std::to_string(int(player->getTotRespawnTime() - player->getRespawnTimer()));
+	if (player->getRespawnTimer() > 0)
+	{
+		Vector2 textSize = UserInterface::getFontArial()->MeasureString(respawnTime.c_str());
+		/*
+		a + f * (b - a);
+		fadedColor.x = lerp(startColor.x, endColor.x, time / totTime);
+		*/
+		float sizeOverT = 0.1f + ((1 - this->respawnTimer) / 1)* (1.0f - 0.1f);
+		Vector3 sizeLerp(sizeOverT);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), respawnTime.c_str(), Vector2( (SCREEN_WIDTH / 2 - textSize.x / 2),  (720 / 2 - textSize.y/2)), Colors::White, 0, Vector2(0, 0), sizeLerp);
+	}
 	this->healthBar->draw(false);
 	this->minimap->draw(false);
 	UserInterface::getSpriteBatch()->End();
@@ -123,6 +152,7 @@ UIPlaying::UIPlaying() : initMinimap(true)
 {
 	Game::getGraphics().loadTexture("UI/quest");
 	this->quest = Game::getGraphics().getTexturePointer("UI/quest");
+	this->respawnTimer = 0;
 }
 
 UIPlaying::~UIPlaying()

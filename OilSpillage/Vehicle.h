@@ -30,16 +30,22 @@ private:
 	btCollisionShape* m_wheelShape;
 
 	int health;
-
+	bool deadImpulse;
+	bool immortal;
+	float immortalTimer;
+	float respawnTimer;
+	float totRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
 
 	float timeSinceLastShot;
+	float timeSinceLastShot2;
 	Weapon weapon;
+	Weapon weapon2;
 	Weapon mountedWeaponData;
 	Stats defaultStats;
 	Stats updatedStats;
 
-	static const int bulletCount = 256;
+	static const int bulletCount = 512;
 	Bullet bullets[bulletCount];
 
 	float gunRotation;
@@ -105,6 +111,8 @@ public:
 	void resetHealth();
 	void changeHealth(int amount);
 	bool isDead() const;
+	float getTotRespawnTime()const;
+	float getRespawnTimer()const;
 
 	float getPitch(DirectX::XMVECTOR Quaternion);
 	float getYaw(DirectX::XMVECTOR Quaternion);

@@ -17,8 +17,9 @@ public:
 	float distanceToPlayer(Vector3 position);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
 
-	void spawnDefenders(std::vector<Vector3> objectives);
-	void spawnAttackers(Vector3 playerPos);
+	void spawnDefenders(Vector3 objective);
+	void spawnAttackers(Vector3 originPos);
+	void spawnTurrets(Vector3 playerPos);
 private:
 	int frameCount = 0;
 	float groupRadius = 6.5f * 6.5f; //Compare with distance^2

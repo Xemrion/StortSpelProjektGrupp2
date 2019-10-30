@@ -11,9 +11,14 @@ Vehicle::Vehicle()
 	acceleratorTempZ = 0;
 	strength = 0;
 	this->dmg = false;
+	this->deadImpulse = false;
+	this->respawnTimer = 0.0f;
+	this->totRespawnTime = 5.0f;
+	this->immortalTimer = 0.0f;
+	this->immortal = false;
 
 	targetRotation = 0.0f;
-	drivingMode = 1;
+	drivingMode = 0;
 	topSpeed = 4700;
 	this->add = 0.0f;
 	this->counter = 0.0f;
@@ -31,7 +36,10 @@ Vehicle::Vehicle()
 
 	this->curDir = Vector2(0.0f, 1.0f);//UP
 	this->timeSinceLastShot = 0.0f;
+	this->timeSinceLastShot2 = 0.0f;
+
 	this->weapon = WeaponHandler::getWeapon(WeaponType::MachineGun);
+	this->weapon2 = WeaponHandler::getWeapon(WeaponType::Flamethrower);
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
 	this->health = this->updatedStats.maxHealth;
@@ -71,6 +79,7 @@ void Vehicle::init(Physics *physics)
 
 	this->vehicleBody1 = new GameObject;
 	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
+	vehicleBody1->setSpotShadow(false);
 	Game::getGraphics().addToDraw(vehicleBody1);
 	vehicleBody1->setScale(Vector3(0.005f, 0.005f, 0.005f));	
 	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
@@ -131,7 +140,21 @@ void Vehicle::init(Physics *physics)
 
 void Vehicle::update(float deltaTime)
 {
+	if (this->deadImpulse == true && this->health <= 0)
+	{
+		this->respawnTimer += deltaTime;
+		if(this->respawnTimer>5)
+		{
+			this->resetHealth();
+			this->immortal = true;
+			this->vehicle->setPosition(Vector3(15, 2, -15));
+			this->vehicleBody1->setPosition(Vector3(15, 2+0.65f, -15));
 
+			this->deadImpulse = false;
+			this->respawnTimer = 0.0f;
+		}
+	}
+	
 	for (int i = 0; i < (int)PowerUpType::Length; ++i)
 	{
 		powerUpTimers[i] = max(powerUpTimers[i] - deltaTime, 0.0f);
@@ -146,7 +169,7 @@ void Vehicle::update(float deltaTime)
 		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate;
 		this->vehicle->setColor(Vector4(0.0, 0.0, 0.0, 1.0));
 	}
-
+	
 	tempTargetRotation = targetRotation;
 
 	//Quaternion Rotation to Euler
@@ -204,15 +227,15 @@ void Vehicle::update(float deltaTime)
 	Vector3 steering2 = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
 		Input::getStrengthL() * /*deltaTime*/0.035f * 80 * max(velocitySpeed * 0.15f, -1),
 		vehicle->getRigidBody()->getAngularVelocity().getZ());
-
+	
 	//Driving mode: Throttle and turning, realistic
 	if (drivingMode == 0) {
-		if (Input::checkButton(Keys::R_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::W)) {
+		if ((Input::checkButton(Keys::R_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::W))&&this->health>0) {
 			if (velocitySpeed < (40 * updatedStats.maxSpeed)) {
 				this->vehicle->getRigidBody()->applyImpulse(btVector3(dx* deltaTime * 160.0f * updatedStats.accelerationRate, 0, -(dy * deltaTime * 160.0f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
 			}
 		}
-		if (Input::getDirectionL().x > 0) {
+		if (Input::getDirectionL().x > 0 && this->health > 0) {
 			if (velocitySpeed > 0.0f) {
 				if (rotationDirection == true) {
 					rotateAcceleration = 0;
@@ -236,7 +259,7 @@ void Vehicle::update(float deltaTime)
 				rotationDirection = true;
 			}
 		}
-		else if (Input::getDirectionL().x < 0) {
+		else if (Input::getDirectionL().x < 0 && this->health>0) {
 			if (velocitySpeed > 0.0f) {
 				if (rotationDirection == true) {
 					rotateAcceleration = 0;
@@ -266,7 +289,7 @@ void Vehicle::update(float deltaTime)
 			vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, vehicle->getRigidBody()->getAngularVelocity().getY()/ (1 + (7.0f * deltaTime)), steering.z));
 
 		}
-		if ((Input::checkButton(Keys::L_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S)) && velocitySpeed > (-40 * updatedStats.maxSpeed)) {
+		if ((Input::checkButton(Keys::L_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S)) && velocitySpeed > (-40 * updatedStats.maxSpeed) && this->health>0) {
 			this->vehicle->getRigidBody()->applyImpulse(btVector3(-(dx* deltaTime * 160.0f * 0.7f * updatedStats.accelerationRate), 0, (dy * deltaTime * 160.0f * 0.7f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
 
 			if (velocitySpeed > 0.0f) {
@@ -284,7 +307,7 @@ void Vehicle::update(float deltaTime)
 			/*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.15f, 1),
 			vehicle->getRigidBody()->getAngularVelocity().getZ());
 
-		if (Input::getStrengthL() > 0) {
+		if (Input::getStrengthL() > 0 && this->health>0) {
 			if (velocitySpeed < 0.5f) {
 				reverseTimer += 10.0f * deltaTime;
 			}
@@ -333,11 +356,17 @@ void Vehicle::update(float deltaTime)
 				}
 			}
 		}
-		else {
+		else if(health > 0) {
 			vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (1.8f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (1.8f * deltaTime))));
 
 			rotateAcceleration /= 1.0f + 0.005f * deltaTime * 40;
 			//vehicle->addRotation(Vector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime*2 * 60 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
+			vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 120 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
+		}
+		else {
+			vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (0.6f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (0.6f * deltaTime))));
+			rotateAcceleration /= 1.0f + 0.005f * deltaTime * 40;
+			
 			vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 120 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
 		}
 
@@ -351,6 +380,9 @@ void Vehicle::update(float deltaTime)
 	Vector2 driftResistance = Vector2(-((dy / hypoC) * 4000 * deltaTime) * updatedStats.handlingRate, -(-((dx / hypoC) * 4000 * deltaTime)) * updatedStats.handlingRate);
 	if (abs(driftForce) < 250) {
 		driftResistance = driftResistance * (abs(driftForce)*0.005f);
+	}
+	if (!(health > 0)) {
+		driftResistance /= 2;
 	}
 	if (drivingMode != 2) {
 		if (Input::getStrengthL() > 0) {
@@ -393,6 +425,19 @@ void Vehicle::update(float deltaTime)
 			dmg = false;
 		}
 	}
+
+	if (this->immortal)
+	{
+		this->immortalTimer += deltaTime;
+		float sine = sin((this->immortalTimer - 0) / 0.3f) - 0.5f;
+		float color = max(sine, 0.0f);
+		this->vehicleBody1->setColor(Vector4(color, color, color, color));
+		if (this->immortalTimer > 5)
+		{
+			this->immortalTimer = 0.0f;
+			this->immortal = false;
+		}
+	}
 }
 
 void Vehicle::updateWeapon(float deltaTime)
@@ -422,15 +467,18 @@ void Vehicle::updateWeapon(float deltaTime)
 	this->mountedWeapon->setRotation(Vector3(0, newRot, 0));
 
 	this->timeSinceLastShot += deltaTime;
+	this->timeSinceLastShot2 += deltaTime;
+
 	// recoil goes from 100% to 0% in half a second
 	this->weapon.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
+	this->weapon2.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
 
 	if (Input::checkButton(Keys::R_SHOULDER, States::HELD) || Input::getStrengthRnoMouse() > 0.01f)
 	{
 		if (this->timeSinceLastShot >= this->weapon.fireRate)
 		{
 			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
-			
+
 			for (int i = 0; i < Vehicle::bulletCount; ++i)
 			{
 				if (bullets[i].getWeaponType() == WeaponType::None)
@@ -438,9 +486,9 @@ void Vehicle::updateWeapon(float deltaTime)
 					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
 					this->bullets[i].shoot(weapon,
-										   this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
-						                   Vector3(curDir.x, 0.0, curDir.y),
-						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
+						this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
+						Vector3(curDir.x, 0.0, curDir.y),
+						Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ())*0.5f);
 					if (soundTimer > 4.0f) {
 						int randomSound = rand() % 6 + 1;
 						int rand2 = rand() % 2;
@@ -451,6 +499,28 @@ void Vehicle::updateWeapon(float deltaTime)
 						Sound::PlaySoundEffect(soundEffect);
 						soundTimer = 0;
 					}
+					break;
+				}
+			}
+		}
+	}
+
+	if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
+	{
+		if (this->timeSinceLastShot2 >= this->weapon2.fireRate)
+		{
+			this->timeSinceLastShot2 = fmod(this->timeSinceLastShot2, this->weapon2.fireRate);
+			
+			for (int i = 0; i < Vehicle::bulletCount; ++i)
+			{
+				if (bullets[i].getWeaponType() == WeaponType::None)
+				{
+					auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+					this->bullets[i].shoot(weapon2,
+										   this->vehicleBody1->getPosition() + Vector3(0, 0, 0),
+						                   Vector3(cos(this->vehicleBody1->getRotation().y - 3.14/2),0,-sin(this->vehicleBody1->getRotation().y - 3.14/2)),
+						                   Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ())*0.5f);
 					break;
 				}
 			}
@@ -525,12 +595,23 @@ void Vehicle::resetHealth()
 
 void Vehicle::changeHealth(int amount)
 {
-	if (amount < 0) {
-		dmg = true;
+	if (!this->immortal)
+	{
+		if (amount < 0) {
+			dmg = true;
+		}
+		vehicleBody1->setColor(Vector4(max(vehicleBody1->getColor().x + -amount * 0.1f, 0), 0, 0, 1));
+		this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
+		Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
+		if (this->deadImpulse == false && this->health <= 0)
+		{
+			this->deadImpulse = true;
+			vehicle->getRigidBody()->applyImpulse(btVector3(this->vehicle->getRigidBody()->getLinearVelocity().getX() * 6.3f, 0, this->vehicle->getRigidBody()->getLinearVelocity().getY() * 6.3f), btVector3(0, 0, 0));
+			//vehicle->getRigidBody()->setAngularVelocity(btVector3(0,2000.0f,0));
+			Game::getGraphics().addParticle(this->vehicle->getPosition() + Vector3(0, 2, 0), Vector3(0, 0, 0), 200, 10);
+			dynamic_cast<PlayingGameState*>(Game::getCurrentState())->changeTime(-30);
+		}
 	}
-	vehicleBody1->setColor(Vector4(max(vehicleBody1->getColor().x + -amount*0.1f,0), 0, 0, 1));
-	this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
-	Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 }
 
 bool Vehicle::isDead() const
@@ -538,7 +619,17 @@ bool Vehicle::isDead() const
 	return this->health <= 0;
 }
 
-Vector3 Vehicle::getCameraDistance(float deltaTime)
+float Vehicle::getTotRespawnTime() const
+{
+	return this->totRespawnTime;
+}
+
+float Vehicle::getRespawnTimer() const
+{
+	return respawnTimer;
+}
+
+float Vehicle::getCameraDistance(float deltaTime)
 {
 	float vehicleDistance = 0;
 	Vector3 vehicleCameraDistance = Vector3(this->vehicle->getRigidBody()->getLinearVelocity().getX(), this->vehicle->getRigidBody()->getLinearVelocity().getY(), this->vehicle->getRigidBody()->getLinearVelocity().getZ());

@@ -15,7 +15,7 @@ ObjectiveHandler::ObjectiveHandler()
 
 	this->types.colors[0] = Vector4(0.7f, 1.0f, 0.3f, 1.0f);
 	this->types.colors[1] = Vector4(0.3f, 0.7f, 1.0f, 1.0f);
-	this->types.colors[2] = Vector4(0.4f, 0.2f, 0.5f, 1.0f);
+	this->types.colors[2] = Vector4(0.0f, 0.0f, 0.0f, 1.0f);
 	this->types.colors[3] = Vector4(1.0f, 0.7f, 1.0f, 1.0f);
 	Game::getGraphics().loadTexture("crate");
 	Game::getGraphics().loadTexture("crateSpec");
@@ -42,12 +42,16 @@ ObjectiveHandler::~ObjectiveHandler()
 
 }
 
-void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfTargets, std::string info, GameObject** target, Actor** enemies)
+void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfTargets, std::string info, TypeOfTarget targetType, GameObject** target, Actor** enemies)
 {
 	PlayingGameState* ptrState = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Objective *temp = new Objective;
 	temp->setType(type);
 	int typeInt = rand() % int(TypeOfTarget::Size);
+	if (targetType != TypeOfTarget::Size)
+	{
+		typeInt = int(targetType);
+	}
 	std::string typeInfo = this->types.getType(TypeOfTarget(typeInt));
 	
 	temp->setReward(rewardTime);
@@ -69,7 +73,7 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 			targets[i]->setPosition(pos);
 			targets[i]->mesh = Game::getGraphics().getMeshPointer("Cube");
 			targets[i]->setRotation(Vector3(0, (23 + 0.3f * 3.14 * (rand() % 200))-(23+0.3f*3.14*(rand()%400)),0));
-			targets[i]->setScale(Vector3(this->types.getColor(TypeOfTarget(typeInt)).z));
+			targets[i]->setScale(Vector3(min((rand()%10+1)*0.1f,0.4f)));
 			
 			if (TypeOfTarget(typeInt) == TypeOfTarget::Crate)
 			{
@@ -129,6 +133,11 @@ void ObjectiveHandler::update(Vector3 playerPos)
 			this->eventNewObj = true;
 		}
 	}
+}
+
+Type ObjectiveHandler::getTypes() const
+{
+	return this->types;
 }
 
 void ObjectiveHandler::reset()
