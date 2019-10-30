@@ -11,7 +11,7 @@ class AStar
 	struct TileData 
 	{
 		Size  gCost = 0, fCost = 0, prevIndex = -1;
-		bool  isTraversible;
+		bool  isTraversible = true;
 	};
 private:
 	int getDistance(Vector3 pos1, Vector3 pos2);
@@ -27,5 +27,4 @@ public:
 	bool algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& path);
 	~AStar();
 	AStar(TileMap const &map);
-
 };

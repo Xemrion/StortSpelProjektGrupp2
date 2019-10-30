@@ -15,7 +15,7 @@ ActorManager::~ActorManager()
 {
 	for (int i = 0; i < actors.size(); i++)
 	{
-		delete actors.at(i);
+		delete actors[i];
 	}
 	actors.clear();
 }
@@ -25,11 +25,11 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	bool hasDied = false;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		if (!actors.at(i)->isDead() && actors.at(i) != nullptr)
+		if (!actors[i]->isDead() && actors[i] != nullptr)
 		{
-			actors.at(i)->run(actors, dt, targetPos);
+			actors[i]->run(actors, dt, targetPos);
 		}
-		else if (actors.at(i)->isDead() && actors.at(i) != nullptr)
+		else if (actors[i]->isDead() && actors[i] != nullptr)
 		{
 			Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
 			if (ptr != nullptr)
@@ -46,10 +46,10 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	{
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
-			if (actors.at(i)->isDead())
+			if (actors[i]->isDead())
 			{
-				actors.at(i)->death();
-				delete actors.at(i);
+				actors[i]->death();
+				delete actors[i];
 				actors.erase(actors.begin() + i);
 			}
 		}
@@ -90,12 +90,12 @@ std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
 
 	for(int i = 0; i < this->actors.size(); i++)
 	{
-		float deltaX = position.x - this->actors.at(i)->getPosition().x;
-		float deltaZ = position.z - this->actors.at(i)->getPosition().z;
+		float deltaX = position.x - this->actors[i]->getPosition().x;
+		float deltaZ = position.z - this->actors[i]->getPosition().z;
 		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		if(distance < rangeOfPlayer)
 		{
-			sendToPlayer.push_back(actors.at(i));
+			sendToPlayer.push_back(actors[i]);
 		}
 	}
 	return &sendToPlayer;
@@ -106,8 +106,8 @@ float ActorManager::distanceToPlayer(Vector3 position)
 	float distance=0;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		float deltaX = position.x - this->actors.at(i)->getPosition().x;
-		float deltaZ = position.z - this->actors.at(i)->getPosition().z;
+		float deltaX = position.x - this->actors[i]->getPosition().x;
+		float deltaZ = position.z - this->actors[i]->getPosition().z;
 		/*if (distance > abs(max((deltaX * deltaX), (deltaZ * deltaZ)))) {*/
 			distance = max(abs(deltaX),abs(deltaZ));
 		/*}*/
@@ -167,15 +167,15 @@ void ActorManager::updateAveragePos()
 	averagePos.clear();
 	for (int i = 0; i < groups.size(); i++)
 	{
-		for (int j = 0; j < groups.at(i).size(); j++)
+		for (int j = 0; j < groups[i].size(); j++)
 		{
 			if(groups[i][j] != nullptr)
 			{
-				totalPos += groups.at(i).at(j)->getPosition();
+				totalPos += groups[i][j]->getPosition();
 			}
 		}
 
-		averagePos.push_back(totalPos / groups.at(i).size());
+		averagePos.push_back(totalPos / groups[i].size());
 	}
 }
 
@@ -185,15 +185,15 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 	int returnIndex = -1;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		Vector3 curAveragePos = averagePos.at(i);
+		Vector3 curAveragePos = averagePos[i];
 		float deltaX = actorPos.x - curAveragePos.x;
 		float deltaZ = actorPos.z - curAveragePos.z;
 		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		bool isInRange = distance <= groupRadius;
-		bool isBiggerGroup = groups.at(i).size() >= biggestGroupSize;
+		bool isBiggerGroup = groups[i].size() >= biggestGroupSize;
 		if (isInRange && isBiggerGroup)
 		{
-			biggestGroupSize = groups.at(i).size();
+			biggestGroupSize = groups[i].size();
 			returnIndex = i;
 		}
 
@@ -217,11 +217,11 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 	std::vector<Vector3> path;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		aStar->algorithm(averagePos.at(i), targetPos, path);
+		aStar->algorithm(averagePos[i], targetPos, path);
 
-		for (int j = 0; j < groups.at(i).size(); j++)
+		for (int j = 0; j < groups[i].size(); j++)
 		{
-			groups.at(i).at(j)->setPath(path);
+			groups[i][j]->setPath(path);
 		}
 	}
 }
@@ -230,16 +230,16 @@ void ActorManager::updateGroups()
 {
 	for (int i = 0; i < groups.size(); i++)
 	{
-		for (int k = 0; k < groups.at(i).size(); k++)
+		for (int k = 0; k < groups[i].size(); k++)
 		{
-			Actor* current = groups.at(i).at(k);
+			Actor* current = groups[i].at(k);
 			if (current->isDead() or current == nullptr)
 			{
 				leaveGroup(i, k);
 			}
 			else
 			{
-				Vector3 curAveragePos = averagePos.at(i);
+				Vector3 curAveragePos = averagePos[i];
 				Vector3 actorPos = current->getPosition();
 				float deltaX = actorPos.x - curAveragePos.x;
 				float deltaZ = actorPos.z - curAveragePos.z;
@@ -249,7 +249,7 @@ void ActorManager::updateGroups()
 				//Actor is outside its own groupRadius, check for other groups or create its own
 				if (distanceToOwnGroup > groupRadius)
 				{
-					int groupIndex = groupInRange(current->getPosition(), groups.at(i).size());
+					int groupIndex = groupInRange(current->getPosition(), groups[i].size());
 					//Found a group within the groupRadius
 					if (groupIndex != -1)
 					{
@@ -266,7 +266,7 @@ void ActorManager::updateGroups()
 				//If actor is inside its own group radius but is also inside another one that has more actors(encourage bigger groups)
 				else
 				{
-					int groupIndex = groupInRange(current->getPosition(), groups.at(i).size());
+					int groupIndex = groupInRange(current->getPosition(), groups[i].size());
 
 					if (groupIndex != -1 && groupIndex != i)
 					{
@@ -277,7 +277,7 @@ void ActorManager::updateGroups()
 			}
 
 		}
-		if (groups.at(i).empty())
+		if (groups[i].empty())
 		{
 			groups.erase(groups.begin() + i);
 			averagePos.erase(averagePos.begin() + i);
