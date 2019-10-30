@@ -66,6 +66,7 @@ void Vehicle::init(Physics *physics)
 
 	this->physics = physics;
 	this->mountedWeapon = new GameObject;
+	this->frontWeapon = new GameObject;
 	this->vehicle = new GameObject;
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
 	//Game::getGraphics().addToDraw(vehicle);
@@ -79,6 +80,13 @@ void Vehicle::init(Physics *physics)
 	mountedWeapon->setTexture(mountedWPMaterial.diffuse);
 	Game::getGraphics().addToDraw(mountedWeapon);
 	mountedWeapon->setScale(Vector3(0.010f,0.007f, 0.007f));
+
+	frontWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
+	Material frontWeaponMat = Game::getGraphics().getMaterial("Entities/Dummy_Turret");
+	frontWeapon->setTexture(frontWeaponMat.diffuse);
+	Game::getGraphics().addToDraw(frontWeapon);
+	frontWeapon->setScale(Vector3(0.002f, 0.005f, 0.005f));
+	frontWeapon->setColor(Vector4(0.7f, 0.7f, 0.0f, 1.0f));
 
 	this->vehicleBody1 = new GameObject;
 	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
@@ -450,6 +458,9 @@ void Vehicle::updateWeapon(float deltaTime)
 {
 
 	this->mountedWeapon->setPosition(this->vehicleBody1->getPosition());
+	Vector3 frontTempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+	this->frontWeapon->setPosition(this->vehicleBody1->getPosition()+1.15f*frontTempDir-Vector3(0.0f,1.0f,0.0f));
+	this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y+3.14/2, 0));
 	Vector2 dir = Input::getDirectionR();
 	dir.Normalize();
 	if ((dir - curDir).Length() > 0.01f)
@@ -528,7 +539,7 @@ void Vehicle::updateWeapon(float deltaTime)
 
 						Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
 						this->bullets[i].shoot(weapon2,
-							this->vehicleBody1->getPosition() + Vector3(tempDir*0.8f) + Vector3(0.0f,-0.5f,0.0f),
+							this->vehicleBody1->getPosition() + Vector3(tempDir*1.5f) + Vector3(0.0f,-0.5f,0.0f),
 							tempDir,
 							Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
 						break;

@@ -448,7 +448,7 @@ void  Map::setDistrictColorCoding( Bool useColorCoding ) noexcept
 		}
 	}
 	else {
-		static auto const  defaultColor = Vector4{ .5f, .5f, .5f, 1.0f };
+		static auto const  defaultColor = Vector4{ .0f, .0f, .0f, 1.0f };
 		for ( auto& e : houseTiles )
 			e.setColor( defaultColor );
 	}

@@ -15,6 +15,7 @@ private:
 	GameObject* vehicle;
 	btScalar mRotation;
 	GameObject* mountedWeapon;//Mounted on top of the car
+	GameObject* frontWeapon;
 	GameObject* wheel1;
 	GameObject* wheel2;
 	GameObject* wheel3;

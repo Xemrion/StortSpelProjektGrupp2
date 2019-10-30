@@ -93,7 +93,7 @@ void UIPlaying::drawUI()
 			this->respawnTimer = 0.0f;
 		}
 		float sizeOverT = 0.1f + ((1 - this->respawnTimer) / 1)* (1.0f - 0.1f);
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), respawnTime.c_str(), Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 ), Colors::Red, 0, Vector2(textSize.x / 2, textSize.y / 2), sizeOverT);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), respawnTime.c_str(), Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 ), Colors::White, 0, Vector2(textSize.x / 2, textSize.y / 2), sizeOverT);
 		Vector2 textSize2 = UserInterface::getFontArial()->MeasureString("You died");
 
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "You died", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)+Vector2(0,50.0f), Colors::Red, 0, Vector2(textSize2.x / 2, textSize2.y / 2), 1.0f);
