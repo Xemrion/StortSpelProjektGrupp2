@@ -74,6 +74,7 @@
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="UI\ObjectiveBox.cpp" />
+    <ClCompile Include="AI\AIGroup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -153,6 +154,7 @@
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
     <ClInclude Include="UI\ObjectiveBox.h" />
+    <ClInclude Include="AI\AIGroup.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
