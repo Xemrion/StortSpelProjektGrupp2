@@ -53,9 +53,10 @@ Vector<GameObject>  TileMap::loadAsModels( Graphics &graphics ) const
 			if ( tileAt(x,y) != Tile::road )
 				currentTileType += "0000";
 			else {
-				currentTileType += ((y < height-1) and (tileAt(x,y+1) == Tile::road))? '1' : '0'; // S
-				currentTileType += ((x <  width-1) and (tileAt(x+1,y) == Tile::road))? '1' : '0'; // E
 				currentTileType += ((y >        0) and (tileAt(x,y-1) == Tile::road))? '1' : '0'; // N
+				currentTileType += ((x <  width-1) and (tileAt(x+1,y) == Tile::road))? '1' : '0'; // E
+currentTileType += ((y < height-1) and (tileAt(x,y+1) == Tile::road))? '1' : '0'; // S
+				
 				currentTileType += ((x >        0) and (tileAt(x-1,y) == Tile::road))? '1' : '0'; // W
 			}
 			auto  &tile        { tiles[ index(x, y)] };
@@ -64,7 +65,7 @@ Vector<GameObject>  TileMap::loadAsModels( Graphics &graphics ) const
 			tile.setScale(Vector3{ 1.0f * config.tileScaleFactor.x,
 			                       1.0f * config.tileScaleFactor.y,
 			                       1.0f * config.tileScaleFactor.z }); // TODO: scale models instead
-			tile.setPosition(convertTilePositionToWorldPosition(x, y) - Vector3{ .0f, 1.0f, .0f } );
+			tile.setPosition(convertTilePositionToWorldPosition(x, y) - Vector3{ .0f, 1.5f, .0f } );
 		}
 	}
 	return tiles; // RVO/Copy Elision
