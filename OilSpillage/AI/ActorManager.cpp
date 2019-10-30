@@ -170,10 +170,6 @@ void ActorManager::updateAveragePos()
 	}
 }
 
-		averagePos.push_back(totalPos / groups.at(i).size());
-	}
-}
-
 int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 {
 	int biggestGroupSize = currentGroupSize;
