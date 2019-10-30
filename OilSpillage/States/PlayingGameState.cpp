@@ -535,6 +535,7 @@ void  PlayingGameState::update(float deltaTime)
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		Bullet::updateSoundTimer(deltaTime);
+		player->updateWeapon(deltaTime);
 		
 #ifndef _DEBUG
 		updateObjects();
