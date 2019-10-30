@@ -35,12 +35,8 @@ void UIPlaying::updateUI(float deltaTime)
 		this->shouldInit = false;
 	}
 
+	
 	this->respawnTimer += deltaTime;
-	if (this->respawnTimer >= 1.0f)
-	{
-		this->respawnTimer = 0.0f;
-	}
-
 	this->minimap->update(deltaTime);
 	this->objectiveBox->update(deltaTime);
 }
@@ -51,7 +47,7 @@ void UIPlaying::drawUI()
 	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
 	std::string timeStr = this->getFormattedTime();
 	Vector2 textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
-	Vector2 timeScale(1.0f, 1.0f);
+	Vector2 timeScale(0.5f, 0.5f);
 	Vector2 shake;
 	if (time < 11)
 	{
@@ -66,25 +62,42 @@ void UIPlaying::drawUI()
 	{
 		colorOverTime = Vector4::Lerp(Vector4(Colors::Yellow), Vector4(Colors::Red), (20.0f - time) / 20.0f);
 	}
-	if (time <= 0)
-	{
-		timeStr = "Game Over Press Enter to Continue";
-		textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
-		timeScale = Vector2(0.7f, 0.7f);
-		position = Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-	}
+	
 
 	this->healthBar->setAmount(player->getHealth() / static_cast<float>(player->getMaxHealth()));
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position, colorOverTime, 0, Vector2(textSize.x / 2, textSize.y / 2), timeScale);
+	if (time <= 0)
+	{
+		timeStr = "Press Enter to Continue";
+		std::string died = "Game over";
+		textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
+		Vector2 diedTxtSize = UserInterface::getFontArial()->MeasureString(died.c_str());
+		timeScale = Vector2(0.7f, 0.7f);
+		position = Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), died.c_str(), position, colorOverTime, 0, Vector2(diedTxtSize.x / 2, diedTxtSize.y / 2), timeScale);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position+Vector2(0,textSize.y), colorOverTime, 0, Vector2(textSize.x / 2, textSize.y / 2), timeScale);
+
+	}
+	else
+	{
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position, colorOverTime, 0, Vector2(textSize.x / 2, (textSize.y / 2)+60), timeScale);
+	}
 	
 	if (player->getRespawnTimer() > 0 && time > 0)
 	{
 		std::string respawnTime = std::to_string(int(player->getTotRespawnTime() - player->getRespawnTimer()));
 		Vector2 textSize = UserInterface::getFontArial()->MeasureString(respawnTime.c_str());
+		if (this->respawnTimer >= 1.0f)
+		{
+			this->respawnTimer = 0.0f;
+		}
 		float sizeOverT = 0.1f + ((1 - this->respawnTimer) / 1)* (1.0f - 0.1f);
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), respawnTime.c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, SCREEN_HEIGHT / 2 - textSize.y / 2), Colors::White, 0, Vector2(textSize.x / 2, textSize.y / 2), sizeOverT);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), respawnTime.c_str(), Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 ), Colors::White, 0, Vector2(textSize.x / 2, textSize.y / 2), sizeOverT);
+		Vector2 textSize2 = UserInterface::getFontArial()->MeasureString("You died");
+
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "You died", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)+Vector2(0,50.0f), Colors::Red, 0, Vector2(textSize2.x / 2, textSize2.y / 2), 1.0f);
+
 	}
 
 	this->healthBar->draw(false);
@@ -105,7 +118,7 @@ void UIPlaying::init()
 {
 	this->healthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 20));
 	this->minimap = std::make_unique<Minimap>(0.25f, 25.0f, Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
-	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(0, 50));
+	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(-10, 15));
 }
 
 void UIPlaying::resetMinimapFog()

@@ -20,14 +20,14 @@ void ObjectiveBox::init()
 
 void ObjectiveBox::draw(bool selected)
 {
-	UserInterface::getSpriteBatch()->Draw(this->textureQuest->getShaderResView(), this->position, nullptr, Colors::White, 0.0f, Vector2(0, 0), 0.4f);
+	UserInterface::getSpriteBatch()->Draw(this->textureQuest->getShaderResView(), this->position, nullptr, Colors::White, 0.0f, Vector2(0, 0), Vector2(0.5f,0.3f));
 
 	for (int i = 0; i < vecToShow.size(); i++)
 	{
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), vecToShow[i].c_str(), this->position + Vector2(60.0f, 60.0f + i * 15.0f), color, 0, Vector2(), 0.2f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), vecToShow[i].c_str(), this->position + Vector2(80.0f, 50.0f + i * 18.0f), color, 0, Vector2(), 0.2f);
 	}
 
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), rewardInfo.c_str(), this->position + Vector2(60.0f, 120.0f), color, 0, Vector2(), 0.2f);
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), rewardInfo.c_str(), this->position + Vector2(80.0f, 120.0f), color, 0, Vector2(), 0.2f);
 }
 
 void ObjectiveBox::update(float deltaTime)
@@ -78,7 +78,7 @@ void ObjectiveBox::update(float deltaTime)
 	{
 		sizeOfStrings += spacedString.at(i).size();
 		temp += spacedString.at(i);
-		if (sizeOfStrings >= 20)
+		if (sizeOfStrings >= 26)
 		{
 			sizeOfStrings = 0;
 			vecToShow.push_back(temp);

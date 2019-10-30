@@ -153,8 +153,8 @@ void  Map::generateBuildings( )
 	std::string buildingArr[4];
 	buildingArr[0] = "Houses/testHouse";
 	buildingArr[1] = "Houses/testHouse2";
-	buildingArr[2] = "Houses/testHouse3";
-	buildingArr[3] = "Houses/testHouse4";
+	//buildingArr[0] = "Houses/testHouse3"; //kanske
+	buildingArr[2] = "Houses/testHouse4";
 	
 	#ifdef _DEBUG
 	   U32            total_building_count{ 0 };
@@ -213,12 +213,18 @@ void  Map::generateBuildings( )
 					BuildingID id                 { generateBuildingID() };
 					currentArea += buildingSize;
 					for ( auto &tilePosition : potentialLot.value() ) {
-						bool isHospital;
-						if ( not hospitalTable[cellId] and (roadDistanceMap[tilemap->index(tilePosition)] == 1.0f) ) {
-							hospitalTable[cellId] = tilePosition;
-							isHospital = true;
+
+						bool isHospital = false;
+						if ( not hospitalTable[cellId] ) {
+							if (    (tilePosition.x >                   0) and (tilemap->tileAt(tilePosition.x-1, tilePosition.y   ) == Tile::road)
+							     or (tilePosition.y >                   0) and (tilemap->tileAt(tilePosition.x,   tilePosition.y-1 ) == Tile::road) 
+							     or (tilePosition.x < tilemap->width  - 1) and (tilemap->tileAt(tilePosition.x+1, tilePosition.y   ) == Tile::road) 
+							     or (tilePosition.y < tilemap->height - 1) and (tilemap->tileAt(tilePosition.x,   tilePosition.y+1 ) == Tile::road) )
+							{
+								hospitalTable[cellId] = tilePosition;
+								isHospital = true;
+							}
 						}
-						else isHospital = false;
 
 						houseTiles.emplace_back();
 						auto &houseTile = houseTiles.back();
@@ -226,8 +232,10 @@ void  Map::generateBuildings( )
 						tilemap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
 						if ( not isHospital ) {
-							int randomHouse = rand() % 4; // decides the house
+							int randomHouse = rand() % 3; // decides the house
 							houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
+							houseTile.setMaterial(graphics.getMaterial("Houses/testHouse"));
+
 							//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
 
 							F32 randomSize = smallProbabilityDist(rng) < smallProbability ? randomSizeDist(rng) : 1.0f;
@@ -249,6 +257,16 @@ void  Map::generateBuildings( )
 						}
 						else { // is hospital
 							// TODO: check which neighbouring tile is the road and rotate the hospital accordingly!
+							auto orientation = getHospitalOrientation( tilePosition );
+							F32 yRotation = .0f;
+							F32 constexpr pi{ 3.14156926535f };
+							switch ( orientation ) {
+								case Direction::south: { houseTile.setRotation({.0f, pi/2,   .0f}); break; } //  90 klockvis Y
+								case Direction::west:  { houseTile.setRotation({.0f, pi,     .0f}); break; } // 180 klockvis Y
+								case Direction::north: { houseTile.setRotation({.0f, pi/2*3, .0f}); break; } // 270 klockvis Y
+								case Direction::east: { break; } // no need to rotate
+								default: assert( false and "BUG! Unaccounted for direction" );
+							}
 							houseTile.mesh       = graphics.getMeshPointer( "Hospital" );
 							houseTile.setMaterial( graphics.getMaterial(    "Hospital" ) );
 							houseTile.setScale({ .048f * config.tileScaleFactor.x,
@@ -301,7 +319,7 @@ Opt<Vector<V2u>>  Map::findValidHouseLot( RNG &rng, U16 cellId, Voronoi const &d
 	auto      isValidPosition { [&](V2u const &tilePosition ) -> Bool {
 	                               return  (districtMap.diagram[districtMap.diagramIndex(tilePosition)] != cellId)
 	                                   or (map.tileAt(tilePosition) != Tile::ground)
-                                      or (roadDistanceMap[map.index(tilePosition)] > District_getBuildingMaxDistanceFromRoad(districtType)); // TODO: refactor into config or district
+                                      or (roadDistanceMap[map.index(tilePosition)] < District_getBuildingMaxDistanceFromRoad(districtType)); // TODO: refactor into config or district
 	                            } };
 
 	U16_Dist        generateTargetSize { District_getBuildingMinArea(districtType), District_getBuildingMaxArea(districtType) };
@@ -430,7 +448,7 @@ void  Map::setDistrictColorCoding( Bool useColorCoding ) noexcept
 		}
 	}
 	else {
-		static auto const  defaultColor = Vector4{ .5f, .5f, .5f, 1.0f };
+		static auto const  defaultColor = Vector4{ .0f, .0f, .0f, 1.0f };
 		for ( auto& e : houseTiles )
 			e.setColor( defaultColor );
 	}
@@ -467,7 +485,11 @@ void Map::generateRoadDistanceMap() noexcept
 		return F32(a.x) * a.x * b.x * b.x * a.y * a.y * b.y * b.y;
 	};
 
-	auto &distance_f = manhattanDistance;
+	auto euclideanDistance = []( V2u const &a, V2u const &b ) {
+		return std::sqrt( F32(a.x) * a.x * b.x * b.x * a.y * a.y * b.y * b.y);
+	};
+
+	auto &distance_f = euclideanDistance;
 
 	V2u centerPos;
 	for ( centerPos.x = 0;  centerPos.x < static_cast<U16>(config.dimensions.x);  ++centerPos.x ) {
@@ -523,4 +545,57 @@ Map::BuildingID  Map::generateBuildingID() noexcept
 Vector<Opt<V2u>> const &Map::getHospitalTable() const noexcept
 {
 	return hospitalTable;
+}
+
+
+Opt<V2u> Map::getNearestFoundHospitalTilePos( Vector3 const &sourceWorldPos, UIPlaying const &ui ) const noexcept
+{
+   Opt<V2u> bestMatch;
+   F32      bestDistanceSqr;
+   for ( auto const &maybeHospitalTilePos : hospitalTable ) {
+      if ( maybeHospitalTilePos ) {
+         auto hospitalTilePos  = maybeHospitalTilePos.value();
+         auto hospitalWorldPos    = tilemap->convertTilePositionToWorldPosition(hospitalTilePos);
+         if ( ui.hasExploredOnMinimap(hospitalWorldPos) ) {
+            auto hospitalDistanceSqr = Vector3::DistanceSquared( sourceWorldPos, hospitalWorldPos );
+            if ( !bestMatch ) { // first match case
+               bestMatch       = maybeHospitalTilePos;
+               bestDistanceSqr = hospitalDistanceSqr;
+            }
+            else if ( hospitalDistanceSqr < bestDistanceSqr ) {
+               bestDistanceSqr = hospitalDistanceSqr;
+               bestMatch       = maybeHospitalTilePos;
+            }
+         }
+      }
+   }
+   return bestMatch;
+}
+
+Direction Map::getHospitalOrientation( V2u const xy ) const noexcept
+{
+   if      ( (xy.y < tilemap->height-1) and (tilemap->tileAt(xy.x, xy.y+1) == Tile::road) )
+      return Direction::south;
+   else if ( (xy.x < tilemap->width-1)  and (tilemap->tileAt(xy.x+1, xy.y) == Tile::road) )
+      return Direction::east;
+   else if ( (xy.x > 0) and (tilemap->tileAt(xy.x-1, xy.y) == Tile::road) )
+      return Direction::west;
+   else if ( (xy.y > 0) and (tilemap->tileAt(xy.x, xy.y-1) == Tile::road) )
+      return Direction::north;
+   else assert( false and "Invalid hospital position!" );
+}
+
+Vector3 Map::getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept
+{
+   // TODO: bryt ut tileScaleFactor x/z till en float tileSideScaleFactor i MapConfig
+   F32 offsetDistance { config.tileScaleFactor.x / 1.6f }; // TODO: tune!
+   auto orientation = getHospitalOrientation( hospitalTilePos );
+   auto result = tilemap->convertTilePositionToWorldPosition( hospitalTilePos );
+   switch ( orientation ) { 
+      case Direction::south: result += Vector3(  .0f, .0f,  -offsetDistance ); break;
+      case Direction::west:  result += Vector3( -offsetDistance, .0f, .0f  ); break;
+      case Direction::east:  result += Vector3(  offsetDistance, .0f, .0f  ); break;
+      case Direction::north: result += Vector3(  .0f, .0f, offsetDistance ); break;
+   }
+   return result;
 }

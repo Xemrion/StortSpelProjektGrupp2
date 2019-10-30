@@ -7,6 +7,7 @@
 #include "RoadGenerator.hpp"
 #include "Voronoi.hpp"
 #include "District.hpp"
+#include "../UI/UIPlaying.h"
 
 class Map {
 public:
@@ -24,6 +25,9 @@ public:
 	Voronoi const   &getDistrictMap() const noexcept;
 // TODO: refactor out
 	Vector<Opt<V2u>> const &getHospitalTable() const noexcept;
+	Opt<V2u>         getNearestFoundHospitalTilePos( Vector3 const &sourceWorldPos, UIPlaying const & ) const noexcept;
+	Direction        getHospitalOrientation(   V2u const hospitalTilePos ) const noexcept;
+	Vector3          getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept;
 
 private:
 	void             generateDistricts();
