@@ -136,6 +136,28 @@ void Minimap::draw(bool selected)
 	Vector3 targetMapPos;
 	Vector3 targetZoomedPos;
 	RECT targetRect;
+
+
+
+	for (int i = 0; i < static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->groups.size(); i++)
+	{
+		targetPos = static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->groups[i].getAvaragePos();
+		if ((targetPos - playerPos).Length() < 150.0f)
+		{
+			targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
+			targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
+			targetMapPos.z = this->textureMap->getHeight() - targetMapPos.z;
+			targetZoomedPos = (targetMapPos - mapCamPos) * zoomedMinimapScale;
+			targetZoomedPos.Clamp(Vector3(), Vector3(Minimap::size.x, 0, Minimap::size.y));
+			targetRect = SimpleMath::Rectangle(
+				static_cast<long>(this->position.x + targetZoomedPos.x), static_cast<long>(this->position.y + targetZoomedPos.z),
+				static_cast<long>(this->textureEnemyMarker->getWidth() * zoomedMinimapScale.x), static_cast<long>(this->textureEnemyMarker->getHeight() * zoomedMinimapScale.z)
+			);
+
+			sb->Draw(this->textureEnemyMarker->getShaderResView(), targetRect, nullptr, Colors::White, 0, this->textureEnemyMarker->getCenter());
+		}
+	}
+
 	if (state->getObjHandler().getObjective(0) != nullptr)
 	{
 		for (int i = 0; i < state->getObjHandler().getObjective(0)->getNrOfMax(); i++)
@@ -161,25 +183,6 @@ void Minimap::draw(bool selected)
 					}
 				}
 			}
-		}
-	}
-
-	for (int i = 0; i < static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->groups.size(); i++)
-	{
-		targetPos = static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->groups[i].getAvaragePos();
-		if ((targetPos - playerPos).Length() < 150.0f)
-		{
-			targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
-			targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
-			targetMapPos.z = this->textureMap->getHeight() - targetMapPos.z;
-			targetZoomedPos = (targetMapPos - mapCamPos) * zoomedMinimapScale;
-			targetZoomedPos.Clamp(Vector3(), Vector3(Minimap::size.x, 0, Minimap::size.y));
-			targetRect = SimpleMath::Rectangle(
-				static_cast<long>(this->position.x + targetZoomedPos.x), static_cast<long>(this->position.y + targetZoomedPos.z),
-				static_cast<long>(this->textureEnemyMarker->getWidth() * zoomedMinimapScale.x), static_cast<long>(this->textureEnemyMarker->getHeight() * zoomedMinimapScale.z)
-			);
-
-			sb->Draw(this->textureEnemyMarker->getShaderResView(), targetRect, nullptr, Colors::White, 0, this->textureEnemyMarker->getCenter());
 		}
 	}
 	

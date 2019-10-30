@@ -35,12 +35,8 @@ void UIPlaying::updateUI(float deltaTime)
 		this->shouldInit = false;
 	}
 
+	
 	this->respawnTimer += deltaTime;
-	if (this->respawnTimer >= 1.0f)
-	{
-		this->respawnTimer = 0.0f;
-	}
-
 	this->minimap->update(deltaTime);
 	this->objectiveBox->update(deltaTime);
 }
@@ -83,6 +79,10 @@ void UIPlaying::drawUI()
 	{
 		std::string respawnTime = std::to_string(int(player->getTotRespawnTime() - player->getRespawnTimer()));
 		Vector2 textSize = UserInterface::getFontArial()->MeasureString(respawnTime.c_str());
+		if (this->respawnTimer >= 1.0f)
+		{
+			this->respawnTimer = 0.0f;
+		}
 		float sizeOverT = 0.1f + ((1 - this->respawnTimer) / 1)* (1.0f - 0.1f);
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), respawnTime.c_str(), Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, SCREEN_HEIGHT / 2 - textSize.y / 2), Colors::White, 0, Vector2(textSize.x / 2, textSize.y / 2), sizeOverT);
 	}
@@ -103,7 +103,7 @@ UIPlaying::~UIPlaying()
 
 void UIPlaying::init()
 {
-	this->healthBar = std::make_unique<Slider>(Vector2(10, 10));
+	this->healthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 20));
 	this->minimap = std::make_unique<Minimap>(0.25f, 25.0f, Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
 	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(0, 50));
 }

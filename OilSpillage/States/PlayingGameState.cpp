@@ -12,21 +12,6 @@ void PlayingGameState::initAI()
 	aStar = new AStar( map->getTileMap() );
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-
-	//actorManager->createTurret(0 + 2, 0 - 2);
-	//actorManager->createTurret(0 + 2, 0 + 4);
-	//actorManager->createTurret(0 + 2, 0 - 4);
-
-	//for (int i = 0; i < 10; i++)
-	//{
-	//	for (int j = 0; j < 5; j++)
-	//	{
-	//		actorManager->createAttacker(static_cast<float>(i*2), static_cast<float>(j*2));
-	//	}
-	//}
-	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 }
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
 {
@@ -519,12 +504,12 @@ void  PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		
-		//if(spawnTimer % 100 == 0)
-		//{
-		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-		//	spawnTimer = 0;
-		//}
-		//spawnTimer++;
+		if(spawnTimer % 200 == 0)
+		{
+			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+			spawnTimer = 0;
+		}
+		spawnTimer++;
 
 		powerUps.erase(
 			std::remove_if(
@@ -555,12 +540,13 @@ void  PlayingGameState::update(float deltaTime)
 		physics->update(deltaTime);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
-		player->updateWeapon(deltaTime);
 		player->setWheelRotation();
 		actorManager->update(deltaTime, playerVehicle->getPosition());
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
+		Bullet::updateSoundTimer(deltaTime);
+		player->updateWeapon(deltaTime);
 		
 #ifndef _DEBUG
 		updateObjects();
@@ -589,11 +575,11 @@ void  PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos( spotlightPos );
 		
-		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 50.0f && soundAggro < 1.0f) {
+		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) {
 			soundAggro += 0.2f * deltaTime;
 		}
 		else if(soundAggro > 0.0f) {
-			soundAggro -= 0.15f * deltaTime;
+			soundAggro -= 0.1f * deltaTime;
 		}
 		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);
 
@@ -624,18 +610,18 @@ void  PlayingGameState::update(float deltaTime)
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 	
-//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-//	   ImGui_ImplDX11_NewFrame();
-//	   ImGui_ImplWin32_NewFrame();
-//	   ImGui::NewFrame();
-//	   ImGui_Driving();
-//	   ImGui_ProcGen();
-//	   ImGui_AI();
-//	   ImGui_Particles();
-//	   ImGui_Camera();
-//	   ImGui::Render();
-//	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-//#endif // !_DEBUG
+#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	   /*ImGui_ImplDX11_NewFrame();
+	   ImGui_ImplWin32_NewFrame();
+	   ImGui::NewFrame();
+	   ImGui_Driving();
+	   ImGui_ProcGen();
+	   ImGui_AI();
+	   ImGui_Particles();
+	   ImGui_Camera();
+	   ImGui::Render();
+	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());*/
+#endif // !_DEBUG
 	
 	graphics.presentScene();
 }
@@ -684,10 +670,10 @@ void PlayingGameState::spawnObjects()
 	Game::getGraphics().loadModel("Entities/Barrel");
 	Game::getGraphics().loadModel("Entities/Garbage_Bag");
 	physicsObjID = 0;
-	physicsObjects.reserve(50);
+	physicsObjects.reserve(300);
 	btRigidBody* tempo2;
 	float randomValue;
-	for (int i = 0; i < 12; i++) {
+	for (int i = 0; i < 20; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
 		Game::getGraphics().loadModel("Cube");
@@ -709,7 +695,7 @@ void PlayingGameState::spawnObjects()
 		  randomValue  = 0;
 	float randomValue2 = 0;
 	float randomValue3 = 0;
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 15; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
 		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
@@ -727,7 +713,7 @@ void PlayingGameState::spawnObjects()
 		objPtr->getRigidBody()->setActivationState(0);
 		objPtr->getRigidBody()->setDeactivationTime(0.1f);
 	}
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 15; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
 		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Garbage_Bag");
@@ -746,23 +732,20 @@ void PlayingGameState::spawnObjects()
 		objPtr->getRigidBody()->setActivationState(0);
 		objPtr->getRigidBody()->setDeactivationTime(0.1f);
 	}
-	for (int i = 0; i < 22; i++) {
+	for (int i = 0; i < 250; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
 		Game::getGraphics().loadModel("Cube");
 		objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
 		Game::getGraphics().addToDraw(objPtr);
-		objPtr->setScale(Vector3(0.12f, 0.01f, 0.19f));
-		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.12f, 0.08f, 0.19f), 0.01f);
+		size = rand() % 3 + 8;
+		size *= 0.125f;
+		randomValue = randomValue = (rand() % 5) * 0.125f;
+		objPtr->setScale(Vector3(0.12f*size, 0.01f, 0.19f*size));
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
-		objPtr->setColor(Vector4(1, 1, 1, 1));
-		objPtr->setRigidBody(tempo2, physics.get());
-		objPtr->getRigidBody()->setDamping(0.93f, 0.94f);
-		objPtr->getRigidBody()->setFriction(0.8f);
-		objPtr->getRigidBody()->setGravity(btVector3(0,-2.5f,0));
-		objPtr->getRigidBody()->setRestitution(0.8f);
-		objPtr->getRigidBody()->setActivationState(0);
-		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+		objPtr->setColor(Vector4(1-randomValue, 1-randomValue, 1-randomValue, 1));
+		objPtr->setSpotShadow(false);
+		objPtr->setSunShadow(false);
 	}
 
 	//physicsObjects.emplace_back(std::make_unique<GameObject>());
@@ -821,39 +804,47 @@ void PlayingGameState::moveObjects()
 		object->getPosition().x < (player->getVehicle()->getPosition().x - 50) ||
 		object->getPosition().z > (player->getVehicle()->getPosition().z + 35) ||
 		object->getPosition().z < (player->getVehicle()->getPosition().z - 35)) {
-		object->getRigidBody()->setActivationState(0);
+		if (object->getRigidBody() != nullptr) {
+			object->getRigidBody()->setActivationState(0);
+		}
 		int randomValue = rand() % 2+1;
 		if (randomValue == 1) {
 			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getZ() > 0) {
 				//Top
 				randomValue = rand() % 100 + 1 - 50;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z + 35));
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -1.5f, player->getVehicle()->getPosition().z + 35));
 			}
 			else {
 				//Bottom
 				randomValue = rand() % 100 + 1 - 50;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -0.5f, player->getVehicle()->getPosition().z - 35));
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -1.5f, player->getVehicle()->getPosition().z - 35));
 			}
 		}else if(randomValue == 2){
 			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getX() < 0) {
 				//Left
 				randomValue = rand() % 50 + 1 - 25;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x - 50, -0.5f, player->getVehicle()->getPosition().z + randomValue));
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x - 50, -1.5f, player->getVehicle()->getPosition().z + randomValue));
 			}
 			else {
 				//Right
 				randomValue = rand() % 50 + 1 - 25;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x + 50, -0.5f, player->getVehicle()->getPosition().z + randomValue));
+				object->setPosition(Vector3(player->getVehicle()->getPosition().x + 50, -1.5f, player->getVehicle()->getPosition().z + randomValue));
 			}
 		}
 		randomValue = rand() % 360 + 1;
 		int randomValue2 = 0;
-		if (object->getScale().x != 0.12f) {
+		if (object->getRigidBody() != nullptr) {
 			randomValue2 = rand() % 2;
 		}
 		Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(randomValue2 * 90 * XM_PI / 180, randomValue * XM_PI/180, 0));
 		btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);
-		object->getRigidBody()->getWorldTransform().setRotation(qt);
+		if (object->getRigidBody() != nullptr) {
+			object->getRigidBody()->getWorldTransform().setRotation(qt);
+		}
+		else {
+			object->setRotation(Vector3(randomValue2 * 90 * XM_PI / 180, randomValue * XM_PI / 180, 0));
+		}
+
 	}
 	physicsObjID++;
 	if (physicsObjID >= physicsObjects.size()) {
