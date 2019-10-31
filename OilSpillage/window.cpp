@@ -2,6 +2,7 @@
 #include"Mouse.h"
 #include"Keyboard.h"
 #include "Sound.h"
+#include "Input.h"
 #include"ImGui/imgui.h"
 #include <Dbt.h>
 #include <Audio.h>
@@ -76,7 +77,6 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		break;
 
 		
-
 	case WM_INPUT:
 	case WM_MOUSEMOVE:
 	case WM_LBUTTONDOWN:
@@ -115,6 +115,11 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 				}
 			}
 		}
+		break;
+	case WM_SIZE:
+		int height = static_cast<int>(lParam >> 16);
+		int width = static_cast<int>(lParam & 0xFFFF);
+		Input::setWindowSize(width, height);
 		break;
 	}
 

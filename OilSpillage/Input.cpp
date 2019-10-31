@@ -508,6 +508,15 @@ float Input::getStrengthRnoMouse()
 	return strength;
 }
 
+void Input::setWindowSize(int width, int height)
+{
+	if (instance.get())
+	{
+		instance->wWidth = width;
+		instance->wHeight = height;
+	}
+}
+
 bool Input::checkButtonMouse(MouseKeys key, States state)
 {
 	Mouse::ButtonStateTracker::ButtonState buttonState = static_cast<Mouse::ButtonStateTracker::ButtonState>(state);

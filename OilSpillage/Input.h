@@ -88,6 +88,7 @@ public:
 	static float getStrengthR(/*int player*/);
 	static float getStrengthRnoMouse(/*int player*/);
 
+	static void setWindowSize(int width, int height);
 	static bool checkButtonMouse(MouseKeys key, States state);
 	static Vector2 getMousePosition();
 
