@@ -24,10 +24,10 @@ void ObjectiveBox::draw(bool selected)
 
 	for (int i = 0; i < vecToShow.size(); i++)
 	{
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), vecToShow[i].c_str(), this->position + Vector2(65.0f, 60.0f + i * 18.0f), color, 0, Vector2(), 0.5f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), vecToShow[i].c_str(), this->position + Vector2(65.0f, 60.0f + i * 18.0f), color, 0, Vector2(), 0.20f);
 	}
 
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), rewardInfo.c_str(), this->position + Vector2(65.0f, 120.0f), color, 0, Vector2(), 0.5f);
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), rewardInfo.c_str(), this->position + Vector2(65.0f, 120.0f), color, 0, Vector2(), 0.20f);
 }
 
 void ObjectiveBox::update(float deltaTime)
