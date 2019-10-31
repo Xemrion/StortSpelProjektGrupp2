@@ -100,11 +100,11 @@ void UIPlaying::drawUI()
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "You died", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)+Vector2(0,50.0f), Colors::Red, 0, Vector2(textSize2.x / 2, textSize2.y / 2), 1.0f);
 
 	}
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Press Q to change driving mode", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(250, -340.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.21f);
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Press Q to change driving mode", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(400, -340.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.41f);
 	if (player->getDrivingMode() == 1) {
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Arcade", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(250, -300.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.21f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Arcade", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(400, -300.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.41f);
 	}else if (player->getDrivingMode() == 0) {
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Realistic", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(250, -300.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.21f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Realistic", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(400, -300.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.41f);
 	}
 	
 	this->healthBar->draw(false);
