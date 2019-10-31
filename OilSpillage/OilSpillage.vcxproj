@@ -195,6 +195,7 @@
     <ClCompile Include="UI\Minimap.cpp" />
     <ClCompile Include="UI\ObjectiveBox.cpp" />
     <ClCompile Include="UI\Slider.cpp" />
+    <ClCompile Include="UI\UIControls.cpp" />
     <ClCompile Include="UI\UICredits.cpp" />
     <ClCompile Include="UI\UIMainMenu.cpp" />
     <ClCompile Include="UI\UIOptions.cpp" />
@@ -273,6 +274,7 @@
     <ClInclude Include="UI\Minimap.h" />
     <ClInclude Include="UI\ObjectiveBox.h" />
     <ClInclude Include="UI\Slider.h" />
+    <ClInclude Include="UI\UIControls.h" />
     <ClInclude Include="UI\UICredits.h" />
     <ClInclude Include="UI\UIMainMenu.h" />
     <ClInclude Include="UI\UIOptions.h" />
