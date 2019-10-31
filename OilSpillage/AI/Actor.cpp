@@ -52,7 +52,8 @@ void Actor::update(float dt, Vector3 targetPos)
 	}
 
 	//this->root->func();
-	followPath();
+	//followPath();
+	destination = targetPos;
 
 	nrOfFrames++;
 }
@@ -365,7 +366,7 @@ void Actor::updateBoid(float deltaTime)
 	{
 		velocity /= velocity.Length();
 	}
-	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 3;
+	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 4;
 	Vector3 targetToSelf = (temp - position);
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)
