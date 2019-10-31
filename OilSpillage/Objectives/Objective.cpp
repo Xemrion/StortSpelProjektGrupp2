@@ -190,8 +190,8 @@ void Objective::update(Vector3 playerPosition)
 				GOptr->setPosition(Vector3(randPos.x,yPos,randPos.z));
 				Game::getGraphics().addToDraw(GOptr);
 				static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->spawnDefenders(GOptr->getPosition());
-				static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->spawnTurrets(GOptr->getPosition(), ActorManager::Radius::CLOSE, 0);
-				static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->spawnTurrets(GOptr->getPosition(), ActorManager::Radius::CLOSE, 50);
+				//static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->spawnTurrets(GOptr->getPosition(), ActorManager::Radius::CLOSE, 0);
+				//static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->spawnTurrets(GOptr->getPosition(), ActorManager::Radius::CLOSE, 50);
 			}
 		}
 	}
