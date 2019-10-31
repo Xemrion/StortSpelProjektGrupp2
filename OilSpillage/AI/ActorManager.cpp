@@ -159,13 +159,51 @@ void ActorManager::spawnAttackers(Vector3 originPos)
 	}
 }
 
-void ActorManager::spawnTurrets(Vector3 playerPos)
+void ActorManager::spawnTurrets(Vector3 position, Radius radius, float angle)
 {
-	//createAttacker(playerPos.x+20, playerPos.z);
-	//createAttacker(playerPos.x+10, playerPos.z-10);
-	//createAttacker(playerPos.x+10, playerPos.z-20);
+	if (angle != 0)
+	{
+		Vector2& newPosition = generateAroundaPoint(position.x, position.z, angle);
+		createTurret(newPosition.x, newPosition.y);
+	}
+	else
+	{
+		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
+		createTurret(newPosition.x, newPosition.y);
+	}
+}
+Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)
+{
+	/*blocksize 10, 4* 10 w, 3 * 10 l */
+	Vector2 newPosition;
 
-	
+	if (radius == Radius::CLOSE)
+	{// max + min ( from min to max )
+		newPosition.x = rand() % 10 + (x + 2);
+		newPosition.y = rand() % 10 + (z + 2);
+	}
+	else if (radius == Radius::MIDDLE)
+	{
+		newPosition.x = rand() % 40 + (x + 2 + 10);
+		newPosition.y = rand() % 40 + (z + 2 + 10);
+	}
+	else if (radius == Radius::OUTER)
+	{
+		newPosition.x = rand() % 60 + (x + 40);
+		newPosition.y = rand() % 60 + (z + 40);
+	}
+	return newPosition;
+
+}
+
+Vector2& ActorManager::generateAroundaPoint(const float& x, const float& z, float angle)
+{
+
+	float radians = angle * (3.14f / 180.f);
+	Vector2 newPosition;
+	newPosition.x = x + (cos(radians) * x + sin(radians) * z);
+	newPosition.y = z + (cos(radians) * x - sin(radians) * z);
+	return newPosition;
 }
 
 void ActorManager::updateAveragePos()

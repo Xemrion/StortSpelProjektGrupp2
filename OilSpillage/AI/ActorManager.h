@@ -6,6 +6,7 @@ public:
 	ActorManager();
 	ActorManager(AStar* aStar);
 	~ActorManager();
+	enum Radius { CLOSE, MIDDLE, OUTER };
 	void update(float dt, Vector3 targetPos);
 	void createDefender(float x,float z, Vector3 objectivePos = Vector3());
 	void createAttacker(float x, float z);
@@ -17,7 +18,9 @@ public:
 
 	void spawnDefenders(Vector3 objective);
 	void spawnAttackers(Vector3 originPos);
-	void spawnTurrets(Vector3 playerPos);
+	void spawnTurrets(Vector3 position, Radius radius, float angle);
+	Vector2& generateRandom(const float& x, const float& z, Radius radius);
+	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
 private:
 	float soundTimer;
 	int frameCount = 0;
