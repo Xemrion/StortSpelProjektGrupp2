@@ -60,28 +60,30 @@ void Actor::update(float dt, Vector3 targetPos)
 void Actor::updateWeapon(float deltaTime)
 {
 	this->timeSinceLastShot += deltaTime;
-
-	if (this->timeSinceLastShot >= this->weapon.fireRate)
+	if((position - targetPos).Length() < 23)
 	{
-		this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
-
-		for (int i = 0; i < Actor::bulletCount; i++)
+		if (this->timeSinceLastShot >= this->weapon.fireRate)
 		{
-			if (bullets[i].getTimeLeft() == 0.0)
-			{
-				Vector3 dir = (targetPos - this->position);
-				dir.Normalize();
-				Vector3 bulletOrigin = this->position + dir;
-				dir = (targetPos - bulletOrigin);
+			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
 
-				this->bullets[i].setWeaponType(this->weapon.type);
-				this->bullets[i].shoot(
-					weapon,
-					bulletOrigin,
-					dir,
-					this->velocity
-				);
-				break;
+			for (int i = 0; i < Actor::bulletCount; i++)
+			{
+				if (bullets[i].getTimeLeft() == 0.0)
+				{
+					Vector3 dir = (targetPos - this->position);
+					dir.Normalize();
+					Vector3 bulletOrigin = this->position + dir;
+					dir = (targetPos - bulletOrigin);
+
+					this->bullets[i].setWeaponType(this->weapon.type);
+					this->bullets[i].shoot(
+						weapon,
+						bulletOrigin,
+						dir,
+						this->velocity
+					);
+					break;
+				}
 			}
 		}
 	}
