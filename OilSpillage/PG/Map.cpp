@@ -150,11 +150,12 @@ void  Map::generateBuildings( )
 	F32_Dist smallProbabilityDist {};
 
 	//Array of possible buildings
-	std::string buildingArr[4];
+	std::string buildingArr[5];
 	buildingArr[0] = "Houses/testHouse";
 	buildingArr[1] = "Houses/testHouse2";
-	//buildingArr[0] = "Houses/testHouse3"; //kanske
-	buildingArr[2] = "Houses/testHouse4";
+	buildingArr[2] = "Houses/testHouse3";
+	buildingArr[3] = "Houses/testHouse4";
+	buildingArr[4] = "Houses/testHouse5";
 	
 	#ifdef _DEBUG
 	   U32            total_building_count{ 0 };
@@ -232,9 +233,9 @@ void  Map::generateBuildings( )
 						tilemap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
 						if ( not isHospital ) {
-							int randomHouse = rand() % 3; // decides the house
+							int randomHouse = rand() % 5; // decides the house
 							houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
-							houseTile.setMaterial(graphics.getMaterial("Houses/testHouse"));
+							houseTile.setMaterial(graphics.getMaterial("Houses/houseMaterial"));
 
 							//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
 
