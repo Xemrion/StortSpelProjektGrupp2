@@ -171,18 +171,18 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	Game::getGraphics().addToDraw(&*powerUps.begin());
 
 	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the important" ,TypeOfTarget::Crate);
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important" ,TypeOfTarget::Crate);
 
 
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::KillingSpree, 240, 75, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::KillingSpree, 120, 50, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 6, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 6, "Pick up the important");
 	objectives.addObjective(TypeOfMission::KillingSpree, 120, 25, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 8, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 7, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
 
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
@@ -588,7 +588,7 @@ void  PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos( spotlightPos );
 		
-		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) {
+		if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
 			soundAggro += 0.2f * deltaTime;
 		}
 		else if(soundAggro > 0.0f) {
