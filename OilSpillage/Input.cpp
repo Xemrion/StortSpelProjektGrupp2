@@ -48,7 +48,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CONFIRM:
 			return !keyboardState.Enter;
 		case Keys::CANCEL:
-			return !keyboardState.Back;
+			return !keyboardState.Q;
 		case Keys::ACTION_1:
 			return !keyboardState.Space;
 		case Keys::ACTION_2:
@@ -92,7 +92,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CONFIRM:
 			return keyboardState.Enter;
 		case Keys::CANCEL:
-			return keyboardState.Back;
+			return keyboardState.Q;
 		case Keys::ACTION_1:
 			return keyboardState.Space;
 		case Keys::ACTION_2:
@@ -136,7 +136,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CONFIRM:
 			return instance->keyboardTracker.pressed.Enter;
 		case Keys::CANCEL:
-			return instance->keyboardTracker.pressed.Back;
+			return instance->keyboardTracker.pressed.Q;
 		case Keys::ACTION_1:
 			return instance->keyboardTracker.pressed.Space;
 		case Keys::ACTION_2:
@@ -180,7 +180,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CONFIRM:
 			return instance->keyboardTracker.released.Enter;
 		case Keys::CANCEL:
-			return instance->keyboardTracker.released.Back;
+			return instance->keyboardTracker.released.Q;
 		case Keys::ACTION_1:
 			return instance->keyboardTracker.released.Space;
 		case Keys::ACTION_2:

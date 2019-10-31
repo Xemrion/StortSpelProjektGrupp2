@@ -469,6 +469,14 @@ void  PlayingGameState::update(float deltaTime)
 		if (Input::isKeyDown_DEBUG(Keyboard::E)) {
 			deltaTime /= 4;
 		}
+		if (Input::checkButton(Keys::CANCEL, States::PRESSED)) {
+			if (player->getDrivingMode() == 0) {
+				player->setDrivingMode(1);
+			}
+			else if(player->getDrivingMode() == 1) {
+				player->setDrivingMode(0);
+			}
+		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
