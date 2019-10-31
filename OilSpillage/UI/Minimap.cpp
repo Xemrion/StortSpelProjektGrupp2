@@ -167,7 +167,7 @@ void Minimap::draw(bool selected)
 				if (state->getObjHandler().getObjective(0)->getTarget(i) != nullptr)
 				{
 					targetPos = state->getObjHandler().getObjective(0)->getTarget(i)->getPosition();
-					if ((targetPos - playerPos).Length() < 150.0f)
+					if ((targetPos - playerPos).Length() < 300.0f)
 					{
 						targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
 						targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
