@@ -47,7 +47,7 @@ void UIPlaying::drawUI()
 	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
 	std::string timeStr = this->getFormattedTime();
 	Vector2 textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
-	Vector2 timeScale(0.5f, 0.5f);
+	Vector2 timeScale(0.8f, 0.8f);
 	Vector2 shake;
 	if (time < 11)
 	{
@@ -73,6 +73,7 @@ void UIPlaying::drawUI()
 		std::string died = "Game over";
 		textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());
 		Vector2 diedTxtSize = UserInterface::getFontArial()->MeasureString(died.c_str());
+		colorOverTime = Colors::Red;
 		timeScale = Vector2(0.7f, 0.7f);
 		position = Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), died.c_str(), position, colorOverTime, 0, Vector2(diedTxtSize.x / 2, diedTxtSize.y / 2), timeScale);
@@ -81,7 +82,7 @@ void UIPlaying::drawUI()
 	}
 	else
 	{
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position, colorOverTime, 0, Vector2(textSize.x / 2, (textSize.y / 2)+60), timeScale);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position+Vector2(0.0f,70.0f), colorOverTime, 0, Vector2(textSize.x / 2, (textSize.y / 2)+60), timeScale);
 	}
 	
 	if (player->getRespawnTimer() > 0 && time > 0)
