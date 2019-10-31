@@ -13,6 +13,7 @@ void PlayingGameState::initAI()
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
 }
+
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
 {
    #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -311,7 +312,6 @@ void PlayingGameState::ImGui_Particles()
 
 	ImGui::End();
 }
-
 
 #include "../PG/MinimapTextureGenerator.hpp"
 void PlayingGameState::ImGui_ProcGen()

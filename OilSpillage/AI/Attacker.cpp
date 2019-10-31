@@ -44,9 +44,10 @@ void Attacker::update(float dt, Vector3 targetPos)
 		nrOfFrames = 1;
 	}
 
-	this->root->func();
-	followPath();
-	this->rotateTowards();
+	//this->root->func();
+	//followPath();
+	//this->rotateTowards();
+	destination = targetPos;
 
 	updateWeapon(dt);
 	nrOfFrames++;

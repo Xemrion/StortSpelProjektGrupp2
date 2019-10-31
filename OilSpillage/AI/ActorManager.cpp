@@ -60,7 +60,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	updateGroups();
 	if (frameCount % 60 == 0)
 	{
-		assignPathsToGroups(targetPos);
+		//assignPathsToGroups(targetPos);
 		frameCount = 0;
 	}
 	updateAveragePos();
