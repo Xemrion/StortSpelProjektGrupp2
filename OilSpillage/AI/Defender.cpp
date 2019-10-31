@@ -17,7 +17,7 @@ Defender::Defender()
 Defender::Defender(float x, float z, AStar* aStar, Vector3 objectivePos)
 	:Actor(x, z, aStar)
 {
-	this->setColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+	this->setColor(Vector4(1.0f, 0.4f, 0.6f, 1.0f));
 	setUpActor();
 	this->objectivePos = objectivePos;
 
