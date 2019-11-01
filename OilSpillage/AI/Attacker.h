@@ -10,5 +10,4 @@ public:
 	void update(float dt, Vector3 targetPos);
 private:
 	void setUpActor();
-	void rotateTowards();
 };

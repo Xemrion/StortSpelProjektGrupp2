@@ -17,13 +17,19 @@ ActorManager::~ActorManager()
 	{
 		delete actors[i];
 	}
+	for (int i = 0; i < turrets.size(); i++)
+	{
+		delete turrets[i];
+	}
 	actors.clear();
+	turrets.clear();
 }
 
 void ActorManager::update(float dt, Vector3 targetPos)
 {
 	soundTimer += dt;
 	bool hasDied = false;
+	bool turretDied = false;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
 		if (!actors[i]->isDead() && actors[i] != nullptr)
@@ -43,7 +49,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 			hasDied = true;
 		}
 	}
-	if(hasDied == true)
+	if (hasDied == true)
 	{
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
@@ -56,59 +62,75 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		}
 		hasDied = false;
 	}
+	for (int i = 0; i < this->turrets.size(); i++)
+	{
+		if (!turrets[i]->isDead() && turrets[i] != nullptr)
+		{
+			turrets[i]->update(dt, targetPos);
+		}
+		else if (turrets[i]->isDead() && turrets[i] != nullptr)
+		{
+			Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+			if (ptr != nullptr)
+			{
+				if (ptr->getType() == TypeOfMission::KillingSpree)
+				{
+					ptr->killEnemy();
+				}
+			}
+			turretDied = true;
+		}
+	}
+	if (turretDied == true)
+	{
+		for (int i = this->turrets.size() - 1; i >= 0; i--)
+		{
+			if (turrets[i]->isDead())
+			{
+				turrets[i]->death();
+				delete turrets[i];
+				turrets.erase(turrets.begin() + i);
+			}
+		}
+		turretDied = false;
+	}
 
 	updateGroups();
 	if (frameCount % 60 == 0)
 	{
-		//assignPathsToGroups(targetPos);
+		assignPathsToGroups(targetPos);
 		frameCount = 0;
 	}
 	updateAveragePos();
 	frameCount++;
 }
 
-void ActorManager::createDefender(float x, float z, Vector3 objectivePos)
-{
-	this->actors.push_back(new Defender(x, z, this->aStar, objectivePos));
-	initGroupForActor(actors.at(actors.size() - 1));
-}
-
 void ActorManager::createAttacker(float x, float z)
 {
 	this->actors.push_back(new Attacker(x, z, this->aStar));
-	initGroupForActor(actors.at(actors.size()-1));
+	initGroupForActor(actors.at(actors.size() - 1));
 }
 
 void ActorManager::createTurret(float x, float z)
 {
-	this->actors.push_back(new Turret(x, z));
-}
-
-std::vector<Actor*>* ActorManager::findClosestGroup(Vector3 position)
-{
-	int rangeOfPlayer = 10*10;
-	sendToPlayer.clear();
-
-	for(int i = 0; i < this->actors.size(); i++)
-	{
-		float deltaX = position.x - this->actors[i]->getPosition().x;
-		float deltaZ = position.z - this->actors[i]->getPosition().z;
-		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-		if(distance < rangeOfPlayer)
-		{
-			sendToPlayer.push_back(actors[i]);
-		}
-	}
-	return &sendToPlayer;
+	this->turrets.push_back(new Turret(x, z));
 }
 
 float ActorManager::distanceToPlayer(Vector3 position)
 {
-	float minDistance=99999999999;
+	float minDistance = 99999999999;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		float distance = (position - this->actors.at(i)->getPosition()).Length();
+		float distance = (position - this->actors[i]->getPosition()).Length();
 		if (minDistance > distance) {
+			minDistance = distance;
+		}
+	}
+	for (int i = 0; i < this->turrets.size(); i++)
+	{
+		float distance = (position - this->turrets[i]->getPosition()).Length();
+		if (minDistance > distance)
+		{
 			minDistance = distance;
 		}
 	}
@@ -138,24 +160,35 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 			}
 		}
 	}
+	for (int i = 0; i < this->turrets.size(); i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			if (!this->turrets[i]->isDead())
+			{
+				if (bulletArray[j].getGameObject()->getAABB().intersect(this->turrets[i]->getAABB()))
+				{
+					if (soundTimer > 0.05f) {
+						/*int randomSound = rand() % 3 + 1;
+						std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
+						Sound::PlaySoundEffect(soundEffect);*/
+						Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+						soundTimer = 0;
+					}
+					this->turrets[i]->changeHealth(-bulletArray[j].getDamage());
+					bulletArray[j].destroy();
+				}
+			}
+		}
+	}
 }
-
-void ActorManager::spawnDefenders(Vector3 objective)
-{
-	createDefender(objective.x + 2, objective.z, objective);
-	createDefender(objective.x, objective.z - 2, objective);
-	createDefender(objective.x, objective.z + 2, objective);
-	createDefender(objective.x+2, objective.z + 2, objective);
-	createDefender(objective.x-2, objective.z + 2, objective);
-}
-
 void ActorManager::spawnAttackers(Vector3 originPos)
 {
-	for(int i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		createAttacker(originPos.x+i, originPos.z);
-		createAttacker(originPos.x, originPos.z+1);
-		createAttacker(originPos.x-i, originPos.z);
+		createAttacker(originPos.x + i, originPos.z);
+		createAttacker(originPos.x, originPos.z + 1);
+		createAttacker(originPos.x - i, originPos.z);
 	}
 }
 
@@ -284,7 +317,7 @@ void ActorManager::updateGroups()
 				//Actor is outside its own groupRadius, check for other groups or create its own
 				if (distanceToOwnGroup > groups[i].getGroupRadius())
 				{
-					int groupIndex = groupInRange(current->getPosition(), groups[i].actors.size());
+					int groupIndex = groupInRange(current->getPosition(), 0);
 					//Found a group within the groupRadius
 					if (groupIndex != -1)
 					{
@@ -323,7 +356,7 @@ void ActorManager::updateGroups()
 void ActorManager::initGroupForActor(Actor* actor)
 {
 	//Is there a group nearby? (Join biggest)
-	int groupIndex = groupInRange(actor->getPosition(),1);
+	int groupIndex = groupInRange(actor->getPosition(), 0);
 	//else, create new group, join that group
 	if (groupIndex != -1)
 	{

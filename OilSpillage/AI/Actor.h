@@ -15,20 +15,14 @@ public:
 	virtual void setUpActor() = 0 {};
 
 	void applyForce(Vector3 force);
-	// Three Laws that boids follow
-	Vector3 separation(vector<Actor*> boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
-	Vector3 alignment(vector<Actor*> boids);
-	Vector3 cohesion(vector<Actor*> boids);
+	// one Laws that boids follow
+	Vector3 separation(vector<Actor*>& boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	// Other function for moving and interacting
 	Vector3 seek(Vector3 target);
-	void run(vector<Actor*> boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
+	void run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	virtual void updateBoid(float deltaTime);
-	void flock(vector<Actor*> boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
-	float angle(Vector3 target);
 	void setPath(std::vector<Vector3> path);
-	Vector3 getDestination();
 	virtual bool hasGroup();
-	void setDestination(Vector3 destination);
 	void joinGroup();
 
 	const int& getHealthRef() const;
@@ -53,7 +47,6 @@ protected:
 	Stats updatedStats;
 
 	Vector3 vecForward;
-	int nrOfFrames = 0;
 	Vector3 destination;
 	Selector* root;
 	std::vector<Vector3> path;
@@ -62,14 +55,10 @@ protected:
 	enum State { Roaming, Chasing, Returning };
 	State state;
 	BT bt;
-	float deltaTime;
 	Vector3 targetPos;
 
-	void findPath();
-	void chase();
-	void roam();
 	virtual Status shoot();
-	virtual Status inRange();
+	virtual Status inAttackRange();	
 	virtual Status enemyNear();
 	virtual Status setChaseState();
 	virtual Status setRoamState();

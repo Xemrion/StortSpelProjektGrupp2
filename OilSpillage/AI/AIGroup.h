@@ -1,5 +1,4 @@
 #pragma once
-#include "Defender.h"
 #include "Attacker.h"
 #include "Turret.h"
 class AIGroup
@@ -17,6 +16,6 @@ public:
 private:
 	float groupRadius = 6.5f * 6.5f; //Compare with distance^2
 	Vector3 averagePos;
-	std::vector<Vector3> path;
+	std::vector<Vector3> path; 
 };
 
