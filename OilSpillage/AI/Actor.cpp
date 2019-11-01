@@ -208,7 +208,7 @@ Vector3 Actor::separation(vector<Actor*>& boids, Vector3 targetPos)
 	return direction;
 }
 
-Vector3 Actor::seek(Vector3 target)
+Vector3 Actor::seek()
 {
 	Vector3 desiredDirection;
 	desiredDirection -= position - destination;
@@ -236,7 +236,7 @@ void Actor::updateBoid(float deltaTime)
 	acceleration *= 0.4f;
 	// Update velocity
 	velocity += acceleration;
-	velocity += seek(Vector3(0.0f));
+	velocity += seek();
 	// Limit speed
 	if (velocity.Length() > maxForce)
 	{

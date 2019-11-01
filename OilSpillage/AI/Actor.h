@@ -18,7 +18,7 @@ public:
 	// one Laws that boids follow
 	Vector3 separation(vector<Actor*>& boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	// Other function for moving and interacting
-	Vector3 seek(Vector3 target);
+	Vector3 seek();
 	void run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	virtual void updateBoid(float deltaTime);
 	void setPath(std::vector<Vector3> path);
