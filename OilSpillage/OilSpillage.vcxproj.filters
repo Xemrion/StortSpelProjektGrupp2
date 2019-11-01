@@ -175,7 +175,7 @@
     <FxCompile Include="Shadows\SimpleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="ShaderDefines.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
