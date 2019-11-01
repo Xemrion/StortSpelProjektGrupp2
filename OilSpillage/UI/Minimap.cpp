@@ -8,24 +8,27 @@ Vector2 Minimap::size = Vector2(96 * 2, 96 * 2);
 
 Minimap::Minimap(float zoom, float fogClearRadius, Vector2 position)
 	: Element(position, 0.0f), fogClearRadius(max(fogClearRadius, 10.0f)), zoom(std::clamp(zoom, 0.0f, 1.0f)),
-							   textureMap(nullptr), textureFog(nullptr), resourceFog(nullptr)
+							   textureMap(nullptr), textureFog(nullptr), resourceFog(nullptr), compassRot(0.0f)
 {
 	Game::getGraphics().loadTexture("UI/mapOutline");
 	Game::getGraphics().loadTexture("UI/mapPlayerMarker");
 	Game::getGraphics().loadTexture("UI/mapObjective");
 	Game::getGraphics().loadTexture("UI/mapEnemy");
-
+	Game::getGraphics().loadTexture("UI/mapCompass");
 	Game::getGraphics().loadTexture("UI/mapFog", false, true);
+
 	this->textureOutline = Game::getGraphics().getTexturePointer("UI/mapOutline");
 	this->texturePlayerMarker = Game::getGraphics().getTexturePointer("UI/mapPlayerMarker");
 	this->textureObjectiveMarker = Game::getGraphics().getTexturePointer("UI/mapObjective");
 	this->textureEnemyMarker = Game::getGraphics().getTexturePointer("UI/mapEnemy");
-
+	this->textureCompass = Game::getGraphics().getTexturePointer("UI/mapCompass");
 	this->textureFogTemp = Game::getGraphics().getTexturePointer("UI/mapFog");
+
 	assert(textureOutline && "Texture failed to load!");
 	assert(texturePlayerMarker && "Texture failed to load!");
 	assert(textureFogTemp && "Texture failed to load!");
 	assert(textureEnemyMarker && "Texture failed to load!");
+	assert(textureCompass && "Texture failed to load!");
 
 	ID3D11Device* device = Game::getGraphics().getDevice();
 	ID3D11DeviceContext* deviceContext = Game::getGraphics().getDeviceContext();
@@ -127,6 +130,10 @@ void Minimap::draw(bool selected)
 		static_cast<long>(this->position.x + playerZoomedPos.x), static_cast<long>(this->position.y + playerZoomedPos.z),
 		static_cast<long>(this->texturePlayerMarker->getWidth() * zoomedMinimapScale.x), static_cast<long>(this->texturePlayerMarker->getHeight() * zoomedMinimapScale.z)
 	);
+	RECT compassRect = SimpleMath::Rectangle(
+		static_cast<long>(this->position.x + playerZoomedPos.x), static_cast<long>(this->position.y + playerZoomedPos.z),
+		static_cast<long>(this->textureCompass->getWidth() * zoomedMinimapScale.x), static_cast<long>(this->textureCompass->getHeight() * zoomedMinimapScale.z)
+	);
 	
 
 	SpriteBatch* sb = UserInterface::getSpriteBatch();
@@ -189,11 +196,21 @@ void Minimap::draw(bool selected)
 	sb->Draw(this->textureOutline->getShaderResView(), this->position - Vector2(5, 5));
 	sb->Draw(this->resourceFog, mapRect, &zoomedRect);
 	sb->Draw(this->texturePlayerMarker->getShaderResView(), markerRect, nullptr, Colors::White, playerRot, this->texturePlayerMarker->getCenter());
+
+	if (state->getObjHandler().getObjective(0) != nullptr && state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree)
+	{
+		sb->Draw(this->textureCompass->getShaderResView(), compassRect, nullptr, Colors::White, this->compassRot, Vector2(this->textureCompass->getWidth() * 0.5f, this->textureCompass->getHeight() * 0.75f));
+	}
 }
 
 void Minimap::update(float deltaTime)
 {
-	Vector3 playerMapPos = Vector3::Transform(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition() * Vector3(1, 0, 1), this->mapMatrix);
+	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
+	Vector3 playerPos(state->getPlayer()->getVehicle()->getPosition() * Vector3(1, 0, 1));
+
+
+
+	Vector3 playerMapPos = Vector3::Transform(playerPos, this->mapMatrix);
 	//playerMapPos /= 3;
 	playerMapPos.Clamp(Vector3(), Vector3(this->textureFogTemp->getWidth(), 0, this->textureFogTemp->getHeight()));
 	playerMapPos.z = this->textureFogTemp->getHeight() - playerMapPos.z;
@@ -241,6 +258,42 @@ void Minimap::update(float deltaTime)
 
 	CopyMemory(mappedResource.pData, this->pixels, this->textureFogTemp->getDataSize());
 	deviceContext->Unmap(this->textureFog, 0);
+
+	Vector3 targetPos;
+	Vector3 closestPos;
+	float targetLength = 0.0f;
+	float closestLength = -1.0f;
+
+	if (state->getObjHandler().getObjective(0) != nullptr)
+	{
+		for (int i = 0; i < state->getObjHandler().getObjective(0)->getNrOfMax(); i++)
+		{
+			if (state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree)
+			{
+				if (state->getObjHandler().getObjective(0)->getTarget(i) != nullptr)
+				{
+					targetPos = state->getObjHandler().getObjective(0)->getTarget(i)->getPosition() * Vector3(1, 0, 1);
+					targetLength = (targetPos - playerPos).Length();
+					
+					if (targetLength < closestLength || closestLength == -1.0f)
+					{
+						closestPos = targetPos;
+						closestLength = targetLength;
+					}
+				}
+			}
+		}
+	}
+
+	if (closestLength != -1.0f)
+	{
+		this->compassRot = XMVector3AngleBetweenVectors(closestPos - playerPos, Vector3::UnitX).m128_f32[0] + XM_PIDIV2;
+		
+		if (playerPos.z < closestPos.z)
+		{
+			this->compassRot = XM_PI - this->compassRot;
+		}
+	}
 }
 
 void Minimap::resetFog()
