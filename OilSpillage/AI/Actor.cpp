@@ -37,7 +37,7 @@ Actor::~Actor()
 {
 }
 
-void Actor::update(float dt, Vector3 targetPos)
+void Actor::update(float dt, Vector3 targetPos, Vector3 targetVelocity)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
@@ -56,6 +56,9 @@ void Actor::updateWeapon(float deltaTime)
 
 Status Actor::shoot()
 {
+	int nrOfFramesAhead = 15;
+	float randomOffset = (rand() % 2) + 0.1;
+	int chance = (rand() % 2)+1;
 	if ((position - targetPos).Length() < 23)
 	{
 		if (this->timeSinceLastShot >= this->weapon.fireRate)
@@ -69,7 +72,20 @@ Status Actor::shoot()
 					Vector3 dir = (targetPos - this->position);
 					dir.Normalize();
 					Vector3 bulletOrigin = this->position + dir;
-					dir = (targetPos - bulletOrigin);
+					//Standard
+					//dir = (targetPos - bulletOrigin);
+					// Random offset
+					if(chance == 1)
+					{
+						dir = (Vector3(targetPos.x + randomOffset, 0.0f, targetPos.z + randomOffset) - bulletOrigin);
+					}
+					else
+					{
+						dir = (Vector3(targetPos.x - randomOffset, 0.0f, targetPos.z - randomOffset) - bulletOrigin);
+					}
+					// Predict
+					//dir = (Vector3(targetPos.x - targetVelocity.x * nrOfFramesAhead, 0.0f, (targetPos.z - targetVelocity.z * nrOfFramesAhead)) - bulletOrigin);
+					
 
 					this->bullets[i].setWeaponType(this->weapon.type);
 					this->bullets[i].shoot(
@@ -86,6 +102,7 @@ Status Actor::shoot()
 
 	return Status::SUCCESS;
 }
+
 Status Actor::inAttackRange()
 {
 	Status status;
@@ -223,10 +240,10 @@ Vector3 Actor::seek()
 	return acceleration;
 }
 
-void Actor::run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos)
+void Actor::run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos, Vector3 targetVelocity)
 {
 	applyForce(separation(boids, targetPos) * 4);
-	update(deltaTime, targetPos);
+	update(deltaTime, targetPos, targetVelocity);
 	updateBoid(deltaTime);
 }
 

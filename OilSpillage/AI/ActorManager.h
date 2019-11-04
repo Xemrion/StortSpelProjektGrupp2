@@ -8,11 +8,10 @@ public:
 	ActorManager(AStar* aStar);
 	~ActorManager();
 	enum Radius { CLOSE, MIDDLE, OUTER };
-	void update(float dt, Vector3 targetPos);
+	void update(float dt, Vector3 targetPos, Vector3 targetVelocity);
 	void createAttacker(float x, float z);
 	void createTurret(float x, float z);
 	std::vector<AIGroup> groups;
-	std::vector<Actor*>* findClosestGroup(Vector3 position);
 	float distanceToPlayer(Vector3 position);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
 

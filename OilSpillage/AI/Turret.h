@@ -8,7 +8,7 @@ public:
 	Turret();
 	Turret(float x, float z);
 	~Turret();
-	void update(float dt, Vector3 targetPos);
+	void update(float dt, Vector3 targetPos, Vector3 targetVelocity);
 private:
 	void setForwardVector(Vector3 forward);
 	void setSightRange(int range);

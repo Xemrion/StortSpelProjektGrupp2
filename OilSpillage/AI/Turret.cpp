@@ -20,7 +20,7 @@ Turret::Turret(float x, float z)
 	: Actor(x, z, nullptr)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
-	this->sightRange = 10;
+	this->sightRange = 23;
 	turretAngle = 90;
 	this->calculateTarget(turretAngle);
 	setUpActor();
@@ -46,10 +46,11 @@ Turret::~Turret()
 	Game::getGraphics().removeFromDraw(&this->body);
 }
 
-void Turret::update(float dt, Vector3 targetPos)
+void Turret::update(float dt, Vector3 targetPos, Vector3 targetVelocity)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
+	this->targetVelocity = targetVelocity;
 	updateWeapon(dt);
 	this->root->func();
 

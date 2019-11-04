@@ -12,7 +12,9 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	
+	actorManager->createTurret(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
+	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 7, map->getStartPositionInWorldSpace().z + 5);
+	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 9, map->getStartPositionInWorldSpace().z + 5);
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
@@ -139,15 +141,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	initAI();
 
-	//testObjective = new GameObject();
-	//testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//Game::getGraphics().addToDraw(testObjective);
-	//testObjective->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
-	//testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
-
-
-
-
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
@@ -273,19 +266,6 @@ void PlayingGameState::ImGui_AI()
 	//ImGui::Text(("Tile y: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).y)).c_str());
 	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
 							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
-
-
-
-							//if(actorManager->groups.size() != 0)
-							//{
-							//	std::vector<Actor*>* temp = actorManager->findClosestGroup(player->getVehicle()->getPosition());
-							//	for (int i = 0; i < temp->size(); i++)
-							//	{
-							//		ImGui::Text(("AI nr " + to_string(i) + ": " + to_string(temp->at(i)->getPosition().x) + " " + to_string(temp->at(i)->getPosition().y) + " " + to_string(temp->at(i)->getPosition().z) + " ").c_str());
-							//	}
-							//}
-
-							//delete temp;
 	ImGui::End();
 }
 
@@ -466,7 +446,7 @@ Vector3 PlayingGameState::getRespawnPosition() const noexcept
 	else return map->getStartPositionInWorldSpace() + Vector3(0, -1.2f, 0);
 }
 
-void  PlayingGameState::update(float deltaTime)
+void PlayingGameState::update(float deltaTime)
 {
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
@@ -518,12 +498,12 @@ void  PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 
-		if (spawnTimer % 200 == 0)
-		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-			spawnTimer = 0;
-		}
-		spawnTimer++;
+		//if (spawnTimer % 200 == 0)
+		//{
+		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+		//	spawnTimer = 0;
+		//}
+		//spawnTimer++;
 
 		powerUps.erase(
 			std::remove_if(
@@ -556,7 +536,9 @@ void  PlayingGameState::update(float deltaTime)
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation();
-		actorManager->update(deltaTime, playerVehicle->getPosition());
+
+		actorManager->update(deltaTime, playerVehicle->getPosition(), Vector3(playerVehicle->getRigidBody()->getAngularVelocity()));
+
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
