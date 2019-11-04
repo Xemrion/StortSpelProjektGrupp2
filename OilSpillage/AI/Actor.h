@@ -41,6 +41,7 @@ private:
 	float maxForce;
 	bool isInGroup = false;
 protected:
+	float deltaTime;
 	Vector3 velocity;
 	int health;
 	Stats defaultStats;

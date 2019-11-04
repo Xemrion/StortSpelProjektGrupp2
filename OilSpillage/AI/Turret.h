@@ -10,7 +10,6 @@ public:
 	~Turret();
 	void update(float dt, Vector3 targetPos);
 private:
-	int deltaTime;
 	void setForwardVector(Vector3 forward);
 	void setSightRange(int range);
 	void setUpActor();

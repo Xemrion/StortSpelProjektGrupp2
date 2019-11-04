@@ -9,7 +9,7 @@ public:
 	std::vector<Actor*> actors;
 
 
-	Vector3 getAvaragePos();
+	Vector3 getAveragePos();
 	float getGroupRadius();
 	void updateAveragePos();
 

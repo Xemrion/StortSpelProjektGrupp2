@@ -8,7 +8,7 @@ AIGroup::~AIGroup()
 {
 }
 
-Vector3 AIGroup::getAvaragePos()
+Vector3 AIGroup::getAveragePos()
 {
 	return this->averagePos;
 }

@@ -37,7 +37,7 @@ Turret::Turret(float x, float z)
 
 	this->defaultStats = VehicleStats::AITurret;
 	this->updatedStats = this->defaultStats;
-
+	this->velocity = Vector3();
 	this->health = this->updatedStats.maxHealth;
 }
 
@@ -50,9 +50,9 @@ void Turret::update(float dt, Vector3 targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
+	updateWeapon(dt);
 	this->root->func();
 
-	updateWeapon(dt);
 }
 
 void Turret::setForwardVector(Vector3 forward)

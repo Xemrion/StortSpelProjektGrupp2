@@ -39,6 +39,7 @@ Actor::~Actor()
 
 void Actor::update(float dt, Vector3 targetPos)
 {
+	this->deltaTime = dt;
 	this->targetPos = targetPos;
 	this->root->func();
 	followPath();
@@ -47,6 +48,14 @@ void Actor::update(float dt, Vector3 targetPos)
 void Actor::updateWeapon(float deltaTime)
 {
 	this->timeSinceLastShot += deltaTime;
+	for (int i = 0; i < Actor::bulletCount; i++)
+	{
+		bullets[i].update(deltaTime);
+	}
+}
+
+Status Actor::shoot()
+{
 	if ((position - targetPos).Length() < 23)
 	{
 		if (this->timeSinceLastShot >= this->weapon.fireRate)
@@ -74,15 +83,6 @@ void Actor::updateWeapon(float deltaTime)
 			}
 		}
 	}
-
-	for (int i = 0; i < Actor::bulletCount; i++)
-	{
-		bullets[i].update(deltaTime);
-	}
-}
-
-Status Actor::shoot()
-{
 
 	return Status::SUCCESS;
 }
@@ -138,6 +138,7 @@ void Actor::followPath()
 			path.pop_back();
 		}
 	}
+	
 }
 
 void Actor::applyForce(Vector3 force)
@@ -224,7 +225,6 @@ Vector3 Actor::seek()
 
 void Actor::run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos)
 {
-
 	applyForce(separation(boids, targetPos) * 4);
 	update(deltaTime, targetPos);
 	updateBoid(deltaTime);

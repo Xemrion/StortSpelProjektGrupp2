@@ -199,7 +199,7 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 	int returnIndex = -1;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		Vector3 curAveragePos = groups[i].getAvaragePos();
+		Vector3 curAveragePos = groups[i].getAveragePos();
 		float deltaX = actorPos.x - curAveragePos.x;
 		float deltaZ = actorPos.z - curAveragePos.z;
 		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -229,7 +229,7 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 {
 	for (int i = 0; i < groups.size(); i++)
 	{
-		aStar->algorithm(groups[i].getAvaragePos(), targetPos, path);
+		aStar->algorithm(groups[i].getAveragePos(), targetPos, path);
 
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
@@ -251,7 +251,7 @@ void ActorManager::updateGroups()
 			}
 			else
 			{
-				Vector3 curAveragePos = groups[i].getAvaragePos();
+				Vector3 curAveragePos = groups[i].getAveragePos();
 				Vector3 actorPos = current->getPosition();
 				float deltaX = actorPos.x - curAveragePos.x;
 				float deltaZ = actorPos.z - curAveragePos.z;
