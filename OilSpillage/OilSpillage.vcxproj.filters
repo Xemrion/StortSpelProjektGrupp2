@@ -74,6 +74,10 @@
     <ClCompile Include="UI\ObjectiveBox.cpp" />
     <ClCompile Include="AI\AIGroup.cpp" />
     <ClCompile Include="UI\UIControls.cpp" />
+    <ClCompile Include="UI\UIUpgrading.cpp" />
+    <ClCompile Include="UI\ItemSelector.cpp" />
+    <ClCompile Include="Inventory\Item.cpp" />
+    <ClCompile Include="Inventory\Inventory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -153,6 +157,10 @@
     <ClInclude Include="UI\ObjectiveBox.h" />
     <ClInclude Include="AI\AIGroup.h" />
     <ClInclude Include="UI\UIControls.h" />
+    <ClInclude Include="UI\UIUpgrading.h" />
+    <ClInclude Include="UI\ItemSelector.h" />
+    <ClInclude Include="Inventory\Item.h" />
+    <ClInclude Include="Inventory\Inventory.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

@@ -152,6 +152,8 @@
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
+    <ClCompile Include="Inventory\Inventory.cpp" />
+    <ClCompile Include="Inventory\Item.cpp" />
     <ClCompile Include="Objectives\Objective.cpp" />
     <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
@@ -190,6 +192,7 @@
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UI\ItemSelector.cpp" />
     <ClCompile Include="UI\Minimap.cpp" />
     <ClCompile Include="UI\ObjectiveBox.cpp" />
     <ClCompile Include="UI\Slider.cpp" />
@@ -199,6 +202,7 @@
     <ClCompile Include="UI\UIOptions.cpp" />
     <ClCompile Include="UI\UIPaused.cpp" />
     <ClCompile Include="UI\UIPlaying.cpp" />
+    <ClCompile Include="UI\UIUpgrading.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="Weapon.cpp" />
@@ -213,6 +217,7 @@
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
     <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="Inventory\Inventory.h" />
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
@@ -267,6 +272,8 @@
     <ClInclude Include="Road Network\RoadNet.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Inventory\Item.h" />
+    <ClInclude Include="UI\ItemSelector.h" />
     <ClInclude Include="UI\Minimap.h" />
     <ClInclude Include="UI\ObjectiveBox.h" />
     <ClInclude Include="UI\Slider.h" />
@@ -276,6 +283,7 @@
     <ClInclude Include="UI\UIOptions.h" />
     <ClInclude Include="UI\UIPaused.h" />
     <ClInclude Include="UI\UIPlaying.h" />
+    <ClInclude Include="UI\UIUpgrading.h" />
     <ClInclude Include="UI\UserInterface.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />
