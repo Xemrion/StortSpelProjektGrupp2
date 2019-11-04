@@ -12,6 +12,7 @@ void PlayingGameState::initAI()
 	aStar = new AStar( map->getTileMap() );
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
+	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 5, map->getStartPositionInWorldSpace().z + 5);
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)

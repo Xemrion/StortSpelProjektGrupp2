@@ -151,6 +151,7 @@
     <ClCompile Include="AI\Behaviour.cpp" />
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
+    <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Objectives\Objective.cpp" />
     <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
     <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />

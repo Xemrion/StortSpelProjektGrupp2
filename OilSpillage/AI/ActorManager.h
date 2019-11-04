@@ -1,5 +1,6 @@
 #pragma once
 #include "AIGroup.h"
+#include"TurretHandler.h"
 class ActorManager
 {
 public:
@@ -20,7 +21,7 @@ public:
 	Vector2& generateRandom(const float& x, const float& z, Radius radius);
 	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
 private:
-	float soundTimer;
+	float soundTimer = 0;
 	int frameCount = 0;
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
@@ -32,7 +33,7 @@ private:
 	void initGroupForActor(Actor* actor);
 	void createGroup(Actor* actor);
 	std::vector<Actor*> actors;
-	std::vector<Actor*> turrets;
+	TurretHandler turretHandler;
 	std::vector<Actor*> sendToPlayer;
 	std::vector<Vector3> path;
 	AStar* aStar;

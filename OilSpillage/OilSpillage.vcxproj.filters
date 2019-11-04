@@ -74,6 +74,7 @@
     <ClCompile Include="UI\ObjectiveBox.cpp" />
     <ClCompile Include="AI\AIGroup.cpp" />
     <ClCompile Include="UI\UIControls.cpp" />
+    <ClCompile Include="AI\TurretHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -153,6 +154,7 @@
     <ClInclude Include="UI\ObjectiveBox.h" />
     <ClInclude Include="AI\AIGroup.h" />
     <ClInclude Include="UI\UIControls.h" />
+    <ClInclude Include="AI\TurretHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

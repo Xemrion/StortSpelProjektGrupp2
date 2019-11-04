@@ -18,7 +18,7 @@ float AIGroup::getGroupRadius()
 	return this->groupRadius;
 }
 
-void AIGroup::updateAvaragePos()
+void AIGroup::updateAveragePos()
 {
 	averagePos = Vector3(0.0f);
 	for(int i = 0; i < actors.size(); i++)

@@ -11,7 +11,7 @@ public:
 
 	Vector3 getAvaragePos();
 	float getGroupRadius();
-	void updateAvaragePos();
+	void updateAveragePos();
 
 private:
 	float groupRadius = 6.5f * 6.5f; //Compare with distance^2
