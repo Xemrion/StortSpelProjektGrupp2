@@ -12,6 +12,8 @@ void PlayingGameState::initAI()
 	aStar = new AStar( map->getTileMap() );
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
+	actorManager->createTurret(player.get()->getVehicle()->getPosition().x +4,
+		player.get()->getVehicle()->getPosition().z +4);
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)

@@ -85,8 +85,6 @@ void Turret::setUpActor()
 	Behavior& lineOf = bt.getAction();
 	lineOf.addAction(std::bind(&Turret::lineOfSight, std::ref(*this)));
 
-	//Attack shoot;
-
 	root->addChildren(sequence);
 	root->addChildren(idle);
 	sequence.addChildren(inRange);
