@@ -98,7 +98,7 @@ Status Actor::shoot()
 				}
 			}
 		}
-	}
+	} 
 
 	return Status::SUCCESS;
 }
@@ -107,7 +107,7 @@ Status Actor::inAttackRange()
 {
 	Status status;
 
-	if ((getPosition() - targetPos).Length() > 7)
+	if ((getPosition() - targetPos).Length() > attackRange)
 	{
 		status = Status::FAILURE;
 	}
