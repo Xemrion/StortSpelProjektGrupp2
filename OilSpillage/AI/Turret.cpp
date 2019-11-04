@@ -14,15 +14,13 @@ Turret::Turret()
 	this->updatedStats = this->defaultStats;
 
 	this->health = this->updatedStats.maxHealth;
-	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
 
 Turret::Turret(float x, float z)
 	: Actor(x, z, nullptr)
 {
-	//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
-	this->sightRange = 10.f;
+	this->sightRange = 10;
 	turretAngle = 90;
 	this->calculateTarget(turretAngle);
 	setUpActor();
@@ -45,24 +43,16 @@ Turret::Turret(float x, float z)
 
 Turret::~Turret()
 {
-
+	Game::getGraphics().removeFromDraw(&this->body);
 }
 
 void Turret::update(float dt, Vector3 targetPos)
 {
-	this->velocity = Vector3(0.0, 0.0, 0.0);
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 	this->root->func();
 
-	//rotateTowards();
-
-	updateWeapon(deltaTime);
-}
-
-bool Turret::hasGroup()
-{
-	return true;
+	updateWeapon(dt);
 }
 
 void Turret::setForwardVector(Vector3 forward)
@@ -105,21 +95,13 @@ void Turret::setUpActor()
 	sequence.addChildren(shoot);
 }
 
-void Turret::followPath()
-{
-}
-void Turret::updateBoid(float deltatime)
-{
-}
-
 Status Turret::rotateTowards()
 {
 	Vector3 targetToSelf = (targetPos - position);
-	//targetToSelf.Normalize();
 
 	if ((targetToSelf).Dot(vecForward) < 0.8)
 	{
-		vecForward -= (targetToSelf * deltaTime) / 0.1;
+		vecForward -= (targetToSelf * deltaTime) / 0.1f;
 		vecForward.Normalize();
 
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
@@ -172,7 +154,8 @@ Status Turret::idle()
 		this->calculateTarget(turretAngle);
 	}
 	else
-	{	vecForward -= (idleTarget * deltaTime) / 1.01;
+	{
+		vecForward -= (idleTarget * deltaTime) / 1.01f;
 		vecForward.Normalize();
 
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
@@ -180,4 +163,3 @@ Status Turret::idle()
 	}
 	return Status::SUCCESS;
 }
-

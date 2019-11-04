@@ -21,8 +21,6 @@ public:
 
 	//AI Stats
 									//{ health, durability, armour, accelerationRate, maxSpeed, handlingRate };
-	static constexpr Stats AIDefender = { 100,       2.0f,    2.0f,          0.5,          1.0f,      1.0f};
-									//{ health, durability, armour, accelerationRate, maxSpeed, handlingRate };
 	static constexpr Stats AIAttacker = { 50,       2.0f,    2.0f,          0.5,          1.0f,      1.0f };
 									//{ health, durability, armour, accelerationRate, maxSpeed, handlingRate };
 	static constexpr Stats AITurret   = { 100,       2.0f,    2.0f,          0.0,          0.0f,      1.0f };
