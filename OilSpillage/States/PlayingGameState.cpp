@@ -107,7 +107,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	testNetwork.get()->saveTestNetwork("test-network");
    */
    //}
-	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(0.76f, 0.76f, 0.76f)));
+	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 
 	graphics.setLightList(lightList.get());
 	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.4f);

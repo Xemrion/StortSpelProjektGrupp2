@@ -104,6 +104,11 @@ Vector3 Objective::getAveragePosition() const
 	return avPos;
 }
 
+Vector3 Objective::getClosestToPlayer() const
+{
+	return this->closestToPlayer;
+}
+
 bool Objective::isDone()
 {
 	if (this->mission->typeMission == TypeOfMission::FindAndCollect)
@@ -133,17 +138,29 @@ bool Objective::isDone()
 void Objective::update(Vector3 playerPosition)
 {
 	PlayingGameState* ptrState = static_cast<PlayingGameState*>(Game::getCurrentState());
+	Vector3 findClosestPlayer(0.0f, 0.0f, 0.0f);
 
 	if (this->mission->typeMission == TypeOfMission::FindAndCollect)
 	{
 		if (started)
 		{
+			if (this->mission->target[0] != nullptr)
+			{
+				findClosestPlayer = this->mission->target[0]->getPosition();
+			}
 			//collision check
 			int nrOfDone = 0;
 			for (int i = 0; i < nrOfMax; i++)
 			{
+
 				if (this->mission->target[i] != nullptr)
 				{
+
+					Vector3 closestTemp = this->mission->target[i]->getPosition();
+					if (i != 0 && (findClosestPlayer -playerPosition).Length() > (closestTemp-playerPosition).Length())
+					{
+						findClosestPlayer = closestTemp;
+					}
 					float time = ptrState->getTime();
 					float sine = sin((time-0) / 0.3f) - 0.5f;
 					float color = max(sine, 0.0f);
@@ -171,6 +188,7 @@ void Objective::update(Vector3 playerPosition)
 			{
 				done = true;
 			}
+
 		}
 		else
 		{
@@ -195,6 +213,7 @@ void Objective::update(Vector3 playerPosition)
 			}
 		}
 	}
+	this->closestToPlayer = findClosestPlayer;
 }
 
 int Objective::getNrOfMax() const
