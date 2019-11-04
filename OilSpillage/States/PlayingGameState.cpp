@@ -275,14 +275,14 @@ void PlayingGameState::ImGui_AI()
 
 
 
-	if(actorManager->groups.size() != 0)
-	{
-		std::vector<Actor*>* temp = actorManager->findClosestGroup(player->getVehicle()->getPosition());
-		for (int i = 0; i < temp->size(); i++)
-		{
-			ImGui::Text(("AI nr " + to_string(i) + ": " + to_string(temp->at(i)->getPosition().x) + " " + to_string(temp->at(i)->getPosition().y) + " " + to_string(temp->at(i)->getPosition().z) + " ").c_str());
-		}
-	}
+	//if(actorManager->groups.size() != 0)
+	//{
+	//	std::vector<Actor*>* temp = actorManager->findClosestGroup(player->getVehicle()->getPosition());
+	//	for (int i = 0; i < temp->size(); i++)
+	//	{
+	//		ImGui::Text(("AI nr " + to_string(i) + ": " + to_string(temp->at(i)->getPosition().x) + " " + to_string(temp->at(i)->getPosition().y) + " " + to_string(temp->at(i)->getPosition().z) + " ").c_str());
+	//	}
+	//}
 
 	//delete temp;
 	ImGui::End();

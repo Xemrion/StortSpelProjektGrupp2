@@ -9,13 +9,11 @@ public:
 	Turret(float x, float z);
 	~Turret();
 	void update(float dt, Vector3 targetPos);
-	bool hasGroup();
 private:
+	int deltaTime;
 	void setForwardVector(Vector3 forward);
 	void setSightRange(int range);
 	void setUpActor();
-	void followPath();
-	void updateBoid(float deltatime);
 	Status rotateTowards();
 	Status inRange();
 	Status idle();

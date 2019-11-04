@@ -19,8 +19,6 @@
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
-    <ClCompile Include="AI\Boid.cpp" />
-    <ClCompile Include="AI\Defender.cpp" />
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
@@ -84,8 +82,6 @@
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
-    <ClInclude Include="AI\Boid.h" />
-    <ClInclude Include="AI\Defender.h" />
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />
     <ClInclude Include="PG\Map.hpp" />
