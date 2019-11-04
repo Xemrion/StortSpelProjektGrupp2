@@ -40,6 +40,7 @@ private:
 	float maxSpeed;
 	float maxForce;
 	bool isInGroup = false;
+	int attackRange = 8;
 protected:
 	float deltaTime;
 	Vector3 velocity;
