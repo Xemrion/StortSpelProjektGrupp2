@@ -57,7 +57,7 @@ Physics::~Physics()
 void Physics::update(float deltaTime)
 {
 	//this->world->stepSimulation(deltaTime);
-	this->world->stepSimulation(deltaTime, 10000, 1. / 240.);
+	this->world->stepSimulation(deltaTime, 1000, 1. / 120.);
 	//this->world->stepSimulation(deltaTime, 0);
 	//this->world->stepSimulation(btScalar(deltaTime));
 }
