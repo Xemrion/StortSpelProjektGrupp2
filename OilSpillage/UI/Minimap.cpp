@@ -259,40 +259,12 @@ void Minimap::update(float deltaTime)
 	CopyMemory(mappedResource.pData, this->pixels, this->textureFogTemp->getDataSize());
 	deviceContext->Unmap(this->textureFog, 0);
 
-	Vector3 targetPos;
-	Vector3 closestPos;
-	float targetLength = 0.0f;
-	float closestLength = -1.0f;
+	Vector3 closestPos = state->getObjHandler().getObjective(0)->getClosestToPlayer();
+	this->compassRot = XMVector3AngleBetweenVectors(closestPos - playerPos, Vector3::UnitX).m128_f32[0] + XM_PIDIV2;
 
-	if (state->getObjHandler().getObjective(0) != nullptr)
+	if (playerPos.z < closestPos.z)
 	{
-		for (int i = 0; i < state->getObjHandler().getObjective(0)->getNrOfMax(); i++)
-		{
-			if (state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree)
-			{
-				if (state->getObjHandler().getObjective(0)->getTarget(i) != nullptr)
-				{
-					targetPos = state->getObjHandler().getObjective(0)->getTarget(i)->getPosition() * Vector3(1, 0, 1);
-					targetLength = (targetPos - playerPos).Length();
-					
-					if (targetLength < closestLength || closestLength == -1.0f)
-					{
-						closestPos = targetPos;
-						closestLength = targetLength;
-					}
-				}
-			}
-		}
-	}
-
-	if (closestLength != -1.0f)
-	{
-		this->compassRot = XMVector3AngleBetweenVectors(closestPos - playerPos, Vector3::UnitX).m128_f32[0] + XM_PIDIV2;
-		
-		if (playerPos.z < closestPos.z)
-		{
-			this->compassRot = XM_PI - this->compassRot;
-		}
+		this->compassRot = XM_PI - this->compassRot;
 	}
 }
 
