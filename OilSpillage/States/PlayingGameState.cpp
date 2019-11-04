@@ -12,7 +12,7 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	
+	actorManager->createAttacker(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
@@ -520,7 +520,7 @@ void  PlayingGameState::update(float deltaTime)
 
 		if (spawnTimer % 200 == 0)
 		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+			//actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 			spawnTimer = 0;
 		}
 		spawnTimer++;
