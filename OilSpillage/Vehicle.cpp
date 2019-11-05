@@ -75,37 +75,37 @@ void Vehicle::init(Physics *physics)
 	Game::getGraphics().loadTexture("CarTemp");
 	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 
-	mountedWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
-	Material mountedWPMaterial = Game::getGraphics().getMaterial("Entities/Dummy_Turret");
+	mountedWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Turret1");
+	Material mountedWPMaterial = Game::getGraphics().getMaterial("Entities/Turret");
 	mountedWeapon->setTexture(mountedWPMaterial.diffuse);
 	Game::getGraphics().addToDraw(mountedWeapon);
 	mountedWeapon->setScale(Vector3(0.010f,0.007f, 0.007f));
 
-	frontWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
-	Material frontWeaponMat = Game::getGraphics().getMaterial("Entities/Dummy_Turret");
+	frontWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Turret1");
+	Material frontWeaponMat = Game::getGraphics().getMaterial("Entities/Turret");
 	frontWeapon->setTexture(frontWeaponMat.diffuse);
 	Game::getGraphics().addToDraw(frontWeapon);
 	frontWeapon->setScale(Vector3(0.002f, 0.005f, 0.005f));
 	frontWeapon->setColor(Vector4(0.7f, 0.7f, 0.0f, 1.0f));
 
 	this->vehicleBody1 = new GameObject;
-	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
+	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player1");
 	vehicleBody1->setSpotShadow(false);
 	Game::getGraphics().addToDraw(vehicleBody1);
 	vehicleBody1->setScale(Vector3(0.005f, 0.005f, 0.005f));	
 	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
 	//vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
 
-	vehicleBody1->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
+	vehicleBody1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
 
 	this->wheel1 = new GameObject;
 	this->wheel2 = new GameObject;
 	this->wheel3 = new GameObject;
 	this->wheel4 = new GameObject;
-	wheel1->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car");
-	wheel2->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car2");
-	wheel3->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car3");
-	wheel4->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car4");
+	wheel1->mesh = Game::getGraphics().getMeshPointer("Entities/Player");
+	wheel2->mesh = Game::getGraphics().getMeshPointer("Entities/Player2");
+	wheel3->mesh = Game::getGraphics().getMeshPointer("Entities/Player3");
+	wheel4->mesh = Game::getGraphics().getMeshPointer("Entities/Player4");
 	Game::getGraphics().addToDraw(wheel1);
 	Game::getGraphics().addToDraw(wheel2);
 	Game::getGraphics().addToDraw(wheel3);
@@ -118,10 +118,10 @@ void Vehicle::init(Physics *physics)
 	wheel2->setScale(Vector3(0.005f, 0.005f, 0.005f));
 	wheel3->setScale(Vector3(0.005f, 0.005f, 0.005f));
 	wheel4->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	wheel1->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
-	wheel2->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
-	wheel3->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
-	wheel4->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
+	wheel1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	wheel2->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	wheel3->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	wheel4->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
 
 
 	btRigidBody* tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y, vehicle->getPosition().z), btVector3(vehicle->getScale().x, vehicle->getScale().y, vehicle->getScale().z), 10.0f);

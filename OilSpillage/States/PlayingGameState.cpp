@@ -6,6 +6,7 @@
 #include "../UI/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
+#include <future>
 
 void PlayingGameState::initAI()
 {
@@ -36,9 +37,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("grass3");
 
 	graphics.loadTexture("brickwallnormal");
-	graphics.loadModel("Dummy_Roller_Melee");
-	graphics.loadModel("Entities/Dummy_Turret");
-	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
+	graphics.loadModel("Roller_Melee");
+	graphics.loadModel("Entities/Turret");
+	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
 
 	graphics.loadModel("Roads/Metro/0000");
 	graphics.loadModel("Roads/Metro/0001");
@@ -84,7 +85,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 		lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
-	for (int i = 0; i < 10; ++i) {
+	for (int i = 0; i < 100; ++i) {
 		Vector3 randPos   = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand()))/ RAND_MAX;
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
@@ -133,7 +134,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_OPTIONS]->init();
 
-	auto startPos = map->getStartPositionInWorldSpace();
+	Vector3 startPos = map->getStartPositionInWorldSpace();
    auto playerVehicle = player->getVehicle();
 	playerVehicle->setPosition(				startPos + Vector3( .0f, 0.00f -1.2f, .0f) );
 	player->getVehicleBody1()->setPosition(	startPos + Vector3( .0f, 0.65f -1.2f, .0f) );
@@ -189,8 +190,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
-	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
-	buildingTest->mesh = Game::getGraphics().getMeshPointer("Vehicles/Dummy_Player_Car");
+	Game::getGraphics().loadModel("Vehicles/Player");
+	buildingTest->mesh = Game::getGraphics().getMeshPointer("Vehicles/Player");
 	Game::getGraphics().addToDraw(buildingTest.get());
 	btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
 	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
@@ -554,14 +555,16 @@ void  PlayingGameState::update(float deltaTime)
 		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
 		player->updatePlayer(deltaTime);
 		physics->update(deltaTime);
+		actorManager->update(deltaTime, playerVehicle->getPosition());
+		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation();
-		actorManager->update(deltaTime, playerVehicle->getPosition());
-		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
+		//actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		Bullet::updateSoundTimer(deltaTime);
+		bulletThread.get();
 		player->updateWeapon(deltaTime);
 		
 #ifndef _DEBUG
