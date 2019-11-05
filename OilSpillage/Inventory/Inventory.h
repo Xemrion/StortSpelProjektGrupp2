@@ -9,7 +9,7 @@ class Inventory
 public:
 	static std::unique_ptr<Inventory> instance;
 private:
-	std::vector<Item*> itemStacks[ItemType::TYPES_SIZE];
+	std::vector<Item*> itemLists[ItemType::TYPES_SIZE];
 public:
 	Inventory();
 	virtual ~Inventory();

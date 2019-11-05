@@ -12,20 +12,20 @@ Inventory::~Inventory()
 
 void Inventory::addItem(Item* item)
 {
-	this->itemStacks[item->getType()].push_back(item);
+	this->itemLists[item->getType()].push_back(item);
 }
 
 void Inventory::removeItem(Item* item)
 {
-	auto found = std::find(this->itemStacks[item->getType()].begin(), this->itemStacks[item->getType()].end(), item);
+	auto found = std::find(this->itemLists[item->getType()].begin(), this->itemLists[item->getType()].end(), item);
 	
-	if (found != this->itemStacks[item->getType()].end())
+	if (found != this->itemLists[item->getType()].end())
 	{
-		this->itemStacks[item->getType()].erase(found);
+		this->itemLists[item->getType()].erase(found);
 	}
 }
 
 std::vector<Item*>* Inventory::getItemList(ItemType type)
 {
-	return &this->itemStacks[type];
+	return &this->itemLists[type];
 }

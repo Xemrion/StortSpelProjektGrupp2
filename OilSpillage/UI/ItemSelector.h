@@ -18,7 +18,7 @@ public:
 	void draw(bool selected);
 
 	void changeSelectedType(bool down);
-	void changeSelectedIndex(bool left);
+	void changeSelectedIndex(bool right);
 	Item* getSelectedItem() const;
 };
 

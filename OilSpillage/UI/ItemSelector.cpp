@@ -35,13 +35,13 @@ void ItemSelector::changeSelectedType(bool down)
 	}
 }
 
-void ItemSelector::changeSelectedIndex(bool left)
+void ItemSelector::changeSelectedIndex(bool right)
 {
-	int stackSize = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->size();
+	int listSize = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->size();
 	
-	if (!left)
+	if (right)
 	{
-		this->selectedIndex[this->selectedType] = (this->selectedIndex[this->selectedType] + 1) % stackSize;
+		this->selectedIndex[this->selectedType] = (this->selectedIndex[this->selectedType] + 1) % listSize;
 	}
 	else
 	{
@@ -49,7 +49,7 @@ void ItemSelector::changeSelectedIndex(bool left)
 
 		if (this->selectedIndex[this->selectedType] < 0)
 		{
-			this->selectedIndex[this->selectedType] = stackSize - 1;
+			this->selectedIndex[this->selectedType] = listSize - 1;
 		}
 	}
 }
