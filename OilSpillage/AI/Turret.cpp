@@ -3,7 +3,7 @@
 
 Turret::Turret()
 {
-	this->sightRange = 10;
+	this->sightRange = 23;
 	this->setPosition(Vector3(-15.0f, 0.0f, 0.0f));
 	setUpActor();
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
@@ -46,11 +46,10 @@ Turret::~Turret()
 	Game::getGraphics().removeFromDraw(&this->body);
 }
 
-void Turret::update(float dt, Vector3 targetPos, Vector3 targetVelocity)
+void Turret::update(float dt, Vector3 targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
-	this->targetVelocity = targetVelocity;
 	updateWeapon(dt);
 	this->root->func();
 
@@ -139,6 +138,7 @@ Status Turret::lineOfSight()
 	return status;
 
 }
+
 void Turret::calculateTarget(float& angle)
 {
 	float radians = angle * (3.14f / 180.f);
@@ -146,6 +146,7 @@ void Turret::calculateTarget(float& angle)
 	float y = cos(radians) * vecForward.x - sin(radians) * vecForward.z;
 	this->idleTarget = Vector3(x, 0.0f, y);
 }
+
 Status Turret::idle()
 {
 	/*calculate new target position if are getting close to the point*/

@@ -8,7 +8,7 @@ public:
 	ActorManager(AStar* aStar);
 	~ActorManager();
 	enum Radius { CLOSE, MIDDLE, OUTER };
-	void update(float dt, Vector3 targetPos, Vector3 targetVelocity);
+	void update(float dt, Vector3 targetPos);
 	void createAttacker(float x, float z);
 	void createTurret(float x, float z);
 	std::vector<AIGroup> groups;

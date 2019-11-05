@@ -21,7 +21,7 @@ ActorManager::~ActorManager()
 	actors.clear();
 }
 
-void ActorManager::update(float dt, Vector3 targetPos, Vector3 targetVelocity)
+void ActorManager::update(float dt, Vector3 targetPos)
 {
 	soundTimer += dt;
 	bool hasDied = false;
@@ -57,7 +57,7 @@ void ActorManager::update(float dt, Vector3 targetPos, Vector3 targetVelocity)
 			}
 		}
 	}
-	turretHandler.update(dt, targetPos, targetVelocity);
+	turretHandler.update(dt, targetPos);
 
 	updateGroups();
 	if (frameCount % 60 == 0)

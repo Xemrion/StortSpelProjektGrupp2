@@ -12,14 +12,14 @@ TurretHandler::~TurretHandler()
 	}
 	turrets.clear();
 }
-void TurretHandler::update(float dt, DirectX::SimpleMath::Vector3 targetPos, Vector3 targetVelocity)
+void TurretHandler::update(float dt, DirectX::SimpleMath::Vector3 targetPos)
 {
 	bool turretDied = false;
 	for (int i = 0; i < this->turrets.size(); i++)
 	{
 		if (!turrets[i]->isDead() && turrets[i] != nullptr)
 		{
-			turrets[i]->update(dt, targetPos, targetVelocity);
+			turrets[i]->update(dt, targetPos);
 		}
 		else if (turrets[i]->isDead() && turrets[i] != nullptr)
 		{
