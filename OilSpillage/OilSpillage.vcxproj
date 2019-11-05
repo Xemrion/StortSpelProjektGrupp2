@@ -154,6 +154,7 @@
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Inventory\Inventory.cpp" />
     <ClCompile Include="Inventory\Item.cpp" />
+    <ClCompile Include="Inventory\ItemWeapon.cpp" />
     <ClCompile Include="Objectives\Objective.cpp" />
     <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
@@ -219,6 +220,7 @@
     <ClInclude Include="AI\Behaviour.h" />
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="Inventory\Inventory.h" />
+    <ClInclude Include="Inventory\ItemWeapon.h" />
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />

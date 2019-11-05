@@ -2,6 +2,8 @@
 #include "Input.h"
 #include "Sound.h"
 #include "UI/UserInterface.h"
+#include "Inventory/Inventory.h"
+#include "Inventory/Item.h"
 #include "States/MenuGameState.h"
 #include "States/PlayingGameState.h"
 #include "States/UpgradingGameState.h"
@@ -17,6 +19,8 @@ void Game::start(Window* window)
 	Input::init(instance->window);
 	Sound::Init();
 	UserInterface::initStaticVariables();
+	Inventory::instance = std::make_unique<Inventory>();
+	Item::init();
 
 	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
 	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");

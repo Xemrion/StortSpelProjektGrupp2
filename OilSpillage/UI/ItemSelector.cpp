@@ -27,11 +27,11 @@ ItemSelector::~ItemSelector()
 void ItemSelector::draw(bool selected)
 {
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), this->position);
-	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position + Vector2(63 + 64 * (this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType]), 31));
+	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position + Vector2(95 + 96 * (this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType]), 47));
 
 	for (int i = 0; i < ItemSelector::tileLength; i++)
 	{
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), std::to_string(this->startIndex[this->selectedType] + i).c_str(), this->position + Vector2(63+ 16 + 64 * i, 31 + 16), Colors::Red, 0, Vector2(), 0.3f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), std::to_string(this->startIndex[this->selectedType] + i).c_str(), this->position + Vector2(95 + 24 + 96 * i, 47 + 24), Colors::Red, 0, Vector2(), 0.45f);
 	}
 }
 
