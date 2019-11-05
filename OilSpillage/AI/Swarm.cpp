@@ -20,8 +20,10 @@ Swarm::Swarm(float x, float z, AStar* aStar, int weaponType)
 	Game::getGraphics().loadModel("Entities/Dummy_Drone");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Drone");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Drone"));
+	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMelee);
 
 	boidOffset = 2.5;
+
 }
 
 Swarm::~Swarm()
