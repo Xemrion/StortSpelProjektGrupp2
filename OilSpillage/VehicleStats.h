@@ -25,7 +25,7 @@ public:
 									//{ health, durability, armour, accelerationRate, maxSpeed, handlingRate };
 	static constexpr Stats AITurret   = { 100,       2.0f,    2.0f,          0.0,          0.0f,      1.0f };
 									//{ health, durability, armour, accelerationRate, maxSpeed, handlingRate };
-	static constexpr Stats AISwarm    = { 20,       1.0f,    1.0f,          2.0,          5.0f,      2.0f };
+	static constexpr Stats AISwarm    = { 20,       1.0f,    1.0f,          2.0,          7.0f,      2.0f };
 };
 
 #endif // !VEHICLE_STATS_H
