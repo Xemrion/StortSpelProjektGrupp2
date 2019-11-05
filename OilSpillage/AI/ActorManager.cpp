@@ -65,6 +65,13 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		assignPathsToGroups(targetPos);
 		frameCount = 0;
 	}
+	if (frameCount % 10 == 0)
+	{
+		for(int i = 0; i < groups.size(); i++)
+		{
+			groups[i].updateBoidDistance();
+		}
+	}
 	updateAveragePos();
 	frameCount++;
 }
@@ -237,7 +244,6 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 		{
 			groups[i].actors[j]->setPath(&path);
 		}
-		groups[i].updateBoidDistance();
 	}	
 }
 
