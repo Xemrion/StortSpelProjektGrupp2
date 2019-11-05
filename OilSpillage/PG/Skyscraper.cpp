@@ -114,8 +114,8 @@ void Skyscraper::testDraw(std::string name)
 		Game::getGraphics().addToDraw(this->building);
 		this->building->setPosition(Vector3(30.0f, 0.0f, -30.0f));
 		this->building->setScale(Vector3(1.0f, 1.0f, 1.0f));
-		this->building->setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-		this->building->setTexture(Game::getGraphics().getTexturePointer("fireball"));
+		this->building->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
+		this->building->setTexture(Game::getGraphics().getTexturePointer("testWood"));
 		this->building->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
 	}
 }
