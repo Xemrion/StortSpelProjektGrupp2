@@ -46,7 +46,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 			hasDied = true;
 		}
 	}
-	if (hasDied == true)
+	if (hasDied)
 	{
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
@@ -79,7 +79,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 
 void ActorManager::createAttacker(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Attacker(x, z, this->aStar, weaponType));
+	this->actors.push_back(new Attacker(x, z, weaponType));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
@@ -90,7 +90,7 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 
 void ActorManager::createSwarm(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Swarm(x, z, this->aStar, weaponType));
+	this->actors.push_back(new Swarm(x, z, weaponType));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
@@ -251,7 +251,7 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 		{
 			groups[i].actors[j]->setPath(&groups[i].getPathRef());
 		}
-	}	
+	}
 }
 
 void ActorManager::updateGroups()

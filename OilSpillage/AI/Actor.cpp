@@ -15,12 +15,11 @@ Actor::Actor()
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 }
 
-Actor::Actor(float x, float z, AStar* aStar = nullptr, int weaponType)
+Actor::Actor(float x, float z, int weaponType)
 {
 	this->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(this);
 
-	this->aStar = aStar;
 	this->setUpActor();
 	this->timeSinceLastShot = 0;
 	this->acceleration = Vector3(0.0f);

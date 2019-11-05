@@ -17,7 +17,7 @@ Turret::Turret()
 }
 
 Turret::Turret(float x, float z, int weaponType)
-	: Actor(x, z, nullptr, weaponType)
+	: Actor(x, z, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 23;

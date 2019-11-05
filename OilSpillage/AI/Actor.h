@@ -9,7 +9,7 @@ class Actor : public GameObject
 {
 public:
 	Actor();
-	Actor(float x, float z, AStar* aStar, int weaponType = 1);
+	Actor(float x, float z, int weaponType = 1);
 	virtual ~Actor();
 	virtual void update(float dt, Vector3 targetPos);
 	virtual void setUpActor() = 0 {};
@@ -54,7 +54,6 @@ protected:
 	Vector3 vecForward;
 	Vector3 destination;
 	Selector* root;
-	AStar* aStar;
 	Vector3 targetNode;
 	enum State { Roaming, Chasing, Returning };
 	State state;

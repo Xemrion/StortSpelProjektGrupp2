@@ -11,8 +11,8 @@ Attacker::Attacker()
 	this->health = this->updatedStats.maxHealth;
 }
 
-Attacker::Attacker(float x, float z, AStar* aStar, int weaponType)
-	:Actor(x, z, aStar, weaponType)
+Attacker::Attacker(float x, float z, int weaponType)
+	:Actor(x, z, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();

@@ -4,7 +4,7 @@ class Swarm : public Actor
 {
 public:
 	Swarm();
-	Swarm(float x, float z, AStar* aStar, int weaponType);
+	Swarm(float x, float z, int weaponType);
 	~Swarm();
 	void update(float dt, Vector3 targetPos);
 
