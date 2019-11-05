@@ -76,6 +76,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadModel("Houses/testHouse6");
 	graphics.loadModel("Houses/houseMaterial");
 	graphics.loadModel("Houses/houseMaterial2");
+	graphics.loadModel("Houses/houseMaterial3");
 
 
 	player = std::make_unique<Vehicle>();

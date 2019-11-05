@@ -158,9 +158,10 @@ void  Map::generateBuildings( )
 	buildingArr[4] = "Houses/testHouse5";
 	buildingArr[5] = "Houses/testHouse6";
 	
-	std::string textureArr[2];
+	std::string textureArr[3];
 	textureArr[0] = "Houses/houseMaterial";
 	textureArr[1] = "Houses/houseMaterial2";
+	textureArr[2] = "Houses/houseMaterial3";
 
 	#ifdef _DEBUG
 	   U32            total_building_count{ 0 };
@@ -240,7 +241,7 @@ void  Map::generateBuildings( )
 						if ( not isHospital ) {
 							int randomHouse = rand() % 6; // decides the house
 							houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
-							int randomTex = rand() % 2;
+							int randomTex = rand() % 3;
 							houseTile.setMaterial(graphics.getMaterial(data(textureArr[randomTex])));
 
 							//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
