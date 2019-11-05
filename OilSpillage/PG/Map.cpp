@@ -150,16 +150,18 @@ void  Map::generateBuildings( )
 	F32_Dist smallProbabilityDist {};
 
 	//Array of possible buildings
-	std::string buildingArr[5];
+	std::string buildingArr[6];
 	buildingArr[0] = "Houses/testHouse";
 	buildingArr[1] = "Houses/testHouse2";
 	buildingArr[2] = "Houses/testHouse3";
 	buildingArr[3] = "Houses/testHouse4";
 	buildingArr[4] = "Houses/testHouse5";
+	buildingArr[5] = "Houses/testHouse6";
 	
-	std::string textureArr[2];
+	std::string textureArr[3];
 	textureArr[0] = "Houses/houseMaterial";
 	textureArr[1] = "Houses/houseMaterial2";
+	textureArr[2] = "Houses/houseMaterial3";
 
 	#ifdef _DEBUG
 	   U32            total_building_count{ 0 };
@@ -237,9 +239,9 @@ void  Map::generateBuildings( )
 						tilemap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
 						if ( not isHospital ) {
-							int randomHouse = rand() % 5; // decides the house
+							int randomHouse = rand() % 6; // decides the house
 							houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
-							int randomTex = rand() % 2;
+							int randomTex = rand() % 3;
 							houseTile.setMaterial(graphics.getMaterial(data(textureArr[randomTex])));
 
 							//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
