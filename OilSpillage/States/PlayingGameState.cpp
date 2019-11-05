@@ -35,9 +35,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("grass3");
 
 	graphics.loadTexture("brickwallnormal");
-	graphics.loadModel("Dummy_Roller_Melee");
-	graphics.loadModel("Entities/Dummy_Turret");
-	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
+	graphics.loadModel("Roller_Melee");
+	graphics.loadModel("Entities/Turret");
+	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
 
 	graphics.loadModel("Roads/Metro/0000");
 	graphics.loadModel("Roads/Metro/0001");
@@ -188,8 +188,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
-	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
-	buildingTest->mesh = Game::getGraphics().getMeshPointer("Vehicles/Dummy_Player_Car");
+	Game::getGraphics().loadModel("Vehicles/Player");
+	buildingTest->mesh = Game::getGraphics().getMeshPointer("Vehicles/Player");
 	Game::getGraphics().addToDraw(buildingTest.get());
 	btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
 	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
