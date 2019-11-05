@@ -130,7 +130,7 @@ public:
 	void renderShadowmap(DynamicCamera* camera);
 	bool createShaders();
 	void fillLightBuffers();
-	void clearScreen();
+	void clearScreen(Vector4 color = Vector4(0, 0, 0, 1));
 	ID3D11DeviceContext* getDeviceContext();
 	ID3D11Device* getDevice();
 	//culling by distance from camera

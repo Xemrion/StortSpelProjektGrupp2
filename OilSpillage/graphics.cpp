@@ -713,10 +713,9 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 	this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
-void Graphics::clearScreen()
+void Graphics::clearScreen(Vector4 color)
 {
-	float color[4] = { 0,0,0,1 };
-	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	deviceContext->ClearRenderTargetView(renderTargetView.Get(), &color.x);
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 }
 

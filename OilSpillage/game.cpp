@@ -2,8 +2,11 @@
 #include "Input.h"
 #include "Sound.h"
 #include "UI/UserInterface.h"
+#include "Inventory/Inventory.h"
+#include "Inventory/Item.h"
 #include "States/MenuGameState.h"
 #include "States/PlayingGameState.h"
+#include "States/UpgradingGameState.h"
 
 std::unique_ptr<Game> Game::instance;
 
@@ -16,6 +19,8 @@ void Game::start(Window* window)
 	Input::init(instance->window);
 	Sound::Init();
 	UserInterface::initStaticVariables();
+	Inventory::instance = std::make_unique<Inventory>();
+	Item::init();
 
 	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
 	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");
@@ -87,6 +92,8 @@ void Game::createCurrentState()
 		state = std::make_unique<MenuGameState>();
 	else if (currentState == STATE_PLAYING)
 		state = std::make_unique<PlayingGameState>();
+	else if (currentState == STATE_UPGRADING)
+		state = std::make_unique<UpgradingGameState>();
 }
 
 void Game::run()
@@ -129,7 +136,7 @@ void Game::run()
 	}
 }
 
-Game::Game() : currentState(STATE_MENU), oldState(-1), running(false) {}
+Game::Game() : currentState(STATE_UPGRADING), oldState(-1), running(false) {}
 
 Game::~Game()
 {

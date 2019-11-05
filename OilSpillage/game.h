@@ -15,7 +15,8 @@ public:
 	enum State
 	{
 		STATE_MENU,
-		STATE_PLAYING
+		STATE_PLAYING,
+		STATE_UPGRADING
 	};
 	static void							start(Window* window);
 	static void							quit();
