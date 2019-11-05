@@ -617,7 +617,6 @@ void  PlayingGameState::update(float deltaTime)
 	else if ( Input::checkButton(Keys::MENU, States::PRESSED) )
 		setCurrentMenu( PlayingGameState::MENU_PAUSED );
 	
-	graphics.renderUI(camera.get(), deltaTime);
 
 	//Render all objects
 	

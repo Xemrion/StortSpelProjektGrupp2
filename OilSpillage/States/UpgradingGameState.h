@@ -3,7 +3,7 @@
 
 #include "GameState.h"
 #include "../game.h"
-#include "../UI/UIUpgrading.h"
+#include "../UI/Upgrading/UIUpgrading.h"
 
 class UpgradingGameState : public GameState
 {
