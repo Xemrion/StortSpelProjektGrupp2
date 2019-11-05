@@ -29,8 +29,9 @@ Actor::Actor(float x, float z, AStar* aStar = nullptr)
 	this->position = Vector3(x, -1.0f, z);
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
-
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+
+	//this->predicting = true;
 }
 
 Actor::~Actor()
@@ -55,10 +56,22 @@ void Actor::updateWeapon(float deltaTime)
 }
 
 Status Actor::shoot()
-{
-	int nrOfFramesAhead = 15;
-	float randomOffset = (rand() % 2) + 0.1;
-	int chance = (rand() % 2)+1;
+{	
+	float offset;
+	Vector3 offsetPos;
+	if(!predicting)
+	{
+		offset = (rand() % 4) - 2;
+		offset *= 0.9f;
+		offsetPos = Vector3(targetPos.x - offset, 0.0f, targetPos.z - offset);
+	}
+	else
+	{
+		Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
+		float predictionFactor = 0.4f;
+		offsetPos = Vector3(targetPos.x + targetVelocity.x * predictionFactor, 0.0f, (targetPos.z + targetVelocity.z * predictionFactor));
+	}
+
 	if ((position - targetPos).Length() < 23)
 	{
 		if (this->timeSinceLastShot >= this->weapon.fireRate)
@@ -72,21 +85,9 @@ Status Actor::shoot()
 					Vector3 dir = (targetPos - this->position);
 					dir.Normalize();
 					Vector3 bulletOrigin = this->position + dir;
-					//Standard
-					//dir = (targetPos - bulletOrigin);
-					// Random offset
-					if(chance == 1)
-					{
-						dir = (Vector3(targetPos.x + randomOffset, 0.0f, targetPos.z + randomOffset) - bulletOrigin);
-					}
-					else
-					{
-						dir = (Vector3(targetPos.x - randomOffset, 0.0f, targetPos.z - randomOffset) - bulletOrigin);
-					}
-					// Predict
-					//dir = (Vector3(targetPos.x - targetVelocity.x * nrOfFramesAhead, 0.0f, (targetPos.z - targetVelocity.z * nrOfFramesAhead)) - bulletOrigin);
+					dir = ( offsetPos- bulletOrigin);
+					dir.Normalize();
 					
-
 					this->bullets[i].setWeaponType(this->weapon.type);
 					this->bullets[i].shoot(
 						weapon,

@@ -42,10 +42,9 @@ private:
 	bool isInGroup = false;
 	int attackRange = 8;
 protected:
-
+	bool predicting = false;
 	float deltaTime;
 	Vector3 velocity;
-	Vector3 targetVelocity;
 	int health;
 	Stats defaultStats;
 	Stats updatedStats;

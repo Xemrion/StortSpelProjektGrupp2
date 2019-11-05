@@ -138,6 +138,7 @@ Status Turret::lineOfSight()
 	return status;
 
 }
+
 void Turret::calculateTarget(float& angle)
 {
 	float radians = angle * (3.14f / 180.f);
@@ -145,6 +146,7 @@ void Turret::calculateTarget(float& angle)
 	float y = cos(radians) * vecForward.x - sin(radians) * vecForward.z;
 	this->idleTarget = Vector3(x, 0.0f, y);
 }
+
 Status Turret::idle()
 {
 	/*calculate new target position if are getting close to the point*/
