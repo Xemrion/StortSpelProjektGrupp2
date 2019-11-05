@@ -72,7 +72,7 @@ void QuadTree::Node::insert(GameObject* o)
 	else
 	{
 		objects.push_back(o);
-		auto comp = [](GameObject* a, GameObject* b) {return a->getAABB().maxPos.y > b->getAABB().maxPos.y; };
+		auto comp = [](GameObject* a, GameObject* b) {return a->getAABB().maxPos.y < b->getAABB().maxPos.y; };
 		std::sort(objects.begin(), objects.end(), comp);
 	}
 }

@@ -275,13 +275,17 @@ Vector<String> const  TileMap::tileTerminalColorTable{
 Bounds TileMap::calculateBounds( Vector3 const &o, F32 r ) const noexcept
 {
    V2u     ots { convertWorldPositionToTilePosition(o) }; // origin tile xy
-   U16     rts { r / config.tileScaleFactor.x };
+   U32     rts = U32(std::ceil(r / config.tileScaleFactor.x));
 	Bounds  b   { { ots.x-rts, ots.y-rts },
                  { ots.x+rts, ots.y+rts } };
-   if ( b.min.x >= width  ) b.min.x = 0;
-   if ( b.min.y >= height ) b.min.y = 0;
-   if ( b.max.x >= width  ) b.max.x = width  - 1;
-   if ( b.max.y >= height ) b.max.y = height - 1;
+   if ( (Size)b.min.x >= width  )
+		b.min.x = 0;
+   if ( (Size)b.min.y >= height )
+		b.min.y = 0;
+   if ( (Size)b.max.x >= width  )
+		b.max.x = width  - 1;
+   if ( (Size)b.max.y >= height )
+		b.max.y = height - 1;
 	return b;
 }
 
@@ -290,8 +294,8 @@ Opt<Vector3> TileMap::getRandomTilePositionInRadius( Vector3 o, F32 r, Tile targ
 {
    RNG      rng  { RD()() };
    Bounds   b    { calculateBounds(o,r) };
-	U16_Dist genX { b.min.x, b.max.x };
-	U16_Dist genY { b.min.y, b.max.y };
+	U32_Dist genX { b.min.x, b.max.x };
+	U32_Dist genY { b.min.y, b.max.y };
 
    for ( auto i=0;  i<tries;  ++i ) {
       V2u pts { genX(rng), genY(rng) };

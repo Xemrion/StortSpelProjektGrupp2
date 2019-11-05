@@ -82,7 +82,7 @@ void  Map::generateRoads()
 	
 	roadTiles = instantiateTilesAsModels( graphics, *tilemap ); //= tilemap->loadAsModels(graphics); // GameObject instantiation
 	for ( auto &e : roadTiles )
-		graphics.addToDraw( &e , true );
+		graphics.addToDraw( e.get() , true );
 }
 
 void  Map::generateDistricts()
@@ -108,8 +108,8 @@ void  Map::generateDistricts()
 			districtMarkers.emplace_back();
 			auto &marker = districtMarkers.back();
 			marker.mesh  = graphics.getMeshPointer("Cube");
-			marker.setColor({ 1, 0,  0, 1 });
-			marker.setScale({ .2f, 4.0f, .2f });
+			marker.setColor(Vector4{ 1.0f, .0f, .0f, 1.0f });
+			marker.setScale(Vector3{ .2f, 4.0f, .2f });
 			marker.setPosition({ tilemap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
 			                                                                  static_cast<U16>(cellCentre.y)) });
 			graphics.addToDraw(&marker, true);
@@ -321,8 +321,8 @@ Opt<Vector<V2u>>  Map::findValidHouseLot( RNG &rng, U16 cellId, Voronoi const &d
 
 	Bounds    cellBounds      { districtMap.computeCellBounds(cellId) };
 	U16_Dist  generateOffset  { 0x0, 0xFF };
-	U16_Dist  generateX       { cellBounds.min.x, cellBounds.max.x };
-	U16_Dist  generateY       { cellBounds.min.y, cellBounds.max.y };
+	U16_Dist  generateX       ( cellBounds.min.x, cellBounds.max.x );
+	U16_Dist  generateY       ( cellBounds.min.y, cellBounds.max.y );
 	District const  districtType       { districtLookUpTable[cellId] }; // TODO: refactor? (and param)
 	auto      isValidPosition { [&](V2u const &tilePosition ) -> Bool {
 	                               return  (districtMap.diagram[districtMap.diagramIndex(tilePosition)] != cellId)
@@ -436,7 +436,7 @@ void  Map::setDistrictColorCoding( Bool useColorCoding ) noexcept
 		for ( U16 y = 0;  y < tilemap->height;  ++y ) {
 			for ( U16 x = 0;  x < tilemap->width;  ++x ) {
 				assert( tilemap->data.size() == districtMap->diagram.size() and "BUG!" );
-				auto       &tile      = roadTiles[ tilemap->index(x, y) ];
+				auto       &tile      = *roadTiles[ tilemap->index(x, y) ];
 				auto        cellIndex = districtMap->diagramIndex(x, y);
 				auto        cellId    = districtMap->diagram[ cellIndex ];
 				auto const &color     = districtColorTable[ cellId % districtColorTable.size() ];
@@ -538,7 +538,7 @@ void Map::generateRoadDistanceMap() noexcept
 							foundRoadDistance = it->distance;
 
 					// assign found distance or some default distance
-					roadDistanceMap[tilemap->index(centerPos)] = foundRoadDistance.value_or( distance_f({0,0}, {searchRadius+1, searchRadius+1}) );
+					roadDistanceMap[tilemap->index(centerPos)] = foundRoadDistance.value_or( distance_f({0,0}, {U32(searchRadius)+1, U32(searchRadius)+1}) );
 				}
 			}
 		}

@@ -58,19 +58,26 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	//graphics.loadModel("Roads/Metro/1110");
 	//graphics.loadModel("Roads/Metro/1111");
 
-	graphics.loadMesh("quad"); // one-sided
-	graphics.loadTexture("tiles/asphalt");
-	graphics.loadTexture("tiles/grass");
-	graphics.loadTexture("tiles/sidewalk_corner_outer_ne");
-	graphics.loadTexture("tiles/sidewalk_side_n");
-	graphics.loadTexture("tiles/sidewalk_corner_inner_ne");
-	graphics.loadTexture("tiles/sidewalk_u_n");
-	graphics.loadTexture("tiles/sidewalk_hole");
-	graphics.loadTexture("tiles/road_marker_straight_n");
-	graphics.loadTexture("tiles/road_marker_deadend_n");
-	graphics.loadTexture("tiles/road_marker_turn_ne");
-	graphics.loadTexture("tiles/road_marker_3way_n");
-	graphics.loadTexture("tiles/road_marker_4way");
+	graphics.loadModel("Tiles/Quad_SS"); // one-sided
+	graphics.loadTexture("Tiles/asphalt");
+	graphics.loadTexture("Tiles/asphalt_nor");
+	graphics.loadTexture("Tiles/grass");
+	graphics.loadTexture("Tiles/grass_nor");
+	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne");
+	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne_nor");
+	graphics.loadTexture("Tiles/sidewalk_side_n");
+	graphics.loadTexture("Tiles/sidewalk_side_n_nor");
+	graphics.loadTexture("Tiles/sidewalk_corner_inner_ne");
+	graphics.loadTexture("Tiles/sidewalk_corner_inner_ne_nor");
+	graphics.loadTexture("Tiles/sidewalk_u_n");
+	graphics.loadTexture("Tiles/sidewalk_u_n_nor");
+	graphics.loadTexture("Tiles/sidewalk_hole");
+	graphics.loadTexture("Tiles/sidewalk_hole_nor");
+	graphics.loadTexture("Tiles/road_marker_straight_n");
+	graphics.loadTexture("Tiles/road_marker_deadend_n");
+	graphics.loadTexture("Tiles/road_marker_turn_ne");
+	graphics.loadTexture("Tiles/road_marker_3way_n");
+	graphics.loadTexture("Tiles/road_marker_4way");
 
 
 
