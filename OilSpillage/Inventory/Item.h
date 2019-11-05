@@ -7,6 +7,7 @@
 enum ItemType
 {
 	WEAPON,
+	USELESS_THING,
 	TYPES_SIZE
 };
 

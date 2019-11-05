@@ -168,6 +168,7 @@
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="PG\District.cpp" />
+    <ClCompile Include="States\UpgradingGameState.cpp" />
     <ClCompile Include="UI\Button.cpp" />
     <ClCompile Include="UI\CheckBox.cpp" />
     <ClCompile Include="UI\Element.cpp" />
@@ -233,6 +234,7 @@
     <ClInclude Include="States\MenuGameState.h" />
     <ClInclude Include="States\PlayingGameState.h" />
     <ClInclude Include="PG\District.hpp" />
+    <ClInclude Include="States\UpgradingGameState.h" />
     <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="STB\stb_image_write.h" />
     <ClInclude Include="UI\Button.h" />

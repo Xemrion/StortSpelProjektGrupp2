@@ -78,6 +78,7 @@
     <ClCompile Include="UI\ItemSelector.cpp" />
     <ClCompile Include="Inventory\Item.cpp" />
     <ClCompile Include="Inventory\Inventory.cpp" />
+    <ClCompile Include="States\UpgradingGameState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="UI\ItemSelector.h" />
     <ClInclude Include="Inventory\Item.h" />
     <ClInclude Include="Inventory\Inventory.h" />
+    <ClInclude Include="States\UpgradingGameState.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

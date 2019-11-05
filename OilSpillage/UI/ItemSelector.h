@@ -7,8 +7,14 @@
 class ItemSelector : public Element
 {
 private:
+	static const int tileLength = 6;
+
+	Texture* textureBG;
+	Texture* textureIndicator;
+
 	int selectedType;
 	int selectedIndex[ItemType::TYPES_SIZE];
+	int startIndex[ItemType::TYPES_SIZE];
 public:
 	static Vector2 size;
 
