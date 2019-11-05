@@ -15,7 +15,9 @@ void PlayingGameState::initAI()
 	aStar->generateTileData(map->getTileMap());
 
 	actorManager->createSpitFire(player.get()->getVehicle()->getPosition().x + 4,
-		player.get()->getVehicle()->getPosition().z + 4);
+		player.get()->getVehicle()->getPosition().z + 4, physics.get());
+
+
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)

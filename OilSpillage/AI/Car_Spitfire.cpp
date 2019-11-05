@@ -19,10 +19,10 @@ void Spitfire::setUpActor()
 }
 
 Spitfire::Spitfire(float x, float z, AStar* aStar):
-	Actor(x, z, nullptr)
+	Actor(x, z, aStar)
 {
-	this->forward = Vector3(1, 0, 0);
-	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
+	this->direction = Vector3(1, 0, 0);
+	//this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->deltaTime = 0;
 	setUpActor();
 	//Game::getGraphics().loadModel("Entities/Dummy_Player_Car1");
@@ -30,7 +30,6 @@ Spitfire::Spitfire(float x, float z, AStar* aStar):
 	//this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car1"));
 	//Game::getGraphics().addToDraw(&mesh);
 	
-	car = new Vehicle();
 }
 
 Spitfire::Spitfire()
@@ -53,16 +52,28 @@ void Spitfire::update(float dt, Vector3 targetPos)
 	this->root->func();
 }
 
+void Spitfire::Init(Physics* physics)
+{
+	car = new Vehicle();
+	car->init(physics);
+	car->getVehicle()->setPosition(Vector3(position.x, 0 - 1.2f, position.z));
+	car->getVehicleBody1()->setPosition(Vector3(position.x, 0 - 1.2f + 0.65f, position.z));
+}
+
 Status Spitfire::inRange()
 {
 	Status status;
-	if ((getPosition() - targetPos).Length() > 15)
+	direction = car->getVehicle()->getPosition() - targetPos;
+	direction.Normalize();
+	if ((car->getVehicle()->getPosition() - targetPos).Length() > 10)
 	{
-		status = Status::FAILURE;
+		status = Status::SUCCESS;
+		gas = 1;
 	}
 	else
 	{
 		status = Status::SUCCESS;
+		gas = 1;
 	}
 	return status;
 }
@@ -75,5 +86,10 @@ Status Spitfire::vehicleUpdate()
 
 void Spitfire::updateVehicle()
 {
-	/*Vehicle->update()*/
+
+	prevAccelForce = Vector3(car->getVehicle()->getRigidBody()->getLinearVelocity());
+	car->update(deltaTime, gas, false, false, Vector2(-direction.x, -direction.z));
+	Vector3 accelForce = Vector3(car->getVehicle()->getRigidBody()->getLinearVelocity().getX(), car->getVehicle()->getRigidBody()->getLinearVelocity().getY(), car->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
+	car->setAccelForce(accelForce, deltaTime);
+	car->setWheelRotation();
 }

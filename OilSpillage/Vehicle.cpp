@@ -18,7 +18,7 @@ Vehicle::Vehicle()
 	this->immortal = false;
 
 	targetRotation = 0.0f;
-	drivingMode = 0;
+	drivingMode = 1;
 	topSpeed = 4700;
 	this->add = 0.0f;
 	this->counter = 0.0f;

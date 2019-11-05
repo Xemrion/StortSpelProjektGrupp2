@@ -155,9 +155,10 @@ void ActorManager::createTurret(float x, float z)
 	this->turrets.push_back(new Turret(x, z));
 }
 
-void ActorManager::createSpitFire(float x, float z)
+void ActorManager::createSpitFire(float x, float z, Physics* physics)
 {
 	this->cars.push_back(new Spitfire(x, z, aStar));
+	this->cars[cars.size() - 1]->Init(physics);
 }
 
 float ActorManager::distanceToPlayer(Vector3 position)
