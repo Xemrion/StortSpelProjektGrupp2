@@ -23,6 +23,8 @@ Attacker::Attacker(float x, float z, AStar* aStar, int weaponType)
 	Game::getGraphics().loadModel("Entities/Dummy_Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Roller_Melee"));
+
+	boidOffset = 9;
 }
 
 Attacker::~Attacker()

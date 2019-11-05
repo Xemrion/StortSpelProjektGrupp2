@@ -75,6 +75,7 @@
     <ClCompile Include="AI\AIGroup.cpp" />
     <ClCompile Include="UI\UIControls.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
+    <ClCompile Include="AI\Swarm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="AI\AIGroup.h" />
     <ClInclude Include="UI\UIControls.h" />
     <ClInclude Include="AI\TurretHandler.h" />
+    <ClInclude Include="AI\Swarm.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

@@ -66,13 +66,13 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		assignPathsToGroups(targetPos);
 		frameCount = 0;
 	}
-	if (frameCount % 10 == 0)
-	{
-		for(int i = 0; i < groups.size(); i++)
-		{
-			groups[i].updateBoidDistance();
-		}
-	}
+	//if (frameCount % 200 == 0)
+	//{
+	//	for(int i = 0; i < groups.size(); i++)
+	//	{
+	//		groups[i].updateBoidDistance();
+	//	}
+	//}
 	updateAveragePos();
 	frameCount++;
 }
@@ -86,6 +86,12 @@ void ActorManager::createAttacker(float x, float z, int weaponType)
 void ActorManager::createTurret(float x, float z, int weaponType)
 {
 	turretHandler.createTurret(x, z, weaponType);
+}
+
+void ActorManager::createSwarm(float x, float z, int weaponType)
+{
+	this->actors.push_back(new Swarm(x, z, this->aStar, weaponType));
+	initGroupForActor(actors.at(actors.size() - 1));
 }
 
 float ActorManager::distanceToPlayer(Vector3 position)

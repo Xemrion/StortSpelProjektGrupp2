@@ -1,6 +1,7 @@
 #pragma once
 #include "AIGroup.h"
-#include"TurretHandler.h"
+#include "TurretHandler.h"
+#include "Swarm.h"
 class ActorManager
 {
 public:
@@ -11,6 +12,7 @@ public:
 	void update(float dt, Vector3 targetPos);
 	void createAttacker(float x, float z, int weaponType = 1);
 	void createTurret(float x, float z, int weaponType = 1);
+	void createSwarm(float x, float z, int weaponType = 1);
 	std::vector<AIGroup> groups;
 	float distanceToPlayer(Vector3 position);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
