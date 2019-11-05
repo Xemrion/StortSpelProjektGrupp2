@@ -353,7 +353,7 @@ bool Graphics::init(Window* window)
 	}*/
 	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	tempCamera.setPosition(Vector3(0, 0, -1));
+	tempCamera.setPosition(Vector3(0, 0, -10));
 
 
 	
@@ -1230,7 +1230,7 @@ void Graphics::setUISun(Vector3 direction, Vector4 color)
 	this->uiSun.setDirection(this->uiSunDir);
 }
 
-void Graphics::renderUI(DynamicCamera* camera, float deltaTime)
+void Graphics::renderUI(float deltaTime)
 {
 	float color[4] = {
 		0,0,0,1
@@ -1246,11 +1246,6 @@ void Graphics::renderUI(DynamicCamera* camera, float deltaTime)
 
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), this->uiDSV.Get());
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	Matrix view = camera->getViewMatrix().Transpose();
-	deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, &view, sizeof(Matrix));
-	deviceContext->Unmap(viewProjBuffer.Get(), 0);
-	deviceContext->CSSetConstantBuffers(1, 1, viewProjBuffer.GetAddressOf());
 
 	HRESULT hr = deviceContext->Map(sunBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &uiSun, sizeof(Sun));

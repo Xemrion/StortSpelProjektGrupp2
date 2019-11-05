@@ -86,7 +86,7 @@ class Graphics {
 	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
-	DynamicCamera tempCamera = DynamicCamera(90, 0.1f, 1000);
+	DynamicCamera tempCamera = DynamicCamera(40, 0.1f, 1000);
 	PixelShader uiPixelShader;
 	VertexShader uiVertexShader;
 	Sun uiSun;
@@ -122,7 +122,7 @@ public:
 	void removeFromUIDraw(GameObject* obj);
 	void removeAllUIDraw();
 	void setUISun(Vector3 direction, Vector4 color);
-	void renderUI(DynamicCamera* camera, float deltaTime);
+	void renderUI(float deltaTime);
 
 	void setLightList(LightList* lightList);
 	void presentScene();
