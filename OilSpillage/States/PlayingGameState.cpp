@@ -13,8 +13,11 @@ void PlayingGameState::initAI()
 	aStar = new AStar( map->getTileMap() );
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	actorManager->createTurret(player.get()->getVehicle()->getPosition().x +4,
-		player.get()->getVehicle()->getPosition().z +4);
+
+	actorManager->createSpitFire(player.get()->getVehicle()->getPosition().x + 4,
+		player.get()->getVehicle()->getPosition().z + 4, physics.get());
+
+
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
@@ -93,8 +96,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadModel("Houses/testHouse3");
 	graphics.loadModel("Houses/testHouse4");
 	graphics.loadModel("Houses/testHouse5");
+	graphics.loadModel("Houses/testHouse6");
 	graphics.loadModel("Houses/houseMaterial");
 	graphics.loadModel("Houses/houseMaterial2");
+	graphics.loadModel("Houses/houseMaterial3");
 
 
 	player = std::make_unique<Vehicle>();
@@ -543,12 +548,12 @@ void  PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		
-		if(spawnTimer % 200 == 0)
+	/*	if(spawnTimer % 200 == 0)
 		{
 			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 			spawnTimer = 0;
 		}
-		spawnTimer++;
+		spawnTimer++;*/
 
 		powerUps.erase(
 			std::remove_if(
@@ -576,7 +581,7 @@ void  PlayingGameState::update(float deltaTime)
 			this->player->setHealth(0);
 		}
 		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
-		player->update(deltaTime);
+		player->updatePlayer(deltaTime);
 		physics->update(deltaTime);
 		actorManager->update(deltaTime, playerVehicle->getPosition());
 		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);

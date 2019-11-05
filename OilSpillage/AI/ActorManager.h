@@ -1,5 +1,7 @@
 #pragma once
 #include "AIGroup.h"
+#include "Car_Spitfire.h"
+class Physics;
 class ActorManager
 {
 public:
@@ -10,6 +12,7 @@ public:
 	void update(float dt, Vector3 targetPos);
 	void createAttacker(float x, float z);
 	void createTurret(float x, float z);
+	void createSpitFire(float x, float z, Physics* physics);
 	std::vector<AIGroup> groups;
 	std::vector<Actor*>* findClosestGroup(Vector3 position);
 	float distanceToPlayer(Vector3 position);
@@ -17,6 +20,7 @@ public:
 
 	void spawnAttackers(Vector3 originPos);
 	void spawnTurrets(Vector3 position, Radius radius, float angle);
+	
 	Vector2& generateRandom(const float& x, const float& z, Radius radius);
 	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
 private:
@@ -33,6 +37,7 @@ private:
 	void createGroup(Actor* actor);
 	std::vector<Actor*> actors;
 	std::vector<Actor*> turrets;
+	std::vector<Spitfire*> cars;
 	std::vector<Actor*> sendToPlayer;
 	std::vector<Vector3> path;
 	AStar* aStar;
