@@ -37,22 +37,38 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadModel("Entities/Dummy_Turret");
 	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
 
-	graphics.loadModel("Roads/Metro/0000");
-	graphics.loadModel("Roads/Metro/0001");
-	graphics.loadModel("Roads/Metro/0010");
-	graphics.loadModel("Roads/Metro/0011");
-	graphics.loadModel("Roads/Metro/0100");
-	graphics.loadModel("Roads/Metro/0101");
-	graphics.loadModel("Roads/Metro/0110");
-	graphics.loadModel("Roads/Metro/0111");
-	graphics.loadModel("Roads/Metro/1000");
-	graphics.loadModel("Roads/Metro/1001");
-	graphics.loadModel("Roads/Metro/1010");
-	graphics.loadModel("Roads/Metro/1011");
-	graphics.loadModel("Roads/Metro/1100");
-	graphics.loadModel("Roads/Metro/1101");
-	graphics.loadModel("Roads/Metro/1110");
-	graphics.loadModel("Roads/Metro/1111");
+	//graphics.loadModel("Roads/Metro/0000");
+	//graphics.loadModel("Roads/Metro/0001");
+	//graphics.loadModel("Roads/Metro/0010");
+	//graphics.loadModel("Roads/Metro/0011");
+	//graphics.loadModel("Roads/Metro/0100");
+	//graphics.loadModel("Roads/Metro/0101");
+	//graphics.loadModel("Roads/Metro/0110");
+	//graphics.loadModel("Roads/Metro/0111");
+	//graphics.loadModel("Roads/Metro/1000");
+	//graphics.loadModel("Roads/Metro/1001");
+	//graphics.loadModel("Roads/Metro/1010");
+	//graphics.loadModel("Roads/Metro/1011");
+	//graphics.loadModel("Roads/Metro/1100");
+	//graphics.loadModel("Roads/Metro/1101");
+	//graphics.loadModel("Roads/Metro/1110");
+	//graphics.loadModel("Roads/Metro/1111");
+
+	graphics.loadMesh("quad"); // one-sided
+	graphics.loadTexture("tiles/asphalt");
+	graphics.loadTexture("tiles/grass");
+	graphics.loadTexture("tiles/sidewalk_corner_outer_ne");
+	graphics.loadTexture("tiles/sidewalk_side_n");
+	graphics.loadTexture("tiles/sidewalk_corner_inner_ne");
+	graphics.loadTexture("tiles/sidewalk_u_n");
+	graphics.loadTexture("tiles/sidewalk_hole");
+	graphics.loadTexture("tiles/road_marker_straight_n");
+	graphics.loadTexture("tiles/road_marker_deadend_n");
+	graphics.loadTexture("tiles/road_marker_turn_ne");
+	graphics.loadTexture("tiles/road_marker_3way_n");
+	graphics.loadTexture("tiles/road_marker_4way");
+
+
 
 	graphics.loadModel("Hospital");
 	//graphics.loadModel("Roads/Road_pavement");

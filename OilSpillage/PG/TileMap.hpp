@@ -139,7 +139,14 @@ public:
 		return data[ index(tilePosition.x, tilePosition.y) ];
 	}
 
+	Opt<Vector3> getRandomTilePositionInRadius( Vector3 origin, F32 radius, Tile target, U16 tries=100 ) const noexcept;
+
+	Vector<Vector3> getAllTilePositionsInRadius( Vector3 origin, F32 radius, Tile target ) const noexcept;
+
 	friend std::ostream &operator<< ( std::ostream &, TileMap const & );
+
+private:
+	Bounds calculateBounds( Vector3 const &origin, F32 radius ) const noexcept;
 };
 
 // road generator stream outputter implementation

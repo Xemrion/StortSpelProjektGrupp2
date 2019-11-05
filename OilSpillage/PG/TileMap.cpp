@@ -270,3 +270,51 @@ Vector<String> const  TileMap::tileTerminalColorTable{
 	/* road2  */    "\033[38;5;246m",
 	/* road3  */    "\033[38;5;243m"
 };
+
+// o = origin, r = radius, p = position, ts = tile space
+Bounds TileMap::calculateBounds( Vector3 const &o, F32 r ) const noexcept
+{
+   V2u     ots { convertWorldPositionToTilePosition(o) }; // origin tile xy
+   U16     rts { r / config.tileScaleFactor.x };
+	Bounds  b   { { ots.x-rts, ots.y-rts },
+                 { ots.x+rts, ots.y+rts } };
+   if ( b.min.x >= width  ) b.min.x = 0;
+   if ( b.min.y >= height ) b.min.y = 0;
+   if ( b.max.x >= width  ) b.max.x = width  - 1;
+   if ( b.max.y >= height ) b.max.y = height - 1;
+	return b;
+}
+
+// o = origin, r = radius, pts = position in tile space
+Opt<Vector3> TileMap::getRandomTilePositionInRadius( Vector3 o, F32 r, Tile target, U16 tries ) const noexcept
+{
+   RNG      rng  { RD()() };
+   Bounds   b    { calculateBounds(o,r) };
+	U16_Dist genX { b.min.x, b.max.x };
+	U16_Dist genY { b.min.y, b.max.y };
+
+   for ( auto i=0;  i<tries;  ++i ) {
+      V2u pts { genX(rng), genY(rng) };
+      if ( tileAt(pts) == target )
+         return convertTilePositionToWorldPosition(pts);
+   }
+   return {}; // no hit found
+}
+
+
+// o = origin, r = radius
+Vector<Vector3> TileMap::getAllTilePositionsInRadius( Vector3 o, F32 r, Tile target ) const noexcept
+{
+   Vector<Vector3> results;
+	results.reserve( 100 ); // TODO: global constexpr
+   Bounds  b   { calculateBounds(o,r) };
+   for ( auto y = b.min.y;  y < b.max.y;  ++y )
+      for ( auto x = b.min.x;  x < b.max.x;  ++x )
+         if ( tileAt(x,y) == target )
+            results.push_back( convertTilePositionToWorldPosition(x,y) );
+
+    return results;
+}
+
+
+// 

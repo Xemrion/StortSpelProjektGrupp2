@@ -1,6 +1,8 @@
+#include "utils.hpp"
 #include "Map.hpp"
 #include "Profiler.hpp"
-#include "utils.hpp"
+#include "Modelizer.hpp"
+
 
 // TODO: 1. make road coverage affect district type
 //       2. scale up road maps
@@ -78,7 +80,7 @@ void  Map::generateRoads()
 		}
 	}
 	
-	roadTiles = tilemap->loadAsModels(graphics); // GameObject instantiation
+	roadTiles = instantiateTilesAsModels( graphics, *tilemap ); //= tilemap->loadAsModels(graphics); // GameObject instantiation
 	for ( auto &e : roadTiles )
 		graphics.addToDraw( &e , true );
 }
