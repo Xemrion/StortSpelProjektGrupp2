@@ -34,6 +34,7 @@ public:
 	void changeHealth(int amount);
 	bool isDead() const;
 	void death();
+	int boidOffset;
 
 private:
 	Vector3 acceleration;

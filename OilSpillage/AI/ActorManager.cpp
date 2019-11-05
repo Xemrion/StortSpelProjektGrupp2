@@ -127,6 +127,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 	turretHandler.intersectPlayerBullets(bulletArray, size, soundTimer);
 	
 }
+
 void ActorManager::spawnAttackers(Vector3 originPos, int weaponType)
 {
 	for (int i = 0; i < 2; i++)
@@ -150,6 +151,7 @@ void ActorManager::spawnTurrets(Vector3 position, Radius radius, float angle, in
 		createTurret(newPosition.x, newPosition.y, weaponType);
 	}
 }
+
 Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)
 {
 	/*blocksize 10, 4* 10 w, 3 * 10 l */
@@ -235,7 +237,8 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 		{
 			groups[i].actors[j]->setPath(&path);
 		}
-	}
+		groups[i].updateBoidDistance();
+	}	
 }
 
 void ActorManager::updateGroups()

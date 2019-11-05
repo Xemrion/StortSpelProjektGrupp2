@@ -188,7 +188,7 @@ void Actor::applyForce(Vector3 force)
 Vector3 Actor::separation(vector<Actor*>& boids, Vector3 targetPos)
 {
 	// Distance of field of vision for separation between boids
-	float desiredSeparationDistance = 3.0f * 3.0f;
+	float desiredSeparationDistance = (3.0f * 3.0f)+boidOffset;
 	Vector3 direction(0.0f);
 	float nrInProximity = 0.0f;
 	int size = boids.size();
