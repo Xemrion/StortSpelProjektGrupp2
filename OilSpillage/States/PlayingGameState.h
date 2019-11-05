@@ -74,6 +74,8 @@ private:
 	std::vector<PowerUp>		    powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
+	GameObject* testObjective2; //Test
+
 	GameObject* objTestPickUp;
 	GameObject* objTestPickUp2;
 	GameObject* objTestPickUp3;

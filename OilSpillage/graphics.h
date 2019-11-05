@@ -75,7 +75,7 @@ class Graphics {
 	};
 	LightBufferContents* lightBufferContents = nullptr;
 	std::unique_ptr<QuadTree> quadTree;
-
+	
 	ParticleSystem particleSystem;
 	ParticleSystem particleSystem2;
 
@@ -85,6 +85,16 @@ class Graphics {
 	Debug* debugger;
 	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
+
+	DynamicCamera tempCamera = DynamicCamera(90, 0.1f, 1000);
+	PixelShader uiPixelShader;
+	VertexShader uiVertexShader;
+	Sun uiSun;
+	Vector3 uiSunDir = Vector3(0.0, 1.0, 0.0);
+	std::vector<GameObject*> uiObjects;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> uiDSV;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> uiDSB;
+
 
 	void cullLights();
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
@@ -107,6 +117,13 @@ public:
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
 	void clearStaticObjects();
+
+	void addToUIDraw(GameObject* obj);
+	void removeFromUIDraw(GameObject* obj);
+	void removeAllUIDraw();
+	void setUISun(Vector3 direction, Vector4 color);
+	void renderUI(DynamicCamera* camera, float deltaTime);
+
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera, float deltaTime);

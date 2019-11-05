@@ -138,14 +138,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	initAI();
 
-	//testObjective = new GameObject();
-	//testObjective->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//Game::getGraphics().addToDraw(testObjective);
-	//testObjective->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
-	//testObjective->setPosition(Vector3(9.0f, 0.0f, 9.0f));
 
-	
 
+	Game::getGraphics().setUISun(Vector3(1.0f, -1.0f, 0.1f), Vector4(0.84, 0.83, 0, 1));
 
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
@@ -209,7 +204,8 @@ PlayingGameState::~PlayingGameState()
 {
 	delete aStar;
 	delete actorManager;
-	delete testObjective;
+
+
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
 	delete this->objTestPickUp3;
@@ -610,6 +606,7 @@ void  PlayingGameState::update(float deltaTime)
 	
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
+
 	graphics.setSpotLighShadow(playerLight);
 	graphics.render( camera.get(), deltaTime );
 	
@@ -620,6 +617,8 @@ void  PlayingGameState::update(float deltaTime)
 	else if ( Input::checkButton(Keys::MENU, States::PRESSED) )
 		setCurrentMenu( PlayingGameState::MENU_PAUSED );
 	
+	graphics.renderUI(camera.get(), deltaTime);
+
 	//Render all objects
 	
 	//testNetwork.get()->drawRoadNetwork(&graphics);
