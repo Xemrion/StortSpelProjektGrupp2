@@ -233,7 +233,7 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
-			groups[i].actors[j]->setPath(path);
+			groups[i].actors[j]->setPath(&path);
 		}
 	}
 }
