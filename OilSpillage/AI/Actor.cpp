@@ -33,7 +33,7 @@ Actor::Actor(float x, float z, int weaponType)
 
 void Actor::assignWeapon(int weaponType)
 {
-	if(weaponType == 1) // MachineGun
+	if (weaponType == 1) // MachineGun
 	{
 		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 		this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -78,10 +78,10 @@ void Actor::updateWeapon(float deltaTime)
 }
 
 Status Actor::shoot()
-{	
+{
 	float offset;
 	Vector3 offsetPos;
-	if(!predicting)
+	if (!predicting)
 	{
 		offset = (rand() % 4) - 2;
 		offset *= 0.9f;
@@ -107,9 +107,9 @@ Status Actor::shoot()
 					Vector3 dir = (targetPos - this->position);
 					dir.Normalize();
 					Vector3 bulletOrigin = this->position + dir;
-					dir = ( offsetPos- bulletOrigin);
+					dir = (offsetPos - bulletOrigin);
 					dir.Normalize();
-					
+
 					this->bullets[i].setWeaponType(this->weapon.type);
 					this->bullets[i].shoot(
 						weapon,
@@ -121,7 +121,7 @@ Status Actor::shoot()
 				}
 			}
 		}
-	} 
+	}
 
 	return Status::SUCCESS;
 }
@@ -178,7 +178,7 @@ void Actor::followPath()
 			path->pop_back();
 		}
 	}
-	
+
 }
 
 void Actor::applyForce(Vector3 force)
@@ -267,10 +267,10 @@ void Actor::run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos)
 {
 	applyForce(separation(boids, targetPos) * 4);
 	update(deltaTime, targetPos);
-	updateBoid(deltaTime);
+	move(deltaTime);
 }
 
-void Actor::updateBoid(float deltaTime)
+void Actor::move(float deltaTime)
 {
 	//To make the slow down not as abrupt
 	acceleration *= 0.4f;

@@ -20,7 +20,7 @@ public:
 	// Other function for moving and interacting
 	Vector3 seek();
 	void run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
-	virtual void updateBoid(float deltaTime);
+	virtual void move(float deltaTime);
 	void setPath(std::vector<Vector3>* path);
 	virtual bool hasGroup();
 	void joinGroup();
