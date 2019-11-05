@@ -1,7 +1,16 @@
 #include "Item.h"
 #include "ItemWeapon.h"
 
-std::unordered_map<const char*, Item> Item::allItems;
+std::array<std::unique_ptr<Item>, 4> Item::allItems = {
+	std::make_unique<Item>("Test Item", "A very useless thing!", ItemType::GADGET, nullptr),
+	std::make_unique<Item>("Test Item 2", "A very useless thing 2!", ItemType::GADGET, nullptr),
+	std::make_unique<Item>("Test Item 3", "A very useless thing 3!", ItemType::GADGET, nullptr),
+	std::make_unique<ItemWeapon>("Machine Gun", WeaponHandler::getWeapon(WeaponType::MachineGun), nullptr)
+};
+
+Item::Item() : name(""), description(""), type(TYPE_INVALID), object(nullptr)
+{
+}
 
 Item::Item(const char* name, const char* description, ItemType type, GameObject* object)
 	: name(name), description(description), type(type), object(object)
@@ -14,17 +23,23 @@ Item::~Item()
 
 void Item::init()
 {
-	Item::allItems["Test Item"] = Item("Test Item", "A very useless thing!", ItemType::GADGET, nullptr);
-	Item::allItems["Machine Gun"] = ItemWeapon("Machine Gun", WeaponHandler::getWeapon(WeaponType::MachineGun), nullptr);
+	//Sort so we can use getItemByName later if needed.
+	std::sort(allItems.begin(), allItems.end(), [](const std::unique_ptr<Item>& a, const std::unique_ptr<Item>& b)
+	{
+		return std::strcmp(a->getName(), b->getName());
+	});
 }
 
 Item* Item::getItemByName(const char* name)
 {
-	auto item = allItems.find(name);
+	auto item = std::lower_bound(allItems.begin(), allItems.end(), name, [](const std::unique_ptr<Item>& item, const char* name)
+	{
+		return std::strcmp(item->getName(), name);
+	});
 
 	if (item != allItems.end())
 	{
-		return &item->second;
+		return item->get();
 	}
 
 	return nullptr;
@@ -32,7 +47,7 @@ Item* Item::getItemByName(const char* name)
 
 Item* Item::getRandom()
 {
-	return &std::next(allItems.begin(), rand() % allItems.size())->second;
+	return allItems[rand() % allItems.size()].get();
 }
 
 const char* Item::getName() const

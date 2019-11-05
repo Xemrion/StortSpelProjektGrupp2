@@ -15,6 +15,10 @@ const char* ItemWeapon::generateDescription()
 	return stream.str().c_str();
 }
 
+ItemWeapon::ItemWeapon()
+{
+}
+
 ItemWeapon::ItemWeapon(const char* name, Weapon weapon, GameObject* object) : Item(name, this->generateDescription(), ItemType::WEAPON, object)
 {
 }

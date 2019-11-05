@@ -2,7 +2,7 @@
 #define ITEM_H
 
 #include <string>
-#include <unordered_map>
+#include <array>
 #include "../GameObject.h"
 
 enum ItemType
@@ -11,25 +11,27 @@ enum ItemType
 	GADGET,
 	CHASSI,
 	WHEEL,
-	TYPES_SIZE
+	TYPES_SIZE,
+	TYPE_INVALID
 };
 
 class Item
 {
 private:
-	static std::unordered_map<const char*, Item> allItems;
+	static std::array<std::unique_ptr<Item>, 4> allItems;
 
 	const char* name;
 	const char* description;
 	ItemType type;
 	GameObject* object;
-protected:
-	Item(const char* name, const char* description, ItemType type, GameObject* object);
-	virtual ~Item();
 public:
 	static void init();
 	static Item* getItemByName(const char* name);
 	static Item* getRandom();
+
+	Item();
+	Item(const char* name, const char* description, ItemType type, GameObject* object);
+	virtual ~Item();
 
 	const char* getName() const;
 	const char* getDescription() const;

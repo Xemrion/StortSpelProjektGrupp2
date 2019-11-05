@@ -10,6 +10,7 @@ private:
 	const char* generateDescription();
 	Weapon weapon;
 public:
+	ItemWeapon();
 	ItemWeapon(const char* name, Weapon weapon, GameObject* object);
 	virtual ~ItemWeapon();
 
