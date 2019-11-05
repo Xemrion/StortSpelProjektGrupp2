@@ -27,3 +27,10 @@ void AIGroup::updateAveragePos()
 	}
 	averagePos /= actors.size();
 }
+
+std::vector<Vector3>& AIGroup::getPathRef()
+{
+	return this->path;
+}
+
+

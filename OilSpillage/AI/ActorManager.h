@@ -36,6 +36,5 @@ private:
 	std::vector<Actor*> actors;
 	TurretHandler turretHandler;
 	std::vector<Actor*> sendToPlayer;
-	std::vector<Vector3> path;
 	AStar* aStar;
 };

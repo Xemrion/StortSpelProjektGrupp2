@@ -28,6 +28,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	bool turretDied = false;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
+
 		if (!actors[i]->isDead() && actors[i] != nullptr)
 		{
 			actors[i]->run(actors, dt, targetPos);
@@ -138,7 +139,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 		}
 	}
 	turretHandler.intersectPlayerBullets(bulletArray, size, soundTimer);
-	
+
 }
 
 void ActorManager::spawnAttackers(Vector3 originPos, int weaponType)
@@ -244,11 +245,11 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 {
 	for (int i = 0; i < groups.size(); i++)
 	{
-		aStar->algorithm(groups[i].getAveragePos(), targetPos, path);
+		aStar->algorithm(groups[i].getAveragePos(), targetPos, groups[i].getPathRef());
 
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
-			groups[i].actors[j]->setPath(&path);
+			groups[i].actors[j]->setPath(&groups[i].getPathRef());
 		}
 	}	
 }
