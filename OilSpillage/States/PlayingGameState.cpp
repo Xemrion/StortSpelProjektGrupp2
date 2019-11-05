@@ -537,7 +537,7 @@ void PlayingGameState::update(float deltaTime)
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation();
 
-		actorManager->update(deltaTime, playerVehicle->getPosition(), Vector3(playerVehicle->getRigidBody()->getAngularVelocity()));
+		actorManager->update(deltaTime, playerVehicle->getPosition());
 
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);

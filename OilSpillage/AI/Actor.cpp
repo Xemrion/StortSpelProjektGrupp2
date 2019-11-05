@@ -37,7 +37,7 @@ Actor::~Actor()
 {
 }
 
-void Actor::update(float dt, Vector3 targetPos, Vector3 targetVelocity)
+void Actor::update(float dt, Vector3 targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
@@ -240,10 +240,10 @@ Vector3 Actor::seek()
 	return acceleration;
 }
 
-void Actor::run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos, Vector3 targetVelocity)
+void Actor::run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos)
 {
 	applyForce(separation(boids, targetPos) * 4);
-	update(deltaTime, targetPos, targetVelocity);
+	update(deltaTime, targetPos);
 	updateBoid(deltaTime);
 }
 

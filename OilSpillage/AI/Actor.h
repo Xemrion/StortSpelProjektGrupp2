@@ -11,7 +11,7 @@ public:
 	Actor();
 	Actor(float x, float z, AStar* aStar);
 	virtual ~Actor();
-	virtual void update(float dt, Vector3 targetPos, Vector3 targetVelocity);
+	virtual void update(float dt, Vector3 targetPos);
 	virtual void setUpActor() = 0 {};
 
 	void applyForce(Vector3 force);
@@ -19,7 +19,7 @@ public:
 	Vector3 separation(vector<Actor*>& boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	// Other function for moving and interacting
 	Vector3 seek();
-	void run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f), Vector3 targetVelocity = Vector3(0.0f));
+	void run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	virtual void updateBoid(float deltaTime);
 	void setPath(std::vector<Vector3> path);
 	virtual bool hasGroup();
