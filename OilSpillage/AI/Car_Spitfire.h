@@ -4,19 +4,18 @@
 class Spitfire : public Actor
 {
 private:
-	bool drive = false;
 	void setUpActor();
+	float deltaTime;
 	Vehicle* car;
+	Vector3 forward;
 public:
 	Spitfire(float x, float z, AStar* aStar);
 	Spitfire();
 	~Spitfire();
+	void update(float dt, Vector3 targetPos);
 
-	Status idle();
+	/*if in range lets stop for now*/
 	Status inRange();
-	Status rotateTowards();
-	Status FollowTarget();
-
-
-
+	Status vehicleUpdate();
+	void updateVehicle();
 };

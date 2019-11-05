@@ -21,6 +21,11 @@ ActorManager::~ActorManager()
 	{
 		delete turrets[i];
 	}
+	for (int i = 0; i < cars.size(); i++)
+	{
+		delete cars[i];
+	}
+	cars.clear();
 	actors.clear();
 	turrets.clear();
 }
@@ -30,6 +35,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	soundTimer += dt;
 	bool hasDied = false;
 	bool turretDied = false;
+	bool carsDied = false;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
 		if (!actors[i]->isDead() && actors[i] != nullptr)
@@ -94,7 +100,40 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		}
 		turretDied = false;
 	}
-
+	//
+	for (int i = 0; i < this->cars.size(); i++)
+	{
+		if (!cars[i]->isDead() && cars[i] != nullptr)
+		{
+		}
+			cars[i]->update(dt, targetPos);
+		/*else if (cars[i]->isDead() && cars[i] != nullptr)
+		{
+			Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+			if (ptr != nullptr)
+			{
+				if (ptr->getType() == TypeOfMission::KillingSpree)
+				{
+					ptr->killEnemy();
+				}
+			}
+			carsDied = true;
+		}*/
+	}
+	if (carsDied == true)
+	{
+		for (int i = this->cars.size() - 1; i >= 0; i--)
+		{
+			if (cars[i]->isDead())
+			{
+				cars[i]->death();
+				delete cars[i];
+				cars.erase(cars.begin() + i);
+			}
+		}
+		carsDied = false;
+	}
+	//
 	updateGroups();
 	if (frameCount % 60 == 0)
 	{
@@ -114,6 +153,11 @@ void ActorManager::createAttacker(float x, float z)
 void ActorManager::createTurret(float x, float z)
 {
 	this->turrets.push_back(new Turret(x, z));
+}
+
+void ActorManager::createSpitFire(float x, float z)
+{
+	this->cars.push_back(new Spitfire(x, z, aStar));
 }
 
 float ActorManager::distanceToPlayer(Vector3 position)

@@ -12,8 +12,9 @@ void PlayingGameState::initAI()
 	aStar = new AStar( map->getTileMap() );
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	actorManager->createTurret(player.get()->getVehicle()->getPosition().x +4,
-		player.get()->getVehicle()->getPosition().z +4);
+
+	actorManager->createSpitFire(player.get()->getVehicle()->getPosition().x + 4,
+		player.get()->getVehicle()->getPosition().z + 4);
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
@@ -519,12 +520,12 @@ void  PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		
-		if(spawnTimer % 200 == 0)
+	/*	if(spawnTimer % 200 == 0)
 		{
 			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 			spawnTimer = 0;
 		}
-		spawnTimer++;
+		spawnTimer++;*/
 
 		powerUps.erase(
 			std::remove_if(
