@@ -4,7 +4,22 @@
 
 void UIUpgrading::updateUI(float deltaTime)
 {
-	//TODO
+	if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
+	{
+		this->itemSelector->changeSelectedIndex(false);
+	}
+	else if(Input::checkButton(Keys::L_RIGHT, States::PRESSED))
+	{
+		this->itemSelector->changeSelectedIndex(true);
+	}
+	else if(Input::checkButton(Keys::L_UP, States::PRESSED))
+	{
+		this->itemSelector->changeSelectedType(false);
+	}
+	else if(Input::checkButton(Keys::L_DOWN, States::PRESSED))
+	{
+		this->itemSelector->changeSelectedType(true);
+	}
 }
 
 void UIUpgrading::drawUI()
