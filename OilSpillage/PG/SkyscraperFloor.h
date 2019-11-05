@@ -33,6 +33,7 @@ private:
 	std::vector<Vector3> verticies;
 	std::vector<int> indices;
 	int nrOfEdges;
+	bool triangleGenFail = false;
 	Vector3 center;
 	GameObject* roof;
 
@@ -40,7 +41,7 @@ private:
 
 
 	void generateShape(int edges);
-	Vector3 intersectingLines(Vector3& pointA1, Vector3& pointA2, Vector3& pointB1, Vector3& pointB2) const;
+	Vector3 intersectingLines(Vector3 pointA1, Vector3 pointA2, Vector3 pointB1, Vector3 pointB2) const;
 	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA) const;
 };
 
