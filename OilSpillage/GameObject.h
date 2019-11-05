@@ -21,6 +21,7 @@ protected:
 	Quaternion rotationQt;
 	Vector4  color;
 	Material material;
+	Vector3 velocity;
 public:
 	~GameObject();
 
@@ -58,6 +59,8 @@ public:
 	AABB     getAABB();
 	btRigidBody* getRigidBody() const;
 	void setRigidBody(btRigidBody* body, Physics* physics);
+	void setVelocity(Vector3 velocity);
+	void updateObject(float deltaTime);
 
 	//Matrix btTransformToMatrix(btTransform const& trans) const;
 	Vector3 btTransformGetRotation(btTransform const& trans) const;

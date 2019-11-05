@@ -27,10 +27,10 @@ Turret::Turret(float x, float z)
 	vecForward.Normalize();
 	this->body.setPosition(this->position);
 	this->body.setScale(this->scale);
-	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret");
-	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
-	this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
-	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
+	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Turret");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Turret1");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
+	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
 	Game::getGraphics().addToDraw(&this->body);
 
 	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
