@@ -32,35 +32,35 @@ Bullet::~Bullet()
 	delete obj;
 }
 
-void Bullet::shoot(Weapon weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity)
+void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity)
 {
-	this->weapon = weapon;
+	this->weapon = Weapon(weapon);
 	if (this->weapon.type == WeaponType::None)
 	{
 
 	}
 	else if (this->weapon.type == WeaponType::Flamethrower)
 	{
-		flamethrowerShoot(position, direction, additionalVelocity);
+		flamethrowerShoot(weapon, position, direction, additionalVelocity);
 	}
 	else if (this->weapon.type == WeaponType::Laser)
 	{
-		laserShoot(position, direction, additionalVelocity);
+		laserShoot(weapon, position, direction, additionalVelocity);
 	}
 	else
 	{
-		defaultShoot(position, direction, additionalVelocity);
+		defaultShoot(weapon, position, direction, additionalVelocity);
 	}
 }
 
-void Bullet::defaultShoot(Vector3& position, Vector3& direction, Vector3& additionalVelocity)
+void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity)
 {
 	direction.Normalize();
 	this->dir = direction;
 
 	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
 	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
-	weapon.currentSpreadIncrease = min(weapon.currentSpreadIncrease + weapon.spreadIncreasePerShot, weapon.maxSpread);
+	vehicleWeapon.currentSpreadIncrease = min(vehicleWeapon.currentSpreadIncrease + vehicleWeapon.spreadIncreasePerShot, vehicleWeapon.maxSpread);
 	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
 	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
 	this->dir *= weapon.bulletSpeed;
@@ -75,7 +75,7 @@ void Bullet::defaultShoot(Vector3& position, Vector3& direction, Vector3& additi
 	Game::getGraphics().addToDraw(this->obj);
 }
 
-void Bullet::flamethrowerShoot(Vector3& position, Vector3& direction, Vector3& additionalVelocity)
+void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity)
 {
 	direction.Normalize();
 	this->dir = direction;
@@ -196,14 +196,19 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 	}
 }
 
-void Bullet::laserShoot(Vector3& position, Vector3& direction, Vector3& additionalVelocity)
+void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity)
 {
+	if (vehicleWeapon.remainingCooldown > 0.0)
+	{
+		this->weapon.type == WeaponType::None;
+		return;
+	}
 	direction.Normalize();
 	this->dir = direction;
-
 	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
 	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
-	weapon.currentSpreadIncrease = min(weapon.currentSpreadIncrease + weapon.spreadIncreasePerShot, weapon.maxSpread);
+	vehicleWeapon.currentSpreadIncrease = vehicleWeapon.currentSpreadIncrease + vehicleWeapon.spreadIncreasePerShot;
+
 	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
 	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
 
@@ -213,16 +218,23 @@ void Bullet::laserShoot(Vector3& position, Vector3& direction, Vector3& addition
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
+	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.2), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread*vehicleWeapon.maxSpread)));
 
 	Game::getGraphics().addToDraw(this->obj);
+	if (vehicleWeapon.currentSpreadIncrease > vehicleWeapon.maxSpread)
+	{
+		vehicleWeapon.remainingCooldown = 4.0;
+	}
 }
 
 void Bullet::laserUpdate(float& deltaTime)
 {
-	this->obj->setScale(weapon.bulletScale);
+	this->obj->setScale(weapon.bulletScale * Vector3(timeLeft / weapon.bulletLifetime, timeLeft / weapon.bulletLifetime, 1.0));
 	if (timeLeft > 0.0f)
 	{
-		obj->move(dir * this->obj->getScale().z + dir * (weapon.bulletLifetime - timeLeft) + dir);
+		obj->move(dir * this->obj->getScale().z + dir);
+		float newRot = atan2(dir.x, dir.z);
+		this->obj->setRotation(Vector3(0, newRot, 0));
 		timeLeft = max(timeLeft - deltaTime, 0.0f);
 	}
 }
@@ -271,4 +283,9 @@ void Bullet::destroy()
 Vector3 Bullet::getDirection() const
 {
 	return dir;
+}
+
+void Bullet::setDirection(Vector3 newDir)
+{
+	dir = newDir;
 }
