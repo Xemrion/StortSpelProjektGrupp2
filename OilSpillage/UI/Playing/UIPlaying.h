@@ -1,10 +1,10 @@
 #ifndef UI_PLAYING_H
 #define UI_PLAYING_H
 
-#include "UserInterface.h"
-#include "Slider.h"
-#include "Minimap.h"
-#include "ObjectiveBox.h"
+#include "../UserInterface.h"
+#include "../Elements/Slider.h"
+#include "../Elements/Minimap.h"
+#include "../Elements/ObjectiveBox.h"
 
 class UIPlaying : public UserInterface
 {

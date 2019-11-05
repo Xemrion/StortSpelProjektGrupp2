@@ -7,10 +7,10 @@
 class ItemWeapon : public Item
 {
 private:
-	const char* generateDescription();
+	static const char* generateDescription(const Weapon& weapon);
+
 	Weapon weapon;
 public:
-	ItemWeapon();
 	ItemWeapon(const char* name, Weapon weapon, GameObject* object);
 	virtual ~ItemWeapon();
 

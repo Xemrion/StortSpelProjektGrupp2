@@ -1,7 +1,7 @@
 #include "UICredits.h"
-#include "..//Input.h"
-#include "..//game.h"
-#include "..//States/MenuGameState.h"
+#include "../../Input.h"
+#include "../../game.h"
+#include "../../States/MenuGameState.h"
 #include <fstream>
 
 void UICredits::updateUI(float deltaTime)

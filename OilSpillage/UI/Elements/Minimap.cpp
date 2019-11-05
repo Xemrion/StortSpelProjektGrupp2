@@ -1,7 +1,7 @@
 #include "Minimap.h"
-#include "UserInterface.h"
-#include "../game.h"
-#include "../States/PlayingGameState.h"
+#include "../UserInterface.h"
+#include "../../game.h"
+#include "../../States/PlayingGameState.h"
 #include <cassert>
 
 Vector2 Minimap::size = Vector2(96 * 2, 96 * 2);

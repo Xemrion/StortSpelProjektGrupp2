@@ -1,25 +1,21 @@
 #include "ItemWeapon.h"
 #include <sstream>
 
-const char* ItemWeapon::generateDescription()
+const char* ItemWeapon::generateDescription(const Weapon& weapon)
 {
 	std::stringstream stream;
-	stream << "Damage:          " << this->weapon.damage;
-	stream << "Fire Rate:       " << this->weapon.fireRate;
-	stream << "Bullet Speed:    " << this->weapon.bulletSpeed;
-	stream << "Bullet Lifetime: " << this->weapon.bulletLifetime;
-	stream << "Spread:          " << this->weapon.spreadRadians;
-	stream << "Max Spread:      " << this->weapon.maxSpread;
-	stream << "Spread Increase: " << this->weapon.spreadIncreasePerShot;
+	stream << "Damage:          " << weapon.damage << "\n";
+	stream << "Fire Rate:       " << weapon.fireRate << "\n";
+	stream << "Bullet Speed:    " << weapon.bulletSpeed << "\n";
+	stream << "Bullet Lifetime: " << weapon.bulletLifetime << "\n";
+	stream << "Spread:          " << weapon.spreadRadians << "\n";
+	stream << "Max Spread:      " << weapon.maxSpread << "\n";
+	stream << "Spread Increase: " << weapon.spreadIncreasePerShot;
 
 	return stream.str().c_str();
 }
 
-ItemWeapon::ItemWeapon()
-{
-}
-
-ItemWeapon::ItemWeapon(const char* name, Weapon weapon, GameObject* object) : Item(name, this->generateDescription(), ItemType::WEAPON, object)
+ItemWeapon::ItemWeapon(const char* name, Weapon weapon, GameObject* object) : Item(name, this->generateDescription(weapon), ItemType::WEAPON, object), weapon(weapon)
 {
 }
 

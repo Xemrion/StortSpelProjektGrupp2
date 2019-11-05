@@ -1,7 +1,7 @@
 #include "UIControls.h"
-#include "../Input.h"
-#include "../game.h"
-#include "../States/MenuGameState.h"
+#include "../../Input.h"
+#include "../../game.h"
+#include "../../States/MenuGameState.h"
 #include <cassert>
 
 void UIControls::updateUI(float deltaTime)

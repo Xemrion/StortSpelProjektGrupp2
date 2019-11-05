@@ -1,8 +1,8 @@
 #include "UIOptions.h"
-#include "..//Input.h"
-#include "..//game.h"
-#include "..//States/MenuGameState.h"
-#include "..//States/PlayingGameState.h"
+#include "../../Input.h"
+#include "../../game.h"
+#include "../../States/MenuGameState.h"
+#include "../../States/PlayingGameState.h"
 
 void UIOptions::updateUI(float deltaTime)
 {

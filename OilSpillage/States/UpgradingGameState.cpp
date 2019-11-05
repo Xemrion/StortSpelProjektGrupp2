@@ -4,6 +4,11 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics())
 {
 	this->menu = std::make_unique<UIUpgrading>();
 	this->menu->init();
+
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
 }
 
 UpgradingGameState::~UpgradingGameState()

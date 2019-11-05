@@ -1,10 +1,10 @@
 #ifndef UI_MAIN_MENU_H
 #define UI_MAIN_MENU_H
 
-#include "UserInterface.h"
-#include "Button.h"
-#include "CheckBox.h"
-#include "Slider.h"
+#include "../UserInterface.h"
+#include "../Elements/Button.h"
+#include "../Elements/CheckBox.h"
+#include "../Elements/Slider.h"
 
 class UIMainMenu : public UserInterface
 {

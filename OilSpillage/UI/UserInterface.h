@@ -7,7 +7,7 @@
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
 #include <CommonStates.h>
-#include "Element.h"
+#include "Elements/Element.h"
 
 class UserInterface
 {

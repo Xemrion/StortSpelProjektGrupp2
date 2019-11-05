@@ -1,6 +1,6 @@
 #include "Slider.h"
-#include "UserInterface.h"
-#include "..//game.h"
+#include "../UserInterface.h"
+#include "../../game.h"
 #include <cassert>
 
 Vector2 Slider::size = Vector2(256, 32);

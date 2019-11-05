@@ -1,8 +1,8 @@
 #ifndef UI_CONTROLS_H
 #define UI_CONTROLS_H
 
-#include "UserInterface.h"
-#include "../Texture.h"
+#include "../UserInterface.h"
+#include "../../Texture.h"
 
 class UIControls : public UserInterface
 {

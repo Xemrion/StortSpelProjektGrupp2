@@ -1,8 +1,8 @@
 #ifndef UI_UPGRADING_H
 #define UI_UPGRADING_H
 
-#include "UserInterface.h"
-#include "ItemSelector.h"
+#include "../UserInterface.h"
+#include "../Elements/ItemSelector.h"
 
 class UIUpgrading : public UserInterface
 {

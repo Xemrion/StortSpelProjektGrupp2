@@ -1,6 +1,6 @@
 #include "Button.h"
-#include "UserInterface.h"
-#include "..//game.h"
+#include "../UserInterface.h"
+#include "../../game.h"
 #include <cassert>
 
 Vector2 Button::size = Vector2(256, 64);
