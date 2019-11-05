@@ -153,7 +153,7 @@ void Vehicle::init(Physics *physics)
 void Vehicle::updatePlayer(float deltaTime)
 {
 
-	this->update(deltaTime, Input::getStrengthL(),Input::checkButton(Keys::R_TRIGGER,States::HELD), Input::checkButton(Keys::L_TRIGGER, States::HELD),Input::getDirectionL());
+	this->update(deltaTime, Input::getStrengthL(),Input::checkButton(Keys::R_TRIGGER,States::HELD) || Input::isKeyDown_DEBUG(Keyboard::W), Input::checkButton(Keys::L_TRIGGER,States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S),Input::getDirectionL());
 }
 
 void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)
