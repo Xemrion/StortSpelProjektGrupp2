@@ -564,6 +564,7 @@ void  PlayingGameState::update(float deltaTime)
 		
 #ifndef _DEBUG
 		updateObjects();
+		paperCollision(deltaTime);
 #endif
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
@@ -683,6 +684,7 @@ void PlayingGameState::spawnObjects()
 {
 	Game::getGraphics().loadModel("Entities/Barrel");
 	Game::getGraphics().loadModel("Entities/Garbage_Bag");
+	Game::getGraphics().loadModel("Entities/Quad");
 	physicsObjID = 0;
 	physicsObjects.reserve(300);
 	btRigidBody* tempo2;
@@ -749,8 +751,7 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 250; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		Game::getGraphics().loadModel("Cube");
-		objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Quad");
 		Game::getGraphics().addToDraw(objPtr);
 		size = rand() % 3 + 8;
 		size *= 0.125f;
@@ -821,7 +822,7 @@ void PlayingGameState::moveObjects()
 		if (object->getRigidBody() != nullptr) {
 			object->getRigidBody()->setActivationState(0);
 		}
-		int randomValue = rand() % 2+1;
+		int randomValue = rand() % 2 + 1;
 		if (randomValue == 1) {
 			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getZ() > 0) {
 				//Top
@@ -864,6 +865,7 @@ void PlayingGameState::moveObjects()
 	if (physicsObjID >= physicsObjects.size()) {
 		physicsObjID = 0;
 	}
+
 }
 
 Vector3 PlayingGameState::generateObjectivePos(float minDistance, float maxDistance) noexcept
@@ -926,6 +928,24 @@ void PlayingGameState::updateObjects()
 			if (abs(player->getVelocitySpeed()) > 20.0f) {
 				moveObjects();
 			}
+		}
+	}
+}
+
+void PlayingGameState::paperCollision(float deltaTime)
+{
+	
+	float randomValue = 0;
+	for (auto &obj : physicsObjects) {
+		if (obj->getRigidBody() == nullptr) {
+			randomValue = rand() % 2;
+			if (((player->getVehicle()->getPosition() - obj->getPosition()).Length()) < 1.5f && abs(player->getVelocitySpeed()) > 8.0f && randomValue == 1) {
+				randomValue = rand() % 20;
+				randomValue = max(randomValue-5.0f,0.0f);
+				obj->setVelocity(Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(),randomValue*0.5f, player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()));
+				obj->setPosition(obj->getPosition() + Vector3(0, 0.1f, 0));
+			}
+			obj->updateObject(deltaTime);
 		}
 	}
 }
