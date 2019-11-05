@@ -12,7 +12,7 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	for (int i = 0; i < 50; i++)
+	for(int i = 0; i < 10; i++)
 	{
 		for (int j = 0; j < 10; j++)
 		{

@@ -16,8 +16,8 @@ Turret::Turret()
 	this->health = this->updatedStats.maxHealth;
 }
 
-Turret::Turret(float x, float z)
-	: Actor(x, z, nullptr)
+Turret::Turret(float x, float z, int weaponType)
+	: Actor(x, z, nullptr, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 23;
@@ -32,8 +32,6 @@ Turret::Turret(float x, float z)
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
 	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
 	Game::getGraphics().addToDraw(&this->body);
-
-	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 
 	this->defaultStats = VehicleStats::AITurret;
 	this->updatedStats = this->defaultStats;

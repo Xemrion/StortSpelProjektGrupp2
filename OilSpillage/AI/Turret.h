@@ -6,7 +6,7 @@ class Turret : public Actor
 {
 public:
 	Turret();
-	Turret(float x, float z);
+	Turret(float x, float z, int weaponType);
 	~Turret();
 	void update(float dt, Vector3 targetPos);
 private:

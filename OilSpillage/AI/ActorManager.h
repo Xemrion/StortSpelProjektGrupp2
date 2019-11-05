@@ -9,14 +9,14 @@ public:
 	~ActorManager();
 	enum Radius { CLOSE, MIDDLE, OUTER };
 	void update(float dt, Vector3 targetPos);
-	void createAttacker(float x, float z);
-	void createTurret(float x, float z);
+	void createAttacker(float x, float z, int weaponType = 1);
+	void createTurret(float x, float z, int weaponType = 1);
 	std::vector<AIGroup> groups;
 	float distanceToPlayer(Vector3 position);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
 
-	void spawnAttackers(Vector3 originPos);
-	void spawnTurrets(Vector3 position, Radius radius, float angle);
+	void spawnAttackers(Vector3 originPos, int weaponType);
+	void spawnTurrets(Vector3 position, Radius radius, float angle, int weaponType);
 	Vector2& generateRandom(const float& x, const float& z, Radius radius);
 	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
 private:

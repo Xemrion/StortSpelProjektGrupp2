@@ -58,61 +58,34 @@ void ActorManager::update(float dt, Vector3 targetPos)
 			}
 		}
 	}
-	for (int i = 0; i < groups.size(); i++)
-	{
-		for (int k = 0; k < groups.at(i).actors.size(); k++)
-		{
-			switch (i)
-			{
-			case 0:
-				groups[i].actors[k]->setColor(Vector4(0, 0, 0, 1));
-				break;
-			case 1:
-				groups[i].actors[k]->setColor(Vector4(0, 1, 0, 1));
-				break;
-			case 2:
-				groups[i].actors[k]->setColor(Vector4(0, 0, 1, 1));
-				break;
-			case 3:
-				groups[i].actors[k]->setColor(Vector4(1, 1, 1, 1));
-				break;
-			case 4:
-				groups[i].actors[k]->setColor(Vector4(1, 0, 1, 1));
-				break;
-			case 5:
-				groups[i].actors[k]->setColor(Vector4(0, 1, 1, 1));
-				break;
-			case 6:
-				groups[i].actors[k]->setColor(Vector4(1, 1, 0, 1));
-				break;
-			case 7:
-				groups[i].actors[k]->setColor(Vector4(0.5f, 0.5f, 0.5f, 1));
-				break;
-			default:
-				break;
-			}
-		}
-		turretHandler.update(dt, targetPos);
+	turretHandler.update(dt, targetPos);
 
-		updateAveragePos();
-		updateGroups();
-		if (frameCount % 60 == 0)
-		{
-			assignPathsToGroups(targetPos);
-			frameCount = 0;
-		}
-		frameCount++;
+	updateGroups();
+	if (frameCount % 60 == 0)
+	{
+		assignPathsToGroups(targetPos);
+		frameCount = 0;
 	}
+	if (frameCount % 10 == 0)
+	{
+		for(int i = 0; i < groups.size(); i++)
+		{
+			groups[i].updateBoidDistance();
+		}
+	}
+	updateAveragePos();
+	frameCount++;
 }
-void ActorManager::createAttacker(float x, float z)
+
+void ActorManager::createAttacker(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Attacker(x, z, this->aStar));
+	this->actors.push_back(new Attacker(x, z, this->aStar, weaponType));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createTurret(float x, float z)
+void ActorManager::createTurret(float x, float z, int weaponType)
 {
-	turretHandler.createTurret(x, z);
+	turretHandler.createTurret(x, z, weaponType);
 }
 
 float ActorManager::distanceToPlayer(Vector3 position)
@@ -162,29 +135,31 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 	turretHandler.intersectPlayerBullets(bulletArray, size, soundTimer);
 
 }
-void ActorManager::spawnAttackers(Vector3 originPos)
+
+void ActorManager::spawnAttackers(Vector3 originPos, int weaponType)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createAttacker(originPos.x + i, originPos.z);
-		createAttacker(originPos.x, originPos.z + 1);
-		createAttacker(originPos.x - i, originPos.z);
+		createAttacker(originPos.x + i, originPos.z, weaponType);
+		createAttacker(originPos.x, originPos.z + 1, weaponType);
+		createAttacker(originPos.x - i, originPos.z, weaponType);
 	}
 }
 
-void ActorManager::spawnTurrets(Vector3 position, Radius radius, float angle)
+void ActorManager::spawnTurrets(Vector3 position, Radius radius, float angle, int weaponType)
 {
 	if (angle != 0)
 	{
 		Vector2& newPosition = generateAroundaPoint(position.x, position.z, angle);
-		createTurret(newPosition.x, newPosition.y);
+		createTurret(newPosition.x, newPosition.y, weaponType);
 	}
 	else
 	{
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
-		createTurret(newPosition.x, newPosition.y);
+		createTurret(newPosition.x, newPosition.y, weaponType);
 	}
 }
+
 Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)
 {
 	/*blocksize 10, 4* 10 w, 3 * 10 l */
@@ -270,7 +245,7 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 		{
 			groups[i].actors[j]->setPath(&groups[i].getPathRef());
 		}
-	}
+	}	
 }
 
 void ActorManager::updateGroups()
