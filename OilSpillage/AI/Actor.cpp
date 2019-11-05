@@ -31,6 +31,7 @@ Actor::Actor(float x, float z, AStar* aStar = nullptr, int weaponType)
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	assignWeapon(weaponType);
 }
+
 void Actor::assignWeapon(int weaponType)
 {
 	if(weaponType == 1) // MachineGun
@@ -55,6 +56,7 @@ void Actor::assignWeapon(int weaponType)
 		this->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
 	}
 }
+
 Actor::~Actor()
 {
 }
@@ -188,7 +190,7 @@ void Actor::applyForce(Vector3 force)
 Vector3 Actor::separation(vector<Actor*>& boids, Vector3 targetPos)
 {
 	// Distance of field of vision for separation between boids
-	float desiredSeparationDistance = (3.0f * 3.0f)+boidOffset;
+	float desiredSeparationDistance = boidOffset;
 	Vector3 direction(0.0f);
 	float nrInProximity = 0.0f;
 	int size = boids.size();
@@ -282,7 +284,7 @@ void Actor::updateBoid(float deltaTime)
 		velocity /= velocity.Length();
 	}
 
-	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 3;
+	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * updatedStats.maxSpeed;
 	Vector3 targetToSelf = (temp - position);
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)

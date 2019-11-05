@@ -14,7 +14,7 @@ void PlayingGameState::initAI()
 	aStar->generateTileData(map->getTileMap());
 	for(int i = 0; i < 10; i++)
 	{
-		actorManager->createAttacker(map->getStartPositionInWorldSpace().x +i*2, map->getStartPositionInWorldSpace().z + 5, (rand()%4)+1);
+		actorManager->createSwarm(map->getStartPositionInWorldSpace().x +i*2, map->getStartPositionInWorldSpace().z + 5, (rand()%4)+1);
 	}
 }
 
