@@ -21,7 +21,7 @@ public:
 	Vector3 seek();
 	void run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	virtual void updateBoid(float deltaTime);
-	void setPath(std::vector<Vector3> path);
+	void setPath(std::vector<Vector3>* path);
 	virtual bool hasGroup();
 	void joinGroup();
 
@@ -52,7 +52,7 @@ protected:
 	Vector3 vecForward;
 	Vector3 destination;
 	Selector* root;
-	std::vector<Vector3> path;
+	std::vector<Vector3>* path;
 	AStar* aStar;
 	Vector3 targetNode;
 	enum State { Roaming, Chasing, Returning };

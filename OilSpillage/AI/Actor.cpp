@@ -169,12 +169,12 @@ Status Actor::setRoamState()
 
 void Actor::followPath()
 {
-	if (path.size() > 0)
+	if (path != nullptr && path->size() > 0)
 	{
-		destination = path.at(path.size() - 1);
-		if (position.Distance(path.at(path.size() - 1), position) < 2)
+		destination = path->at(path->size() - 1);
+		if (position.Distance(path->at(path->size() - 1), position) < 2)
 		{
-			path.pop_back();
+			path->pop_back();
 		}
 	}
 	
@@ -299,7 +299,7 @@ void Actor::updateBoid(float deltaTime)
 	acceleration *= 0;
 }
 
-void Actor::setPath(std::vector<Vector3> path)
+void Actor::setPath(std::vector<Vector3>* path)
 {
 	this->path = path;
 }

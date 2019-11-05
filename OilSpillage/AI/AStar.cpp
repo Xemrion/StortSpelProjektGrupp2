@@ -7,8 +7,7 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 	{
 		return false;
 	}
-	//startPos = Vector3(startPos.x, startPos.y, -startPos.z);
-	//endPos = Vector3(endPos.x, endPos.y, -endPos.z);
+
 	Vector3 startTilePos = Vector3(map.convertWorldPositionToTilePosition(startPos).x,
 		0,
 		map.convertWorldPositionToTilePosition(startPos).y);
