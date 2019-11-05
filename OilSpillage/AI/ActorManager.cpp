@@ -145,7 +145,24 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 		{
 			if (!this->actors[i]->isDead())
 			{
-				if (bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
+				if (bulletArray[j].getWeaponType() == WeaponType::Laser)
+				{
+					GameObject* laserObject = bulletArray[j].getGameObject();
+					Vector3 rayDir = bulletArray[j].getDirection();
+					Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
+					if (this->actors[i]->getAABB().intersect(rayOrigin, rayDir, laserObject->getScale().z * 2))
+					{
+						if (soundTimer > 0.05f) {
+							/*int randomSound = rand() % 3 + 1;
+							std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
+							Sound::PlaySoundEffect(soundEffect);*/
+							Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+							soundTimer = 0;
+						}
+						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
+					}
+				}
+				else if (bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
 						/*int randomSound = rand() % 3 + 1;

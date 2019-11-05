@@ -38,7 +38,7 @@ Vehicle::Vehicle()
 	this->timeSinceLastShot = 0.0f;
 	this->timeSinceLastShot2 = 0.0f;
 
-	this->weapon = WeaponHandler::getWeapon(WeaponType::MachineGun);
+	this->weapon = WeaponHandler::getWeapon(WeaponType::Laser);
 	this->weapon2 = WeaponHandler::getWeapon(WeaponType::Flamethrower);
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
@@ -568,6 +568,10 @@ void Vehicle::updateWeapon(float deltaTime)
 	}
 	for (int i = 0; i < Vehicle::bulletCount; i++)
 	{
+		if (bullets[i].getWeaponType() == WeaponType::Laser)
+		{
+			bullets[i].getGameObject()->setPosition(this->vehicleBody1->getPosition());
+		}
 		bullets[i].update(deltaTime);
 	}
 	this->spotLight->setPos(this->mountedWeapon->getPosition()-Vector3(curDir.x,-1,curDir.y));

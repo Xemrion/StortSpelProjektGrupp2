@@ -62,7 +62,6 @@ void Actor::updateWeapon(float deltaTime)
 					Vector3 bulletOrigin = this->position + dir;
 					dir = (targetPos - bulletOrigin);
 
-					this->bullets[i].setWeaponType(this->weapon.type);
 					this->bullets[i].shoot(
 						weapon,
 						bulletOrigin,
