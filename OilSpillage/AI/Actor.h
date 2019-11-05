@@ -9,7 +9,7 @@ class Actor : public GameObject
 {
 public:
 	Actor();
-	Actor(float x, float z, AStar* aStar);
+	Actor(float x, float z, AStar* aStar, int weaponType = 1);
 	virtual ~Actor();
 	virtual void update(float dt, Vector3 targetPos);
 	virtual void setUpActor() = 0 {};
@@ -67,6 +67,7 @@ protected:
 	virtual Status setRoamState();
 	virtual void  followPath();
 	virtual void  updateWeapon(float deltaTime);
+	virtual void assignWeapon(int weaponType);
 
 
 	Weapon weapon;

@@ -15,7 +15,7 @@ Actor::Actor()
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 }
 
-Actor::Actor(float x, float z, AStar* aStar = nullptr)
+Actor::Actor(float x, float z, AStar* aStar = nullptr, int weaponType)
 {
 	this->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(this);
@@ -23,17 +23,38 @@ Actor::Actor(float x, float z, AStar* aStar = nullptr)
 	this->aStar = aStar;
 	this->setUpActor();
 	this->timeSinceLastShot = 0;
-	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 	this->acceleration = Vector3(0.0f);
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, -1.0f, z);
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
-
-	//this->predicting = true;
+	assignWeapon(weaponType);
 }
-
+void Actor::assignWeapon(int weaponType)
+{
+	if(weaponType == 1) // MachineGun
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+		this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+	else if (weaponType == 2)// MissileLauncher
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::MissileLauncher);
+		this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+		this->predicting = true;
+	}
+	else if (weaponType == 3)// Laser
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::Laser);
+		this->setColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f));
+	}
+	else if (weaponType == 4)// Flamethrower
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::Flamethrower);
+		this->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
+	}
+}
 Actor::~Actor()
 {
 }

@@ -12,9 +12,10 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	actorManager->createTurret(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 7, map->getStartPositionInWorldSpace().z + 5);
-	actorManager->createTurret(map->getStartPositionInWorldSpace().x + 9, map->getStartPositionInWorldSpace().z + 5);
+	for(int i = 0; i < 10; i++)
+	{
+		actorManager->createAttacker(map->getStartPositionInWorldSpace().x +i*2, map->getStartPositionInWorldSpace().z + 5, (rand()%4)+1);
+	}
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
