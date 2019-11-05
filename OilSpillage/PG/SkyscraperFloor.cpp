@@ -33,6 +33,7 @@ void SkyscraperFloor::rotateDeg(float degrees)
 		this->verticies[i].z = rotZ;
 	}
 }
+
 void SkyscraperFloor::rotateRad(float radians)
 {
 	float rotX = 0.0f, rotZ = 0.0f;
@@ -113,7 +114,6 @@ bool SkyscraperFloor::evenOddCheck( Vector3 pointB1,Vector3 pointB2, Vector3 poi
 	
 	return intersect;
 }
-
 
 void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 {
@@ -266,6 +266,7 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 		}
 	}
 }
+
 void SkyscraperFloor::testDrawLines() const
 {
 	
