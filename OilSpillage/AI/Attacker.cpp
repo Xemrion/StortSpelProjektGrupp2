@@ -9,22 +9,21 @@ Attacker::Attacker()
 	this->updatedStats = this->defaultStats;
 
 	this->health = this->updatedStats.maxHealth;
-	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
 
 Attacker::Attacker(float x, float z, AStar* aStar)
 	:Actor(x, z, aStar)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
-	this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	this->setColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 	setUpActor();
 
 	this->defaultStats = VehicleStats::AIAttacker;
 	this->updatedStats = this->defaultStats;
 	this->health = this->updatedStats.maxHealth;
-	Game::getGraphics().loadModel("Entities/Dummy_Roller_Melee");
-	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Roller_Melee");
-	this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Roller_Melee"));
+	Game::getGraphics().loadModel("Entities/Roller_Melee");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 
 	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
@@ -35,21 +34,10 @@ Attacker::~Attacker()
 
 void Attacker::update(float dt, Vector3 targetPos)
 {
-	this->deltaTime = dt;
 	this->targetPos = targetPos;
-
-	if (nrOfFrames % 100 == 0)
-	{
-		//findPath();
-		nrOfFrames = 1;
-	}
-
+	updateWeapon(dt);
 	this->root->func();
 	followPath();
-	this->rotateTowards();
-
-	updateWeapon(dt);
-	nrOfFrames++;
 }
 
 void Attacker::setUpActor()
@@ -60,7 +48,7 @@ void Attacker::setUpActor()
 	Sequence& seq2 = bt.getSequence();
 
 	Behavior& inRange = bt.getAction();
-	inRange.addAction(std::bind(&Attacker::inRange, std::ref(*this)));
+	inRange.addAction(std::bind(&Attacker::inAttackRange, std::ref(*this)));
 	Behavior& chase = bt.getAction();
 	chase.addAction(std::bind(&Attacker::setChaseState, std::ref(*this)));
 	Behavior& roam = bt.getAction();
@@ -75,30 +63,10 @@ void Attacker::setUpActor()
 
 	sequence.addChildren(enemyNear);
 	sequence.addChildren(selector);
-	
+
 	selector.addChildren(seq2);
 	selector.addChildren(chase);
 
 	seq2.addChildren(inRange);
 	seq2.addChildren(shoot);
-}
-
-void Attacker::rotateTowards()
-{
-	if(this->enemyNear() == Status::SUCCESS)
-	{
-		Vector3 targetToSelf = (targetPos - position);
-		//targetToSelf.Normalize();
-		if ((targetToSelf).Dot(vecForward) < 0.8)
-		{
-			vecForward -= (targetToSelf * deltaTime) / 0.1;
-			vecForward.Normalize();
-
-			float newRot = atan2(this->vecForward.x, this->vecForward.z);
-			this->setRotation(Vector3(0, newRot - (XM_PI / 2), 0));
-		}
-	}
-
-
-
 }

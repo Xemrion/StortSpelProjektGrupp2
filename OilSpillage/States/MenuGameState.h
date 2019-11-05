@@ -14,6 +14,7 @@ public:
 		MENU_MAIN,
 		MENU_OPTIONS,
 		MENU_CREDITS,
+		MENU_CONTROLS,
 		MENUCOUNT
 	};
 private:
@@ -25,10 +26,7 @@ public:
 	MenuGameState();
 	virtual ~MenuGameState();
 
-	void init();
-	void cleanUp();
 	void update(float deltaTime);
-
 	void setCurrentMenu(Menu menu);
 };
 

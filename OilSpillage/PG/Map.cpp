@@ -152,12 +152,17 @@ void  Map::generateBuildings( )
 	F32_Dist smallProbabilityDist {};
 
 	//Array of possible buildings
-	std::string buildingArr[4];
+	std::string buildingArr[5];
 	buildingArr[0] = "Houses/testHouse";
 	buildingArr[1] = "Houses/testHouse2";
 	buildingArr[2] = "Houses/testHouse3";
 	buildingArr[3] = "Houses/testHouse4";
+	buildingArr[4] = "Houses/testHouse5";
 	
+	std::string textureArr[2];
+	textureArr[0] = "Houses/houseMaterial";
+	textureArr[1] = "Houses/houseMaterial2";
+
 	#ifdef _DEBUG
 	   U32            total_building_count{ 0 };
 	   U32            total_building_tile_count{ 0 };
@@ -234,8 +239,11 @@ void  Map::generateBuildings( )
 						tilemap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
 						if ( not isHospital ) {
-							int randomHouse = rand() % 4; // decides the house
+							int randomHouse = rand() % 5; // decides the house
 							houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
+							int randomTex = rand() % 2;
+							houseTile.setMaterial(graphics.getMaterial(data(textureArr[randomTex])));
+
 							//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
 
 							F32 randomSize = smallProbabilityDist(rng) < smallProbability ? randomSizeDist(rng) : 1.0f;
@@ -259,11 +267,12 @@ void  Map::generateBuildings( )
 							// TODO: check which neighbouring tile is the road and rotate the hospital accordingly!
 							auto orientation = getHospitalOrientation( tilePosition );
 							F32 yRotation = .0f;
+							F32 constexpr pi{ 3.14156926535f };
 							switch ( orientation ) {
-								case Direction::south: { break; }
-								case Direction::west:  { break; }
-								case Direction::east:  { break; }
-								case Direction::north: { break; }
+								case Direction::south: { houseTile.setRotation({.0f, pi/2,   .0f}); break; } //  90 klockvis Y
+								case Direction::west:  { houseTile.setRotation({.0f, pi,     .0f}); break; } // 180 klockvis Y
+								case Direction::north: { houseTile.setRotation({.0f, pi/2*3, .0f}); break; } // 270 klockvis Y
+								case Direction::east: { break; } // no need to rotate
 								default: assert( false and "BUG! Unaccounted for direction" );
 							}
 							houseTile.mesh       = graphics.getMeshPointer( "Hospital" );
@@ -447,7 +456,7 @@ void  Map::setDistrictColorCoding( Bool useColorCoding ) noexcept
 		}
 	}
 	else {
-		static auto const  defaultColor = Vector4{ .5f, .5f, .5f, 1.0f };
+		static auto const  defaultColor = Vector4{ .0f, .0f, .0f, 1.0f };
 		for ( auto& e : houseTiles )
 			e.setColor( defaultColor );
 	}
@@ -591,10 +600,10 @@ Vector3 Map::getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcep
    auto orientation = getHospitalOrientation( hospitalTilePos );
    auto result = tilemap->convertTilePositionToWorldPosition( hospitalTilePos );
    switch ( orientation ) { 
-      case Direction::south: result += Vector3(  .0f, .0f,  offsetDistance ); break;
+      case Direction::south: result += Vector3(  .0f, .0f,  -offsetDistance ); break;
       case Direction::west:  result += Vector3( -offsetDistance, .0f, .0f  ); break;
       case Direction::east:  result += Vector3(  offsetDistance, .0f, .0f  ); break;
-      case Direction::north: result += Vector3(  .0f, .0f, -offsetDistance ); break;
+      case Direction::north: result += Vector3(  .0f, .0f, offsetDistance ); break;
    }
    return result;
 }

@@ -178,10 +178,10 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 		if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition()).Length() < 1.5f)
 		{
 			if (soundTimer > 0.05f) {
-				int randomSound = rand() % 4 + 1;
+				int randomSound = rand() % 3 + 1;
 				std::wstring soundEffect = L"data/sound/CarGlass" + to_wstring(randomSound) + L".wav";
 				Sound::PlaySoundEffect(soundEffect);
-				Sound::PlaySoundEffect(L"data/sound/CarImpactSoft.wav");
+				Sound::PlaySoundEffect(L"data/sound/MetalImpact1.wav");
 				soundTimer = 0;
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-WeaponHandler::weapons[(int)weaponType].damage);

@@ -5,13 +5,12 @@
 Defender::Defender()
 {
 	setUpActor();
-	objectivePos = Vector3(9.0f,0.0f,9.0f);
+	objectivePos = Vector3(9.0f, 0.0f, 9.0f);
 
 	this->defaultStats = VehicleStats::AIDefender;
 	this->updatedStats = this->defaultStats;
 
 	this->health = this->updatedStats.maxHealth;
-	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 }
 
 Defender::Defender(float x, float z, AStar* aStar, Vector3 objectivePos)
@@ -33,33 +32,22 @@ Defender::~Defender()
 {
 
 }
-
 void Defender::update(float dt, Vector3 targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 
-	if (nrOfFrames % 20 == 0)
+	this->root->func();
+	followPath();
+
+	if (nrOfFrames % 60 == 0)
 	{
-		if (inObjectiveRange() == Status::FAILURE)
+		if (this->state == State::Returning && inObjectiveRange() == Status::SUCCESS)
 		{
-			returning();
-		}
-		else if (enemyWithinObjective() == Status::FAILURE) 
-		{
-			chase();
-		}
-		else
-		{
-			roam();
+			setRoamState();
 		}
 		nrOfFrames = 0;
 	}
-	//this->root->func();
-	followPath();
-
-
-	updateWeapon(deltaTime);
 
 	nrOfFrames++;
 }
@@ -80,7 +68,7 @@ void Defender::setUpActor()
 	chase.addAction(std::bind(&Defender::setChaseState, std::ref(*this)));
 
 	Behavior& inRange = bt.getAction();
-	inRange.addAction(std::bind(&Defender::inRange, std::ref(*this)));
+	inRange.addAction(std::bind(&Defender::inAttackRange, std::ref(*this)));
 
 	Behavior& attack = bt.getAction();
 	attack.addAction(std::bind(&Defender::shoot, std::ref(*this)));
@@ -112,66 +100,17 @@ void Defender::setUpActor()
 	sequence3.addChildren(inRange);
 	sequence3.addChildren(attack);
 }
-
-void Defender::followPath()
-{
-	if (path.size() > 0)
-	{
-		/*destination = DirectX::SimpleMath::Vector3(float(path.at(path.size() - 1)->getXPos()),
-			.0f,
-			float(path.at(path.size() - 1)->getYPos()));*/
-
-		destination = path.at(path.size() - 1);
-		if (position.Distance(path.at(path.size() - 1), position) < 1)
-		{
-			path.pop_back();
-		}
-	}
-	else
-	{
-		if (this->state == State::Chasing)
-		{
-			chase();
-		}
-		else if (this->state == State::Roaming)
-		{
-			roam();
-		}
-		else if (this->state == State::Returning)
-		{
-			returning();
-		}
-	}
-}
-
 void Defender::returning()
 {
 	targetPos = objectivePos;
-	destination = objectivePos;
-	findPath();
-}
-
-Status Defender::inRange()
-{
-	Status status;
-	float tempDelta = deltaTime + this->timeSinceLastShot;
-
-	if ((this->getPosition() - targetPos).Length() > 7 && tempDelta <= this->weapon.fireRate)
-	{
-		status = Status::FAILURE;
-	}
-	else
-	{
-		status = Status::SUCCESS;
-	}
-	return status;
+	aStar->algorithm(this->getPosition(), targetPos, path);
 }
 
 Status Defender::inObjectiveRange()
 {
 	Status status;
 
-	if ((getPosition() - objectivePos).Length() > 4)
+	if ((getPosition() - objectivePos).Length() > 30)
 	{
 		status = Status::FAILURE;
 	}
@@ -190,6 +129,7 @@ Status Defender::idle()
 Status Defender::setReturnState()
 {
 	this->state = State::Returning;
+	returning();
 	return Status::SUCCESS;
 }
 
@@ -197,7 +137,7 @@ Status Defender::enemyWithinObjective()
 {
 	Status status;
 
-	if ((targetPos - objectivePos).Length() > 12)
+	if ((targetPos - objectivePos).Length() > 30)
 	{
 		status = Status::FAILURE;
 	}

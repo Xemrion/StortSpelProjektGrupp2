@@ -6,13 +6,17 @@
 #include "../UI/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
+#include <future>
 
 void PlayingGameState::initAI()
 {
 	aStar = new AStar( map->getTileMap() );
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
+	actorManager->createTurret(player.get()->getVehicle()->getPosition().x +4,
+		player.get()->getVehicle()->getPosition().z +4);
 }
+
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
 {
    #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -33,9 +37,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("grass3");
 
 	graphics.loadTexture("brickwallnormal");
-	graphics.loadModel("Dummy_Roller_Melee");
-	graphics.loadModel("Entities/Dummy_Turret");
-	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
+	graphics.loadModel("Roller_Melee");
+	graphics.loadModel("Entities/Turret");
+	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
 
 	//graphics.loadModel("Roads/Metro/0000");
 	//graphics.loadModel("Roads/Metro/0001");
@@ -81,6 +85,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadModel("Houses/testHouse2");
 	graphics.loadModel("Houses/testHouse3");
 	graphics.loadModel("Houses/testHouse4");
+	graphics.loadModel("Houses/testHouse5");
+	graphics.loadModel("Houses/houseMaterial");
+	graphics.loadModel("Houses/houseMaterial2");
+
 
 	player = std::make_unique<Vehicle>();
 
@@ -93,7 +101,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 		lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
-	for (int i = 0; i < 1000; ++i) {
+	for (int i = 0; i < 100; ++i) {
 		Vector3 randPos   = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand()))/ RAND_MAX;
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
@@ -118,10 +126,11 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	testNetwork.get()->saveTestNetwork("test-network");
    */
    //}
-	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(0.76f, 0.76f, 0.76f)));
+	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 
 	graphics.setLightList(lightList.get());
-
+	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.4f);
+	this->player->setSpotLight(lightList->addLight(tempLight));
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
 	
@@ -141,10 +150,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_OPTIONS]->init();
 
-	auto startPos = map->getStartPositionInWorldSpace();
+	Vector3 startPos = map->getStartPositionInWorldSpace();
    auto playerVehicle = player->getVehicle();
-	playerVehicle->setPosition(             startPos + Vector3( .0f, 3.00f, .0f) );
-	player->getVehicleBody1()->setPosition( startPos + Vector3( .0f, 3.65f, .0f) );
+	playerVehicle->setPosition(				startPos + Vector3( .0f, 0.00f -1.2f, .0f) );
+	player->getVehicleBody1()->setPosition(	startPos + Vector3( .0f, 0.65f -1.2f, .0f) );
 
 	initAI();
 
@@ -181,24 +190,24 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
 
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies that is protecting the anvil");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the important" ,TypeOfTarget::Crate);
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important" ,TypeOfTarget::Crate);
 
 
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 5, "Pick up the trash");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 3, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 6, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 1, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 8, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 120, 7, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::KillingSpree, 240, 75, "Kill the enemies");
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 50, "Kill the enemies");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 6, "Pick up the important");
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 25, "Kill the enemies");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
 
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
-	Game::getGraphics().loadModel("Vehicles/Dummy_Player_Car");
-	buildingTest->mesh = Game::getGraphics().getMeshPointer("Vehicles/Dummy_Player_Car");
+	Game::getGraphics().loadModel("Vehicles/Player");
+	buildingTest->mesh = Game::getGraphics().getMeshPointer("Vehicles/Player");
 	Game::getGraphics().addToDraw(buildingTest.get());
 	btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
 	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
@@ -285,14 +294,14 @@ void PlayingGameState::ImGui_AI()
 
 
 
-	if(actorManager->groups.size() != 0)
-	{
-		std::vector<Actor*>* temp = actorManager->findClosestGroup(player->getVehicle()->getPosition());
-		for (int i = 0; i < temp->size(); i++)
-		{
-			ImGui::Text(("AI nr " + to_string(i) + ": " + to_string(temp->at(i)->getPosition().x) + " " + to_string(temp->at(i)->getPosition().y) + " " + to_string(temp->at(i)->getPosition().z) + " ").c_str());
-		}
-	}
+	//if(actorManager->groups.size() != 0)
+	//{
+	//	std::vector<Actor*>* temp = actorManager->findClosestGroup(player->getVehicle()->getPosition());
+	//	for (int i = 0; i < temp->size(); i++)
+	//	{
+	//		ImGui::Text(("AI nr " + to_string(i) + ": " + to_string(temp->at(i)->getPosition().x) + " " + to_string(temp->at(i)->getPosition().y) + " " + to_string(temp->at(i)->getPosition().z) + " ").c_str());
+	//	}
+	//}
 
 	//delete temp;
 	ImGui::End();
@@ -326,7 +335,6 @@ void PlayingGameState::ImGui_Particles()
 
 	ImGui::End();
 }
-
 
 #include "../PG/MinimapTextureGenerator.hpp"
 void PlayingGameState::ImGui_ProcGen()
@@ -470,10 +478,10 @@ Vector3 PlayingGameState::getRespawnPosition() const noexcept
 	auto ui = static_cast<UIPlaying const *>( menues[Menu::MENU_PLAYING].get() );
 	auto maybeHospitalTilePos = map->getNearestFoundHospitalTilePos( player->getVehicle()->getPosition(), *ui );
 	if ( maybeHospitalTilePos ) {
-		return map->getHospitalFrontPosition( maybeHospitalTilePos.value() );
+		return map->getHospitalFrontPosition( maybeHospitalTilePos.value() )+Vector3(0,-1.2f,0);
 		// TODO: rotate player
 	}
-	else return map->getStartPositionInWorldSpace();
+	else return map->getStartPositionInWorldSpace() + Vector3(0, -1.2f, 0);
 }
 
 void  PlayingGameState::update(float deltaTime)
@@ -483,6 +491,14 @@ void  PlayingGameState::update(float deltaTime)
 	{
 		if (Input::isKeyDown_DEBUG(Keyboard::E)) {
 			deltaTime /= 4;
+		}
+		if (Input::checkButton(Keys::CANCEL, States::PRESSED)) {
+			if (player->getDrivingMode() == 0) {
+				player->setDrivingMode(1);
+			}
+			else if(player->getDrivingMode() == 1) {
+				player->setDrivingMode(0);
+			}
 		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -550,22 +566,26 @@ void  PlayingGameState::update(float deltaTime)
 		if (time == 0)
 		{
 			deltaTime /= 4;
+			this->player->setHealth(0);
 		}
 		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
 		player->update(deltaTime);
 		physics->update(deltaTime);
+		actorManager->update(deltaTime, playerVehicle->getPosition());
+		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation();
-		actorManager->update(deltaTime, playerVehicle->getPosition());
-		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
+		//actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		Bullet::updateSoundTimer(deltaTime);
+		bulletThread.get();
 		player->updateWeapon(deltaTime);
 		
 #ifndef _DEBUG
 		updateObjects();
+		paperCollision(deltaTime);
 #endif
 		btVector3 positionCam { playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
@@ -591,7 +611,7 @@ void  PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos( spotlightPos );
 		
-		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) {
+		if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
 			soundAggro += 0.2f * deltaTime;
 		}
 		else if(soundAggro > 0.0f) {
@@ -685,6 +705,7 @@ void PlayingGameState::spawnObjects()
 {
 	Game::getGraphics().loadModel("Entities/Barrel");
 	Game::getGraphics().loadModel("Entities/Garbage_Bag");
+	Game::getGraphics().loadModel("Entities/Quad");
 	physicsObjID = 0;
 	physicsObjects.reserve(300);
 	btRigidBody* tempo2;
@@ -751,8 +772,7 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 250; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		Game::getGraphics().loadModel("Cube");
-		objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Quad");
 		Game::getGraphics().addToDraw(objPtr);
 		size = rand() % 3 + 8;
 		size *= 0.125f;
@@ -823,7 +843,7 @@ void PlayingGameState::moveObjects()
 		if (object->getRigidBody() != nullptr) {
 			object->getRigidBody()->setActivationState(0);
 		}
-		int randomValue = rand() % 2+1;
+		int randomValue = rand() % 2 + 1;
 		if (randomValue == 1) {
 			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getZ() > 0) {
 				//Top
@@ -866,6 +886,7 @@ void PlayingGameState::moveObjects()
 	if (physicsObjID >= physicsObjects.size()) {
 		physicsObjID = 0;
 	}
+
 }
 
 Vector3 PlayingGameState::generateObjectivePos(float minDistance, float maxDistance) noexcept
@@ -928,6 +949,24 @@ void PlayingGameState::updateObjects()
 			if (abs(player->getVelocitySpeed()) > 20.0f) {
 				moveObjects();
 			}
+		}
+	}
+}
+
+void PlayingGameState::paperCollision(float deltaTime)
+{
+	
+	float randomValue = 0;
+	for (auto &obj : physicsObjects) {
+		if (obj->getRigidBody() == nullptr) {
+			randomValue = rand() % 2;
+			if (((player->getVehicle()->getPosition() - obj->getPosition()).Length()) < 1.5f && abs(player->getVelocitySpeed()) > 8.0f && randomValue == 1) {
+				randomValue = rand() % 20;
+				randomValue = max(randomValue-5.0f,0.0f);
+				obj->setVelocity(Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(),randomValue*0.5f, player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()));
+				obj->setPosition(obj->getPosition() + Vector3(0, 0.1f, 0));
+			}
+			obj->updateObject(deltaTime);
 		}
 	}
 }

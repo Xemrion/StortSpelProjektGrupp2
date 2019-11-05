@@ -43,6 +43,7 @@ Vehicle::Vehicle()
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
 	this->health = this->updatedStats.maxHealth;
+	
 }
 
 Vehicle::~Vehicle()
@@ -61,8 +62,11 @@ Vehicle::~Vehicle()
 
 void Vehicle::init(Physics *physics)
 {
+	
+
 	this->physics = physics;
 	this->mountedWeapon = new GameObject;
+	this->frontWeapon = new GameObject;
 	this->vehicle = new GameObject;
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
 	//Game::getGraphics().addToDraw(vehicle);
@@ -71,30 +75,37 @@ void Vehicle::init(Physics *physics)
 	Game::getGraphics().loadTexture("CarTemp");
 	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 
-	mountedWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
-	Material mountedWPMaterial = Game::getGraphics().getMaterial("Entities/Dummy_Turret");
+	mountedWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Turret1");
+	Material mountedWPMaterial = Game::getGraphics().getMaterial("Entities/Turret");
 	mountedWeapon->setTexture(mountedWPMaterial.diffuse);
 	Game::getGraphics().addToDraw(mountedWeapon);
 	mountedWeapon->setScale(Vector3(0.010f,0.007f, 0.007f));
 
+	frontWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Turret1");
+	Material frontWeaponMat = Game::getGraphics().getMaterial("Entities/Turret");
+	frontWeapon->setTexture(frontWeaponMat.diffuse);
+	Game::getGraphics().addToDraw(frontWeapon);
+	frontWeapon->setScale(Vector3(0.002f, 0.005f, 0.005f));
+	frontWeapon->setColor(Vector4(0.7f, 0.7f, 0.0f, 1.0f));
+
 	this->vehicleBody1 = new GameObject;
-	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
+	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player1");
 	vehicleBody1->setSpotShadow(false);
 	Game::getGraphics().addToDraw(vehicleBody1);
 	vehicleBody1->setScale(Vector3(0.005f, 0.005f, 0.005f));	
 	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
 	//vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
 
-	vehicleBody1->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
+	vehicleBody1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
 
 	this->wheel1 = new GameObject;
 	this->wheel2 = new GameObject;
 	this->wheel3 = new GameObject;
 	this->wheel4 = new GameObject;
-	wheel1->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car");
-	wheel2->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car2");
-	wheel3->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car3");
-	wheel4->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car4");
+	wheel1->mesh = Game::getGraphics().getMeshPointer("Entities/Player");
+	wheel2->mesh = Game::getGraphics().getMeshPointer("Entities/Player2");
+	wheel3->mesh = Game::getGraphics().getMeshPointer("Entities/Player3");
+	wheel4->mesh = Game::getGraphics().getMeshPointer("Entities/Player4");
 	Game::getGraphics().addToDraw(wheel1);
 	Game::getGraphics().addToDraw(wheel2);
 	Game::getGraphics().addToDraw(wheel3);
@@ -107,10 +118,10 @@ void Vehicle::init(Physics *physics)
 	wheel2->setScale(Vector3(0.005f, 0.005f, 0.005f));
 	wheel3->setScale(Vector3(0.005f, 0.005f, 0.005f));
 	wheel4->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	wheel1->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
-	wheel2->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
-	wheel3->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
-	wheel4->setTexture(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car").diffuse);
+	wheel1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	wheel2->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	wheel3->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	wheel4->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
 
 
 	btRigidBody* tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y, vehicle->getPosition().z), btVector3(vehicle->getScale().x, vehicle->getScale().y, vehicle->getScale().z), 10.0f);
@@ -118,6 +129,7 @@ void Vehicle::init(Physics *physics)
 	this->getVehicle()->getRigidBody()->activate();
 	this->getVehicle()->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	this->getVehicle()->getRigidBody()->setFriction(0);
+	this->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1,0,1));
 
 	tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y + 0.65f, vehicle->getPosition().z), -btVector3(this->vehicleBody1->getAABB().minPos.x - this->vehicleBody1->getAABB().maxPos.x, (this->vehicleBody1->getAABB().minPos.y - this->vehicleBody1->getAABB().maxPos.y) * 0.2f, this->vehicleBody1->getAABB().minPos.z - this->vehicleBody1->getAABB().maxPos.z) * 0.5f, 1.0f);
 	vehicleBody1->setRigidBody(tempo, physics);
@@ -289,7 +301,12 @@ void Vehicle::update(float deltaTime)
 		else {
 			rotateAcceleration = 0;
 			rotateAcceleration /= 1.0f + 20 * deltaTime;
-			vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, vehicle->getRigidBody()->getAngularVelocity().getY()/ (1 + (7.0f * deltaTime)), steering.z));
+			if (health > 0) {
+				vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, vehicle->getRigidBody()->getAngularVelocity().getY() / (1 + (7.0f * deltaTime)), steering.z));
+			}
+			else {
+				vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, (vehicle->getRigidBody()->getAngularVelocity().getY() / (1 + (0.8f * deltaTime)))/** min(abs(velocitySpeed), 1)*/, steering.z));
+			}
 
 		}
 		if ((Input::checkButton(Keys::L_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S)) && velocitySpeed > (-40 * updatedStats.maxSpeed) && this->health>0) {
@@ -370,7 +387,7 @@ void Vehicle::update(float deltaTime)
 			vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (0.6f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (0.6f * deltaTime))));
 			rotateAcceleration /= 1.0f + 0.005f * deltaTime * 40;
 			
-			vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime * 120 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
+			vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, (vehicle->getRigidBody()->getAngularVelocity().getY() / (1 + (0.8f * deltaTime)))/** min(abs(velocitySpeed), 1)*/, steering.z));
 		}
 
 		rotateAcceleration /= 1.0f + 6*deltaTime;
@@ -385,7 +402,7 @@ void Vehicle::update(float deltaTime)
 		driftResistance = driftResistance * (abs(driftForce)*0.005f);
 	}
 	if (!(health > 0)) {
-		driftResistance /= 2;
+		//driftResistance /= 2;
 	}
 	if (drivingMode != 2) {
 		if (Input::getStrengthL() > 0) {
@@ -447,6 +464,9 @@ void Vehicle::updateWeapon(float deltaTime)
 {
 
 	this->mountedWeapon->setPosition(this->vehicleBody1->getPosition());
+	Vector3 frontTempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+	this->frontWeapon->setPosition(this->vehicleBody1->getPosition()+1.15f*frontTempDir-Vector3(0.0f,1.0f,0.0f));
+	this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y+3.14/2, 0));
 	Vector2 dir = Input::getDirectionR();
 	dir.Normalize();
 	if ((dir - curDir).Length() > 0.01f)
@@ -513,6 +533,13 @@ void Vehicle::updateWeapon(float deltaTime)
 
 		if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
 		{
+			if (flameBool == true) {
+				int randomSound = rand() % 2 + 1;
+				std::wstring soundEffect = L"data/sound/FlameLoop" + to_wstring(randomSound) + L".wav";
+				Sound::PlayLoopingSound(soundEffect);
+				Sound::PlaySoundEffect(L"data/sound/FlameStart.wav");
+				flameBool = false;
+			}
 			if (this->timeSinceLastShot2 >= this->weapon2.fireRate)
 			{
 				this->timeSinceLastShot2 = fmod(this->timeSinceLastShot2, this->weapon2.fireRate);
@@ -525,7 +552,7 @@ void Vehicle::updateWeapon(float deltaTime)
 
 						Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
 						this->bullets[i].shoot(weapon2,
-							this->vehicleBody1->getPosition() + Vector3(tempDir*0.8f) + Vector3(0.0f,-0.5f,0.0f),
+							this->vehicleBody1->getPosition() + Vector3(tempDir*1.5f) + Vector3(0.0f,-0.5f,0.0f),
 							tempDir,
 							Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
 						break;
@@ -533,16 +560,28 @@ void Vehicle::updateWeapon(float deltaTime)
 				}
 			}
 		}
+		else {
+			flameBool = true;
+			Sound::StopLoopingSound(L"data/sound/FlameLoop1.wav",true);
+			Sound::StopLoopingSound(L"data/sound/FlameLoop2.wav", true);
+		}
 	}
 	for (int i = 0; i < Vehicle::bulletCount; i++)
 	{
 		bullets[i].update(deltaTime);
 	}
+	this->spotLight->setPos(this->mountedWeapon->getPosition()-Vector3(curDir.x,-1,curDir.y));
+	this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
 }
 
 float Vehicle::getAcceleratorX()
 {
 	return accelerator.x;
+}
+
+void Vehicle::setSpotLight(SpotLight* theLight)
+{
+	this->spotLight = theLight;
 }
 
 void Vehicle::setDrivingMode(int i)
@@ -648,8 +687,8 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 	vehicleDistance = min(vehicleDistance, 20.0f);
 
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime*1.2f + cameraDistance;
-	cameraDistanceX = ((this->vehicle->getRigidBody()->getLinearVelocity().getX() * 0.15f + Input::getDirectionR().x * Input::getStrengthR()*3) - cameraDistanceX) * deltaTime * 2.2f + cameraDistanceX;
-	cameraDistanceZ = ((this->vehicle->getRigidBody()->getLinearVelocity().getZ() * 0.15f + Input::getDirectionR().y * Input::getStrengthR()*3) - cameraDistanceZ) * deltaTime * 2.2f + cameraDistanceZ;
+	cameraDistanceX = ((this->vehicle->getRigidBody()->getLinearVelocity().getX() * 0.3f + Input::getDirectionR().x * Input::getStrengthR()*3) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
+	cameraDistanceZ = ((this->vehicle->getRigidBody()->getLinearVelocity().getZ() * 0.25f + Input::getDirectionR().y * Input::getStrengthR()*3) - cameraDistanceZ) * deltaTime * 12.2f + cameraDistanceZ;
 
 	return Vector3(cameraDistanceX,cameraDistance,cameraDistanceZ);
 }
@@ -661,18 +700,23 @@ void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 	if ((max(abs(accelForce.x), abs(accelForce.z)) > 5.0f)) {
 		int randomSound = rand() % 3 + 1;
 		std::wstring soundEffect = L"data/sound/CarImpact" + to_wstring(randomSound) + L".wav";
+		int randomSound2 = rand() % 3 + 1;
+		std::wstring soundEffect2 = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
 			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-20.0f);
 			Sound::PlaySoundEffect(L"data/sound/CarCrash.wav");
+			Sound::PlaySoundEffect(soundEffect2);
 		}
 		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
 			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-10.0f);
 			Sound::PlaySoundEffect(soundEffect);
+			Sound::PlaySoundEffect(soundEffect2);
 		}
 		else {
 			Sound::PlaySoundEffect(L"data/sound/CarImpactSoft.wav");
+			Sound::PlaySoundEffect(soundEffect2);
 		}
 	}
 	/*else {

@@ -44,6 +44,7 @@ public:
 	void removeLight(PointLight* theLight);
 	void		 moveObjects();
 	void		 updateObjects();
+	void		 paperCollision(float deltaTime);
 	Vector3   getRespawnPosition() const noexcept;
 
 

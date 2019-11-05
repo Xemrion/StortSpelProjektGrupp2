@@ -11,7 +11,7 @@ void UIMainMenu::updateUI(float deltaTime)
 	{
 		if (this->selected == this->buttonPlay.get())
 		{
-			Game::setState(Game::STATE_PLAYING);
+			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(MenuGameState::MENU_CONTROLS);
 		}
 		else if (this->selected == this->buttonOptions.get())
 		{

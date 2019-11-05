@@ -31,6 +31,7 @@ public:
 	static void Update(float deltaTime);
 	static void Reset();
 
+	static void loadSound(std::wstring fileName);
 	static void PlaySoundEffect(std::wstring fileName);
 	static void PlayLoopingSound(std::wstring fileName);
 	static void StopLoopingSound(std::wstring fileName, bool immediate);

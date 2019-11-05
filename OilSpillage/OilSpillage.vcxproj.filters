@@ -19,8 +19,6 @@
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
-    <ClCompile Include="AI\Boid.cpp" />
-    <ClCompile Include="AI\Defender.cpp" />
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
@@ -75,6 +73,8 @@
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="UI\ObjectiveBox.cpp" />
     <ClCompile Include="AI\AIGroup.cpp" />
+    <ClCompile Include="UI\UIControls.cpp" />
+    <ClCompile Include="AI\Car_Spitfire.cpp" />
     <ClCompile Include="PG\Modelizer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -84,8 +84,6 @@
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
-    <ClInclude Include="AI\Boid.h" />
-    <ClInclude Include="AI\Defender.h" />
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />
     <ClInclude Include="PG\Map.hpp" />
@@ -157,6 +155,8 @@
     <ClInclude Include="UI\ObjectiveBox.h" />
     <ClInclude Include="AI\AIGroup.h" />
     <ClInclude Include="PG\Modelizer.hpp" />
+    <ClInclude Include="UI\UIControls.h" />
+    <ClInclude Include="AI\Car_Spitfire.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
@@ -175,7 +175,7 @@
     <FxCompile Include="Shadows\SimpleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="ShaderDefines.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

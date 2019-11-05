@@ -6,6 +6,7 @@
 #include "VehicleStats.h"
 #include "Powerup.h"
 #include "Sound.h"
+#include"Lights.h"
 using namespace DirectX::SimpleMath;
 
 class Vehicle
@@ -14,6 +15,7 @@ private:
 	GameObject* vehicle;
 	btScalar mRotation;
 	GameObject* mountedWeapon;//Mounted on top of the car
+	GameObject* frontWeapon;
 	GameObject* wheel1;
 	GameObject* wheel2;
 	GameObject* wheel3;
@@ -28,7 +30,7 @@ private:
 	btRaycastVehicle::btVehicleTuning	m_tuning;
 	btVehicleRaycaster* m_vehicleRayCaster;
 	btCollisionShape* m_wheelShape;
-
+	SpotLight* spotLight;
 	int health;
 	bool deadImpulse;
 	bool immortal;
@@ -72,6 +74,7 @@ private:
 	float reverseTimer;
 	float reverseTimer2;
 	float soundTimer;
+	bool flameBool;
 	bool dmg;
 
 	
@@ -93,6 +96,7 @@ public:
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
 
+	void setSpotLight(SpotLight* theLight);
 	void setDrivingMode(int i);
 	bool getDrivingMode();
 	Vector3 getVelocity();
