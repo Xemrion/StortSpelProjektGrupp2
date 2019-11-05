@@ -25,6 +25,7 @@ Spitfire::Spitfire(float x, float z, AStar* aStar):
 	//this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->deltaTime = 0;
 	setUpActor();
+	throttleInputStrength = 0;
 	//Game::getGraphics().loadModel("Entities/Dummy_Player_Car1");
 	//this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
 	//this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car1"));
@@ -62,18 +63,26 @@ void Spitfire::Init(Physics* physics)
 
 Status Spitfire::inRange()
 {
-	Status status;
+	Status status = Status::SUCCESS;
 	direction = car->getVehicle()->getPosition() - targetPos;
 	direction.Normalize();
-	if ((car->getVehicle()->getPosition() - targetPos).Length() > 10)
+	if ((car->getVehicle()->getPosition() - targetPos).Length() > 5)
 	{
 		status = Status::SUCCESS;
-		gas = 1;
+		throttleInputStrength += 0.5 * deltaTime;
+		if (throttleInputStrength > 1)
+		{
+			throttleInputStrength = 1;
+		}
 	}
-	else
+	else if ((car->getVehicle()->getPosition() - targetPos).Length() < 5)
 	{
 		status = Status::SUCCESS;
-		gas = 1;
+		throttleInputStrength -= 0.5 * deltaTime;
+		if (throttleInputStrength < 0)
+		{
+			throttleInputStrength = 0;
+		}
 	}
 	return status;
 }
@@ -88,7 +97,7 @@ void Spitfire::updateVehicle()
 {
 
 	prevAccelForce = Vector3(car->getVehicle()->getRigidBody()->getLinearVelocity());
-	car->update(deltaTime, gas, false, false, Vector2(-direction.x, -direction.z));
+	car->update(deltaTime, throttleInputStrength, false, false, Vector2(-direction.x, -direction.z));
 	Vector3 accelForce = Vector3(car->getVehicle()->getRigidBody()->getLinearVelocity().getX(), car->getVehicle()->getRigidBody()->getLinearVelocity().getY(), car->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 	car->setAccelForce(accelForce, deltaTime);
 	car->setWheelRotation();

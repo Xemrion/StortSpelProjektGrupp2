@@ -6,12 +6,15 @@ class Spitfire : public Actor
 private:
 	void setUpActor();
 	float deltaTime;
+
+	//car functions
 	Vehicle* car;
 	Vector3 direction;
-	float gas;
+	float throttleInputStrength;
 	class Physics* physics;
 	Vector3 prevAccelForce;
 	Vector3 accelForce;
+	void updateVehicle(); 
 public:
 	Spitfire(float x, float z, AStar* aStar);
 	Spitfire();
@@ -21,5 +24,4 @@ public:
 	/*if in range lets stop for now*/
 	Status inRange();
 	Status vehicleUpdate();
-	void updateVehicle();
 };
