@@ -28,6 +28,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	bool turretDied = false;
 	for (int i = 0; i < this->actors.size(); i++)
 	{
+
 		if (!actors[i]->isDead() && actors[i] != nullptr)
 		{
 			actors[i]->run(actors, dt, targetPos);
@@ -57,18 +58,52 @@ void ActorManager::update(float dt, Vector3 targetPos)
 			}
 		}
 	}
-	turretHandler.update(dt, targetPos);
-
-	updateGroups();
-	if (frameCount % 60 == 0)
+	for (int i = 0; i < groups.size(); i++)
 	{
-		assignPathsToGroups(targetPos);
-		frameCount = 0;
-	}
-	updateAveragePos();
-	frameCount++;
-}
+		for (int k = 0; k < groups.at(i).actors.size(); k++)
+		{
+			switch (i)
+			{
+			case 0:
+				groups[i].actors[k]->setColor(Vector4(0, 0, 0, 1));
+				break;
+			case 1:
+				groups[i].actors[k]->setColor(Vector4(0, 1, 0, 1));
+				break;
+			case 2:
+				groups[i].actors[k]->setColor(Vector4(0, 0, 1, 1));
+				break;
+			case 3:
+				groups[i].actors[k]->setColor(Vector4(1, 1, 1, 1));
+				break;
+			case 4:
+				groups[i].actors[k]->setColor(Vector4(1, 0, 1, 1));
+				break;
+			case 5:
+				groups[i].actors[k]->setColor(Vector4(0, 1, 1, 1));
+				break;
+			case 6:
+				groups[i].actors[k]->setColor(Vector4(1, 1, 0, 1));
+				break;
+			case 7:
+				groups[i].actors[k]->setColor(Vector4(0.5f, 0.5f, 0.5f, 1));
+				break;
+			default:
+				break;
+			}
+		}
+		turretHandler.update(dt, targetPos);
 
+		updateAveragePos();
+		updateGroups();
+		if (frameCount % 60 == 0)
+		{
+			assignPathsToGroups(targetPos);
+			frameCount = 0;
+		}
+		frameCount++;
+	}
+}
 void ActorManager::createAttacker(float x, float z)
 {
 	this->actors.push_back(new Attacker(x, z, this->aStar));
@@ -125,7 +160,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 		}
 	}
 	turretHandler.intersectPlayerBullets(bulletArray, size, soundTimer);
-	
+
 }
 void ActorManager::spawnAttackers(Vector3 originPos)
 {
@@ -229,11 +264,11 @@ void ActorManager::assignPathsToGroups(Vector3 targetPos)
 {
 	for (int i = 0; i < groups.size(); i++)
 	{
-		aStar->algorithm(groups[i].getAveragePos(), targetPos, path);
+		aStar->algorithm(groups[i].getAveragePos(), targetPos, groups[i].getPathRef());
 
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
-			groups[i].actors[j]->setPath(&path);
+			groups[i].actors[j]->setPath(&groups[i].getPathRef());
 		}
 	}
 }

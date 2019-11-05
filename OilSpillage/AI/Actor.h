@@ -34,6 +34,7 @@ public:
 	void changeHealth(int amount);
 	bool isDead() const;
 	void death();
+	std::vector<Vector3>* path;
 
 private:
 	Vector3 acceleration;
@@ -52,7 +53,6 @@ protected:
 	Vector3 vecForward;
 	Vector3 destination;
 	Selector* root;
-	std::vector<Vector3>* path;
 	AStar* aStar;
 	Vector3 targetNode;
 	enum State { Roaming, Chasing, Returning };
