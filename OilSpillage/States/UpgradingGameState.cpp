@@ -12,7 +12,7 @@ UpgradingGameState::~UpgradingGameState()
 
 void UpgradingGameState::update(float deltaTime)
 {
-	this->graphics.clearScreen(Vector4(1, 1, 1, 1));
+	this->graphics.clearScreen(Vector4(1,1,1,0));
 	this->menu->update(deltaTime);
 	this->graphics.presentScene();
 }

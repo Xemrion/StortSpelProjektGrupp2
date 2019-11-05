@@ -25,7 +25,7 @@ MenuGameState::~MenuGameState() {}
 
 void MenuGameState::update(float deltaTime)
 {
-	this->graphics.clearScreen();
+	this->graphics.clearScreen(Vector4(0,0,0,0));
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2());
