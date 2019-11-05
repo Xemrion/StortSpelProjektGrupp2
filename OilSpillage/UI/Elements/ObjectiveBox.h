@@ -2,7 +2,7 @@
 #define OBJECTIVE_BOX_H
 
 #include "Element.h"
-#include"../Objectives/ObjectiveHandler.h"
+#include"../../Objectives/ObjectiveHandler.h"
 
 class ObjectiveBox : public Element
 {

@@ -2,7 +2,7 @@
 #define CHECKBOX_H
 
 #include "Element.h"
-#include "..//Texture.h"
+#include "../../Texture.h"
 
 class CheckBox : public Element
 {

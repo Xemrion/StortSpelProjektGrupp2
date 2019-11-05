@@ -1,6 +1,6 @@
 #include "ObjectiveBox.h"
-#include "../game.h"
-#include "../States/PlayingGameState.h"
+#include "../../game.h"
+#include "../../States/PlayingGameState.h"
 
 ObjectiveBox::ObjectiveBox(Vector2 position) : Element(position), objHandlerPtr(nullptr)
 {

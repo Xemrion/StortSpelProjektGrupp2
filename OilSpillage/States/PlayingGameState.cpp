@@ -1,9 +1,9 @@
 #include "PlayingGameState.h"
 #include "../Input.h"
 #include "../Sound.h"
-#include "../UI/UIPlaying.h"
-#include "../UI/UIPaused.h"
-#include "../UI/UIOptions.h"
+#include "../UI/Playing/UIPlaying.h"
+#include "../UI/Playing/UIPaused.h"
+#include "../UI/Menu/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
 

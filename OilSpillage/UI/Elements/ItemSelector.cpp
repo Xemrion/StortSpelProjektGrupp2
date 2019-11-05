@@ -1,6 +1,6 @@
 #include "ItemSelector.h"
-#include "../game.h"
-#include "UserInterface.h"
+#include "../../game.h"
+#include "../UserInterface.h"
 
 Vector2 ItemSelector::size = Vector2(512, 128);
 
@@ -27,11 +27,13 @@ ItemSelector::~ItemSelector()
 void ItemSelector::draw(bool selected)
 {
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), this->position);
-	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position + Vector2(95 + 96 * (this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType]), 47));
+	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position + Vector2(95.0f + 96.0f * (this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType]), 47.0f));
 
-	for (int i = 0; i < ItemSelector::tileLength; i++)
+	std::vector<Item*>* list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType));
+
+	for (int i = 0; i < list->size(); i++)
 	{
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), std::to_string(this->startIndex[this->selectedType] + i).c_str(), this->position + Vector2(95 + 24 + 96 * i, 47 + 24), Colors::Red, 0, Vector2(), 0.45f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), (*list)[i]->getName(), this->position + Vector2(95.0f + 96.0f * i, 47.0f + 24.0f), Colors::Red, 0, Vector2(), 0.2f);
 	}
 }
 
@@ -54,7 +56,12 @@ void ItemSelector::changeSelectedType(bool down)
 
 void ItemSelector::changeSelectedIndex(bool right)
 {
-	int listSize = 16;//Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->size();
+	int listSize = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->size();
+	if (listSize == 0)
+	{ 
+		this->selectedIndex[this->selectedType] = 0;
+		return;
+	}
 	
 	if (right)
 	{
@@ -78,6 +85,11 @@ void ItemSelector::changeSelectedIndex(bool right)
 	{
 		this->startIndex[this->selectedType] = this->selectedIndex[this->selectedType] - (ItemSelector::tileLength - 1);
 	}
+}
+
+ItemType ItemSelector::getSelectedType() const
+{
+	return static_cast<ItemType>(this->selectedType);
 }
 
 Item* ItemSelector::getSelectedItem() const

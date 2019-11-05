@@ -1,7 +1,7 @@
 #include "UIPlaying.h"
-#include "../Input.h"
-#include "../game.h"
-#include "../States/PlayingGameState.h"
+#include "../../Input.h"
+#include "../../game.h"
+#include "../../States/PlayingGameState.h"
 #include <sstream>
 
 std::string UIPlaying::getFormattedTime()

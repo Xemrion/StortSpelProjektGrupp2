@@ -1,6 +1,6 @@
 #include "CheckBox.h"
-#include "UserInterface.h"
-#include "..//game.h"
+#include "../UserInterface.h"
+#include "../../game.h"
 #include <cassert>
 
 Vector2 CheckBox::size = Vector2(64, 64);

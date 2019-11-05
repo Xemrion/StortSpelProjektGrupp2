@@ -2,7 +2,7 @@
 #define ITEM_H
 
 #include <string>
-#include <array>
+#include <vector>
 #include "../GameObject.h"
 
 enum ItemType
@@ -11,14 +11,13 @@ enum ItemType
 	GADGET,
 	CHASSI,
 	WHEEL,
-	TYPES_SIZE,
-	TYPE_INVALID
+	TYPES_SIZE
 };
 
 class Item
 {
 private:
-	static std::array<std::unique_ptr<Item>, 4> allItems;
+	static std::vector<Item> allItems;
 
 	const char* name;
 	const char* description;
@@ -29,7 +28,6 @@ public:
 	static Item* getItemByName(const char* name);
 	static Item* getRandom();
 
-	Item();
 	Item(const char* name, const char* description, ItemType type, GameObject* object);
 	virtual ~Item();
 

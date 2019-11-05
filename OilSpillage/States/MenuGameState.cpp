@@ -1,8 +1,8 @@
 #include "MenuGameState.h"
-#include "../UI/UIMainMenu.h"
-#include "../UI/UIOptions.h"
-#include "../UI/UICredits.h"
-#include "../UI/UIControls.h"
+#include "../UI/Menu/UIMainMenu.h"
+#include "../UI/Menu/UIOptions.h"
+#include "../UI/Menu/UICredits.h"
+#include "../UI/Menu/UIControls.h"
 #include <cassert>
 
 MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU_MAIN)

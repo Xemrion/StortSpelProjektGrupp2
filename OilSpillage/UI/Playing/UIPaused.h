@@ -1,8 +1,8 @@
 #ifndef UI_PAUSED_H
 #define UI_PAUSED_H
 
-#include "UserInterface.h"
-#include "Button.h"
+#include "../UserInterface.h"
+#include "../Elements/Button.h"
 
 class UIPaused : public UserInterface
 {
