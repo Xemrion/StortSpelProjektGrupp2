@@ -552,7 +552,7 @@ void  PlayingGameState::update(float deltaTime)
 			this->player->setHealth(0);
 		}
 		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
-		player->update(deltaTime);
+		player->updatePlayer(deltaTime);
 		physics->update(deltaTime);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
