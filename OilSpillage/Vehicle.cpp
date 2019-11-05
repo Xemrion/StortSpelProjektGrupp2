@@ -58,6 +58,7 @@ Vehicle::~Vehicle()
 	delete wheel4;
 	delete spring1;
 	delete pointJoint;
+	delete frontWeapon;
 }
 
 void Vehicle::init(Physics *physics)
