@@ -120,12 +120,12 @@ Status Actor::shoot()
 					dir = (offsetPos - bulletOrigin);
 					dir.Normalize();
 
-					this->bullets[i].setWeaponType(this->weapon.type);
 					this->bullets[i].shoot(
 						weapon,
 						bulletOrigin,
 						dir,
-						this->velocity
+						this->velocity,
+						deltaTime
 					);
 					break;
 				}

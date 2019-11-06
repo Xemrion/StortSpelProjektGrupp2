@@ -29,7 +29,7 @@ struct TileInfo {
 			   w  : 1,
 			   nw : 1;
 		};
-	} roadmap;
+	} roadmap, housemap;
 	Vector3  origin { .0f, .0f, .0f };
 	Tile     type   { Tile::ground  };
 };
@@ -42,23 +42,39 @@ TileInfo t;
 			auto &entry   =  results[ map.index(x,y) ];
 			entry.origin  =  map.convertTilePositionToWorldPosition(x,y);
 			entry.type    =  map.tileAt(x,y);
-			if ( (y > 0) and (map.tileAt(x,y-1) == Tile::road) )
+			if ( (y > 0) and (map.tileAt(x,y-1)==Tile::road) )
 				entry.roadmap.n  = true;
-			if ( (x < map.width-1) and (y > 0) and (map.tileAt(x+1,y-1) == Tile::road) )
+			if ( (x < map.width-1) and (y > 0) and (map.tileAt(x+1,y-1)==Tile::road) )
 				entry.roadmap.ne = true;
-			if ( (x < map.width-1) and map.tileAt(x+1,y) == Tile::road )
+			if ( (x < map.width-1) and (map.tileAt(x+1,y)==Tile::road) )
 				entry.roadmap.e  = true;
-			if ( (x < map.width-1) and (y < map.height-1) and (map.tileAt(x+1,y+1) == Tile::road) )
+			if ( (x < map.width-1) and (y < map.height-1) and (map.tileAt(x+1,y+1)==Tile::road) )
 				entry.roadmap.se = true;
-			if ( (y < map.height-1) and (map.tileAt(x,y+1) == Tile::road) )
+			if ( (y < map.height-1) and (map.tileAt(x,y+1)==Tile::road) )
 				entry.roadmap.s  = true;
-			if ( (x > 0) and (y < map.height-1) and (map.tileAt(x-1,y+1) == Tile::road) )
+			if ( (x > 0) and (y < map.height-1) and (map.tileAt(x-1,y+1)==Tile::road) )
 				entry.roadmap.sw = true;
-			if ( (x > 0) and (map.tileAt(x-1,y) == Tile::road) )
+			if ( (x > 0) and (map.tileAt(x-1,y)==Tile::road) )
 				entry.roadmap.w  = true;
-			if ( (x > 0) and (y > 0) and (map.tileAt(x-1,y-1) == Tile::road) )
+			if ( (x > 0) and (y > 0) and (map.tileAt(x-1,y-1)==Tile::road) )
 				entry.roadmap.nw = true;
-			std::cout << ' ';
+
+			if ( (y > 0) and (map.tileAt(x,y-1)==Tile::building) )
+				entry.housemap.n  = true;
+			if ( (x < map.width-1) and (y > 0) and (map.tileAt(x+1,y-1)==Tile::building) )
+				entry.housemap.ne = true;
+			if ( (x < map.width-1) and (map.tileAt(x+1,y)==Tile::building) )
+				entry.housemap.e  = true;
+			if ( (x < map.width-1) and (y < map.height-1) and (map.tileAt(x+1,y+1)==Tile::building) )
+				entry.housemap.se = true;
+			if ( (y < map.height-1) and (map.tileAt(x,y+1)==Tile::building) )
+				entry.housemap.s  = true;
+			if ( (x > 0) and (y < map.height-1) and (map.tileAt(x-1,y+1)==Tile::building) )
+				entry.housemap.sw = true;
+			if ( (x > 0) and (map.tileAt(x-1,y)==Tile::building) )
+				entry.housemap.w  = true;
+			if ( (x > 0) and (y > 0) and (map.tileAt(x-1,y-1)==Tile::building) )
+				entry.housemap.nw = true;
 		}
 	}
 	return results;
@@ -168,21 +184,24 @@ Vector<UPtr<GameObject>> instantiateTilesAsModels( Graphics &graphics, TileMap c
 		model.setSunShadow(  noShadowcasting );
 	};
 	for ( auto const &e : extractTileInfo(map) ) {
-		if ( e.type != Tile::road ) {
+		if ( e.type == Tile::building )
+			instantiatePart( "Tiles/concrete", e.origin );
+		else if ( e.type == Tile::ground ) {
 			// intrinsic: center c == 0
 			instantiatePart( "Tiles/grass", e.origin );
 
 			// place eventual outer sidewalk borders:
-			if ( (e.roadmap.bitmap & maskHole) == predHole )
+			U8 bitmap = e.roadmap.bitmap | e.housemap.bitmap;
+			if ( (bitmap & maskHole) == predHole )
 				 instantiatePart( "Tiles/sidewalk_hole", e.origin, sidewalkOffsetY );
 			else for ( auto d=0;  d<8;  d+=2 ) {
-				if ( (e.roadmap.bitmap & util::cycleLeft( maskOuterC, d )) == util::cycleLeft(predOuterC,d) )
+				if ( (bitmap & util::cycleLeft( maskOuterC, d )) == util::cycleLeft(predOuterC,d) )
 					instantiatePart( "Tiles/sidewalk_corner_outer_ne", e.origin, 45.0f*d, sidewalkOffsetY );
-				if ( (e.roadmap.bitmap & util::cycleLeft( maskSide,   d )) == util::cycleLeft(predSide,d) )
+				if ( (bitmap & util::cycleLeft( maskSide,   d )) == util::cycleLeft(predSide,d) )
 					instantiatePart( "Tiles/sidewalk_side_n", e.origin, 45.0f*d, sidewalkOffsetY );
-				if ( (e.roadmap.bitmap & util::cycleLeft( maskInnerC, d )) == util::cycleLeft(predInnerC,d) )
+				if ( (bitmap & util::cycleLeft( maskInnerC, d )) == util::cycleLeft(predInnerC,d) )
 					instantiatePart( "Tiles/sidewalk_corner_inner_ne", e.origin, 45.0f*d, sidewalkOffsetY );
-				if ( (e.roadmap.bitmap & util::cycleLeft( maskU,      d )) == util::cycleLeft(predU,d) )
+				if ( (bitmap & util::cycleLeft( maskU,      d )) == util::cycleLeft(predU,d) )
 					instantiatePart( "Tiles/sidewalk_u_n", e.origin, 45.0f*d, sidewalkOffsetY );
 			}
 		}
@@ -190,17 +209,21 @@ Vector<UPtr<GameObject>> instantiateTilesAsModels( Graphics &graphics, TileMap c
 			// intrinsic: center c == 1
 			
 			// place eventual inner sidewalk borders:
-			U8 inversedMap = 0xFFu - e.roadmap.bitmap; // gotta invert since we're inside the road graph now
-			if ( (inversedMap & maskHole) == predHole )
+
+			// invert roadmaps (since we're inside the road graph)
+			// mask with housemap to exclude building tiles
+			// set corners as always existing
+			U8 bitmap = ~e.roadmap.bitmap | e.housemap.bitmap | 0b1010'1010;
+			if ( (bitmap & maskHole) == predHole )
 				 instantiatePart( "Tiles/sidewalk_hole", e.origin, sidewalkOffsetY );
 			else for ( auto d=0; d<8; d+=2 ) {
-				if ( (inversedMap & util::cycleLeft( maskOuterC, d )) == util::cycleLeft(predOuterC,d) )
+				if ( (bitmap & util::cycleLeft( maskOuterC, d )) == util::cycleLeft(predOuterC,d) )
 					instantiatePart( "Tiles/sidewalk_corner_outer_ne", e.origin, 45.0f*d, sidewalkOffsetY );
-				if ( (inversedMap & util::cycleLeft( maskSide,   d )) == util::cycleLeft(predSide,d) )
+				if ( (bitmap & util::cycleLeft( maskSide,   d )) == util::cycleLeft(predSide,d) )
 					instantiatePart( "Tiles/sidewalk_side_n", e.origin, 45.0f*d, sidewalkOffsetY );
-				if ( (inversedMap & util::cycleLeft( maskInnerC, d )) == util::cycleLeft(predInnerC,d) )
+				if ( (bitmap & util::cycleLeft( maskInnerC, d )) == util::cycleLeft(predInnerC,d) )
 					instantiatePart( "Tiles/sidewalk_corner_inner_ne", e.origin, 45.0f*d, sidewalkOffsetY );
-				if ( (inversedMap & util::cycleLeft( maskU,      d )) == util::cycleLeft(predU,d) )
+				if ( (bitmap & util::cycleLeft( maskU,      d )) == util::cycleLeft(predU,d) )
 					instantiatePart( "Tiles/sidewalk_u_n", e.origin, 45.0f*d, sidewalkOffsetY );
 			}
 
@@ -221,7 +244,7 @@ Vector<UPtr<GameObject>> instantiateTilesAsModels( Graphics &graphics, TileMap c
 					instantiatePart( "Tiles/road_marker_turn_ne", e.origin, 45.0f*d, markerOffsetY, false );
 					break;
 				}
-				if ( maskedMap == util::cycleLeft(   predDeadend, d ) ) {
+				if ( maskedMap == util::cycleLeft( predDeadend, d ) ) {
 					instantiatePart( "Tiles/road_marker_deadend_n", e.origin, 45.0f*d, markerOffsetY, false );
 					break;
 				}
