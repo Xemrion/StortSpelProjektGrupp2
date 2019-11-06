@@ -18,7 +18,6 @@ Actor::Actor()
 Actor::Actor(float x, float z, int weaponType)
 {
 	this->mesh = Game::getGraphics().getMeshPointer("Cube");
-	Game::getGraphics().addToDraw(this);
 
 	this->setUpActor();
 	this->timeSinceLastShot = 0;
@@ -162,9 +161,9 @@ Status Actor::setChaseState()
 	return Status::SUCCESS;
 }
 
-Status Actor::setRoamState()
+Status Actor::setIdleState()
 {
-	this->state = State::Roaming;
+	this->state = State::Idle;
 	return Status::SUCCESS;
 }
 
@@ -274,10 +273,10 @@ void Actor::run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos)
 {
 	applyForce(separation(boids, targetPos) * 4);
 	update(deltaTime, targetPos);
-	move(deltaTime);
+	move();
 }
 
-void Actor::move(float deltaTime)
+void Actor::move()
 {
 	//To make the slow down not as abrupt
 	acceleration *= 0.4f;
@@ -365,5 +364,5 @@ bool Actor::isDead() const
 
 void Actor::death()
 {
-	Game::getGraphics().removeFromDraw(this);
+	
 }

@@ -63,8 +63,6 @@ Vehicle::~Vehicle()
 
 void Vehicle::init(Physics *physics)
 {
-	
-
 	this->physics = physics;
 	this->mountedWeapon = new GameObject;
 	this->frontWeapon = new GameObject;

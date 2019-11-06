@@ -9,23 +9,35 @@ void Spitfire::setUpActor()
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Spitfire::inRange, std::ref(*this)));
 
-	Behavior& updateVehicle = bt.getAction();
-	updateVehicle.addAction(std::bind(&Spitfire::vehicleUpdate, std::ref(*this)));
+	Behavior& idle = bt.getAction();
+	idle.addAction(std::bind(&Spitfire::setIdleState, std::ref(*this)));
 
+	Behavior& chase = bt.getAction();
+	chase.addAction(std::bind(&Spitfire::setChaseState, std::ref(*this)));
 
 	root->addChildren(sequence);
+	root->addChildren(idle);
+
 	sequence.addChildren(inRange);
-	sequence.addChildren(updateVehicle);
+	sequence.addChildren(chase);
 }
 
-Spitfire::Spitfire(float x, float z):
-	Actor(x, z)
+Spitfire::Spitfire(float x, float z,Physics* physics)
+	:	Actor(x, z)
 {
 	this->direction = Vector3(1, 0, 0);
 	//this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->deltaTime = 0;
 	setUpActor();
 	throttleInputStrength = 0;
+	car = new Vehicle();
+	car->init(physics);
+	car->getVehicle()->setPosition(Vector3(position.x, 0 - 1.2f, position.z));
+	car->getVehicleBody1()->setPosition(Vector3(position.x, 0 - 1.2f + 0.65f, position.z));
+	this->defaultStats = VehicleStats::AIAttacker;
+	this->updatedStats = this->defaultStats;
+	this->health = this->updatedStats.maxHealth;
+	boidOffset = 0;
 	//Game::getGraphics().loadModel("Entities/Dummy_Player_Car1");
 	//this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
 	//this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car1"));
@@ -46,43 +58,17 @@ Spitfire::~Spitfire()
 	delete this->car;
 }
 
-void Spitfire::update(float dt, Vector3 targetPos)
-{
-	this->deltaTime = dt;
-	this->targetPos = targetPos;
-	this->root->func();
-}
-
-void Spitfire::Init(Physics* physics)
-{
-	car = new Vehicle();
-	car->init(physics);
-	car->getVehicle()->setPosition(Vector3(position.x, 0 - 1.2f, position.z));
-	car->getVehicleBody1()->setPosition(Vector3(position.x, 0 - 1.2f + 0.65f, position.z));
-}
-
 Status Spitfire::inRange()
 {
-	Status status = Status::SUCCESS;
-	direction = car->getVehicle()->getPosition() - targetPos;
-	direction.Normalize();
-	if ((car->getVehicle()->getPosition() - targetPos).Length() > 5)
+	Status status;
+
+	if ((car->getVehicle()->getPosition() - targetPos).Length() <= chaseRange)
 	{
 		status = Status::SUCCESS;
-		throttleInputStrength += 0.5 * deltaTime;
-		if (throttleInputStrength > 1)
-		{
-			throttleInputStrength = 1;
-		}
 	}
-	else if ((car->getVehicle()->getPosition() - targetPos).Length() < 5)
+	else
 	{
-		status = Status::SUCCESS;
-		throttleInputStrength -= 0.5 * deltaTime;
-		if (throttleInputStrength < 0)
-		{
-			throttleInputStrength = 0;
-		}
+		status = Status::FAILURE;
 	}
 	return status;
 }
@@ -95,10 +81,51 @@ Status Spitfire::vehicleUpdate()
 
 void Spitfire::updateVehicle()
 {
-
 	prevAccelForce = Vector3(car->getVehicle()->getRigidBody()->getLinearVelocity());
 	car->update(deltaTime, throttleInputStrength, false, false, Vector2(-direction.x, -direction.z));
 	Vector3 accelForce = Vector3(car->getVehicle()->getRigidBody()->getLinearVelocity().getX(), car->getVehicle()->getRigidBody()->getLinearVelocity().getY(), car->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 	car->setAccelForce(accelForce, deltaTime);
 	car->setWheelRotation();
+}
+
+void Spitfire::move()
+{
+	direction = car->getVehicle()->getPosition() - destination;
+	direction.Normalize();
+	if ((car->getVehicle()->getPosition() - destination).Length() > 5)
+	{
+		throttleInputStrength += 0.025 * deltaTime;
+		if (throttleInputStrength > 1)
+		{
+			throttleInputStrength = 1;
+		}
+	}
+	/*else if ((car->getVehicle()->getPosition() - destination).Length() < 5)
+	{
+		throttleInputStrength -= 0.5 * deltaTime;
+		if (throttleInputStrength < 0)
+		{
+			throttleInputStrength = 0;
+		}
+	}*/
+	updateVehicle();
+}
+
+void Spitfire::followPath()
+{
+	if (path != nullptr)
+	{
+		if (path->size() > 0)
+		{
+			destination = path->at(path->size() - 1);
+			if ((destination - car->getVehicle()->getPosition()).Length() < 20)
+			{
+				path->pop_back();
+			}
+		}
+		else
+		{
+			destination = targetPos;
+		}
+	}
 }
