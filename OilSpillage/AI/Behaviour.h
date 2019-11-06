@@ -13,7 +13,8 @@ enum Status
 	INVALID,
 	RUNNING,
 	SUCCESS,
-	FAILURE
+	FAILURE,
+	WAIT
 };
 using ActionCallback = std::function<Status()>;
 class Behavior
@@ -48,7 +49,12 @@ public:
 	~Selector();
 };
 
-
+struct WaitTimer
+{
+	float wait_time = 0;
+	float time_left = 0;
+	bool repeatable = false;
+};
 class BT
 {
 private:

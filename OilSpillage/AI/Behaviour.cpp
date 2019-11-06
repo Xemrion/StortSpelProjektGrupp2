@@ -18,7 +18,8 @@ Status Sequence::func()
 
 	for (size_t i = 0; i < children.size() &&
 		status != Status::FAILURE &&// if fail dont go further down
-		status != Status::RUNNING; i++) //if Running, we are not done with the task til its succeeded
+		status != Status::RUNNING &&
+		status != Status::WAIT; i++) //if Running, we are not done with the task til its succeeded
 	{
 		Selector* selector = dynamic_cast<Selector*>(children[i]);
 		if (selector)
@@ -60,7 +61,8 @@ Status Selector::func()
 
 	for (size_t i = 0; i < children.size() &&
 		status != Status::SUCCESS &&// if we succeed lets return it
-		status != Status::RUNNING; i++) //if Running, we are not done with the task til its succeeded
+		status != Status::RUNNING &&
+		status != Status::WAIT	; i++) //if Running, we are not done with the task til its succeeded
 	{
 		Sequence* sequence = dynamic_cast<Sequence*>(children[i]);
 		if (sequence)

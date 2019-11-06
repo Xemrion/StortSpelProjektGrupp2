@@ -33,6 +33,7 @@ Attacker::~Attacker()
 
 void Attacker::update(float dt, Vector3 targetPos)
 {
+	
 	this->targetPos = targetPos;
 	updateWeapon(dt);
 	this->root->func();
@@ -48,6 +49,8 @@ void Attacker::setUpActor()
 
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Attacker::inAttackRange, std::ref(*this)));
+	Behavior& waitTimer = bt.getAction();
+	waitTimer.addAction(std::bind(&Attacker::WaitTime, std::ref(*this)));
 	Behavior& chase = bt.getAction();
 	chase.addAction(std::bind(&Attacker::setChaseState, std::ref(*this)));
 	Behavior& roam = bt.getAction();
@@ -67,5 +70,7 @@ void Attacker::setUpActor()
 	selector.addChildren(chase);
 
 	seq2.addChildren(inRange);
+	
+	//seq2.addChildren(waitTimer);
 	seq2.addChildren(shoot);
 }
