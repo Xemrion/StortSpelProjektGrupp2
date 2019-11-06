@@ -39,7 +39,6 @@ private:
 	void createGroup(Actor* actor);
 	std::vector<Actor*> actors;
 	TurretHandler turretHandler;
-	std::vector<Spitfire*> cars;
 	std::vector<Actor*> sendToPlayer;
 	AStar* aStar;
 };
