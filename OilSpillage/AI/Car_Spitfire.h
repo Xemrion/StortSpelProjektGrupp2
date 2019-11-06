@@ -4,19 +4,24 @@
 class Spitfire : public Actor
 {
 private:
-	bool drive = false;
 	void setUpActor();
+	float deltaTime;
+
+	//car functions
 	Vehicle* car;
+	Vector3 direction;
+	float throttleInputStrength;
+	class Physics* physics;
+	Vector3 prevAccelForce;
+	Vector3 accelForce;
+	void updateVehicle(); 
 public:
-	Spitfire(float x, float z, AStar* aStar);
+	Spitfire(float x, float z);
 	Spitfire();
 	~Spitfire();
-
-	Status idle();
+	void update(float dt, Vector3 targetPos);
+	void Init(Physics* physics);
+	/*if in range lets stop for now*/
 	Status inRange();
-	Status rotateTowards();
-	Status FollowTarget();
-
-
-
+	Status vehicleUpdate();
 };

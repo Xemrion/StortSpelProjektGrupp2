@@ -14,6 +14,7 @@ enum class WeaponType
 	Railgun,
 	Flamethrower,
 	aiMachineGun,
+	aiMelee,
 	None
 };
 

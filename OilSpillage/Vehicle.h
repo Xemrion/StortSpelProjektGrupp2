@@ -89,7 +89,8 @@ public:
 	virtual ~Vehicle();
 
 	void init(Physics *physics);
-	void update(float deltaTime);
+	void updatePlayer(float deltaTime);
+	void update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput);
 	void updateWeapon(float deltaTime);
 	
 	GameObject* getVehicle() { return this->vehicle; }

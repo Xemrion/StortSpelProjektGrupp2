@@ -148,7 +148,7 @@ void Minimap::draw(bool selected)
 
 	for (int i = 0; i < static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->groups.size(); i++)
 	{
-		targetPos = static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->groups[i].getAvaragePos();
+		targetPos = static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->groups[i].getAveragePos();
 		if ((targetPos - playerPos).Length() < 150.0f)
 		{
 			targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);

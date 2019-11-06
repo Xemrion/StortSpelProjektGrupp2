@@ -1,5 +1,9 @@
 #pragma once
 #include "AIGroup.h"
+#include "Car_Spitfire.h"
+class Physics;
+#include "TurretHandler.h"
+#include "Swarm.h"
 class ActorManager
 {
 public:
@@ -8,19 +12,21 @@ public:
 	~ActorManager();
 	enum Radius { CLOSE, MIDDLE, OUTER };
 	void update(float dt, Vector3 targetPos);
-	void createAttacker(float x, float z);
-	void createTurret(float x, float z);
+	void createAttacker(float x, float z, int weaponType = 1);
+	void createTurret(float x, float z, int weaponType = 1);
+	void createSwarm(float x, float z, int weaponType = 1);
+
+	void createSpitFire(float x, float z, Physics* physics);
 	std::vector<AIGroup> groups;
-	std::vector<Actor*>* findClosestGroup(Vector3 position);
 	float distanceToPlayer(Vector3 position);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
 
-	void spawnAttackers(Vector3 originPos);
-	void spawnTurrets(Vector3 position, Radius radius, float angle);
+	void spawnAttackers(Vector3 originPos, int weaponType);
+	void spawnTurrets(Vector3 position, Radius radius, float angle, int weaponType);
 	Vector2& generateRandom(const float& x, const float& z, Radius radius);
 	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
 private:
-	float soundTimer;
+	float soundTimer = 0;
 	int frameCount = 0;
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
@@ -32,8 +38,8 @@ private:
 	void initGroupForActor(Actor* actor);
 	void createGroup(Actor* actor);
 	std::vector<Actor*> actors;
-	std::vector<Actor*> turrets;
+	TurretHandler turretHandler;
+	std::vector<Spitfire*> cars;
 	std::vector<Actor*> sendToPlayer;
-	std::vector<Vector3> path;
 	AStar* aStar;
 };

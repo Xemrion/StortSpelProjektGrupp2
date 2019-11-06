@@ -11,11 +11,10 @@ Attacker::Attacker()
 	this->health = this->updatedStats.maxHealth;
 }
 
-Attacker::Attacker(float x, float z, AStar* aStar)
-	:Actor(x, z, aStar)
+Attacker::Attacker(float x, float z, int weaponType)
+	:Actor(x, z, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
-	this->setColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 	setUpActor();
 
 	this->defaultStats = VehicleStats::AIAttacker;
@@ -25,7 +24,7 @@ Attacker::Attacker(float x, float z, AStar* aStar)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 
-	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+	boidOffset = 9;
 }
 
 Attacker::~Attacker()

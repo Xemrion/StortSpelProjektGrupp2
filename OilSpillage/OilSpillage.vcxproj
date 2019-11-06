@@ -152,6 +152,7 @@
     <ClCompile Include="AI\Car_Spitfire.cpp" />
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
+    <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Objectives\Objective.cpp" />
     <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="PG\MapConfig.cpp" />
     <ClCompile Include="PG\Map.cpp" />
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
+    <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="PowerUp.cpp" />
@@ -167,6 +169,7 @@
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="PG\District.cpp" />
+    <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="UI\Button.cpp" />
     <ClCompile Include="UI\CheckBox.cpp" />
     <ClCompile Include="UI\Element.cpp" />
@@ -215,6 +218,8 @@
     <ClInclude Include="AI\Behaviour.h" />
     <ClInclude Include="AI\Car_Spitfire.h" />
     <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="AI\TurretHandler.h" />
+    <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
@@ -232,6 +237,7 @@
     <ClInclude Include="PG\District.hpp" />
     <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="STB\stb_image_write.h" />
+    <ClInclude Include="AI\Swarm.h" />
     <ClInclude Include="UI\Button.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DynamicCamera.h" />
