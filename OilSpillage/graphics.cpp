@@ -1275,18 +1275,18 @@ void Graphics::renderUI(float deltaTime)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	int index = 0;
-	for (GameObject* object : this->uiObjects)
+	for (std::pair<GameObject*,Matrix*> object : this->uiObjects)
 	{
-		SimpleMath::Matrix world = *this->matricesForUI[index];//worlds[]
+		SimpleMath::Matrix world = *object.second;//worlds[]
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
 		deviceContext->Unmap(worldBuffer.Get(), 0);
-		UINT vertexCount = object->mesh->getVertexCount();
+		UINT vertexCount = object.first->mesh->getVertexCount();
 		UINT stride = sizeof(Vertex3D);
 		UINT offset = 0;
-		Material material = object->getMaterial();
+		Material material = object.first->getMaterial();
 
 		ID3D11ShaderResourceView* textureSRV = nullptr;
 		if (material.diffuse != nullptr)
@@ -1309,14 +1309,14 @@ void Graphics::renderUI(float deltaTime)
 			glossSRV = material.gloss->getShaderResView();
 		}
 
-		Vector4 modColor = object->getColor();
+		Vector4 modColor = object.first->getColor();
 		hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
 		deviceContext->Unmap(colorBuffer.Get(), 0);
 
 		deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+		deviceContext->IASetVertexBuffers(0, 1, object.first->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		deviceContext->PSSetShaderResources(0, 1, &textureSRV);
 		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
 		deviceContext->PSSetShaderResources(5, 1, &specularSRV);
