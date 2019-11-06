@@ -223,7 +223,8 @@ void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direc
 	Game::getGraphics().addToDraw(this->obj);
 	if (vehicleWeapon.currentSpreadIncrease > vehicleWeapon.maxSpread)
 	{
-		vehicleWeapon.remainingCooldown = 2.0;
+		vehicleWeapon.remainingCooldown = 4.0;
+		vehicleWeapon.currentSpreadIncrease = 0.0;
 	}
 }
 
