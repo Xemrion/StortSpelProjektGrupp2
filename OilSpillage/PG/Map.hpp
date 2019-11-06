@@ -35,14 +35,14 @@ private:
 	void             generateBuildings();
 	Opt<Vector<V2u>> findValidHouseLot( RNG &, U16 districtCellID, Voronoi const &, TileMap &, Vector<District> const &districtTable );
 
-	Graphics              &graphics;
-	V2u                    startPositionInTileSpace;
-	UPtr<TileMap>          tilemap;
-	UPtr<Voronoi>          districtMap;
-	Vector<GameObject>     districtMarkers;
-	Vector<GameObject>     roadTiles;
-	Vector<GameObject>     houseTiles;
-	Physics * const        physics;
+	Graphics                 &graphics;
+	V2u                       startPositionInTileSpace;
+	UPtr<TileMap>             tilemap;
+	UPtr<Voronoi>             districtMap;
+	Vector<GameObject>        districtMarkers;
+	Vector<UPtr<GameObject>>  roadTiles;
+	Vector<GameObject>        houseTiles;
+	Physics * const           physics;
 	// TODO: refactor out:
 	using DistrictID = U16;
 	using BuildingID = U16;                    // 0 = unused tile
