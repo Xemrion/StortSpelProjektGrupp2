@@ -20,16 +20,16 @@ void PlayingGameState::initAI()
 	}
 			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
 	actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
 
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
-	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
 
 	//actorManager->createTurret(map->getStartPositionInWorldSpace().x + 7, map->getStartPositionInWorldSpace().z + 5);
 	//actorManager->createTurret(map->getStartPositionInWorldSpace().x + 9, map->getStartPositionInWorldSpace().z + 5);

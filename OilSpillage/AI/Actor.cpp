@@ -170,12 +170,19 @@ Status Actor::setRoamState()
 
 void Actor::followPath()
 {
-	if (path != nullptr && path->size() > 0)
+	if (path != nullptr)
 	{
-		destination = path->at(path->size() - 1);
-		if (position.Distance(path->at(path->size() - 1), position) < 2)
+		if (path->size() > 0)
 		{
-			path->pop_back();
+			destination = path->at(path->size() - 1);
+			if (position.Distance(path->at(path->size() - 1), position) < 2)
+			{
+				path->pop_back();
+			}
+		}
+		else
+		{
+			destination = targetPos;
 		}
 	}
 
