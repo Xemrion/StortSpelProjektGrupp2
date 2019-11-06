@@ -91,6 +91,7 @@ public:
 	static void setWindowSize(int width, int height);
 	static bool checkButtonMouse(MouseKeys key, States state);
 	static Vector2 getMousePosition();
+	static Vector2 getWindowSize();
 
 	//static void setKeyboardPlayerID(int player);
 };

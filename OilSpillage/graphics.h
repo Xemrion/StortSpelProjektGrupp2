@@ -144,7 +144,7 @@ public:
 	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setVectorField(float vectorFieldSize,float vectorFieldPower);
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
-
+	Vector3 screenToWorldSpaceUI(Vector2 screenPos);
 
 	float farZTempShadow;
 	void setSpotLighShadow(SpotLight* spotLight);

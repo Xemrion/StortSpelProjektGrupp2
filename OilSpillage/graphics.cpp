@@ -5,6 +5,7 @@
 #include "ShaderDefines.hlsli"
 #include "UI/UserInterface.h"
 #include <cassert>
+#include "Input.h"
 
 Graphics::Graphics()
 {
@@ -711,6 +712,16 @@ void Graphics::setVectorField(float vectorFieldSize, float vectorFieldPower)
 void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 {
 	this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
+}
+
+Vector3 Graphics::screenToWorldSpaceUI(Vector2 screenPos)
+{
+	Matrix inverse((this->tempCamera.getViewMatrix()*this->tempCamera.getProjectionMatrix()).Invert());
+	inverse._43 = 0.0f;
+	Vector2 sO = screenPos - (Input::getWindowSize() * 0.5f);
+	Vector3 woo(sO.x, sO.y, 0.0f);
+
+	return Vector3::Transform(woo, inverse);
 }
 
 void Graphics::clearScreen(Vector4 color)

@@ -1,4 +1,5 @@
 #include "UpgradingGameState.h"
+#include "../Input.h"
 
 UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics())
 {
@@ -21,6 +22,8 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics())
 	Inventory::instance->addItem(Item::getRandom());
 	Inventory::instance->addItem(Item::getRandom());
 	Inventory::instance->addItem(Item::getRandom());
+
+	Vector3 test = this->graphics.screenToWorldSpaceUI(Input::getWindowSize() * 0.5f);
 
 }
 

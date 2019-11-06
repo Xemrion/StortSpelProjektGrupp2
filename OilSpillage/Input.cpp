@@ -543,6 +543,11 @@ Vector2 Input::getMousePosition()
 	return Vector2(instance->mouse.GetState().x, instance->mouse.GetState().y);
 }
 
+Vector2 Input::getWindowSize()
+{
+	return Vector2(instance->wWidth, instance->wHeight);
+}
+
 /*void Input::setKeyboardPlayerID(int player)
 {
 	if (player >= Input::PLAYER_COUNT || player < -1) return;
