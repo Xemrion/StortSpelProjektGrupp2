@@ -17,6 +17,7 @@ enum ItemType
 class Item
 {
 private:
+	static std::unique_ptr<GameObject> machineGun;
 	static std::vector<Item> allItems;
 
 	const char* name;

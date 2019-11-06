@@ -20,6 +20,8 @@ void UIUpgrading::updateUI(float deltaTime)
 	{
 		this->itemSelector->changeSelectedType(true);
 	}
+
+	this->itemSelector->update(deltaTime);
 }
 
 void UIUpgrading::drawUI()

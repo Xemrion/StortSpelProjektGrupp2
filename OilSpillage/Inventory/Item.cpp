@@ -1,6 +1,8 @@
 #include "Item.h"
 #include "ItemWeapon.h"
+#include "../game.h"
 
+std::unique_ptr<GameObject> Item::machineGun;
 std::vector<Item> Item::allItems;
 
 Item::Item(const char* name, const char* description, ItemType type, GameObject* object)
@@ -14,12 +16,19 @@ Item::~Item()
 
 void Item::init()
 {
+	Graphics& graphics = Game::getGraphics();
+
+	graphics.loadModel("Entities/Barrel");
+	Item::machineGun = std::make_unique<GameObject>();
+	Item::machineGun->mesh = graphics.getMeshPointer("Entities/Barrel");
+	Item::machineGun->setMaterial(graphics.getMaterial("Entities/Barrel"));
+	Item::machineGun->setScale(Vector3(0.1f));
 
 	Item::allItems = {
 		Item("Test Item", "A very useless thing!", ItemType::GADGET, nullptr),
 		Item("Test Item 2", "A very useless thing 2!", ItemType::GADGET, nullptr),
 		Item("Test Item 3", "A very useless thing 3!", ItemType::GADGET, nullptr),
-		ItemWeapon("Machine Gun", WeaponHandler::getWeapon(WeaponType::MachineGun), nullptr)
+		ItemWeapon("Machine Gun", WeaponHandler::getWeapon(WeaponType::MachineGun), Item::machineGun.get())
 	};
 
 	//Sort so we can use getItemByName later if needed.

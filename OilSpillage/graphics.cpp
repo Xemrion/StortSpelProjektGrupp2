@@ -716,12 +716,14 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 
 Vector3 Graphics::screenToWorldSpaceUI(Vector2 screenPos)
 {
-	Matrix inverse((this->tempCamera.getViewMatrix()*this->tempCamera.getProjectionMatrix()).Invert());
-	inverse._43 = 0.0f;
-	Vector2 sO = screenPos - (Input::getWindowSize() * 0.5f);
-	Vector3 woo(sO.x, sO.y, 0.0f);
+	Vector2 s0((screenPos * 2.0f) / Input::getWindowSize() - Vector2::One);
 
-	return Vector3::Transform(woo, inverse);
+	Vector4 w0(Vector4::Transform(Vector4(s0.x, -s0.y, 0.0f, 1.0f), this->tempCamera.getProjectionMatrix().Invert()));
+	w0 *= w0.w;
+	w0.w = 1.0f;
+	w0 = Vector4::Transform(w0, this->tempCamera.getViewMatrix().Invert());
+
+	return Vector3(w0.x, w0.y, 0);
 }
 
 void Graphics::clearScreen(Vector4 color)

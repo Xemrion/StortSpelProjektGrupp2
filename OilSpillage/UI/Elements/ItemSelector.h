@@ -12,6 +12,11 @@ private:
 	Texture* textureBG;
 	Texture* textureIndicator;
 
+	float rotationTimer;
+	Matrix transforms[tileLength];
+	int selectedTypeLastDraw;
+	int selectedIndexLastDraw;
+	int startIndexLastDraw;
 	int selectedType;
 	int selectedIndex[ItemType::TYPES_SIZE];
 	int startIndex[ItemType::TYPES_SIZE];
@@ -22,6 +27,7 @@ public:
 	virtual ~ItemSelector();
 
 	void draw(bool selected);
+	void update(float deltaTime);
 
 	void changeSelectedType(bool down);
 	void changeSelectedIndex(bool right);

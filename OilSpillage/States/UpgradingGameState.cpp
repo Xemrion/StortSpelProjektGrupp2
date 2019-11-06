@@ -6,25 +6,12 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics())
 	this->menu = std::make_unique<UIUpgrading>();
 	this->menu->init();
 
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-	Inventory::instance->addItem(Item::getRandom());
-
-	Vector3 test = this->graphics.screenToWorldSpaceUI(Input::getWindowSize() * 0.5f);
-
+	for (int i = 0; i < 20; i++)
+	{
+		Inventory::instance->addItem(Item::getRandom());
+	}
+	
+	graphics.setUISun(Vector3(0, 0, 1), Vector4(1, 1, 1, 1));
 }
 
 UpgradingGameState::~UpgradingGameState()

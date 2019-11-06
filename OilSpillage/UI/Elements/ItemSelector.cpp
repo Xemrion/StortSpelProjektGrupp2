@@ -4,14 +4,8 @@
 
 Vector2 ItemSelector::size = Vector2(512, 128);
 
-ItemSelector::ItemSelector(Vector2 position) : Element(position), selectedType(0)
+ItemSelector::ItemSelector(Vector2 position) : Element(position), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimer(0)
 {
-	for (int i = 0; i < ItemType::TYPES_SIZE; i++)
-	{
-		this->selectedIndex[i] = 0;
-		this->startIndex[i] = 0;
-	}
-
 	Game::getGraphics().loadTexture("UI/itemSelectorBG");
 	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
 	this->textureBG = Game::getGraphics().getTexturePointer("UI/itemSelectorBG");
@@ -29,12 +23,76 @@ void ItemSelector::draw(bool selected)
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), this->position);
 	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position + Vector2(95.0f + 96.0f * (this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType]), 47.0f));
 
-	std::vector<Item*>* list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType));
-
-	for (int i = 0; i < min(list->size() - this->startIndex[this->selectedType], ItemSelector::tileLength); i++)
+	/*for (int i = 0; i < min(list->size() - this->startIndex[this->selectedType], ItemSelector::tileLength); i++)
 	{
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), (*list)[this->startIndex[this->selectedType] + i]->getName(), this->position + Vector2(95.0f + 96.0f * i, 47.0f + 24.0f), Colors::Red, 0, Vector2(), 0.2f);
+	}*/
+}
+
+void ItemSelector::update(float deltaTime)
+{
+	std::vector<Item*>* list = nullptr;
+
+	if (this->selectedTypeLastDraw != this->selectedType || this->startIndexLastDraw != this->startIndex[this->selectedType])
+	{
+		if (this->selectedTypeLastDraw != -1)
+		{
+			list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedTypeLastDraw));
+
+			for (int i = 0; i < min(list->size() - this->startIndexLastDraw, ItemSelector::tileLength); i++)
+			{
+				GameObject* object = list->at(this->startIndexLastDraw + i)->getObject();
+				if (object)
+				{
+					Game::getGraphics().removeFromUIDraw(object, &transforms[i]);
+				}
+			}
+		}
+
+		list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType));
+
+		for (int i = 0; i < min(list->size() - this->startIndex[this->selectedType], ItemSelector::tileLength); i++)
+		{
+			GameObject* object = list->at(this->startIndex[this->selectedType] + i)->getObject();
+			if (object)
+			{
+				transforms[i] = Matrix::CreateScale(object->getScale());
+				transforms[i] *= Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, 0.0f);
+				transforms[i] *= Matrix::CreateTranslation(Game::getGraphics().screenToWorldSpaceUI(this->position + Vector2(150.0f + 96.0f * i, 47.0f + 48.0f)));
+
+				Game::getGraphics().addToUIDraw(object, &transforms[i]);
+			}
+		}
+
 	}
+
+	if (this->selectedIndexLastDraw != this->selectedIndex[this->selectedType] && this->selectedTypeLastDraw != -1)
+	{
+		list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedTypeLastDraw));
+		if (list->size() > 0 && list->at(this->selectedIndexLastDraw)->getObject())
+		{
+			transforms[this->selectedIndexLastDraw] = Matrix::CreateScale(list->at(this->selectedIndexLastDraw)->getObject()->getScale());
+			transforms[this->selectedIndexLastDraw] *= Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, 0.0f);
+			transforms[this->selectedIndexLastDraw] *= Matrix::CreateTranslation(Game::getGraphics().screenToWorldSpaceUI(this->position + Vector2(150.0f + 96.0f * this->selectedIndexLastDraw, 47.0f + 48.0f)));
+		}
+	}
+
+	list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType));
+	if (list->size() > 0 && list->at(this->selectedIndex[this->selectedType])->getObject())
+	{
+		rotationTimer = std::fmodf(rotationTimer + deltaTime, XM_2PI);
+		transforms[this->selectedIndex[this->selectedType]] = Matrix::CreateScale(list->at(this->selectedIndex[this->selectedType])->getObject()->getScale() * 1.2f);
+		transforms[this->selectedIndex[this->selectedType]] *= Matrix::CreateFromYawPitchRoll(rotationTimer * XM_PI, 0.0f, 0.0f);
+		transforms[this->selectedIndex[this->selectedType]] *= Matrix::CreateTranslation(Game::getGraphics().screenToWorldSpaceUI(this->position + Vector2(150.0f + 96.0f * this->selectedIndex[this->selectedType], 47.0f + 48.0f)));
+	}
+	else
+	{
+		rotationTimer = 0.0f;
+	}
+
+	this->selectedTypeLastDraw = this->selectedType;
+	this->selectedIndexLastDraw = this->selectedIndex[this->selectedType];
+	this->startIndexLastDraw = this->startIndex[this->selectedType];
 }
 
 void ItemSelector::changeSelectedType(bool down)
