@@ -8,8 +8,8 @@ public:
 	~Swarm();
 	void update(float dt, Vector3 targetPos);
 
-
 private:
 	void setUpActor();
+	Status shoot();
 };
 

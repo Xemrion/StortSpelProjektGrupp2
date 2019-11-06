@@ -13,28 +13,13 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	for(int i = 0; i < 1; i++)
+	for(int i = 0; i < 10; i++)
 	{
 		for (int j = 0; j < 10; j++)
 		{
-			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
+			actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10 + i, map->getStartPositionInWorldSpace().z + 10 + j);
 		}
 	}
-			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
-	
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 45, map->getStartPositionInWorldSpace().z + 45);
-
-	//actorManager->createTurret(map->getStartPositionInWorldSpace().x + 7, map->getStartPositionInWorldSpace().z + 5);
-	//actorManager->createTurret(map->getStartPositionInWorldSpace().x + 9, map->getStartPositionInWorldSpace().z + 5);
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)

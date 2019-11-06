@@ -16,10 +16,10 @@ public:
 
 	void applyForce(Vector3 force);
 	// one Laws that boids follow
-	Vector3 separation(vector<Actor*>& boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
+	Vector3 separation(vector<Actor*>& boids, vector<Vector3> buildings, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	// Other function for moving and interacting
 	Vector3 seek();
-	void run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
+	void run(vector<Actor*>& boids, float deltaTime, vector<Vector3> buildings, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
 	virtual void move(float deltaTime);
 	void setPath(std::vector<Vector3>* path);
 	virtual bool hasGroup();

@@ -38,7 +38,7 @@ void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 
 	{
 
 	}
-	else if (this->weaponType == WeaponType::Flamethrower)
+	else if (this->weaponType == WeaponType::Flamethrower or this->weaponType == WeaponType::aiFlamethrower)
 	{
 		flamethrowerShoot(weapon, position, direction, additionalVelocity);
 	}
@@ -144,7 +144,12 @@ void Bullet::update(float deltaTime)
 	{
 		this->obj->setPosition(Vector3(1000, 1000, 1000));
 	}
-	else if (this->weaponType == WeaponType::aiMachineGun)
+	else if (
+		this->weaponType == WeaponType::aiMachineGun or
+		this->weaponType == WeaponType::aiFlamethrower or
+		this->weaponType == WeaponType::aiLaser or
+		this->weaponType == WeaponType::aiMissileLauncher or
+		this->weaponType == WeaponType::aiMelee)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}
