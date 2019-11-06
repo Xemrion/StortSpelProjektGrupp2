@@ -8,10 +8,10 @@ public:
 	~AIGroup();
 	std::vector<Actor*> actors;
 
-
-	Vector3 getAvaragePos();
+	Vector3 getAveragePos();
 	float getGroupRadius();
-	void updateAvaragePos();
+	void updateAveragePos();
+	std::vector<Vector3>& getPathRef();
 
 private:
 	float groupRadius = 6.5f * 6.5f; //Compare with distance^2

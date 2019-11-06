@@ -74,6 +74,8 @@
     <ClCompile Include="UI\ObjectiveBox.cpp" />
     <ClCompile Include="AI\AIGroup.cpp" />
     <ClCompile Include="UI\UIControls.cpp" />
+    <ClCompile Include="AI\TurretHandler.cpp" />
+    <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
     <ClCompile Include="PG\Modelizer.cpp" />
   </ItemGroup>
@@ -156,6 +158,8 @@
     <ClInclude Include="AI\AIGroup.h" />
     <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="UI\UIControls.h" />
+    <ClInclude Include="AI\TurretHandler.h" />
+    <ClInclude Include="AI\Swarm.h" />
     <ClInclude Include="AI\Car_Spitfire.h" />
   </ItemGroup>
   <ItemGroup>

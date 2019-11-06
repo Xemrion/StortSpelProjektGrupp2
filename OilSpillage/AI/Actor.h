@@ -9,7 +9,7 @@ class Actor : public GameObject
 {
 public:
 	Actor();
-	Actor(float x, float z, AStar* aStar);
+	Actor(float x, float z, int weaponType = 1);
 	virtual ~Actor();
 	virtual void update(float dt, Vector3 targetPos);
 	virtual void setUpActor() = 0 {};
@@ -20,8 +20,8 @@ public:
 	// Other function for moving and interacting
 	Vector3 seek();
 	void run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
-	virtual void updateBoid(float deltaTime);
-	void setPath(std::vector<Vector3> path);
+	virtual void move(float deltaTime);
+	void setPath(std::vector<Vector3>* path);
 	virtual bool hasGroup();
 	void joinGroup();
 
@@ -34,13 +34,18 @@ public:
 	void changeHealth(int amount);
 	bool isDead() const;
 	void death();
+	std::vector<Vector3>* path;
+	int boidOffset;
 
 private:
 	Vector3 acceleration;
 	float maxSpeed;
 	float maxForce;
 	bool isInGroup = false;
+	int attackRange = 8;
 protected:
+	bool predicting = false;
+	float deltaTime;
 	Vector3 velocity;
 	int health;
 	Stats defaultStats;
@@ -49,8 +54,6 @@ protected:
 	Vector3 vecForward;
 	Vector3 destination;
 	Selector* root;
-	std::vector<Vector3> path;
-	AStar* aStar;
 	Vector3 targetNode;
 	enum State { Roaming, Chasing, Returning };
 	State state;
@@ -64,6 +67,7 @@ protected:
 	virtual Status setRoamState();
 	virtual void  followPath();
 	virtual void  updateWeapon(float deltaTime);
+	virtual void assignWeapon(int weaponType);
 
 
 	Weapon weapon;
