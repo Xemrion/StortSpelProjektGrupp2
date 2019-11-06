@@ -20,9 +20,9 @@ Attacker::Attacker(float x, float z, int weaponType)
 	this->defaultStats = VehicleStats::AIAttacker;
 	this->updatedStats = this->defaultStats;
 	this->health = this->updatedStats.maxHealth;
-	Game::getGraphics().loadModel("Entities/Dummy_Roller_Melee");
-	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Roller_Melee");
-	this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Roller_Melee"));
+	Game::getGraphics().loadModel("Entities/Roller_Melee");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 
 	boidOffset = 9;
 }

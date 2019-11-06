@@ -1,5 +1,7 @@
 #pragma once
 #include "AIGroup.h"
+#include "Car_Spitfire.h"
+class Physics;
 #include "TurretHandler.h"
 #include "Swarm.h"
 class ActorManager
@@ -13,6 +15,8 @@ public:
 	void createAttacker(float x, float z, int weaponType = 1);
 	void createTurret(float x, float z, int weaponType = 1);
 	void createSwarm(float x, float z, int weaponType = 1);
+
+	void createSpitFire(float x, float z, Physics* physics);
 	std::vector<AIGroup> groups;
 	float distanceToPlayer(Vector3 position);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
@@ -35,6 +39,7 @@ private:
 	void createGroup(Actor* actor);
 	std::vector<Actor*> actors;
 	TurretHandler turretHandler;
+	std::vector<Spitfire*> cars;
 	std::vector<Actor*> sendToPlayer;
 	AStar* aStar;
 };

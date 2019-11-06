@@ -27,10 +27,10 @@ Turret::Turret(float x, float z, int weaponType)
 	vecForward.Normalize();
 	this->body.setPosition(this->position);
 	this->body.setScale(this->scale);
-	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret");
-	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
-	this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
-	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
+	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Turret");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Turret1");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
+	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
 	Game::getGraphics().addToDraw(&this->body);
 
 	this->defaultStats = VehicleStats::AITurret;
@@ -82,8 +82,6 @@ void Turret::setUpActor()
 
 	Behavior& lineOf = bt.getAction();
 	lineOf.addAction(std::bind(&Turret::lineOfSight, std::ref(*this)));
-
-	//Attack shoot;
 
 	root->addChildren(sequence);
 	root->addChildren(idle);
