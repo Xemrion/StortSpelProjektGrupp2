@@ -31,9 +31,9 @@ void ItemSelector::draw(bool selected)
 
 	std::vector<Item*>* list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType));
 
-	for (int i = 0; i < list->size(); i++)
+	for (int i = 0; i < min(list->size() - this->startIndex[this->selectedType], ItemSelector::tileLength); i++)
 	{
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), (*list)[i]->getName(), this->position + Vector2(95.0f + 96.0f * i, 47.0f + 24.0f), Colors::Red, 0, Vector2(), 0.2f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), (*list)[this->startIndex[this->selectedType] + i]->getName(), this->position + Vector2(95.0f + 96.0f * i, 47.0f + 24.0f), Colors::Red, 0, Vector2(), 0.2f);
 	}
 }
 
