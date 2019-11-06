@@ -23,12 +23,12 @@ void Item::init()
 	};
 
 	//Sort so we can use getItemByName later if needed.
-	//std::sort(allItems.begin(), allItems.end(), [](const Item& a, const Item& b) { return std::strcmp(a.getName(), b.getName()); });
+	std::sort(allItems.begin(), allItems.end(), [](const Item& a, const Item& b) { return std::strcmp(a.getName(), b.getName()) < 0; });
 }
 
 Item* Item::getItemByName(const char* name)
 {
-	auto item = std::lower_bound(allItems.begin(), allItems.end(), name, [](const Item& item, const char* name) { return std::strcmp(item.getName(), name); });
+	auto item = std::lower_bound(allItems.begin(), allItems.end(), name, [](const Item& item, const char* name) { return std::strcmp(item.getName(), name) < 0; });
 
 	if (item != allItems.end())
 	{
