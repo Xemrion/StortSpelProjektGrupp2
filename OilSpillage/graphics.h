@@ -91,8 +91,8 @@ class Graphics {
 	VertexShader uiVertexShader;
 	Sun uiSun;
 	Vector3 uiSunDir = Vector3(0.0, 1.0, 0.0);
-	std::vector<GameObject*> uiObjects;
-	std::vector<Matrix*> matricesForUI;
+	std::vector<std::pair<GameObject*,Matrix*>> uiObjects;
+
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> uiDSV;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> uiDSB;
 
@@ -120,7 +120,7 @@ public:
 	void clearStaticObjects();
 
 	void addToUIDraw(GameObject* obj, Matrix* world);
-	void removeFromUIDraw(GameObject* obj);
+	void removeFromUIDraw(GameObject* obj, Matrix* world);
 	void removeAllUIDraw();
 	void setUISun(Vector3 direction, Vector4 color);
 	void renderUI(float deltaTime);

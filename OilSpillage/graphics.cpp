@@ -1205,17 +1205,18 @@ void Graphics::clearStaticObjects()
 void Graphics::addToUIDraw(GameObject* obj, Matrix* world)
 {
 	assert(obj != nullptr);
-	uiObjects.push_back(obj);
-	matricesForUI.push_back(world);
+	uiObjects.push_back(std::pair<GameObject*, Matrix*>(obj, world));
 }
 
-void Graphics::removeFromUIDraw(GameObject* obj)
+void Graphics::removeFromUIDraw(GameObject* obj, Matrix* world)
 {
-	auto object = std::find(uiObjects.begin(), uiObjects.end(), obj);
-
-	if (object != drawableObjects.end())
+	for (auto pair = uiObjects.begin(); pair != uiObjects.end(); pair++)
 	{
-		uiObjects.erase(object);
+		if ((*pair).first == obj && (*pair).second == world)
+		{
+			uiObjects.erase(pair);
+			break;
+		}
 	}
 }
 
