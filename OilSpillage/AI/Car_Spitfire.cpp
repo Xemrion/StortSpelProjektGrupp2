@@ -18,8 +18,8 @@ void Spitfire::setUpActor()
 	sequence.addChildren(updateVehicle);
 }
 
-Spitfire::Spitfire(float x, float z, AStar* aStar):
-	Actor(x, z, aStar)
+Spitfire::Spitfire(float x, float z):
+	Actor(x, z)
 {
 	this->direction = Vector3(1, 0, 0);
 	//this->setScale(Vector3(0.01f, 0.01f, 0.01f));

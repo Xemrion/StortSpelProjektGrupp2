@@ -16,7 +16,7 @@ private:
 	Vector3 accelForce;
 	void updateVehicle(); 
 public:
-	Spitfire(float x, float z, AStar* aStar);
+	Spitfire(float x, float z);
 	Spitfire();
 	~Spitfire();
 	void update(float dt, Vector3 targetPos);

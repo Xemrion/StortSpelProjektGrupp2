@@ -15,22 +15,45 @@ Actor::Actor()
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 }
 
-Actor::Actor(float x, float z, AStar* aStar = nullptr)
+Actor::Actor(float x, float z, int weaponType)
 {
 	this->mesh = Game::getGraphics().getMeshPointer("Cube");
 	Game::getGraphics().addToDraw(this);
 
-	this->aStar = aStar;
 	this->setUpActor();
 	this->timeSinceLastShot = 0;
-	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 	this->acceleration = Vector3(0.0f);
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, -1.0f, z);
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
-
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+	assignWeapon(weaponType);
+}
+
+void Actor::assignWeapon(int weaponType)
+{
+	if (weaponType == 1) // MachineGun
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+		this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+	else if (weaponType == 2)// MissileLauncher
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::MissileLauncher);
+		this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+		this->predicting = true;
+	}
+	else if (weaponType == 3)// Laser
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::Laser);
+		this->setColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f));
+	}
+	else if (weaponType == 4)// Flamethrower
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::Flamethrower);
+		this->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
+	}
 }
 
 Actor::~Actor()
@@ -39,6 +62,7 @@ Actor::~Actor()
 
 void Actor::update(float dt, Vector3 targetPos)
 {
+	this->deltaTime = dt;
 	this->targetPos = targetPos;
 	this->root->func();
 	followPath();
@@ -47,6 +71,29 @@ void Actor::update(float dt, Vector3 targetPos)
 void Actor::updateWeapon(float deltaTime)
 {
 	this->timeSinceLastShot += deltaTime;
+	for (int i = 0; i < Actor::bulletCount; i++)
+	{
+		bullets[i].update(deltaTime);
+	}
+}
+
+Status Actor::shoot()
+{
+	float offset;
+	Vector3 offsetPos;
+	if (!predicting)
+	{
+		offset = (rand() % 4) - 2;
+		offset *= 0.9f;
+		offsetPos = Vector3(targetPos.x - offset, 0.0f, targetPos.z - offset);
+	}
+	else
+	{
+		Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
+		float predictionFactor = 0.4f;
+		offsetPos = Vector3(targetPos.x + targetVelocity.x * predictionFactor, 0.0f, (targetPos.z + targetVelocity.z * predictionFactor));
+	}
+
 	if ((position - targetPos).Length() < 23)
 	{
 		if (this->timeSinceLastShot >= this->weapon.fireRate)
@@ -60,7 +107,8 @@ void Actor::updateWeapon(float deltaTime)
 					Vector3 dir = (targetPos - this->position);
 					dir.Normalize();
 					Vector3 bulletOrigin = this->position + dir;
-					dir = (targetPos - bulletOrigin);
+					dir = (offsetPos - bulletOrigin);
+					dir.Normalize();
 
 					this->bullets[i].setWeaponType(this->weapon.type);
 					this->bullets[i].shoot(
@@ -75,22 +123,14 @@ void Actor::updateWeapon(float deltaTime)
 		}
 	}
 
-	for (int i = 0; i < Actor::bulletCount; i++)
-	{
-		bullets[i].update(deltaTime);
-	}
-}
-
-Status Actor::shoot()
-{
-
 	return Status::SUCCESS;
 }
+
 Status Actor::inAttackRange()
 {
 	Status status;
 
-	if ((getPosition() - targetPos).Length() > 7)
+	if ((getPosition() - targetPos).Length() > attackRange)
 	{
 		status = Status::FAILURE;
 	}
@@ -130,14 +170,22 @@ Status Actor::setRoamState()
 
 void Actor::followPath()
 {
-	if (path.size() > 0)
+	if (path != nullptr)
 	{
-		destination = path.at(path.size() - 1);
-		if (position.Distance(path.at(path.size() - 1), position) < 2)
+		if (path->size() > 0)
 		{
-			path.pop_back();
+			destination = path->at(path->size() - 1);
+			if (position.Distance(path->at(path->size() - 1), position) < 2)
+			{
+				path->pop_back();
+			}
+		}
+		else
+		{
+			destination = targetPos;
 		}
 	}
+
 }
 
 void Actor::applyForce(Vector3 force)
@@ -148,7 +196,7 @@ void Actor::applyForce(Vector3 force)
 Vector3 Actor::separation(vector<Actor*>& boids, Vector3 targetPos)
 {
 	// Distance of field of vision for separation between boids
-	float desiredSeparationDistance = 3.0f * 3.0f;
+	float desiredSeparationDistance = boidOffset;
 	Vector3 direction(0.0f);
 	float nrInProximity = 0.0f;
 	int size = boids.size();
@@ -224,13 +272,12 @@ Vector3 Actor::seek()
 
 void Actor::run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos)
 {
-
 	applyForce(separation(boids, targetPos) * 4);
 	update(deltaTime, targetPos);
-	updateBoid(deltaTime);
+	move(deltaTime);
 }
 
-void Actor::updateBoid(float deltaTime)
+void Actor::move(float deltaTime)
 {
 	//To make the slow down not as abrupt
 	acceleration *= 0.4f;
@@ -243,7 +290,7 @@ void Actor::updateBoid(float deltaTime)
 		velocity /= velocity.Length();
 	}
 
-	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 3;
+	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * updatedStats.maxSpeed;
 	Vector3 targetToSelf = (temp - position);
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)
@@ -260,7 +307,7 @@ void Actor::updateBoid(float deltaTime)
 	acceleration *= 0;
 }
 
-void Actor::setPath(std::vector<Vector3> path)
+void Actor::setPath(std::vector<Vector3>* path)
 {
 	this->path = path;
 }

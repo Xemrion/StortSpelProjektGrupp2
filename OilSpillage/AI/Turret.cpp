@@ -3,7 +3,7 @@
 
 Turret::Turret()
 {
-	this->sightRange = 10;
+	this->sightRange = 23;
 	this->setPosition(Vector3(-15.0f, 0.0f, 0.0f));
 	setUpActor();
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
@@ -16,11 +16,11 @@ Turret::Turret()
 	this->health = this->updatedStats.maxHealth;
 }
 
-Turret::Turret(float x, float z)
-	: Actor(x, z, nullptr)
+Turret::Turret(float x, float z, int weaponType)
+	: Actor(x, z, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
-	this->sightRange = 10;
+	this->sightRange = 23;
 	turretAngle = 90;
 	this->calculateTarget(turretAngle);
 	setUpActor();
@@ -33,11 +33,9 @@ Turret::Turret(float x, float z)
 	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
 	Game::getGraphics().addToDraw(&this->body);
 
-	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
-
 	this->defaultStats = VehicleStats::AITurret;
 	this->updatedStats = this->defaultStats;
-
+	this->velocity = Vector3();
 	this->health = this->updatedStats.maxHealth;
 }
 
@@ -50,9 +48,9 @@ void Turret::update(float dt, Vector3 targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
+	updateWeapon(dt);
 	this->root->func();
 
-	updateWeapon(dt);
 }
 
 void Turret::setForwardVector(Vector3 forward)
@@ -136,6 +134,7 @@ Status Turret::lineOfSight()
 	return status;
 
 }
+
 void Turret::calculateTarget(float& angle)
 {
 	float radians = angle * (3.14f / 180.f);
@@ -143,6 +142,7 @@ void Turret::calculateTarget(float& angle)
 	float y = cos(radians) * vecForward.x - sin(radians) * vecForward.z;
 	this->idleTarget = Vector3(x, 0.0f, y);
 }
+
 Status Turret::idle()
 {
 	/*calculate new target position if are getting close to the point*/

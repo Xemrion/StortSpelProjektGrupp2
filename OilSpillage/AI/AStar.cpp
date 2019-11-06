@@ -3,18 +3,17 @@
 
 bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& path)
 {
-	if (!map.isInBounds(map.convertWorldPositionToTilePositionXZ(startPos)) || !map.isInBounds(map.convertWorldPositionToTilePositionXZ(endPos)))
+	if (!map.isInBounds(map.convertWorldPositionToTilePosition(startPos)) || !map.isInBounds(map.convertWorldPositionToTilePosition(endPos)))
 	{
 		return false;
 	}
-	//startPos = Vector3(startPos.x, startPos.y, -startPos.z);
-	//endPos = Vector3(endPos.x, endPos.y, -endPos.z);
-	Vector3 startTilePos = Vector3(map.convertWorldPositionToTilePositionXZ(startPos).x,
+
+	Vector3 startTilePos = Vector3(map.convertWorldPositionToTilePosition(startPos).x,
 		0,
-		map.convertWorldPositionToTilePositionXZ(startPos).y);
-	Vector3 goalTilePos = Vector3(map.convertWorldPositionToTilePositionXZ(endPos).x,
+		map.convertWorldPositionToTilePosition(startPos).y);
+	Vector3 goalTilePos = Vector3(map.convertWorldPositionToTilePosition(endPos).x,
 		0,
-		map.convertWorldPositionToTilePositionXZ(endPos).y);
+		map.convertWorldPositionToTilePosition(endPos).y);
 	path.clear();
 	resetTileData();
 	Size startIndex = map.index(startTilePos.x, startTilePos.z);

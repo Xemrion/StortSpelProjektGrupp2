@@ -102,23 +102,13 @@ public:
 
 	inline V2u  convertWorldPositionToTilePosition( Vector3 const &worldPosition ) const
 	{
-		V2u result { static_cast<U32>( std::floor(worldPosition.x /  config.tileScaleFactor.x) ),
-		             static_cast<U32>( std::floor(worldPosition.z / -config.tileScaleFactor.y) ) };
+		
+		V2u result { static_cast<U32>( std::round(worldPosition.x /  config.tileScaleFactor.x) ),
+		             static_cast<U32>( std::round(worldPosition.z / -config.tileScaleFactor.y) ) };
 		//assert( result.x <  width );
 		//assert( result.y < height );
 		return result;
 	}
-
-	//  uses the inputs x and z values
-	inline V2u  convertWorldPositionToTilePositionXZ( Vector3 const &worldPosition ) const
-	{
-		V2u result { static_cast<U32>( std::floor(worldPosition.x /  config.tileScaleFactor.x) ),
-		             static_cast<U32>( std::floor(worldPosition.z / -config.tileScaleFactor.y) ) };
-		//assert( result.x <  width );
-		//assert( result.y < height );
-		return result;
-	}
-
 	inline Tile const &tileAt( U16 x, U16 y ) const noexcept
 	{
 		return data[ index(x, y) ];

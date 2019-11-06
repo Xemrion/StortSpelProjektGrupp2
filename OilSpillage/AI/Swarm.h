@@ -1,13 +1,15 @@
 #pragma once
 #include "Actor.h"
-class Attacker : public Actor
+class Swarm : public Actor
 {
 public:
-	Attacker();
-	Attacker(float x, float z, int weaponType);
-	~Attacker();
-
+	Swarm();
+	Swarm(float x, float z, int weaponType);
+	~Swarm();
 	void update(float dt, Vector3 targetPos);
+
+
 private:
 	void setUpActor();
 };
+
