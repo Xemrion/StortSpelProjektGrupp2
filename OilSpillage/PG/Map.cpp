@@ -24,7 +24,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	config          ( config                                                                                        ),
 	tilemap         ( std::make_unique<TileMap>( config )                                                           ),
 	districtMarkers ( static_cast<Size>( config.districtCellSide) * config.districtCellSide                         ),
-	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y                             ),
+	groundTiles     ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y                             ),
    roadDistanceMap ( config.dimensions.x * config.dimensions.y                                                     ),
 	buildingIDs     ( config.dimensions.x * config.dimensions.y                                                     ),
 	hospitalTable	 ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide )
@@ -35,6 +35,10 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	generateRoads();
 	generateRoadDistanceMap();
 	generateBuildings();
+
+	groundTiles = instantiateTilesAsModels( graphics, *tilemap );
+	for ( auto &e : groundTiles )
+		graphics.addToDraw( e.get() , true );
 }
 
 
@@ -79,10 +83,6 @@ void  Map::generateRoads()
 		   roadGenerationLog.close();
 		}
 	}
-	
-	roadTiles = instantiateTilesAsModels( graphics, *tilemap ); //= tilemap->loadAsModels(graphics); // GameObject instantiation
-	for ( auto &e : roadTiles )
-		graphics.addToDraw( e.get() , true );
 }
 
 void  Map::generateDistricts()
@@ -438,7 +438,7 @@ void  Map::setDistrictColorCoding( Bool useColorCoding ) noexcept
 		for ( U16 y = 0;  y < tilemap->height;  ++y ) {
 			for ( U16 x = 0;  x < tilemap->width;  ++x ) {
 				assert( tilemap->data.size() == districtMap->diagram.size() and "BUG!" );
-				auto       &tile      = *roadTiles[ tilemap->index(x, y) ];
+				auto       &tile      = *groundTiles[ tilemap->index(x, y) ];
 				auto        cellIndex = districtMap->diagramIndex(x, y);
 				auto        cellId    = districtMap->diagram[ cellIndex ];
 				auto const &color     = districtColorTable[ cellId % districtColorTable.size() ];

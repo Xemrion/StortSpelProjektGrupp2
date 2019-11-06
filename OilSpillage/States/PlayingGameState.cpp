@@ -81,6 +81,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("Tiles/road_marker_turn_ne");
 	graphics.loadTexture("Tiles/road_marker_3way_n");
 	graphics.loadTexture("Tiles/road_marker_4way");
+	graphics.loadTexture("Tiles/concrete");
+	graphics.loadTexture("Tiles/concrete_nor");
 
 
 

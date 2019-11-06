@@ -40,7 +40,7 @@ private:
 	UPtr<TileMap>             tilemap;
 	UPtr<Voronoi>             districtMap;
 	Vector<GameObject>        districtMarkers;
-	Vector<UPtr<GameObject>>  roadTiles;
+	Vector<UPtr<GameObject>>  groundTiles;
 	Vector<GameObject>        houseTiles;
 	Physics * const           physics;
 	// TODO: refactor out:
