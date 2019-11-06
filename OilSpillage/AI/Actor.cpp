@@ -180,10 +180,10 @@ void Actor::followPath()
 				path->pop_back();
 			}
 		}
-		else
-		{
-			destination = targetPos;
-		}
+		//else
+		//{
+		//	destination = targetPos;
+		//}
 	}
 
 }
@@ -215,6 +215,26 @@ Vector3 Actor::separation(vector<Actor*>& boids, Vector3 targetPos)
 			difference = position - boids.at(i)->position;
 			difference.Normalize();
 			difference /= distance;      // Weight by distance
+			direction += difference;
+			nrInProximity++;
+		}
+	}
+	vector<Vector3> temp;
+	temp = static_cast<PlayingGameState*>(Game::getCurrentState())->map->getTileMap().getAllTilePositionsInRadius(this->position, 120, Tile::building);
+	for (int i = 0; i < temp.size(); i++)
+	{
+		// Calculate distance from current boid to boid we're looking at
+		Vector3 curBoidPos = temp[i];
+		float deltaX = position.x - curBoidPos.x;
+		float deltaZ = position.z - curBoidPos.z;
+		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+		// If this is a fellow boid and it's too close, move away from it
+		if ((distance < 110) && distance != 0)
+		{
+			Vector3 difference(0.0f);
+			difference = position - temp[i];
+			difference.Normalize();
+			difference;      // Weight by distance
 			direction += difference;
 			nrInProximity++;
 		}

@@ -47,8 +47,8 @@ public:
 	void		 paperCollision(float deltaTime);
 	Vector3   getRespawnPosition() const noexcept;
 
-
 	ActorManager* actorManager;
+	std::unique_ptr<Map>            map;
 
 private:
 	friend class Game;
@@ -65,7 +65,6 @@ private:
 	MapConfig                       config;
 	Graphics                       &graphics;
 	AStar                          *aStar;
-	std::unique_ptr<Map>            map;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
