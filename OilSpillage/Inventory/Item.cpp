@@ -14,6 +14,7 @@ Item::~Item()
 
 void Item::init()
 {
+
 	Item::allItems = {
 		Item("Test Item", "A very useless thing!", ItemType::GADGET, nullptr),
 		Item("Test Item 2", "A very useless thing 2!", ItemType::GADGET, nullptr),
@@ -22,7 +23,7 @@ void Item::init()
 	};
 
 	//Sort so we can use getItemByName later if needed.
-	std::sort(allItems.begin(), allItems.end(), [](const Item& a, const Item& b) { return std::strcmp(a.getName(), b.getName()); });
+	//std::sort(allItems.begin(), allItems.end(), [](const Item& a, const Item& b) { return std::strcmp(a.getName(), b.getName()); });
 }
 
 Item* Item::getItemByName(const char* name)

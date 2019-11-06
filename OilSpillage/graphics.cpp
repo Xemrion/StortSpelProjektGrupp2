@@ -1202,10 +1202,11 @@ void Graphics::clearStaticObjects()
 	quadTree->clearGameObjects();
 }
 
-void Graphics::addToUIDraw(GameObject* obj)
+void Graphics::addToUIDraw(GameObject* obj, Matrix* world)
 {
 	assert(obj != nullptr);
 	uiObjects.push_back(obj);
+	matricesForUI.push_back(world);
 }
 
 void Graphics::removeFromUIDraw(GameObject* obj)
@@ -1272,9 +1273,10 @@ void Graphics::renderUI(float deltaTime)
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	int index = 0;
 	for (GameObject* object : this->uiObjects)
 	{
-		SimpleMath::Matrix world = object->getTransform();
+		SimpleMath::Matrix world = *this->matricesForUI[index];//worlds[]
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -1321,6 +1323,7 @@ void Graphics::renderUI(float deltaTime)
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
 		deviceContext->Draw(vertexCount, 0);
+		index++;
 	}
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());

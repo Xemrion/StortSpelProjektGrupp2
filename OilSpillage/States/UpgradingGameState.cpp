@@ -9,6 +9,19 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics())
 	Inventory::instance->addItem(Item::getRandom());
 	Inventory::instance->addItem(Item::getRandom());
 	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+	Inventory::instance->addItem(Item::getRandom());
+
 }
 
 UpgradingGameState::~UpgradingGameState()
@@ -19,5 +32,6 @@ void UpgradingGameState::update(float deltaTime)
 {
 	this->graphics.clearScreen(Vector4(1,1,1,0));
 	this->menu->update(deltaTime);
+	this->graphics.renderUI(deltaTime);
 	this->graphics.presentScene();
 }
