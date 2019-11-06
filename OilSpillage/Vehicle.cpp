@@ -495,9 +495,8 @@ void Vehicle::updateWeapon(float deltaTime)
 		this->timeSinceLastShot += deltaTime;
 		this->timeSinceLastShot2 += deltaTime;
 
-		// recoil goes from 100% to 0% in half a second
-		this->weapon.currentSpreadIncrease  = max(this->weapon.currentSpreadIncrease - (deltaTime * this->weapon.maxSpread * (1.0 / this->weapon.recoilDissipationTime)), 0.0);
-		this->weapon2.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - (deltaTime * this->weapon.maxSpread * (1.0 / this->weapon.recoilDissipationTime)), 0.0);
+		this->weapon.currentSpreadIncrease  = max(this->weapon.currentSpreadIncrease - (deltaTime * this->weapon.maxSpread * this->weapon.spreadDecreasePerSecond), 0.0);
+		this->weapon2.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - (deltaTime * this->weapon.maxSpread * this->weapon.spreadDecreasePerSecond), 0.0);
 		this->weapon.remainingCooldown  = max(this->weapon.remainingCooldown - deltaTime, 0.0);
 		this->weapon2.remainingCooldown = max(this->weapon.remainingCooldown - deltaTime, 0.0);
 
@@ -516,7 +515,8 @@ void Vehicle::updateWeapon(float deltaTime)
 						this->bullets[i].shoot(weapon,
 							this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
 							Vector3(curDir.x, 0.0, curDir.y),
-							Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 0.5f);
+							Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 0.5f,
+							deltaTime);
 
 						if (soundTimer > 4.0f) {
 							int randomSound = rand() % 6 + 1;
@@ -558,7 +558,8 @@ void Vehicle::updateWeapon(float deltaTime)
 						this->bullets[i].shoot(weapon2,
 							this->vehicleBody1->getPosition() + Vector3(tempDir*1.5f) + Vector3(0.0f,-0.5f,0.0f),
 							tempDir,
-							Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
+							Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()),
+							deltaTime);
 						break;
 					}
 				}

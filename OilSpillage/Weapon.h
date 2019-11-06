@@ -26,9 +26,10 @@ struct Weapon
 	DirectX::SimpleMath::Vector3 bulletScale = DirectX::SimpleMath::Vector3(1.0);
 	float spreadRadians = 0.0;
 	float maxSpread = 1.0;
-	float spreadIncreasePerShot = 1.0;
+	float spreadIncreasePerSecond = 1.0;
 	float currentSpreadIncrease = 0.0;
-	float recoilDissipationTime = 1.0; // time (in seconds) for recoil to go from 100% to 0%
+	//float recoilDissipationTime = 1.0; // time (in seconds) for recoil to go from 100% to 0%
+	float spreadDecreasePerSecond = 1.0;
 	float remainingCooldown = 0.0;
 	WeaponType type = WeaponType::Default;
 };
@@ -38,9 +39,9 @@ class WeaponHandler
 public:
 	static constexpr Weapon weapons[] = {
 		Weapon(), //default gun
-		{     6,      0.05f,        55.0f,          1.4f,		Vector3(0.07f, 0.07f, 0.3f),	 0.1f, 0.3f, 0.11f, 0.0f, 2.0, 0.0, WeaponType::MachineGun },
+		{     6,      0.05f,        55.0f,          1.4f,		Vector3(0.07f, 0.07f, 0.3f),	 0.1f, 0.3f, 0.11f, 0.0f, 0.7, 0.0, WeaponType::MachineGun },
 		{    200,      1.5f,        13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f, 0.0f, 0.0f, 0.0f,  2.0, 0.0, WeaponType::MissileLauncher },
-		{     1,      0.015f,        0.0f,          0.15f,		Vector3(0.37f, 0.37f, 30.0f),	 0.0f, 5.0f, 0.18f, 0.0f,  0.5, 0.0, WeaponType::Laser },
+		{     1,      0.015f,        0.0f,          0.15f,		Vector3(0.37f, 0.37f, 30.0f),	 0.0f, 5.0f, 1.15f, 0.0f,  0.5, 0.0, WeaponType::Laser },
 		{     300,      1.5f,        0.0f,          0.15f,		Vector3(0.17f, 0.17f, 30.0f),	 0.0f, 0.0f, 0.11f, 0.0f, 2.0, 0.0, WeaponType::Railgun },
 		{     4,      0.01f,        8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f, 0.0f, 0.0f, 0.0f,  2.0, 0.0, WeaponType::Flamethrower },
 		{	   2,      0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f, 0.0f, 0.0f, 0.0f,  2.0, 0.0, WeaponType::aiMachineGun },
@@ -54,11 +55,11 @@ public:
 
 class Bullet
 {
-	void defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity);
+	void defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
 	void defaultUpdate(float& deltaTime);
 	void defaultEnemyUpdate(float& deltaTime);
-	void flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity);
-	void laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity);
+	void flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
+	void laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
 	void laserUpdate(float& deltaTime);
 	GameObject* obj = nullptr;
 	Vector3 dir;
@@ -73,7 +74,7 @@ public:
 	Weapon getWeapon() const;
 	WeaponType getWeaponType() const;
 	int getDamage() const;
-	void shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity);
+	void shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity, float deltaTime);
 	void update(float deltaTime);
 	float getTimeLeft() const;
 	void destroy();

@@ -32,7 +32,7 @@ Bullet::~Bullet()
 	delete obj;
 }
 
-void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity)
+void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity, float deltaTime)
 {
 	this->weapon = Weapon(weapon);
 	if (this->weapon.type == WeaponType::None)
@@ -41,26 +41,26 @@ void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 
 	}
 	else if (this->weapon.type == WeaponType::Flamethrower)
 	{
-		flamethrowerShoot(weapon, position, direction, additionalVelocity);
+		flamethrowerShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
 	else if (this->weapon.type == WeaponType::Laser)
 	{
-		laserShoot(weapon, position, direction, additionalVelocity);
+		laserShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
 	else
 	{
-		defaultShoot(weapon, position, direction, additionalVelocity);
+		defaultShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
 }
 
-void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity)
+void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
 {
 	direction.Normalize();
 	this->dir = direction;
 
 	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
 	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
-	vehicleWeapon.currentSpreadIncrease = min(vehicleWeapon.currentSpreadIncrease + vehicleWeapon.spreadIncreasePerShot, vehicleWeapon.maxSpread);
+	vehicleWeapon.currentSpreadIncrease = min(vehicleWeapon.currentSpreadIncrease + vehicleWeapon.spreadIncreasePerSecond * vehicleWeapon.maxSpread * deltaTime, vehicleWeapon.maxSpread);
 	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
 	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
 	this->dir *= weapon.bulletSpeed;
@@ -75,7 +75,7 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& dir
 	Game::getGraphics().addToDraw(this->obj);
 }
 
-void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity)
+void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
 {
 	direction.Normalize();
 	this->dir = direction;
@@ -196,7 +196,7 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 	}
 }
 
-void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity)
+void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
 {
 	if (vehicleWeapon.remainingCooldown > 0.0)
 	{
@@ -207,7 +207,7 @@ void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direc
 	this->dir = direction;
 	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
 	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
-	vehicleWeapon.currentSpreadIncrease = vehicleWeapon.currentSpreadIncrease + vehicleWeapon.spreadIncreasePerShot;
+	vehicleWeapon.currentSpreadIncrease += vehicleWeapon.spreadIncreasePerSecond * vehicleWeapon.maxSpread * deltaTime;
 
 	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
 	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
@@ -218,12 +218,12 @@ void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direc
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.2), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread*vehicleWeapon.maxSpread)));
+	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.02), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread*vehicleWeapon.maxSpread)));
 
 	Game::getGraphics().addToDraw(this->obj);
 	if (vehicleWeapon.currentSpreadIncrease > vehicleWeapon.maxSpread)
 	{
-		vehicleWeapon.remainingCooldown = 4.0;
+		vehicleWeapon.remainingCooldown = 2.0;
 	}
 }
 

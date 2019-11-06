@@ -66,7 +66,8 @@ void Actor::updateWeapon(float deltaTime)
 						weapon,
 						bulletOrigin,
 						dir,
-						this->velocity
+						this->velocity,
+						deltaTime
 					);
 					break;
 				}
