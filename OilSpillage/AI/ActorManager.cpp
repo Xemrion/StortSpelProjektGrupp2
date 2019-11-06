@@ -128,7 +128,7 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 
 void ActorManager::createSpitFire(float x, float z, Physics* physics)
 {
-	this->cars.push_back(new Spitfire(x, z, aStar));
+	this->cars.push_back(new Spitfire(x, z));
 	this->cars[cars.size() - 1]->Init(physics);
 }
 
