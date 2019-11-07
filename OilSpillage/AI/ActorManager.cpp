@@ -60,7 +60,8 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		}
 	}
 	updateGroups();
-	if (frameCount % 5 == 0)
+	turretHandler.update(dt, targetPos);
+	if (frameCount % 20 == 0)
 	{
 		assignPathsToGroups(targetPos);
 		frameCount = 0;

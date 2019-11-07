@@ -75,7 +75,7 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 		{
 			if (!this->turrets[i]->isDead())
 			{
-				if (bulletArray[j].getGameObject()->getAABB().intersect(this->turrets[i]->getAABB()))
+				if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->turrets[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
 						/*int randomSound = rand() % 3 + 1;

@@ -23,5 +23,5 @@ private:
 	Vector3 idleTarget;
 	float turretAngle;
 
-	void calculateTarget(float& angle);
+	void calculateTarget(float angle);
 };

@@ -32,6 +32,7 @@ Turret::Turret(float x, float z, int weaponType)
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
 	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
 	Game::getGraphics().addToDraw(&this->body);
+	Game::getGraphics().addToDraw(this);
 
 	this->defaultStats = VehicleStats::AITurret;
 	this->updatedStats = this->defaultStats;
@@ -135,29 +136,31 @@ Status Turret::lineOfSight()
 
 }
 
-void Turret::calculateTarget(float& angle)
+void Turret::calculateTarget(float angle)
 {
 	float radians = angle * (3.14f / 180.f);
 	float x = cos(radians) * vecForward.x + sin(radians) * vecForward.z;
 	float y = cos(radians) * vecForward.x - sin(radians) * vecForward.z;
 	this->idleTarget = Vector3(x, 0.0f, y);
+	this->idleTarget.Normalize();
 }
 
 Status Turret::idle()
 {
 	/*calculate new target position if are getting close to the point*/
-	if (idleTarget.Dot(vecForward) <= 0.0f)
+	if (idleTarget.Dot(vecForward) <= 0.1f)
 	{
 		turretAngle += 90;
 		this->calculateTarget(turretAngle);
 	}
 	else
 	{
-		vecForward -= (idleTarget * deltaTime) / 1.01f;
+		vecForward -= (idleTarget * deltaTime);
 		vecForward.Normalize();
 
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
-		this->setRotation(Vector3(0, newRot - (XM_PIDIV2), 0));
+		Vector3 tempRot = Vector3(0, newRot - (XM_PIDIV2), 0);
+		this->setRotation(tempRot);
 	}
 	return Status::SUCCESS;
 }
