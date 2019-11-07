@@ -77,8 +77,6 @@ Vehicle::~Vehicle()
 
 void Vehicle::init(Physics *physics)
 {
-	
-
 	this->physics = physics;
 	this->mountedWeapon = new GameObject;
 	this->frontWeapon = new GameObject;
@@ -486,19 +484,29 @@ void Vehicle::update(float deltaTime)
 
 void Vehicle::updateWeapon(float deltaTime)
 {
+	/*MOUNTED*/
+	this->slots[Slots::MOUNTED]->getObject()->setPosition(this->vehicleBody1->getPosition());
 
-	this->mountedWeapon->setPosition(this->vehicleBody1->getPosition());
+	/*END*/
+
+	/*FRONT*/
 	Vector3 frontTempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-	this->frontWeapon->setPosition(this->vehicleBody1->getPosition()+1.15f*frontTempDir-Vector3(0.0f,1.0f,0.0f));
-	this->test.setPosition(this->vehicleBody1->getPosition() - 1.15f * frontTempDir - Vector3(0.0f, 1.0f, 0.0f));
 	float yaw = this->vehicleBody1->getRotation().y;
 	float pitch = this->vehicleBody1->getRotation().z;
 	Vector3 tempDirYawPtich = Vector3(cos(yaw) * cos(pitch), sin(yaw) * cos(pitch), sin(pitch));
 	tempDirYawPtich.Normalize();
 	//this->frontWeapon->setPosition(this->vehicleBody1->getPosition() + tempDirYawPtich * 1 - Vector3(0, 1, 0));
 	float angleWP = tempDirYawPtich.Dot(Vector3(0, 0, 1));
-	this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14 / 2, acos(angleWP) - 3.14 / 2));
-	this->test.setRotation(Vector3(0, this->vehicleBody1->getRotation().y - 3.14 / 2, acos(angleWP) - 3.14 / 2));
+	this->slots[Slots::FRONT]->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14 / 2, acos(angleWP) - 3.14 / 2));
+	this->slots[Slots::FRONT]->getObject()->setPosition(this->vehicleBody1->getPosition() + 1.15f * frontTempDir - Vector3(0.0f, 1.0f, 0.0f));
+
+	/*END*/
+
+	/*BACK*/
+	this->slots[Slots::BACK]->getObject()->setPosition(this->vehicleBody1->getPosition() - 1.15f * frontTempDir - Vector3(0.0f, 1.0f, 0.0f));
+	this->slots[Slots::BACK]->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y - 3.14 / 2, acos(angleWP) - 3.14 / 2));
+
+	/*END*/
 
 	//this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y+3.14/2, ));
 	Vector2 dir = Input::getDirectionR();
@@ -524,7 +532,7 @@ void Vehicle::updateWeapon(float deltaTime)
 	{
 		float newRot = atan2(curDir.x, curDir.y) + 3.14f / 2;
 		this->gunRotation = newRot;
-		this->mountedWeapon->setRotation(Vector3(0, newRot, 0));
+		this->slots[Slots::MOUNTED]->getObject()->setRotation(Vector3(0, newRot, 0));
 
 		this->timeSinceLastShot += deltaTime;
 		this->timeSinceLastShot2 += deltaTime;
@@ -536,7 +544,7 @@ void Vehicle::updateWeapon(float deltaTime)
 		{
 			if (Input::checkButton(Keys::R_SHOULDER, States::HELD) || Input::getStrengthRnoMouse() > 0.01f)
 			{
-				if (this->timeSinceLastShot >= this->weapon.fireRate)
+				if (this->timeSinceLastShot >= this->vehicleSlots->getSlot(Slots::MOUNTED)->getType().fireRate)
 				{
 					this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
 
@@ -603,15 +611,20 @@ void Vehicle::updateWeapon(float deltaTime)
 		}
 	}
 	
-	if (this->spotLight != nullptr)
+	if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
 	{
 		for (int i = 0; i < Vehicle::bulletCount; i++)
 		{
 			bullets[i].update(deltaTime);
 		}
-		this->spotLight->setPos(this->mountedWeapon->getPosition() - Vector3(curDir.x, -1, curDir.y));
+		this->spotLight->setPos(this->slots[Slots::MOUNTED]->getObject()->getPosition() - Vector3(curDir.x, -1, curDir.y));
 		this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
 	}
+}
+
+void Vehicle::setVehicleSlots(VehicleSlots* slots)
+{
+	this->vehicleSlots = slots;
 }
 
 float Vehicle::getAcceleratorX()

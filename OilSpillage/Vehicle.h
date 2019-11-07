@@ -18,6 +18,30 @@ enum Slots
 	BACK,
 	SIZEOF
 };
+struct VehicleSlots
+{
+	Item** slots = new Item * [Slots::SIZEOF];
+	void setSlot(Slots slot, Item* item)
+	{
+		this->slots[int(slot)] = item;
+	};
+	Item* getSlot(Slots slot)
+	{
+		return this->slots[int(slot)];
+	};
+	~VehicleSlots()
+	{
+		for (int i = 0; i < Slots::SIZEOF; i++)
+		{
+			if (this->slots[i] != nullptr)
+			{
+				delete this->slots;
+			}
+		}
+		delete[] this->slots;
+	};
+
+};
 class Vehicle
 {
 private:
@@ -49,6 +73,7 @@ private:
 	GameObject* mountedWeapon;//Mounted on top of the car
 	GameObject* frontWeapon;
 	Item** slots;
+	VehicleSlots* vehicleSlots;
 	GameObject test;
 
 	float timeSinceLastShot;
@@ -103,7 +128,8 @@ public:
 	void init(Physics *physics);
 	void update(float deltaTime);
 	void updateWeapon(float deltaTime);
-	
+	void setVehicleSlots(VehicleSlots* slots);
+
 	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
@@ -137,6 +163,8 @@ public:
 
 	Bullet* getBulletArray(size_t& count);
 	void powerUp(PowerUpType p);
+
+
 };
 
 #endif // !VEHICLE_H
