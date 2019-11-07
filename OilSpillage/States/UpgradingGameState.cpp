@@ -17,7 +17,7 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics())
 	graphics.setLightList(lightList.get());
 	graphics.setUISun(Vector3(0, 0, 1), Vector4(1, 1, 1, 1));
 
-	this->camera = new DynamicCamera(Vector3(0, 4.5f, -5.0f),Vector3(3.14/4,0,0));
+	this->camera = new DynamicCamera(Vector3(0, 4.5f, -7.0f),Vector3(3.14/4,0,0));
 
 	this->theVehicle = new Vehicle;
 	graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
@@ -25,6 +25,9 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics())
 	this->theVehicle->init(physics.get());
 	this->theVehicle->getVehicle()->setPosition(Vector3(0, 0, 0));
 	this->theVehicle->getVehicleBody1()->setPosition(Vector3(0, 0.55, 0));
+
+
+	//this->cubeTest->parent = this->cubeTest2;
 
 }
 

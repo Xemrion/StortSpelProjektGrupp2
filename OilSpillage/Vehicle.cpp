@@ -44,12 +44,26 @@ Vehicle::Vehicle()
 	this->updatedStats = this->defaultStats;
 	this->health = this->updatedStats.maxHealth;
 	
+	this->slots = new Item * [Slots::SIZEOF];
+	for (int i = 0; i < Slots::SIZEOF; i++)
+	{
+		this->slots[i] = nullptr;
+	}
 }
 
 Vehicle::~Vehicle()
 {
 	delete vehicle;
 	delete vehicleBody1;
+
+	for (int i = 0; i < Slots::SIZEOF; i++)
+	{
+		if (this->slots[i] != nullptr)
+		{
+			delete this->slots[i];
+		}
+	}
+	delete[] this->slots;
 
 	delete this->mountedWeapon;
 	delete this->frontWeapon;
@@ -68,8 +82,11 @@ void Vehicle::init(Physics *physics)
 	this->physics = physics;
 	this->mountedWeapon = new GameObject;
 	this->frontWeapon = new GameObject;
+	this->slots[Slots::FRONT] = new Item("slot", "Shootishoot", ItemType::WEAPON, this->frontWeapon);
+	this->slots[Slots::MOUNTED] = new Item("slot", "Shootishoot", ItemType::WEAPON, this->mountedWeapon);
+
 	this->vehicle = new GameObject;
-	Game::getGraphics().loadMesh("Cube");
+	Game::getGraphics().loadShape(Shapes::SHAPE_CUBE);
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
 	//Game::getGraphics().addToDraw(vehicle);
 	vehicle->setPosition(Vector3(0.0f, 10.0f, 0.0f));
@@ -149,7 +166,9 @@ void Vehicle::init(Physics *physics)
 	
 	pointJoint = physics->addPointJoint(this->vehicle->getRigidBody(), this->vehicleBody1->getRigidBody());
 	//vehicleBody1->getRigidBody()->setDamping(btScalar(0),3);
-
+	test = *this->mountedWeapon;
+	Game::getGraphics().addToDraw(&test);
+	test.setPosition(Vector3(2, 0, 0));
 }
 
 void Vehicle::update(float deltaTime)
@@ -471,7 +490,17 @@ void Vehicle::updateWeapon(float deltaTime)
 	this->mountedWeapon->setPosition(this->vehicleBody1->getPosition());
 	Vector3 frontTempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
 	this->frontWeapon->setPosition(this->vehicleBody1->getPosition()+1.15f*frontTempDir-Vector3(0.0f,1.0f,0.0f));
-	this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y+3.14/2, 0));
+	this->test.setPosition(this->vehicleBody1->getPosition() - 1.15f * frontTempDir - Vector3(0.0f, 1.0f, 0.0f));
+	float yaw = this->vehicleBody1->getRotation().y;
+	float pitch = this->vehicleBody1->getRotation().z;
+	Vector3 tempDirYawPtich = Vector3(cos(yaw) * cos(pitch), sin(yaw) * cos(pitch), sin(pitch));
+	tempDirYawPtich.Normalize();
+	//this->frontWeapon->setPosition(this->vehicleBody1->getPosition() + tempDirYawPtich * 1 - Vector3(0, 1, 0));
+	float angleWP = tempDirYawPtich.Dot(Vector3(0, 0, 1));
+	this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14 / 2, acos(angleWP) - 3.14 / 2));
+	this->test.setRotation(Vector3(0, this->vehicleBody1->getRotation().y - 3.14 / 2, acos(angleWP) - 3.14 / 2));
+
+	//this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y+3.14/2, ));
 	Vector2 dir = Input::getDirectionR();
 	dir.Normalize();
 	if ((dir - curDir).Length() > 0.01f)
@@ -503,7 +532,7 @@ void Vehicle::updateWeapon(float deltaTime)
 		// recoil goes from 100% to 0% in half a second
 		this->weapon.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
 		this->weapon2.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
-		if (spotLight != nullptr)
+		if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr) 
 		{
 			if (Input::checkButton(Keys::R_SHOULDER, States::HELD) || Input::getStrengthRnoMouse() > 0.01f)
 			{

@@ -7,15 +7,22 @@
 #include "Powerup.h"
 #include "Sound.h"
 #include"Lights.h"
+#include"Inventory/Item.h"
 using namespace DirectX::SimpleMath;
-
+enum Slots
+{
+	FRONT,
+	LEFT,
+	RIGHT,
+	MOUNTED,
+	BACK,
+	SIZEOF
+};
 class Vehicle
 {
 private:
 	GameObject* vehicle;
 	btScalar mRotation;
-	GameObject* mountedWeapon;//Mounted on top of the car
-	GameObject* frontWeapon;
 	GameObject* wheel1;
 	GameObject* wheel2;
 	GameObject* wheel3;
@@ -38,6 +45,11 @@ private:
 	float respawnTimer;
 	float totRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
+
+	GameObject* mountedWeapon;//Mounted on top of the car
+	GameObject* frontWeapon;
+	Item** slots;
+	GameObject test;
 
 	float timeSinceLastShot;
 	float timeSinceLastShot2;

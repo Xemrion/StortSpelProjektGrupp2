@@ -17,7 +17,6 @@ private:
 	float timer;
 	std::unique_ptr<Physics>		physics;//for vehicle
 
-
 public:
 	UpgradingGameState();
 	virtual ~UpgradingGameState();

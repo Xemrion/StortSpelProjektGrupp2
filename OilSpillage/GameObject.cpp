@@ -1,6 +1,10 @@
 #include"GameObject.h"
 #include"game.h"
 
+GameObject::GameObject()
+{
+}
+
 GameObject::~GameObject()
 {
 	/*if (rigidBody != nullptr) {
@@ -8,6 +12,19 @@ GameObject::~GameObject()
 		this->rigidBody = nullptr;
 	}*/
 }
+
+//GameObject::GameObject(const GameObject& obj)
+//{
+//
+//}
+//
+//void GameObject::operator=(const GameObject& obj)
+//{
+//	if (this != &obj)
+//	{
+//
+//	}
+//}
 
 bool GameObject::getSpotShadow() const
 {
