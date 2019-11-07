@@ -223,7 +223,7 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 			}
 		}
 		else { //If first is not 0, then first and last are connected.
-			for (int i = 1; i < indicesOfIntersections.size(); i+=2) {
+			for (size_t i = 1; i < indicesOfIntersections.size(); i+=2) {
 				if (i == indicesOfIntersections.size() - 1) {
 					this->verticies.insert(
 						this->verticies.begin() + indicesOfIntersections[i].second + 1,
@@ -235,10 +235,13 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 						toUnion.verticies.begin() + indicesOfIntersections[0].first);
 				}
 				else {
+					if (indicesOfIntersections[i].first > indicesOfIntersections[i + 1].first) {
+						std::swap(indicesOfIntersections[i].first, indicesOfIntersections[i + 1].first);
+					}
 					this->verticies.insert(
 						this->verticies.begin() + indicesOfIntersections[i].second + 1,
 						toUnion.verticies.begin() + indicesOfIntersections[i].first + 1,
-						toUnion.verticies.begin() + size_t(indicesOfIntersections[size_t(i) + 1].first));
+						toUnion.verticies.begin() + indicesOfIntersections[i + 1].first);
 				}
 			}
 		}
@@ -264,22 +267,6 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 			this->verticies.clear();
 			this->verticies = toUnion.verticies;
 		}
-	}
-}
-
-void SkyscraperFloor::testDrawLines() const
-{
-	
-	for (int i = 0; i < this->indices.size(); i += 3) {
-		Game::getGraphics().getdebugger()->DrawLine(XMFLOAT3(this->verticies[this->indices[i]].x, this->center.y, this->verticies[this->indices[i]].z),
-			XMFLOAT3(this->verticies[this->indices[(size_t(i) + 1)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 1)]].z),
-			XMFLOAT3(0.0f, 1.0f, 1.0f));
-		Game::getGraphics().getdebugger()->DrawLine(XMFLOAT3(this->verticies[this->indices[(size_t(i) + 1)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 1)]].z),
-			XMFLOAT3(this->verticies[this->indices[(size_t(i) + 2)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 2)]].z),
-			XMFLOAT3(0.0f, 1.0f, 1.0f));
-		Game::getGraphics().getdebugger()->DrawLine(XMFLOAT3(this->verticies[this->indices[(size_t(i) + 2)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 2)]].z),
-			XMFLOAT3(this->verticies[this->indices[i]].x, this->center.y, this->verticies[this->indices[i]].z),
-			XMFLOAT3(0.0f, 1.0f, 1.0f));
 	}
 }
 
@@ -365,7 +352,11 @@ void SkyscraperFloor::getTriangleIndices()
 						}
 					}
 				}
-
+				if (!mainPointLeft) {
+					if (forwardsOffset == 1 && backwardsOffset == 1) {
+						counter -= 2;
+					}
+				}
 				if (mainPointLeft) {
 					triangleIndices.push_back(int(counter - backwardsOffset + int(size)) % int(size));
 					triangleIndices.push_back(int(counter));
@@ -373,7 +364,7 @@ void SkyscraperFloor::getTriangleIndices()
 					usedIndices[counter] = true;
 					pointsUsed++;
 					if (backwardsOffset == 1 || forwardsOffset == 1) {
-						counter++;
+						counter += 2;
 					}
 				}
 				mainPointLeft = false;
@@ -382,10 +373,10 @@ void SkyscraperFloor::getTriangleIndices()
 		}
 		counter++;
 		triangleIndiciesCounter++;
-		if (triangleIndiciesCounter > size * 3) {
+		if (triangleIndiciesCounter > size * 5) {
 			triangleGenFail = true;
 		}
-		counter = counter % size;
+		counter = (counter + size) % size;
 
 		backwardsOffset = 1;
 		forwardsOffset = 1;
@@ -497,17 +488,51 @@ std::vector<Vertex3D> SkyscraperFloor::getRoofVertices()
 	return meshData;
 }
 
-void SkyscraperFloor::testDrawTriangles(std::string name, Vector4 colour)
+std::vector<Vertex3D> SkyscraperFloor::getDifferenceAsRoofVerticies(const SkyscraperFloor& other)
 {
-	std::vector<Vertex3D> meshData;
-	meshData = this->getRoofVertices();
-	this->roof = new GameObject;
-	Game::getGraphics().loadMesh(name.c_str(), meshData);
-	this->roof->mesh = Game::getGraphics().getPGMeshPointer(name.c_str());
-	Game::getGraphics().addToDraw(this->roof);
-	this->roof->setPosition(this->center);
-	this->roof->setScale(Vector3(2.50f, 1.0f, 2.50f));
-	this->roof->setColor(colour);
+	SkyscraperFloor temp(*this);
+	Vector3 shifted = Vector3(0.0f, temp.center.y, 0.0f);
+	bool exists = false;
+	std::pair<size_t, size_t> startIndex(0,0);
+	bool mutualPointFound = false;
+	for (size_t i = 0; i < other.nrOfEdges && !mutualPointFound; i++) {
+		shifted.x = other.verticies[i].x;
+		shifted.z = other.verticies[i].z;
+		for (size_t j = 0; j < temp.nrOfEdges; j++) {
+			if (shifted == temp.verticies[j]) {
+				startIndex.first = i;
+				startIndex.second = j;
+				mutualPointFound = true;
+			}
+		}
+	}
+	size_t insertPos = temp.nrOfEdges + startIndex.second;
+	for (size_t i = 0; i < other.nrOfEdges; i++) {
+		exists = false;
+		shifted.x = other.verticies[(i + startIndex.first) % other.nrOfEdges].x;
+		shifted.z = other.verticies[(i + startIndex.first) % other.nrOfEdges].z;
+		for (size_t j = 0; j < temp.nrOfEdges && !exists; j++) {
+			if (shifted == temp.verticies[(j + startIndex.second) % temp.nrOfEdges]) {
+				temp.verticies.erase(temp.verticies.begin() + ((j + startIndex.second) % temp.nrOfEdges));
+				if (j == 0) {
+					j = -1;
+				}
+				else {
+					j--;
+				}
+				temp.nrOfEdges--;
+				insertPos--;
+				exists = true;
+			}
+		}
+		if (!exists) {
+			temp.verticies.insert(temp.verticies.begin() + (insertPos % temp.nrOfEdges) , shifted);
+		}
+	}
+	temp.nrOfEdges = temp.verticies.size();
+	temp.getTriangleIndices();
+	std::vector<Vertex3D> roofMesh = temp.getRoofVertices();
+	return roofMesh;
 }
 
 Vector3 SkyscraperFloor::getAVertex(int vertex) const //Returns the vertex in the index - 1

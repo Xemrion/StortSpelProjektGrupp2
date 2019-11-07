@@ -24,11 +24,10 @@ public:
 	void scale(Vector3 scaleBy);
 	void regenerateShape(int edges);
 
-	void testDrawLines() const; //Lines
 	void getTriangleIndices();
 	std::vector<Vertex3D> getWallVertices(Vector3 otherCenter);
 	std::vector<Vertex3D> getRoofVertices();
-	void testDrawTriangles(std::string name, Vector4 colour);
+	std::vector<Vertex3D> getDifferenceAsRoofVerticies(const SkyscraperFloor& other);
 private:
 	std::vector<Vector3> verticies;
 	std::vector<int> indices;

@@ -6,9 +6,13 @@ class Skyscraper
 {
 private:
 	std::vector<SkyscraperFloor> floors;
-	std::vector<Vertex3D> mesh;
+	std::vector<Vertex3D> meshRoof;
+	std::vector<Vertex3D> meshWindows;
+	std::vector<Vertex3D> meshWalls;
 	RNG rng { RD() () };
-	GameObject* building;
+	GameObject* roof;
+	GameObject* windows;
+	GameObject* walls;
 
 	bool generateSkyscraperMesh();
 public:
