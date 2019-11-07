@@ -260,11 +260,6 @@ Vector3 Actor::separation(vector<Actor*>& boids, vector<Vector3> buildings, Vect
 		direction += difference;
 		nrInProximity++;
 	}
-	// Adds average difference of location to acceleration
-	if (nrInProximity > 0)
-	{
-		direction /= nrInProximity;
-	}
 	if (direction.Length() > 0.0f)
 	{
 		// Steering = Desired - Velocity

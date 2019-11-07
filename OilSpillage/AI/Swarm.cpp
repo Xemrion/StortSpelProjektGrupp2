@@ -57,15 +57,13 @@ Status Swarm::shoot()
 				Vector3 dir = (targetPos - this->position);
 				dir.Normalize();
 				Vector3 bulletOrigin = this->position + dir;
-				dir = (targetPos - bulletOrigin);
-				dir.Normalize();
 
 				this->bullets[0].setWeaponType(this->weapon.type);
 				this->bullets[0].shoot(
 					weapon,
 					bulletOrigin,
-					dir,
-					this->velocity
+					vecForward,
+					Vector3(0.0f)
 				);
 			}
 			
