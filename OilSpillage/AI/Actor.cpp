@@ -64,10 +64,17 @@ void Actor::update(float dt, Vector3 targetPos)
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 	this->root->func();
-	followPath();
+	if (this->state != State::Idle)
+	{
+		followPath();
+	}
+	else
+	{
+		//idle
+	}
 }
 
-void Actor::updateWeapon(float deltaTime)
+void Actor::updateBullets(float deltaTime)
 {
 	this->timeSinceLastShot += deltaTime;
 	for (int i = 0; i < Actor::bulletCount; i++)
@@ -171,7 +178,6 @@ void Actor::followPath()
 {
 	if (path != nullptr)
 	{
-		hasDestination = true;
 		if (path->size() > 0)
 		{
 			destination = path->at(path->size() - 1);
@@ -292,7 +298,7 @@ void Actor::run(vector<Actor*>& boids, float deltaTime, vector<Vector3> building
 {
 	applyForce(separation(boids, buildings, targetPos) * 4);
 	update(deltaTime, targetPos);
-	if (hasDestination)
+	if (this->state != State::Idle)
 	{
 		move();
 	}

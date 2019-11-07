@@ -33,7 +33,7 @@ void Swarm::update(float dt, Vector3 targetPos)
 {
 	this->targetPos = targetPos;
 	this->deltaTime = dt;
-	updateWeapon(dt);
+	updateBullets(dt);
 	//this->root->func();
 	followPath();
 	shoot();

@@ -13,7 +13,7 @@ private:
 	Vector3 prevAccelForce;
 	Vector3 accelForce;
 	void updateVehicle(); 
-	int chaseRange = 1000;
+	int chaseRange = 500;
 public:
 	Spitfire(float x, float z,Physics* physics);
 	Spitfire();

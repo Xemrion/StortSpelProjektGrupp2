@@ -17,7 +17,7 @@ void PlayingGameState::initAI()
 	{
 		for (int j = 0; j < 1; j++)
 		{
-			actorManager->createTurret(map->getStartPositionInWorldSpace().x + 10 + i, map->getStartPositionInWorldSpace().z + 10 + j);
+			actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + 10 + i, map->getStartPositionInWorldSpace().z + 200 + j,physics.get());
 		}
 	}
 }

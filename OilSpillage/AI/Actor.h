@@ -45,9 +45,9 @@ private:
 	bool isInGroup = false;
 	int attackRange = 8;
 protected:
-	bool hasDestination = false;
 	bool predicting = false;
 	float deltaTime;
+	
 	Vector3 velocity;
 	int health;
 	Stats defaultStats;
@@ -67,7 +67,7 @@ protected:
 	virtual Status setChaseState();
 	virtual Status setIdleState();
 	virtual void  followPath();
-	virtual void  updateWeapon(float deltaTime);
+	virtual void  updateBullets(float deltaTime);
 	virtual void assignWeapon(int weaponType);
 
 

@@ -116,7 +116,10 @@ void Spitfire::update(float dt, Vector3 targetPos)
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 	this->root->func();
-	followPath();
+	if (this->state != State::Idle)
+	{
+		followPath();
+	}
 	updateVehicle();
 	this->setPosition(car->getVehicle()->getPosition());
 }
@@ -125,7 +128,6 @@ void Spitfire::followPath()
 {
 	if (path != nullptr)
 	{
-		hasDestination = true;
 
 		if (path->size() > 0)
 		{

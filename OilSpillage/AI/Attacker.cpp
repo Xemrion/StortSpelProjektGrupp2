@@ -37,7 +37,7 @@ void Attacker::update(float dt, Vector3 targetPos)
 {
 	this->targetPos = targetPos;
 	deltaTime = dt;
-	updateWeapon(dt);
+	updateBullets(dt);
 	this->root->func();
 	followPath();
 }

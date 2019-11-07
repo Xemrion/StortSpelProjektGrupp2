@@ -49,7 +49,7 @@ void Turret::update(float dt, Vector3 targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
-	updateWeapon(dt);
+	updateBullets(dt);
 	this->root->func();
 
 }
