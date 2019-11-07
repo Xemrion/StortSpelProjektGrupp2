@@ -86,7 +86,7 @@ class Graphics {
 	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
-	DynamicCamera tempCamera = DynamicCamera(20, 0.1f, 1000);
+	DynamicCamera uiCamera;
 	PixelShader uiPixelShader;
 	VertexShader uiVertexShader;
 	Sun uiSun;

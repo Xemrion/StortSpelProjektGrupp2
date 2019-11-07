@@ -68,13 +68,14 @@ void Vehicle::init(Physics *physics)
 	this->mountedWeapon = new GameObject;
 	this->frontWeapon = new GameObject;
 	this->vehicle = new GameObject;
+	Game::getGraphics().loadMesh("Cube");
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
 	//Game::getGraphics().addToDraw(vehicle);
 	vehicle->setPosition(Vector3(0.0f, 10.0f, 0.0f));
 	vehicle->setScale(Vector3(0.5f, 0.14f, 0.9f));
 	Game::getGraphics().loadTexture("CarTemp");
 	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
-
+	Game::getGraphics().loadModel("Entities/Dummy_Turret");
 	mountedWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
 	Material mountedWPMaterial = Game::getGraphics().getMaterial("Entities/Dummy_Turret");
 	mountedWeapon->setTexture(mountedWPMaterial.diffuse);
@@ -152,24 +153,27 @@ void Vehicle::init(Physics *physics)
 
 void Vehicle::update(float deltaTime)
 {
-	if (this->deadImpulse == true && this->health <= 0)
-	{
-		this->respawnTimer += deltaTime;
-		if(this->respawnTimer>5)
-		{
-			this->resetHealth();
-			this->immortal = true;
-			this->vehicle->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getRespawnPosition());
-			this->vehicleBody1->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getRespawnPosition() + Vector3(0.0f, 0.65f, 0.0f));
+	if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr) {
+		if (this->deadImpulse == true && this->health <= 0)
+			{
+				this->respawnTimer += deltaTime;
+				if(this->respawnTimer>5)
+				{
+					this->resetHealth();
+					this->immortal = true;
+					this->vehicle->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getRespawnPosition());
+					this->vehicleBody1->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getRespawnPosition() + Vector3(0.0f, 0.65f, 0.0f));
 
-			this->deadImpulse = false;
+					this->deadImpulse = false;
+					this->respawnTimer = 0.0f;
+				}
+			}
+		if (dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime() == 0)
+		{
 			this->respawnTimer = 0.0f;
 		}
 	}
-	if (dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime() == 0)
-	{
-		this->respawnTimer = 0.0f;
-	}
+	
 	for (int i = 0; i < (int)PowerUpType::Length; ++i)
 	{
 		powerUpTimers[i] = max(powerUpTimers[i] - deltaTime, 0.0f);
@@ -498,80 +502,86 @@ void Vehicle::updateWeapon(float deltaTime)
 		// recoil goes from 100% to 0% in half a second
 		this->weapon.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
 		this->weapon2.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
-
-		if (Input::checkButton(Keys::R_SHOULDER, States::HELD) || Input::getStrengthRnoMouse() > 0.01f)
+		if (spotLight != nullptr)
 		{
-			if (this->timeSinceLastShot >= this->weapon.fireRate)
+			if (Input::checkButton(Keys::R_SHOULDER, States::HELD) || Input::getStrengthRnoMouse() > 0.01f)
 			{
-				this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
-
-				for (int i = 0; i < Vehicle::bulletCount; ++i)
+				if (this->timeSinceLastShot >= this->weapon.fireRate)
 				{
-					if (bullets[i].getWeaponType() == WeaponType::None)
-					{
-						auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+					this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
 
-						this->bullets[i].shoot(weapon,
-							this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
-							Vector3(curDir.x, 0.0, curDir.y),
-							Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 0.5f);
-						if (soundTimer > 4.0f) {
-							int randomSound = rand() % 6 + 1;
-							int rand2 = rand() % 2;
-							std::wstring soundEffect = L"data/sound/MachineGunSound" + to_wstring(randomSound) + L".wav";
-							if (rand2 < 1) {
-								soundEffect = L"data/sound/MachineGunSound1.wav";
+					for (int i = 0; i < Vehicle::bulletCount; ++i)
+					{
+						if (bullets[i].getWeaponType() == WeaponType::None)
+						{
+							auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+							this->bullets[i].shoot(weapon,
+								this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
+								Vector3(curDir.x, 0.0, curDir.y),
+								Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 0.5f);
+							if (soundTimer > 4.0f) {
+								int randomSound = rand() % 6 + 1;
+								int rand2 = rand() % 2;
+								std::wstring soundEffect = L"data/sound/MachineGunSound" + to_wstring(randomSound) + L".wav";
+								if (rand2 < 1) {
+									soundEffect = L"data/sound/MachineGunSound1.wav";
+								}
+								Sound::PlaySoundEffect(soundEffect);
+								soundTimer = 0;
 							}
-							Sound::PlaySoundEffect(soundEffect);
-							soundTimer = 0;
+							break;
 						}
-						break;
 					}
 				}
 			}
-		}
 
-		if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
-		{
-			if (flameBool == true) {
-				int randomSound = rand() % 2 + 1;
-				std::wstring soundEffect = L"data/sound/FlameLoop" + to_wstring(randomSound) + L".wav";
-				Sound::PlayLoopingSound(soundEffect);
-				Sound::PlaySoundEffect(L"data/sound/FlameStart.wav");
-				flameBool = false;
-			}
-			if (this->timeSinceLastShot2 >= this->weapon2.fireRate)
+			if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
 			{
-				this->timeSinceLastShot2 = fmod(this->timeSinceLastShot2, this->weapon2.fireRate);
-
-				for (int i = 0; i < Vehicle::bulletCount; ++i)
+				if (flameBool == true) {
+					int randomSound = rand() % 2 + 1;
+					std::wstring soundEffect = L"data/sound/FlameLoop" + to_wstring(randomSound) + L".wav";
+					Sound::PlayLoopingSound(soundEffect);
+					Sound::PlaySoundEffect(L"data/sound/FlameStart.wav");
+					flameBool = false;
+				}
+				if (this->timeSinceLastShot2 >= this->weapon2.fireRate)
 				{
-					if (bullets[i].getWeaponType() == WeaponType::None)
-					{
-						auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+					this->timeSinceLastShot2 = fmod(this->timeSinceLastShot2, this->weapon2.fireRate);
 
-						Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-						this->bullets[i].shoot(weapon2,
-							this->vehicleBody1->getPosition() + Vector3(tempDir*1.5f) + Vector3(0.0f,-0.5f,0.0f),
-							tempDir,
-							Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
-						break;
+					for (int i = 0; i < Vehicle::bulletCount; ++i)
+					{
+						if (bullets[i].getWeaponType() == WeaponType::None)
+						{
+							auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+							Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+							this->bullets[i].shoot(weapon2,
+								this->vehicleBody1->getPosition() + Vector3(tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
+								tempDir,
+								Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
+							break;
+						}
 					}
 				}
 			}
-		}
-		else {
-			flameBool = true;
-			Sound::StopLoopingSound(L"data/sound/FlameLoop1.wav",true);
-			Sound::StopLoopingSound(L"data/sound/FlameLoop2.wav", true);
+			else {
+				flameBool = true;
+				Sound::StopLoopingSound(L"data/sound/FlameLoop1.wav", true);
+				Sound::StopLoopingSound(L"data/sound/FlameLoop2.wav", true);
+			}
 		}
 	}
-	for (int i = 0; i < Vehicle::bulletCount; i++)
+	
+	if (this->spotLight != nullptr)
 	{
-		bullets[i].update(deltaTime);
+		for (int i = 0; i < Vehicle::bulletCount; i++)
+		{
+			bullets[i].update(deltaTime);
+		}
+		this->spotLight->setPos(this->mountedWeapon->getPosition() - Vector3(curDir.x, -1, curDir.y));
+		this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
 	}
-	this->spotLight->setPos(this->mountedWeapon->getPosition()-Vector3(curDir.x,-1,curDir.y));
-	this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
 }
 
 float Vehicle::getAcceleratorX()

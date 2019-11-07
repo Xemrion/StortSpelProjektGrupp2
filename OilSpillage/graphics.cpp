@@ -354,7 +354,8 @@ bool Graphics::init(Window* window)
 	}*/
 	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	tempCamera.setPosition(Vector3(0, 0, -10));
+	uiCamera= DynamicCamera(20, 0.1f, 1000);
+	uiCamera.setPosition(Vector3(0, 0, -10));
 
 
 	
@@ -718,10 +719,10 @@ Vector3 Graphics::screenToWorldSpaceUI(Vector2 screenPos)
 {
 	Vector2 s0((screenPos * 2.0f) / Input::getWindowSize() - Vector2::One);
 
-	Vector4 w0(Vector4::Transform(Vector4(s0.x, -s0.y, 0.0f, 1.0f), this->tempCamera.getProjectionMatrix().Invert()));
+	Vector4 w0(Vector4::Transform(Vector4(s0.x, -s0.y, 0.0f, 1.0f), this->uiCamera.getProjectionMatrix().Invert()));
 	w0 *= w0.w;
 	w0.w = 1.0f;
-	w0 = Vector4::Transform(w0, this->tempCamera.getViewMatrix().Invert());
+	w0 = Vector4::Transform(w0, this->uiCamera.getViewMatrix().Invert());
 
 	return Vector3(w0.x, w0.y, 0);
 }
@@ -1266,7 +1267,7 @@ void Graphics::renderUI(float deltaTime)
 	CopyMemory(mappedResource.pData, &uiSun, sizeof(Sun));
 	deviceContext->Unmap(sunBuffer.Get(), 0);
 	
-	Matrix viewProj = (tempCamera.getViewMatrix() * tempCamera.getProjectionMatrix()).Transpose();
+	Matrix viewProj = (uiCamera.getViewMatrix() * uiCamera.getProjectionMatrix()).Transpose();
 	hr = deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
