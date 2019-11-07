@@ -36,6 +36,7 @@ public:
 	void death();
 	std::vector<Vector3>* path;
 	int boidOffset;
+	Vector3 destination;
 
 private:
 	Vector3 acceleration;
@@ -44,6 +45,7 @@ private:
 	bool isInGroup = false;
 	int attackRange = 8;
 protected:
+	bool hasDestination = false;
 	bool predicting = false;
 	float deltaTime;
 	Vector3 velocity;
@@ -52,7 +54,6 @@ protected:
 	Stats updatedStats;
 
 	Vector3 vecForward;
-	Vector3 destination;
 	Selector* root;
 	Vector3 targetNode;
 	enum State {Idle, Chasing };

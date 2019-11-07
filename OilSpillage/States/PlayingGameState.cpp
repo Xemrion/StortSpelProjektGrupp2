@@ -305,8 +305,23 @@ void PlayingGameState::ImGui_AI()
 	//ImGui::Text(("z: " + std::to_string(player->getVehicle()->getPosition().z)).c_str());
 
 	//Vector3 xzPos = Vector3(player->getVehicle()->getPosition().x, 0, -player->getVehicle()->getPosition().z);
+	/*float goalX = actorManager->groups.at(0).actors.at(0)->destination.x;
+	float goalZ = actorManager->groups.at(0).actors.at(0)->destination.z;
+	ImGui::Text((("GoalPosX: " + std::to_string(goalX)).c_str()));
+	ImGui::Text((("GoalPosZ: " + std::to_string(goalZ)).c_str()));
 
-	//ImGui::Text(("Tile x: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).x)).c_str());
+	float posX = actorManager->groups.at(0).actors.at(0)->getPosition().x;
+	float posZ = actorManager->groups.at(0).actors.at(0)->getPosition().z;
+
+	ImGui::Text((("PosX: " + std::to_string(posX)).c_str()));
+	ImGui::Text((("PosZ: " + std::to_string(posZ)).c_str()));
+	
+	float distance = (actorManager->groups.at(0).actors.at(0)->destination - actorManager->groups.at(0).actors.at(0)->getPosition()).Length();
+
+	ImGui::Text((("Distance: " + std::to_string(distance)).c_str()));
+
+	float pathSize = actorManager->groups.at(0).actors.at(0)->path->size();
+	ImGui::Text((("Path size: " + std::to_string(pathSize)).c_str()));*/
 	//ImGui::Text(("Tile y: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).y)).c_str());
 	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
 							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
@@ -653,16 +668,16 @@ void PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   /*ImGui_ImplDX11_NewFrame();
+	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();
 	   ImGui::NewFrame();
-	   ImGui_Driving();
-	   ImGui_ProcGen();
+	//   ImGui_Driving();
+	//   ImGui_ProcGen();
 	   ImGui_AI();
-	   ImGui_Particles();
-	   ImGui_Camera();
+	//   ImGui_Particles();
+	  ImGui_Camera();
 	   ImGui::Render();
-	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());*/
+	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #endif // !_DEBUG
 
 	graphics.presentScene();

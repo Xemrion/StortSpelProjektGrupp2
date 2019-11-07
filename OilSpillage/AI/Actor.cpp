@@ -297,7 +297,10 @@ void Actor::run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos)
 {
 	applyForce(separation(boids, targetPos) * 4);
 	update(deltaTime, targetPos);
-	move();
+	if (hasDestination)
+	{
+		move();
+	}
 }
 
 void Actor::move()
@@ -388,5 +391,5 @@ bool Actor::isDead() const
 
 void Actor::death()
 {
-	
+
 }

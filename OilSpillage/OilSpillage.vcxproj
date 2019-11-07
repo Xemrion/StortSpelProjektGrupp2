@@ -146,6 +146,7 @@
     <ClCompile Include="AI\AIGroup.cpp" />
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\ActorManager.cpp" />
+    <ClCompile Include="AI\AIVehicle.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="AI\AIGroup.h" />
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\ActorManager.h" />
+    <ClInclude Include="AI\AIVehicle.h" />
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />

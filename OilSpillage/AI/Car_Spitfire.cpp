@@ -30,7 +30,7 @@ Spitfire::Spitfire(float x, float z,Physics* physics)
 	this->deltaTime = 0;
 	setUpActor();
 	throttleInputStrength = 0;
-	car = new Vehicle();
+	car = new AIVehicle();
 	car->init(physics);
 	car->getVehicle()->setPosition(Vector3(position.x, 0 - 1.2f, position.z));
 	car->getVehicleBody1()->setPosition(Vector3(position.x, 0 - 1.2f + 0.65f, position.z));
@@ -108,7 +108,17 @@ void Spitfire::move()
 			throttleInputStrength = 0;
 		}
 	}*/
+
+}
+
+void Spitfire::update(float dt,Vector3 targetPos)
+{
+	this->deltaTime = dt;
+	this->targetPos = targetPos;
+	this->root->func();
+	followPath();
 	updateVehicle();
+	this->setPosition(car->getVehicle()->getPosition());
 }
 
 void Spitfire::followPath()
@@ -117,8 +127,9 @@ void Spitfire::followPath()
 	{
 		if (path->size() > 0)
 		{
+			hasDestination = true;
 			destination = path->at(path->size() - 1);
-			if ((destination - car->getVehicle()->getPosition()).Length() < 20)
+			if ((destination - car->getVehicle()->getPosition()).Length() < 15)
 			{
 				path->pop_back();
 			}
