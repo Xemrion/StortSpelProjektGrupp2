@@ -171,6 +171,7 @@ void Actor::followPath()
 {
 	if (path != nullptr)
 	{
+		hasDestination = true;
 		if (path->size() > 0)
 		{
 			destination = path->at(path->size() - 1);
@@ -183,10 +184,6 @@ void Actor::followPath()
 		{
 			destination = targetPos;
 		}
-		//else
-		//{
-		//	destination = targetPos;
-		//}
 	}
 
 }

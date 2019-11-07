@@ -22,8 +22,8 @@ void Spitfire::setUpActor()
 	sequence.addChildren(chase);
 }
 
-Spitfire::Spitfire(float x, float z,Physics* physics)
-	:	Actor(x, z)
+Spitfire::Spitfire(float x, float z, Physics* physics)
+	: Actor(x, z)
 {
 	this->direction = Vector3(1, 0, 0);
 	//this->setScale(Vector3(0.01f, 0.01f, 0.01f));
@@ -42,7 +42,7 @@ Spitfire::Spitfire(float x, float z,Physics* physics)
 	//this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
 	//this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car1"));
 	//Game::getGraphics().addToDraw(&mesh);
-	
+
 }
 
 Spitfire::Spitfire()
@@ -111,7 +111,7 @@ void Spitfire::move()
 
 }
 
-void Spitfire::update(float dt,Vector3 targetPos)
+void Spitfire::update(float dt, Vector3 targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
@@ -125,9 +125,10 @@ void Spitfire::followPath()
 {
 	if (path != nullptr)
 	{
+		hasDestination = true;
+
 		if (path->size() > 0)
 		{
-			hasDestination = true;
 			destination = path->at(path->size() - 1);
 			if ((destination - car->getVehicle()->getPosition()).Length() < 15)
 			{
