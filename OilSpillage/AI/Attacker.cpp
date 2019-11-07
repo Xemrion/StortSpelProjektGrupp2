@@ -4,10 +4,10 @@
 Attacker::Attacker()
 {
 	setUpActor();
+	Game::getGraphics().addToDraw(this);
 
 	this->defaultStats = VehicleStats::AIAttacker;
 	this->updatedStats = this->defaultStats;
-
 	this->health = this->updatedStats.maxHealth;
 }
 
@@ -16,6 +16,7 @@ Attacker::Attacker(float x, float z, int weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
+	Game::getGraphics().addToDraw(this);
 
 	this->defaultStats = VehicleStats::AIAttacker;
 	this->updatedStats = this->defaultStats;
@@ -29,6 +30,7 @@ Attacker::Attacker(float x, float z, int weaponType)
 
 Attacker::~Attacker()
 {
+	Game::getGraphics().removeFromDraw(this);
 }
 
 void Attacker::update(float dt, Vector3 targetPos)
@@ -51,7 +53,7 @@ void Attacker::setUpActor()
 	Behavior& chase = bt.getAction();
 	chase.addAction(std::bind(&Attacker::setChaseState, std::ref(*this)));
 	Behavior& roam = bt.getAction();
-	roam.addAction(std::bind(&Attacker::setRoamState, std::ref(*this)));
+	roam.addAction(std::bind(&Attacker::setIdleState, std::ref(*this)));
 	Behavior& shoot = bt.getAction();
 	shoot.addAction(std::bind(&Attacker::shoot, std::ref(*this)));
 	Behavior& enemyNear = bt.getAction();

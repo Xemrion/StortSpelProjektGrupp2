@@ -20,7 +20,7 @@ public:
 	// Other function for moving and interacting
 	Vector3 seek();
 	void run(vector<Actor*>& boids, float deltaTime, vector<Vector3> buildings, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
-	virtual void move(float deltaTime);
+	virtual void move();
 	void setPath(std::vector<Vector3>* path);
 	virtual bool hasGroup();
 	void joinGroup();
@@ -55,7 +55,7 @@ protected:
 	Vector3 destination;
 	Selector* root;
 	Vector3 targetNode;
-	enum State { Roaming, Chasing, Returning };
+	enum State {Idle, Chasing };
 	State state;
 	BT bt;
 	Vector3 targetPos;
@@ -64,7 +64,7 @@ protected:
 	virtual Status inAttackRange();	
 	virtual Status enemyNear();
 	virtual Status setChaseState();
-	virtual Status setRoamState();
+	virtual Status setIdleState();
 	virtual void  followPath();
 	virtual void  updateWeapon(float deltaTime);
 	virtual void assignWeapon(int weaponType);

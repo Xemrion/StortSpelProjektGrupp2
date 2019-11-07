@@ -5,22 +5,22 @@ class Spitfire : public Actor
 {
 private:
 	void setUpActor();
-	float deltaTime;
 
 	//car functions
 	Vehicle* car;
 	Vector3 direction;
 	float throttleInputStrength;
-	class Physics* physics;
 	Vector3 prevAccelForce;
 	Vector3 accelForce;
 	void updateVehicle(); 
+	int chaseRange = 1000;
 public:
-	Spitfire(float x, float z);
+	Spitfire(float x, float z,Physics* physics);
 	Spitfire();
 	~Spitfire();
-	void update(float dt, Vector3 targetPos);
-	void Init(Physics* physics);
+	void move();
+	void followPath();
+
 	/*if in range lets stop for now*/
 	Status inRange();
 	Status vehicleUpdate();
