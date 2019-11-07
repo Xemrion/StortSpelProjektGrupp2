@@ -24,24 +24,28 @@ void ActorManager::update(float dt, Vector3 targetPos)
 {
 	soundTimer += dt;
 	bool hasDied = false;
-	for (int i = 0; i < this->actors.size(); i++)
+	vector<Vector3> temp;
+	for (int i = 0; i < this->groups.size(); i++)
 	{
-
-		if (!actors[i]->isDead() && actors[i] != nullptr)
+		temp = static_cast<PlayingGameState*>(Game::getCurrentState())->map->getTileMap().getAllTilePositionsInRadius(groups[i].getAveragePos(), 300, Tile::building);
+		for(int j = 0; j < groups[i].actors.size(); j++)
 		{
-			actors[i]->run(actors, dt, targetPos);
-		}
-		else if (actors[i]->isDead() && actors[i] != nullptr)
-		{
-			Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
-			if (ptr != nullptr)
+			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
 			{
-				if (ptr->getType() == TypeOfMission::KillingSpree)
-				{
-					ptr->killEnemy();
-				}
+				groups[i].actors[j]->run(actors, dt, temp, targetPos);
 			}
-			hasDied = true;
+			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
+			{
+				Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+				if (ptr != nullptr)
+				{
+					if (ptr->getType() == TypeOfMission::KillingSpree)
+					{
+						ptr->killEnemy();
+					}
+				}
+				hasDied = true;
+			}
 		}
 	}
 	if (hasDied)
@@ -61,13 +65,6 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		assignPathsToGroups(targetPos);
 		frameCount = 0;
 	}
-	//if (frameCount % 200 == 0)
-	//{
-	//	for(int i = 0; i < groups.size(); i++)
-	//	{
-	//		groups[i].updateBoidDistance();
-	//	}
-	//}
 	updateAveragePos();
 	frameCount++;
 }
@@ -124,7 +121,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 		{
 			if (!this->actors[i]->isDead())
 			{
-				if (bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
+				if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
 						/*int randomSound = rand() % 3 + 1;

@@ -39,18 +39,18 @@ void Actor::assignWeapon(int weaponType)
 	}
 	else if (weaponType == 2)// MissileLauncher
 	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::MissileLauncher);
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMissileLauncher);
 		this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
 		this->predicting = true;
 	}
 	else if (weaponType == 3)// Laser
 	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::Laser);
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiLaser);
 		this->setColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f));
 	}
 	else if (weaponType == 4)// Flamethrower
 	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::Flamethrower);
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiFlamethrower);
 		this->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
 	}
 }
@@ -193,7 +193,7 @@ void Actor::applyForce(Vector3 force)
 	acceleration += force;
 }
 
-Vector3 Actor::separation(vector<Actor*>& boids, Vector3 targetPos)
+Vector3 Actor::separation(vector<Actor*>& boids, vector<Vector3> buildings, Vector3 targetPos)
 {
 	// Distance of field of vision for separation between boids
 	float desiredSeparationDistance = boidOffset;
@@ -219,12 +219,10 @@ Vector3 Actor::separation(vector<Actor*>& boids, Vector3 targetPos)
 			nrInProximity++;
 		}
 	}
-	vector<Vector3> temp;
-	temp = static_cast<PlayingGameState*>(Game::getCurrentState())->map->getTileMap().getAllTilePositionsInRadius(this->position, 120, Tile::building);
-	for (int i = 0; i < temp.size(); i++)
+	for (int i = 0; i < buildings.size(); i++)
 	{
 		// Calculate distance from current boid to boid we're looking at
-		Vector3 curBoidPos = temp[i];
+		Vector3 curBoidPos = buildings[i];
 		float deltaX = position.x - curBoidPos.x;
 		float deltaZ = position.z - curBoidPos.z;
 		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
@@ -232,7 +230,7 @@ Vector3 Actor::separation(vector<Actor*>& boids, Vector3 targetPos)
 		if ((distance < 110) && distance != 0)
 		{
 			Vector3 difference(0.0f);
-			difference = position - temp[i];
+			difference = position - buildings[i];
 			difference.Normalize();
 			difference;      // Weight by distance
 			direction += difference;
@@ -290,9 +288,9 @@ Vector3 Actor::seek()
 	return acceleration;
 }
 
-void Actor::run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos)
+void Actor::run(vector<Actor*>& boids, float deltaTime, vector<Vector3> buildings, Vector3 targetPos)
 {
-	applyForce(separation(boids, targetPos) * 4);
+	applyForce(separation(boids, buildings, targetPos) * 4);
 	update(deltaTime, targetPos);
 	if (hasDestination)
 	{
