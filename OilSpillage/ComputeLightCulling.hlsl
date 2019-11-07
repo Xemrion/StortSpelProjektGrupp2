@@ -80,12 +80,12 @@ void main( uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID )
 		}
 
 		float4 pos = mul(float4(l.pos.xyz, 1.0), view);
-		float radius = max(sqrt(l.luminance), 1.0) * 7.0;
+		float radius = max(sqrt(l.luminance), 1.0) * 8.0;
 
 		if (l.width > 0.0)
 		{
 			//l.direction = mul(float4(l.direction, 0.0), view);
-			radius *= 2.0;
+			radius *= 4.0;
 		}
 
 		inside = testPlane(pos.xyz + l.direction * radius, groupFrustum.left, radius);

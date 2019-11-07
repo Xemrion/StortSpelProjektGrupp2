@@ -23,6 +23,7 @@
 #include"Shadows/ShadowMapping.h"
 #include"Particle/ParticleSystem.h"
 #include "Structs.h"
+#include "Fog.h"
 
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
@@ -79,6 +80,8 @@ class Graphics {
 	ParticleSystem particleSystem;
 	ParticleSystem particleSystem2;
 
+	Fog fog;
+
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
@@ -88,6 +91,7 @@ class Graphics {
 
 	void cullLights();
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
+	void drawFog(DynamicCamera* camera, float deltaTime);
 public:
 	Graphics();
 	~Graphics();
@@ -126,7 +130,6 @@ public:
 	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setVectorField(float vectorFieldSize,float vectorFieldPower);
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
-
 
 	float farZTempShadow;
 	void setSpotLighShadow(SpotLight* spotLight);

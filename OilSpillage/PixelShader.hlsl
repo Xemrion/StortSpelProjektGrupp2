@@ -68,13 +68,31 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float bias)
 	shadowCoord.xy = shadowCoord.xy * float2(0.5f, -0.5f) + 0.5f;
 	float visibility = 0.0f;
 
-	float4 pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy).r;
+	float4 pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(0, 0)).r;
+	visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
+
+	pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(-2, -0)).r;
+	visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
+
+	pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(-2, 0)).r;
+	visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
+
+	pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(0, -2)).r;
 	visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
 	visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
 	visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
 	visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
 	
-	visibility *= 0.25;
+	visibility *= 0.25 * 0.25;
 
 	return visibility;
 };
@@ -100,7 +118,7 @@ float4 main(VS_OUT input) : SV_Target
 	uint2 lightTileIndex = floor(uint2(input.Pos.x, input.Pos.y) / uint2(16.f, 16.f));
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 
-	float4 ambient = max(-dot(sunDir, normal)*(1- shadowVisible(input.shadowPos, ShadowMap, 0.00015f)), float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
+	float4 ambient = max(-dot(sunDir, normal)*(1- shadowVisible(input.shadowPos, ShadowMap, 0.00015f) * texColor.a), float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
 	float shadowSpotVisible = 1.0f;
 
 	float4 diffuseLight = float4(0.0, 0.0, 0.0, 1.0);
@@ -129,7 +147,7 @@ float4 main(VS_OUT input) : SV_Target
 			if (lightTileData.indices[i] == indexForSpot)
 			{
 				shadowSpotVisible = shadowVisible(input.shadowPosSpot, ShadowMapSpot, 0.005f);
-				shadowSpotVisible = 1 - shadowSpotVisible;
+				shadowSpotVisible = 1 - shadowSpotVisible * texColor.a;
 			}
 		}
 

@@ -11,6 +11,7 @@
     <FxCompile Include="Particle\ParticlePS.hlsl" />
     <FxCompile Include="Particle\ParticleUpdateCS.hlsl" />
     <FxCompile Include="Particle\ParticleVS.hlsl" />
+    <FxCompile Include="FogPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="physics.cpp" />
@@ -78,6 +79,7 @@
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
     <ClCompile Include="PG\Modelizer.cpp" />
+    <ClCompile Include="fog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -161,6 +163,7 @@
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="AI\Swarm.h" />
     <ClInclude Include="AI\Car_Spitfire.h" />
+    <ClInclude Include="fog.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
