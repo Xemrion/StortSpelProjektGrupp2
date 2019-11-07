@@ -48,6 +48,19 @@ public:
 	Status func();
 	~Selector();
 };
+class Randomize : public Behavior
+{
+private:
+	std::vector<Behavior*> m_children;
+	/*status on the random action */
+	Status randomize;
+	uint8_t index;
+public:
+	void addChildren(Behavior& child);
+	Status func();
+	~Randomize();
+
+};
 
 struct WaitTimer
 {
@@ -61,10 +74,12 @@ private:
 	std::vector<Sequence*> sequence;
 	std::vector<Selector*> selector;
 	std::vector<Behavior*> action;
+	std::vector<Randomize*> random;
 public:
 	Sequence& getSequence();
 	Selector& getSelector();
 	Behavior& getAction();
+	Randomize& getRandom();
 	~BT();
 };
 #endif // ! BEHAVIOUR_H

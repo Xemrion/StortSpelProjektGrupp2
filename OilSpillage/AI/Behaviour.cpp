@@ -104,6 +104,13 @@ Behavior& BT::getAction()
 	return *temp;
 }
 
+Randomize& BT::getRandom()
+{
+	Randomize* temp = new Randomize();
+	random.emplace_back(temp);
+	return *temp;
+}
+
 BT::~BT()
 {
 	for (std::vector<Sequence*>::iterator pObj = sequence.begin();
@@ -120,6 +127,11 @@ BT::~BT()
 
 	for (std::vector<Behavior*>::iterator pObj = action.begin();
 		pObj != action.end(); ++pObj) {
+		delete* pObj; // Note that this is deleting what pObj points to,
+					  // which is a pointer
+	}
+	for (std::vector<Randomize*>::iterator pObj = random.begin();
+		pObj != random.end(); ++pObj) {
 		delete* pObj; // Note that this is deleting what pObj points to,
 					  // which is a pointer
 	}
@@ -153,4 +165,47 @@ Status Behavior::execute()
 	}
 	return status;
 
+}
+
+void Randomize::addChildren(Behavior& child)
+{
+	m_children.emplace_back(&child);
+	randomize = Status::INVALID;
+	index = rand() % m_children.size();
+}
+
+Status Randomize::func()
+{
+	/*	choses one out of the children to execute	*/
+
+	/*if we haven't succeed the action*/
+	if (randomize != Status::SUCCESS)
+	{
+		Sequence* sequence = dynamic_cast<Sequence*>(m_children[index]);
+		Selector* selector = dynamic_cast<Selector*>(m_children[index]);
+		if (sequence)
+		{
+			randomize = sequence->func();
+		}
+		else if (selector)
+		{
+			randomize = selector->func();
+		}
+		else {
+
+			randomize = m_children[index]->execute();
+		}
+	}
+	if (randomize == Status::SUCCESS)
+	{
+		/*pick another random action to execute*/
+		index = rand() % m_children.size();
+		randomize = Status::RUNNING;// its still running 
+	}
+
+	return randomize;
+}
+
+Randomize::~Randomize()
+{
 }
