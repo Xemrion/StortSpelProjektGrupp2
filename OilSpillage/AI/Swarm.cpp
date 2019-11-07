@@ -22,6 +22,7 @@ Swarm::Swarm(float x, float z, int weaponType)
 	Game::getGraphics().addToDraw(this);
 
 	boidOffset = 2.5;
+	this->state = State::Chasing;
 }
 
 Swarm::~Swarm()

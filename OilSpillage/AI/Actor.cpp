@@ -268,13 +268,9 @@ Vector3 Actor::separation(vector<Actor*>& boids, vector<Vector3> buildings, Vect
 	if (direction.Length() > 0.0f)
 	{
 		// Steering = Desired - Velocity
-		direction.Normalize();
 		direction *= maxSpeed;
 		direction -= velocity;
-		if (direction.Length() > maxForce)
-		{
-			direction /= direction.Length();
-		}
+		direction.Normalize();
 
 	}
 	return direction;
