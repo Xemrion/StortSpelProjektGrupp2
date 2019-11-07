@@ -52,6 +52,7 @@ Vehicle::~Vehicle()
 	delete vehicleBody1;
 
 	delete this->mountedWeapon;
+	delete this->frontWeapon;
 	delete wheel1;
 	delete wheel2;
 	delete wheel3;
