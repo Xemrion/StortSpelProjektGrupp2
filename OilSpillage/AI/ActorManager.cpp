@@ -65,13 +65,6 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		assignPathsToGroups(targetPos);
 		frameCount = 0;
 	}
-	//if (frameCount % 200 == 0)
-	//{
-	//	for(int i = 0; i < groups.size(); i++)
-	//	{
-	//		groups[i].updateBoidDistance();
-	//	}
-	//}
 	updateAveragePos();
 	frameCount++;
 }

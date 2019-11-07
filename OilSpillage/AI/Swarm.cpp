@@ -19,6 +19,7 @@ Swarm::Swarm(float x, float z, int weaponType)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Drone");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Drone"));
 	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMelee);
+	Game::getGraphics().addToDraw(this);
 
 	boidOffset = 2.5;
 }
@@ -31,6 +32,7 @@ Swarm::~Swarm()
 void Swarm::update(float dt, Vector3 targetPos)
 {
 	this->targetPos = targetPos;
+	this->deltaTime = dt;
 	updateWeapon(dt);
 	//this->root->func();
 	followPath();
