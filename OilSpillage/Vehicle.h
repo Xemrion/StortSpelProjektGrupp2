@@ -8,6 +8,7 @@
 #include "Sound.h"
 #include"Lights.h"
 #include"Inventory/Item.h"
+#include"Inventory/ItemWeapon.h"
 using namespace DirectX::SimpleMath;
 enum Slots
 {
