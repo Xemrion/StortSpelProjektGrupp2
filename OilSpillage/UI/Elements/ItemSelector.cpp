@@ -57,8 +57,8 @@ void ItemSelector::update(float deltaTime)
 			if (object)
 			{
 				rotationTimers[i] = 0.0f;
-				defaultTransforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f));
-				transforms[i] = defaultTransforms[i];
+				rotation[i] = Vector3();
+				transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f));
 				Game::getGraphics().addToUIDraw(object, &transforms[i]);
 			}
 		}

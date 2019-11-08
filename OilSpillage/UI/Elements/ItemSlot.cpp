@@ -35,13 +35,15 @@ void ItemSlot::update(bool selected, float deltaTime)
 	{
 		if (selected)
 		{
-			this->rotationTimer = std::fmodf(this->rotationTimer + deltaTime, XM_2PI);
-			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.2f, 1.2f, 1.2f), Vector3(rotationTimer * XM_PI, 0.0f, 0.0f));
+			rotationTimer = std::fmodf(rotationTimer + deltaTime * 4, XM_2PI);
+			rotation = Vector3(rotationTimer, 0.0f, 0.0f);
+			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.2f), rotation, false);
 		}
 		else
 		{
-			this->rotationTimer = 0.0f;
-			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f));
+			rotationTimer = Game::lerp(rotationTimer, 0.0f, deltaTime * 4);
+			rotation = Vector3::Lerp(rotation, Vector3(), deltaTime * 4);
+			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.0f), rotation);
 		}
 	}
 }
@@ -60,6 +62,8 @@ void ItemSlot::setItem(Item* item)
 
 	if (item && item->getObject())
 	{
+		rotationTimer = 0.0f;
+		rotation = Vector3();
 		transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f));
 		Game::getGraphics().addToUIDraw(item->getObject(), &this->transform);
 	}

@@ -13,9 +13,9 @@ private:
 	Texture* textureIndicator;
 
 	float rotationTimers[tileLength];
-	Matrix defaultTransforms[tileLength];
 	Vector3 rotation[tileLength];
 	Matrix transforms[tileLength];
+
 	int selectedTypeLastDraw;
 	int selectedIndexLastDraw;
 	int startIndexLastDraw;

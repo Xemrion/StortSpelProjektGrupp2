@@ -12,8 +12,10 @@ private:
 	Texture* textureSlot;
 	Texture* textureIndicator;
 	Item* item;
-	Matrix transform;
+
 	float rotationTimer;
+	Vector3 rotation;
+	Matrix transform;
 public:
 	static Vector2 size;
 
