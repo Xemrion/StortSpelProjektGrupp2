@@ -195,6 +195,7 @@
     <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UI\Elements\ItemSelector.cpp" />
+    <ClCompile Include="UI\Elements\ItemSlot.cpp" />
     <ClCompile Include="UI\Elements\Minimap.cpp" />
     <ClCompile Include="UI\Elements\ObjectiveBox.cpp" />
     <ClCompile Include="UI\Elements\Slider.cpp" />
@@ -204,6 +205,7 @@
     <ClCompile Include="UI\Menu\UIOptions.cpp" />
     <ClCompile Include="UI\Playing\UIPaused.cpp" />
     <ClCompile Include="UI\Playing\UIPlaying.cpp" />
+    <ClCompile Include="UI\Upgrading\UIRandomItem.cpp" />
     <ClCompile Include="UI\Upgrading\UIUpgrading.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
@@ -278,6 +280,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Inventory\Item.h" />
     <ClInclude Include="UI\Elements\ItemSelector.h" />
+    <ClInclude Include="UI\Elements\ItemSlot.h" />
     <ClInclude Include="UI\Elements\Minimap.h" />
     <ClInclude Include="UI\Elements\ObjectiveBox.h" />
     <ClInclude Include="UI\Elements\Slider.h" />
@@ -287,6 +290,7 @@
     <ClInclude Include="UI\Menu\UIOptions.h" />
     <ClInclude Include="UI\Playing\UIPaused.h" />
     <ClInclude Include="UI\Playing\UIPlaying.h" />
+    <ClInclude Include="UI\Upgrading\UIRandomItem.h" />
     <ClInclude Include="UI\Upgrading\UIUpgrading.h" />
     <ClInclude Include="UI\UserInterface.h" />
     <ClInclude Include="Vehicle.h" />

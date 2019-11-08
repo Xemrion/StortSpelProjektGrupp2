@@ -21,7 +21,7 @@ ItemSelector::~ItemSelector()
 void ItemSelector::draw(bool selected)
 {
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), this->position);
-	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position + Vector2(95.0f + 96.0f * (this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType]), 47.0f));
+	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position + Vector2(96.0f + 96.0f * (this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType]), 47.0f));
 
 	/*for (int i = 0; i < min(list->size() - this->startIndex[this->selectedType], ItemSelector::tileLength); i++)
 	{
@@ -56,34 +56,37 @@ void ItemSelector::update(float deltaTime)
 			GameObject* object = list->at(this->startIndex[this->selectedType] + i)->getObject();
 			if (object)
 			{
-				transforms[i] = Matrix::CreateScale(object->getScale());
-				transforms[i] *= Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, 0.0f);
-				transforms[i] *= Matrix::CreateTranslation(Game::getGraphics().screenToWorldSpaceUI(this->position + Vector2(150.0f + 96.0f * i, 47.0f + 48.0f)));
-
+				transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f));
 				Game::getGraphics().addToUIDraw(object, &transforms[i]);
 			}
 		}
 
 	}
 
-	if (this->selectedIndexLastDraw != this->selectedIndex[this->selectedType] && this->selectedTypeLastDraw != -1)
+	if (this->selectedTypeLastDraw != -1 && this->selectedTypeLastDraw == this->selectedType && this->selectedIndexLastDraw != this->selectedIndex[this->selectedType])
 	{
 		list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedTypeLastDraw));
-		if (list->size() > 0 && list->at(this->selectedIndexLastDraw)->getObject())
+		if (list->size() > 0)
 		{
-			transforms[this->selectedIndexLastDraw] = Matrix::CreateScale(list->at(this->selectedIndexLastDraw)->getObject()->getScale());
-			transforms[this->selectedIndexLastDraw] *= Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, 0.0f);
-			transforms[this->selectedIndexLastDraw] *= Matrix::CreateTranslation(Game::getGraphics().screenToWorldSpaceUI(this->position + Vector2(150.0f + 96.0f * this->selectedIndexLastDraw, 47.0f + 48.0f)));
+			GameObject* object = list->at(this->selectedIndexLastDraw)->getObject();
+			if (object)
+			{
+				int i = this->selectedIndexLastDraw - this->startIndexLastDraw;
+				transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f));
+			}
 		}
 	}
 
 	list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType));
-	if (list->size() > 0 && list->at(this->selectedIndex[this->selectedType])->getObject())
+	if (list->size() > 0)
 	{
-		rotationTimer = std::fmodf(rotationTimer + deltaTime, XM_2PI);
-		transforms[this->selectedIndex[this->selectedType]] = Matrix::CreateScale(list->at(this->selectedIndex[this->selectedType])->getObject()->getScale() * 1.2f);
-		transforms[this->selectedIndex[this->selectedType]] *= Matrix::CreateFromYawPitchRoll(rotationTimer * XM_PI, 0.0f, 0.0f);
-		transforms[this->selectedIndex[this->selectedType]] *= Matrix::CreateTranslation(Game::getGraphics().screenToWorldSpaceUI(this->position + Vector2(150.0f + 96.0f * this->selectedIndex[this->selectedType], 47.0f + 48.0f)));
+		GameObject* object = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->at(this->selectedIndex[this->selectedType])->getObject();
+		if (object)
+		{
+			int i = this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType];
+			rotationTimer = std::fmodf(rotationTimer + deltaTime, XM_2PI);
+			transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f), Vector3(1.2f, 1.2f, 1.2f), Vector3(rotationTimer * XM_PI, 0.0f, 0.0f));
+		}
 	}
 	else
 	{
@@ -103,12 +106,7 @@ void ItemSelector::changeSelectedType(bool down)
 	}
 	else
 	{
-		this->selectedType -= 1;
-
-		if (this->selectedType < 0)
-		{
-			this->selectedType = ItemType::TYPES_SIZE - 1;
-		}
+		this->selectedType = (this->selectedType - 1 + ItemType::TYPES_SIZE) % ItemType::TYPES_SIZE;
 	}
 }
 
@@ -127,12 +125,7 @@ void ItemSelector::changeSelectedIndex(bool right)
 	}
 	else
 	{
-		this->selectedIndex[this->selectedType] -= 1;
-
-		if (this->selectedIndex[this->selectedType] < 0)
-		{
-			this->selectedIndex[this->selectedType] = listSize - 1;
-		}
+		this->selectedIndex[this->selectedType] = (this->selectedIndex[this->selectedType] - 1 + listSize) % listSize;
 	}
 
 	if (this->selectedIndex[this->selectedType] < this->startIndex[this->selectedType])

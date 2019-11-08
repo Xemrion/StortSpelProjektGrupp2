@@ -4,24 +4,32 @@
 #include"../Vehicle.h"
 #include "GameState.h"
 #include "../game.h"
-#include "../UI/Upgrading/UIUpgrading.h"
+#include "../UI/UserInterface.h"
 
 class UpgradingGameState : public GameState
 {
+public:
+	enum Menu
+	{
+		MENU_RANDOMITEM,
+		MENU_UPGRADING,
+		MENUCOUNT
+	};
 private:
 	Graphics& graphics;
-	std::unique_ptr<UIUpgrading> menu;
-	DynamicCamera* camera;
-	Vehicle* theVehicle;
-	std::unique_ptr<LightList>      lightList;
+	std::unique_ptr<UserInterface> menues[MENUCOUNT];
+	std::unique_ptr<DynamicCamera> camera;
+	std::unique_ptr<Vehicle> theVehicle;
+	std::unique_ptr<LightList> lightList;
+	std::unique_ptr<Physics> physics; //for vehicle
 	float timer;
-	std::unique_ptr<Physics>		physics;//for vehicle
-
+	int currentMenu;
 public:
 	UpgradingGameState();
 	virtual ~UpgradingGameState();
 
 	void update(float deltaTime);
+	void setCurrentMenu(Menu menu);
 };
 
 #endif // !UPGRADING_GAME_STATE_H
