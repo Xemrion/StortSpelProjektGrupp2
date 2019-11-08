@@ -25,6 +25,7 @@ public:
 	void regenerateShape(int edges);
 
 	void getTriangleIndices();
+	std::vector<Vertex3D> getWindowVertices(Vector3 otherCenter);
 	std::vector<Vertex3D> getWallVertices(Vector3 otherCenter);
 	std::vector<Vertex3D> getRoofVertices();
 	std::vector<Vertex3D> getDifferenceAsRoofVerticies(const SkyscraperFloor& other);

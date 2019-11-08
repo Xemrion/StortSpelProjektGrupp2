@@ -273,13 +273,13 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 void SkyscraperFloor::getTriangleIndices()
 { 
 	this->indices.clear();
-	int triangleIndiciesCounter = 0;
+	int triangleIndiciesCounter = 0, failedAttempts = 0;
 	std::vector<int> triangleIndices;
 	std::vector<bool> usedIndices;
-	size_t counter = 1, forwardsOffset = 1, backwardsOffset = 1;
 	size_t size = this->verticies.size();
+	size_t counter = 0, forwardsOffset = 1, backwardsOffset = 1;
 	bool counterUsed = false, forwardsUsed = false, backwardsUsed = false;
-	bool mainPointLeft = false;
+	bool mainPointLeft = false, alreadyFailedWithNeighbors = false;;
 	int pointsUsed = 0;
 	usedIndices.resize(size);
 
@@ -355,6 +355,10 @@ void SkyscraperFloor::getTriangleIndices()
 				if (!mainPointLeft) {
 					if (forwardsOffset == 1 && backwardsOffset == 1) {
 						counter -= 2;
+						if (alreadyFailedWithNeighbors) {
+							counter += (size / 2);
+						}
+						alreadyFailedWithNeighbors = true;
 					}
 				}
 				if (mainPointLeft) {
@@ -363,6 +367,7 @@ void SkyscraperFloor::getTriangleIndices()
 					triangleIndices.push_back(int(counter + forwardsOffset) % int(size));
 					usedIndices[counter] = true;
 					pointsUsed++;
+					alreadyFailedWithNeighbors = false;
 					if (backwardsOffset == 1 || forwardsOffset == 1) {
 						counter += 2;
 					}
@@ -372,12 +377,23 @@ void SkyscraperFloor::getTriangleIndices()
 
 		}
 		counter++;
-		triangleIndiciesCounter++;
-		if (triangleIndiciesCounter > size * 5) {
-			triangleGenFail = true;
-		}
 		counter = (counter + size) % size;
 
+		triangleIndiciesCounter++;
+		if (triangleIndiciesCounter > size * 3) {
+			for (int i = 0; i < usedIndices.size(); i++) {
+				usedIndices[i] = false;
+			}
+			pointsUsed = 0;
+			triangleIndiciesCounter = 0;
+			triangleIndices.clear();
+			failedAttempts++;
+			counter = failedAttempts % size;
+			if (failedAttempts > size) {
+				triangleGenFail = true;
+			}
+		}
+		
 		backwardsOffset = 1;
 		forwardsOffset = 1;
 	}
@@ -385,7 +401,7 @@ void SkyscraperFloor::getTriangleIndices()
 	this->indices = triangleIndices;
 }
 
-std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
+std::vector<Vertex3D> SkyscraperFloor::getWindowVertices(Vector3 otherCenter)
 {	//Strange triangles
 	std::vector<Vertex3D> meshData;
 	Vertex3D temp;
@@ -403,6 +419,68 @@ std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
 
 		lineLenght = floor(sqrt((pow(line1.x, 2) + pow(line1.z, 2))));
 		botRight.x = topRight.x = lineLenght;
+
+		temp.position = this->verticies[i];
+		temp.normal = normal;
+		temp.uv = topRight;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = lowerFirst;
+		temp.normal = normal;
+		temp.uv = botRight;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = lowerSecond;
+		temp.normal = normal;
+		temp.uv = botLeft;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = this->verticies[(i + 1) % this->nrOfEdges];
+		temp.normal = normal;
+		temp.uv = topLeft;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = this->verticies[i];
+		temp.normal = normal;
+		temp.uv = topRight;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = lowerSecond;
+		temp.normal = normal;
+		temp.uv = botLeft;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+	}
+	return meshData;
+}
+
+std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
+{	//Strange triangles
+	std::vector<Vertex3D> meshData;
+	Vertex3D temp;
+	Vector2 topLeft(0, 0), topRight(1, 0), botLeft(0, 1), botRight(1, 1);
+	float lineLenght = 0.0f;
+	Vector3 lowerFirst(0.0f), lowerSecond(0.0f);
+	Vector3 normal(0.0f), line1(0.0f), line2(0.0f);
+	for (size_t i = 0; i < this->verticies.size(); i++) {
+		lowerFirst = Vector3(this->verticies[i].x, otherCenter.y, this->verticies[i].z);
+		lowerSecond = Vector3(this->verticies[(i + 1) % this->nrOfEdges].x, otherCenter.y, this->verticies[(i + 1) % this->nrOfEdges].z);
+
+		line1 = this->verticies[(i + 1) % this->nrOfEdges] - this->verticies[i];
+		line2 = lowerSecond - this->verticies[i];
+		normal = line2.Cross(line1);
 
 		temp.position = this->verticies[i];
 		temp.normal = normal;

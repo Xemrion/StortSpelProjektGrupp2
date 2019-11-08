@@ -15,8 +15,8 @@ Skyscraper::~Skyscraper()
 void Skyscraper::generateSkyscraper()
 {
 	this->floors.clear();
-	Vector3 modifyBy(0.0f, 1.0f, 0.0f);
-	I32_Dist floorPoints(4, 8), rotation(1, 360), height(4, 9), vectorPoint(0, 500);
+	Vector3 modifyBy(0.0f, 2.0f, 0.0f);
+	I32_Dist floorPoints(4, 8), rotation(1, 360), height(4, 9), vectorPoint(1, 500);
 	I32_Dist floors(2 , 4);
 	int nrOfFloors = 0;
 	//Random
@@ -33,7 +33,7 @@ void Skyscraper::generateSkyscraper()
 	this->floors[0].translateBy(modifyBy);
 	this->floors.push_back(roof);
 
-	modifyBy.y = 2;
+	modifyBy.y = height(rng);
 	for (int i = 0; i < this->floors.size(); i++) {
 		this->floors[i].translateBy(modifyBy);
 	}
@@ -65,7 +65,7 @@ void Skyscraper::generateSkyscraper()
 		
 	this->floors.push_back(roof);
 
-	modifyBy.y = 1.5f;
+	modifyBy.y = 2.0f;
 	for (int i = 0; i < this->floors.size(); i++) {
 		this->floors[i].translateBy(modifyBy);
 	}
@@ -89,14 +89,14 @@ bool Skyscraper::generateSkyscraperMesh()
 		this->floors[1].getTriangleIndices();
 		temp = this->floors[1].getRoofVertices();
 		this->meshRoof.insert(this->meshRoof.cend(), temp.begin(), temp.end());
-		temp = this->floors[1].getWallVertices(this->floors[2].getCenter());
+		temp = this->floors[1].getWindowVertices(this->floors[2].getCenter());
 		this->meshWindows.insert(this->meshWindows.cend(), temp.begin(), temp.end());
 
 		for (size_t i = 2; i < this->floors.size() - 1; i++) {
 			
 			temp = this->floors[i].getDifferenceAsRoofVerticies(this->floors[i - 1]);
 			this->meshRoof.insert(this->meshRoof.cend(), temp.begin(), temp.end());
-			temp = this->floors[i].getWallVertices(this->floors[i + 1].getCenter());
+			temp = this->floors[i].getWindowVertices(this->floors[i + 1].getCenter());
 			this->meshWindows.insert(this->meshWindows.cend(), temp.begin(), temp.end());
 		}
 		Vector3 center = this->floors.back().getCenter();
