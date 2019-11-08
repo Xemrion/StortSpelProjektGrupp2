@@ -23,9 +23,10 @@ void Item::init()
 	Item::machineGun->mesh = graphics.getMeshPointer("Entities/Barrel");
 	Item::machineGun->setMaterial(graphics.getMaterial("Entities/Barrel"));
 	Item::machineGun->setScale(Vector3(0.1f));
+	Item::machineGun->setPosition(Item::machineGun->mesh->getAABB().scale(Item::machineGun->getScale()).maxPos * Vector3(0, 1, 0));
 
 	Item::allItems = {
-		Item("Test Item", "A very useless thing!", ItemType::GADGET, nullptr),
+		Item("Test Item", "A very useless thing!", ItemType::WEAPON, nullptr),
 		Item("Test Item 2", "A very useless thing 2!", ItemType::GADGET, nullptr),
 		Item("Test Item 3", "A very useless thing 3!", ItemType::GADGET, nullptr),
 		ItemWeapon("Machine Gun", WeaponHandler::getWeapon(WeaponType::MachineGun), Item::machineGun.get())
@@ -50,6 +51,15 @@ Item* Item::getItemByName(const char* name)
 Item* Item::getRandom()
 {
 	return &allItems[rand() % allItems.size()];
+}
+
+Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale, Vector3 rotation)
+{
+	Matrix transform = Matrix::CreateScale(scale * object->getScale());
+	transform *= Matrix::CreateFromQuaternion(Quaternion::Concatenate(Quaternion::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z), object->getRotationQuaternion()));
+	transform *= Matrix::CreateTranslation(Game::getGraphics().screenToWorldSpaceUI(screenPos) + object->getPosition());
+	
+	return transform;
 }
 
 const char* Item::getName() const

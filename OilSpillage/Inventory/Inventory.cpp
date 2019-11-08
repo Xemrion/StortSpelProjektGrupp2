@@ -18,13 +18,19 @@ void Inventory::addItem(Item* item)
 
 void Inventory::removeItem(Item* item)
 {
-	auto found = std::find(this->itemLists[item->getType()].begin(), this->itemLists[item->getType()].end(), item);
+	auto found = std::lower_bound(this->itemLists[item->getType()].begin(), this->itemLists[item->getType()].end(), item);
 	
 	if (found != this->itemLists[item->getType()].end())
 	{
 		this->itemLists[item->getType()].erase(found);
 		//this->changed[item->getType()] = true;
 	}
+}
+
+bool Inventory::containsItem(Item* item)
+{
+	auto found = std::lower_bound(this->itemLists[item->getType()].begin(), this->itemLists[item->getType()].end(), item);
+	return found != this->itemLists[item->getType()].end();
 }
 
 /*bool Inventory::hasChanged(ItemType type, bool shouldReset)

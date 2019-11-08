@@ -82,6 +82,8 @@
     <ClCompile Include="UI\Elements\Button.cpp" />
     <ClCompile Include="UI\Playing\UIPaused.cpp" />
     <ClCompile Include="UI\Playing\UIPlaying.cpp" />
+    <ClCompile Include="UI\Upgrading\UIRandomItem.cpp" />
+    <ClCompile Include="UI\Elements\ItemSlot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -167,6 +169,8 @@
     <ClInclude Include="UI\Elements\Button.h" />
     <ClInclude Include="UI\Playing\UIPaused.h" />
     <ClInclude Include="UI\Playing\UIPlaying.h" />
+    <ClInclude Include="UI\Upgrading\UIRandomItem.h" />
+    <ClInclude Include="UI\Elements\ItemSlot.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

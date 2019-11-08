@@ -17,6 +17,7 @@ public:
 
 	void addItem(Item* item);
 	void removeItem(Item* item);
+	bool containsItem(Item* item);
 	//bool hasChanged(ItemType type, bool shouldReset);
 	std::vector<Item*>* getItemList(ItemType type);
 };

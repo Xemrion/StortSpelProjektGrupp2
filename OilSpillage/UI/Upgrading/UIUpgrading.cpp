@@ -46,8 +46,7 @@ void UIUpgrading::drawUI()
 		break;
 	}
 
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), type, Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), Colors::Black, 0, Vector2(0, 0), 0.5f);
-
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), type, Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), Colors::White, 0, Vector2(0, 0), 0.5f);
 	UserInterface::getSpriteBatch()->End();
 }
 
