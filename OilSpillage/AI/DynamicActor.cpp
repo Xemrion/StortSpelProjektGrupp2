@@ -1,6 +1,6 @@
-#include "Dynamic.h"
+#include "DynamicActor.h"
 
-Dynamic::Dynamic()
+DynamicActor::DynamicActor()
 {
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
@@ -8,16 +8,16 @@ Dynamic::Dynamic()
 
 }
 
-Dynamic::Dynamic(float x, float z)
+DynamicActor::DynamicActor(float x, float z)
 	:Actor(x, z)
 {
 }
 
-Dynamic::~Dynamic()
+DynamicActor::~DynamicActor()
 {
 }
 
-void Dynamic::move()
+void DynamicActor::move()
 {
 	//To make the slow down not as abrupt
 	acceleration *= 0.4f;
@@ -48,13 +48,13 @@ void Dynamic::move()
 	acceleration *= 0;
 }
 
-void Dynamic::setPath(std::vector<Vector3>* path)
+void DynamicActor::setPath(std::vector<Vector3>* path)
 {
 	this->path = path;
 
 }
 
-void Dynamic::update(float dt, Vector3 targetPos)
+void DynamicActor::update(float dt, Vector3 targetPos)
 {
 	Actor::update(dt, targetPos);
 	if (this->state != State::Idle)
@@ -68,7 +68,7 @@ void Dynamic::update(float dt, Vector3 targetPos)
 	}
 }
 
-void Dynamic::applyForce(Vector3 force)
+void DynamicActor::applyForce(Vector3 force)
 {
 	acceleration += force;
 }
@@ -154,7 +154,7 @@ void Dynamic::applyForce(Vector3 force)
 //	return direction;
 //}
 
-Vector3 Dynamic::seek()
+Vector3 DynamicActor::seek()
 {
 	Vector3 desiredDirection;
 	desiredDirection -= position - destination;
@@ -168,7 +168,7 @@ Vector3 Dynamic::seek()
 	return acceleration;
 }
 
-void Dynamic::followPath()
+void DynamicActor::followPath()
 {
 	if (path != nullptr)
 	{
@@ -187,13 +187,13 @@ void Dynamic::followPath()
 	}
 }
 
-Status Dynamic::setChaseState()
+Status DynamicActor::setChaseState()
 {
 	this->state = State::Chasing;
 	return Status::SUCCESS;
 }
 
-Status Dynamic::enemyNear()
+Status DynamicActor::enemyNear()
 {
 	Status status;
 
@@ -208,7 +208,7 @@ Status Dynamic::enemyNear()
 	return status;
 }
 
-Status Dynamic::setIdleState()
+Status DynamicActor::setIdleState()
 {
 	this->state = State::Idle;
 	return Status::SUCCESS;

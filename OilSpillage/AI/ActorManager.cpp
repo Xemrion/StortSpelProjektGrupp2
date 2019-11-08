@@ -233,7 +233,7 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 	return returnIndex;
 }
 
-void ActorManager::joinGroup(Dynamic* actor, int groupIndex)
+void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 {
 	actor->joinGroup();
 	groups.at(groupIndex).actors.push_back(actor);
@@ -263,7 +263,7 @@ void ActorManager::updateGroups()
 	{
 		for (int k = 0; k < groups[i].actors.size(); k++)
 		{
-			Dynamic* current = groups[i].actors[k];
+			DynamicActor* current = groups[i].actors[k];
 			if (current->isDead() or current == nullptr)
 			{
 				leaveGroup(i, k);
@@ -316,7 +316,7 @@ void ActorManager::updateGroups()
 	}
 }
 
-void ActorManager::initGroupForActor(Dynamic* actor)
+void ActorManager::initGroupForActor(DynamicActor* actor)
 {
 	//Is there a group nearby? (Join biggest)
 	int groupIndex = groupInRange(actor->getPosition(), 0);
@@ -331,7 +331,7 @@ void ActorManager::initGroupForActor(Dynamic* actor)
 	}
 }
 
-void ActorManager::createGroup(Dynamic* actor)
+void ActorManager::createGroup(DynamicActor* actor)
 {
 	AIGroup temp;
 	temp.actors.push_back(actor);

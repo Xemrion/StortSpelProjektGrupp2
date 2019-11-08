@@ -11,7 +11,7 @@ Attacker::Attacker()
 }
 
 Attacker::Attacker(float x, float z, int weaponType)
-	:Dynamic(x,z),Ranged(&this->position,&this->targetPos,&this->velocity,weaponType)
+	:DynamicActor(x,z),Ranged(&this->position,&this->targetPos,&this->velocity,weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
@@ -29,7 +29,7 @@ Attacker::Attacker(float x, float z, int weaponType)
 
 void Attacker::update(float dt, Vector3 targetPos)
 {
-	Dynamic::update(dt, targetPos);
+	DynamicActor::update(dt, targetPos);
 	this->updateBullets(dt);
 }
 

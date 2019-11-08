@@ -151,7 +151,7 @@
     <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
-    <ClCompile Include="AI\Dynamic.cpp" />
+    <ClCompile Include="AI\DynamicActor.cpp" />
     <ClCompile Include="AI\Melee.cpp" />
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="AI\Ranged.cpp" />
@@ -222,7 +222,7 @@
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
     <ClInclude Include="AI\Car_Spitfire.h" />
-    <ClInclude Include="AI\Dynamic.h" />
+    <ClInclude Include="AI\DynamicActor.h" />
     <ClInclude Include="AI\Melee.h" />
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="AI\Ranged.h" />

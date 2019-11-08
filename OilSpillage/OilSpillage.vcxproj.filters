@@ -80,8 +80,8 @@
     <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="AI\AIVehicle.cpp" />
     <ClCompile Include="AI\Ranged.cpp" />
-    <ClCompile Include="AI\Dynamic.cpp" />
     <ClCompile Include="AI\Melee.cpp" />
+    <ClCompile Include="AI\DynamicActor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -166,9 +166,9 @@
     <ClInclude Include="AI\Car_Spitfire.h" />
     <ClInclude Include="AI\AIVehicle.h" />
     <ClInclude Include="AI\Ranged.h" />
-    <ClInclude Include="AI\Dynamic.h" />
     <ClInclude Include="AI\Melee.h" />
     <ClInclude Include="Vehicle.h" />
+    <ClInclude Include="AI\DynamicActor.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

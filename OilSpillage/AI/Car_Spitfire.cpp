@@ -23,7 +23,7 @@ void Spitfire::setUpActor()
 }
 
 Spitfire::Spitfire(float x, float z, Physics* physics)
-	: Dynamic(x,z)
+	: DynamicActor(x,z)
 {
 	this->direction = Vector3(1, 0, 0);
 	//this->setScale(Vector3(0.01f, 0.01f, 0.01f));
@@ -112,7 +112,7 @@ void Spitfire::move()
 
 void Spitfire::update(float dt, Vector3 targetPos)
 {
-	Dynamic::update(dt, targetPos);
+	DynamicActor::update(dt, targetPos);
 	updateVehicle();
 	this->setPosition(car->getVehicle()->getPosition());
 }

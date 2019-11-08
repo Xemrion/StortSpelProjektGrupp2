@@ -1,20 +1,7 @@
-//#include "../States/PlayingGameState.h"
 #include "Turret.h"
 
 Turret::Turret()
-{
-	this->sightRange = 23;
-	this->setPosition(Vector3(-15.0f, 0.0f, 0.0f));
-	setUpActor();
-	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
-	turretAngle = 90;
-	this->calculateTarget(turretAngle);
-
-	this->defaultStats = VehicleStats::AITurret;
-	this->updatedStats = this->defaultStats;
-
-	setHealth(this->updatedStats.maxHealth);
-}
+{}
 
 Turret::Turret(float x, float z, int weaponType)
 	: Actor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity, weaponType)
@@ -36,8 +23,8 @@ Turret::Turret(float x, float z, int weaponType)
 
 	this->defaultStats = VehicleStats::AITurret;
 	this->updatedStats = this->defaultStats;
-	this->velocity = Vector3();
 	setHealth(this->updatedStats.maxHealth);
+	this->velocity = Vector3();
 }
 
 Turret::~Turret()

@@ -1,7 +1,7 @@
 #pragma once
 #include"Ranged.h"
-#include"Dynamic.h"
-class Attacker : public Dynamic, public Ranged
+#include"DynamicActor.h"
+class Attacker : public DynamicActor, public Ranged
 {
 public:
 	Attacker();

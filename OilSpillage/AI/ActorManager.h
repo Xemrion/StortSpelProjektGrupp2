@@ -30,14 +30,14 @@ private:
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
 	int groupInRange(Vector3 actorPos, int currentGroupSize);
-	void joinGroup(Dynamic* actor, int groupIndex);
+	void joinGroup(DynamicActor* actor, int groupIndex);
 	void leaveGroup(int groupIndex, int where);
 	void assignPathsToGroups(Vector3 targetPos);
 	void updateGroups();
-	void initGroupForActor(Dynamic* actor);
-	void createGroup(Dynamic* actor);
-	std::vector<Dynamic*> actors;
+	void initGroupForActor(DynamicActor* actor);
+	void createGroup(DynamicActor* actor);
+	std::vector<DynamicActor*> actors;
 	TurretHandler turretHandler;
-	std::vector<Dynamic*> sendToPlayer;
+	std::vector<DynamicActor*> sendToPlayer;
 	AStar* aStar;
 };

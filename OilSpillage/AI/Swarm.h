@@ -1,7 +1,7 @@
 #pragma once
-#include "Dynamic.h"
+#include "DynamicActor.h"
 #include"Melee.h"
-class Swarm : public Dynamic,public Melee
+class Swarm : public DynamicActor,public Melee
 {
 public:
 	Swarm();
