@@ -492,43 +492,37 @@ std::vector<Vertex3D> SkyscraperFloor::getDifferenceAsRoofVerticies(const Skyscr
 {
 	SkyscraperFloor temp(*this);
 	Vector3 shifted = Vector3(0.0f, temp.center.y, 0.0f);
+	std::vector<Vector3> pointsToAdd;
 	bool exists = false;
-	std::pair<size_t, size_t> startIndex(0,0);
-	bool mutualPointFound = false;
-	for (size_t i = 0; i < other.nrOfEdges && !mutualPointFound; i++) {
-		shifted.x = other.verticies[i].x;
-		shifted.z = other.verticies[i].z;
-		for (size_t j = 0; j < temp.nrOfEdges; j++) {
-			if (shifted == temp.verticies[j]) {
-				startIndex.first = i;
-				startIndex.second = j;
-				mutualPointFound = true;
-			}
-		}
-	}
-	size_t insertPos = temp.nrOfEdges + startIndex.second;
+	int insertPos = -1;
+	int postErasePoint = -1;
+	
 	for (size_t i = 0; i < other.nrOfEdges; i++) {
 		exists = false;
-		shifted.x = other.verticies[(i + startIndex.first) % other.nrOfEdges].x;
-		shifted.z = other.verticies[(i + startIndex.first) % other.nrOfEdges].z;
-		for (size_t j = 0; j < temp.nrOfEdges && !exists; j++) {
-			if (shifted == temp.verticies[(j + startIndex.second) % temp.nrOfEdges]) {
-				temp.verticies.erase(temp.verticies.begin() + ((j + startIndex.second) % temp.nrOfEdges));
-				if (j == 0) {
-					j = -1;
+		shifted.x = other.verticies[i].x;
+		shifted.z = other.verticies[i].z;
+		for (int j = 0; j < temp.nrOfEdges && !exists; j++) {
+			if (shifted == temp.verticies[j]) {
+				if (insertPos == -1) {
+					insertPos = j;
+					postErasePoint = pointsToAdd.size();
 				}
-				else {
-					j--;
-				}
+				temp.verticies.erase(temp.verticies.begin() + j);
+				j--;
 				temp.nrOfEdges--;
-				insertPos--;
 				exists = true;
 			}
 		}
 		if (!exists) {
-			temp.verticies.insert(temp.verticies.begin() + (insertPos % temp.nrOfEdges) , shifted);
+			if (insertPos == -1) {
+				pointsToAdd.insert(pointsToAdd.begin(), shifted);
+			}
+			else {
+				pointsToAdd.insert(pointsToAdd.begin() + postErasePoint, shifted);
+			}
 		}
 	}
+	temp.verticies.insert(temp.verticies.begin() + insertPos, pointsToAdd.begin(), pointsToAdd.end());
 	temp.nrOfEdges = temp.verticies.size();
 	temp.getTriangleIndices();
 	std::vector<Vertex3D> roofMesh = temp.getRoofVertices();
