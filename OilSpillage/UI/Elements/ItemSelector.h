@@ -12,7 +12,9 @@ private:
 	Texture* textureBG;
 	Texture* textureIndicator;
 
-	float rotationTimer;
+	float rotationTimers[tileLength];
+	Matrix defaultTransforms[tileLength];
+	Vector3 rotation[tileLength];
 	Matrix transforms[tileLength];
 	int selectedTypeLastDraw;
 	int selectedIndexLastDraw;

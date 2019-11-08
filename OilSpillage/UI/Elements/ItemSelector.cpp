@@ -4,7 +4,7 @@
 
 Vector2 ItemSelector::size = Vector2(512, 128);
 
-ItemSelector::ItemSelector(Vector2 position) : Element(position), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimer(0)
+ItemSelector::ItemSelector(Vector2 position) : Element(position), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimers{ 0 }
 {
 	Game::getGraphics().loadTexture("UI/itemSelectorBG");
 	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
@@ -56,41 +56,35 @@ void ItemSelector::update(float deltaTime)
 			GameObject* object = list->at(this->startIndex[this->selectedType] + i)->getObject();
 			if (object)
 			{
-				transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f));
+				rotationTimers[i] = 0.0f;
+				defaultTransforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f));
+				transforms[i] = defaultTransforms[i];
 				Game::getGraphics().addToUIDraw(object, &transforms[i]);
 			}
 		}
 
 	}
 
-	if (this->selectedTypeLastDraw != -1 && this->selectedTypeLastDraw == this->selectedType && this->selectedIndexLastDraw != this->selectedIndex[this->selectedType])
-	{
-		list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedTypeLastDraw));
-		if (list->size() > 0)
-		{
-			GameObject* object = list->at(this->selectedIndexLastDraw)->getObject();
-			if (object)
-			{
-				int i = this->selectedIndexLastDraw - this->startIndexLastDraw;
-				transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f));
-			}
-		}
-	}
-
+	int selectedIndex = this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType];
 	list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType));
-	if (list->size() > 0)
+
+	for (int i = 0; i < min(list->size(), ItemSelector::tileLength); i++)
 	{
-		GameObject* object = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->at(this->selectedIndex[this->selectedType])->getObject();
-		if (object)
+		GameObject* object = list->at(this->startIndex[this->selectedType] + i)->getObject();
+		if (object == nullptr) continue;
+
+		if (i == selectedIndex)
 		{
-			int i = this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType];
-			rotationTimer = std::fmodf(rotationTimer + deltaTime, XM_2PI);
-			transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f), Vector3(1.2f, 1.2f, 1.2f), Vector3(rotationTimer * XM_PI, 0.0f, 0.0f));
+			rotationTimers[i] = std::fmodf(rotationTimers[i] + deltaTime * 4, XM_2PI);
+			rotation[i] = Vector3(rotationTimers[i], 0.0f, 0.0f);
+			transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f), Vector3(1.2f), rotation[i], false);
 		}
-	}
-	else
-	{
-		rotationTimer = 0.0f;
+		else
+		{
+			rotationTimers[i] = Game::lerp(rotationTimers[i], 0.0f, deltaTime * 4);
+			rotation[i] = Vector3::Lerp(rotation[i], Vector3(), deltaTime * 4);
+			transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f), Vector3(1.0f), rotation[i]);
+		}
 	}
 
 	this->selectedTypeLastDraw = this->selectedType;

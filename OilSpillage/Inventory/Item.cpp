@@ -24,6 +24,7 @@ void Item::init()
 	Item::machineGun->setMaterial(graphics.getMaterial("Entities/Barrel"));
 	Item::machineGun->setScale(Vector3(0.1f));
 	Item::machineGun->setPosition(Item::machineGun->mesh->getAABB().scale(Item::machineGun->getScale()).maxPos * Vector3(0, 1, 0));
+	Item::machineGun->setRotation(Vector3(1.5f, 0.3f, 0.8f));
 
 	Item::allItems = {
 		Item("Test Item", "A very useless thing!", ItemType::WEAPON, nullptr),
@@ -53,10 +54,10 @@ Item* Item::getRandom()
 	return &allItems[rand() % allItems.size()];
 }
 
-Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale, Vector3 rotation)
+Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale, Vector3 rotation, bool ignoreObjectRotation)
 {
 	Matrix transform = Matrix::CreateScale(scale * object->getScale());
-	transform *= Matrix::CreateFromQuaternion(Quaternion::Concatenate(Quaternion::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z), object->getRotationQuaternion()));
+	transform *= Matrix::CreateFromQuaternion(Quaternion::Concatenate(Quaternion::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z), ignoreObjectRotation ? Quaternion() : object->getRotationQuaternion()));
 	transform *= Matrix::CreateTranslation(Game::getGraphics().screenToWorldSpaceUI(screenPos) + object->getPosition());
 	
 	return transform;

@@ -23,6 +23,7 @@ public:
 	static GameState				   *getCurrentState();
 	static void							setState(State);
 	static Graphics					   &getGraphics() noexcept;
+	static float						lerp(float v0, float v1, float t);
 
 private:
 	void								createCurrentState();
