@@ -1,6 +1,10 @@
 #include "ActorManager.h"
 #include "../game.h"
 #include "../States/PlayingGameState.h"
+#include "Attacker.h"
+#include "Swarm.h"
+#include "Car_Spitfire.h"
+
 ActorManager::ActorManager()
 {
 	this->aStar = nullptr;
@@ -24,7 +28,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 {
 	soundTimer += dt;
 	bool hasDied = false;
-	vector<Vector3> temp;
+	std::vector<Vector3> temp;
 	for (int i = 0; i < this->groups.size(); i++)
 	{
 		temp = static_cast<PlayingGameState*>(Game::getCurrentState())->map->getTileMap().getAllTilePositionsInRadius(groups[i].getAveragePos(), 300, Tile::building);
@@ -32,7 +36,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		{
 			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
 			{
-				groups[i].actors[j]->run(actors, dt, temp, targetPos);
+				groups[i].actors[j]->update(dt, targetPos);
 			}
 			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
 			{
@@ -229,7 +233,7 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 	return returnIndex;
 }
 
-void ActorManager::joinGroup(Actor* actor, int groupIndex)
+void ActorManager::joinGroup(Dynamic* actor, int groupIndex)
 {
 	actor->joinGroup();
 	groups.at(groupIndex).actors.push_back(actor);
@@ -259,7 +263,7 @@ void ActorManager::updateGroups()
 	{
 		for (int k = 0; k < groups[i].actors.size(); k++)
 		{
-			Actor* current = groups[i].actors[k];
+			Dynamic* current = groups[i].actors[k];
 			if (current->isDead() or current == nullptr)
 			{
 				leaveGroup(i, k);
@@ -312,7 +316,7 @@ void ActorManager::updateGroups()
 	}
 }
 
-void ActorManager::initGroupForActor(Actor* actor)
+void ActorManager::initGroupForActor(Dynamic* actor)
 {
 	//Is there a group nearby? (Join biggest)
 	int groupIndex = groupInRange(actor->getPosition(), 0);
@@ -327,7 +331,7 @@ void ActorManager::initGroupForActor(Actor* actor)
 	}
 }
 
-void ActorManager::createGroup(Actor* actor)
+void ActorManager::createGroup(Dynamic* actor)
 {
 	AIGroup temp;
 	temp.actors.push_back(actor);

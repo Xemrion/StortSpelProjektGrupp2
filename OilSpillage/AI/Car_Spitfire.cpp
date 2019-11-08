@@ -23,7 +23,7 @@ void Spitfire::setUpActor()
 }
 
 Spitfire::Spitfire(float x, float z, Physics* physics)
-	: Actor(x, z)
+	: Dynamic(x,z)
 {
 	this->direction = Vector3(1, 0, 0);
 	//this->setScale(Vector3(0.01f, 0.01f, 0.01f));
@@ -36,8 +36,7 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	car->getVehicleBody1()->setPosition(Vector3(position.x, 0 - 1.2f + 0.65f, position.z));
 	this->defaultStats = VehicleStats::AIAttacker;
 	this->updatedStats = this->defaultStats;
-	this->health = this->updatedStats.maxHealth;
-	boidOffset = 0;
+	setHealth(this->updatedStats.maxHealth);
 	//Game::getGraphics().loadModel("Entities/Dummy_Player_Car1");
 	//this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
 	//this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car1"));
@@ -119,6 +118,7 @@ void Spitfire::update(float dt, Vector3 targetPos)
 	if (this->state != State::Idle)
 	{
 		followPath();
+		move();
 	}
 	updateVehicle();
 	this->setPosition(car->getVehicle()->getPosition());

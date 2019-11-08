@@ -40,7 +40,6 @@ void TurretHandler::update(float dt, DirectX::SimpleMath::Vector3 targetPos)
 		{
 			if (turrets[i]->isDead())
 			{
-				turrets[i]->death();
 				delete turrets[i];
 				turrets.erase(turrets.begin() + i);
 			}

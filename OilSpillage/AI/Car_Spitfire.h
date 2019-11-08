@@ -1,7 +1,7 @@
 #pragma once
-#include "Actor.h"
+#include "Dynamic.h"
 #include "AIVehicle.h"
-class Spitfire : public Actor
+class Spitfire : public Dynamic
 {
 private:
 	void setUpActor();

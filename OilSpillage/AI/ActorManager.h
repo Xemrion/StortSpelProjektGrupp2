@@ -1,9 +1,8 @@
 #pragma once
 #include "AIGroup.h"
-#include "Car_Spitfire.h"
 class Physics;
 #include "TurretHandler.h"
-#include "Swarm.h"
+#include "AStar.h"
 class ActorManager
 {
 public:
@@ -31,14 +30,14 @@ private:
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
 	int groupInRange(Vector3 actorPos, int currentGroupSize);
-	void joinGroup(Actor* actor, int groupIndex);
+	void joinGroup(Dynamic* actor, int groupIndex);
 	void leaveGroup(int groupIndex, int where);
 	void assignPathsToGroups(Vector3 targetPos);
 	void updateGroups();
-	void initGroupForActor(Actor* actor);
-	void createGroup(Actor* actor);
-	std::vector<Actor*> actors;
+	void initGroupForActor(Dynamic* actor);
+	void createGroup(Dynamic* actor);
+	std::vector<Dynamic*> actors;
 	TurretHandler turretHandler;
-	std::vector<Actor*> sendToPlayer;
+	std::vector<Dynamic*> sendToPlayer;
 	AStar* aStar;
 };

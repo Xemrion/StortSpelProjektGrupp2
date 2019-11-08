@@ -1,6 +1,5 @@
-#include "../States/PlayingGameState.h"
 #include "Attacker.h"
-
+#include"../States/PlayingGameState.h"
 Attacker::Attacker()
 {
 	setUpActor();
@@ -8,11 +7,11 @@ Attacker::Attacker()
 
 	this->defaultStats = VehicleStats::AIAttacker;
 	this->updatedStats = this->defaultStats;
-	this->health = this->updatedStats.maxHealth;
+	setHealth(this->updatedStats.maxHealth);
 }
 
 Attacker::Attacker(float x, float z, int weaponType)
-	:Actor(x, z, weaponType)
+	:Dynamic(x,z),Ranged(&this->position,&this->targetPos,&this->velocity,weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
@@ -20,7 +19,7 @@ Attacker::Attacker(float x, float z, int weaponType)
 
 	this->defaultStats = VehicleStats::AIAttacker;
 	this->updatedStats = this->defaultStats;
-	this->health = this->updatedStats.maxHealth;
+	setHealth(this->updatedStats.maxHealth);
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
@@ -28,20 +27,27 @@ Attacker::Attacker(float x, float z, int weaponType)
 	boidOffset = 9;
 }
 
+void Attacker::update(float dt, Vector3 targetPos)
+{
+	this->deltaTime = dt;
+	this->targetPos = targetPos;
+	this->root->func();
+	this->updateBullets(dt);
+	if (this->state != State::Idle)
+	{
+		followPath();
+		move();
+	}
+	else
+	{
+		//idle
+	}
+}
+
 Attacker::~Attacker()
 {
 	Game::getGraphics().removeFromDraw(this);
 }
-
-void Attacker::update(float dt, Vector3 targetPos)
-{
-	this->targetPos = targetPos;
-	deltaTime = dt;
-	updateBullets(dt);
-	this->root->func();
-	followPath();
-}
-
 void Attacker::setUpActor()
 {
 	this->root = &bt.getSelector();

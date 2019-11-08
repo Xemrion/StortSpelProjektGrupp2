@@ -1,4 +1,4 @@
-#include "../States/PlayingGameState.h"
+//#include "../States/PlayingGameState.h"
 #include "Turret.h"
 
 Turret::Turret()
@@ -13,11 +13,11 @@ Turret::Turret()
 	this->defaultStats = VehicleStats::AITurret;
 	this->updatedStats = this->defaultStats;
 
-	this->health = this->updatedStats.maxHealth;
+	setHealth(this->updatedStats.maxHealth);
 }
 
 Turret::Turret(float x, float z, int weaponType)
-	: Actor(x, z, weaponType)
+	: Actor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 23;
@@ -37,7 +37,7 @@ Turret::Turret(float x, float z, int weaponType)
 	this->defaultStats = VehicleStats::AITurret;
 	this->updatedStats = this->defaultStats;
 	this->velocity = Vector3();
-	this->health = this->updatedStats.maxHealth;
+	setHealth(this->updatedStats.maxHealth);
 }
 
 Turret::~Turret()

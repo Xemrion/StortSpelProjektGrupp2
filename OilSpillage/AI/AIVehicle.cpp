@@ -2,7 +2,7 @@
 #include "..//game.h"
 #include "..//Sound.h"
 #include "..//Input.h"
-#include "..//States/PlayingGameState.h"
+//#include "..//States/PlayingGameState.h"
 AIVehicle::AIVehicle()
 {
 	velocity = Vector2(0.0f, 0.0f);
@@ -288,9 +288,9 @@ void AIVehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 	//AccelForce
 	if ((max(abs(accelForce.x), abs(accelForce.z)) > 5.0f)) {
 		int randomSound = rand() % 3 + 1;
-		std::wstring soundEffect = L"data/sound/CarImpact" + to_wstring(randomSound) + L".wav";
+		std::wstring soundEffect = L"data/sound/CarImpact" + std::to_wstring(randomSound) + L".wav";
 		int randomSound2 = rand() % 3 + 1;
-		std::wstring soundEffect2 = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
+		std::wstring soundEffect2 = L"data/sound/MetalImpactPitched" + std::to_wstring(randomSound) + L".wav";
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
 			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-20.0f);

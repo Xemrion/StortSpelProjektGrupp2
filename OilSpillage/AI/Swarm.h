@@ -1,15 +1,14 @@
 #pragma once
-#include "Actor.h"
-class Swarm : public Actor
+#include "Dynamic.h"
+#include"Melee.h"
+class Swarm : public Dynamic,public Melee
 {
 public:
 	Swarm();
 	Swarm(float x, float z, int weaponType);
 	~Swarm();
-	void update(float dt, Vector3 targetPos);
 
 private:
 	void setUpActor();
-	Status shoot();
 };
 

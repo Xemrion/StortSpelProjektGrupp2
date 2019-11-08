@@ -1,12 +1,11 @@
 #pragma once
-#include "Attacker.h"
-#include "Turret.h"
+#include"Dynamic.h"
 class AIGroup
 {
 public:
 	AIGroup();
 	~AIGroup();
-	std::vector<Actor*> actors;
+	std::vector<Dynamic*> actors;
 
 	Vector3 getAveragePos();
 	float getGroupRadius();

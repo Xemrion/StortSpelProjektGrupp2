@@ -79,6 +79,9 @@
     <ClCompile Include="AI\Car_Spitfire.cpp" />
     <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="AI\AIVehicle.cpp" />
+    <ClCompile Include="AI\Ranged.cpp" />
+    <ClCompile Include="AI\Dynamic.cpp" />
+    <ClCompile Include="AI\Melee.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -140,7 +143,6 @@
     <ClInclude Include="UI\UIPaused.h" />
     <ClInclude Include="UI\UIPlaying.h" />
     <ClInclude Include="UI\UserInterface.h" />
-    <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="window.h" />
@@ -163,6 +165,10 @@
     <ClInclude Include="AI\Swarm.h" />
     <ClInclude Include="AI\Car_Spitfire.h" />
     <ClInclude Include="AI\AIVehicle.h" />
+    <ClInclude Include="AI\Ranged.h" />
+    <ClInclude Include="AI\Dynamic.h" />
+    <ClInclude Include="AI\Melee.h" />
+    <ClInclude Include="Vehicle.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

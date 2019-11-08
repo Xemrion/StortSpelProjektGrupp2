@@ -17,7 +17,7 @@ void PlayingGameState::initAI()
 	{
 		for (int j = 0; j < 1; j++)
 		{
-			actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + 10 + i, map->getStartPositionInWorldSpace().z + 200 + j,physics.get());
+			actorManager->createSpitFire(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z,physics.get());
 		}
 	}
 }
@@ -246,7 +246,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
-	ImGui::Text(("Rotation: " + to_string(player->getRotator())).c_str());
+	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
 	ImGui::Text("Driving Mode:");
 	static int radioButtonValue = 0;
 	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
@@ -516,7 +516,7 @@ void PlayingGameState::update(float deltaTime)
 
 		if (!pausedTime && time > 0.0f)
 		{
-			time = max(time - deltaTime, 0.0f);
+			time = std::max(time - deltaTime, 0.0f);
 		}
 		else if (time <= 0.0f)
 		{
@@ -525,7 +525,7 @@ void PlayingGameState::update(float deltaTime)
 #else
 		if (time > 0.0f)
 		{
-			time = max(time - deltaTime, 0.0f);
+			time = std::max(time - deltaTime, 0.0f);
 		}
 		else if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 		{
@@ -678,11 +678,11 @@ F32 PlayingGameState::getTime() const noexcept {
 }
 
 void PlayingGameState::setTime(float time) noexcept {
-	time = max(time, .0f);
+	time = std::max(time, .0f);
 }
 
 void PlayingGameState::changeTime(float timeDiff) noexcept {
-	time = max(time + timeDiff, .0f);
+	time = std::max(time + timeDiff, .0f);
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
@@ -970,7 +970,7 @@ void PlayingGameState::paperCollision(float deltaTime)
 			randomValue = rand() % 2;
 			if (((player->getVehicle()->getPosition() - obj->getPosition()).Length()) < 1.5f && abs(player->getVelocitySpeed()) > 8.0f && randomValue == 1) {
 				randomValue = rand() % 20;
-				randomValue = max(randomValue-5.0f,0.0f);
+				randomValue = std::max(randomValue-5.0f,0.0f);
 				obj->setVelocity(Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(),randomValue*0.5f, player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()));
 				obj->setPosition(obj->getPosition() + Vector3(0, 0.1f, 0));
 			}

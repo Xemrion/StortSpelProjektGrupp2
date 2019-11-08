@@ -184,7 +184,7 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 		{
 			if (soundTimer > 0.05f) {
 				int randomSound = rand() % 3 + 1;
-				std::wstring soundEffect = L"data/sound/CarGlass" + to_wstring(randomSound) + L".wav";
+				std::wstring soundEffect = L"data/sound/CarGlass" + std::to_wstring(randomSound) + L".wav";
 				Sound::PlaySoundEffect(soundEffect);
 				Sound::PlaySoundEffect(L"data/sound/MetalImpact1.wav");
 				soundTimer = 0;

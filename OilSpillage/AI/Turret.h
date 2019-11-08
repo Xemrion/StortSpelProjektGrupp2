@@ -1,8 +1,7 @@
-
 #pragma once
+#include "Ranged.h"
 #include "Actor.h"
-
-class Turret : public Actor
+class Turret : public Actor,public Ranged
 {
 public:
 	Turret();

@@ -1,6 +1,6 @@
 #pragma once
-#include "Actor.h"
-
+#include"..//VehicleStats.h"
+#include "..//GameObject.h"
 class AIVehicle
 {
 private:
@@ -12,7 +12,6 @@ private:
 	GameObject* wheel4;
 
 	GameObject* vehicleBody1;
-	SpotLight* spotLight;
 	int health;
 
 	Stats defaultStats;
