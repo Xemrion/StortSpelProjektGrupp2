@@ -29,19 +29,8 @@ Attacker::Attacker(float x, float z, int weaponType)
 
 void Attacker::update(float dt, Vector3 targetPos)
 {
-	this->deltaTime = dt;
-	this->targetPos = targetPos;
-	this->root->func();
+	Dynamic::update(dt, targetPos);
 	this->updateBullets(dt);
-	if (this->state != State::Idle)
-	{
-		followPath();
-		move();
-	}
-	else
-	{
-		//idle
-	}
 }
 
 Attacker::~Attacker()

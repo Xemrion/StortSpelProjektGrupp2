@@ -47,10 +47,8 @@ Turret::~Turret()
 
 void Turret::update(float dt, Vector3 targetPos)
 {
-	this->deltaTime = dt;
-	this->targetPos = targetPos;
+	Actor::update(dt, targetPos);
 	updateBullets(dt);
-	this->root->func();
 
 }
 

@@ -56,9 +56,7 @@ void Dynamic::setPath(std::vector<Vector3>* path)
 
 void Dynamic::update(float dt, Vector3 targetPos)
 {
-	this->deltaTime = dt;
-	this->targetPos = targetPos;
-	this->root->func();
+	Actor::update(dt, targetPos);
 	if (this->state != State::Idle)
 	{
 		followPath();

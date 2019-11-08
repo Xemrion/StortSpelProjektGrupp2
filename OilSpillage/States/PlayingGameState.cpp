@@ -17,7 +17,7 @@ void PlayingGameState::initAI()
 	{
 		for (int j = 0; j < 1; j++)
 		{
-			actorManager->createSpitFire(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z,physics.get());
+			actorManager->createAttacker(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
 		}
 	}
 }

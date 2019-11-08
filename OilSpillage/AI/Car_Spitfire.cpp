@@ -112,14 +112,7 @@ void Spitfire::move()
 
 void Spitfire::update(float dt, Vector3 targetPos)
 {
-	this->deltaTime = dt;
-	this->targetPos = targetPos;
-	this->root->func();
-	if (this->state != State::Idle)
-	{
-		followPath();
-		move();
-	}
+	Dynamic::update(dt, targetPos);
 	updateVehicle();
 	this->setPosition(car->getVehicle()->getPosition());
 }
