@@ -59,12 +59,15 @@ protected:
 	State state;
 	BT bt;
 	Vector3 targetPos;
+	WaitTimer patrol;
 
 	virtual Status shoot();
 	virtual Status inAttackRange();	
 	virtual Status enemyNear();
 	virtual Status setChaseState();
 	virtual Status setRoamState();
+	virtual Status WaitTime();
+
 	virtual void  followPath();
 	virtual void  updateWeapon(float deltaTime);
 	virtual void assignWeapon(int weaponType);

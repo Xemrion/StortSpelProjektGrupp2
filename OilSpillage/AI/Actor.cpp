@@ -13,6 +13,11 @@ Actor::Actor()
 	this->maxForce = 0.5f;
 
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+
+	/*Patrol exemple*/
+	patrol.wait_time = 0.5;
+	patrol.time_left = patrol.wait_time;
+	patrol.repeatable = true;
 }
 
 Actor::Actor(float x, float z, int weaponType)
@@ -29,6 +34,11 @@ Actor::Actor(float x, float z, int weaponType)
 	this->maxForce = 0.5f;
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	assignWeapon(weaponType);
+
+	/*Patrol exemple*/
+	patrol.wait_time = 0.5;
+	patrol.time_left = patrol.wait_time;
+	patrol.repeatable = true;
 }
 
 void Actor::assignWeapon(int weaponType)
@@ -166,6 +176,25 @@ Status Actor::setRoamState()
 {
 	this->state = State::Roaming;
 	return Status::SUCCESS;
+}
+
+Status Actor::WaitTime()
+{	/* Timer "Patrol" needs to be set in somwhere else before we call this action	*/
+	/*	Timer will start when we first Enter this action	*/
+
+	Status status = Status::WAIT;
+	if (patrol.time_left <= 0.0f)
+	{
+		status = Status::SUCCESS;
+		patrol.time_left = 0;
+		if (patrol.repeatable)
+		{
+			patrol.time_left = patrol.wait_time;
+		}
+	}
+
+	patrol.time_left -= (deltaTime / 10);
+	return status;
 }
 
 void Actor::followPath()
