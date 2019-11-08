@@ -77,7 +77,6 @@
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
-    <ClCompile Include="PG\Modelizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -156,7 +155,6 @@
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
     <ClInclude Include="UI\ObjectiveBox.h" />
     <ClInclude Include="AI\AIGroup.h" />
-    <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="UI\UIControls.h" />
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="AI\Swarm.h" />

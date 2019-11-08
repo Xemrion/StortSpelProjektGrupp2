@@ -39,6 +39,8 @@ using F64  = double;
 using Bool = bool;
 using Size = size_t;
 
+using RGBA = U32;
+
 #ifdef _DEBUG
    Bool constexpr isDebugging {  true };
 #else

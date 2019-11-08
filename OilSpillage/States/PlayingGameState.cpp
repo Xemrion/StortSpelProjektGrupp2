@@ -100,7 +100,17 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("Tiles/concrete");
 	graphics.loadTexture("Tiles/concrete_nor");
 
-
+	graphics.loadTexture("Tiles/road_2file_deadend_n");
+	graphics.loadTexture("Tiles/road_2file_deadend_n_nor");
+	graphics.loadTexture("Tiles/road_2file_turn_ne");
+	graphics.loadTexture("Tiles/road_2file_turn_ne_nor");
+	graphics.loadTexture("Tiles/road_2file_straight_n");
+	graphics.loadTexture("Tiles/road_2file_straight_n_nor");
+	graphics.loadTexture("Tiles/road_2file_3way_n");
+	graphics.loadTexture("Tiles/road_2file_3way_n_nor");
+	graphics.loadTexture("Tiles/road_2file_4way");
+	graphics.loadTexture("Tiles/road_2file_4way_nor");
+	// missing: single tile road!
 
 	graphics.loadModel("Hospital");
 	//graphics.loadModel("Roads/Road_pavement");
