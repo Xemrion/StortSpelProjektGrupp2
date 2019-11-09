@@ -12,7 +12,6 @@ private:
 	GameObject* wheel4;
 
 	GameObject* vehicleBody1;
-	int health;
 
 	Stats defaultStats;
 	Stats updatedStats;
@@ -31,6 +30,7 @@ private:
 	float velocitySpeed;
 	class Physics* physics;
 
+	int health;
 public:
 	AIVehicle();
 	virtual ~AIVehicle();
@@ -45,6 +45,10 @@ public:
 	void setWheelRotation();
 	//void onCollision(Vector2 direction);
 
+
+	float getYaw(DirectX::XMVECTOR Quaternion);
+	float getHeading(Quaternion qt);
+
 	const int& getHealthRef() const;
 	int getHealth() const;
 	int getMaxHealth() const;
@@ -52,7 +56,4 @@ public:
 	void setMaxHealth(int maxHealth);
 	void resetHealth();
 	void changeHealth(int amount);
-
-	float getYaw(DirectX::XMVECTOR Quaternion);
-	float getHeading(Quaternion qt);
 };

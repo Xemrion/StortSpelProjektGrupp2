@@ -277,10 +277,6 @@ void AIVehicle::update(float deltaTime, float throttleInputStrength, bool thrott
 
 }
 
-const int& AIVehicle::getHealthRef() const
-{
-	return this->health;
-}
 
 void AIVehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 {
@@ -357,6 +353,10 @@ float AIVehicle::getHeading(Quaternion qt)
 		bank = atan2(2 * qt.x * qt.w - 2 * qt.y * qt.z, 1 - 2 * sqx - 2 * sqz);
 	}
 	return heading;
+}
+const int& AIVehicle::getHealthRef() const
+{
+	return this->health;
 }
 int AIVehicle::getHealth() const
 {
