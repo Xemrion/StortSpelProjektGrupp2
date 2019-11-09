@@ -8,20 +8,23 @@ private:
 	Vector3* positionPtr;
 	Vector3* targetPosPtr;
 	Vector3* velocityPtr;
+
+	float timeSinceLastShot;
+	bool predicting = false;
+	Weapon weapon;
+
+	static const int bulletCount = 32;
+	Bullet bullets[bulletCount];
+
+	void assignWeapon(int weaponType);
+protected:
+	int attackRange;
+	void updateBullets(float deltaTime);
+	virtual Status shoot();
+	Status inAttackRange();
+
 public:
 	Ranged();
 	Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType);
-protected:
-	static const int bulletCount = 32;
-	bool predicting = false;
-	int attackRange = 8;
-
-	float timeSinceLastShot;
-	Bullet bullets[bulletCount];
-	virtual void  updateBullets(float deltaTime);
-	virtual Status inAttackRange();
-	virtual void assignWeapon(int weaponType);
-	Weapon weapon;
-	virtual Status shoot();
-
+	virtual ~Ranged();
 };

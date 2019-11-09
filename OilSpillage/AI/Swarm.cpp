@@ -12,9 +12,8 @@ Swarm::Swarm(float x, float z, int weaponType)
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
 
-	this->defaultStats = VehicleStats::AISwarm;
-	this->updatedStats = this->defaultStats;
-	setHealth(this->updatedStats.maxHealth);
+	this->stats = VehicleStats::AISwarm;
+	setHealth(this->stats.maxHealth);
 	Game::getGraphics().loadModel("Entities/Drone");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Drone");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Drone"));

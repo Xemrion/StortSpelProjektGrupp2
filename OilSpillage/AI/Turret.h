@@ -6,7 +6,7 @@ class Turret : public Actor,public Ranged
 public:
 	Turret();
 	Turret(float x, float z, int weaponType);
-	~Turret();
+	virtual ~Turret();
 	void update(float dt, Vector3 targetPos);
 private:
 	void setForwardVector(Vector3 forward);

@@ -34,9 +34,8 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	car->init(physics);
 	car->getVehicle()->setPosition(Vector3(position.x, 0 - 1.2f, position.z));
 	car->getVehicleBody1()->setPosition(Vector3(position.x, 0 - 1.2f + 0.65f, position.z));
-	this->defaultStats = VehicleStats::AIAttacker;
-	this->updatedStats = this->defaultStats;
-	setHealth(this->updatedStats.maxHealth);
+	this->stats = VehicleStats::AIAttacker;
+	setHealth(this->stats.maxHealth);
 	//Game::getGraphics().loadModel("Entities/Dummy_Player_Car1");
 	//this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
 	//this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car1"));
@@ -46,10 +45,6 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 
 Spitfire::Spitfire()
 {
-	/* should not go inside here*/
-	this->deltaTime = 0;
-	//this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
-	//this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car1"));
 }
 
 Spitfire::~Spitfire()
@@ -85,6 +80,8 @@ void Spitfire::updateVehicle()
 	Vector3 accelForce = Vector3(car->getVehicle()->getRigidBody()->getLinearVelocity().getX(), car->getVehicle()->getRigidBody()->getLinearVelocity().getY(), car->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 	car->setAccelForce(accelForce, deltaTime);
 	car->setWheelRotation();
+	this->setPosition(car->getVehicle()->getPosition());
+
 }
 
 void Spitfire::move()
@@ -114,7 +111,6 @@ void Spitfire::update(float dt, Vector3 targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	updateVehicle();
-	this->setPosition(car->getVehicle()->getPosition());
 }
 
 void Spitfire::followPath()

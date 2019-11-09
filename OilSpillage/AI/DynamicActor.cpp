@@ -2,15 +2,19 @@
 
 DynamicActor::DynamicActor()
 {
-	this->maxSpeed = 3.5f;
-	this->maxForce = 0.5f;
-	this->acceleration = Vector3(0.0f);
-
 }
 
 DynamicActor::DynamicActor(float x, float z)
 	:Actor(x, z)
 {
+	this->maxSpeed = 3.5f;
+	this->maxForce = 0.5f;
+	this->acceleration = Vector3(0.0f);
+	this->boidOffset = 9;
+	this->path = nullptr;
+	this->state = State::Idle;
+	this->aggroRange = 20;
+
 }
 
 DynamicActor::~DynamicActor()
@@ -30,7 +34,7 @@ void DynamicActor::move()
 		velocity /= velocity.Length();
 	}
 
-	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * updatedStats.maxSpeed;
+	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed;
 	Vector3 targetToSelf = (temp - position);
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)
@@ -197,7 +201,7 @@ Status DynamicActor::enemyNear()
 {
 	Status status;
 
-	if ((getPosition() - targetPos).Length() > 20)
+	if ((getPosition() - targetPos).Length() > aggroRange)
 	{
 		status = Status::FAILURE;
 	}

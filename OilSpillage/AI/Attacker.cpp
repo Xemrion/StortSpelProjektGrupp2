@@ -2,29 +2,21 @@
 #include"../States/PlayingGameState.h"
 Attacker::Attacker()
 {
-	setUpActor();
-	Game::getGraphics().addToDraw(this);
-
-	this->defaultStats = VehicleStats::AIAttacker;
-	this->updatedStats = this->defaultStats;
-	setHealth(this->updatedStats.maxHealth);
 }
 
 Attacker::Attacker(float x, float z, int weaponType)
-	:DynamicActor(x,z),Ranged(&this->position,&this->targetPos,&this->velocity,weaponType)
+	:DynamicActor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
 	Game::getGraphics().addToDraw(this);
 
-	this->defaultStats = VehicleStats::AIAttacker;
-	this->updatedStats = this->defaultStats;
-	setHealth(this->updatedStats.maxHealth);
+	this->stats = VehicleStats::AIAttacker;
+	setHealth(this->stats.maxHealth);
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 
-	boidOffset = 9;
 }
 
 void Attacker::update(float dt, Vector3 targetPos)

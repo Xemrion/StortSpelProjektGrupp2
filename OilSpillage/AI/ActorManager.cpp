@@ -235,7 +235,6 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 
 void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 {
-	actor->joinGroup();
 	groups.at(groupIndex).actors.push_back(actor);
 }
 
@@ -336,6 +335,5 @@ void ActorManager::createGroup(DynamicActor* actor)
 	AIGroup temp;
 	temp.actors.push_back(actor);
 	temp.updateAveragePos();
-	actor->joinGroup();
 	groups.push_back(temp);
 }

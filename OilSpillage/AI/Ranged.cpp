@@ -97,8 +97,6 @@ Status Ranged::shoot()
 }
 Ranged::Ranged()
 {
-	this->timeSinceLastShot = 0;
-	//Assign weapon()
 }
 
 Ranged::Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType)
@@ -106,5 +104,10 @@ Ranged::Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponTy
 	this->positionPtr = pos;
 	this->targetPosPtr = targetPos;
 	this->velocityPtr = velocity;
+	this->attackRange = 8;
 	assignWeapon(weaponType);
+}
+
+Ranged::~Ranged()
+{
 }

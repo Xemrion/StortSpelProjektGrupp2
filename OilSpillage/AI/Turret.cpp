@@ -11,7 +11,6 @@ Turret::Turret(float x, float z, int weaponType)
 	turretAngle = 90;
 	this->calculateTarget(turretAngle);
 	setUpActor();
-	vecForward.Normalize();
 	this->body.setPosition(this->position);
 	this->body.setScale(this->scale);
 	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Turret");
@@ -21,9 +20,8 @@ Turret::Turret(float x, float z, int weaponType)
 	Game::getGraphics().addToDraw(&this->body);
 	Game::getGraphics().addToDraw(this);
 
-	this->defaultStats = VehicleStats::AITurret;
-	this->updatedStats = this->defaultStats;
-	setHealth(this->updatedStats.maxHealth);
+	this->stats = VehicleStats::AITurret;
+	setHealth(this->stats.maxHealth);
 	this->velocity = Vector3();
 }
 
@@ -36,7 +34,6 @@ void Turret::update(float dt, Vector3 targetPos)
 {
 	Actor::update(dt, targetPos);
 	updateBullets(dt);
-
 }
 
 void Turret::setForwardVector(Vector3 forward)

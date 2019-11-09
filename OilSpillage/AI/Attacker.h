@@ -6,9 +6,8 @@ class Attacker : public DynamicActor, public Ranged
 public:
 	Attacker();
 	Attacker(float x, float z, int weaponType);
+	virtual ~Attacker();
 	void update(float dt, Vector3 targetPos);
-
-	~Attacker();
 private:
 	void setUpActor();
 

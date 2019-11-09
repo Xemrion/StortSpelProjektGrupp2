@@ -707,3 +707,5 @@ OilSpillage/PG/Logs/*.txt
 OilSpillage/data/logs/profiler/*.txt
 OilSpillage/data/map/*.tga
 OilSpillage/data/textures/map/map.tga
+/OilSpillage/BulletSDK/include/out/build/x64-Debug
+/OilSpillage/glm/out/build/x64-Debug
