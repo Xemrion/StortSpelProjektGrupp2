@@ -44,13 +44,13 @@ void Attacker::setUpActor()
 	roam.addAction(std::bind(&Attacker::setIdleState, std::ref(*this)));
 	Behavior& shoot = bt.getAction();
 	shoot.addAction(std::bind(&Attacker::shoot, std::ref(*this)));
-	Behavior& enemyNear = bt.getAction();
-	enemyNear.addAction(std::bind(&Attacker::enemyNear, std::ref(*this)));
+	Behavior& inAggroRange = bt.getAction();
+	inAggroRange.addAction(std::bind(&Attacker::inAggroRange, std::ref(*this)));
 
 	root->addChildren(sequence);
 	root->addChildren(roam);
 
-	sequence.addChildren(enemyNear);
+	sequence.addChildren(inAggroRange);
 	sequence.addChildren(selector);
 
 	selector.addChildren(seq2);

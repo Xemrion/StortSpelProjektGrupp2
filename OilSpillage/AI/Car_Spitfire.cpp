@@ -7,7 +7,7 @@ void Spitfire::setUpActor()
 	Sequence& sequence = bt.getSequence();
 
 	Behavior& inRange = bt.getAction();
-	inRange.addAction(std::bind(&Spitfire::inRange, std::ref(*this)));
+	inRange.addAction(std::bind(&Spitfire::inAggroRange, std::ref(*this)));
 
 	Behavior& idle = bt.getAction();
 	idle.addAction(std::bind(&Spitfire::setIdleState, std::ref(*this)));
@@ -36,6 +36,8 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	car->getVehicleBody1()->setPosition(Vector3(position.x, 0 - 1.2f + 0.65f, position.z));
 	this->stats = VehicleStats::AIAttacker;
 	setHealth(this->stats.maxHealth);
+	this->aggroRange = 500; //TODO: Find better aggro range 
+
 	//Game::getGraphics().loadModel("Entities/Dummy_Player_Car1");
 	//this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
 	//this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car1"));
@@ -50,27 +52,6 @@ Spitfire::Spitfire()
 Spitfire::~Spitfire()
 {
 	delete this->car;
-}
-
-Status Spitfire::inRange()
-{
-	Status status;
-
-	if ((car->getVehicle()->getPosition() - targetPos).Length() <= chaseRange)
-	{
-		status = Status::SUCCESS;
-	}
-	else
-	{
-		status = Status::FAILURE;
-	}
-	return status;
-}
-
-Status Spitfire::vehicleUpdate()
-{
-	this->updateVehicle();
-	return Status::SUCCESS;
 }
 
 void Spitfire::updateVehicle()

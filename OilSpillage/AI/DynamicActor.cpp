@@ -197,7 +197,7 @@ Status DynamicActor::setChaseState()
 	return Status::SUCCESS;
 }
 
-Status DynamicActor::enemyNear()
+Status DynamicActor::inAggroRange()
 {
 	Status status;
 

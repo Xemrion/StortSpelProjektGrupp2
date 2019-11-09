@@ -31,7 +31,7 @@ protected:
 	virtual Vector3 seek();
 	virtual void followPath();
 	Status setChaseState();
-	Status enemyNear();
+	Status inAggroRange();
 	Status setIdleState();
 
 };
