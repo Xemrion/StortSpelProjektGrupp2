@@ -34,7 +34,6 @@ solver(new btSequentialImpulseConstraintSolver)
 
 Physics::~Physics()
 {
-
 	//osäker på om man deletar på detta sätt
 	for (int i = 0; i < bodies.size(); i++)
 	{
@@ -44,6 +43,10 @@ Physics::~Physics()
 		delete bodies[i];
 		delete shape;
 		delete motionState;
+	}
+	for (int i = 0; i < pointJoints.size(); i++)
+	{
+		delete pointJoints[i];
 	}
 	delete dispatcher;
 	delete collisionConfig;

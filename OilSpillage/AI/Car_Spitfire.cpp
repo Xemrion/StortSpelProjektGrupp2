@@ -73,7 +73,6 @@ Spitfire::~Spitfire()
 	delete wheel2;
 	delete wheel3;
 	delete wheel4;
-	//delete this->car;
 }
 
 void Spitfire::updateVehicle()
@@ -113,7 +112,7 @@ void Spitfire::move()
 void Spitfire::update(float dt, Vector3 targetPos)
 {
 	DynamicActor::update(dt, targetPos);
-	updateVehicle();
+	//updateVehicle();
 }
 
 void Spitfire::followPath()
@@ -190,15 +189,17 @@ void Spitfire::init(Physics* physics)
 	vehicle->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicle->getRigidBody()->setFriction(0);
 	vehicle->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
-
-	tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y + 0.65f, vehicle->getPosition().z), -btVector3(this->vehicleBody1->getAABB().minPos.x - this->vehicleBody1->getAABB().maxPos.x, (this->vehicleBody1->getAABB().minPos.y - this->vehicleBody1->getAABB().maxPos.y) * 0.2f, this->vehicleBody1->getAABB().minPos.z - this->vehicleBody1->getAABB().maxPos.z) * 0.5f, 1.0f);
+	AABB vehicleBodyAABB = vehicleBody1->getAABB();
+	btVector3 origin = btVector3(vehicle->getPosition().x, vehicle->getPosition().y + 0.65f, vehicle->getPosition().z);
+	btVector3 size = btVector3(vehicleBodyAABB.maxPos.x - vehicleBodyAABB.minPos.x,
+		(vehicleBodyAABB.maxPos.y - vehicleBodyAABB.minPos.y) * 0.2f,
+		vehicleBodyAABB.maxPos.z - vehicleBodyAABB.minPos.z) * 0.5f;
+	tempo = physics->addBox(origin, size, 1.0f);
 	vehicleBody1->setRigidBody(tempo, physics);
 	vehicleBody1->getRigidBody()->activate();
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicleBody1->getRigidBody()->setFriction(1);
-
 	physics->addPointJoint(this->vehicle->getRigidBody(), this->vehicleBody1->getRigidBody());
-
 }
 
 void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)

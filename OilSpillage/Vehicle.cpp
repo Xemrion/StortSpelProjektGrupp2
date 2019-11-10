@@ -57,7 +57,6 @@ Vehicle::~Vehicle()
 	delete wheel3;
 	delete wheel4;
 	delete spring1;
-	delete pointJoint;
 	delete frontWeapon;
 }
 
