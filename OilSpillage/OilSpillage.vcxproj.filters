@@ -82,6 +82,7 @@
     <ClCompile Include="AI\Ranged.cpp" />
     <ClCompile Include="AI\Melee.cpp" />
     <ClCompile Include="AI\DynamicActor.cpp" />
+    <ClCompile Include="AI\Boss.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="AI\Melee.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="AI\DynamicActor.h" />
+    <ClInclude Include="AI\Boss.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

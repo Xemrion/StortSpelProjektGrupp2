@@ -14,12 +14,18 @@ public:
 	void createAttacker(float x, float z, int weaponType = 1);
 	void createTurret(float x, float z, int weaponType = 1);
 	void createSwarm(float x, float z, int weaponType = 1);
+	void createBoss(float x, float z, int weaponType = 1);
+
 	void createSpitFire(float x, float z, Physics* physics);
 
 	float distanceToPlayer(const Vector3& position);
 	const std::vector<AIGroup>& getGroups() const;
 	void spawnAttackers(Vector3 originPos, int weaponType);
 	void spawnTurrets(Vector3 position, Radius radius, float angle, int weaponType);
+	void spawnBoss(Vector3 originPos, int weaponType);
+	Vector2& generateRandom(const float& x, const float& z, Radius radius);
+	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
+	void seperation(Vector3 targetPos);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
 private:
 	const float groupRadius = 6.5f * 6.5f; //Compare with distance^2

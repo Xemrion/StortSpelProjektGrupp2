@@ -13,7 +13,7 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	for(int i = 0; i < 1; i++)
+	for(int i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < 1; j++)
 		{
@@ -552,6 +552,16 @@ void PlayingGameState::update(float deltaTime)
 			spawnTimer = 0;
 		}
 		spawnTimer++;*/
+		//spawn Boss
+		/*if (spawnTimer % 1000 == 0)
+		{
+			actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
+				player->getVehicle()->getPosition().y,
+				player->getVehicle()->getPosition().z + 5), 0);
+			spawnTimer = 0;
+		}
+		spawnTimer++;
+		*/
 
 		powerUps.erase(
 			std::remove_if(
