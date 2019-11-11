@@ -34,7 +34,7 @@ struct VehicleSlots
 			if (item->getObject() != nullptr)
 			{
 				item->getObject()->setRotation(Vector3(0,0.0f,0));
-				item->getObject()->setScale(Vector3(0.005f));
+				item->getObject()->setScale(Vector3(0.25f));
 			}
 		}
 	};

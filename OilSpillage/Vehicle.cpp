@@ -483,7 +483,12 @@ void Vehicle::updateWeapon(float deltaTime)
 		{
 			if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
 			{
-				this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setPosition(vehicleBody1->getPosition());
+				if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) == nullptr)
+				{
+					//in upgradingstate 
+					this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y, acos(angleWP) - 3.14 / 2));
+				}
+				this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setPosition(vehicleBody1->getPosition()+Vector3(0,0.5f,0));
 			}
 		}
 
@@ -494,8 +499,8 @@ void Vehicle::updateWeapon(float deltaTime)
 		{
 			if (this->vehicleSlots->getSlot(Slots::FRONT)->getObject() != nullptr)
 			{
-				this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14 / 2, acos(angleWP) - 3.14 / 2));
-				this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setPosition(this->vehicleBody1->getPosition() + 1.15f * frontTempDir - Vector3(0.0f, 1.0f, 0.0f));
+				this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y, acos(angleWP) - 3.14 / 2));
+				this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setPosition(this->vehicleBody1->getPosition() + 1.15f * frontTempDir - Vector3(0.0f, 0.75f, 0.0f));
 			}
 		}
 		/*END*/
@@ -503,8 +508,8 @@ void Vehicle::updateWeapon(float deltaTime)
 		/*BACK*/
 		if (this->vehicleSlots->getSlot(Slots::BACK) != nullptr)
 		{
-			this->vehicleSlots->getSlot(Slots::BACK)->getObject()->setPosition(this->vehicleBody1->getPosition() - 1.15f * frontTempDir - Vector3(0.0f, 1.0f, 0.0f));
-			this->vehicleSlots->getSlot(Slots::BACK)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y - 3.14 / 2, acos(angleWP) - 3.14 / 2));
+			this->vehicleSlots->getSlot(Slots::BACK)->getObject()->setPosition(this->vehicleBody1->getPosition() - 1.15f * frontTempDir - Vector3(0.0f, 0.75f, 0.0f));
+			this->vehicleSlots->getSlot(Slots::BACK)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14f, acos(angleWP) - 3.14 / 2));
 		}
 		/*END*/
 
@@ -528,6 +533,7 @@ void Vehicle::updateWeapon(float deltaTime)
 		/*END*/
 		//this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y+3.14/2, ));
 		Vector2 dir = Input::getDirectionR();
+		
 		dir.Normalize();
 		if ((dir - curDir).Length() > 0.01f)
 		{
