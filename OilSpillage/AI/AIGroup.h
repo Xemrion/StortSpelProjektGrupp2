@@ -5,15 +5,14 @@ class AIGroup
 public:
 	AIGroup();
 	~AIGroup();
-	std::vector<DynamicActor*> actors;
 
-	Vector3 getAveragePos();
-	float getGroupRadius();
+	const Vector3& getAveragePos() const;
 	void updateAveragePos();
-	std::vector<Vector3>& getPathRef();
-
+	std::vector<Vector3>* getPathPtr();
+	void setPath(std::vector<Vector3> path);
 private:
-	float groupRadius = 6.5f * 6.5f; //Compare with distance^2
+	friend class ActorManager;
+	std::vector<DynamicActor*> actors;
 	Vector3 averagePos;
 	std::vector<Vector3> path; 
 };

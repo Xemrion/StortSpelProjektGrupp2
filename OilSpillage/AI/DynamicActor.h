@@ -12,6 +12,7 @@ protected:
 	int aggroRange;
 	int boidOffset;
 
+	Vector3 predictedTargetPos;
 	std::vector<Vector3>* path;
 	Vector3 destination;
 	Vector3 acceleration;

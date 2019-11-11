@@ -52,7 +52,7 @@ void TurretHandler::createTurret(float x, float z, int weaponType)
 	this->turrets.emplace_back(new Turret(x, z, weaponType));
 }
 
-float TurretHandler::distanceToPlayer(DirectX::SimpleMath::Vector3 position)
+float TurretHandler::distanceToPlayer(const DirectX::SimpleMath::Vector3& position)
 {
 	float minDistance = -1;
 	for (int i = 0; i < this->turrets.size(); i++)

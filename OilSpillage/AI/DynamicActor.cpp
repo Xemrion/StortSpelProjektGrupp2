@@ -13,7 +13,7 @@ DynamicActor::DynamicActor(float x, float z)
 	this->boidOffset = 9;
 	this->path = nullptr;
 	this->state = State::Idle;
-	this->aggroRange = 20;
+	this->aggroRange = 80;
 
 }
 
@@ -184,13 +184,12 @@ void DynamicActor::followPath()
 				path->pop_back();
 			}
 		}
-		else
+		else if((position - targetPos).Length() < 15)
 		{
 			destination = targetPos;
 		}
 	}
 }
-
 Status DynamicActor::setChaseState()
 {
 	this->state = State::Chasing;

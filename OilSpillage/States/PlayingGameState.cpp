@@ -17,13 +17,15 @@ void PlayingGameState::initAI()
 	{
 		for (int j = 0; j < 1; j++)
 		{
-			actorManager->createSpitFire(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z,physics.get());
+			//actorManager->createSpitFire(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z,physics.get());
+			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j,2);
 		}
 	}
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
 {
+
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	pausedTime = false;
 #endif // _DEBUG
@@ -181,7 +183,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 		 Vector3(0.0f, cameraDistance, 0.0f) + playerVehicle->getPosition(),
 		 Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
-	camera->startCinematic(&points, false);
+	camera->startCinematic(&points, true);
 	Vector4 colorP2[] = {
 		Vector4(0.03f,0.03f,0.03f,1),
 		Vector4(0.9f, 0.9f, 0.05f, 1)
@@ -272,7 +274,6 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
 	ImGui::Text(("R Str: " + std::to_string(rStr)).c_str());
 	ImGui::Text(("Accelerator: " + std::to_string(player->getAcceleratorX())).c_str());
-	ImGui::Text(("Groups: " + std::to_string(actorManager->groups.size())).c_str());
 	ImGui::End();
 }
 
@@ -308,7 +309,9 @@ void PlayingGameState::ImGui_AI()
 
 	float pathSize = actorManager->groups.at(0).actors.at(0)->path->size();
 	ImGui::Text((("Path size: " + std::to_string(pathSize)).c_str()));*/
-	//ImGui::Text(("Tile y: " + std::to_string(map->getTileMap().convertWorldPositionToTilePositionXZ(xzPos).y)).c_str());
+	ImGui::Text(("VelocityX: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getX())).c_str());
+	ImGui::Text(("VelocityY: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getY())).c_str());
+	ImGui::Text(("VelocityZ: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getZ())).c_str());
 	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
 							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
 	ImGui::End();
@@ -583,7 +586,6 @@ void PlayingGameState::update(float deltaTime)
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation();
-		//actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		Bullet::updateSoundTimer(deltaTime);
@@ -654,16 +656,16 @@ void PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	//   ImGui_ImplDX11_NewFrame();
-	//   ImGui_ImplWin32_NewFrame();
-	//   ImGui::NewFrame();
+	   ImGui_ImplDX11_NewFrame();
+	   ImGui_ImplWin32_NewFrame();
+	   ImGui::NewFrame();
 	//   ImGui_Driving();
 	//   ImGui_ProcGen();
-	  // ImGui_AI();
+	   ImGui_AI();
 	//   ImGui_Particles();
-	//  ImGui_Camera();
-	 //  ImGui::Render();
-	  // ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	  ImGui_Camera();
+	   ImGui::Render();
+	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #endif // !_DEBUG
 
 	graphics.presentScene();

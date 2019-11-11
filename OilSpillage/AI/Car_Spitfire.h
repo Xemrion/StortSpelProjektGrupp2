@@ -16,8 +16,7 @@ private:
 	DirectX::XMFLOAT2 velocity;
 
 	float targetRotation;
-	int drivingMode;
-	float rotateAcceleration = 0.0f;
+	float rotateAcceleration;
 	bool rotationDirection;
 	float reverseTimer;
 	float reverseTimer2;

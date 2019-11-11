@@ -8,14 +8,9 @@ AIGroup::~AIGroup()
 {
 }
 
-Vector3 AIGroup::getAveragePos()
+const Vector3& AIGroup::getAveragePos() const
 {
 	return this->averagePos;
-}
-
-float AIGroup::getGroupRadius()
-{
-	return this->groupRadius;
 }
 
 void AIGroup::updateAveragePos()
@@ -28,9 +23,14 @@ void AIGroup::updateAveragePos()
 	averagePos /= actors.size();
 }
 
-std::vector<Vector3>& AIGroup::getPathRef()
+std::vector<Vector3>* AIGroup::getPathPtr()
 {
-	return this->path;
+	return &this->path;
+}
+
+void AIGroup::setPath(std::vector<Vector3> path)
+{
+	this->path = path;
 }
 
 

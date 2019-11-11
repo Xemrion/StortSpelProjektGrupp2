@@ -29,10 +29,11 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	soundTimer += dt;
 	bool hasDied = false;
 	std::vector<Vector3> temp;
+	predictPlayerPos(targetPos);
 	for (int i = 0; i < this->groups.size(); i++)
 	{
 		temp = static_cast<PlayingGameState*>(Game::getCurrentState())->map->getTileMap().getAllTilePositionsInRadius(groups[i].getAveragePos(), 300, Tile::building);
-		for(int j = 0; j < groups[i].actors.size(); j++)
+		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
 			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
 			{
@@ -87,7 +88,7 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 
 void ActorManager::createSpitFire(float x, float z, Physics* physics)
 {
-	this->actors.push_back(new Spitfire(x, z,physics));
+	this->actors.push_back(new Spitfire(x, z, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
@@ -97,7 +98,7 @@ void ActorManager::createSwarm(float x, float z, int weaponType)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-float ActorManager::distanceToPlayer(Vector3 position)
+float ActorManager::distanceToPlayer(const Vector3& position)
 {
 	float minDistance = 99999999999;
 	for (int i = 0; i < this->actors.size(); i++)
@@ -118,6 +119,11 @@ float ActorManager::distanceToPlayer(Vector3 position)
 	}
 }
 
+const std::vector<AIGroup>& ActorManager::getGroups() const
+{
+	return this->groups;
+}
+
 void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 {
 	for (int i = 0; i < this->actors.size(); i++)
@@ -126,7 +132,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 		{
 			if (!this->actors[i]->isDead())
 			{
-				if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
+				if (bulletArray[j].getTimeLeft() > 0  && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
 						/*int randomSound = rand() % 3 + 1;
@@ -222,7 +228,7 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 		float deltaX = actorPos.x - curAveragePos.x;
 		float deltaZ = actorPos.z - curAveragePos.z;
 		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-		bool isInRange = distance <= groups[i].getGroupRadius();
+		bool isInRange = distance <= groupRadius;
 		bool isBiggerGroup = groups[i].actors.size() >= biggestGroupSize;
 		if (isInRange && isBiggerGroup)
 		{
@@ -245,13 +251,26 @@ void ActorManager::leaveGroup(int groupIndex, int where)
 
 void ActorManager::assignPathsToGroups(Vector3 targetPos)
 {
+	std::vector<Vector3> pathToPlayer;
+	std::vector<Vector3> pathToPredicted;
+	std::vector<Vector3>* pathToUse;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		aStar->algorithm(groups[i].getAveragePos(), targetPos, groups[i].getPathRef());
+		aStar->algorithm(groups[i].getAveragePos(), targetPos, pathToPlayer);
+		aStar->algorithm(groups[i].getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
 
+		if (pathToPlayer.size() < pathToPredicted.size())
+		{
+			pathToUse = &pathToPlayer;
+		}
+		else
+		{
+			pathToUse = &pathToPredicted;
+		}
+		groups[i].setPath(*pathToUse);
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
-			groups[i].actors[j]->setPath(&groups[i].getPathRef());
+			groups[i].actors[j]->setPath(groups[i].getPathPtr());
 		}
 	}
 }
@@ -263,7 +282,7 @@ void ActorManager::updateGroups()
 		for (int k = 0; k < groups[i].actors.size(); k++)
 		{
 			DynamicActor* current = groups[i].actors[k];
-			if (current->isDead() or current == nullptr)
+			if (current->isDead() || current == nullptr)
 			{
 				leaveGroup(i, k);
 			}
@@ -274,10 +293,10 @@ void ActorManager::updateGroups()
 				float deltaX = actorPos.x - curAveragePos.x;
 				float deltaZ = actorPos.z - curAveragePos.z;
 				float distanceToOwnGroup = (deltaX * deltaX) + (deltaZ * deltaZ);
-				bool isInRange = distanceToOwnGroup <= groups[i].getGroupRadius();
+				bool isInRange = distanceToOwnGroup <= groupRadius;
 
 				//Actor is outside its own groupRadius, check for other groups or create its own
-				if (distanceToOwnGroup > groups[i].getGroupRadius())
+				if (distanceToOwnGroup > groupRadius)
 				{
 					int groupIndex = groupInRange(current->getPosition(), 0);
 					//Found a group within the groupRadius
@@ -336,4 +355,12 @@ void ActorManager::createGroup(DynamicActor* actor)
 	temp.actors.push_back(actor);
 	temp.updateAveragePos();
 	groups.push_back(temp);
+}
+
+Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
+{
+	Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
+	targetVelocity.Normalize();
+	Vector3 predictedPos = targetPos + targetVelocity * 20;
+	return predictedPos;
 }
