@@ -49,6 +49,11 @@ UpgradingGameState::~UpgradingGameState()
 {
 }
 
+Vehicle* UpgradingGameState::getVehicle()
+{
+	return this->theVehicle.get();
+}
+
 void UpgradingGameState::update(float deltaTime)
 {
 	timer += deltaTime;
@@ -74,10 +79,4 @@ void UpgradingGameState::update(float deltaTime)
 void UpgradingGameState::setCurrentMenu(Menu menu)
 {
 	this->currentMenu = static_cast<int>(menu);
-	if (this->currentMenu == MENU_UPGRADING)
-	{
-		UIUpgrading* temp = static_cast<UIUpgrading*>(this->menues[currentMenu].get());
-		if (temp->getVehicleSlots() != nullptr)
-			this->theVehicle->setVehicleSlots(temp->getVehicleSlots());
-	}
 }

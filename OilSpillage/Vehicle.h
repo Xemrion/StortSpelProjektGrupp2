@@ -33,7 +33,8 @@ struct VehicleSlots
 		{
 			if (item->getObject() != nullptr)
 			{
-				item->getObject()->setScale(Vector3(0.5f));
+				item->getObject()->setRotation(Vector3(0,0.0f,0));
+				item->getObject()->setScale(Vector3(0.25f));
 			}
 		}
 	};
@@ -155,6 +156,7 @@ public:
 	void update(float deltaTime);
 	void updateWeapon(float deltaTime);
 	void setVehicleSlots(VehicleSlots* slots);
+	void setSpecSlot(Slots slot, Item* item);
 
 	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }

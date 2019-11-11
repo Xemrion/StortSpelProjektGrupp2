@@ -30,6 +30,7 @@ public:
 	UpgradingGameState();
 	virtual ~UpgradingGameState();
 
+	Vehicle* getVehicle();
 	void update(float deltaTime);
 	void setCurrentMenu(Menu menu);
 };
