@@ -28,10 +28,9 @@ void ActorManager::update(float dt, Vector3 targetPos)
 {
 	soundTimer += dt;
 	bool hasDied = false;
-	std::vector<Vector3> temp;
+	seperation(targetPos);
 	for (int i = 0; i < this->groups.size(); i++)
 	{
-		temp = static_cast<PlayingGameState*>(Game::getCurrentState())->map->getTileMap().getAllTilePositionsInRadius(groups[i].getAveragePos(), 300, Tile::building);
 		for(int j = 0; j < groups[i].actors.size(); j++)
 		{
 			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
@@ -201,6 +200,95 @@ Vector2& ActorManager::generateAroundaPoint(const float& x, const float& z, floa
 	newPosition.x = x + (cos(radians) * x + sin(radians) * z);
 	newPosition.y = z + (cos(radians) * x - sin(radians) * z);
 	return newPosition;
+}
+
+void ActorManager::seperation(Vector3 targetPos)
+{
+	std::vector<Vector3> buildings;
+	float desiredSeparationDistance;
+	for(int i = 0; i < groups.size(); i++)
+	{
+		buildings = static_cast<PlayingGameState*>(Game::getCurrentState())->map->getTileMap().getAllTilePositionsInRadius(groups[i].getAveragePos(), 300, Tile::building);
+		for(int j = 0; j < groups[i].actors.size(); j++)
+		{
+			// Distance of field of vision for separation between boids
+			desiredSeparationDistance = groups[i].actors[j]->getBoidOffset();
+			Vector3 direction(0.0f);
+			float nrInProximity = 0.0f;
+			// For every boid in the system, check if it's too close
+			for (int k = 0; k < actors.size(); k++)
+			{
+				// Calculate distance from current boid to boid we're looking at
+				Vector3 curBoidPos = actors[k]->getPosition();
+				float deltaX = groups[i].actors[j]->getPosition().x - curBoidPos.x;
+				float deltaZ = groups[i].actors[j]->getPosition().z - curBoidPos.z;
+				float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+				// If this is a fellow boid and it's too close, move away from it
+				if ((distance < desiredSeparationDistance) && distance != 0)
+				{
+					Vector3 difference(0.0f);
+					difference = groups[i].actors[j]->getPosition() - actors[k]->getPosition();
+					difference.Normalize();
+					difference /= distance;      // Weight by distance
+					direction += difference;
+					nrInProximity++;
+				}
+			}
+			for (int k = 0; k < buildings.size(); k++)
+			{
+				// Calculate distance from current boid to boid we're looking at
+				Vector3 curBoidPos = buildings[k];
+				float deltaX = groups[i].actors[j]->getPosition().x - curBoidPos.x;
+				float deltaZ = groups[i].actors[j]->getPosition().z - curBoidPos.z;
+				float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+				// If this is a fellow boid and it's too close, move away from it
+				if ((distance < 110) && distance != 0)
+				{
+					Vector3 difference(0.0f);
+					difference = groups[i].actors[j]->getPosition() - buildings[k];
+					difference.Normalize();
+					difference;      // Weight by distance
+					direction += difference;
+					nrInProximity++;
+				}
+			}
+			// Calculate distance from current boid to player
+			float deltaX = groups[i].actors[j]->getPosition().x - targetPos.x;
+			float deltaZ = groups[i].actors[j]->getPosition().z - targetPos.z;
+			float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+			// If this is a fellow boid and it's too close, move away from it
+			if (distance < desiredSeparationDistance)
+			{
+				Vector3 difference(0.0f);
+				difference = groups[i].actors[j]->getPosition() - targetPos;
+				difference.Normalize();
+				if (distance != 0)
+				{
+					difference /= distance;      // Weight by distance
+				}
+				direction += difference;
+				nrInProximity++;
+			}
+			// Adds average difference of location to acceleration
+			if (nrInProximity > 0)
+			{
+				direction /= nrInProximity;
+			}
+			if (direction.Length() > 0.0f)
+			{
+				// Steering = Desired - Velocity
+				direction.Normalize();
+				direction *= groups[i].actors[j]->getMaxSpeed();
+				direction -= groups[i].actors[j]->getVelocity();
+				if (direction.Length() > groups[i].actors[j]->getMaxForce())
+				{
+					direction /= direction.Length();
+				}
+
+			}
+			groups[i].actors[j]->applyForce(direction*4);
+		}
+	}
 }
 
 void ActorManager::updateAveragePos()

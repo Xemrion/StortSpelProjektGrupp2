@@ -24,6 +24,7 @@ public:
 	void spawnTurrets(Vector3 position, Radius radius, float angle, int weaponType);
 	Vector2& generateRandom(const float& x, const float& z, Radius radius);
 	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
+	void seperation(Vector3 targetPos);
 private:
 	float soundTimer = 0;
 	int frameCount = 0;
