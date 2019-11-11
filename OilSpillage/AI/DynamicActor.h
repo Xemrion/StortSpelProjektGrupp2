@@ -29,7 +29,7 @@ protected:
 	float maxSpeed;
 	float maxForce;
 	
-	enum class State { Idle, Chasing };
+	enum class State { Idle, Chasing, Circulate };
 	State state;
 
 	// one Laws that boids follow
@@ -37,9 +37,12 @@ protected:
 	// Other function for moving and interacting
 	virtual void move();
 	virtual Vector3 seek();
+	virtual void moveCirculate(Vector3 desiredDirection);
+	virtual Vector3 seekCirculate(Vector3 desiredDirection);
 	virtual void followPath();
+	virtual void circulatePlayer();
 	Status setChaseState();
 	Status inAggroRange();
 	Status setIdleState();
-
+	Status setCirculateState();
 };
