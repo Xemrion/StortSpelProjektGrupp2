@@ -11,7 +11,7 @@ Boss::Boss(float x, float z, int weaponType)
 	setUpActor();
 	Game::getGraphics().addToDraw(this);
 
-	this->stats = VehicleStats::AIAttacker;
+	this->stats = VehicleStats::AIBoss;
 	setHealth(this->stats.maxHealth);
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
