@@ -57,13 +57,15 @@ void UpgradingGameState::update(float deltaTime)
 	this->theVehicle->getVehicle()->getRigidBody()->setAngularVelocity(btVector3(0,100*deltaTime, 0));
 	this->theVehicle->updateWeapon(deltaTime);
 	this->theVehicle->update(deltaTime);
+	
 	this->theVehicle->setWheelRotation();
 	this->physics->update(deltaTime);
 
-	this->graphics.clearScreen(Vector4(1,1,1,0));
-	this->graphics.render(this->camera.get(), deltaTime);
+	this->graphics.clearScreen(Vector4(Colors::Red));
+	//this->graphics.render(this->camera.get(), deltaTime);
 
 	this->menues[currentMenu]->update(deltaTime);
+	
 	this->graphics.renderUI(deltaTime);
 
 	this->graphics.presentScene();
@@ -72,4 +74,10 @@ void UpgradingGameState::update(float deltaTime)
 void UpgradingGameState::setCurrentMenu(Menu menu)
 {
 	this->currentMenu = static_cast<int>(menu);
+	if (this->currentMenu == MENU_UPGRADING)
+	{
+		UIUpgrading* temp = static_cast<UIUpgrading*>(this->menues[currentMenu].get());
+		if (temp->getVehicleSlots() != nullptr)
+			this->theVehicle->setVehicleSlots(temp->getVehicleSlots());
+	}
 }

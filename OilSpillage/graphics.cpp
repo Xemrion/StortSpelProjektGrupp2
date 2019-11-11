@@ -5,7 +5,6 @@
 #include "ShaderDefines.hlsli"
 #include "UI/UserInterface.h"
 #include <cassert>
-#include "Input.h"
 
 Graphics::Graphics()
 {
@@ -719,7 +718,7 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 
 Vector3 Graphics::screenToWorldSpaceUI(Vector2 screenPos)
 {
-	Vector2 s0((screenPos * 2.0f) / Input::getWindowSize() - Vector2::One);
+	Vector2 s0((screenPos * 2.0f) / Vector2(1280, 720) - Vector2::One);
 
 	Vector4 w0(Vector4::Transform(Vector4(s0.x, -s0.y, 0.0f, 1.0f), this->uiCamera.getProjectionMatrix().Invert()));
 	w0 *= w0.w;

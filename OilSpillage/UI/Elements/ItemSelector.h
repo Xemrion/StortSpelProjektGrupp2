@@ -2,15 +2,18 @@
 #define ITEM_SELECTOR_H
 
 #include "Element.h"
+#include "TextBox.h"
 #include "../../Inventory/Inventory.h"
 
 class ItemSelector : public Element
 {
 private:
 	static const int tileLength = 6;
+	void addTextbox();
 
 	Texture* textureBG;
 	Texture* textureIndicator;
+	std::unique_ptr<TextBox> textBox;
 
 	float rotationTimers[tileLength];
 	Quaternion rotation[tileLength];

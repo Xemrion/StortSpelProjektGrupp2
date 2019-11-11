@@ -24,11 +24,36 @@ struct VehicleSlots
 	Item** slots = new Item * [Slots::SIZEOF];
 	void setSlot(Slots slot, Item* item)
 	{
+		if (this->slots[int(slot)] != nullptr)
+		{
+			delete this->slots[int(slot)];
+		}
 		this->slots[int(slot)] = item;
+		if (item != nullptr)
+		{
+			if (item->getObject() != nullptr)
+			{
+				item->getObject()->setScale(Vector3(0.5f));
+			}
+		}
 	};
 	Item* getSlot(Slots slot)
 	{
-		return this->slots[int(slot)];
+		if (this->slots[int(slot)] != nullptr)
+		{
+			return this->slots[int(slot)];
+		}
+		else
+		{
+			return nullptr;
+		}
+	};
+	VehicleSlots()
+	{
+		for (int i = 0; i < Slots::SIZEOF; i++)
+		{
+			this->slots[i] = nullptr;
+		}
 	};
 	~VehicleSlots()
 	{
@@ -36,7 +61,7 @@ struct VehicleSlots
 		{
 			if (this->slots[i] != nullptr)
 			{
-				delete this->slots;
+				delete this->slots[i];
 			}
 		}
 		delete[] this->slots;

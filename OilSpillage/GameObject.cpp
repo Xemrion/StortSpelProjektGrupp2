@@ -13,6 +13,22 @@ GameObject::~GameObject()
 	}*/
 }
 
+GameObject::GameObject(const GameObject& obj)
+{
+	this->color = obj.color;
+	this->material = obj.material;
+	this->mesh = obj.mesh;
+	this->parent = obj.parent;
+	this->physics = obj.physics;
+	this->position = obj.position;
+	this->sunShadow = obj.sunShadow;
+	this->spotShadow = obj.spotShadow;
+	this->rigidBody = obj.rigidBody;
+	this->rotation = obj.rotation;
+	this->rotationQt = obj.rotationQt;
+	this->scale = obj.scale;
+}
+
 //GameObject::GameObject(const GameObject& obj)
 //{
 //

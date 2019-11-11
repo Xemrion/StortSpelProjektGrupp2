@@ -2,16 +2,33 @@
 #include "ItemWeapon.h"
 #include "../game.h"
 
-std::unique_ptr<GameObject> Item::machineGun;
+std::shared_ptr<GameObject> Item::machineGun;
 std::vector<Item> Item::allItems;
 
-Item::Item(const char* name, const char* description, ItemType type, GameObject* object)
+Item::Item(std::string name, std::string description, ItemType type, std::shared_ptr<GameObject> object)
 	: name(name), description(description), type(type), object(object)
 {
 }
 
 Item::~Item()
 {
+
+}
+
+Item::Item(const Item& obj)
+{
+	this->name = obj.name;
+	this->description = obj.description;
+	this->type = obj.type;
+	
+	if (obj.object != nullptr)
+	{
+		this->object = std::make_shared<GameObject>(*obj.object.get());
+	}
+	else
+	{
+		this->object = nullptr;
+	}
 }
 
 void Item::init()
@@ -30,16 +47,16 @@ void Item::init()
 		Item("Test Item", "A very useless thing!", ItemType::WEAPON, nullptr),
 		Item("Test Item 2", "A very useless thing 2!", ItemType::GADGET, nullptr),
 		Item("Test Item 3", "A very useless thing 3!", ItemType::GADGET, nullptr),
-		ItemWeapon("Machine Gun", WeaponHandler::getWeapon(WeaponType::MachineGun), Item::machineGun.get())
+		ItemWeapon("Machine Gun", WeaponHandler::getWeapon(WeaponType::MachineGun), Item::machineGun)
 	};
 
 	//Sort so we can use getItemByName later if needed.
-	std::sort(allItems.begin(), allItems.end(), [](const Item& a, const Item& b) { return std::strcmp(a.getName(), b.getName()) < 0; });
+	std::sort(allItems.begin(), allItems.end(), [](const Item& a, const Item& b) { return std::strcmp(a.getName().c_str(), b.getName().c_str()) < 0; });
 }
 
-Item* Item::getItemByName(const char* name)
+Item* Item::getItemByName(std::string name)
 {
-	auto item = std::lower_bound(allItems.begin(), allItems.end(), name, [](const Item& item, const char* name) { return std::strcmp(item.getName(), name) < 0; });
+	auto item = std::lower_bound(allItems.begin(), allItems.end(), name, [](const Item& item, std::string name) { return std::strcmp(item.getName().c_str(), name.c_str()) < 0; });
 
 	if (item != allItems.end())
 	{
@@ -63,12 +80,12 @@ Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 sc
 	return transform;
 }
 
-const char* Item::getName() const
+std::string Item::getName() const
 {
 	return this->name;
 }
 
-const char* Item::getDescription() const
+std::string Item::getDescription() const
 {
 	return this->description;
 }
@@ -80,5 +97,5 @@ ItemType Item::getType() const
 
 GameObject* Item::getObject() const
 {
-	return this->object;
+	return this->object.get();
 }

@@ -7,11 +7,11 @@
 class ItemWeapon : public Item
 {
 private:
-	static const char* generateDescription(const Weapon& weapon);
+	static std::string generateDescription(Weapon weapon);
 
 	Weapon weapon;
 public:
-	ItemWeapon(const char* name, Weapon weapon, GameObject* object);
+	ItemWeapon(std::string name, Weapon weapon, std::shared_ptr<GameObject> object);
 	virtual ~ItemWeapon();
 
 	Weapon getWeapon() const;

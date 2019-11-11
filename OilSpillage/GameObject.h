@@ -27,8 +27,8 @@ public:
 	GameObject();
 	~GameObject();
 
-	/*GameObject(const GameObject& obj);
-	void operator=(const GameObject& obj);*/
+	GameObject(const GameObject& obj);
+	/*void operator=(const GameObject& obj);*/
 
 	const Mesh *mesh   = nullptr;
 	GameObject *parent = nullptr;

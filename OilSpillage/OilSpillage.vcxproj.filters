@@ -84,6 +84,9 @@
     <ClCompile Include="UI\Playing\UIPlaying.cpp" />
     <ClCompile Include="UI\Upgrading\UIRandomItem.cpp" />
     <ClCompile Include="UI\Elements\ItemSlot.cpp" />
+    <ClCompile Include="UI\Elements\TextBox.cpp" />
+    <ClCompile Include="UI\Elements\CarGadgetSelector.cpp" />
+    <ClCompile Include="UI\Elements\VehicleStatBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -171,6 +174,9 @@
     <ClInclude Include="UI\Playing\UIPlaying.h" />
     <ClInclude Include="UI\Upgrading\UIRandomItem.h" />
     <ClInclude Include="UI\Elements\ItemSlot.h" />
+    <ClInclude Include="UI\Elements\TextBox.h" />
+    <ClInclude Include="UI\Elements\CarGadgetSelector.h" />
+    <ClInclude Include="UI\Elements\VehicleStatBox.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

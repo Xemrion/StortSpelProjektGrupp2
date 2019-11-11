@@ -5,7 +5,16 @@
 
 Vector2 ItemSlot::size = Vector2(100, 100);
 
-ItemSlot::ItemSlot(Vector2 position) : Element(position), item(nullptr), rotationTimer(0)
+void ItemSlot::addTextbox()
+{
+	if (this->showTextBox)
+	{
+		this->textBox = std::make_unique<TextBox>("-- " + item->getName() + " --\n" + item->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::TOP);
+		this->textBox->setPosition(this->position + Vector2(ItemSlot::size.x * 0.5f - this->textBox->getSize().x * 0.5f, ItemSlot::size.y + 10.0f));
+	}
+}
+
+ItemSlot::ItemSlot(Vector2 position, bool showTextBox) : Element(position), showTextBox(showTextBox), item(nullptr), rotationTimer(0)
 {
 	Game::getGraphics().loadTexture("UI/itemSlot");
 	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
@@ -26,6 +35,11 @@ void ItemSlot::draw(bool selected)
 	if (selected)
 	{
 		UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position);
+
+		if (this->textBox)
+		{
+			this->textBox->draw(selected);
+		}
 	}
 }
 
@@ -56,18 +70,28 @@ Item* ItemSlot::getItem() const
 
 void ItemSlot::setItem(Item* item)
 {
-	if (this->item && this->item->getObject())
+	if (this->item)
 	{
-		Game::getGraphics().removeFromUIDraw(this->item->getObject(), &this->transform);
-	}
-
-	if (item && item->getObject())
-	{
-		rotationTimer = 190 * XM_PI / 180;
-		rotation = Quaternion::CreateFromYawPitchRoll(XM_PI + 0.3f, 0.26f, 0.0f);
-		transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f),Vector3(1.0f), rotation,true);
-		Game::getGraphics().addToUIDraw(item->getObject(), &this->transform);
+		if (this->item->getObject())
+		{
+			Game::getGraphics().removeFromUIDraw(this->item->getObject(), &this->transform);
+		}
+		
+		this->textBox.reset();
 	}
 
 	this->item = item;
+
+	if (item)
+	{
+		if (item->getObject())
+		{
+			rotationTimer = 190 * XM_PI / 180;
+			rotation = Quaternion::CreateFromYawPitchRoll(XM_PI + 0.3f, 0.26f, 0.0f);
+			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.0f), rotation, true);
+			Game::getGraphics().addToUIDraw(item->getObject(), &this->transform);
+		}
+
+		this->addTextbox();
+	}
 }
