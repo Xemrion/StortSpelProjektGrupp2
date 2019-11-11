@@ -167,7 +167,6 @@
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
-    <ClCompile Include="PG\District.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="UI\Button.cpp" />
     <ClCompile Include="UI\CheckBox.cpp" />
@@ -218,6 +217,7 @@
     <ClInclude Include="AI\Car_Spitfire.h" />
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="AI\TurretHandler.h" />
+    <ClInclude Include="PG\Biome.hpp" />
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />

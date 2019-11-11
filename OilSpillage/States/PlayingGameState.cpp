@@ -77,11 +77,18 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	//graphics.loadModel("Roads/Metro/1110");
 	//graphics.loadModel("Roads/Metro/1111");
 
-	graphics.loadModel("Tiles/Quad_SS"); // one-sided
+	graphics.loadModel("Tiles/Quad_SS"); // single-sided
 	graphics.loadTexture("Tiles/asphalt");
 	graphics.loadTexture("Tiles/asphalt_nor");
 	graphics.loadTexture("Tiles/grass");
 	graphics.loadTexture("Tiles/grass_nor");
+// graphics.loadTexture("Tiles/grass_spec");
+	graphics.loadTexture("Tiles/snow");
+	graphics.loadTexture("Tiles/snow_nor");
+// graphics.loadTexture("Tiles/snow_spec");
+	graphics.loadTexture("Tiles/desert");
+	graphics.loadTexture("Tiles/desert_nor");
+// graphics.loadTexture("Tiles/desert_spec");
 	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne");
 	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne_nor");
 	graphics.loadTexture("Tiles/sidewalk_side_n");

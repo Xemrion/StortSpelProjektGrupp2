@@ -30,6 +30,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	hospitalTable	 ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide )
 {
 	DBG_PROBE(Map::Map);
+	biome = Biome::desert;
 	// TODO: generate water etc
 	generateRoads();
 	generateRoadDistanceMap();
@@ -105,16 +106,18 @@ void  Map::generateDistricts()
 		                                            Voronoi::EuclideanDistanceTag{});
 
 	// generate look-up table (TODO: refactor)
-	districtLookupTable = Vector<District>( districtMap->noise.size() );
-	Vector<District> cityCenterDistricts { District::residential, District::metropolitan, District::downtown };
+	districtLookupTable = Vector<District::Type const *>( districtMap->noise.size() );
+	Vector<District::Type const *> cityCenterDistricts { &District::residential,
+	                                              &District::metropolitan,
+	                                              &District::downtown };
 	for ( U16 i = 0; i < districtLookupTable.size(); ++i ) {
 		auto roadCoverage = districtMap->computeCellRoadCoverage( i, *tilemap );
-		if      ( roadCoverage < .05f ) districtLookupTable[i] = District::park;
-		else if ( roadCoverage < .15f ) districtLookupTable[i] = District::suburban;
-		else if ( roadCoverage < .25f ) districtLookupTable[i] = District::residential;
-		else if ( roadCoverage < .30f ) districtLookupTable[i] = District::downtown;
+		if      ( roadCoverage < .05f ) districtLookupTable[i] = &District::park;
+		else if ( roadCoverage < .15f ) districtLookupTable[i] = &District::suburban;
+		else if ( roadCoverage < .25f ) districtLookupTable[i] = &District::residential;
+		else if ( roadCoverage < .30f ) districtLookupTable[i] = &District::downtown;
 		else if ( roadCoverage < .40f ) districtLookupTable[i] = util::randomElementOf( cityCenterDistricts, rng );
-		else                            districtLookupTable[i] = District::metropolitan;
+		else                            districtLookupTable[i] = &District::metropolitan;
 		std::cout << (int)districtLookupTable[i];
 	}
 }
@@ -180,24 +183,24 @@ void  Map::generateBuildings( )
 
 	// for each cell:
 	for ( U16 cellId = 0;  cellId < districtMap->noise.size();  ++cellId) {
-		District    districtType{ districtLookupTable[cellId] };
+		District::Type const *district{ districtLookupTable[cellId] };
 		Size        currentArea{ 0 };
 		Size const  cellArea{ districtMap->computeCellRealEstateArea(cellId,*tilemap) };
 		
 		#ifdef _DEBUG
 		   U64  currrentDistrictBuildingCount { 0 };
 		   buildingLogs << "\n\t" "Generating buildings for district #"
-		                << cellId << " (TYPE: \"" << stringify(districtType) << "\")\n";
+		                << cellId << " (TYPE: \"" << district->name << "\")\n";
 		#endif
 		
 		if ( (cellArea != 0) ) { //and (districtType != District::park) ) {
-			F32  const  targetDistrictCoverage         { District_getBuildingDensity(districtType) };
+			F32  const  targetDistrictCoverage         { district->buildingDensity };
 			auto        computeCurrentDistrictCoverage { [&currentArea, cellArea]() {
 			                                                return F32(currentArea) / F32(cellArea);
 			                                             } };
          U16 currentTries { 0U };
 			while ( computeCurrentDistrictCoverage() < targetDistrictCoverage and ++currentTries < maxTries ) {
-				auto potentialLot = findValidHouseLot(rng, cellId, *districtMap, *tilemap, districtLookupTable);
+				auto potentialLot = findValidHouseLot(rng, cellId, *districtMap, *tilemap );
 				if ( potentialLot ) {
                currentTries = 0; // reset try counter
 					auto &building     = potentialLot.value();
@@ -211,7 +214,7 @@ void  Map::generateBuildings( )
 						   << (computeCurrentDistrictCoverage() * 100.0f) << "%\n"
 						   << "\t\t\t" "The target coverage is: " << targetDistrictCoverage * 100.0f << "%\n";
 					#endif
-					U16_Dist   generateFloorCount { District_getMinFloorCount(districtType), District_getMaxFloorCount(districtType) };
+					U16_Dist   generateFloorCount { district->minFloors, district->maxFloors };
 					F32        randomFloorCount   { static_cast<F32>(generateFloorCount(rng)) };
 					BuildingID id                 { generateBuildingID() };
 					currentArea += buildingSize;
@@ -310,23 +313,23 @@ void  Map::generateBuildings( )
 
 // basic proto placement algorithm
 // TODO: refactor out of Game
-Opt<Vector<V2u>>  Map::findValidHouseLot( RNG &rng, U16 cellId, Voronoi const &districtMap, TileMap &map, Vector<District> const &districtLookUpTable )
+Opt<Vector<V2u>>  Map::findValidHouseLot( RNG &rng, U16 cellId, Voronoi const &districtMap, TileMap &map )
  {
    DBG_PROBE(Map::findValidHouseLot);
    U16 const maxTries { 50U }; // TODO: refactor out
 
-	Bounds    cellBounds      { districtMap.computeCellBounds(cellId) };
-	U16_Dist  generateOffset  { 0x0, 0xFF };
-	U16_Dist  generateX       ( cellBounds.min.x, cellBounds.max.x );
-	U16_Dist  generateY       ( cellBounds.min.y, cellBounds.max.y );
-	District const  districtType       { districtLookUpTable[cellId] }; // TODO: refactor? (and param)
+	Bounds                cellBounds      { districtMap.computeCellBounds(cellId) };
+	U16_Dist              generateOffset  { 0x0, 0xFF };
+	U16_Dist              generateX       ( cellBounds.min.x, cellBounds.max.x );
+	U16_Dist              generateY       ( cellBounds.min.y, cellBounds.max.y );
+	District::Type const *district        { districtLookupTable[cellId] };
 	auto      isValidPosition { [&](V2u const &tilePosition ) -> Bool {
 	                               return  (districtMap.diagram[districtMap.diagramIndex(tilePosition)] != cellId)
 	                                   or (map.tileAt(tilePosition) != Tile::ground)
-                                      or (roadDistanceMap[map.index(tilePosition)] < District_getBuildingMaxDistanceFromRoad(districtType)); // TODO: refactor into config or district
+                                      or (roadDistanceMap[map.index(tilePosition)] < district->maxDistFromRoad ); // TODO: refactor into config or district
 	                            } };
 
-	U16_Dist        generateTargetSize { District_getBuildingMinArea(districtType), District_getBuildingMaxArea(districtType) };
+	U16_Dist        generateTargetSize { district->minArea, district->maxArea };
 	U16      const  targetSize         { generateTargetSize(rng) };
 
 	// find valid starting coordinate:
@@ -604,7 +607,7 @@ Vector3 Map::getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcep
    return result;
 }
 
-District Map::getDistrictAt( U32 x, U32 y ) const noexcept {
+District::Type const *Map::getDistrictAt( U32 x, U32 y ) const noexcept {
 	auto tileIdx = districtMap->diagramIndex(x,y);
 	auto cellIdx = districtMap->diagram[ tileIdx ];
 	return districtLookupTable[ cellIdx ];
@@ -644,7 +647,7 @@ struct TileInfo {
 	} roadmap, housemap, concreteMap;
 	Vector3  origin;
 	Tile     tileType;
-	District districtType;
+	District::Type const *districtType;
 };
 
 inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
@@ -697,16 +700,16 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 				// d <=> 0b{ NW W SW S ' SE E NE N }
 
 				// used to account for road sidewalk edge cases:
-				auto districtRoadsHaveSidewalk = []( District d ) constexpr {
-					return d == District::metropolitan
-					    or d == District::downtown
-					    or d == District::residential;
+				auto districtRoadsHaveSidewalk = []( District::Type const *d ) constexpr {
+					return d == &District::metropolitan
+					    or d == &District::downtown
+					    or d == &District::residential;
 				};
 
 				if (
-					( entry.districtType==District::metropolitan and entry.tileType!=Tile::road )
-				or ( entry.districtType==District::residential   or entry.districtType==District::downtown)
-                 and entry.tileType==Tile::building )
+					( entry.districtType == &District::metropolitan and entry.tileType     != Tile::road )
+				or ( entry.districtType == &District::residential   or entry.districtType == &District::downtown)
+                 and entry.tileType == Tile::building )
 				{
 					entry.concreteMap.bitmap = 0x00; // no sidewalk borders on these tiles! (they're full concrete)
 				}
@@ -724,14 +727,14 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 						auto nDistrict = map.getDistrictAt(nX,nY);
 						auto nTile     = tilemap.tileAt(nX,nY);
 
-						if ( (entry.districtType==District::residential or entry.districtType==District::downtown)
+						if ( (entry.districtType == &District::residential or entry.districtType == &District::downtown)
                            and (entry.tileType==Tile::ground and nTile!=Tile::ground) )
 						{
 							entry.concreteMap.bitmap |= d; // outer sidewalk! (TEMP)
 						}
 						else {
-							if ( (nDistrict==District::metropolitan)
-							 or ((nDistrict==District::residential or nDistrict==District::downtown) and nTile==Tile::building) )
+							if ( (nDistrict == &District::metropolitan)
+							 or ((nDistrict == &District::residential or nDistrict == &District::downtown) and nTile==Tile::building) )
 							{
 								entry.concreteMap.bitmap |= d; // concrete!
 							}
@@ -754,9 +757,9 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 								}
 							}
 
-							if ( (  entry.districtType==District::metropolitan
-								  or entry.districtType==District::residential
-								  or entry.districtType==District::downtown )
+							if ( (  entry.districtType == &District::metropolitan
+								  or entry.districtType == &District::residential
+								  or entry.districtType == &District::downtown )
 							and entry.tileType==Tile::road and (nTile!=Tile::road or ( d & 0b1010'1010 )) /* corner! */ )
 							{
 									entry.concreteMap.bitmap |= d; // inner sidewalk!
@@ -859,6 +862,10 @@ static F32 constexpr baseOffsetY     { -1.50f };
 static F32 constexpr sidewalkOffsetY { -1.49f };
 static F32 constexpr markerOffsetY   { -1.49f };
 
+Biome Map::getBiome() const noexcept {
+	return biome;
+}
+
 Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 {
 	Vector<UPtr<GameObject>> models;
@@ -894,36 +901,36 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 		}
 
 		if ( e.tileType == Tile::building ) {
-			if ( e.districtType == District::metropolitan
-           or e.districtType == District::downtown
-           or e.districtType == District::residential )
+			if ( e.districtType == &District::metropolitan
+           or e.districtType == &District::downtown
+           or e.districtType == &District::residential )
 				instantiatePart( "Tiles/concrete", e.origin );
-			else if ( e.districtType == District::suburban 
-                or e.districtType == District::park )
+			else if ( e.districtType == &District::suburban 
+                or e.districtType == &District::park )
 			{ // no full-size concrete under buildings in these districts
-				instantiatePart( "Tiles/grass", e.origin );
+				instantiatePart( "Tiles/"+stringify(biome), e.origin );
 			}
 		}
 			
 		else if ( e.tileType == Tile::ground ) {
 		// intrinsic: center c == 0
-			if ( e.districtType == District::metropolitan )
+			if ( e.districtType == &District::metropolitan )
 			{ // no grass tiles in metropolitan districts
 				instantiatePart( "Tiles/concrete", e.origin );
 			}
-			else if ( e.districtType == District::downtown
-                or e.districtType == District::residential
-                or e.districtType == District::suburban
-					 or e.districtType == District::park )
+			else if ( e.districtType == &District::downtown
+                or e.districtType == &District::residential
+                or e.districtType == &District::suburban
+					 or e.districtType == &District::park )
 			{
-				instantiatePart( "Tiles/grass", e.origin );
+				instantiatePart( "Tiles/"+stringify(biome), e.origin );
 			}
 		}
 		else if ( e.tileType == Tile::road ) {
 		// intrinsic: center c == 1
-			if ( e.districtType == District::metropolitan
-           or e.districtType == District::downtown
-           or e.districtType == District::residential )
+			if ( e.districtType == &District::metropolitan
+           or e.districtType == &District::downtown
+           or e.districtType == &District::residential )
 			{	// ^ these districts have 4-lane roads
 				// place eventual inner sidewalk borders:
 
@@ -951,7 +958,7 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 				}
 				instantiatePart( "Tiles/asphalt", e.origin );
 			}
-			else if ( e.districtType == District::suburban or e.districtType == District::park ) {
+			else if ( e.districtType == &District::suburban or e.districtType == &District::park ) {
 				// only 2-lane roads in suburban districts
 				auto maskedMap = e.roadmap.bitmap & maskRoad;
 				if ( maskedMap == pred4Way )
@@ -974,11 +981,11 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 						break;
 					}
 				}
-				instantiatePart( "Tiles/grass", e.origin );
+				instantiatePart( "Tiles/"+stringify(biome), e.origin );
 			}
 		}
-		else if ( e.districtType == District::park ) {
-			instantiatePart( "Tiles/grass", e.origin );
+		else if ( e.districtType == &District::park ) {
+			instantiatePart( "Tiles/"+stringify(biome), e.origin );
 			// TODO: park roads using L-systems
 		}
 	}
