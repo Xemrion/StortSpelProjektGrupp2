@@ -13,6 +13,7 @@ private:
 	void addTextbox();
 
 	std::unique_ptr<TextBox> textBox;
+	bool showTextBox;
 	Texture* textureSlot;
 	Texture* textureIndicator;
 	Item* item;
@@ -23,7 +24,7 @@ private:
 public:
 	static Vector2 size;
 
-	ItemSlot(Vector2 position = Vector2());
+	ItemSlot(Vector2 position = Vector2(), bool showTextBox = true);
 	virtual ~ItemSlot();
 
 	void draw(bool selected);

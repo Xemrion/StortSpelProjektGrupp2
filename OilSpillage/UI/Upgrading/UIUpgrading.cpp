@@ -4,21 +4,41 @@
 
 void UIUpgrading::updateUI(float deltaTime)
 {
-	if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
+	if (this->selectingItem)
 	{
-		this->itemSelector->changeSelectedIndex(false);
+		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
+		{
+			this->selectingItem = false;
+		}
+		else if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
+		{
+			this->itemSelector->changeSelectedIndex(false);
+		}
+		else if (Input::checkButton(Keys::L_RIGHT, States::PRESSED))
+		{
+			this->itemSelector->changeSelectedIndex(true);
+		}
+		else if (Input::checkButton(Keys::L_UP, States::PRESSED))
+		{
+			this->itemSelector->changeSelectedType(false);
+		}
+		else if (Input::checkButton(Keys::L_DOWN, States::PRESSED))
+		{
+			this->itemSelector->changeSelectedType(true);
+		}
 	}
-	else if(Input::checkButton(Keys::L_RIGHT, States::PRESSED))
+	else
 	{
-		this->itemSelector->changeSelectedIndex(true);
-	}
-	else if(Input::checkButton(Keys::L_UP, States::PRESSED))
-	{
-		this->itemSelector->changeSelectedType(false);
-	}
-	else if(Input::checkButton(Keys::L_DOWN, States::PRESSED))
-	{
-		this->itemSelector->changeSelectedType(true);
+		this->carGadgetSelector->update(true, deltaTime);
+
+		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
+		{
+			this->carGadgetSelector->setItemOfSelected(this->itemSelector->getSelectedItem());
+		}
+		else if (Input::checkButton(Keys::CANCEL, States::PRESSED))
+		{
+			this->selectingItem = true;
+		}
 	}
 
 	this->itemSelector->update(deltaTime);
@@ -28,6 +48,7 @@ void UIUpgrading::drawUI()
 {
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	this->itemSelector->draw(false);
+	this->carGadgetSelector->draw(!this->selectingItem);
 
 	const char* type = "";
 	switch (this->itemSelector->getSelectedType())
@@ -46,11 +67,11 @@ void UIUpgrading::drawUI()
 		break;
 	}
 
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), type, Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), Colors::White, 0, Vector2(0, 0), 0.5f);
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), type, Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2 - 200.0f, SCREEN_HEIGHT - ItemSelector::size.y + 65.0f), Colors::White, 0, Vector2::Zero, 0.5f);
 	UserInterface::getSpriteBatch()->End();
 }
 
-UIUpgrading::UIUpgrading()
+UIUpgrading::UIUpgrading() : selectingItem(true)
 {
 }
 
@@ -60,5 +81,6 @@ UIUpgrading::~UIUpgrading()
 
 void UIUpgrading::init()
 {
-	this->itemSelector = std::make_unique<ItemSelector>(Vector2(0, 0));
+	this->itemSelector = std::make_unique<ItemSelector>(Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2, SCREEN_HEIGHT - ItemSelector::size.y));
+	this->carGadgetSelector = std::make_unique<CarGadgetSelector>(Vector2(ItemSlot::size.x + 20.0f, ItemSlot::size.x + 20.0f));
 }

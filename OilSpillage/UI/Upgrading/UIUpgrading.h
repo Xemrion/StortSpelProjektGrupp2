@@ -3,6 +3,7 @@
 
 #include "../UserInterface.h"
 #include "../Elements/ItemSelector.h"
+#include "../Elements/CarGadgetSelector.h"
 
 class UIUpgrading : public UserInterface
 {
@@ -10,7 +11,9 @@ private:
 	void updateUI(float deltaTime);
 	void drawUI();
 
+	bool selectingItem;
 	std::unique_ptr<ItemSelector> itemSelector;
+	std::unique_ptr<CarGadgetSelector> carGadgetSelector;
 public:
 	UIUpgrading();
 	virtual ~UIUpgrading();

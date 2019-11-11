@@ -2,14 +2,14 @@
 #include "../../game.h"
 #include "../UserInterface.h"
 
-Vector2 ItemSelector::size = Vector2(512, 128);
+Vector2 ItemSelector::size = Vector2(736, 192);
 
 void ItemSelector::addTextbox()
 {
 	int selectedIndex = this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType];
 	Item* item = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->at(this->selectedIndex[this->selectedType]);
-	this->textBox = std::make_unique<TextBox>("-- " + item->getName() + " --\n" + item->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::TOP);
-	this->textBox->setPosition(this->position + Vector2(145.0f + 96.0f * selectedIndex - this->textBox->getSize().x * 0.5f, 140.0f + 50.0f));
+	this->textBox = std::make_unique<TextBox>("-- " + item->getName() + " --\n" + item->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::BOTTOM);
+	this->textBox->setPosition(this->position + Vector2(145.0f + 96.0f * selectedIndex - this->textBox->getSize().x * 0.5f, -this->textBox->getSize().y + 40.0f));
 }
 
 ItemSelector::ItemSelector(Vector2 position) : Element(position), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimers{ 0 }

@@ -7,11 +7,14 @@ Vector2 ItemSlot::size = Vector2(100, 100);
 
 void ItemSlot::addTextbox()
 {
-	this->textBox = std::make_unique<TextBox>("-- " + item->getName() + " --\n" + item->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::TOP);
-	this->textBox->setPosition(this->position + Vector2(ItemSlot::size.x * 0.5f - this->textBox->getSize().x * 0.5f, ItemSlot::size.y + 10.0f));
+	if (this->showTextBox)
+	{
+		this->textBox = std::make_unique<TextBox>("-- " + item->getName() + " --\n" + item->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::TOP);
+		this->textBox->setPosition(this->position + Vector2(ItemSlot::size.x * 0.5f - this->textBox->getSize().x * 0.5f, ItemSlot::size.y + 10.0f));
+	}
 }
 
-ItemSlot::ItemSlot(Vector2 position) : Element(position), item(nullptr), rotationTimer(0)
+ItemSlot::ItemSlot(Vector2 position, bool showTextBox) : Element(position), showTextBox(showTextBox), item(nullptr), rotationTimer(0)
 {
 	Game::getGraphics().loadTexture("UI/itemSlot");
 	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");

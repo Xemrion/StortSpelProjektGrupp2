@@ -61,15 +61,15 @@ void TextBox::draw(bool selected)
 			arrowPos = Vector2(this->size.x / 2, 0);
 			break;
 		case ArrowPlacement::RIGHT:
-			arrowPos = Vector2(this->size.x, this->size.y / 2);
+			arrowPos = Vector2(this->size.x - this->textureArrow->getHeight(), this->size.y / 2 - this->textureArrow->getCenter().x);
 			arrowRot = XM_PIDIV2;
 			break;
 		case ArrowPlacement::BOTTOM:
-			arrowPos = Vector2(this->size.x / 2, this->size.y);
+			arrowPos = Vector2(this->size.x / 2, this->size.y - this->textureArrow->getHeight());
 			arrowRot = XM_PI;
 			break;
 		case ArrowPlacement::LEFT:
-			arrowPos = Vector2(0, this->size.y / 2);
+			arrowPos = Vector2(0, this->size.y / 2 - this->textureArrow->getCenter().x);
 			arrowRot = XM_PIDIV2 * 3;
 			break;
 		}
