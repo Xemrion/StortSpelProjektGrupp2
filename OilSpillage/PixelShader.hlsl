@@ -115,7 +115,7 @@ float4 main(VS_OUT input) : SV_Target
 
 	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
 
-	uint2 lightTileIndex = floor(uint2(input.Pos.x, input.Pos.y) / uint2(16.f, 16.f));
+	uint2 lightTileIndex = uint2(input.Pos.x * 0.0625f, input.Pos.y * 0.0625f);
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 
 	float4 ambient = max(-dot(sunDir, normal)*(1- shadowVisible(input.shadowPos, ShadowMap, 0.00015f) * texColor.a), float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
@@ -129,7 +129,7 @@ float4 main(VS_OUT input) : SV_Target
 		Light l = lights[lightTileData.indices[i]];
 		float3 lightVector = l.pos.xyz - input.wPos.xyz;
 		float attenuation = l.color.w / dot(lightVector, lightVector);
-		if (attenuation < 0.0005) attenuation = 0;
+
 		float nDotL = max(dot(normal, normalize(lightVector)), 0.0);
 		float directional = 1.0;
 		shadowSpotVisible = 1.0f;

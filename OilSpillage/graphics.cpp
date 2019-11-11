@@ -219,7 +219,7 @@ bool Graphics::init(Window* window)
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-	desc.ByteWidth = static_cast<UINT>(sizeof(UINT) * (MAX_LIGHTS_PER_TILE + 1) * 80 * 45);
+	desc.ByteWidth = static_cast<UINT>(sizeof(UINT) * (MAX_LIGHTS_PER_TILE + 1) * (window->width / 16) * (window->height / 16));
 	desc.StructureByteStride = static_cast<UINT>(sizeof(UINT) * (MAX_LIGHTS_PER_TILE + 1));
 
 	hr = device->CreateBuffer(&desc, 0, &culledLightBuffer);
@@ -242,7 +242,7 @@ bool Graphics::init(Window* window)
 
 	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
 	uavDesc.Buffer.FirstElement = 0;
-	uavDesc.Buffer.NumElements = 80 * 45;
+	uavDesc.Buffer.NumElements = (window->width / 16) * (window->height / 16);
 	uavDesc.Buffer.Flags = 0;
 	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
@@ -253,7 +253,7 @@ bool Graphics::init(Window* window)
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.NumElements = 80 * 45;
+	srvDesc.Buffer.NumElements = (window->width / 16) * (window->height / 16);
 
 	hr = device->CreateShaderResourceView(culledLightBuffer.Get(), &srvDesc, &culledLightBufferSRV);
 	if (FAILED(hr))
@@ -386,15 +386,11 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	Matrix view = camera->getViewMatrix().Transpose();
-	deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, &view, sizeof(Matrix));
-	deviceContext->Unmap(viewProjBuffer.Get(), 0);
-	deviceContext->CSSetConstantBuffers(1, 1, viewProjBuffer.GetAddressOf());
-	fillLightBuffers();
-	cullLights();
 
+	fillLightBuffers();
+	cullLights(camera->getViewMatrix());
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	Matrix viewProj = (camera->getViewMatrix() * camera->getProjectionMatrix()).Transpose();
 	HRESULT hr = deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
@@ -522,6 +518,7 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	Frustum frustum = shadowMap.getSunFrustum();
 	Frustum spotFrustum = shadowMap.getSpotFrustum();
 
+	shadowMap.setDSun();
 	for (GameObject* object : drawableObjects)
 	{
 		AABB boundingBox = object->getAABB();
@@ -535,13 +532,30 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 			shadowMap.setWorld(worldTr);
 			deviceContext->PSSetShader(nullptr, nullptr, 0);
 			deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-			shadowMap.setDSun();
 			if (object->getSunShadow())
 			{
 				deviceContext->Draw(vertexCount, 0);
 			}
-			shadowMap.setDSpot();
-			if (object->getSpotShadow() && spotFrustum.intersect(boundingBox, 10.0f))
+
+		}
+	}
+
+	shadowMap.setDSpot();
+	for (GameObject* object : drawableObjects)
+	{
+		AABB boundingBox = object->getAABB();
+		if (frustum.intersect(boundingBox, 0.0f))
+		{
+			UINT vertexCount = object->mesh->getVertexCount();
+			UINT stride = sizeof(Vertex3D);
+			UINT offset = 0;
+			SimpleMath::Matrix world = object->getTransform();
+			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+			shadowMap.setWorld(worldTr);
+			deviceContext->PSSetShader(nullptr, nullptr, 0);
+			deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+
+			if (object->getSpotShadow() && spotFrustum.intersect(boundingBox, 5.0f, false))
 			{
 				deviceContext->Draw(vertexCount, 0);
 			}
@@ -550,6 +564,7 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 
 	std::vector<GameObject*> objects;
 	quadTree->getGameObjects(objects, frustum, 0.0f);
+	shadowMap.setDSun();
 	for (GameObject* o : objects)
 	{
 		AABB boundingBox = o->getAABB();
@@ -561,13 +576,26 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 		shadowMap.setWorld(worldTr);
 		deviceContext->PSSetShader(nullptr, nullptr, 0);
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-		shadowMap.setDSun();
 		if (o->getSunShadow())
 		{
 			deviceContext->Draw(vertexCount, 0);
 		}
-		shadowMap.setDSpot();
-		if (o->getSpotShadow() && spotFrustum.intersect(boundingBox, 10.0f))
+	}
+
+	shadowMap.setDSpot();
+	for (GameObject* o : objects)
+	{
+		AABB boundingBox = o->getAABB();
+		UINT vertexCount = o->mesh->getVertexCount();
+		UINT stride = sizeof(Vertex3D);
+		UINT offset = 0;
+		SimpleMath::Matrix world = o->getTransform().Transpose();
+		SimpleMath::Matrix worldTr = world;
+		shadowMap.setWorld(worldTr);
+		deviceContext->PSSetShader(nullptr, nullptr, 0);
+		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+
+		if (o->getSpotShadow() && spotFrustum.intersect(boundingBox, 5.0f))
 		{
 			deviceContext->Draw(vertexCount, 0);
 		}
@@ -1208,8 +1236,15 @@ void Graphics::fillLightBuffers()
 	deviceContext->Unmap(sunBuffer.Get(), 0);
 }
 
-void Graphics::cullLights()
+void Graphics::cullLights(Matrix view)
 {
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	view = view.Transpose();
+	deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &view, sizeof(Matrix));
+	deviceContext->Unmap(viewProjBuffer.Get(), 0);
+	deviceContext->CSSetConstantBuffers(1, 1, viewProjBuffer.GetAddressOf());
+
 	deviceContext->CSSetShader(lightCullingShader.getShader(), NULL, 0);
 	ID3D11ShaderResourceView* nullSRV = NULL;
 	deviceContext->PSSetShaderResources(2, 1, &nullSRV);
@@ -1219,7 +1254,7 @@ void Graphics::cullLights()
 
 	deviceContext->CSSetUnorderedAccessViews(0, 1, culledLightBufferUAV.GetAddressOf(), &uavCounter);
 
-	deviceContext->Dispatch(80, 45, 1);
+	deviceContext->Dispatch((window->width / 16), (window->height / 16), 1);
 
 	ID3D11UnorderedAccessView* nullUAV = NULL;
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &nullUAV, 0);
@@ -1239,10 +1274,10 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-	desc.ByteWidth = static_cast<UINT>(sizeof(PartialFrustum) * 80 * 45);
+	desc.ByteWidth = static_cast<UINT>(sizeof(PartialFrustum) * (window->width / 16) * (window->height / 16));
 	desc.StructureByteStride = sizeof(PartialFrustum);
 
-	PartialFrustum* frustumTiles = new PartialFrustum[80 * 45];
+	PartialFrustum* frustumTiles = new PartialFrustum[(window->width / 16) * (window->height / 16)];
 	D3D11_SUBRESOURCE_DATA data;
 	data.pSysMem = frustumTiles;
 	data.SysMemPitch = 0;
@@ -1259,7 +1294,7 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 	};
 
 	auto screenToView = [&](Vector4 screen) {
-		Vector2 texCoord = Vector2(screen) / Vector2(1280, 720);
+		Vector2 texCoord = Vector2(screen) / Vector2(window->width, window->height);
 		texCoord.y = 1.f - texCoord.y;
 		texCoord = texCoord * Vector2(2.0f, 2.0f) - Vector2(1.0f, 1.0f);
 		Vector4 clip = Vector4(texCoord.x, texCoord.y, screen.z, screen.w);
@@ -1267,9 +1302,9 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 		return clipToView(clip);
 	};
 
-	for (int y = 0; y < 45; ++y)
+	for (int y = 0; y < window->height / 16; ++y)
 	{
-		for (int x = 0; x < 80; ++x)
+		for (int x = 0; x < window->width / 16; ++x)
 		{
 			Vector4 screenTopLeft     =	Vector4(x * 16.f, y * 16.f, 1.0f, 1.0f);
 			Vector4 screenTopRight    =	Vector4((x + 1) * 16.f, y * 16.f, 1.0f, 1.0f);
@@ -1286,7 +1321,7 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 			frustum.left   = DirectX::XMPlaneFromPoints(eye, viewBottomLeft, viewTopLeft);
 			frustum.right  = DirectX::XMPlaneFromPoints(eye, viewTopRight, viewBottomRight);
 
-			frustumTiles[y * 80 + x] = frustum;
+			frustumTiles[y * (window->width / 16) + x] = frustum;
 		}
 	}
 
@@ -1300,7 +1335,7 @@ HRESULT Graphics::createFrustumBuffer(DynamicCamera* camera)
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.NumElements = 80 * 45;
+	srvDesc.Buffer.NumElements = (window->width / 16) * (window->height / 16);
 
 	hr = device->CreateShaderResourceView(frustumBuffer.Get(), &srvDesc, frustumBufferSRV.GetAddressOf());
 
@@ -1388,7 +1423,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 	int i = 0;
 	for (GameObject* object : fog.getQuads())
 	{
-		object->setRotation(object->getRotation() + Vector3(0.0, deltaTime * 0.005 - 0.000 * i, 0.0));
+		//object->setRotation(object->getRotation() + Vector3(0.0, deltaTime * 0.005 - 0.000 * i, 0.0));
 		SimpleMath::Matrix world = object->getTransform();
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 

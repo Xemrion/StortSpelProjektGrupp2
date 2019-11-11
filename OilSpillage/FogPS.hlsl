@@ -86,7 +86,7 @@ PS_OUT main(VS_OUT input) : SV_TARGET
 	//float u = noiseTex.Sample(samplerState, input.Pos.xy / 500, -offset.yx).r;
 	//float d = noiseTex.Sample(samplerState, input.Pos.xy / 500, offset.yx).r;
 	
-	float4 nd = noised(float3(input.Pos.xy * 0.1, normalY));
+	float4 nd = noised(float3(input.Pos.xy * 0.1, normalY * 10.0));
 	float alpha = nd.x < densityThreshold ? density : 0.0;
 	//float alpha = 0.0;
 	//int radius = 1;
@@ -107,7 +107,8 @@ PS_OUT main(VS_OUT input) : SV_TARGET
 	output.color = float4(color.r, color.g, color.b, alpha + ambientDensity);
 	//output.normal = lerp(float4(normalize(float3(r - l, d - u, normalY)) * 0.5 + 0.5, 1.0), float4(float3(0.0, 0.0, 1.0) * 0.5 + 0.5, 1.0), ambientDensity / (alpha + ambientDensity));
 	//output.normal = float4(normalize(float3(r - l, d - u, normalY)) * 0.5 + 0.5, 1.0);
-	nd = noised(float3(input.Pos.xy * 0.1, normalY));
+	//nd = noised(float3(input.Pos.xy + float2(100.0, 100.0), 50.0));
+	
 	output.normal.xyz = nd.yzw * 0.5 + 0.5;
 
 	return output;

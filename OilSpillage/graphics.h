@@ -89,7 +89,7 @@ class Graphics {
 	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
-	void cullLights();
+	void cullLights(Matrix view);
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
 	void drawFog(DynamicCamera* camera, float deltaTime);
 public:

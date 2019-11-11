@@ -14,7 +14,7 @@ struct Frustum {
 		return point.Dot(Vector3(plane)) + plane.w;
 	}
 
-	bool intersect(AABB box, float bias = 0.0)
+	bool intersect(AABB box, float bias = 0.0, bool partialFrustum = true)
 	{
 		Vector3 p = box.minPos;
 		if (leftPlane.x < 0) p.x = box.maxPos.x;
@@ -39,6 +39,20 @@ struct Frustum {
 		if (bottomPlane.y < 0) p.y = box.maxPos.y;
 		if (bottomPlane.z < 0) p.z = box.maxPos.z;
 		if (pointToPlaneDistance(bottomPlane, p) > bias) return false;
+
+		if (partialFrustum) return true;
+
+		p = box.minPos;
+		if (nearPlane.x < 0) p.x = box.maxPos.x;
+		if (nearPlane.y < 0) p.y = box.maxPos.y;
+		if (nearPlane.z < 0) p.z = box.maxPos.z;
+		if (pointToPlaneDistance(nearPlane, p) > bias) return false;
+
+		p = box.minPos;
+		if (farPlane.x < 0) p.x = box.maxPos.x;
+		if (farPlane.y < 0) p.y = box.maxPos.y;
+		if (farPlane.z < 0) p.z = box.maxPos.z;
+		if (pointToPlaneDistance(farPlane, p) > bias) return false;
 
 		return true;
 	}

@@ -97,7 +97,7 @@ void QuadTree::Node::getGameObjects(std::vector<GameObject*>& objects, Frustum& 
 		{
 			for (GameObject* o : this->objects)
 			{
-				if (viewFrustum.intersect(o->getAABB(), frustumBias))
+				if (viewFrustum.intersect(o->getAABB(), 0.0))
 				{
 					objects.push_back(o);
 				}

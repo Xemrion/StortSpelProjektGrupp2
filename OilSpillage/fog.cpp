@@ -38,9 +38,9 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 	{
 		GameObject* q = new GameObject();
 		q->mesh = Game::getGraphics().getMeshPointer("Quad");
-		q->setPosition(Vector3(96*10, i * spacing - 1.5f, -96*10));
+		q->setPosition(Vector3(95*10, i * spacing - 1.5f, -95*10));
 		//spacing *= 0.95;
-		q->setScale(Vector3(96.0 * 14, 96.0 * 14, 1.0));
+		q->setScale(Vector3(96.0 * 10, 96.0 * 10, 1.0));
 		q->setColor(Vector4(0.0, 0.0, 0.0, (float(i) / slices)));
 		//Game::getGraphics().loadTexture("brickwallnormal");
 		//Game::getGraphics().loadTexture("brickwall");
