@@ -57,5 +57,39 @@ void Attacker::setUpActor()
 	selector.addChildren(chase);
 
 	seq2.addChildren(inRange);
-	seq2.addChildren(shoot);
+	//seq2.addChildren(shoot);
 }
+
+Vector3 Attacker::seek()
+{
+	Vector3 desiredDirection;
+	Vector3 offsetVec;
+	Vector3 eliminatingVec = Vector3(0.0f, -1.0f, 0.0f) - Vector3(0.0f, 1.0f, 0.0f);
+	//standard group movement
+	//if (!vActive)
+	//{
+		desiredDirection -= position - destination;
+		//desired *= maxSpeed;
+	//}
+
+	////do something
+	//else if (vActive && duty == 1)
+	//{
+
+	//}
+
+	////do something else
+	//else if (vActive && duty == 2)
+	//{
+
+	//}
+
+	acceleration = desiredDirection - velocity;
+	if (acceleration.Length() > maxForce)
+	{
+		acceleration /= acceleration.Length();
+	}
+	vActive = false;
+	return acceleration;
+}
+

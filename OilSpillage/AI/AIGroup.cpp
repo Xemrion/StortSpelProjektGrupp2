@@ -38,7 +38,7 @@ void AIGroup::formationP(Vector3 targetPos)
 	float deltaZ = averagePos.z - targetPos.z;
 	float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 
-	if (distance < 150 && distance > 2)
+	if (distance < 50 && distance > 2)
 	{
 		this->groupRadius = groupRadius * 2;
 		for (int i = 0; i < actors.size(); i++)

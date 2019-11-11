@@ -69,11 +69,19 @@ Vector3 Swarm::seek()
 	{
 		desiredDirection -= position - destination;
 		//desired *= maxSpeed;
+		if (this->stats.maxSpeed != 7.0)
+		{
+			this->stats.maxSpeed = 7.0;
+		}
 	}
 
 	//strafe to the left of player
 	else if (vActive && duty == 1)
 	{
+		if (this->stats.maxSpeed == 7.0)
+		{
+			this->stats.maxSpeed = 9.0;
+		}
 		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
 		offsetVec = crossVector.Cross(eliminatingVec);
 		offsetVec.Normalize();
@@ -84,6 +92,10 @@ Vector3 Swarm::seek()
 	//strafe to the right of player
 	else if (vActive && duty == 2)
 	{
+		if (this->stats.maxSpeed == 7.0)
+		{
+			this->stats.maxSpeed = 9.0;
+		}
 		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
 		offsetVec = crossVector.Cross(eliminatingVec);
 		offsetVec.Normalize();
