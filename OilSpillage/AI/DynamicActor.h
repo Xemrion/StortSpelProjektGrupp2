@@ -13,6 +13,10 @@ public:
 	float getMaxSpeed();
 	float getMaxForce();
 	Vector3 getVelocity();
+
+	int duty;
+	bool vActive;
+	Vector3 groupPos;
 protected:	
 	int aggroRange;
 	int boidOffset;

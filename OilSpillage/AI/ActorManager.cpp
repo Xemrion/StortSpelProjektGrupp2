@@ -31,6 +31,7 @@ void ActorManager::update(float dt, Vector3 targetPos)
 	seperation(targetPos);
 	for (int i = 0; i < this->groups.size(); i++)
 	{
+		groups[i].formationP(targetPos);
 		for(int j = 0; j < groups[i].actors.size(); j++)
 		{
 			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
@@ -324,6 +325,7 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 {
 	groups.at(groupIndex).actors.push_back(actor);
+	groups[groupIndex].updateDuty();
 }
 
 void ActorManager::leaveGroup(int groupIndex, int where)
@@ -424,4 +426,5 @@ void ActorManager::createGroup(DynamicActor* actor)
 	temp.actors.push_back(actor);
 	temp.updateAveragePos();
 	groups.push_back(temp);
+	groups[groups.size() - 1].updateDuty();
 }
