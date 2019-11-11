@@ -12,7 +12,7 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 	return stream.str();
 }
 
-ItemWeapon::ItemWeapon(std::string name, Weapon weapon, GameObject* object) : Item(name, generateDescription(weapon), ItemType::WEAPON, object), weapon(weapon)
+ItemWeapon::ItemWeapon(std::string name, Weapon weapon, std::shared_ptr<GameObject> object) : Item(name, generateDescription(weapon), ItemType::WEAPON, object), weapon(weapon)
 {
 }
 

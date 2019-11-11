@@ -17,21 +17,23 @@ enum ItemType
 class Item
 {
 private:
-	static std::unique_ptr<GameObject> machineGun;
+	static std::shared_ptr<GameObject> machineGun;
 	static std::vector<Item> allItems;
 protected:
 	std::string name;
 	std::string description;
 	ItemType type;
-	GameObject* object;
+	std::shared_ptr<GameObject> object;
 public:
 	static void init();
 	static Item* getItemByName(std::string name);
 	static Item* getRandom();
 	static Matrix generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale = Vector3::One, Vector3 rotation = Vector3::Zero, bool ignoreObjectRotation = false);
 
-	Item(std::string name, std::string description, ItemType type, GameObject* object);
+	Item(std::string name, std::string description, ItemType type, std::shared_ptr<GameObject> object);
 	virtual ~Item();
+	Item(const Item& obj);
+	/*void operator=(const Item& obj);*/
 
 	std::string getName() const;
 	std::string getDescription() const;
