@@ -4,6 +4,7 @@
 #include "Attacker.h"
 #include "Swarm.h"
 #include "Car_Spitfire.h"
+#include "Boss.h"
 
 ActorManager::ActorManager()
 {
@@ -97,6 +98,12 @@ void ActorManager::createSwarm(float x, float z, int weaponType)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
+void ActorManager::createBoss(float x, float z, int weaponType)
+{
+	this->actors.push_back(new Boss(x, z, weaponType));
+	initGroupForActor(actors.at(actors.size() - 1));
+}
+
 float ActorManager::distanceToPlayer(Vector3 position)
 {
 	float minDistance = 99999999999;
@@ -167,6 +174,11 @@ void ActorManager::spawnTurrets(Vector3 position, Radius radius, float angle, in
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
 		createTurret(newPosition.x, newPosition.y, weaponType);
 	}
+}
+
+void ActorManager::spawnBoss(Vector3 originPos, int weaponType)
+{
+	createBoss(originPos.x, originPos.z, weaponType);
 }
 
 Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)

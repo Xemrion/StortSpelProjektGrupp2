@@ -549,6 +549,16 @@ void PlayingGameState::update(float deltaTime)
 			spawnTimer = 0;
 		}
 		spawnTimer++;*/
+		//spawn Boss
+		/*if (spawnTimer % 1000 == 0)
+		{
+			actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
+				player->getVehicle()->getPosition().y,
+				player->getVehicle()->getPosition().z + 5), 0);
+			spawnTimer = 0;
+		}
+		spawnTimer++;
+		*/
 
 		powerUps.erase(
 			std::remove_if(
