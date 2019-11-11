@@ -35,6 +35,7 @@ Element* UserInterface::changeSelected(Element* selected)
 		if (selected->getDown() != nullptr)
 		{
 			selected = selected->getDown();
+			Sound::PlaySoundEffect(L"data/sound/MenuMove.wav");
 		}
 	}
 
@@ -43,6 +44,7 @@ Element* UserInterface::changeSelected(Element* selected)
 		if (selected->getUp() != nullptr)
 		{
 			selected = selected->getUp();
+			Sound::PlaySoundEffect(L"data/sound/MenuMove.wav");
 		}
 	}
 
@@ -51,6 +53,7 @@ Element* UserInterface::changeSelected(Element* selected)
 		if (selected->getLeft() != nullptr)
 		{
 			selected = selected->getLeft();
+			Sound::PlaySoundEffect(L"data/sound/MenuMove.wav");
 		}
 	}
 
@@ -59,6 +62,7 @@ Element* UserInterface::changeSelected(Element* selected)
 		if (selected->getRight() != nullptr)
 		{
 			selected = selected->getRight();
+			Sound::PlaySoundEffect(L"data/sound/MenuMove.wav");
 		}
 	}
 

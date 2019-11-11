@@ -22,6 +22,8 @@ private:
 	std::unique_ptr<Vehicle> theVehicle;
 	std::unique_ptr<LightList> lightList;
 	std::unique_ptr<Physics> physics; //for vehicle
+	std::unique_ptr<GameObject> background;
+	std::unique_ptr<VehicleSlots> vehicleSlots;
 	float timer;
 	int currentMenu;
 public:

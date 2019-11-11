@@ -16,7 +16,7 @@ private:
 	std::unique_ptr<TextBox> textBox;
 
 	float rotationTimers[tileLength];
-	Vector3 rotation[tileLength];
+	Quaternion rotation[tileLength];
 	Matrix transforms[tileLength];
 
 	int selectedTypeLastDraw;

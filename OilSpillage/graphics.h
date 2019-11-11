@@ -32,7 +32,11 @@ enum Shapes
 	SHAPE_CUBE,
 	SHAPE_QUAD
 };
-
+struct MaterialColor
+{
+	Vector4 color;
+	Vector4 shading;
+};
 class Graphics {
 	Window* window;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;

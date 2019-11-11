@@ -186,7 +186,7 @@ bool Graphics::init(Window* window)
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>(sizeof(Vector4) + (16 - (sizeof(Vector4) % 16)));
+	desc.ByteWidth = 32;//static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16)));
 	desc.StructureByteStride = 0;
 
 	hr = device->CreateBuffer(&desc, 0, &colorBuffer);
@@ -485,9 +485,11 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 					glossSRV = material.gloss->getShaderResView();
 				}
 
-				Vector4 modColor = object->getColor();
+				MaterialColor modColor;
+				modColor.color = object->getColor();
+				modColor.shading.x = object->getShading();
 				hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-				CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
+				CopyMemory(mappedResource.pData, &modColor, static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16))));
 				deviceContext->Unmap(colorBuffer.Get(), 0);
 
 				deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());

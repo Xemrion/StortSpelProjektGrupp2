@@ -19,7 +19,7 @@ private:
 	Item* item;
 
 	float rotationTimer;
-	Vector3 rotation;
+	Quaternion rotation;
 	Matrix transform;
 public:
 	static Vector2 size;

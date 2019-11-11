@@ -50,14 +50,15 @@ void ItemSlot::update(bool selected, float deltaTime)
 		if (selected)
 		{
 			rotationTimer = std::fmodf(rotationTimer + deltaTime * 4, XM_2PI);
-			rotation = Vector3(rotationTimer, 0.0f, 0.0f);
-			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.2f), rotation, false);
+			//rotation = Quaternion::CreateFromYawPitchRoll(rotationTimer, 0.0f, 0.0f);
+			rotation = Quaternion::Slerp(rotation, Quaternion::CreateFromYawPitchRoll(rotationTimer, 0, 0), deltaTime * 10);
+			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.5f), rotation, true);
 		}
 		else
 		{
-			rotationTimer = Game::lerp(rotationTimer, 0.0f, deltaTime * 4);
-			rotation = Vector3::Lerp(rotation, Vector3(), deltaTime * 4);
-			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.0f), rotation);
+			rotationTimer = Game::lerp(rotationTimer, 190 * XM_PI / 180, deltaTime * 4);
+			rotation = Quaternion::Slerp(rotation, Quaternion::CreateFromYawPitchRoll(XM_PI + 0.3f, 0.26f, 0.0f), deltaTime * 4);
+			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.5f), rotation,true);
 		}
 	}
 }
@@ -85,9 +86,9 @@ void ItemSlot::setItem(Item* item)
 	{
 		if (item->getObject())
 		{
-			rotationTimer = 0.0f;
-			rotation = Vector3();
-			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f));
+			rotationTimer = 190 * XM_PI / 180;
+			rotation = Quaternion::CreateFromYawPitchRoll(XM_PI + 0.3f, 0.26f, 0.0f);
+			transform = Item::generateTransform(item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.0f), rotation, true);
 			Game::getGraphics().addToUIDraw(item->getObject(), &this->transform);
 		}
 

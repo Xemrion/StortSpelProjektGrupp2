@@ -8,6 +8,7 @@
 #include <SpriteFont.h>
 #include <CommonStates.h>
 #include "Elements/Element.h"
+#include "../Sound.h"
 
 class UserInterface
 {
