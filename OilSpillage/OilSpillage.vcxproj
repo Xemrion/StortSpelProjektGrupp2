@@ -201,6 +201,7 @@
     <ClCompile Include="UI\Elements\ObjectiveBox.cpp" />
     <ClCompile Include="UI\Elements\Slider.cpp" />
     <ClCompile Include="UI\Elements\TextBox.cpp" />
+    <ClCompile Include="UI\Elements\VehicleStatBox.cpp" />
     <ClCompile Include="UI\Menu\UIControls.cpp" />
     <ClCompile Include="UI\Menu\UICredits.cpp" />
     <ClCompile Include="UI\Menu\UIMainMenu.cpp" />
@@ -288,6 +289,7 @@
     <ClInclude Include="UI\Elements\ObjectiveBox.h" />
     <ClInclude Include="UI\Elements\Slider.h" />
     <ClInclude Include="UI\Elements\TextBox.h" />
+    <ClInclude Include="UI\Elements\VehicleStatBox.h" />
     <ClInclude Include="UI\Menu\UIControls.h" />
     <ClInclude Include="UI\Menu\UICredits.h" />
     <ClInclude Include="UI\Menu\UIMainMenu.h" />

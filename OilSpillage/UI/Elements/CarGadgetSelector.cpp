@@ -50,6 +50,14 @@ void CarGadgetSelector::update(bool selected, float deltaTime)
 
 void CarGadgetSelector::setItemOfSelected(Item* item)
 {
+	for (int i = 0; i < Slots::SIZEOF; i++)
+	{
+		if (this->slots[i]->getItem() == item)
+		{
+			this->slots[i]->setItem(nullptr);
+		}
+	}
+
 	if (this->selected == this->slots[Slots::LEFT].get() || this->selected == this->slots[Slots::RIGHT].get())
 	{
 		this->slots[Slots::LEFT]->setItem(item);

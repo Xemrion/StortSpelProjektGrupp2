@@ -29,11 +29,11 @@ void UIUpgrading::updateUI(float deltaTime)
 	}
 	else
 	{
-		this->carGadgetSelector->update(true, deltaTime);
+		this->gadgetSelector->update(true, deltaTime);
 
 		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 		{
-			this->carGadgetSelector->setItemOfSelected(this->itemSelector->getSelectedItem());
+			this->gadgetSelector->setItemOfSelected(this->itemSelector->getSelectedItem());
 		}
 		else if (Input::checkButton(Keys::CANCEL, States::PRESSED))
 		{
@@ -48,7 +48,8 @@ void UIUpgrading::drawUI()
 {
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	this->itemSelector->draw(false);
-	this->carGadgetSelector->draw(!this->selectingItem);
+	this->gadgetSelector->draw(!this->selectingItem);
+	this->statBox->draw(!this->selectingItem);
 
 	const char* type = "";
 	switch (this->itemSelector->getSelectedType())
@@ -82,5 +83,6 @@ UIUpgrading::~UIUpgrading()
 void UIUpgrading::init()
 {
 	this->itemSelector = std::make_unique<ItemSelector>(Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2, SCREEN_HEIGHT - ItemSelector::size.y));
-	this->carGadgetSelector = std::make_unique<CarGadgetSelector>(Vector2(ItemSlot::size.x + 20.0f, ItemSlot::size.x + 20.0f));
+	this->gadgetSelector = std::make_unique<CarGadgetSelector>(Vector2(ItemSlot::size.x + 20.0f, ItemSlot::size.x + 20.0f));
+	this->statBox = std::make_unique<VehicleStatBox>(Vector2(SCREEN_WIDTH - VehicleStatBox::size.x - 10.0f, SCREEN_HEIGHT / 2 - VehicleStatBox::size.y / 2));
 }

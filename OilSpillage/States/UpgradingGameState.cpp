@@ -48,7 +48,7 @@ void UpgradingGameState::update(float deltaTime)
 	this->physics->update(deltaTime);
 
 	this->graphics.clearScreen(Vector4(Colors::Red));
-	this->graphics.render(this->camera.get(), deltaTime);
+	//this->graphics.render(this->camera.get(), deltaTime);
 
 	this->menues[currentMenu]->update(deltaTime);
 	this->graphics.renderUI(deltaTime);
