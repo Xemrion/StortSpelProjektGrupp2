@@ -3,6 +3,7 @@
 
 #include "../UserInterface.h"
 #include "../Elements/ItemSelector.h"
+#include"../Vehicle.h"
 
 class UIUpgrading : public UserInterface
 {
@@ -11,10 +12,12 @@ private:
 	void drawUI();
 
 	std::unique_ptr<ItemSelector> itemSelector;
+	std::unique_ptr<VehicleSlots> vehicleSlots;
 public:
 	UIUpgrading();
 	virtual ~UIUpgrading();
 
+	VehicleSlots* getVehicleSlots();
 	void init();
 };
 

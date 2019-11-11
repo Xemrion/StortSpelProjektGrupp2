@@ -6,19 +6,44 @@ void UIUpgrading::updateUI(float deltaTime)
 {
 	if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 	{
+		if (this->vehicleSlots->getSlot(Slots::FRONT) != nullptr)
+			Game::getGraphics().removeFromDraw(this->vehicleSlots->getSlot(Slots::FRONT)->getObject());
 		this->itemSelector->changeSelectedIndex(false);
+		Item* newItem = new Item(*this->itemSelector->getSelectedItem());
+		if (newItem->getObject() != nullptr)
+			Game::getGraphics().addToDraw(newItem->getObject());
+		this->vehicleSlots->setSlot(Slots::FRONT, newItem);
 	}
-	else if(Input::checkButton(Keys::L_RIGHT, States::PRESSED))
+	else if (Input::checkButton(Keys::L_RIGHT, States::PRESSED))
 	{
+		if(this->vehicleSlots->getSlot(Slots::FRONT)!=nullptr)
+			Game::getGraphics().removeFromDraw(this->vehicleSlots->getSlot(Slots::FRONT)->getObject());
+
 		this->itemSelector->changeSelectedIndex(true);
+		Item* newItem = new Item(*this->itemSelector->getSelectedItem());
+		if(newItem->getObject()!=nullptr)
+			Game::getGraphics().addToDraw(newItem->getObject());
+		this->vehicleSlots->setSlot(Slots::FRONT, newItem);
 	}
-	else if(Input::checkButton(Keys::L_UP, States::PRESSED))
+	else if (Input::checkButton(Keys::L_UP, States::PRESSED))
 	{
+		if (this->vehicleSlots->getSlot(Slots::FRONT) != nullptr)
+			Game::getGraphics().removeFromDraw(this->vehicleSlots->getSlot(Slots::FRONT)->getObject());
 		this->itemSelector->changeSelectedType(false);
+		Item* newItem = new Item(*this->itemSelector->getSelectedItem());
+		if (newItem->getObject() != nullptr)
+			Game::getGraphics().addToDraw(newItem->getObject());
+		this->vehicleSlots->setSlot(Slots::FRONT, newItem);
 	}
-	else if(Input::checkButton(Keys::L_DOWN, States::PRESSED))
+	else if (Input::checkButton(Keys::L_DOWN, States::PRESSED))
 	{
+		if (this->vehicleSlots->getSlot(Slots::FRONT) != nullptr)
+			Game::getGraphics().removeFromDraw(this->vehicleSlots->getSlot(Slots::FRONT)->getObject());
 		this->itemSelector->changeSelectedType(true);
+		Item* newItem = new Item(*this->itemSelector->getSelectedItem());
+		if (newItem->getObject() != nullptr)
+			Game::getGraphics().addToDraw(newItem->getObject());
+		this->vehicleSlots->setSlot(Slots::FRONT, newItem);
 	}
 
 	this->itemSelector->update(deltaTime);
@@ -58,7 +83,14 @@ UIUpgrading::~UIUpgrading()
 {
 }
 
+VehicleSlots* UIUpgrading::getVehicleSlots()
+{
+	return this->vehicleSlots.get();
+}
+
 void UIUpgrading::init()
 {
 	this->itemSelector = std::make_unique<ItemSelector>(Vector2(0, 0));
+	this->vehicleSlots = std::make_unique<VehicleSlots>();
+
 }

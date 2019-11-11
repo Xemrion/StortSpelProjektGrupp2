@@ -11,9 +11,8 @@ private:
 
 	Weapon weapon;
 public:
-	ItemWeapon(const char* name, Weapon weapon, GameObject* object);
-	virtual ~ItemWeapon();
-
+	ItemWeapon(const char* name, Weapon weapon, std::shared_ptr<GameObject> object);
+	~ItemWeapon();
 	Weapon getWeapon() const;
 };
 

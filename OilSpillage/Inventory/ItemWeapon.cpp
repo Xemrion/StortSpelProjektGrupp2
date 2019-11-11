@@ -15,7 +15,7 @@ const char* ItemWeapon::generateDescription(const Weapon& weapon)
 	return stream.str().c_str();
 }
 
-ItemWeapon::ItemWeapon(const char* name, Weapon weapon, GameObject* object) : Item(name, this->generateDescription(weapon), ItemType::WEAPON, object), weapon(weapon)
+ItemWeapon::ItemWeapon(const char* name, Weapon weapon, std::shared_ptr<GameObject> object) : Item(name, this->generateDescription(weapon), ItemType::WEAPON, object), weapon(weapon)
 {
 }
 

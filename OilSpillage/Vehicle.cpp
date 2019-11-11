@@ -150,9 +150,6 @@ void Vehicle::init(Physics *physics)
 	
 	pointJoint = physics->addPointJoint(this->vehicle->getRigidBody(), this->vehicleBody1->getRigidBody());
 	//vehicleBody1->getRigidBody()->setDamping(btScalar(0),3);
-	test = *this->mountedWeapon;
-	Game::getGraphics().addToDraw(&test);
-	test.setPosition(Vector3(2, 0, 0));
 }
 
 void Vehicle::update(float deltaTime)
@@ -483,7 +480,10 @@ void Vehicle::updateWeapon(float deltaTime)
 		/*MOUNTED*/
 		if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
 		{
-			this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setPosition(this->vehicleBody1->getPosition());
+			if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
+			{
+				this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setPosition(vehicleBody1->getPosition());
+			}
 		}
 
 		/*END*/
@@ -491,8 +491,11 @@ void Vehicle::updateWeapon(float deltaTime)
 		/*FRONT*/
 		if (this->vehicleSlots->getSlot(Slots::FRONT) != nullptr)
 		{
-			this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14 / 2, acos(angleWP) - 3.14 / 2));
-			this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setPosition(this->vehicleBody1->getPosition() + 1.15f * frontTempDir - Vector3(0.0f, 1.0f, 0.0f));
+			if (this->vehicleSlots->getSlot(Slots::FRONT)->getObject() != nullptr)
+			{
+				this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14 / 2, acos(angleWP) - 3.14 / 2));
+				this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setPosition(this->vehicleBody1->getPosition() + 1.15f * frontTempDir - Vector3(0.0f, 1.0f, 0.0f));
+			}
 		}
 		/*END*/
 
@@ -532,7 +535,7 @@ void Vehicle::updateWeapon(float deltaTime)
 			{
 				float newRot = atan2(curDir.x, curDir.y) + 3.14f / 2;
 				this->gunRotation = newRot;
-				if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
+				if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
 				{
 					this->weapon.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
 					this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, newRot, 0));
@@ -573,7 +576,7 @@ void Vehicle::updateWeapon(float deltaTime)
 					}
 				}
 
-				if (this->vehicleSlots->getSlot(Slots::FRONT) != nullptr)
+				if (this->vehicleSlots->getSlot(Slots::FRONT)->getObject() != nullptr)
 				{
 					if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
 					{
@@ -620,8 +623,11 @@ void Vehicle::updateWeapon(float deltaTime)
 			{
 				bullets[i].update(deltaTime);
 			}
-			this->spotLight->setPos(this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->getPosition() - Vector3(curDir.x, -1, curDir.y));
-			this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
+			if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
+			{
+				this->spotLight->setPos(this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->getPosition() - Vector3(curDir.x, -1, curDir.y));
+				this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
+			}
 		}
 	}
 }
