@@ -28,7 +28,7 @@ public:
 	static void init();
 	static Item* getItemByName(const char* name);
 	static Item* getRandom();
-	static Matrix generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale = Vector3::One, Vector3 rotation = Vector3::Zero, bool ignoreObjectRotation = false);
+	static Matrix generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale = Vector3::One, Quaternion rotation = Quaternion::Identity, bool ignoreObjectRotation = false);
 
 	Item(const char* name, const char* description, ItemType type, GameObject* object);
 	virtual ~Item();

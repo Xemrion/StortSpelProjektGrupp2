@@ -26,6 +26,11 @@ GameObject::~GameObject()
 //	}
 //}
 
+bool GameObject::getShading() const
+{
+	return this->shading;
+}
+
 bool GameObject::getSpotShadow() const
 {
 	return this->spotShadow;
@@ -99,6 +104,11 @@ Matrix GameObject::getTransform()
 
 	//	return transform;
 	//}
+}
+
+void GameObject::setShading(bool arg)
+{
+	this->shading = arg;
 }
 
 void GameObject::setSunShadow(bool arg)

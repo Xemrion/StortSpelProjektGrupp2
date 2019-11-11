@@ -22,7 +22,7 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 	this->graphics.setLightList(lightList.get());
 	this->graphics.setUISun(Vector3(0, 0, 1), Vector4(1, 1, 1, 1));
 
-	this->camera = std::make_unique<DynamicCamera>(Vector3(0, 4.5f, -5.0f),Vector3(3.14/4,0,0));
+	this->camera = std::make_unique<DynamicCamera>(Vector3(0, 0.5f, -8.0f),Vector3(/*3.14/4*/0,0,0));
 
 	this->theVehicle = std::make_unique<Vehicle>();
 	this->graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
@@ -30,6 +30,19 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 	this->theVehicle->init(physics.get());
 	this->theVehicle->getVehicle()->setPosition(Vector3(0, 0, 0));
 	this->theVehicle->getVehicleBody1()->setPosition(Vector3(0, 0.55, 0));
+
+	this->background = std::make_unique<GameObject>();
+	auto objPtr = background.get();
+	this->graphics.loadModel("Entities/Quad");
+	objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Quad");
+	graphics.loadTexture("garageThing");
+	objPtr->setTexture(Game::getGraphics().getTexturePointer("garageThing"));
+	Game::getGraphics().addToDraw(objPtr);
+	objPtr->setPosition(Vector3(0, 0.5f, +2));
+	objPtr->setRotation(Vector3(90.0f * (XM_PI / 180.0f), 180.0f * (XM_PI / 180.0f), 0/*180 * XM_PI / 180*/));
+	objPtr->setScale(Vector3(16, 1, 9)*1.2f);
+	//objPtr->setColor(Vector4(0.4, 0.4, 0.4,1));
+	objPtr->setShading(false);
 }
 
 UpgradingGameState::~UpgradingGameState()

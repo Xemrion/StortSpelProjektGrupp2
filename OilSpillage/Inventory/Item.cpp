@@ -18,13 +18,13 @@ void Item::init()
 {
 	Graphics& graphics = Game::getGraphics();
 
-	graphics.loadModel("Entities/Barrel");
+	graphics.loadModel("Entities/FlameThrower");
 	Item::machineGun = std::make_unique<GameObject>();
-	Item::machineGun->mesh = graphics.getMeshPointer("Entities/Barrel");
-	Item::machineGun->setMaterial(graphics.getMaterial("Entities/Barrel"));
-	Item::machineGun->setScale(Vector3(0.1f));
+	Item::machineGun->mesh = graphics.getMeshPointer("Entities/FlameThrower");
+	Item::machineGun->setMaterial(graphics.getMaterial("Entities/FlameThrower"));
+	Item::machineGun->setScale(Vector3(0.05f));
 	Item::machineGun->setPosition(Item::machineGun->mesh->getAABB().scale(Item::machineGun->getScale()).maxPos * Vector3(0, 1, 0));
-	Item::machineGun->setRotation(Vector3(1.5f, 0.3f, 0.8f));
+	Item::machineGun->setRotation(Vector3(0.0f, 0.0f, 0.0f));
 
 	Item::allItems = {
 		Item("Test Item", "A very useless thing!", ItemType::WEAPON, nullptr),
@@ -54,10 +54,10 @@ Item* Item::getRandom()
 	return &allItems[rand() % allItems.size()];
 }
 
-Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale, Vector3 rotation, bool ignoreObjectRotation)
+Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale, Quaternion rotation, bool ignoreObjectRotation)
 {
 	Matrix transform = Matrix::CreateScale(scale * object->getScale());
-	transform *= Matrix::CreateFromQuaternion(Quaternion::Concatenate(Quaternion::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z), ignoreObjectRotation ? Quaternion() : object->getRotationQuaternion()));
+	transform *= Matrix::CreateFromQuaternion(Quaternion::Concatenate(rotation, ignoreObjectRotation ? Quaternion() : object->getRotationQuaternion()));
 	transform *= Matrix::CreateTranslation(Game::getGraphics().screenToWorldSpaceUI(screenPos) + object->getPosition());
 	
 	return transform;

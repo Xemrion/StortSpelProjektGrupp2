@@ -14,6 +14,7 @@ private:
 	Physics* physics = nullptr;
 	bool spotShadow = true;
 	bool sunShadow = true;
+	bool shading = true;
 protected:
    Vector3  position { 1.0f, 1.0f, 1.0f };
 	Vector3  scale    { 1.0f, 1.0f, 1.0f };
@@ -32,10 +33,11 @@ public:
 	const Mesh *mesh   = nullptr;
 	GameObject *parent = nullptr;
 	
-
+	bool getShading()const;
 	bool getSpotShadow()const;
 	bool getSunShadow()const;
 	Matrix   getTransform();
+	void setShading(bool arg);
 	void setSunShadow(bool arg);
 	void setSpotShadow(bool arg);
 	void     setPosition(Vector3);

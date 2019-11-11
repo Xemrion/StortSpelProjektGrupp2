@@ -56,8 +56,8 @@ void ItemSelector::update(float deltaTime)
 			GameObject* object = list->at(this->startIndex[this->selectedType] + i)->getObject();
 			if (object)
 			{
-				rotationTimers[i] = 0.0f;
-				rotation[i] = Vector3();
+				rotationTimers[i] = 190 * XM_PI/180;
+				rotation[i] = Quaternion::CreateFromYawPitchRoll(XM_PI+ 0.3f, 0.26f, 0.0f);
 				transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f));
 				Game::getGraphics().addToUIDraw(object, &transforms[i]);
 			}
@@ -76,14 +76,14 @@ void ItemSelector::update(float deltaTime)
 		if (i == selectedIndex)
 		{
 			rotationTimers[i] = std::fmodf(rotationTimers[i] + deltaTime * 4, XM_2PI);
-			rotation[i] = Vector3(rotationTimers[i], 0.0f, 0.0f);
-			transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f), Vector3(1.2f), rotation[i], false);
+			rotation[i] = Quaternion::Slerp(rotation[i], Quaternion::CreateFromYawPitchRoll(rotationTimers[i],0,0), deltaTime * 10);
+			transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f), Vector3(1.5f), rotation[i], true);
 		}
 		else
 		{
-			rotationTimers[i] = Game::lerp(rotationTimers[i], 0.0f, deltaTime * 4);
-			rotation[i] = Vector3::Lerp(rotation[i], Vector3(), deltaTime * 4);
-			transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f), Vector3(1.0f), rotation[i]);
+			rotationTimers[i] = Game::lerp(rotationTimers[i], 190 * XM_PI / 180, deltaTime * 4);
+			rotation[i] = Quaternion::Slerp(rotation[i], Quaternion::CreateFromYawPitchRoll(XM_PI + 0.3f, 0.26f, 0.0f), deltaTime * 4);
+			transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f), Vector3(1.5f), rotation[i],true);
 		}
 	}
 
