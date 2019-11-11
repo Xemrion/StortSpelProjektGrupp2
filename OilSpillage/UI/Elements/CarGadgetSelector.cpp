@@ -2,6 +2,7 @@
 #include "../UserInterface.h"
 #include "../../game.h"
 #include <cassert>
+#include "../../States/UpgradingGameState.h"
 
 Vector2 CarGadgetSelector::size = Vector2(180, 300);
 
@@ -55,6 +56,7 @@ void CarGadgetSelector::setItemOfSelected(Item* item)
 		if (this->slots[i]->getItem() == item)
 		{
 			this->slots[i]->setItem(nullptr);
+			static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots(i), nullptr);
 		}
 	}
 
@@ -62,10 +64,28 @@ void CarGadgetSelector::setItemOfSelected(Item* item)
 	{
 		this->slots[Slots::LEFT]->setItem(item);
 		this->slots[Slots::RIGHT]->setItem(item);
+
+		Item* newItem = new Item(*item);
+		static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots::RIGHT, newItem);
+
+		newItem = new Item(*item);
+		static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots::LEFT, newItem);
 	}
 	else
 	{
 		static_cast<ItemSlot*>(this->selected)->setItem(item);
+
+		for (int i = 0; i < Slots::SIZEOF; i++)
+		{
+			if (this->slots[i].get() == this->selected)
+			{
+				Item* newItem = new Item(*this->slots[i]->getItem());
+				static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots(i), newItem);
+				break;
+			}
+		}
+
+		
 	}
 }
 

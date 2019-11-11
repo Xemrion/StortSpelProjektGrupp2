@@ -35,11 +35,11 @@ void Item::init()
 {
 	Graphics& graphics = Game::getGraphics();
 
-	graphics.loadModel("Entities/Barrel");
+	graphics.loadModel("Entities/Dummy_Turret");
 	Item::machineGun = std::make_unique<GameObject>();
-	Item::machineGun->mesh = graphics.getMeshPointer("Entities/Barrel");
-	Item::machineGun->setMaterial(graphics.getMaterial("Entities/Barrel"));
-	Item::machineGun->setScale(Vector3(0.1f));
+	Item::machineGun->mesh = graphics.getMeshPointer("Entities/Dummy_Turret1");
+	Item::machineGun->setMaterial(graphics.getMaterial("Entities/Dummy_Turret"));
+	Item::machineGun->setScale(Vector3(0.001f));
 	Item::machineGun->setPosition(Item::machineGun->mesh->getAABB().scale(Item::machineGun->getScale()).maxPos * Vector3(0, 1, 0));
 	Item::machineGun->setRotation(Vector3(1.5f, 0.3f, 0.8f));
 

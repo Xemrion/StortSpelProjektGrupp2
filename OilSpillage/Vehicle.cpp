@@ -44,7 +44,7 @@ Vehicle::Vehicle()
 	this->updatedStats = this->defaultStats;
 	this->health = this->updatedStats.maxHealth;
 
-	this->vehicleSlots = nullptr;
+	this->vehicleSlots = new VehicleSlots;
 	
 }
 
@@ -61,6 +61,7 @@ Vehicle::~Vehicle()
 	delete wheel4;
 	delete spring1;
 	delete pointJoint;
+	delete this->vehicleSlots;
 }
 
 void Vehicle::init(Physics *physics)
@@ -507,6 +508,24 @@ void Vehicle::updateWeapon(float deltaTime)
 		}
 		/*END*/
 
+		/*RIGHT*/
+
+		Vector3 upp(0, 1, 0);
+		Vector3 right = upp.Cross(frontTempDir);
+		if (this->vehicleSlots->getSlot(Slots::RIGHT) != nullptr)
+		{
+			this->vehicleSlots->getSlot(Slots::RIGHT)->getObject()->setPosition(this->vehicleBody1->getPosition() - 1.15f * right - Vector3(0.0f, 1.0f, 0.0f));
+			this->vehicleSlots->getSlot(Slots::RIGHT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y - 3.14/2, acos(angleWP) - 3.14 / 2));
+		}
+		/*END*/
+
+		/*LEFT*/
+		if (this->vehicleSlots->getSlot(Slots::LEFT) != nullptr)
+		{
+			this->vehicleSlots->getSlot(Slots::LEFT)->getObject()->setPosition(this->vehicleBody1->getPosition() + 1.15f * right - Vector3(0.0f, 1.0f, 0.0f));
+			this->vehicleSlots->getSlot(Slots::LEFT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14/2, acos(angleWP) - 3.14 / 2));
+		}
+		/*END*/
 		//this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y+3.14/2, ));
 		Vector2 dir = Input::getDirectionR();
 		dir.Normalize();
@@ -635,6 +654,22 @@ void Vehicle::updateWeapon(float deltaTime)
 void Vehicle::setVehicleSlots(VehicleSlots* slots)
 {
 	this->vehicleSlots = slots;
+}
+
+void Vehicle::setSpecSlot(Slots slot, Item* item)
+{
+	if (this->vehicleSlots->getSlot(slot) != nullptr)
+	{
+		Game::getGraphics().removeFromDraw(this->vehicleSlots->getSlot(slot)->getObject());
+	}
+	if (item!=nullptr)
+	{
+		if (item->getObject() != nullptr)
+		{
+			Game::getGraphics().addToDraw(item->getObject());
+		}
+	}
+	this->vehicleSlots->setSlot(slot, item);
 }
 
 float Vehicle::getAcceleratorX()
