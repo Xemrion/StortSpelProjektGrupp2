@@ -8,7 +8,7 @@ void Element::setNeighbours(Element* left, Element* right, Element* up, Element*
 	this->down = down;
 }
 
-Element::Element(Vector2 position, float rotation) : position(position), rotation(rotation), left(nullptr), right(nullptr), up(nullptr), down(nullptr)
+Element::Element(Vector2 position, float rotation) : position(Vector2(std::roundf(position.x), std::roundf(position.y))), rotation(rotation), left(nullptr), right(nullptr), up(nullptr), down(nullptr)
 {
 }
 

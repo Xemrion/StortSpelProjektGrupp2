@@ -4,6 +4,14 @@
 
 Vector2 ItemSelector::size = Vector2(512, 128);
 
+void ItemSelector::addTextbox()
+{
+	int selectedIndex = this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType];
+	Item* item = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->at(this->selectedIndex[this->selectedType]);
+	this->textBox = std::make_unique<TextBox>("-- " + item->getName() + " --\n" + item->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::TOP);
+	this->textBox->setPosition(this->position + Vector2(145.0f + 96.0f * selectedIndex - this->textBox->getSize().x * 0.5f, 140.0f + 50.0f));
+}
+
 ItemSelector::ItemSelector(Vector2 position) : Element(position), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimers{ 0 }
 {
 	Game::getGraphics().loadTexture("UI/itemSelectorBG");
@@ -23,15 +31,20 @@ void ItemSelector::draw(bool selected)
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), this->position);
 	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position + Vector2(96.0f + 96.0f * (this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType]), 47.0f));
 
-	/*for (int i = 0; i < min(list->size() - this->startIndex[this->selectedType], ItemSelector::tileLength); i++)
+	if (this->textBox)
 	{
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), (*list)[this->startIndex[this->selectedType] + i]->getName(), this->position + Vector2(95.0f + 96.0f * i, 47.0f + 24.0f), Colors::Red, 0, Vector2(), 0.2f);
-	}*/
+		this->textBox->draw(false);
+	}
 }
 
 void ItemSelector::update(float deltaTime)
 {
 	std::vector<Item*>* list = nullptr;
+
+	if (this->selectedTypeLastDraw == -1)
+	{
+		this->addTextbox();
+	}
 
 	if (this->selectedTypeLastDraw != this->selectedType || this->startIndexLastDraw != this->startIndex[this->selectedType])
 	{
@@ -102,6 +115,16 @@ void ItemSelector::changeSelectedType(bool down)
 	{
 		this->selectedType = (this->selectedType - 1 + ItemType::TYPES_SIZE) % ItemType::TYPES_SIZE;
 	}
+
+	int listSize = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->size();
+	if (listSize > 0)
+	{
+		this->addTextbox();
+	}
+	else
+	{
+		this->textBox.reset();
+	}
 }
 
 void ItemSelector::changeSelectedIndex(bool right)
@@ -130,6 +153,8 @@ void ItemSelector::changeSelectedIndex(bool right)
 	{
 		this->startIndex[this->selectedType] = this->selectedIndex[this->selectedType] - (ItemSelector::tileLength - 1);
 	}
+
+	this->addTextbox();
 }
 
 ItemType ItemSelector::getSelectedType() const

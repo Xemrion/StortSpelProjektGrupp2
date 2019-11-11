@@ -3,7 +3,6 @@
 
 #include "../UserInterface.h"
 #include "../Elements/ItemSelector.h"
-#include "../Elements/TextBox.h"
 
 class UIUpgrading : public UserInterface
 {
@@ -12,7 +11,6 @@ private:
 	void drawUI();
 
 	std::unique_ptr<ItemSelector> itemSelector;
-	std::unique_ptr<TextBox> textBox;
 public:
 	UIUpgrading();
 	virtual ~UIUpgrading();

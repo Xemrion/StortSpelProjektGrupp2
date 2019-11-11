@@ -47,7 +47,6 @@ void UIUpgrading::drawUI()
 	}
 
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), type, Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), Colors::White, 0, Vector2(0, 0), 0.5f);
-	this->textBox->draw(false);
 	UserInterface::getSpriteBatch()->End();
 }
 
@@ -62,5 +61,4 @@ UIUpgrading::~UIUpgrading()
 void UIUpgrading::init()
 {
 	this->itemSelector = std::make_unique<ItemSelector>(Vector2(0, 0));
-	this->textBox = std::make_unique<TextBox>("Testing some advanced stuff.\nVery\ncool\nright?", Color(Colors::Red), Vector2(400, 150), ArrowPlacement::TOP, Vector2(500, 400));
 }

@@ -2,8 +2,13 @@
 #include "../../game.h"
 #include "../UserInterface.h"
 
-TextBox::TextBox(const char* text, Color textColor, Vector2 size, ArrowPlacement arrowPlacement, Vector2 position)
-	: Element(position), text(text), textColor(textColor), size(size), arrowPlacement(arrowPlacement)
+TextBox::TextBox(std::string text, Color textColor, Vector2 position, ArrowPlacement arrowPlacement, float textScale)
+	: TextBox(text, textColor, UserInterface::getFontArial()->MeasureString(text.c_str()) * textScale, position, arrowPlacement, textScale)
+{
+}
+
+TextBox::TextBox(std::string text, Color textColor, Vector2 size, Vector2 position, ArrowPlacement arrowPlacement, float textScale)
+	: Element(position), text(text), textColor(textColor), size(Vector2(std::roundf(size.x), std::roundf(size.y))), arrowPlacement(arrowPlacement), textScale(textScale)
 {
 	Game::getGraphics().loadTexture("UI/textBoxCorner");
 	Game::getGraphics().loadTexture("UI/textBoxSide");
@@ -17,6 +22,8 @@ TextBox::TextBox(const char* text, Color textColor, Vector2 size, ArrowPlacement
 	assert(textureSide && "Texture failed to load!");
 	assert(textureMiddle && "Texture failed to load!");
 	assert(textureArrow && "Texture failed to load!");
+
+	this->size += textureCorner->getSize() * 3;
 }
 
 TextBox::~TextBox()
@@ -70,5 +77,15 @@ void TextBox::draw(bool selected)
 		sb->Draw(this->textureArrow->getShaderResView(), this->position + arrowPos, nullptr, Colors::White, arrowRot, this->textureArrow->getCenter());
 	}
 
-	UserInterface::getFontArial()->DrawString(sb, this->text, this->position + this->textureCorner->getSize(), this->textColor, 0, Vector2::Zero, 0.2f);
+	UserInterface::getFontArial()->DrawString(sb, this->text.c_str(), this->position + this->textureCorner->getSize(), this->textColor, 0, Vector2::Zero, this->textScale);
+}
+
+void TextBox::setPosition(Vector2 position)
+{
+	this->position = Vector2(std::roundf(position.x), std::roundf(position.y));
+}
+
+Vector2 TextBox::getSize() const
+{
+	return this->size;
 }

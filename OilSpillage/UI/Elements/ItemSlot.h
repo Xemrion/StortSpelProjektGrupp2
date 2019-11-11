@@ -4,11 +4,15 @@
 #include "Element.h"
 #include "../../Texture.h"
 #include "../../Inventory/Item.h"
+#include "TextBox.h"
 
 
 class ItemSlot : public Element
 {
 private:
+	void addTextbox();
+
+	std::unique_ptr<TextBox> textBox;
 	Texture* textureSlot;
 	Texture* textureIndicator;
 	Item* item;

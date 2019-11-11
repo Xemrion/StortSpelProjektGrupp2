@@ -22,14 +22,19 @@ private:
 	Texture* textureMiddle;
 
 	ArrowPlacement arrowPlacement;
-	const char* text;
+	std::string text;
 	Color textColor;
-public:
+	float textScale;
 	Vector2 size;
-	TextBox(const char* text, Color textColor, Vector2 size, ArrowPlacement arrowPlacement = ArrowPlacement::NONE, Vector2 position = Vector2());
+public:
+	TextBox(std::string text, Color textColor, Vector2 position = Vector2(), ArrowPlacement arrowPlacement = ArrowPlacement::NONE, float textScale = 0.2f);
+	TextBox(std::string text, Color textColor, Vector2 size, Vector2 position = Vector2(), ArrowPlacement arrowPlacement = ArrowPlacement::NONE, float textScale = 0.2f);
 	virtual ~TextBox();
 
 	void draw(bool selected);
+
+	void setPosition(Vector2 position);
+	Vector2 getSize() const;
 };
 
 #endif // !TEXT_BOX_H
