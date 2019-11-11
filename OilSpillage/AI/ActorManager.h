@@ -14,6 +14,7 @@ public:
 	void createAttacker(float x, float z, int weaponType = 1);
 	void createTurret(float x, float z, int weaponType = 1);
 	void createSwarm(float x, float z, int weaponType = 1);
+	void createBoss(float x, float z, int weaponType = 1);
 
 	void createSpitFire(float x, float z, Physics* physics);
 	std::vector<AIGroup> groups;
@@ -22,6 +23,7 @@ public:
 
 	void spawnAttackers(Vector3 originPos, int weaponType);
 	void spawnTurrets(Vector3 position, Radius radius, float angle, int weaponType);
+	void spawnBoss(Vector3 originPos, int weaponType);
 	Vector2& generateRandom(const float& x, const float& z, Radius radius);
 	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
 private:
