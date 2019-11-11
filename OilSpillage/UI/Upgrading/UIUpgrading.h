@@ -5,7 +5,7 @@
 #include "../Elements/ItemSelector.h"
 #include "../Elements/CarGadgetSelector.h"
 #include "../Elements/VehicleStatBox.h"
-#include"../Vehicle.h"
+#include"../..//Vehicle.h"
 
 class UIUpgrading : public UserInterface
 {
