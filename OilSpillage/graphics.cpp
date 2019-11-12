@@ -1268,11 +1268,11 @@ void Graphics::renderUI(float deltaTime)
 	CopyMemory(mappedResource.pData, &uiSun, sizeof(Sun));
 	deviceContext->Unmap(sunBuffer.Get(), 0);
 	
+	
 	Matrix viewProj = (uiCamera.getViewMatrix() * uiCamera.getProjectionMatrix()).Transpose();
 	hr = deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
-
 	
 
 	deviceContext->RSSetViewports(1, &this->vp);
@@ -1328,6 +1328,8 @@ void Graphics::renderUI(float deltaTime)
 		hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
 		deviceContext->Unmap(colorBuffer.Get(), 0);
+
+		
 
 		deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
