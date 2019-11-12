@@ -38,7 +38,7 @@ Vehicle::Vehicle()
 	this->timeSinceLastShot = 0.0f;
 	this->timeSinceLastShot2 = 0.0f;
 
-	this->weapon = WeaponHandler::getWeapon(WeaponType::Laser);
+	this->weapon = WeaponHandler::getWeapon(WeaponType::MachineGun);
 	this->weapon2 = WeaponHandler::getWeapon(WeaponType::Flamethrower);
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
@@ -512,7 +512,7 @@ void Vehicle::updateWeapon(float deltaTime)
 
 				for (int i = 0; i < Vehicle::bulletCount; ++i)
 				{
-					if (bullets[i].getWeaponType() == WeaponType::None)
+					if (bullets[i].getWeaponType() != WeaponType::None)
 					{
 						auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
@@ -553,7 +553,7 @@ void Vehicle::updateWeapon(float deltaTime)
 
 				for (int i = 0; i < Vehicle::bulletCount; ++i)
 				{
-					if (bullets[i].getWeaponType() == WeaponType::None)
+					if (bullets[i].getWeaponType() != WeaponType::None)
 					{
 						auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
