@@ -43,7 +43,7 @@ void DynamicActor::move()
 		vecForward.Normalize();
 
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
-		
+
 		this->setRotation(Vector3(0, newRot - (DirectX::XM_PI / 2), 0));
 	}
 
@@ -64,13 +64,17 @@ void DynamicActor::update(float dt, Vector3 targetPos)
 	if (this->state != State::Idle)
 	{
 		followPath();
-		
+
 	}
 	else
 	{
 		destination = position;
 	}
+
 	move();
+
+	if (this->state == State::Circulate)
+		this->circulatePlayer();
 }
 
 void DynamicActor::applyForce(Vector3 force)
@@ -112,6 +116,47 @@ Vector3 DynamicActor::seek()
 	return acceleration;
 }
 
+void DynamicActor::moveCirculate(Vector3 desiredDirection)
+{
+	//To make the slow down not as abrupt
+	acceleration *= 0.4f;
+	// Update velocity
+	//velocity += acceleration;
+	velocity = seekCirculate(desiredDirection);
+	// Limit speed
+	if (velocity.Length() > maxForce)
+	{
+		velocity /= velocity.Length();
+	}
+
+	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed;
+	Vector3 targetToSelf = (temp - position);
+	//Rotate
+	if ((targetToSelf).Dot(vecForward) < 0.8)
+	{
+		vecForward -= (targetToSelf * deltaTime) / 0.02f;
+		vecForward.Normalize();
+
+		float newRot = atan2(this->vecForward.x, this->vecForward.z);
+
+		this->setRotation(Vector3(0, newRot - (DirectX::XM_PI / 2), 0));
+	}
+
+	position = temp;
+	// Reset accelertion to 0 each cycle
+	acceleration *= 0;
+}
+
+Vector3 DynamicActor::seekCirculate(Vector3 desiredDirection)
+{
+	acceleration = desiredDirection; //-velocity
+	if (acceleration.Length() > maxForce)
+	{
+		acceleration /= acceleration.Length();
+	}
+	return acceleration;
+}
+
 void DynamicActor::followPath()
 {
 	if (path != nullptr)
@@ -130,6 +175,26 @@ void DynamicActor::followPath()
 		}
 	}
 }
+
+void DynamicActor::circulatePlayer()
+{
+	std::vector<Vector3> pointsAroundPlayer;
+	int currentPoint = 0;
+	Vector3 playerToAI = position - destination;
+	Vector3 radiusFromPlayer = { 10, 0, 10 };
+
+	pointsAroundPlayer.push_back({ playerToAI.x, playerToAI.y, playerToAI.z + radiusFromPlayer.z });
+	pointsAroundPlayer.push_back({ playerToAI.x + sqrt(radiusFromPlayer.x), playerToAI.y, playerToAI.z + sqrt(radiusFromPlayer.z) });
+	pointsAroundPlayer.push_back({ playerToAI.x + radiusFromPlayer.x, playerToAI.y, playerToAI.z });
+	pointsAroundPlayer.push_back({ playerToAI.x + sqrt(radiusFromPlayer.x), playerToAI.y, playerToAI.z - sqrt(radiusFromPlayer.z) });
+	pointsAroundPlayer.push_back({ playerToAI.x, playerToAI.y, playerToAI.z - radiusFromPlayer.z });
+	pointsAroundPlayer.push_back({ playerToAI.x - sqrt(radiusFromPlayer.x), playerToAI.y, playerToAI.z - sqrt(radiusFromPlayer.z) });
+	pointsAroundPlayer.push_back({ playerToAI.x - radiusFromPlayer.x, playerToAI.y, playerToAI.z });
+	pointsAroundPlayer.push_back({ playerToAI.x - sqrt(radiusFromPlayer.x), playerToAI.y, playerToAI.z + sqrt(radiusFromPlayer.z) });
+
+	moveCirculate(pointsAroundPlayer[currentPoint]);
+}
+
 Status DynamicActor::setChaseState()
 {
 	this->state = State::Chasing;
@@ -154,5 +219,11 @@ Status DynamicActor::inAggroRange()
 Status DynamicActor::setIdleState()
 {
 	this->state = State::Idle;
+	return Status::SUCCESS;
+}
+
+Status DynamicActor::setCirculateState()
+{
+	this->state = State::Circulate;
 	return Status::SUCCESS;
 }
