@@ -24,6 +24,7 @@ SkyscraperFloor::~SkyscraperFloor()
 
 void SkyscraperFloor::rotateDeg(float degrees)
 {
+	this->debugInfo.push_back("Rotate " + std::to_string(degrees) + " degrees");
 	float rotX = 0.0f, rotZ = 0.0f;
 	float angle = degrees * (pi / 180.0f);
 	for (int i = 0; i < this->verticies.size(); i++) {
@@ -49,6 +50,7 @@ void SkyscraperFloor::rotateRad(float radians)
 void SkyscraperFloor::generateShape(int edges)
 {
 	if (edges >= 3) {
+		this->debugInfo.push_back("Generate shape with " + std::to_string(edges) + " corners");
 		this->nrOfEdges = edges;
 		Vector3 temp = this->center + Vector3(0.0f, 0.0f, 3.0f);
 		float angle = ((pi * 2) / float(edges));
@@ -128,9 +130,12 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 	Add points of B between the intersecting points added to A
 	You have a union.
 	*/
-
+	//Might need fixing
 	//Phase 1: Intersections.
 	toUnion.translate(newCenter);
+	this->debugInfo.push_back("Union <");
+	this->debugInfo.insert(this->debugInfo.end(), toUnion.debugInfo.begin(), toUnion.debugInfo.end());
+	toUnion.debugInfo.clear();
 	std::vector<Vector3> intersections;
 	Vector3 intersectionA(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < toUnion.nrOfEdges; i++) {
@@ -216,6 +221,7 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 		}
 		if (indicesOfIntersections[0].first == 0) { //If first is 0, then it is connected to second
 			for (int i = 0; i < indicesOfIntersections.size(); i+=2) {
+				this->debugInfo.push_back("Union: insert (First is zero)");
 				this->verticies.insert(
 						this->verticies.begin() + indicesOfIntersections[i].second + 1,
 						toUnion.verticies.begin() + indicesOfIntersections[i].first + 1,
@@ -224,6 +230,7 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 		}
 		else { //If first is not 0, then first and last are connected.
 			for (size_t i = 1; i < indicesOfIntersections.size(); i+=2) {
+				this->debugInfo.push_back("Union: insert (First is not zero)");
 				if (i == indicesOfIntersections.size() - 1) {
 					this->verticies.insert(
 						this->verticies.begin() + indicesOfIntersections[i].second + 1,
@@ -246,10 +253,11 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 			}
 		}
 		this->nrOfEdges = int(this->verticies.size());
-
+		this->debugInfo.push_back("> Union ended");
 	}
 	else {
-		//Even-Odd Rule on one point in 
+		//Even-Odd Rule on one point in
+		this->debugInfo.push_back("Union: No intersections");
 		int evenOddCount = 0;
 		for (int i = 0; i < toUnion.nrOfEdges; i++) {
 			evenOddCount = 0;
@@ -267,10 +275,12 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 			this->verticies.clear();
 			this->verticies = toUnion.verticies;
 		}
+		this->debugInfo.push_back("> Union ended");
 	}
+
 }
 
-void SkyscraperFloor::getTriangleIndices()
+bool SkyscraperFloor::getTriangleIndices()
 { 
 	this->indices.clear();
 	int triangleIndiciesCounter = 0, failedAttempts = 0;
@@ -398,7 +408,13 @@ void SkyscraperFloor::getTriangleIndices()
 		forwardsOffset = 1;
 	}
 	this->indices.clear();
-	this->indices = triangleIndices;
+	if (triangleGenFail) {
+		return false;
+	}
+	else {
+		this->indices = triangleIndices;
+		return true;
+	}
 }
 
 std::vector<Vertex3D> SkyscraperFloor::getWindowVertices(Vector3 otherCenter)
@@ -568,12 +584,16 @@ std::vector<Vertex3D> SkyscraperFloor::getRoofVertices()
 
 std::vector<Vertex3D> SkyscraperFloor::getDifferenceAsRoofVerticies(const SkyscraperFloor& other)
 {
+	//Might need fixing for intersecting on a point.
 	SkyscraperFloor temp(*this);
+	std::vector<Vertex3D> roofMesh;
 	Vector3 shifted = Vector3(0.0f, temp.center.y, 0.0f);
 	std::vector<Vector3> pointsToAdd;
 	bool exists = false;
 	int insertPos = -1;
 	int postErasePoint = -1;
+	int onPointIntersectCheck1 = -1, onPointIntersectCheck2 = -1;
+	int onPointIntersectCheck3 = -1, onPointIntersectCheck4 = -1;
 	
 	for (size_t i = 0; i < other.nrOfEdges; i++) {
 		exists = false;
@@ -594,16 +614,54 @@ std::vector<Vertex3D> SkyscraperFloor::getDifferenceAsRoofVerticies(const Skyscr
 		if (!exists) {
 			if (insertPos == -1) {
 				pointsToAdd.insert(pointsToAdd.begin(), shifted);
+				onPointIntersectCheck1 = i;
+				if (onPointIntersectCheck2 == -1) {
+					onPointIntersectCheck2 = i;
+				}
 			}
 			else {
+				if (onPointIntersectCheck1 == -1) {
+					onPointIntersectCheck1 = i;
+				}
+				onPointIntersectCheck2 = i;
 				pointsToAdd.insert(pointsToAdd.begin() + postErasePoint, shifted);
 			}
 		}
 	}
+	
+	//If it intersects on a point.
+	onPointIntersectCheck3 = (insertPos - 1 + temp.nrOfEdges) % temp.nrOfEdges;
+	onPointIntersectCheck4 = insertPos;
+
+	Vector3 shiftedDot1(0.0f, shifted.y, 0.0f), shiftedDot2(0.0f, shifted.y, 0.0f);
+	shiftedDot1.x = other.verticies[onPointIntersectCheck1].x;
+	shiftedDot1.z = other.verticies[onPointIntersectCheck1].z;
+	shiftedDot2.x = other.verticies[(onPointIntersectCheck1 + 1) % other.nrOfEdges].x;
+	shiftedDot2.z = other.verticies[(onPointIntersectCheck1 + 1) % other.nrOfEdges].z;
+	Vector3 line1 = shiftedDot2 - shiftedDot1;
+	Vector3 line2 = shiftedDot2 - temp.verticies[onPointIntersectCheck3];
+	line1.Normalize();
+	line2.Normalize();
+	if (line1.Dot(line2) != 1) {
+		pointsToAdd.insert(pointsToAdd.begin(), other.verticies[(onPointIntersectCheck1 + 1) % other.nrOfEdges]);
+	}
+	shiftedDot1.x = other.verticies[onPointIntersectCheck2].x;
+	shiftedDot1.z = other.verticies[onPointIntersectCheck2].z;
+	shiftedDot2.x = other.verticies[(onPointIntersectCheck1 - 1 + other.nrOfEdges) % other.nrOfEdges].x;
+	shiftedDot2.z = other.verticies[(onPointIntersectCheck1 - 1 + other.nrOfEdges) % other.nrOfEdges].z;
+	line1 = shiftedDot2 - shiftedDot1;
+	line2 = shiftedDot2 - temp.verticies[onPointIntersectCheck4];
+	line1.Normalize();
+	line2.Normalize();
+	if (line1.Dot(line2) != 1) {
+		pointsToAdd.insert(pointsToAdd.end(), other.verticies[(onPointIntersectCheck1 - 1 + other.nrOfEdges) % other.nrOfEdges]);
+	}
+
 	temp.verticies.insert(temp.verticies.begin() + insertPos, pointsToAdd.begin(), pointsToAdd.end());
 	temp.nrOfEdges = temp.verticies.size();
-	temp.getTriangleIndices();
-	std::vector<Vertex3D> roofMesh = temp.getRoofVertices();
+	if (temp.getTriangleIndices()) {
+		roofMesh = temp.getRoofVertices();
+	}
 	return roofMesh;
 }
 
@@ -626,6 +684,7 @@ int SkyscraperFloor::getNrOfEdges() const
 
 void SkyscraperFloor::translate(Vector3 newCenter)
 {
+	this->debugInfo.push_back("Translate to X:" + std::to_string(newCenter.x) + " Z:" + std::to_string(newCenter.z) + "!");
 	Vector3 translation = newCenter - this->center;
 	this->center = this->center + translation;
 	for (int i = 0; i < this->nrOfEdges; i++) {

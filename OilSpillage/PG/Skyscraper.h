@@ -15,6 +15,7 @@ private:
 	GameObject* walls;
 
 	bool generateSkyscraperMesh();
+	void scrapSkyScraper();
 public:
 	Skyscraper(I32 input = -1);
 	~Skyscraper();

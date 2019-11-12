@@ -20,8 +20,10 @@ void Skyscraper::generateSkyscraper()
 	I32_Dist floors(2 , 4);
 	int nrOfFloors = 0;
 	//Random
-	SkyscraperFloor toAdd(floorPoints(rng));
-	SkyscraperFloor roof(floorPoints(rng));
+	/*SkyscraperFloor toAdd(floorPoints(rng));
+	SkyscraperFloor roof(floorPoints(rng));*/
+	SkyscraperFloor toAdd(5);
+	SkyscraperFloor roof(8);
 
 	//Random
 	toAdd.rotateDeg(rotation(rng));
@@ -75,18 +77,23 @@ bool Skyscraper::generateSkyscraperMesh()
 {
 	bool success = false;
 	if (this->floors.size() != 0) {
+		success = true;
 		std::vector<Vertex3D> temp;
 		this->meshRoof.clear();
 		this->meshWindows.clear();
 		this->meshWalls.clear();
 
-		this->floors[0].getTriangleIndices();
+		if (!this->floors[0].getTriangleIndices()) {
+			success = false;
+		}
 		temp = this->floors[0].getRoofVertices();
 		this->meshRoof.insert(this->meshRoof.cend(), temp.begin(), temp.end());
 		temp = this->floors[0].getWallVertices(this->floors[1].getCenter());
 		this->meshWalls.insert(this->meshWalls.cend(), temp.begin(), temp.end());
 
-		this->floors[1].getTriangleIndices();
+		if (!this->floors[1].getTriangleIndices()) {
+			success = false;
+		}
 		temp = this->floors[1].getRoofVertices();
 		this->meshRoof.insert(this->meshRoof.cend(), temp.begin(), temp.end());
 		temp = this->floors[1].getWindowVertices(this->floors[2].getCenter());
@@ -95,7 +102,12 @@ bool Skyscraper::generateSkyscraperMesh()
 		for (size_t i = 2; i < this->floors.size() - 1; i++) {
 			
 			temp = this->floors[i].getDifferenceAsRoofVerticies(this->floors[i - 1]);
-			this->meshRoof.insert(this->meshRoof.cend(), temp.begin(), temp.end());
+			if (temp.size() == 0) {
+				success = false;
+			}
+			else {
+				this->meshRoof.insert(this->meshRoof.cend(), temp.begin(), temp.end());
+			}
 			temp = this->floors[i].getWindowVertices(this->floors[i + 1].getCenter());
 			this->meshWindows.insert(this->meshWindows.cend(), temp.begin(), temp.end());
 		}
@@ -103,9 +115,16 @@ bool Skyscraper::generateSkyscraperMesh()
 		center.y = 0;
 		temp = this->floors.back().getWallVertices(center);
 		this->meshWalls.insert(this->meshWalls.cend(), temp.begin(), temp.end());
-		success = true;
 	}
 	return success;
+}
+
+void Skyscraper::scrapSkyScraper()
+{
+	this->floors.clear();
+	this->meshRoof.clear();
+	this->meshWalls.clear();
+	this->meshWindows.clear();
 }
 
 bool Skyscraper::saveSkyscraper(std::string name)
@@ -122,33 +141,41 @@ bool Skyscraper::saveSkyscraper(std::string name)
 
 void Skyscraper::testDraw(std::string name)
 {
-	if (saveSkyscraper(name)) {
-		this->roof = new GameObject;
-		std::string ss_roof = name + "-roof", ss_windows = name + "-wind", ss_walls = name + "-wall";
-		this->roof->mesh = Game::getGraphics().getPGMeshPointer(ss_roof.c_str());
-		this->windows = new GameObject;
-		this->windows->mesh = Game::getGraphics().getPGMeshPointer(ss_windows.c_str());
-		this->walls = new GameObject;
-		this->walls->mesh = Game::getGraphics().getPGMeshPointer(ss_walls.c_str());
-		Game::getGraphics().addToDraw(this->roof);
-		Game::getGraphics().addToDraw(this->windows);
-		Game::getGraphics().addToDraw(this->walls);
-		this->roof->setPosition(Vector3(30.0f, 0.0f, -30.0f));
-		this->roof->setScale(Vector3(1.0f, 1.0f, 1.0f));
-		this->roof->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
-		this->roof->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
-		this->roof->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
+	bool success = false;
+	do {
+		if (saveSkyscraper(name)) {
+			this->roof = new GameObject;
+			std::string ss_roof = name + "-roof", ss_windows = name + "-wind", ss_walls = name + "-wall";
+			this->roof->mesh = Game::getGraphics().getPGMeshPointer(ss_roof.c_str());
+			this->windows = new GameObject;
+			this->windows->mesh = Game::getGraphics().getPGMeshPointer(ss_windows.c_str());
+			this->walls = new GameObject;
+			this->walls->mesh = Game::getGraphics().getPGMeshPointer(ss_walls.c_str());
+			Game::getGraphics().addToDraw(this->roof);
+			Game::getGraphics().addToDraw(this->windows);
+			Game::getGraphics().addToDraw(this->walls);
+			this->roof->setPosition(Vector3(30.0f, 0.0f, -30.0f));
+			this->roof->setScale(Vector3(2.0f, 1.0f, 2.0f));
+			this->roof->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
+			this->roof->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
+			this->roof->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
 
-		this->windows->setPosition(Vector3(30.0f, 0.0f, -30.0f));
-		this->windows->setScale(Vector3(1.0f, 1.0f, 1.0f));
-		this->windows->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
-		this->windows->setTexture(Game::getGraphics().getTexturePointer("fireball"));
-		this->windows->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
+			this->windows->setPosition(Vector3(30.0f, 0.0f, -30.0f));
+			this->windows->setScale(Vector3(2.0f, 1.0f, 2.0f));
+			this->windows->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
+			this->windows->setTexture(Game::getGraphics().getTexturePointer("fireball"));
+			this->windows->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
 
-		this->walls->setPosition(Vector3(30.0f, 0.0f, -30.0f));
-		this->walls->setScale(Vector3(1.0f, 1.0f, 1.0f));
-		this->walls->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
-		this->walls->setTexture(Game::getGraphics().getTexturePointer("testWood"));
-		this->walls->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
-	}
+			this->walls->setPosition(Vector3(30.0f, 0.0f, -30.0f));
+			this->walls->setScale(Vector3(2.0f, 1.0f, 2.0f));
+			this->walls->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
+			this->walls->setTexture(Game::getGraphics().getTexturePointer("testWood"));
+			this->walls->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
+			success = true;
+		}
+		else {
+			scrapSkyScraper();
+			generateSkyscraper();
+		}
+	} while (!success);
 }

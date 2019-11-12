@@ -24,7 +24,7 @@ public:
 	void scale(Vector3 scaleBy);
 	void regenerateShape(int edges);
 
-	void getTriangleIndices();
+	bool getTriangleIndices();
 	std::vector<Vertex3D> getWindowVertices(Vector3 otherCenter);
 	std::vector<Vertex3D> getWallVertices(Vector3 otherCenter);
 	std::vector<Vertex3D> getRoofVertices();
@@ -32,10 +32,10 @@ public:
 private:
 	std::vector<Vector3> verticies;
 	std::vector<int> indices;
+	std::vector<std::string> debugInfo;
 	int nrOfEdges;
 	bool triangleGenFail = false;
 	Vector3 center;
-	GameObject* roof;
 
 	float pi = 3.141592653f;
 
@@ -57,22 +57,4 @@ private:
 	if yes, change start point and repeat
 		if (point - unavailable points) is two or lower, end loop
 	if no, make triangle, set start point to unavailable
-*/
-
-/*
-	Get a lower roof.
-
-	Compare two vectors of points
-	if a point doesn't exist in both, add to a new vector of points
-	save index of the points, compare one below the lowest index, if it exists in both, add it
-	repeat for one after the highest index
-	this vector is the lower roof
-*/
-
-/*
-	Making sides
-
-	compare bottom to top
-	if the point doesn't exist, compare to a lower floor
-	it the point exists, save index of both and the roof it is on
 */
