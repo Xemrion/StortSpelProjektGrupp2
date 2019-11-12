@@ -133,8 +133,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 		Vector3 randPos   = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand()))/ RAND_MAX;
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
-		randColor = Vector3(1.0, 0.0, 0.0);
-		randPos = Vector3(200, (i * 0.25) - 1.0, i * 10.0 - 500.0);
+		//randColor = Vector3(1.0, 0.0, 0.0);
+		//randPos = Vector3(200, (i * 0.25) - 1.0, i * 10.0 - 500.0);
 		lightList->addLight(
 			PointLight(
 				randPos,
@@ -639,7 +639,7 @@ void PlayingGameState::update(float deltaTime)
 
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
-	graphics.setSpotLighShadow(playerLight);
+	graphics.setSpotLightShadow(playerLight);
 	graphics.render(camera.get(), deltaTime);
 
 	// render UI

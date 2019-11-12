@@ -186,6 +186,17 @@ bool Graphics::init(Window* window)
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
+	desc.ByteWidth = static_cast<UINT>(sizeof(Vector4));
+	desc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&desc, 0, &fogAnimationBuffer);
+	if (FAILED(hr))
+		return false;
+
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
 	desc.ByteWidth = static_cast<UINT>(sizeof(Vector4) * 2);
 	desc.StructureByteStride = 0;
 
@@ -341,8 +352,7 @@ bool Graphics::init(Window* window)
 	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
-	
-	fog.initialize(device, deviceContext, 3, 0.45);
+	fog.initialize(device, deviceContext, 1, 1.45);
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	deviceContext->RSSetViewports(1, &this->vp);
 
@@ -1408,7 +1418,7 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 	}
 }
 
-void Graphics::setSpotLighShadow(SpotLight* spotLight)
+void Graphics::setSpotLightShadow(SpotLight* spotLight)
 {
 	shadowMap.setViewProjSpot(spotLight->getPos(), spotLight->getDirection(), spotLight->getLuminance());//REMOVE LUMINANCE
 	UINT index = (static_cast<Light*>(spotLight) - lightList->lights.data());
@@ -1420,14 +1430,19 @@ void Graphics::setSpotLighShadow(SpotLight* spotLight)
 
 void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 {
-	int i = 0;
+	deviceContext->VSSetShader(fog.drawShader.vs.getShader(), NULL, 0);
+	deviceContext->PSSetShader(fog.drawShader.ps.getShader(), NULL, 0);
+	time += deltaTime;
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+
+	int i = 1;
 	for (GameObject* object : fog.getQuads())
 	{
-		//object->setRotation(object->getRotation() + Vector3(0.0, deltaTime * 0.005 - 0.000 * i, 0.0));
 		SimpleMath::Matrix world = object->getTransform();
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		mappedResource;
 		HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
 		deviceContext->Unmap(worldBuffer.Get(), 0);
@@ -1446,16 +1461,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		{
 			normalSRV = material.normal->getShaderResView();
 		}
-		ID3D11ShaderResourceView* specularSRV = nullptr;
-		if (material.specular != nullptr)
-		{
-			specularSRV = material.specular->getShaderResView();
-		}
-		ID3D11ShaderResourceView* glossSRV = nullptr;
-		if (material.gloss != nullptr)
-		{
-			glossSRV = material.gloss->getShaderResView();
-		}
+
 
 		Vector4 modColor = object->getColor();
 		hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -1467,11 +1473,15 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		deviceContext->PSSetShaderResources(0, 1, &textureSRV);
 		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
-		deviceContext->PSSetShaderResources(5, 1, &specularSRV);
-		deviceContext->PSSetShaderResources(6, 1, &glossSRV);
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
+		Vector4 t = Vector4(time, 0.0005 * i, 0.00047 * i + 0.00007, 0.0);
+		deviceContext->Map(fogAnimationBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &t, sizeof(Vector4));
+		deviceContext->Unmap(fogAnimationBuffer.Get(), 0);
+		deviceContext->VSSetConstantBuffers(4, 1, fogAnimationBuffer.GetAddressOf());
+
 		deviceContext->Draw(vertexCount, 0);
-		++i;
+		i += 1;
 	}
 }

@@ -20,7 +20,8 @@ private:
 	std::vector<Texture*> normalTextures;
 	float spacing;
 
-	ShaderClass shader;
+
+	ShaderClass generateTextureShader;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> textureRTV;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> normalRTV;
 
@@ -30,4 +31,5 @@ public:
 	~Fog();
 	void initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, UINT slices, float spacing);
 	std::vector<GameObject*>& getQuads();
+	ShaderClass drawShader;
 };

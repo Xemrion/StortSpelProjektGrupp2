@@ -58,6 +58,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Buffer> culledLightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexSpot;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> cameraBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> fogAnimationBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> culledLightBufferUAV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> culledLightBufferSRV;
@@ -81,7 +82,7 @@ class Graphics {
 	ParticleSystem particleSystem2;
 
 	Fog fog;
-
+	float time = 0.0;
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
@@ -132,5 +133,5 @@ public:
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
 
 	float farZTempShadow;
-	void setSpotLighShadow(SpotLight* spotLight);
+	void setSpotLightShadow(SpotLight* spotLight);
 };

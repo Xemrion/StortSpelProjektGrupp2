@@ -12,6 +12,8 @@
     <FxCompile Include="Particle\ParticleUpdateCS.hlsl" />
     <FxCompile Include="Particle\ParticleVS.hlsl" />
     <FxCompile Include="FogPS.hlsl" />
+    <FxCompile Include="FogDrawPS.hlsl" />
+    <FxCompile Include="FogDrawVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="physics.cpp" />

@@ -76,8 +76,8 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 	};
 	UINT numElements = ARRAYSIZE(inputDesc);
 
-	this->shader.createVS(device.Get(), shaderfolder + L"SimpleVS.cso", inputDesc, numElements);
-	this->shader.createPS(device.Get(), shaderfolder + L"FogPS.cso");
+	this->generateTextureShader.createVS(device.Get(), shaderfolder + L"SimpleVS.cso", inputDesc, numElements);
+	this->generateTextureShader.createPS(device.Get(), shaderfolder + L"FogPS.cso");
 
 	this->vp.Width = noiseTexture->getWidth();
 	this->vp.Height = noiseTexture->getHeight();
@@ -87,6 +87,9 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 	this->vp.TopLeftY = 0;
 	
 	generateTextures(device, deviceContext);
+
+	this->drawShader.createVS(device.Get(), shaderfolder + L"FogDrawVS.cso", inputDesc, numElements);
+	this->drawShader.createPS(device.Get(), shaderfolder + L"FogDrawPS.cso");
 }
 
 void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
@@ -97,11 +100,11 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 
 	deviceContext->RSSetViewports(1, &this->vp);
 
-	deviceContext->PSSetShader(this->shader.ps.getShader(), nullptr, 0);
-	deviceContext->VSSetShader(this->shader.vs.getShader(), nullptr, 0);
+	deviceContext->PSSetShader(this->generateTextureShader.ps.getShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->generateTextureShader.vs.getShader(), nullptr, 0);
 
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	deviceContext->IASetInputLayout(this->shader.vs.getInputLayout());
+	deviceContext->IASetInputLayout(this->generateTextureShader.vs.getInputLayout());
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 	D3D11_BUFFER_DESC desc = { 0 };
@@ -126,7 +129,7 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		float densityThreshold;
 		float density;
 		float ambientDensity;
-		float normalY;
+		float scale;
 		float padding;
 	};
 	Microsoft::WRL::ComPtr<ID3D11Buffer> materialBuffer;
@@ -183,21 +186,14 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		deviceContext->Unmap(worldBuffer.Get(), 0);
 
 		FogMaterial material;
-		Vector4 color = object->getColor();
-		material.color = Vector3(color);
-		//material.densityThreshold = color.w;
-		material.densityThreshold = 0.075f;
-		material.ambientDensity = 0.015f;
-		material.density = 0.15f;
 		
-		auto smoothstep = [](float edge0, float edge1, float x)
-		{
-			float t = clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
-			return t * t * (3.0f - 2.0f * t);
-		};
+		//material.color = Vector3(0.6, 0.6, 0.62);
+		//material.densityThreshold = color.w;
+		material.densityThreshold = 0.15f;
+		material.ambientDensity = 0.1 / quads.size();
+		material.density = 0.25f / (i + 1);
+		material.scale = 50.f * (i + 1);
 
-		material.normalY = smoothstep(quads[quads.size() - 1]->getPosition().y, quads[0]->getPosition().y, object->getPosition().y) - 0.5;
-		material.normalY = object->getPosition().y;
 		hr = deviceContext->Map(materialBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &material, sizeof(FogMaterial));
 		deviceContext->Unmap(materialBuffer.Get(), 0);

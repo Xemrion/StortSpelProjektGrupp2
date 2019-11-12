@@ -82,7 +82,7 @@ void main( uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID )
 		float4 pos = float4(l.pos.xyz, 1.0);
 		pos.y = -pos.y;
 		pos = mul(pos, view);
-		float radius = sqrt(l.luminance / 0.05) * 2.0;
+		float radius = sqrt(l.luminance / 0.05);
 
 		if (l.width > 0.0)
 		{
