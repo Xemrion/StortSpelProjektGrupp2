@@ -188,7 +188,7 @@ InventorySlot ItemSelector::getSelectedSlot() const
 bool ItemSelector::isSelectedValid() const
 {
 	int listSize = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->size();
-	return this->selectedIndex[this->selectedType] > 0 && this->selectedIndex[this->selectedType] < listSize;
+	return this->selectedIndex[this->selectedType] >= 0 && this->selectedIndex[this->selectedType] < listSize;
 }
 
 void ItemSelector::setUsedSlots(InventorySlot* used)
