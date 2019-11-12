@@ -12,16 +12,17 @@ Bullet::Bullet()
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
 	this->obj->setScale(Vector3(0.05f, 0.25f, 0.35f));
 	this->obj->setColor(Vector4(1.2f, 1.2f, 0, 1));
+	this->weapon.type = WeaponType::None;
 }
 
-Bullet::Bullet(WeaponType type)
+Bullet::Bullet(Weapon weapon)
 {
 	this->obj = new GameObject;
 	this->obj->setSunShadow(false);
 	this->obj->setSpotShadow(false);
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
-	this->weaponType = type;
-	this->obj->setScale(WeaponHandler::weapons[(int)this->weaponType].bulletScale);
+	this->weapon = weapon;
+	this->obj->setScale(weapon.bulletScale);
 	this->obj->setColor(Vector4(0, 0, 0, 1));
 }
 
@@ -31,31 +32,35 @@ Bullet::~Bullet()
 	delete obj;
 }
 
-void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity)
+void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity, float deltaTime)
 {
-	this->weaponType = weapon.type;
-	if (this->weaponType == WeaponType::None)
+	this->weapon = Weapon(weapon);
+	if (this->weapon.type == WeaponType::None)
 	{
 
 	}
-	else if (this->weaponType == WeaponType::Flamethrower)
+	else if (this->weapon.type == WeaponType::Flamethrower)
 	{
-		flamethrowerShoot(weapon, position, direction, additionalVelocity);
+		flamethrowerShoot(weapon, position, direction, additionalVelocity, deltaTime);
+	}
+	else if (this->weapon.type == WeaponType::Laser)
+	{
+		laserShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
 	else
 	{
-		defaultShoot(weapon, position, direction, additionalVelocity);
+		defaultShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
 }
 
-void Bullet::defaultShoot(Weapon& weapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity)
+void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
 {
 	direction.Normalize();
 	this->dir = direction;
 
 	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
 	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
-	weapon.currentSpreadIncrease = min(weapon.currentSpreadIncrease + weapon.spreadIncreasePerShot, weapon.maxSpread);
+	vehicleWeapon.currentSpreadIncrease = min(vehicleWeapon.currentSpreadIncrease + vehicleWeapon.spreadIncreasePerSecond * vehicleWeapon.maxSpread * deltaTime, vehicleWeapon.maxSpread);
 	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
 	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
 	this->dir *= weapon.bulletSpeed;
@@ -63,16 +68,14 @@ void Bullet::defaultShoot(Weapon& weapon, Vector3& position, Vector3& direction,
 	this->dir += additionalVelocity;
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
-	Vector3 tempDir = this->dir;
-	tempDir.Normalize();
 
-	float newRot = atan2(tempDir.x, tempDir.z);
+	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
 
 	Game::getGraphics().addToDraw(this->obj);
 }
 
-void Bullet::flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity)
+void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
 {
 	direction.Normalize();
 	this->dir = direction;
@@ -87,10 +90,7 @@ void Bullet::flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direc
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
 
-	Vector3 tempDir = this->dir;
-	tempDir.Normalize();
-
-	float newRot = atan2(tempDir.x, tempDir.z);
+	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
 
 	//Game::getGraphics().addToDraw(this->obj);
@@ -140,13 +140,17 @@ void Bullet::flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direc
 
 void Bullet::update(float deltaTime)
 {
-	if (this->weaponType == WeaponType::None)
+	if (this->weapon.type == WeaponType::None)
 	{
-		this->obj->setPosition(Vector3(1000, 1000, 1000));
+
 	}
-	else if (this->weaponType == WeaponType::aiMachineGun)
+	else if (this->weapon.type == WeaponType::aiMachineGun)
 	{
 		defaultEnemyUpdate(deltaTime);
+	}
+	else if (this->weapon.type == WeaponType::Laser)
+	{
+		laserUpdate(deltaTime);
 	}
 	else
 	{
@@ -161,7 +165,7 @@ void Bullet::update(float deltaTime)
 
 void Bullet::defaultUpdate(float& deltaTime)
 {
-	this->obj->setScale(WeaponHandler::weapons[(int)this->weaponType].bulletScale);
+	this->obj->setScale(weapon.bulletScale);
 	if (timeLeft > 0.0f)
 	{
 		obj->move(dir * min(deltaTime, timeLeft));
@@ -184,10 +188,54 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 				Sound::PlaySoundEffect(L"data/sound/MetalImpact1.wav");
 				soundTimer = 0;
 			}
-			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-WeaponHandler::weapons[(int)weaponType].damage);
+			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);
 			this->timeLeft = 0.f;
 		}
 
+		timeLeft = max(timeLeft - deltaTime, 0.0f);
+	}
+}
+
+void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
+{
+	if (vehicleWeapon.remainingCooldown > 0.0)
+	{
+		this->weapon.type == WeaponType::None;
+		return;
+	}
+	direction.Normalize();
+	this->dir = direction;
+	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
+	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
+	vehicleWeapon.currentSpreadIncrease += vehicleWeapon.spreadIncreasePerSecond * vehicleWeapon.maxSpread * deltaTime;
+
+	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
+	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
+
+	this->timeLeft = weapon.bulletLifetime;
+	this->obj->setScale(weapon.bulletScale);
+	this->obj->setPosition(position + direction * this->obj->getScale().z);
+
+	float newRot = atan2(direction.x, direction.z);
+	this->obj->setRotation(Vector3(0, newRot, 0));
+	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.02), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread*vehicleWeapon.maxSpread)));
+
+	Game::getGraphics().addToDraw(this->obj);
+	if (vehicleWeapon.currentSpreadIncrease > vehicleWeapon.maxSpread)
+	{
+		vehicleWeapon.remainingCooldown = 4.0;
+		vehicleWeapon.currentSpreadIncrease = 0.0;
+	}
+}
+
+void Bullet::laserUpdate(float& deltaTime)
+{
+	this->obj->setScale(weapon.bulletScale * Vector3(timeLeft / weapon.bulletLifetime, timeLeft / weapon.bulletLifetime, 1.0));
+	if (timeLeft > 0.0f)
+	{
+		obj->move(dir * this->obj->getScale().z + dir);
+		float newRot = atan2(dir.x, dir.z);
+		this->obj->setRotation(Vector3(0, newRot, 0));
 		timeLeft = max(timeLeft - deltaTime, 0.0f);
 	}
 }
@@ -197,19 +245,24 @@ float Bullet::getTimeLeft() const
 	return timeLeft;
 }
 
-void Bullet::setWeaponType(WeaponType type) 
+void Bullet::setWeapon(Weapon weapon) 
 {
-	this->weaponType = type;
+	this->weapon = weapon;
+}
+
+Weapon Bullet::getWeapon() const
+{
+	return this->weapon;
 }
 
 WeaponType Bullet::getWeaponType() const
 {
-	return this->weaponType;
+	return this->weapon.type;
 }
 
 int Bullet::getDamage() const
 {
-	return WeaponHandler::weapons[(int)this->weaponType].damage;
+	return weapon.damage;
 }
 
 GameObject* Bullet::getGameObject()
@@ -224,6 +277,16 @@ void Bullet::updateSoundTimer(float deltaTime)
 
 void Bullet::destroy()
 {
-	setWeaponType(WeaponType::None);
+	setWeapon(WeaponHandler::getWeapon(WeaponType::None));
 	Game::getGraphics().removeFromDraw(obj);
+}
+
+Vector3 Bullet::getDirection() const
+{
+	return dir;
+}
+
+void Bullet::setDirection(Vector3 newDir)
+{
+	dir = newDir;
 }

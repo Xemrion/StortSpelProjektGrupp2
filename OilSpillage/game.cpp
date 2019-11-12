@@ -22,8 +22,8 @@ void Game::start(Window* window)
 	Inventory::instance = std::make_unique<Inventory>();
 	Item::init();
 
-	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
-	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");
+	Sound::loadSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
+	Sound::loadSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");
 
 	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
 	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");

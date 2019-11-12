@@ -62,33 +62,20 @@ SamplerState SampSt : register(s0);
 SamplerState ShadowSamp : register(s1);
 StructuredBuffer<TileData> tileData : register(t2);
 
-float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float biasTemp)
+float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float bias)
 {
 	float4 shadowCoord = shadowPosition;
-	shadowCoord.x = shadowPosition.x / shadowPosition.w / 2.0f + 0.5f;
-	shadowCoord.y = -shadowPosition.y / shadowPosition.w / 2.0f + 0.5f;
-	shadowCoord.z = shadowCoord.z / shadowCoord.w;
+	shadowCoord.xyz /= shadowCoord.w;
+	shadowCoord.xy = shadowCoord.xy * float2(0.5f, -0.5f) + 0.5f;
 	float visibility = 0.0f;
-	float bias  = 0.0f;
-	bias = biasTemp;
 
-
-	int width;
-	int height;
-	int nrOfLevels;
-	shadowMap.GetDimensions(0, width, height, nrOfLevels);
-	float2 textureSize = float2(width, height);
-	float2 texelSize = 1.0 / textureSize;
-	for (int x = -1; x <= 1; ++x)
-	{
-		for (int y = -1; y <= 1; ++y)
-		{
-			float pcfDepth = shadowMap.Sample(ShadowSamp, shadowCoord.xy + float2(x, y) * texelSize).r;
-			visibility += shadowCoord.z - bias > pcfDepth ? 1.0f : 0.0;
-		}
-	}
+	float4 pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy).r;
+	visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
 	
-	visibility /= 9.0;
+	visibility *= 0.25;
 
 	return visibility;
 };
@@ -118,7 +105,7 @@ float4 main(VS_OUT input) : SV_Target
 	uint2 lightTileIndex = floor(uint2(input.Pos.x, input.Pos.y) / uint2(16.f, 16.f));
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 
-	float4 ambient = max(-dot(sunDir, normal)*(1- shadowVisible(input.shadowPos, ShadowMap, 0.00025f)), float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
+	float4 ambient = max(-dot(sunDir, normal)*(1- shadowVisible(input.shadowPos, ShadowMap, 0.00015f)), float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
 	float shadowSpotVisible = 1.0f;
 
 	float4 diffuseLight = float4(0.0, 0.0, 0.0, 1.0);

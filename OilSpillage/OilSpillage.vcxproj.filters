@@ -87,6 +87,11 @@
     <ClCompile Include="UI\Elements\TextBox.cpp" />
     <ClCompile Include="UI\Elements\CarGadgetSelector.cpp" />
     <ClCompile Include="UI\Elements\VehicleStatBox.cpp" />
+    <ClCompile Include="UI\UIControls.cpp" />
+    <ClCompile Include="AI\TurretHandler.cpp" />
+    <ClCompile Include="AI\Swarm.cpp" />
+    <ClCompile Include="AI\Car_Spitfire.cpp" />
+    <ClCompile Include="PG\Modelizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -177,6 +182,11 @@
     <ClInclude Include="UI\Elements\TextBox.h" />
     <ClInclude Include="UI\Elements\CarGadgetSelector.h" />
     <ClInclude Include="UI\Elements\VehicleStatBox.h" />
+    <ClInclude Include="PG\Modelizer.hpp" />
+    <ClInclude Include="UI\UIControls.h" />
+    <ClInclude Include="AI\TurretHandler.h" />
+    <ClInclude Include="AI\Swarm.h" />
+    <ClInclude Include="AI\Car_Spitfire.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

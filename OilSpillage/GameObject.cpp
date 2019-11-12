@@ -333,6 +333,27 @@ void GameObject::setRigidBody(btRigidBody* body, Physics* physics)
 	this->physics = physics;
 }
 
+void GameObject::setVelocity(Vector3 velocity)
+{
+	this->velocity = velocity;
+}
+
+void GameObject::updateObject(float deltaTime)
+{
+	if (this->getPosition().y > -1.4f) {
+		velocity.y -= 9.82f*deltaTime;
+		velocity /= 1 + (1.5f * deltaTime);
+	}
+	else {
+		this->setPosition(Vector3(this->getPosition().x,-1.4f, this->getPosition().z));
+		velocity.y = 0;
+		velocity /= 1 + (4.5f * deltaTime);
+	}
+	this->setRotation(Vector3(velocity.y*0.12f*this->getRotation().y,this->getRotation().y, velocity.y * 0.2f * -this->getRotation().y));
+
+	this->setPosition(this->getPosition() + this->velocity * deltaTime);
+}
+
 /*Matrix GameObject::btTransformToMatrix(btTransform const& trans) const
 {
 	//store btTranform in 4x4 Matrix

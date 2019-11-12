@@ -149,8 +149,10 @@
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
+    <ClCompile Include="AI\Car_Spitfire.cpp" />
     <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
+    <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Inventory\Inventory.cpp" />
     <ClCompile Include="Inventory\Item.cpp" />
@@ -161,6 +163,7 @@
     <ClCompile Include="PG\MapConfig.cpp" />
     <ClCompile Include="PG\Map.cpp" />
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
+    <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="PowerUp.cpp" />
@@ -174,6 +177,10 @@
     <ClCompile Include="UI\Elements\CarGadgetSelector.cpp" />
     <ClCompile Include="UI\Elements\CheckBox.cpp" />
     <ClCompile Include="UI\Elements\Element.cpp" />
+    <ClCompile Include="AI\Swarm.cpp" />
+    <ClCompile Include="UI\Button.cpp" />
+    <ClCompile Include="UI\CheckBox.cpp" />
+    <ClCompile Include="UI\Element.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="graphics.cpp" />
@@ -223,7 +230,10 @@
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
+    <ClInclude Include="AI\Car_Spitfire.h" />
     <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="AI\TurretHandler.h" />
+    <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="Inventory\Inventory.h" />
     <ClInclude Include="Inventory\ItemWeapon.h" />
     <ClInclude Include="Powerup.h" />
@@ -244,6 +254,7 @@
     <ClInclude Include="States\UpgradingGameState.h" />
     <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="STB\stb_image_write.h" />
+    <ClInclude Include="AI\Swarm.h" />
     <ClInclude Include="UI\Elements\Button.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DynamicCamera.h" />
