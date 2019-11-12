@@ -7,9 +7,9 @@ private:
 public:
 	TurretHandler();
 	~TurretHandler();
-	void update(float dt, DirectX::SimpleMath::Vector3 targetPos);
+	void update(float dt, const Vector3& targetPos);
 	void createTurret(float x, float z,int weaponType);
-	float distanceToPlayer(const DirectX::SimpleMath::Vector3& position);
+	float distanceToPlayer(const Vector3& position);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size,float soundTimer);
 
 

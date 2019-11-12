@@ -50,6 +50,6 @@ public:
 	float getHeading(Quaternion qt);
 
 	void move();
-	void update(float dt, Vector3 targetPos);
+	void update(float dt, const Vector3& targetPos);
 	void followPath();
 };

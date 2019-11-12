@@ -26,7 +26,7 @@ Actor::~Actor()
 {
 }
 
-void Actor::update(float dt, Vector3 targetPos)
+void Actor::update(float dt, const Vector3& targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;

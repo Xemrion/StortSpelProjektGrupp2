@@ -7,12 +7,12 @@ public:
 	DynamicActor(float x,float z);
 	virtual ~DynamicActor();
 	void setPath(std::vector<Vector3>* path);
-	virtual void update(float dt,Vector3 targetPos);
-	void applyForce(Vector3 force);
-	int getBoidOffset();
-	float getMaxSpeed();
-	float getMaxForce();
-	Vector3 getVelocity();
+	virtual void update(float dt, const Vector3& targetPos);
+	void applyForce(const Vector3& force);
+	int getBoidOffset()const;
+	float getMaxSpeed()const;
+	float getMaxForce()const;
+	const Vector3& getVelocity()const;
 
 	int duty;
 	bool vActive;
@@ -38,8 +38,8 @@ protected:
 	// Other function for moving and interacting
 	virtual void move();
 	virtual Vector3 seek();
-	virtual void moveCirculate(Vector3 desiredDirection);
-	virtual Vector3 seekCirculate(Vector3 desiredDirection);
+	virtual void moveCirculate(const Vector3& desiredDirection);
+	virtual Vector3 seekCirculate(const Vector3& desiredDirection);
 	virtual void followPath();
 	virtual void circulatePlayer();
 	Status setChaseState();
