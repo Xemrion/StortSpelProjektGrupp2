@@ -53,8 +53,6 @@ Vehicle::~Vehicle()
 	delete vehicle;
 	delete vehicleBody1;
 
-	delete this->mountedWeapon;
-	delete this->frontWeapon;
 	delete wheel1;
 	delete wheel2;
 	delete wheel3;
@@ -67,8 +65,7 @@ Vehicle::~Vehicle()
 void Vehicle::init(Physics *physics)
 {
 	this->physics = physics;
-	this->mountedWeapon = new GameObject;
-	this->frontWeapon = new GameObject;
+	
 
 	this->vehicle = new GameObject;
 	Game::getGraphics().loadShape(Shapes::SHAPE_CUBE);
@@ -78,20 +75,10 @@ void Vehicle::init(Physics *physics)
 	vehicle->setScale(Vector3(0.5f, 0.14f, 0.9f));
 	Game::getGraphics().loadTexture("CarTemp");
 	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
-	Game::getGraphics().loadModel("Entities/Dummy_Turret");
-	mountedWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
-	Material mountedWPMaterial = Game::getGraphics().getMaterial("Entities/Dummy_Turret");
-	mountedWeapon->setTexture(mountedWPMaterial.diffuse);
-	Game::getGraphics().addToDraw(mountedWeapon);
-	mountedWeapon->setScale(Vector3(0.010f,0.007f, 0.007f));
+	Game::getGraphics().loadModel("Entities/Turret");
+	
 
-	frontWeapon->mesh = Game::getGraphics().getMeshPointer("Entities/Turret1");
-	Material frontWeaponMat = Game::getGraphics().getMaterial("Entities/Turret");
-	frontWeapon->setTexture(frontWeaponMat.diffuse);
-	Game::getGraphics().addToDraw(frontWeapon);
-	frontWeapon->setScale(Vector3(0.002f, 0.005f, 0.005f));
-	frontWeapon->setColor(Vector4(0.7f, 0.7f, 0.0f, 1.0f));
-
+	
 	this->vehicleBody1 = new GameObject;
 	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player1");
 	vehicleBody1->setSpotShadow(false);
@@ -155,17 +142,6 @@ void Vehicle::init(Physics *physics)
 
 void Vehicle::updatePlayer(float deltaTime)
 {
-	if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr) {
-		if (this->deadImpulse == true && this->health <= 0)
-			{
-				this->respawnTimer += deltaTime;
-				if(this->respawnTimer>5)
-				{
-					this->resetHealth();
-					this->immortal = true;
-					this->vehicle->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getRespawnPosition());
-					this->vehicleBody1->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getRespawnPosition() + Vector3(0.0f, 0.65f, 0.0f));
-
 	this->update(deltaTime, Input::getStrengthL(),Input::checkButton(Keys::R_TRIGGER,States::HELD) || Input::isKeyDown_DEBUG(Keyboard::W), Input::checkButton(Keys::L_TRIGGER,States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S),Input::getDirectionL());
 }
 
@@ -183,8 +159,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 					this->deadImpulse = false;
 					this->respawnTimer = 0.0f;
-				}
-			}
+		}
 		if (dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime() == 0)
 		{
 			this->respawnTimer = 0.0f;
@@ -500,7 +475,6 @@ void Vehicle::updateWeapon(float deltaTime)
 		Vector3 frontTempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
 		Vector3 tempDirYawPtich = Vector3(cos(yaw) * cos(pitch), sin(yaw) * cos(pitch), sin(pitch));
 		tempDirYawPtich.Normalize();
-		//this->frontWeapon->setPosition(this->vehicleBody1->getPosition() + tempDirYawPtich * 1 - Vector3(0, 1, 0));
 		float angleWP = tempDirYawPtich.Dot(Vector3(0, 0, 1));
 		/*MOUNTED*/
 		if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
@@ -564,7 +538,6 @@ void Vehicle::updateWeapon(float deltaTime)
 			}
 		}
 		/*END*/
-		//this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y+3.14/2, ));
 		Vector2 dir = Input::getDirectionR();
 		
 		dir.Normalize();
@@ -611,7 +584,7 @@ void Vehicle::updateWeapon(float deltaTime)
 									this->bullets[i].shoot(weapon,
 										this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
 										Vector3(curDir.x, 0.0, curDir.y),
-										Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 0.5f);
+										Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 0.5f,deltaTime);
 
 									WeaponHandler::weaponStartSound(temp->getWeapon());
 									break;
@@ -640,7 +613,7 @@ void Vehicle::updateWeapon(float deltaTime)
 									this->bullets[i].shoot(temp->getWeapon(),
 										this->vehicleBody1->getPosition() + Vector3(tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 										tempDir,
-										Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
+										Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()),deltaTime);
 									break;
 								}
 							}

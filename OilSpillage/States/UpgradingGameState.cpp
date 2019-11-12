@@ -25,7 +25,9 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 	this->camera = std::make_unique<DynamicCamera>(Vector3(0, 0.5f, -8.0f),Vector3(/*3.14/4*/0,0,0));
 
 	this->theVehicle = std::make_unique<Vehicle>();
-	this->graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
+	//this->graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
+	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
+
 	this->physics = std::make_unique<Physics>();
 	this->theVehicle->init(physics.get());
 	this->theVehicle->getVehicle()->setPosition(Vector3(0, 0, 0));
@@ -59,10 +61,10 @@ void UpgradingGameState::update(float deltaTime)
 	timer += deltaTime;
 	timer = fmod(timer, XM_2PI);
 	
-	this->theVehicle->getVehicle()->getRigidBody()->setAngularVelocity(btVector3(0,100*deltaTime, 0));
 	this->theVehicle->updateWeapon(deltaTime);
-	this->theVehicle->update(deltaTime);
-	
+	this->theVehicle->update(deltaTime, 0, 0, 0, Vector2(0, 0));
+	this->theVehicle->getVehicle()->getRigidBody()->setAngularVelocity(btVector3(0, deltaTime*100, 0));
+
 	this->theVehicle->setWheelRotation();
 	this->physics->update(deltaTime);
 

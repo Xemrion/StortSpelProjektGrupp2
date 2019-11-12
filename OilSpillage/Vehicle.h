@@ -97,8 +97,6 @@ private:
 	float totRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
 
-	GameObject* mountedWeapon;//Mounted on top of the car
-	GameObject* frontWeapon;
 	Item** slots;
 	VehicleSlots* vehicleSlots;
 	GameObject test;
