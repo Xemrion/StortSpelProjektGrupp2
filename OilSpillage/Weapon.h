@@ -3,8 +3,7 @@
 #include <d3d11.h>
 #include "SimpleMath.h"
 #include "GameObject.h"
-
-
+#include "Sound.h"
 enum class WeaponType
 {
 	Default,
@@ -28,6 +27,30 @@ struct Weapon
 	float spreadIncreasePerShot = 1.0;
 	float currentSpreadIncrease = 0.0;
 	WeaponType type = WeaponType::Default;
+	float soundTimer = 0.0f;
+	float timeSinceLastShot = 0.0f;
+	bool flameBool = false;
+	void updateWeapon(float deltaTime)
+	{
+		if (deltaTime > 0.01f) {
+			soundTimer += 100.0f * deltaTime;
+		}
+		else {
+			soundTimer += 100.0f;
+		}
+		timeSinceLastShot += deltaTime;
+		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * maxSpread * 2.0, 0.0);
+	};
+
+	bool updateFireRate()
+	{
+		if (timeSinceLastShot >= fireRate)
+		{
+			timeSinceLastShot = fmod(timeSinceLastShot, fireRate);
+			return true;
+		}
+		return false;
+	};
 };
 
 class WeaponHandler
@@ -45,6 +68,49 @@ public:
 	static Weapon getWeapon(WeaponType type) { 
 		return weapons[(int)type];
 	};
+
+	static void weaponStartSound(Weapon& weapon)
+	{
+		if (weapon.type == WeaponType::MachineGun)
+		{
+			if (weapon.soundTimer > 4.0f) {
+				int randomSound = rand() % 6 + 1;
+				int rand2 = rand() % 2;
+				std::wstring soundEffect = L"data/sound/MachineGunSound" + std::to_wstring(randomSound) + L".wav";
+				if (rand2 < 1) {
+					soundEffect = L"data/sound/MachineGunSound1.wav";
+				}
+				Sound::PlaySoundEffect(soundEffect);
+				weapon.soundTimer = 0;
+			}
+		}
+		else if (weapon.type == WeaponType::Flamethrower)
+		{
+			if (weapon.flameBool == true) {
+				int randomSound = rand() % 2 + 1;
+				std::wstring soundEffect = L"data/sound/FlameLoop" + std::to_wstring(randomSound) + L".wav";
+				Sound::PlayLoopingSound(soundEffect);
+				Sound::PlaySoundEffect(L"data/sound/FlameStart.wav");
+				weapon.flameBool = false;
+			}
+		}
+	};
+
+	static void weaponEndSound(Weapon& weapon)
+	{
+		if (weapon.type == WeaponType::MachineGun)
+		{
+			return;
+		}
+		else if (weapon.type == WeaponType::Flamethrower)
+		{
+			weapon.flameBool = true;
+			Sound::StopLoopingSound(L"data/sound/FlameLoop1.wav", true);
+			Sound::StopLoopingSound(L"data/sound/FlameLoop2.wav", true);
+		}
+	};
+
+
 };
 
 class Bullet

@@ -14,7 +14,7 @@ public:
 	ItemWeapon(std::string name, Weapon weapon, std::shared_ptr<GameObject> object);
 	virtual ~ItemWeapon();
 
-	Weapon getWeapon() const;
+	Weapon& getWeapon();
 };
 
 #endif // !ITEM_WEAPON_H
