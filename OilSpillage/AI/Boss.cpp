@@ -18,6 +18,7 @@ Boss::Boss(float x, float z, int weaponType)
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 
 	this->attackRange = 10;
+	this->testNr = 1;
 }
 
 Boss::~Boss()
@@ -53,6 +54,9 @@ void Boss::setUpActor()
 
 	Behavior& circulate = bt.getAction();
 	circulate.addAction(std::bind(&Boss::setCirculateState, std::ref(*this)));
+
+	testNr++;
+	//std::printf((char*)testNr);
 
 	root->addChildren(sequence1);
 	root->addChildren(chase);
