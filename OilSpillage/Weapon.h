@@ -11,6 +11,7 @@ enum class WeaponType
 	MachineGun,
 	MissileLauncher,
 	Laser,
+	Railgun,
 	Flamethrower,
 	aiMachineGun,
 	aiMelee,
@@ -29,8 +30,11 @@ struct Weapon
 	DirectX::SimpleMath::Vector3 bulletScale = DirectX::SimpleMath::Vector3(1.0);
 	float spreadRadians = 0.0;
 	float maxSpread = 1.0;
-	float spreadIncreasePerShot = 1.0;
+	float spreadIncreasePerSecond = 1.0;
 	float currentSpreadIncrease = 0.0;
+	//float recoilDissipationTime = 1.0; // time (in seconds) for recoil to go from 100% to 0%
+	float spreadDecreasePerSecond = 1.0;
+	float remainingCooldown = 0.0;
 	WeaponType type = WeaponType::Default;
 };
 
@@ -50,35 +54,40 @@ public:
 		{      1,     0.05f,          8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f, 0.0f, 0.0f,  0.0f, WeaponType::aiFlamethrower }
 	};
 
-	static Weapon getWeapon(WeaponType type) { 
+	static Weapon getWeapon(WeaponType type) {
 		return weapons[(int)type];
 	};
 };
 
 class Bullet
 {
-	void defaultShoot(Weapon& weapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity);
+	void defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
 	void defaultUpdate(float& deltaTime);
 	void defaultEnemyUpdate(float& deltaTime);
-	void flamethrowerShoot(Weapon& weapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity);
+	void flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
+	void laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
+	void laserUpdate(float& deltaTime);
 	GameObject* obj = nullptr;
 	Vector3 dir;
 	float timeLeft = 0.0f;
-	WeaponType weaponType = WeaponType::None;
+	Weapon weapon;
 	static float soundTimer;
 public:
 	Bullet();
-	Bullet(WeaponType type);
+	Bullet(Weapon weapon);
 	~Bullet();
-	void setWeaponType(WeaponType type);
+	void setWeapon(Weapon weapon);
+	Weapon getWeapon() const;
 	WeaponType getWeaponType() const;
 	int getDamage() const;
-	void shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity);
+	void shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity, float deltaTime);
 	void update(float deltaTime);
 	float getTimeLeft() const;
 	void destroy();
 	GameObject* getGameObject();
 	static void updateSoundTimer(float deltaTime);
+	Vector3 getDirection() const;
+	void setDirection(Vector3 newDir);
 };
 
 #endif // !WEAPON_H
