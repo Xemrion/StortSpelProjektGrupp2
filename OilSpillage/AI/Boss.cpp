@@ -11,11 +11,14 @@ Boss::Boss(float x, float z, int weaponType)
 	setUpActor();
 	Game::getGraphics().addToDraw(this);
 
-	this->stats = VehicleStats::AIAttacker;
+	this->stats = VehicleStats::AIBoss;
 	setHealth(this->stats.maxHealth);
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
+
+	this->attackRange = 10;
+	this->testNr = 1;
 }
 
 Boss::~Boss()
@@ -27,14 +30,15 @@ void Boss::update(float dt, Vector3 targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	this->updateBullets(dt);
+
 }
 
 void Boss::setUpActor()
 {
-	this->root = &bt.getSelector();
-	Sequence& sequence = bt.getSequence();
-	Selector& selector = bt.getSelector();
-	Sequence& seq2 = bt.getSequence();
+	this->root = &bt.getSelector();				//selector1
+	Sequence& sequence1 = bt.getSequence();		//sequence1
+	Selector& selector2 = bt.getSelector();		//selector2
+	Sequence& sequence2 = bt.getSequence();		//sequence2
 
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Boss::inAttackRange, std::ref(*this)));
@@ -42,24 +46,21 @@ void Boss::setUpActor()
 	Behavior& chase = bt.getAction();
 	chase.addAction(std::bind(&Boss::setChaseState, std::ref(*this)));
 
-	Behavior& roam = bt.getAction();
-	roam.addAction(std::bind(&Boss::setIdleState, std::ref(*this)));
-
 	Behavior& shoot = bt.getAction();
 	shoot.addAction(std::bind(&Boss::shoot, std::ref(*this)));
 
-	Behavior& inAggroRange = bt.getAction();
-	inAggroRange.addAction(std::bind(&Boss::inAggroRange, std::ref(*this)));
+	Behavior& idle = bt.getAction();
+	idle.addAction(std::bind(&Boss::setIdleState, std::ref(*this)));
 
-	root->addChildren(sequence);
-	root->addChildren(roam);
+	Behavior& circulate = bt.getAction();
+	circulate.addAction(std::bind(&Boss::setCirculateState, std::ref(*this)));
 
-	sequence.addChildren(inAggroRange);
-	sequence.addChildren(selector);
+	testNr++;
+	//std::printf((char*)testNr);
 
-	selector.addChildren(seq2);
-	selector.addChildren(chase);
+	root->addChildren(sequence1);
+	root->addChildren(chase);
 
-	seq2.addChildren(inRange);
-	seq2.addChildren(shoot);
+	sequence1.addChildren(inRange);
+	sequence1.addChildren(circulate);
 }
