@@ -436,11 +436,20 @@ void Vehicle::update(float deltaTime)
 	vehicle->getRigidBody()->setAngularVelocity(btVector3(0, vehicle->getRigidBody()->getAngularVelocity().getY(), 0));
 
 
-	if (deltaTime > 0.01f) {
-		soundTimer += 100.0f * deltaTime;
-	}
-	else {
-		soundTimer += 100.0f;
+	for (int i = 0; i < Slots::SIZEOF; i++)
+	{
+		Item* temp = this->vehicleSlots->getSlot(Slots(i));
+		if (temp != nullptr)
+		{
+			if (temp->getType() == ItemType::WEAPON)
+			{
+				ItemWeapon* tempWeapon = dynamic_cast<ItemWeapon*>(temp);
+				if (tempWeapon != nullptr)
+				{
+					tempWeapon->getWeapon().updateWeapon(deltaTime);//for sound and timeSinceLastShot
+				}
+			}
+		}
 	}
 
 	add += 0.4f * deltaTime;
@@ -564,67 +573,48 @@ void Vehicle::updateWeapon(float deltaTime)
 		if (this->health > 0)
 		{
 			// recoil goes from 100% to 0% in half a second
-			this->weapon2.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
 			if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
 			{
 				float newRot = atan2(curDir.x, curDir.y) + 3.14f / 2;
 				this->gunRotation = newRot;
 				if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
 				{
-					this->weapon.currentSpreadIncrease = max(this->weapon.currentSpreadIncrease - deltaTime * this->weapon.maxSpread * 2.0, 0.0);
 					this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, newRot, 0));
 
-					this->timeSinceLastShot += deltaTime;
-					this->timeSinceLastShot2 += deltaTime;
 					if (Input::checkButton(Keys::R_SHOULDER, States::HELD) || Input::getStrengthRnoMouse() > 0.01f)
 					{
 						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::MOUNTED));
-						if (this->timeSinceLastShot >= temp->getWeapon().fireRate)
+						if (temp->getWeapon().updateFireRate())
 						{
-							this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+							//this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
 
 							for (int i = 0; i < Vehicle::bulletCount; ++i)
 							{
 								if (bullets[i].getWeaponType() == WeaponType::None)
 								{
 									auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
-
 									this->bullets[i].shoot(weapon,
 										this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
 										Vector3(curDir.x, 0.0, curDir.y),
 										Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 0.5f);
-									if (soundTimer > 4.0f) {
-										int randomSound = rand() % 6 + 1;
-										int rand2 = rand() % 2;
-										std::wstring soundEffect = L"data/sound/MachineGunSound" + to_wstring(randomSound) + L".wav";
-										if (rand2 < 1) {
-											soundEffect = L"data/sound/MachineGunSound1.wav";
-										}
-										Sound::PlaySoundEffect(soundEffect);
-										soundTimer = 0;
-									}
+
+									WeaponHandler::weaponStartSound(temp->getWeapon());
 									break;
 								}
 							}
 						}
+						
 					}
 				}
-
 				if (this->vehicleSlots->getSlot(Slots::FRONT)->getObject() != nullptr)
 				{
+					ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::FRONT));
 					if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
 					{
-						if (flameBool == true) {
-							int randomSound = rand() % 2 + 1;
-							std::wstring soundEffect = L"data/sound/FlameLoop" + to_wstring(randomSound) + L".wav";
-							Sound::PlayLoopingSound(soundEffect);
-							Sound::PlaySoundEffect(L"data/sound/FlameStart.wav");
-							flameBool = false;
-						}
-						if (this->timeSinceLastShot2 >= this->weapon2.fireRate)
+						//weapon.startSound();
+						WeaponHandler::weaponStartSound(temp->getWeapon());
+						if (temp->getWeapon().updateFireRate())
 						{
-							this->timeSinceLastShot2 = fmod(this->timeSinceLastShot2, this->weapon2.fireRate);
-
 							for (int i = 0; i < Vehicle::bulletCount; ++i)
 							{
 								if (bullets[i].getWeaponType() == WeaponType::None)
@@ -632,7 +622,7 @@ void Vehicle::updateWeapon(float deltaTime)
 									auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
 
 									Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-									this->bullets[i].shoot(weapon2,
+									this->bullets[i].shoot(temp->getWeapon(),
 										this->vehicleBody1->getPosition() + Vector3(tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 										tempDir,
 										Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()));
@@ -643,9 +633,7 @@ void Vehicle::updateWeapon(float deltaTime)
 					}
 					else 
 					{
-						flameBool = true;
-						Sound::StopLoopingSound(L"data/sound/FlameLoop1.wav", true);
-						Sound::StopLoopingSound(L"data/sound/FlameLoop2.wav", true);
+						WeaponHandler::weaponEndSound(temp->getWeapon());
 					}
 				}
 			}

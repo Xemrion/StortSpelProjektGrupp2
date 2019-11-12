@@ -20,7 +20,7 @@ ItemWeapon::~ItemWeapon()
 {
 }
 
-Weapon ItemWeapon::getWeapon() const
+Weapon& ItemWeapon::getWeapon()
 {
 	return this->weapon;
 }
