@@ -3,7 +3,7 @@
 class Spitfire : public DynamicActor
 {
 private:
-	GameObject* vehicle;
+	//GameObject* vehicle;
 	btScalar mRotation;
 	GameObject* wheel1;
 	GameObject* wheel2;
