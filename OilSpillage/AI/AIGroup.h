@@ -12,8 +12,9 @@ public:
 	void setPath(std::vector<Vector3> path);
 	void formationP(Vector3 targetPos);
 	void updateDuty();
-
+	const float getGroupRadius() const;
 private:
+	float groupRadius; //Compare with distance^2
 	friend class ActorManager;
 	std::vector<DynamicActor*> actors;
 	Vector3 averagePos;

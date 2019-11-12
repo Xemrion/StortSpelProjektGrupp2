@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -146,7 +146,6 @@
     <ClCompile Include="AI\AIGroup.cpp" />
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\ActorManager.cpp" />
-    <ClCompile Include="AI\AIVehicle.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
@@ -154,7 +153,6 @@
     <ClCompile Include="AI\Car_Spitfire.cpp" />
     <ClCompile Include="AI\DynamicActor.cpp" />
     <ClCompile Include="AI\Melee.cpp" />
-    <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="AI\Ranged.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
@@ -218,7 +216,6 @@
     <ClInclude Include="AI\AIGroup.h" />
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\ActorManager.h" />
-    <ClInclude Include="AI\AIVehicle.h" />
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
@@ -226,7 +223,6 @@
     <ClInclude Include="AI\Car_Spitfire.h" />
     <ClInclude Include="AI\DynamicActor.h" />
     <ClInclude Include="AI\Melee.h" />
-    <ClInclude Include="AI\Node.h" />
     <ClInclude Include="AI\Ranged.h" />
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="PG\Modelizer.hpp" />

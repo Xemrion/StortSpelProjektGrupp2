@@ -1,6 +1,5 @@
 #pragma once
 #include "DynamicActor.h"
-#include "AIVehicle.h"
 class Spitfire : public DynamicActor
 {
 private:

@@ -328,7 +328,7 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 		float deltaX = actorPos.x - curAveragePos.x;
 		float deltaZ = actorPos.z - curAveragePos.z;
 		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-		bool isInRange = distance <= groupRadius;
+		bool isInRange = distance <= groups[i].getGroupRadius();
 		bool isBiggerGroup = groups[i].actors.size() >= biggestGroupSize;
 		if (isInRange && isBiggerGroup)
 		{
@@ -394,10 +394,10 @@ void ActorManager::updateGroups()
 				float deltaX = actorPos.x - curAveragePos.x;
 				float deltaZ = actorPos.z - curAveragePos.z;
 				float distanceToOwnGroup = (deltaX * deltaX) + (deltaZ * deltaZ);
-				bool isInRange = distanceToOwnGroup <= groupRadius;
+				bool isInRange = distanceToOwnGroup <= groups[i].getGroupRadius();
 
 				//Actor is outside its own groupRadius, check for other groups or create its own
-				if (distanceToOwnGroup > groupRadius)
+				if (distanceToOwnGroup > groups[i].getGroupRadius())
 				{
 					int groupIndex = groupInRange(current->getPosition(), 0);
 					//Found a group within the groupRadius

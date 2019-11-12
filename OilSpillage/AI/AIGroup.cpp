@@ -2,6 +2,7 @@
 
 AIGroup::AIGroup()
 {
+	groupRadius = 6.5f * 6.5f;
 }
 
 AIGroup::~AIGroup()
@@ -66,4 +67,9 @@ void AIGroup::updateDuty()
 			actors[i]->duty = 2;
 		}
 	}
+}
+
+const float AIGroup::getGroupRadius() const
+{
+	return this->groupRadius;
 }
