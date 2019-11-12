@@ -67,35 +67,35 @@ void Attacker::setUpActor()
 Vector3 Attacker::seek()
 {
 	Vector3 desiredDirection;
-	Vector3 offsetVec;
-	Vector3 eliminatingVec = Vector3(0.0f, -1.0f, 0.0f) - Vector3(0.0f, 1.0f, 0.0f);
-	//standard group movement
-	if (!vActive)
-	{
+	//Vector3 offsetVec;
+	//Vector3 eliminatingVec = Vector3(0.0f, -1.0f, 0.0f) - Vector3(0.0f, 1.0f, 0.0f);
+	////standard group movement
+	//if (!vActive)
+	//{
 		desiredDirection -= position - destination;
 		//desired *= maxSpeed;
 		if (this->stats.maxSpeed != 3.0)
 		{
 			this->stats.maxSpeed = 3.0;
 		}
-	}
+	//}
 
-	//strafe to the left of player
-	else if (vActive)
-	{
-		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
-		crossVector.Normalize();
-		crossVector *= -10;
-		desiredDirection -= position - (destination - crossVector);
-	}
-	
+	////strafe to the left of player
+	//else if (vActive)
+	//{
+	//	Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
+	//	crossVector.Normalize();
+	//	crossVector *= -10;
+	//	desiredDirection -= position - (destination - crossVector);
+	//}
+	//
 
 	acceleration = desiredDirection - velocity;
 	if (acceleration.Length() > maxForce)
 	{
 		acceleration /= acceleration.Length();
 	}
-	vActive = false;
+	//vActive = false;
 	return acceleration;
 }
 

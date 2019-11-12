@@ -38,7 +38,7 @@ Vehicle::Vehicle()
 	this->timeSinceLastShot = 0.0f;
 	this->timeSinceLastShot2 = 0.0f;
 
-	this->weapon = WeaponHandler::getWeapon(WeaponType::MachineGun);
+	this->weapon = WeaponHandler::getWeapon(WeaponType::Laser);
 	this->weapon2 = WeaponHandler::getWeapon(WeaponType::Flamethrower);
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
