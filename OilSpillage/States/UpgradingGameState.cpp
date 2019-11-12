@@ -13,7 +13,7 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 
 	for (int i = 0; i < 20; i++)
 	{
-		Inventory::instance->addItem(Item::getRandom());
+		Container::playerInventory->addItem(Item::getRandom());
 	}
 
 	this->lightList = std::make_unique<LightList>();

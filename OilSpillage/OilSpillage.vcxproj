@@ -154,7 +154,7 @@
     <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
-    <ClCompile Include="Inventory\Inventory.cpp" />
+    <ClCompile Include="Inventory\Container.cpp" />
     <ClCompile Include="Inventory\Item.cpp" />
     <ClCompile Include="Inventory\ItemWeapon.cpp" />
     <ClCompile Include="Objectives\Objective.cpp" />
@@ -231,7 +231,7 @@
     <ClInclude Include="AI\Node.h" />
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="PG\Modelizer.hpp" />
-    <ClInclude Include="Inventory\Inventory.h" />
+    <ClInclude Include="Inventory\Container.h" />
     <ClInclude Include="Inventory\ItemWeapon.h" />
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />

@@ -3,7 +3,7 @@
 
 #include "Element.h"
 #include "TextBox.h"
-#include "../../Inventory/Inventory.h"
+#include "../../Inventory/Container.h"
 #include "../../Vehicle.h"
 
 class ItemSelector : public Element
@@ -12,7 +12,7 @@ private:
 	static const int tileLength = 6;
 	void addTextbox();
 
-	InventorySlot* used;
+	Container::Slot** used;
 
 	Texture* textureBG;
 	Texture* textureIndicator;
@@ -40,10 +40,9 @@ public:
 	void changeSelectedType(bool down);
 	void changeSelectedIndex(bool right);
 	ItemType getSelectedType() const;
-	Item* getSelectedItem() const;
-	InventorySlot getSelectedSlot() const;
+	Container::Slot* getSelectedSlot() const;
 	bool isSelectedValid() const;
-	void setUsedSlots(InventorySlot* used);
+	void setUsed(Container::Slot** used);
 };
 
 

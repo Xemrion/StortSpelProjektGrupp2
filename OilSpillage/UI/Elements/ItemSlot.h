@@ -4,7 +4,7 @@
 #include "Element.h"
 #include "../../Texture.h"
 #include "../../Inventory/Item.h"
-#include "../../Inventory/Inventory.h"
+#include "../../Inventory/Container.h"
 #include "TextBox.h"
 
 
@@ -17,8 +17,7 @@ private:
 	bool showTextBox;
 	Texture* textureSlot;
 	Texture* textureIndicator;
-	Item* item;
-	InventorySlot slot;
+	Container::Slot* slot;
 
 	float rotationTimer;
 	Quaternion rotation;
@@ -32,10 +31,8 @@ public:
 	void draw(bool selected);
 	void update(bool selected, float deltaTime);
 
-	Item* getItem() const;
-	InventorySlot getInventorySlot() const;
-	void setItem(Item* item);
-	void setInventorySlot(InventorySlot slot);
+	Container::Slot* getSlot() const;
+	void setSlot(Container::Slot* slot);
 };
 
 #endif // !ITEM_SLOT_H

@@ -2,7 +2,7 @@
 #include "Input.h"
 #include "Sound.h"
 #include "UI/UserInterface.h"
-#include "Inventory/Inventory.h"
+#include "Inventory/Container.h"
 #include "Inventory/Item.h"
 #include "States/MenuGameState.h"
 #include "States/PlayingGameState.h"
@@ -19,7 +19,7 @@ void Game::start(Window* window)
 	Input::init(instance->window);
 	Sound::Init();
 	UserInterface::initStaticVariables();
-	Inventory::instance = std::make_unique<Inventory>();
+	Container::playerInventory = std::make_unique<Container>();
 	Item::init();
 
 	Sound::loadSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");

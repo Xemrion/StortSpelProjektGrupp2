@@ -14,6 +14,7 @@ private:
 
 	Element* selected;
 	std::unique_ptr<ItemSlot> slots[slotCount];
+	Container::Slot container[slotCount];
 public:
 	UIRandomItem();
 	virtual ~UIRandomItem();
