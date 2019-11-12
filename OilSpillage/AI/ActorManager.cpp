@@ -3,7 +3,7 @@
 #include "../States/PlayingGameState.h"
 #include "Attacker.h"
 #include "Swarm.h"
-#include "Car_Spitfire.h"
+#include "ChaseCar.h"
 #include "Boss.h"
 
 ActorManager::ActorManager()
@@ -89,6 +89,12 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 void ActorManager::createSpitFire(float x, float z, Physics* physics)
 {
 	this->actors.push_back(new Spitfire(x, z, physics));
+	initGroupForActor(actors.at(actors.size() - 1));
+}
+
+void ActorManager::createChaseCar(float x, float z, Physics* physics)
+{
+	this->actors.push_back(new ChaseCar(x, z, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 

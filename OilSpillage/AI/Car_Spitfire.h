@@ -30,7 +30,6 @@ private:
 
 	Vector3 direction;
 	float throttleInputStrength;
-	Vector3 prevAccelForce;
 	Vector3 accelForce;
 	void updateVehicle(); 
 public:
@@ -50,6 +49,6 @@ public:
 	float getHeading(Quaternion qt);
 
 	void move();
-	void update(float dt, const Vector3& targetPos);
+	virtual void update(float dt, const Vector3& targetPos);
 	void followPath();
 };

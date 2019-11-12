@@ -17,6 +17,7 @@ public:
 	void createBoss(float x, float z, int weaponType = 1);
 
 	void createSpitFire(float x, float z, Physics* physics);
+	void createChaseCar(float x, float z, Physics* physics);
 
 	float distanceToPlayer(const Vector3& position);
 	const std::vector<AIGroup>& getGroups() const;

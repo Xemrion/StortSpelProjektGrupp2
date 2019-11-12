@@ -70,7 +70,6 @@ void DynamicActor::update(float dt, const Vector3& targetPos)
 	{
 		destination = position;
 	}
-	this->groupPos;
 	move();
 
 	if (this->state == State::Circulate)

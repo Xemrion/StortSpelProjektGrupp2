@@ -35,22 +35,15 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	this->reverseTimer = 0;
 	this->reverseTimer2 = 0;
 	this->direction = Vector3(1, 0, 0);
-	//this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->deltaTime = 0;
 	setUpActor();
 	throttleInputStrength = 0;
 	init(physics);
-	vehicle->setPosition(Vector3(position.x, 0 - 1.2f, position.z));
+	vehicle->setPosition(Vector3(position.x,- 1.2f, position.z));
 	vehicleBody1->setPosition(Vector3(position.x, 0 - 1.2f + 0.65f, position.z));
-	this->stats = VehicleStats::AIAttacker;
+	this->stats = VehicleStats::AICar;
 	setHealth(this->stats.maxHealth);
-	this->aggroRange = 500; //TODO: Find better aggro range 
-
-	//Game::getGraphics().loadModel("Entities/Dummy_Player_Car1");
-	//this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
-	//this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car1"));
-	//Game::getGraphics().addToDraw(&mesh);
-
+	this->aggroRange = 500; //TODO: Find better aggro range
 }
 
 Spitfire::Spitfire()
@@ -74,9 +67,9 @@ Spitfire::~Spitfire()
 
 void Spitfire::updateVehicle()
 {
-	prevAccelForce = Vector3(vehicle->getRigidBody()->getLinearVelocity());
-	vehicleMovement(deltaTime, throttleInputStrength, false, false, Vector2(-direction.x, -direction.z));
-	Vector3 accelForce = Vector3(vehicle->getRigidBody()->getLinearVelocity().getX(), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
+	Vector3 prevAccelForce = Vector3(vehicle->getRigidBody()->getLinearVelocity());
+	vehicleMovement(deltaTime, throttleInputStrength, false, false, Vector2(direction.x, direction.z));
+	Vector3 accelForce = Vector3(vehicle->getRigidBody()->getLinearVelocity()) - prevAccelForce;
 	setAccelForce(accelForce, deltaTime);
 	setWheelRotation();
 	this->setPosition(vehicle->getPosition());
@@ -85,7 +78,7 @@ void Spitfire::updateVehicle()
 
 void Spitfire::move()
 {
-	direction = this->position - destination;
+	direction = destination - this->position;
 	direction.Normalize();
 	if ((this->position - destination).Length() > 5)
 	{
@@ -137,7 +130,6 @@ void Spitfire::init(Physics* physics)
 	this->physics = physics;
 	this->vehicle = new GameObject;
 	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//Game::getGraphics().addToDraw(vehicle);
 	vehicle->setPosition(Vector3(0.0f, 10.0f, 0.0f));
 	vehicle->setScale(Vector3(0.5f, 0.14f, 0.9f));
 	Game::getGraphics().loadTexture("CarTemp");
@@ -149,10 +141,8 @@ void Spitfire::init(Physics* physics)
 	vehicleBody1->setSpotShadow(false);
 	Game::getGraphics().addToDraw(vehicleBody1);
 	vehicleBody1->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
-	//vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
-
-	vehicleBody1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	Texture* vehicleTexture = Game::getGraphics().getMaterial("Entities/Player").diffuse;
+	vehicleBody1->setTexture(vehicleTexture);
 
 	this->wheel1 = new GameObject;
 	this->wheel2 = new GameObject;
@@ -174,10 +164,10 @@ void Spitfire::init(Physics* physics)
 	wheel2->setScale(Vector3(0.005f, 0.005f, 0.005f));
 	wheel3->setScale(Vector3(0.005f, 0.005f, 0.005f));
 	wheel4->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	wheel1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
-	wheel2->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
-	wheel3->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
-	wheel4->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	wheel1->setTexture(vehicleTexture);
+	wheel2->setTexture(vehicleTexture);
+	wheel3->setTexture(vehicleTexture);
+	wheel4->setTexture(vehicleTexture);
 
 
 	btRigidBody* tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y, vehicle->getPosition().z), btVector3(vehicle->getScale().x, vehicle->getScale().y, vehicle->getScale().z), 10.0f);
