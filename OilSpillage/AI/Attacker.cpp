@@ -5,7 +5,7 @@ Attacker::Attacker()
 }
 
 Attacker::Attacker(float x, float z, int weaponType)
-	:DynamicActor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity, weaponType)
+	:DynamicActor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity,&this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
@@ -38,8 +38,8 @@ void Attacker::setUpActor()
 
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Attacker::inAttackRange, std::ref(*this)));
-	Behavior& waitTimer = bt.getAction();
-	waitTimer.addAction(std::bind(&Attacker::WaitTime, std::ref(*this)));
+	//Behavior& waitTimer = bt.getAction();
+	//waitTimer.addAction(std::bind(&Attacker::WaitTime, std::ref(*this)));
 	Behavior& chase = bt.getAction();
 	chase.addAction(std::bind(&Attacker::setChaseState, std::ref(*this)));
 	Behavior& roam = bt.getAction();

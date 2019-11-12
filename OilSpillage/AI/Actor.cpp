@@ -9,10 +9,7 @@ Actor::Actor()
 	this->position = Vector3(0, 0.0f, 0);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 
-	/*Patrol exemple*/
-	patrol.wait_time = 0.5;
-	patrol.time_left = patrol.wait_time;
-	patrol.repeatable = true;
+
 }
 
 Actor::Actor(float x, float z)
@@ -23,10 +20,7 @@ Actor::Actor(float x, float z)
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, -1.0f, z);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
-	/*Patrol exemple*/
-	patrol.wait_time = 0.5;
-	patrol.time_left = patrol.wait_time;
-	patrol.repeatable = true;
+
 }
 Actor::~Actor()
 {

@@ -81,12 +81,12 @@ Status Ranged::shoot()
 					dir = (offsetPos - bulletOrigin);
 					dir.Normalize();
 
-					this->bullets[i].setWeaponType(this->weapon.type);
 					this->bullets[i].shoot(
 						weapon,
 						bulletOrigin,
 						dir,
-						*velocityPtr
+						*velocityPtr,
+						*deltaTimePtr
 					);
 					break;
 				}
@@ -100,12 +100,13 @@ Ranged::Ranged()
 {
 }
 
-Ranged::Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType)
+Ranged::Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity,float* deltaTimePtr, int weaponType)
 {
 	this->positionPtr = pos;
 	this->targetPosPtr = targetPos;
 	this->velocityPtr = velocity;
 	this->attackRange = 8;
+	this->deltaTimePtr = deltaTimePtr;
 	assignWeapon(weaponType);
 }
 

@@ -8,7 +8,7 @@ private:
 	Vector3* positionPtr;
 	Vector3* targetPosPtr;
 	Vector3* velocityPtr;
-
+	float* deltaTimePtr;
 	float timeSinceLastShot;
 	bool predicting = false;
 	Weapon weapon;
@@ -25,6 +25,6 @@ protected:
 
 public:
 	Ranged();
-	Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType);
+	Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity, float* deltaTimePtr, int weaponType);
 	virtual ~Ranged();
 };

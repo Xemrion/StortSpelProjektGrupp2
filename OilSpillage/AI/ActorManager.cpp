@@ -155,7 +155,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					}
 				}
-				else if (bulletArray[j]->getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
+				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
 						/*int randomSound = rand() % 3 + 1;

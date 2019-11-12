@@ -43,15 +43,15 @@ class WeaponHandler
 public:
 	static constexpr Weapon weapons[] = {
 		Weapon(), //default gun
-		{     6,      0.05f,         55.0f,          1.4f,		Vector3(0.07f, 0.07f, 0.3f),	 0.1f, 0.3f, 0.11f, 0.0f, WeaponType::MachineGun },
-		{    200,      1.5f,         13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f, 0.0f, 0.0f,  0.0f, WeaponType::MissileLauncher },
-		{    160,      1.0f,          0.0f,          0.5f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f, 0.0f, 0.0f,  0.0f, WeaponType::Laser },
-		{      4,     0.01f,          8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f, 0.0f, 0.0f,  0.0f, WeaponType::Flamethrower },
-		{	   2,      0.3f,         24.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f, 0.0f, 0.0f,  0.0f, WeaponType::aiMachineGun },
-		{	  10,      1.5f,          1.0f,          0.1f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f, 0.0f, 0.0f,  0.0f, WeaponType::aiMelee },
-		{    200,      1.5f,         4.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f, 0.0f, 0.0f,  0.0f, WeaponType::aiMissileLauncher },
-		{     60,      1.0f,          0.0f,          0.5f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f, 0.0f, 0.0f,  0.0f, WeaponType::aiLaser },
-		{      1,     0.05f,          8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f, 0.0f, 0.0f,  0.0f, WeaponType::aiFlamethrower }
+		{     6,      0.05f,         55.0f,          1.4f,		Vector3(0.07f, 0.07f, 0.3f),	 0.1f, 0.3f, 0.11f, 0.0f, 0.7f, 0.0f, WeaponType::MachineGun },
+		{    200,      1.5f,         13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f, 0.0f, 0.0f,  0.0f, 2.0f, 0.0f, WeaponType::MissileLauncher },
+		{    160,      1.0f,          0.0f,          0.5f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f, 0.0f, 0.0f,  0.0f, 1.5f, 0.0f, WeaponType::Laser },
+		{      4,     0.01f,          8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f, 0.0f, 0.0f,  0.0f, 2.0f, 0.0f, WeaponType::Flamethrower },
+		{	   2,      0.3f,         24.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f, 0.0f, 0.0f,  0.0f, 2.0f, 0.0f, WeaponType::aiMachineGun },
+		{	  10,      1.5f,          1.0f,          0.1f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f, 0.0f, 0.0f,  0.0f, 2.0f, 0.0f, WeaponType::aiMelee },
+		{    200,      1.5f,         4.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f, 0.0f, 0.0f,  0.0f, 2.0f, 0.0f, WeaponType::aiMissileLauncher },
+		{     60,      1.0f,          0.0f,          0.5f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f, 0.0f, 0.0f,  0.0f, 2.0f, 0.0f, WeaponType::aiLaser },
+		{      1,     0.05f,          8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f, 0.0f, 0.0f,  0.0f, 2.0f, 0.0f,WeaponType::aiFlamethrower }
 	};
 
 	static Weapon getWeapon(WeaponType type) {
