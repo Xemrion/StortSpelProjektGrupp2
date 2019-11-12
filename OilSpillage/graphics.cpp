@@ -186,7 +186,7 @@ bool Graphics::init(Window* window)
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = 32;//static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16)));
+	desc.ByteWidth = static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16)));
 	desc.StructureByteStride = 0;
 
 	hr = device->CreateBuffer(&desc, 0, &colorBuffer);

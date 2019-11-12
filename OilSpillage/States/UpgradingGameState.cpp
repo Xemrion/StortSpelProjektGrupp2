@@ -21,6 +21,7 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 	this->lightList->addLight(PointLight(Vector3(0, 5, 0), Vector3(0.5, 0, 0), 10));
 	this->graphics.setLightList(lightList.get());
 	this->graphics.setUISun(Vector3(0, 0, 1), Vector4(1, 1, 1, 1));
+	graphics.loadShape(SHAPE_CUBE);
 
 	this->camera = std::make_unique<DynamicCamera>(Vector3(0, 0.5f, -8.0f),Vector3(/*3.14/4*/0,0,0));
 
@@ -81,4 +82,14 @@ void UpgradingGameState::update(float deltaTime)
 void UpgradingGameState::setCurrentMenu(Menu menu)
 {
 	this->currentMenu = static_cast<int>(menu);
+}
+
+std::unique_ptr<Vehicle>& UpgradingGameState::getPlayer()
+{
+	return this->theVehicle;
+}
+
+void UpgradingGameState::setPlayer(Vehicle* theVehicle)
+{
+	this->theVehicle.reset(theVehicle);// = std::make_unique<Vehicle>(theVehicle);
 }

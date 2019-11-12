@@ -21,7 +21,7 @@ enum Slots
 };
 struct VehicleSlots
 {
-	Item** slots = new Item * [Slots::SIZEOF];
+	Item** slots;
 	void setSlot(Slots slot, Item* item)
 	{
 		if (this->slots[int(slot)] != nullptr)
@@ -51,6 +51,7 @@ struct VehicleSlots
 	};
 	VehicleSlots()
 	{
+		slots = new Item * [Slots::SIZEOF];
 		for (int i = 0; i < Slots::SIZEOF; i++)
 		{
 			this->slots[i] = nullptr;
@@ -67,6 +68,21 @@ struct VehicleSlots
 		}
 		delete[] this->slots;
 	};
+	VehicleSlots(const VehicleSlots& obj)
+	{
+		this->slots = new Item * [Slots::SIZEOF];
+		for (int i = 0; i < Slots::SIZEOF; i++)
+		{
+			if (obj.slots[i] != nullptr)
+			{
+				this->slots[i] = new Item(*obj.slots[i]);// (Slots(i)));
+			}
+			else
+			{
+				this->slots[i] = nullptr;
+			}
+		}
+	}
 
 };
 class Vehicle
@@ -97,9 +113,7 @@ private:
 	float totRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
 
-	Item** slots;
 	VehicleSlots* vehicleSlots;
-	GameObject test;
 
 	float timeSinceLastShot;
 	float timeSinceLastShot2;
@@ -156,12 +170,13 @@ public:
 	void updateWeapon(float deltaTime);
 	void setVehicleSlots(VehicleSlots* slots);
 	void setSpecSlot(Slots slot, Item* item);
-
+	VehicleSlots* getSlots();
 	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
 
 	void setSpotLight(SpotLight* theLight);
+	SpotLight* getSpotLight();
 	void setDrivingMode(int i);
 	bool getDrivingMode();
 	Vector3 getVelocity();

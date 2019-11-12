@@ -47,7 +47,9 @@ public:
 	void		 paperCollision(float deltaTime);
 	Vector3   getRespawnPosition() const noexcept;
 
-
+	std::unique_ptr<Vehicle>& getPlayer();
+	void setPlayer(Vehicle* theVehicle);
+	void initiatePlayer();
 	ActorManager* actorManager;
 
 private:

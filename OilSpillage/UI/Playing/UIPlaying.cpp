@@ -43,7 +43,7 @@ void UIPlaying::updateUI(float deltaTime)
 
 void UIPlaying::drawUI()
 {
-	Vehicle* player = static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer();
+	Vehicle* player = static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer().get();
 	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
 	std::string timeStr = this->getFormattedTime();
 	Vector2 textSize = UserInterface::getFontArial()->MeasureString(timeStr.c_str());

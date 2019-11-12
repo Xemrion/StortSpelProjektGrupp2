@@ -82,10 +82,10 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float bias)
 float4 main(VS_OUT input) : SV_Target
 {
 	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
-	if (shadeTrue.x == 0)
+	/*if (shadeTrue.x == 0)
 	{
 		return texColor;
-	}
+	}*/
 	float3 normal = input.NormalWS.xyz;
 	float3 tangent = input.TangentWS.xyz;
 	float3 bitangent = input.BitangentWS.xyz;

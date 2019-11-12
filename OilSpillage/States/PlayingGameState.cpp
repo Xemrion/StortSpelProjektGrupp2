@@ -50,7 +50,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.createFrustumBuffer(camera.get());
 
 
-	graphics.loadMesh("Cube");
+	//graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
 	graphics.loadTexture("grass3");
@@ -495,6 +495,24 @@ Vector3 PlayingGameState::getRespawnPosition() const noexcept
 		// TODO: rotate player
 	}
 	else return map->getStartPositionInWorldSpace() + Vector3(0, -1.2f, 0);
+}
+
+std::unique_ptr<Vehicle>& PlayingGameState::getPlayer()
+{
+	return this->player;
+}
+
+void PlayingGameState::setPlayer(Vehicle* theVehicle)
+{
+	SpotLight* temp = this->player->getSpotLight();
+	this->player.reset(theVehicle);// = std::make_unique<Vehicle>(theVehicle);
+	this->player->setSpotLight(temp);
+}
+
+void PlayingGameState::initiatePlayer()
+{
+
+	
 }
 
 void PlayingGameState::update(float deltaTime)
