@@ -25,7 +25,7 @@ ActorManager::~ActorManager()
 	actors.clear();
 }
 
-void ActorManager::update(float dt, Vector3 targetPos)
+void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
 	bool hasDied = false;
@@ -174,7 +174,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 
 }
 
-void ActorManager::spawnAttackers(Vector3 originPos, int weaponType)
+void ActorManager::spawnAttackers(const Vector3& originPos, int weaponType)
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -184,7 +184,7 @@ void ActorManager::spawnAttackers(Vector3 originPos, int weaponType)
 	}
 }
 
-void ActorManager::spawnTurrets(Vector3 position, Radius radius, float angle, int weaponType)
+void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float angle, int weaponType)
 {
 	if (angle != 0)
 	{
@@ -198,7 +198,7 @@ void ActorManager::spawnTurrets(Vector3 position, Radius radius, float angle, in
 	}
 }
 
-void ActorManager::spawnBoss(Vector3 originPos, int weaponType)
+void ActorManager::spawnBoss(const Vector3& originPos, int weaponType)
 {
 	createBoss(originPos.x, originPos.z, weaponType);
 }
@@ -237,7 +237,7 @@ Vector2& ActorManager::generateAroundaPoint(const float& x, const float& z, floa
 	return newPosition;
 }
 
-void ActorManager::seperation(Vector3 targetPos)
+void ActorManager::seperation(const Vector3& targetPos)
 {
 	std::vector<Vector3> buildings;
 	float desiredSeparationDistance;
@@ -328,14 +328,13 @@ void ActorManager::seperation(Vector3 targetPos)
 
 void ActorManager::updateAveragePos()
 {
-	Vector3 totalPos;
 	for (int i = 0; i < groups.size(); i++)
 	{
 		groups[i].updateAveragePos();
 	}
 }
 
-int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
+int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 {
 	int biggestGroupSize = currentGroupSize;
 	int returnIndex = -1;
@@ -367,7 +366,7 @@ void ActorManager::leaveGroup(int groupIndex, int where)
 	groups[groupIndex].actors.erase(groups[groupIndex].actors.begin() + where);
 }
 
-void ActorManager::assignPathsToGroups(Vector3 targetPos)
+void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 {
 	std::vector<Vector3> pathToPlayer;
 	std::vector<Vector3> pathToPredicted;

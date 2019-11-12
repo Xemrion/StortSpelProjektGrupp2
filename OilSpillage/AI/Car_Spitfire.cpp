@@ -106,7 +106,7 @@ void Spitfire::move()
 
 }
 
-void Spitfire::update(float dt, Vector3 targetPos)
+void Spitfire::update(float dt,const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	updateVehicle();

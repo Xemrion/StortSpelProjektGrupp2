@@ -33,7 +33,7 @@ void AIGroup::setPath(std::vector<Vector3> path)
 {
 	this->path = path;
 }
-void AIGroup::formationP(Vector3 targetPos)
+void AIGroup::formationP(const Vector3& targetPos)
 {
 	float deltaX = averagePos.x - targetPos.x;
 	float deltaZ = averagePos.z - targetPos.z;

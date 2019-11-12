@@ -14,7 +14,7 @@ public:
 	Actor();
 	Actor(float x, float z);
 	virtual ~Actor();
-	virtual void update(float dt, Vector3 targetPos);
+	virtual void update(float dt, const Vector3& targetPos);
 	virtual void setUpActor() = 0 {};
 
 	void setHealth(int health);

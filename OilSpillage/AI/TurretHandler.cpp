@@ -12,7 +12,7 @@ TurretHandler::~TurretHandler()
 	}
 	turrets.clear();
 }
-void TurretHandler::update(float dt, DirectX::SimpleMath::Vector3 targetPos)
+void TurretHandler::update(float dt,const Vector3& targetPos)
 {
 	bool turretDied = false;
 	for (int i = 0; i < this->turrets.size(); i++)
@@ -52,7 +52,7 @@ void TurretHandler::createTurret(float x, float z, int weaponType)
 	this->turrets.emplace_back(new Turret(x, z, weaponType));
 }
 
-float TurretHandler::distanceToPlayer(const DirectX::SimpleMath::Vector3& position)
+float TurretHandler::distanceToPlayer(const Vector3& position)
 {
 	float minDistance = -1;
 	for (int i = 0; i < this->turrets.size(); i++)
@@ -77,9 +77,6 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 				if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->turrets[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						/*int randomSound = rand() % 3 + 1;
-						std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
-						Sound::PlaySoundEffect(soundEffect);*/
 						Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
 						soundTimer = 0;
 					}

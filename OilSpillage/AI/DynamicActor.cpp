@@ -58,7 +58,7 @@ void DynamicActor::setPath(std::vector<Vector3>* path)
 
 }
 
-void DynamicActor::update(float dt, Vector3 targetPos)
+void DynamicActor::update(float dt, const Vector3& targetPos)
 {
 	Actor::update(dt, targetPos);
 	if (this->state != State::Idle)
@@ -70,34 +70,36 @@ void DynamicActor::update(float dt, Vector3 targetPos)
 	{
 		destination = position;
 	}
-
+	this->groupPos;
 	move();
 
 	if (this->state == State::Circulate)
+	{
 		this->circulatePlayer();
+	}
 }
 
-void DynamicActor::applyForce(Vector3 force)
+void DynamicActor::applyForce(const Vector3& force)
 {
 	acceleration += force;
 }
 
-int DynamicActor::getBoidOffset()
+int DynamicActor::getBoidOffset()const
 {
 	return this->boidOffset;
 }
 
-float DynamicActor::getMaxSpeed()
+float DynamicActor::getMaxSpeed()const
 {
 	return this->maxSpeed;
 }
 
-float DynamicActor::getMaxForce()
+float DynamicActor::getMaxForce()const
 {
 	return this->maxForce;
 }
 
-Vector3 DynamicActor::getVelocity()
+const Vector3& DynamicActor::getVelocity()const
 {
 	return this->velocity;
 }
@@ -116,7 +118,7 @@ Vector3 DynamicActor::seek()
 	return acceleration;
 }
 
-void DynamicActor::moveCirculate(Vector3 desiredDirection)
+void DynamicActor::moveCirculate(const Vector3& desiredDirection)
 {
 	//To make the slow down not as abrupt
 	acceleration *= 0.4f;
@@ -147,7 +149,7 @@ void DynamicActor::moveCirculate(Vector3 desiredDirection)
 	acceleration *= 0;
 }
 
-Vector3 DynamicActor::seekCirculate(Vector3 desiredDirection)
+Vector3 DynamicActor::seekCirculate(const Vector3& desiredDirection)
 {
 	acceleration = desiredDirection; //-velocity
 	if (acceleration.Length() > maxForce)
@@ -169,7 +171,7 @@ void DynamicActor::followPath()
 				path->pop_back();
 			}
 		}
-		else if((position - targetPos).Length() < 15)
+		else if ((position - targetPos).Length() < 15)
 		{
 			destination = targetPos;
 		}
