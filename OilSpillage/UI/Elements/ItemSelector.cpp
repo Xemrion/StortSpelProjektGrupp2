@@ -7,12 +7,12 @@ Vector2 ItemSelector::size = Vector2(736, 192);
 void ItemSelector::addTextbox()
 {
 	int selectedIndex = this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType];
-	Item* item = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->at(this->selectedIndex[this->selectedType]);
+	Item* item = Inventory::instance->getItemInList(static_cast<ItemType>(this->selectedType), this->selectedIndex[this->selectedType]);
 	this->textBox = std::make_unique<TextBox>("-- " + item->getName() + " --\n" + item->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::BOTTOM);
 	this->textBox->setPosition(this->position + Vector2(145.0f + 96.0f * selectedIndex - this->textBox->getSize().x * 0.5f, -this->textBox->getSize().y + 40.0f));
 }
 
-ItemSelector::ItemSelector(Vector2 position) : Element(position), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimers{ 0 }
+ItemSelector::ItemSelector(Vector2 position) : Element(position), used(nullptr), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimers{ 0 }
 {
 	Game::getGraphics().loadTexture("UI/itemSelectorBG");
 	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
@@ -30,6 +30,19 @@ void ItemSelector::draw(bool selected)
 {
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), this->position);
 	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position + Vector2(96.0f + 96.0f * (this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType]), 47.0f));
+
+	int listSize = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->size();
+	for (int i = 0; i < Slots::SIZEOF && listSize > 0; i++)
+	{
+		if (this->used[i].index != -1 && this->used[i].type == this->selectedType)
+		{
+			if (this->used[i].index >= this->startIndex[this->selectedType] && this->used[i].index < min(listSize, this->startIndex[this->selectedType] + ItemSelector::tileLength))
+			{
+				int index = this->used[i].index - this->startIndex[this->selectedType];
+				UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Used", this->position + Vector2(145.0f + 96.0f * index, 128.0f), Colors::White, 0.0f, Vector2::Zero, 0.2f);
+			}
+		}
+	}
 
 	if (this->textBox)
 	{
@@ -164,5 +177,21 @@ ItemType ItemSelector::getSelectedType() const
 
 Item* ItemSelector::getSelectedItem() const
 {
-	return Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->at(this->selectedIndex[this->selectedType]);
+	return Inventory::instance->getItemInList(static_cast<ItemType>(this->selectedType), this->selectedIndex[this->selectedType]);
+}
+
+InventorySlot ItemSelector::getSelectedSlot() const
+{
+	return InventorySlot(static_cast<ItemType>(this->selectedType), this->selectedIndex[this->selectedType]);
+}
+
+bool ItemSelector::isSelectedValid() const
+{
+	int listSize = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->size();
+	return this->selectedIndex[this->selectedType] > 0 && this->selectedIndex[this->selectedType] < listSize;
+}
+
+void ItemSelector::setUsedSlots(InventorySlot* used)
+{
+	this->used = used;
 }

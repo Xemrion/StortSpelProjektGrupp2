@@ -4,12 +4,15 @@
 #include "Element.h"
 #include "TextBox.h"
 #include "../../Inventory/Inventory.h"
+#include "../../Vehicle.h"
 
 class ItemSelector : public Element
 {
 private:
 	static const int tileLength = 6;
 	void addTextbox();
+
+	InventorySlot* used;
 
 	Texture* textureBG;
 	Texture* textureIndicator;
@@ -38,6 +41,9 @@ public:
 	void changeSelectedIndex(bool right);
 	ItemType getSelectedType() const;
 	Item* getSelectedItem() const;
+	InventorySlot getSelectedSlot() const;
+	bool isSelectedValid() const;
+	void setUsedSlots(InventorySlot* used);
 };
 
 

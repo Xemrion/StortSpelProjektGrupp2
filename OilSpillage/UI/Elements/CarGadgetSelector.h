@@ -11,6 +11,7 @@ private:
 	Texture* textureBG;
 	Element* selected;
 	std::unique_ptr<ItemSlot> slots[Slots::SIZEOF];
+	InventorySlot used[Slots::SIZEOF];
 public:
 	static Vector2 size;
 
@@ -20,8 +21,8 @@ public:
 	void draw(bool selected);
 	void update(bool selected, float deltaTime);
 
-	void setItemOfSelected(Item* item);
-	Item* getItemOfSelected() const;
+	void setSlotOfSelected(InventorySlot slot);
+	InventorySlot* getUsedSlots();
 };
 
 #endif // !CAR_GADGET_SELECTOR_H

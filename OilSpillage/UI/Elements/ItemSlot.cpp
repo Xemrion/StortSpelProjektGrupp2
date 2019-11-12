@@ -14,7 +14,7 @@ void ItemSlot::addTextbox()
 	}
 }
 
-ItemSlot::ItemSlot(Vector2 position, bool showTextBox) : Element(position), showTextBox(showTextBox), item(nullptr), rotationTimer(0)
+ItemSlot::ItemSlot(Vector2 position, bool showTextBox) : Element(position), showTextBox(showTextBox), item(nullptr), slot(), rotationTimer(0)
 {
 	Game::getGraphics().loadTexture("UI/itemSlot");
 	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
@@ -68,8 +68,15 @@ Item* ItemSlot::getItem() const
 	return this->item;
 }
 
+InventorySlot ItemSlot::getInventorySlot() const
+{
+	return this->slot;
+}
+
 void ItemSlot::setItem(Item* item)
 {
+	this->slot = InventorySlot();
+
 	if (this->item)
 	{
 		if (this->item->getObject())
@@ -94,4 +101,10 @@ void ItemSlot::setItem(Item* item)
 
 		this->addTextbox();
 	}
+}
+
+void ItemSlot::setInventorySlot(InventorySlot slot)
+{
+	this->setItem(Inventory::instance->getItemInList(slot));
+	this->slot = slot;
 }

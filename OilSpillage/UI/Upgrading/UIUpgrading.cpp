@@ -6,7 +6,7 @@ void UIUpgrading::updateUI(float deltaTime)
 {
 	if (this->selectingItem)
 	{
-		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
+		if (Input::checkButton(Keys::CONFIRM, States::PRESSED) && this->itemSelector->isSelectedValid())
 		{
 			this->selectingItem = false;
 		}
@@ -37,7 +37,7 @@ void UIUpgrading::updateUI(float deltaTime)
 
 		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 		{
-			this->gadgetSelector->setItemOfSelected(this->itemSelector->getSelectedItem());
+			this->gadgetSelector->setSlotOfSelected(this->itemSelector->getSelectedSlot());
 		}
 		else if (Input::checkButton(Keys::CANCEL, States::PRESSED))
 		{
@@ -46,6 +46,11 @@ void UIUpgrading::updateUI(float deltaTime)
 	}
 
 	this->itemSelector->update(deltaTime);
+
+	if (Input::checkButton(Keys::MENU, States::PRESSED))
+	{
+		Game::setState(Game::STATE_PLAYING);
+	}
 }
 
 void UIUpgrading::drawUI()
@@ -95,4 +100,6 @@ void UIUpgrading::init()
 	this->itemSelector = std::make_unique<ItemSelector>(Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2, SCREEN_HEIGHT - ItemSelector::size.y));
 	this->gadgetSelector = std::make_unique<CarGadgetSelector>(Vector2(ItemSlot::size.x + 20.0f, ItemSlot::size.x + 20.0f));
 	this->statBox = std::make_unique<VehicleStatBox>(Vector2(SCREEN_WIDTH - VehicleStatBox::size.x - 10.0f, SCREEN_HEIGHT / 2 - VehicleStatBox::size.y / 2));
+
+	this->itemSelector->setUsedSlots(this->gadgetSelector->getUsedSlots());
 }

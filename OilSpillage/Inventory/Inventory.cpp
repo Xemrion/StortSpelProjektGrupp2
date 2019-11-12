@@ -49,3 +49,13 @@ std::vector<Item*>* Inventory::getItemList(ItemType type)
 {
 	return &this->itemLists[type];
 }
+
+Item* Inventory::getItemInList(ItemType type, int index)
+{
+	return this->itemLists[type][index];
+}
+
+Item* Inventory::getItemInList(InventorySlot slot)
+{
+	return this->itemLists[slot.type][slot.index];
+}
