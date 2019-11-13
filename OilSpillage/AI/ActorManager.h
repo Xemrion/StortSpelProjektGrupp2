@@ -7,18 +7,17 @@ class ActorManager
 {
 public:
 	ActorManager();
-	ActorManager(AStar* aStar);
+	ActorManager(AStar* aStar,Physics* physics);
 	~ActorManager();
 	enum Radius { CLOSE, MIDDLE, OUTER };
 	void update(float dt, const Vector3& targetPos);
-	void createAttacker(float x, float z, int weaponType,Physics* physics);
-	void createTurret(float x, float z, int weaponType,Physics* physics);
-	void createSwarm(float x, float z, int weaponType, Physics * physics);
-	void createBoss(float x, float z, int weaponType, Physics * physics);
-	void createSniper(float x, float z, int weaponType, Physics * physics);
+	void createAttacker(float x, float z, int weaponType);
+	void createTurret(float x, float z, int weaponType);
+	void createSwarm(float x, float z, int weaponType);
+	void createBoss(float x, float z, int weaponType);
 
-	void createSpitFire(float x, float z, Physics* physics);
-	void createChaseCar(float x, float z, Physics* physics);
+	void createSpitFire(float x, float z);
+	void createChaseCar(float x, float z);
 
 	float distanceToPlayer(const Vector3& position);
 	const std::vector<AIGroup>& getGroups() const;
@@ -31,7 +30,7 @@ public:
 private:
 	float soundTimer = 0;
 	int frameCount = 0;
-
+	Physics* physics;
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
 	int groupInRange(const Vector3& actorPos, int currentGroupSize);
