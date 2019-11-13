@@ -3,8 +3,8 @@
 Turret::Turret()
 {}
 
-Turret::Turret(float x, float z, int weaponType)
-	: Actor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity,&this->deltaTime, weaponType)
+Turret::Turret(float x, float z, int weaponType, Physics* physics)
+	: Actor(x, z, physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 23;
@@ -19,7 +19,12 @@ Turret::Turret(float x, float z, int weaponType)
 	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
 	Game::getGraphics().addToDraw(&this->body);
 	Game::getGraphics().addToDraw(this);
-
+	btRigidBody* tempo = physics->addBox(btVector3(position.x, position.y, position.z), btVector3(1, 1, 1), 0);
+	setRigidBody(tempo, physics);
+	getRigidBody()->activate();
+	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	getRigidBody()->setFriction(0);
+	getRigidBody()->setLinearFactor(btVector3(0, 0, 0));
 	this->stats = VehicleStats::AITurret;
 	setHealth(this->stats.maxHealth);
 	this->velocity = Vector3();

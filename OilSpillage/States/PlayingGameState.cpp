@@ -13,14 +13,17 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar);
 	aStar->generateTileData(map->getTileMap());
-	for(int i = 0; i < 2; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		for (int j = 0; j < 1; j++)
 		{
-			//actorManager->createSniper(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
-			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j,1);
+		//actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j,physics.get());
+			actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1, physics.get());
+			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1, physics.get());
+
 		}
 	}
+
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
@@ -120,8 +123,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
 
 	for (int i = 0; i < 100; ++i) {
-		Vector3 randPos   = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
-		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand()))/ RAND_MAX;
+		Vector3 randPos = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
+		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand())) / RAND_MAX;
 		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
 
 		lightList->addLight(
@@ -130,20 +133,20 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 				randColor,
 				10.0f));
 	}
-   
-   /*
-	//Road Network Turtlewalker
-	testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-	testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-	testNetwork.get()->setAngle(45);
-	for (int i = 0; i < 5; i++) {
-		testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
-		testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	}
-	testNetwork.get()->cleanRoadNetwork();
-	testNetwork.get()->saveTestNetwork("test-network");
-   */
-   //}
+
+	/*
+	 //Road Network Turtlewalker
+	 testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
+	 testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+	 testNetwork.get()->setAngle(45);
+	 for (int i = 0; i < 5; i++) {
+		 testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
+		 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+	 }
+	 testNetwork.get()->cleanRoadNetwork();
+	 testNetwork.get()->saveTestNetwork("test-network");
+	*/
+	//}
 	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 
 	graphics.setLightList(lightList.get());
@@ -169,9 +172,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	menues[MENU_OPTIONS]->init();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
-   auto playerVehicle = player->getVehicle();
-	playerVehicle->setPosition(				startPos + Vector3( .0f, 0.00f -1.2f, .0f) );
-	player->getVehicleBody1()->setPosition(	startPos + Vector3( .0f, 0.65f -1.2f, .0f) );
+	auto playerVehicle = player->getVehicle();
+	playerVehicle->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
+	player->getVehicleBody1()->setPosition(startPos + Vector3(.0f, 0.65f - 1.2f, .0f));
 
 	initAI();
 
@@ -304,7 +307,7 @@ void PlayingGameState::ImGui_AI()
 
 	ImGui::Text((("PosX: " + std::to_string(posX)).c_str()));
 	ImGui::Text((("PosZ: " + std::to_string(posZ)).c_str()));
-	
+
 	float distance = (actorManager->groups.at(0).actors.at(0)->destination - actorManager->groups.at(0).actors.at(0)->getPosition()).Length();
 
 	ImGui::Text((("Distance: " + std::to_string(distance)).c_str()));
@@ -591,7 +594,9 @@ void PlayingGameState::update(float deltaTime)
 		}
 		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
 		player->updatePlayer(deltaTime);
+
 		physics->update(deltaTime);
+
 		actorManager->update(deltaTime, playerVehicle->getPosition());
 		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
@@ -667,16 +672,16 @@ void PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   ImGui_ImplDX11_NewFrame();
-	   ImGui_ImplWin32_NewFrame();
-	   ImGui::NewFrame();
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
 	//   ImGui_Driving();
 	//   ImGui_ProcGen();
-	   ImGui_AI();
+	ImGui_AI();
 	//   ImGui_Particles();
-	  ImGui_Camera();
-	   ImGui::Render();
-	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	ImGui_Camera();
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #endif // !_DEBUG
 
 	graphics.presentScene();
@@ -976,15 +981,15 @@ void PlayingGameState::updateObjects()
 
 void PlayingGameState::paperCollision(float deltaTime)
 {
-	
+
 	float randomValue = 0;
-	for (auto &obj : physicsObjects) {
+	for (auto& obj : physicsObjects) {
 		if (obj->getRigidBody() == nullptr) {
 			randomValue = rand() % 2;
 			if (((player->getVehicle()->getPosition() - obj->getPosition()).Length()) < 1.5f && abs(player->getVelocitySpeed()) > 8.0f && randomValue == 1) {
 				randomValue = rand() % 20;
-				randomValue = std::max(randomValue-5.0f,0.0f);
-				obj->setVelocity(Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(),randomValue*0.5f, player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()));
+				randomValue = std::max(randomValue - 5.0f, 0.0f);
+				obj->setVelocity(Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), randomValue * 0.5f, player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()));
 				obj->setPosition(obj->getPosition() + Vector3(0, 0.1f, 0));
 			}
 			obj->updateObject(deltaTime);

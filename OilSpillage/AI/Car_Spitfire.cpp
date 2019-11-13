@@ -23,7 +23,7 @@ void Spitfire::setUpActor()
 }
 
 Spitfire::Spitfire(float x, float z, Physics* physics)
-	: DynamicActor(x, z)
+	: DynamicActor(x, z,physics)
 {
 	velocity = Vector2(0.0f, 0.0f);
 
@@ -31,26 +31,18 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	this->rotateAcceleration = 0.0f;
 	this->velocitySpeed = 0.0f;
 	this->rotationDirection = true;
-	this->vehicle = nullptr;
 	this->reverseTimer = 0;
 	this->reverseTimer2 = 0;
 	this->direction = Vector3(1, 0, 0);
-	//this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->deltaTime = 0;
 	setUpActor();
 	throttleInputStrength = 0;
 	init(physics);
-	vehicle->setPosition(Vector3(position.x, 0 - 1.2f, position.z));
-	vehicleBody1->setPosition(Vector3(position.x, 0 - 1.2f + 0.65f, position.z));
-	this->stats = VehicleStats::AIAttacker;
+	setPosition(Vector3(x,- 1.2f, z));
+	vehicleBody1->setPosition(Vector3(x, 0 - 1.2f + 0.65f, z));
+	this->stats = VehicleStats::AICar;
 	setHealth(this->stats.maxHealth);
-	this->aggroRange = 500; //TODO: Find better aggro range 
-
-	//Game::getGraphics().loadModel("Entities/Dummy_Player_Car1");
-	//this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Player_Car1");
-	//this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Player_Car1"));
-	//Game::getGraphics().addToDraw(&mesh);
-
+	this->aggroRange = 500; //TODO: Find better aggro range
 }
 
 Spitfire::Spitfire()
@@ -64,7 +56,6 @@ Spitfire::~Spitfire()
 	Game::getGraphics().removeFromDraw(wheel2);
 	Game::getGraphics().removeFromDraw(wheel3);
 	Game::getGraphics().removeFromDraw(wheel4);
-	delete vehicle;
 	delete vehicleBody1;
 	delete wheel1;
 	delete wheel2;
@@ -74,18 +65,18 @@ Spitfire::~Spitfire()
 
 void Spitfire::updateVehicle()
 {
-	prevAccelForce = Vector3(vehicle->getRigidBody()->getLinearVelocity());
-	vehicleMovement(deltaTime, throttleInputStrength, false, false, Vector2(-direction.x, -direction.z));
-	Vector3 accelForce = Vector3(vehicle->getRigidBody()->getLinearVelocity().getX(), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
+	Vector3 prevAccelForce = Vector3(getRigidBody()->getLinearVelocity());
+	vehicleMovement(deltaTime, throttleInputStrength, false, false, Vector2(direction.x, direction.z));
+	Vector3 accelForce = Vector3(getRigidBody()->getLinearVelocity()) - prevAccelForce;
 	setAccelForce(accelForce, deltaTime);
 	setWheelRotation();
-	this->setPosition(vehicle->getPosition());
+	this->setPosition(getPosition());
 
 }
 
 void Spitfire::move()
 {
-	direction = this->position - destination;
+	direction = destination - this->position;
 	direction.Normalize();
 	if ((this->position - destination).Length() > 5)
 	{
@@ -135,13 +126,11 @@ void Spitfire::followPath()
 void Spitfire::init(Physics* physics)
 {
 	this->physics = physics;
-	this->vehicle = new GameObject;
-	vehicle->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//Game::getGraphics().addToDraw(vehicle);
-	vehicle->setPosition(Vector3(0.0f, 10.0f, 0.0f));
-	vehicle->setScale(Vector3(0.5f, 0.14f, 0.9f));
+	mesh = Game::getGraphics().getMeshPointer("Cube");
+	setPosition(Vector3(0.0f, 10.0f, 0.0f));
+	setScale(Vector3(0.5f, 0.14f, 0.9f));
 	Game::getGraphics().loadTexture("CarTemp");
-	vehicle->setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
+	setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 
 
 	this->vehicleBody1 = new GameObject;
@@ -149,10 +138,8 @@ void Spitfire::init(Physics* physics)
 	vehicleBody1->setSpotShadow(false);
 	Game::getGraphics().addToDraw(vehicleBody1);
 	vehicleBody1->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
-	//vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
-
-	vehicleBody1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	Texture* vehicleTexture = Game::getGraphics().getMaterial("Entities/Player").diffuse;
+	vehicleBody1->setTexture(vehicleTexture);
 
 	this->wheel1 = new GameObject;
 	this->wheel2 = new GameObject;
@@ -174,20 +161,20 @@ void Spitfire::init(Physics* physics)
 	wheel2->setScale(Vector3(0.005f, 0.005f, 0.005f));
 	wheel3->setScale(Vector3(0.005f, 0.005f, 0.005f));
 	wheel4->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	wheel1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
-	wheel2->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
-	wheel3->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
-	wheel4->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	wheel1->setTexture(vehicleTexture);
+	wheel2->setTexture(vehicleTexture);
+	wheel3->setTexture(vehicleTexture);
+	wheel4->setTexture(vehicleTexture);
 
 
-	btRigidBody* tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y, vehicle->getPosition().z), btVector3(vehicle->getScale().x, vehicle->getScale().y, vehicle->getScale().z), 10.0f);
-	vehicle->setRigidBody(tempo, physics);
-	vehicle->getRigidBody()->activate();
-	vehicle->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	vehicle->getRigidBody()->setFriction(0);
-	vehicle->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+	btRigidBody* tempo = physics->addBox(btVector3(getPosition().x, getPosition().y, getPosition().z), btVector3(getScale().x, getScale().y, getScale().z), 10.0f);
+	setRigidBody(tempo, physics);
+	getRigidBody()->activate();
+	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	getRigidBody()->setFriction(0);
+	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
 	AABB vehicleBodyAABB = vehicleBody1->getAABB();
-	btVector3 origin = btVector3(vehicle->getPosition().x, vehicle->getPosition().y + 0.65f, vehicle->getPosition().z);
+	btVector3 origin = btVector3(getPosition().x, getPosition().y + 0.65f, getPosition().z);
 	btVector3 size = btVector3(vehicleBodyAABB.maxPos.x - vehicleBodyAABB.minPos.x,
 		(vehicleBodyAABB.maxPos.y - vehicleBodyAABB.minPos.y) * 0.2f,
 		vehicleBodyAABB.maxPos.z - vehicleBodyAABB.minPos.z) * 0.5f;
@@ -196,7 +183,7 @@ void Spitfire::init(Physics* physics)
 	vehicleBody1->getRigidBody()->activate();
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicleBody1->getRigidBody()->setFriction(1);
-	physics->addPointJoint(this->vehicle->getRigidBody(), this->vehicleBody1->getRigidBody());
+	physics->addPointJoint(getRigidBody(), this->vehicleBody1->getRigidBody());
 }
 
 void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)
@@ -205,13 +192,13 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 	//Quaternion Rotation to Euler
 	btScalar m;
 	btScalar n;
-	Quaternion qt = Vector4(this->vehicle->getRigidBody()->getWorldTransform().getRotation().getX(), this->vehicle->getRigidBody()->getWorldTransform().getRotation().getY(), this->vehicle->getRigidBody()->getWorldTransform().getRotation().getZ(), this->vehicle->getRigidBody()->getWorldTransform().getRotation().getW());
+	Quaternion qt = Vector4(getRigidBody()->getWorldTransform().getRotation().getX(), getRigidBody()->getWorldTransform().getRotation().getY(), getRigidBody()->getWorldTransform().getRotation().getZ(), getRigidBody()->getWorldTransform().getRotation().getW());
 
-	qt = this->vehicle->getRotationQuaternion();
+	qt = getRotationQuaternion();
 
 	float heading = getHeading(qt);
 
-	this->vehicle->getRigidBody()->getWorldTransform().getRotation().getEulerZYX(n, mRotation, m);
+	getRigidBody()->getWorldTransform().getRotation().getEulerZYX(n, mRotation, m);
 
 	//Current rotation of vehicle
 	float vehicleRotation = fmod((/*(getYaw(qt)*/heading * 180 / DirectX::XM_PI), 360.0f);
@@ -251,22 +238,22 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 
 
 	targetRotation = (atan2(-directionInput.x, -directionInput.y) * 180 / DirectX::XM_PI) + 180;
-	velocitySpeed = (this->vehicle->getRigidBody()->getLinearVelocity().getX() * (dx)) + (-this->vehicle->getRigidBody()->getLinearVelocity().getZ() * (dy));
+	velocitySpeed = (getRigidBody()->getLinearVelocity().getX() * (dx)) + (-getRigidBody()->getLinearVelocity().getZ() * (dy));
 
-	Vector3 steering = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
+	Vector3 steering = Vector3(getRigidBody()->getAngularVelocity().getX(),
 		throttleInputStrength * /*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.15f, 1),
-		vehicle->getRigidBody()->getAngularVelocity().getZ());
+		getRigidBody()->getAngularVelocity().getZ());
 
-	Vector3 steering2 = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
+	Vector3 steering2 = Vector3(getRigidBody()->getAngularVelocity().getX(),
 		throttleInputStrength * /*deltaTime*/0.035f * 80 * max(velocitySpeed * 0.15f, -1),
-		vehicle->getRigidBody()->getAngularVelocity().getZ());
+		getRigidBody()->getAngularVelocity().getZ());
 
 
 	//Driving Mode: Turn towards direction, semi-realistic
 
-	Vector3 steering3 = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
+	Vector3 steering3 = Vector3(getRigidBody()->getAngularVelocity().getX(),
 		/*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.15f, 1),
-		vehicle->getRigidBody()->getAngularVelocity().getZ());
+		getRigidBody()->getAngularVelocity().getZ());
 
 	if (throttleInputStrength > 0 && !this->isDead()) {
 		if (velocitySpeed < 0.5f) {
@@ -277,7 +264,7 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 			reverseTimer2 = 0;
 		}
 		if ((reverseTimer > 10.0f) && !(reverseTimer2 > 10.0f)) {
-			this->vehicle->getRigidBody()->applyImpulse(btVector3(-dx * deltaTime * 160.0f * stats.accelerationRate, 0, (dy * deltaTime * 160.0f * stats.accelerationRate)) * throttleInputStrength, btVector3(0, 0, 0));
+			getRigidBody()->applyImpulse(btVector3(-dx * deltaTime * 160.0f * stats.accelerationRate, 0, (dy * deltaTime * 160.0f * stats.accelerationRate)) * throttleInputStrength, btVector3(0, 0, 0));
 			reverseTimer2 += 10.0f * deltaTime;
 			if (reverseTimer2 > 10.0f) {
 				reverseTimer = 0;
@@ -287,7 +274,7 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 		else {
 			reverseTimer2 = 0;
 			if (velocitySpeed < (40 * stats.maxSpeed)) {
-				this->vehicle->getRigidBody()->applyImpulse(btVector3(dx * deltaTime * 160.0f * stats.accelerationRate, 0, -(dy * deltaTime * 160.0f * stats.accelerationRate)) * throttleInputStrength, btVector3(0, 0, 0));
+				getRigidBody()->applyImpulse(btVector3(dx * deltaTime * 160.0f * stats.accelerationRate, 0, -(dy * deltaTime * 160.0f * stats.accelerationRate)) * throttleInputStrength, btVector3(0, 0, 0));
 			}
 		}
 
@@ -295,33 +282,33 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 
 		if (vehicleRotation < targetRotation) {
 			if (abs(vehicleRotation - targetRotation) < 180) {
-				vehicle->getRigidBody()->setAngularVelocity(btVector3(0, steering3.y * difference2, 0));
+				getRigidBody()->setAngularVelocity(btVector3(0, steering3.y * difference2, 0));
 			}
 			else {
-				vehicle->getRigidBody()->setAngularVelocity(btVector3(0, -steering3.y * difference2, 0));
+				getRigidBody()->setAngularVelocity(btVector3(0, -steering3.y * difference2, 0));
 			}
 		}
 		else {
 			if (abs(vehicleRotation - targetRotation) < 180) {
-				vehicle->getRigidBody()->setAngularVelocity(btVector3(0, -steering3.y * difference2, 0));
+				getRigidBody()->setAngularVelocity(btVector3(0, -steering3.y * difference2, 0));
 			}
 			else {
-				vehicle->getRigidBody()->setAngularVelocity(btVector3(0, steering3.y * difference2, 0));
+				getRigidBody()->setAngularVelocity(btVector3(0, steering3.y * difference2, 0));
 			}
 		}
 	}
 	else if (!isDead()) {
-		vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (1.8f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (1.8f * deltaTime))));
+		getRigidBody()->setLinearVelocity(btVector3(getRigidBody()->getLinearVelocity().getX() / (1 + (1.8f * deltaTime)), getRigidBody()->getLinearVelocity().getY(), getRigidBody()->getLinearVelocity().getZ() / (1 + (1.8f * deltaTime))));
 
 		rotateAcceleration /= 1.0f + 0.005f * deltaTime * 40;
 		//vehicle->addRotation(Vector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime*2 * 60 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
-		vehicle->getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180) * deltaTime * 120 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
+		getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180) * deltaTime * 120 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
 	}
 	else {
-		vehicle->getRigidBody()->setLinearVelocity(btVector3(vehicle->getRigidBody()->getLinearVelocity().getX() / (1 + (0.6f * deltaTime)), vehicle->getRigidBody()->getLinearVelocity().getY(), vehicle->getRigidBody()->getLinearVelocity().getZ() / (1 + (0.6f * deltaTime))));
+		getRigidBody()->setLinearVelocity(btVector3(getRigidBody()->getLinearVelocity().getX() / (1 + (0.6f * deltaTime)), getRigidBody()->getLinearVelocity().getY(), getRigidBody()->getLinearVelocity().getZ() / (1 + (0.6f * deltaTime))));
 		rotateAcceleration /= 1.0f + 0.005f * deltaTime * 40;
 
-		vehicle->getRigidBody()->setAngularVelocity(btVector3(steering.x, (vehicle->getRigidBody()->getAngularVelocity().getY() / (1 + (0.8f * deltaTime)))/** min(abs(velocitySpeed), 1)*/, steering.z));
+		getRigidBody()->setAngularVelocity(btVector3(steering.x, (getRigidBody()->getAngularVelocity().getY() / (1 + (0.8f * deltaTime)))/** min(abs(velocitySpeed), 1)*/, steering.z));
 	}
 
 	rotateAcceleration /= 1.0f + 6 * deltaTime;
@@ -329,33 +316,33 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 
 	//Drifting
 	float hypoC = sqrt(pow(dx, 2) + (pow(dy, 2)));
-	float driftForce = this->vehicle->getRigidBody()->getLinearVelocity().getX() * (dy / hypoC) + -this->vehicle->getRigidBody()->getLinearVelocity().getZ() * -(dx / hypoC);
+	float driftForce = getRigidBody()->getLinearVelocity().getX() * (dy / hypoC) + -getRigidBody()->getLinearVelocity().getZ() * -(dx / hypoC);
 	Vector2 driftResistance = Vector2(-((dy / hypoC) * 4000 * deltaTime) * stats.handlingRate, -(-((dx / hypoC) * 4000 * deltaTime)) * stats.handlingRate);
 	if (abs(driftForce) < 250) {
 		driftResistance = driftResistance * (abs(driftForce) * 0.005f);
 	}
 	if (Input::getStrengthL() > 0) {
 		if (driftForce < -0) {
-			this->vehicle->getRigidBody()->applyImpulse(btVector3(-driftResistance.x, 0, 0), btVector3(0, 0, 0));
-			this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, driftResistance.y), btVector3(0, 0, 0));
+			getRigidBody()->applyImpulse(btVector3(-driftResistance.x, 0, 0), btVector3(0, 0, 0));
+			getRigidBody()->applyImpulse(btVector3(0, 0, driftResistance.y), btVector3(0, 0, 0));
 		}
 		else if (driftForce > 0) {
-			this->vehicle->getRigidBody()->applyImpulse(btVector3(driftResistance.x, 0, 0), btVector3(0, 0, 0));
-			this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, -driftResistance.y), btVector3(0, 0, 0));
+			getRigidBody()->applyImpulse(btVector3(driftResistance.x, 0, 0), btVector3(0, 0, 0));
+			getRigidBody()->applyImpulse(btVector3(0, 0, -driftResistance.y), btVector3(0, 0, 0));
 		}
 	}
 	else {
 		if (driftForce < -0) {
-			this->vehicle->getRigidBody()->applyImpulse(btVector3(-driftResistance.x, 0, 0), btVector3(0, 0, 0));
-			this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, driftResistance.y), btVector3(0, 0, 0));
+			getRigidBody()->applyImpulse(btVector3(-driftResistance.x, 0, 0), btVector3(0, 0, 0));
+			getRigidBody()->applyImpulse(btVector3(0, 0, driftResistance.y), btVector3(0, 0, 0));
 		}
 		else if (driftForce > 0) {
-			this->vehicle->getRigidBody()->applyImpulse(btVector3(driftResistance.x, 0, 0), btVector3(0, 0, 0));
-			this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, -driftResistance.y), btVector3(0, 0, 0));
+			getRigidBody()->applyImpulse(btVector3(driftResistance.x, 0, 0), btVector3(0, 0, 0));
+			getRigidBody()->applyImpulse(btVector3(0, 0, -driftResistance.y), btVector3(0, 0, 0));
 		}
 	}
 	//this->vehicle->getRigidBody()->setLinearVelocity(btVector3((velocity.x * deltaTime*2 * 0.002f) * 100.0f, this->vehicle->getRigidBody()->getLinearVelocity().getY(), -(velocity.y * deltaTime*2 * 0.002f) * 100.0f));
-	vehicle->getRigidBody()->setAngularVelocity(btVector3(0, vehicle->getRigidBody()->getAngularVelocity().getY(), 0));
+	getRigidBody()->setAngularVelocity(btVector3(0, getRigidBody()->getAngularVelocity().getY(), 0));
 
 
 	if (deltaTime > 0.01f) {
@@ -377,13 +364,13 @@ void Spitfire::setAccelForce(Vector3 accelForce, float deltaTime)
 		int randomSound2 = rand() % 3 + 1;
 		std::wstring soundEffect2 = L"data/sound/MetalImpactPitched" + std::to_wstring(randomSound) + L".wav";
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
-			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
+			Game::getGraphics().addParticle2(getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-20.0f);
 			Sound::PlaySoundEffect(L"data/sound/CarCrash.wav");
 			Sound::PlaySoundEffect(soundEffect2);
 		}
 		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
-			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
+			Game::getGraphics().addParticle2(getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-10.0f);
 			Sound::PlaySoundEffect(soundEffect);
 			Sound::PlaySoundEffect(soundEffect2);
@@ -400,10 +387,10 @@ void Spitfire::setAccelForce(Vector3 accelForce, float deltaTime)
 
 void Spitfire::setWheelRotation()
 {
-	wheel1->setPosition(vehicle->getPosition() + Vector3(0, 0.25f, 0));
-	wheel2->setPosition(vehicle->getPosition() + Vector3(0, 0.25f, 0));
-	wheel3->setPosition(vehicle->getPosition() + Vector3(0, 0.25f, 0));
-	wheel4->setPosition(vehicle->getPosition() + Vector3(0, 0.25f, 0));
+	wheel1->setPosition(getPosition() + Vector3(0, 0.25f, 0));
+	wheel2->setPosition(getPosition() + Vector3(0, 0.25f, 0));
+	wheel3->setPosition(getPosition() + Vector3(0, 0.25f, 0));
+	wheel4->setPosition(getPosition() + Vector3(0, 0.25f, 0));
 
 	wheel1->setRotation(Vector3(0, vehicleBody1->getRotation().y, 0));
 	wheel2->setRotation(Vector3(0, vehicleBody1->getRotation().y, 0));

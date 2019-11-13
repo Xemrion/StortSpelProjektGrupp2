@@ -47,9 +47,9 @@ void TurretHandler::update(float dt,const Vector3& targetPos)
 	}
 }
 
-void TurretHandler::createTurret(float x, float z, int weaponType)
+void TurretHandler::createTurret(float x, float z, int weaponType,Physics* physics)
 {
-	this->turrets.emplace_back(new Turret(x, z, weaponType));
+	this->turrets.push_back(new Turret(x, z, weaponType,physics));
 }
 
 float TurretHandler::distanceToPlayer(const Vector3& position)

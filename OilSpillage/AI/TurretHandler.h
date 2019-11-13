@@ -8,7 +8,7 @@ public:
 	TurretHandler();
 	~TurretHandler();
 	void update(float dt, const Vector3& targetPos);
-	void createTurret(float x, float z,int weaponType);
+	void createTurret(float x, float z,int weaponType,Physics* physics);
 	float distanceToPlayer(const Vector3& position);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size,float soundTimer);
 

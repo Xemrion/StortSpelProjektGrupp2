@@ -5,7 +5,7 @@ class Turret : public Actor,public Ranged
 {
 public:
 	Turret();
-	Turret(float x, float z, int weaponType);
+	Turret(float x, float z, int weaponType,Physics* physics);
 	virtual ~Turret();
 	void update(float dt, const Vector3& targetPos);
 private:
