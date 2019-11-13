@@ -7,7 +7,7 @@ public:
 	Boss();
 	Boss(float x, float z, int weaponType, Physics* physics);
 	virtual ~Boss();
-	void update(float dt, Vector3 targetPos);
+	void update(float dt, const Vector3& targetPos);
 private:
 	void setUpActor();
 	int testNr;

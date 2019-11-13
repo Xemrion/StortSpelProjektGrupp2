@@ -7,7 +7,7 @@ public:
 	Attacker();
 	Attacker(float x, float z, int weaponType, Physics* physics);
 	virtual ~Attacker();
-	void update(float dt, Vector3 targetPos);
+	void update(float dt, const Vector3& targetPos);
 private:
 	void setUpActor();
 	Vector3 seek();

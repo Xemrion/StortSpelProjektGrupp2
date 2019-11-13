@@ -7,7 +7,7 @@ public:
 	Turret();
 	Turret(float x, float z, int weaponType,Physics* physics);
 	virtual ~Turret();
-	void update(float dt, Vector3 targetPos);
+	void update(float dt, const Vector3& targetPos);
 private:
 	void setForwardVector(Vector3 forward);
 	void setSightRange(int range);

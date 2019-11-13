@@ -26,7 +26,7 @@ Boss::~Boss()
 	Game::getGraphics().removeFromDraw(this);
 }
 
-void Boss::update(float dt, Vector3 targetPos)
+void Boss::update(float dt, const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	this->updateBullets(dt);

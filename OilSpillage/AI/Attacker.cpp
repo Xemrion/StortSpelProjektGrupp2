@@ -16,10 +16,10 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
-
+	this->attackRange = 10;
 }
 
-void Attacker::update(float dt, Vector3 targetPos)
+void Attacker::update(float dt, const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	this->updateBullets(dt);

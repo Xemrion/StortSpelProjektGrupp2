@@ -558,22 +558,22 @@ void PlayingGameState::update(float deltaTime)
 		auto playerVehicle{ player->getVehicle() };
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
-
-		/*	if(spawnTimer % 200 == 0)
-			{
-				actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-				spawnTimer = 0;
-			}
-			spawnTimer++;*/
-			//spawn Boss
-		if (spawnTimer % 10 == 0)
+		
+	/*	if(spawnTimer % 200 == 0)
 		{
-			actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
-				player->getVehicle()->getPosition().y,
-				player->getVehicle()->getPosition().z + 5), 1);
+			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
 			spawnTimer = 0;
 		}
-		spawnTimer = 1;
+		spawnTimer++;*/
+		//spawn Boss
+		//if (spawnTimer % 10 == 0)
+		//{
+		//	actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
+		//		player->getVehicle()->getPosition().y,
+		//		player->getVehicle()->getPosition().z + 5), 1);
+		//	spawnTimer = 0;
+		//}
+		//spawnTimer = 1;
 
 		powerUps.erase(
 			std::remove_if(

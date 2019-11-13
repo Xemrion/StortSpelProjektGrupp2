@@ -24,7 +24,7 @@ Swarm::Swarm(float x, float z, int weaponType, Physics* physics)
 	this->aggroRange = 40;
 }
 
-void Swarm::update(float dt, Vector3 targetPos)
+void Swarm::update(float dt, const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 }
