@@ -38,6 +38,7 @@ void UIUpgrading::updateUI(float deltaTime)
 		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 		{
 			this->gadgetSelector->setSlotOfSelected(this->itemSelector->getSelectedSlot());
+			this->selectingItem = true;
 		}
 		else if (Input::checkButton(Keys::CANCEL, States::PRESSED))
 		{
