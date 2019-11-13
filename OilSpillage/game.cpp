@@ -22,6 +22,7 @@ void Game::start(Window* window)
 	Container::playerInventory = std::make_unique<Container>();
 	Item::init();
 
+
 	Sound::loadSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
 	Sound::loadSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");
 
@@ -91,14 +92,45 @@ float Game::lerp(float v0, float v1, float t)
 	return (1 - t) * v0 + t * v1;
 }
 
+
+
 void Game::createCurrentState()
 {
+	VehicleSlots* transfer = nullptr;
+	VehicleSlots* newSlots = nullptr;
 	if (currentState == STATE_MENU)
 		state = std::make_unique<MenuGameState>();
 	else if (currentState == STATE_PLAYING)
+	{
+		if (oldState == STATE_UPGRADING)
+		{
+			transfer = static_cast<UpgradingGameState*>(state.get())->getPlayer()->getSlots();
+			newSlots = new VehicleSlots(*transfer);
+		}
 		state = std::make_unique<PlayingGameState>();
+
+		if (oldState == STATE_UPGRADING)
+		{	
+			static_cast<PlayingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
+			//static_cast<PlayingGameState*>(state.get())->initiatePlayer();
+		}
+	}
 	else if (currentState == STATE_UPGRADING)
+	{
+		if (oldState == STATE_PLAYING)
+		{
+			transfer = static_cast<PlayingGameState*>(state.get())->getPlayer()->getSlots();
+			newSlots = new VehicleSlots(*transfer);
+		}
+
 		state = std::make_unique<UpgradingGameState>();
+
+		if (oldState == STATE_PLAYING)
+		{
+			
+			static_cast<UpgradingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
+		}
+	}
 }
 
 void Game::run()
@@ -128,6 +160,7 @@ void Game::run()
 
 		if (oldState != -1) {
 			graphics.clearDraw();
+			
 			createCurrentState(); //Init the new state
 			curTime = 0;
 			QueryPerformanceCounter((LARGE_INTEGER*)& curTime);

@@ -31,6 +31,11 @@ Item::Item(const Item& obj)
 	}
 }
 
+Item* Item::clone() const
+{
+	return new Item(*this);
+}
+
 void Item::init()
 {
 	Graphics& graphics = Game::getGraphics();
@@ -47,7 +52,7 @@ void Item::init()
 		Item("Test Item", "A very useless thing!", ItemType::WEAPON, nullptr),
 		Item("Test Item 2", "A very useless thing 2!", ItemType::GADGET, nullptr),
 		Item("Test Item 3", "A very useless thing 3!", ItemType::GADGET, nullptr),
-		ItemWeapon("Machine Gun", WeaponHandler::getWeapon(WeaponType::MachineGun), Item::machineGun)
+		ItemWeapon("Flamethrower", WeaponHandler::getWeapon(WeaponType::Flamethrower), Item::machineGun)
 	};
 
 	//Sort so we can use getItemByName later if needed.

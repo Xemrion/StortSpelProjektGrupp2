@@ -33,6 +33,9 @@ public:
 	Vehicle* getVehicle();
 	void update(float deltaTime);
 	void setCurrentMenu(Menu menu);
+
+	std::unique_ptr<Vehicle> & getPlayer();
+	void setPlayer(Vehicle* theVehicle);
 };
 
 #endif // !UPGRADING_GAME_STATE_H
