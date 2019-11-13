@@ -55,13 +55,19 @@ void UpgradingGameState::update(float deltaTime)
 	this->theVehicle->updateWeapon(deltaTime);
 	this->theVehicle->update(deltaTime, 0, 0, 0, Vector2(0, 0));
 
-	float spin = -deltaTime * 200;
-	if (Input::checkButton(Keys::R_LEFT, States::HELD))
+	if (Input::getStrengthRnoMouse() > 0.1f)
 	{
-		spin *= -1;
-	}
-	this->theVehicle->getVehicle()->getRigidBody()->setAngularVelocity(btVector3(0, spin, 0));
+		Quaternion rotationNow = this->theVehicle->getVehicle()->getRotationQuaternion();
+		Quaternion rotationDest = Quaternion::Lerp(rotationNow, Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), std::atan2f(Input::getDirectionR().x, Input::getDirectionR().y)), deltaTime * 4);
 
+		btQuaternion trams(rotationDest.x, rotationDest.y, rotationDest.z, rotationDest.w);
+		this->theVehicle->getVehicle()->getRigidBody()->getWorldTransform().setRotation(trams);
+	}
+	else
+	{
+		this->theVehicle->getVehicle()->getRigidBody()->setAngularVelocity(btVector3(0, deltaTime * 150, 0));
+	}
+	
 	this->theVehicle->setWheelRotation();
 	this->physics->update(deltaTime);
 
