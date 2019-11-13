@@ -13,6 +13,8 @@ private:
 public:
 	ItemWeapon(std::string name, Weapon weapon, std::shared_ptr<GameObject> object);
 	virtual ~ItemWeapon();
+	ItemWeapon(const ItemWeapon& obj);
+	Item* clone()const;
 
 	Weapon& getWeapon();
 };

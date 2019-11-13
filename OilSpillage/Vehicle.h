@@ -75,7 +75,7 @@ struct VehicleSlots
 		{
 			if (obj.slots[i] != nullptr)
 			{
-				this->slots[i] = new Item(*obj.slots[i]);// (Slots(i)));
+				this->slots[i] = obj.slots[i]->clone();//will make new item/itemWeapon
 			}
 			else
 			{

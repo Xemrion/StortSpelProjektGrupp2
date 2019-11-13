@@ -33,6 +33,7 @@ public:
 	Item(std::string name, std::string description, ItemType type, std::shared_ptr<GameObject> object);
 	virtual ~Item();
 	Item(const Item& obj);
+	virtual Item* clone()const;
 	/*void operator=(const Item& obj);*/
 
 	std::string getName() const;

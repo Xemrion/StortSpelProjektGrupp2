@@ -84,7 +84,8 @@ void CarGadgetSelector::setSlotOfSelected(InventorySlot slot)
 			if (this->slots[i].get() == this->selected)
 			{
 				this->used[i] = slot;
-				Item* newItem = new Item(*itemSlot->getItem());
+
+				Item* newItem = 
 				static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(static_cast<Slots>(i), newItem);
 				break;
 			}

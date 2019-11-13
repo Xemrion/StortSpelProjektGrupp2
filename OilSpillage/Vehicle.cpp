@@ -433,7 +433,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		{
 			if (temp->getType() == ItemType::WEAPON)
 			{
-				ItemWeapon* tempWeapon = dynamic_cast<ItemWeapon*>(temp);
+				ItemWeapon* tempWeapon = static_cast<ItemWeapon*>(temp);
 				if (tempWeapon != nullptr)
 				{
 					tempWeapon->getWeapon().updateWeapon(deltaTime);//for sound and timeSinceLastShot
@@ -661,6 +661,10 @@ void Vehicle::updateWeapon(float deltaTime)
 
 void Vehicle::setVehicleSlots(VehicleSlots* slots)
 {
+	if (this->vehicleSlots != nullptr)
+	{
+		delete this->vehicleSlots;
+	}
 	this->vehicleSlots = slots;
 	for (int i = 0; i < Slots::SIZEOF; i++)
 	{
