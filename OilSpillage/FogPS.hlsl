@@ -26,6 +26,7 @@ SamplerState samplerState : register(s0);
 
 float2 hash(float2 p)
 {
+	p = fmod(p, scale);
 	p = float2(dot(p, float2(127.1, 311.7)),
 		dot(p, float2(269.5, 183.3)));
 
@@ -39,14 +40,13 @@ float noise(in float2 x)
 	float2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
 
 	return lerp(lerp(dot(hash(i + float2(0.0, 0.0)), f - float2(0.0, 0.0)),
-		dot(hash(i + float2(1.0, 0.0)), f - float2(1.0, 0.0)), u.x),
-		lerp(dot(hash(i + float2(0.0, 1.0)), f - float2(0.0, 1.0)),
-			dot(hash(i + float2(1.0, 1.0)), f - float2(1.0, 1.0)), u.x), u.y);
+					 dot(hash(i + float2(1.0, 0.0)), f - float2(1.0, 0.0)), u.x),
+				lerp(dot(hash(i + float2(0.0, 1.0)), f - float2(0.0, 1.0)),
+					 dot(hash(i + float2(1.0, 1.0)), f - float2(1.0, 1.0)), u.x), u.y);
 }
 
 PS_OUT main(VS_OUT input) : SV_TARGET
 {
-	float2 uv = input.Pos.xy / float2(500.0, 500.0);
 	float n = noise(input.Tex.xy * scale);
 	float alpha = n > densityThreshold ? density : 0.0;
 	//alpha = n * 0.5 + 0.5;

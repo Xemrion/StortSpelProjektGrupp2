@@ -24,7 +24,7 @@ Fog::~Fog()
 	}
 }
 
-void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, UINT slices, float spacing)
+void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, UINT slices, float spacing, FogMaterial material)
 {
 	Game::getGraphics().loadMesh("Quad");
 	Game::getGraphics().loadShape(SHAPE_QUAD);
@@ -86,13 +86,13 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 	this->vp.TopLeftX = 0;
 	this->vp.TopLeftY = 0;
 	
-	generateTextures(device, deviceContext);
+	generateTextures(device, deviceContext, material);
 
 	this->drawShader.createVS(device.Get(), shaderfolder + L"FogDrawVS.cso", inputDesc, numElements);
 	this->drawShader.createPS(device.Get(), shaderfolder + L"FogDrawPS.cso");
 }
 
-void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
+void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, FogMaterial& material)
 {
 	float clearColor[4] = {
 		0,0,0,0
@@ -123,15 +123,7 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 	device->CreateBuffer(&desc, 0, &worldBuffer);
 	deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
 
-	struct FogMaterial
-	{
-		Vector3 color;
-		float densityThreshold;
-		float density;
-		float ambientDensity;
-		float scale;
-		float padding;
-	};
+
 	Microsoft::WRL::ComPtr<ID3D11Buffer> materialBuffer;
 	desc.ByteWidth = static_cast<UINT>(sizeof(FogMaterial));
 	device->CreateBuffer(&desc, 0, &materialBuffer);
@@ -185,19 +177,17 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
 		deviceContext->Unmap(worldBuffer.Get(), 0);
 
-		FogMaterial material;
+		FogMaterial materialCopy;
 		
-		//material.color = Vector3(0.6, 0.6, 0.62);
-		//material.densityThreshold = color.w;
-		material.densityThreshold = 0.15f;
-		material.ambientDensity = 0.1 / quads.size();
-		material.density = 0.25f / (i + 1);
-		material.scale = 50.f * (i + 1);
+		materialCopy.densityThreshold = material.densityThreshold;
+		materialCopy.ambientDensity = material.ambientDensity / quads.size();
+		materialCopy.density = material.density / (i + 1);
+		materialCopy.scale = material.scale * (i + 1);
 
 		hr = deviceContext->Map(materialBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, &material, sizeof(FogMaterial));
+		CopyMemory(mappedResource.pData, &materialCopy, sizeof(FogMaterial));
 		deviceContext->Unmap(materialBuffer.Get(), 0);
-		object->setColor(Vector4(0.6, 0.6, 0.62, 0.0));
+		object->setColor(Vector4(material.color.x, material.color.z, material.color.z, 0.0));
 
 
 		Texture* diffuseTexture = new Texture();
@@ -229,7 +219,7 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 	for (int i = 0; i < quads.size(); ++i)
 	{
 		quads[i]->setTexture(fogTextures[i]);
-		//quads[i]->setNormalMap(normalTextures[i]);
+		quads[i]->setNormalMap(normalTextures[i]);
 	}
 }
 

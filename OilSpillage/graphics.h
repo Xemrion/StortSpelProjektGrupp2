@@ -81,7 +81,7 @@ class Graphics {
 	ParticleSystem particleSystem;
 	ParticleSystem particleSystem2;
 
-	Fog fog;
+	std::unique_ptr<Fog> fog;
 	float time = 0.0;
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;

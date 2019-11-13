@@ -74,41 +74,41 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float bias)
 	visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
 	visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
 
-	//pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(-2, -0)).r;
-	//visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
-	//visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
-	//visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
-	//visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
+	pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(-2, -0)).r;
+	visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
 
-	//pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(-2, 0)).r;
-	//visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
-	//visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
-	//visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
-	//visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
+	pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(-2, 0)).r;
+	visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
 
-	//pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(0, -2)).r;
-	//visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
-	//visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
-	//visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
-	//visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
+	pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(0, -2)).r;
+	visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
+	visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
 
-	visibility *= 0.25 /** 0.25*/;
+	visibility *= 0.25 * 0.25;
 
 	return visibility;
 };
 float4 main(VS_OUT input) : SV_Target
 {
 	float3 normal = input.NormalWS.xyz;
-	//float3 tangent = input.TangentWS.xyz;
-	//float3 bitangent = input.BitangentWS.xyz;
-	//float3 normalMap = NormalMap.Sample(SampSt, input.Tex).xyz;
+	float3 tangent = input.TangentWS.xyz;
+	float3 bitangent = input.BitangentWS.xyz;
+	float3 normalMap = NormalMap.Sample(SampSt, input.Tex).xyz;
 
-	//if (length(normalMap) > 0.f)
-	//{
-	//	normalMap = 2.0f * normalMap - 1.0f;
-	//	float3x3 TBN = float3x3(tangent, bitangent, normal);
-	//	normal = normalize(mul(normalMap, TBN));
-	//}
+	if (length(normalMap) > 0.f)
+	{
+		normalMap = 2.0f * normalMap - 1.0f;
+		float3x3 TBN = float3x3(tangent, bitangent, normal);
+		normal = normalize(mul(normalMap, TBN));
+	}
 
 	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
 	

@@ -87,7 +87,7 @@ void main( uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID )
 		if (l.width > 0.0)
 		{
 			l.direction = mul(float4(l.direction, 0.0), view);
-			radius *= 1.5;
+			radius *= 2.0;
 			pos.xyz += l.direction * radius;
 		}
 		

@@ -352,7 +352,10 @@ bool Graphics::init(Window* window)
 	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
-	fog.initialize(device, deviceContext, 1, 1.45);
+	FogMaterial fogMaterial;
+	fog = std::make_unique<Fog>();
+	fogMaterial.scale = 5.0;
+	fog->initialize(device, deviceContext, 5, 1.945, fogMaterial);
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	deviceContext->RSSetViewports(1, &this->vp);
 
@@ -1430,14 +1433,14 @@ void Graphics::setSpotLightShadow(SpotLight* spotLight)
 
 void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 {
-	deviceContext->VSSetShader(fog.drawShader.vs.getShader(), NULL, 0);
-	deviceContext->PSSetShader(fog.drawShader.ps.getShader(), NULL, 0);
+	deviceContext->VSSetShader(fog->drawShader.vs.getShader(), NULL, 0);
+	deviceContext->PSSetShader(fog->drawShader.ps.getShader(), NULL, 0);
 	time += deltaTime;
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
 	int i = 1;
-	for (GameObject* object : fog.getQuads())
+	for (GameObject* object : fog->getQuads())
 	{
 		SimpleMath::Matrix world = object->getTransform();
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
@@ -1475,7 +1478,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
-		Vector4 t = Vector4(time, 0.0005 * i, 0.00047 * i + 0.00007, 0.0);
+		Vector4 t = Vector4(time, 0.0005 * (i % 4), 0.00047 * (i % 5), 0.0);
 		deviceContext->Map(fogAnimationBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &t, sizeof(Vector4));
 		deviceContext->Unmap(fogAnimationBuffer.Get(), 0);
