@@ -433,7 +433,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		{
 			if (temp->getType() == ItemType::WEAPON)
 			{
-				ItemWeapon* tempWeapon = static_cast<ItemWeapon*>(temp);
+				ItemWeapon* tempWeapon = dynamic_cast<ItemWeapon*>(temp);
 				if (tempWeapon != nullptr)
 				{
 					tempWeapon->getWeapon().updateWeapon(deltaTime);//for sound and timeSinceLastShot
@@ -484,7 +484,7 @@ void Vehicle::updateWeapon(float deltaTime)
 				if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) == nullptr)
 				{
 					//in upgradingstate 
-					this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y, acos(angleWP) - 3.14 / 2));
+					this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y, acos(angleWP)));
 				}
 				this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setPosition(vehicleBody1->getPosition()+Vector3(0,0.5f,0));
 			}
@@ -563,17 +563,17 @@ void Vehicle::updateWeapon(float deltaTime)
 			// recoil goes from 100% to 0% in half a second
 			if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
 			{
-				float newRot = atan2(curDir.x, curDir.y) + 3.14f / 2;
+				float newRot = atan2(curDir.x, curDir.y);
 				this->gunRotation = newRot;
 				if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
 				{
 					if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
 					{
+						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::MOUNTED));
 						this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, newRot, 0));
 
 						if (Input::checkButton(Keys::R_SHOULDER, States::HELD) || Input::getStrengthRnoMouse() > 0.01f)
 						{
-							ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::MOUNTED));
 							if (temp->getWeapon().updateFireRate())
 							{
 								//this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
@@ -583,7 +583,7 @@ void Vehicle::updateWeapon(float deltaTime)
 									if (bullets[i].getWeaponType() == WeaponType::None)
 									{
 										auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
-										this->bullets[i].shoot(weapon,
+										this->bullets[i].shoot(temp->getWeapon(),
 											this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
 											Vector3(curDir.x, 0.0, curDir.y),
 											Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 0.5f, deltaTime);
@@ -594,6 +594,10 @@ void Vehicle::updateWeapon(float deltaTime)
 								}
 							}
 
+						}
+						else
+						{
+							WeaponHandler::weaponEndSound(temp->getWeapon());
 						}
 					}
 				}
@@ -620,6 +624,114 @@ void Vehicle::updateWeapon(float deltaTime)
 											this->bullets[i].shoot(temp->getWeapon(),
 												this->vehicleBody1->getPosition() + Vector3(tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 												tempDir,
+												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
+											break;
+										}
+									}
+								}
+							}
+							else
+							{
+								WeaponHandler::weaponEndSound(temp->getWeapon());
+							}
+						}
+					}
+				}
+				if (this->vehicleSlots->getSlot(Slots::BACK) != nullptr)
+				{
+					if (this->vehicleSlots->getSlot(Slots::BACK)->getObject() != nullptr)
+					{
+						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::BACK));
+						if (this->vehicleSlots->getSlot(Slots::BACK)->getType() == ItemType::WEAPON && temp != nullptr)
+						{
+							if (Input::checkButton(Keys::ACTION_1, States::HELD))
+							{
+								//weapon.startSound();
+								WeaponHandler::weaponStartSound(temp->getWeapon());
+								if (temp->getWeapon().updateFireRate())
+								{
+									for (int i = 0; i < Vehicle::bulletCount; ++i)
+									{
+										if (bullets[i].getWeaponType() == WeaponType::None)
+										{
+											auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+											this->bullets[i].shoot(temp->getWeapon(),
+												this->vehicleBody1->getPosition() + Vector3(-tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
+												-tempDir,
+												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
+											break;
+										}
+									}
+								}
+							}
+							else
+							{
+								WeaponHandler::weaponEndSound(temp->getWeapon());
+							}
+						}
+					}
+				}
+				if (this->vehicleSlots->getSlot(Slots::RIGHT) != nullptr)
+				{
+					if (this->vehicleSlots->getSlot(Slots::RIGHT)->getObject() != nullptr)
+					{
+						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::RIGHT));
+						if (this->vehicleSlots->getSlot(Slots::RIGHT)->getType() == ItemType::WEAPON && temp != nullptr)
+						{
+							if (Input::checkButton(Keys::ACTION_2, States::HELD))
+							{
+								//weapon.startSound();
+								WeaponHandler::weaponStartSound(temp->getWeapon());
+								if (temp->getWeapon().updateFireRate())
+								{
+									for (int i = 0; i < Vehicle::bulletCount; ++i)
+									{
+										if (bullets[i].getWeaponType() == WeaponType::None)
+										{
+											auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+											this->bullets[i].shoot(temp->getWeapon(),
+												this->vehicleBody1->getPosition() + Vector3(right * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
+												right,
+												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
+											break;
+										}
+									}
+								}
+							}
+							else
+							{
+								WeaponHandler::weaponEndSound(temp->getWeapon());
+							}
+						}
+					}
+				}
+				if (this->vehicleSlots->getSlot(Slots::LEFT) != nullptr)
+				{
+					if (this->vehicleSlots->getSlot(Slots::LEFT)->getObject() != nullptr)
+					{
+						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::LEFT));
+						if (this->vehicleSlots->getSlot(Slots::LEFT)->getType() == ItemType::WEAPON && temp != nullptr)
+						{
+							if (Input::checkButton(Keys::ACTION_2, States::HELD))
+							{
+								//weapon.startSound();
+								WeaponHandler::weaponStartSound(temp->getWeapon());
+								if (temp->getWeapon().updateFireRate())
+								{
+									for (int i = 0; i < Vehicle::bulletCount; ++i)
+									{
+										if (bullets[i].getWeaponType() == WeaponType::None)
+										{
+											auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+											this->bullets[i].shoot(temp->getWeapon(), 
+												this->vehicleBody1->getPosition() + Vector3(-right * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
+												-right,
 												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
 											break;
 										}
@@ -661,6 +773,8 @@ void Vehicle::updateWeapon(float deltaTime)
 
 void Vehicle::setVehicleSlots(VehicleSlots* slots)
 {
+	if (slots == this->vehicleSlots)
+		return;
 	if (this->vehicleSlots != nullptr)
 	{
 		delete this->vehicleSlots;
