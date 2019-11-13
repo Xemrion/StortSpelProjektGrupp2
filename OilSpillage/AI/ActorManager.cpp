@@ -30,7 +30,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
 	bool hasDied = false;
-	seperation(targetPos);
+	//seperation(targetPos);
 	for (int i = 0; i < this->groups.size(); i++)
 	{
 		groups[i].formationP(targetPos);
@@ -196,12 +196,12 @@ void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float an
 	if (angle != 0)
 	{
 		Vector2& newPosition = generateAroundaPoint(position.x, position.z, angle);
-		//	createTurret(newPosition.x, newPosition.y, weaponType);
+			createTurret(newPosition.x, newPosition.y, weaponType);
 	}
 	else
 	{
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
-		//	createTurret(newPosition.x, newPosition.y, weaponType);
+			createTurret(newPosition.x, newPosition.y, weaponType);
 	}
 }
 

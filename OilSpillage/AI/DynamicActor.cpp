@@ -14,7 +14,7 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 	this->path = nullptr;
 	this->state = State::Idle;
 	this->aggroRange = 80;
-	btRigidBody* tempo = physics->addBox(btVector3(x, position.y, z), btVector3(this->scale.x, this->scale.y, this->scale.z), 10.0f);
+	btRigidBody* tempo = physics->addBox(btVector3(x, position.y, z), btVector3(this->scale.x, this->scale.y, this->scale.z), 1.0f);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
@@ -169,17 +169,17 @@ void DynamicActor::followPath()
 {
 	if (path != nullptr)
 	{
-		if (path->size() > 0)
+		if ((position - targetPos).Length() < 15)
+		{
+			destination = targetPos;
+		}
+		else if (path->size() > 0)
 		{
 			destination = path->at(path->size() - 1);
 			if (position.Distance(path->at(path->size() - 1), position) < 2)
 			{
 				path->pop_back();
 			}
-		}
-		else if ((position - targetPos).Length() < 15)
-		{
-			destination = targetPos;
 		}
 	}
 }
