@@ -23,6 +23,7 @@ Bullet::Bullet(Weapon weapon)
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
 	this->weapon = weapon;
 	this->obj->setScale(weapon.bulletScale);
+	this->obj->setScale(Vector3(5,5,5));
 	this->obj->setColor(Vector4(0, 0, 0, 1));
 }
 
@@ -71,7 +72,6 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& dir
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-
 	Game::getGraphics().addToDraw(this->obj);
 }
 
@@ -221,7 +221,7 @@ void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direc
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.02), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread*vehicleWeapon.maxSpread)));
+	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 1), Vector4(4.5, 0.5, 0.5, 1), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread*vehicleWeapon.maxSpread)));
 
 	Game::getGraphics().addToDraw(this->obj);
 	if (vehicleWeapon.currentSpreadIncrease > vehicleWeapon.maxSpread)
