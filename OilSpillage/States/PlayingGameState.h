@@ -80,7 +80,8 @@ private:
 	GameObject** objArray = new GameObject * [3];
 	ObjectiveHandler objectives;
 	RNG rng{ RD()() };        // gör privat klassmedlem istället
-	
+	int frameCount = 0;
+
 	//Bullet
 	std::unique_ptr<Physics>		physics;
 	std::unique_ptr<GameObject>		buildingTest;

@@ -4,8 +4,8 @@ DynamicActor::DynamicActor()
 {
 }
 
-DynamicActor::DynamicActor(float x, float z)
-	:Actor(x, z)
+DynamicActor::DynamicActor(float x, float z, Physics* physics)
+	:Actor(x, z,physics)
 {
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
@@ -14,6 +14,12 @@ DynamicActor::DynamicActor(float x, float z)
 	this->path = nullptr;
 	this->state = State::Idle;
 	this->aggroRange = 80;
+	btRigidBody* tempo = physics->addBox(btVector3(x, position.y, z), btVector3(getScale().x, getScale().y, getScale().z), 10.0f);
+	setRigidBody(tempo, physics);
+	getRigidBody()->activate();
+	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	getRigidBody()->setFriction(0);
+	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
 
 }
 
@@ -35,6 +41,7 @@ void DynamicActor::move()
 	}
 
 	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed;
+	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 200);
 	Vector3 targetToSelf = (temp - position);
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)
@@ -47,7 +54,7 @@ void DynamicActor::move()
 		this->setRotation(Vector3(0, newRot - (DirectX::XM_PI / 2), 0));
 	}
 
-	position = temp;
+	//position = temp;
 	// Reset accelertion to 0 each cycle
 	acceleration *= 0;
 }

@@ -12,7 +12,7 @@ class Actor : public GameObject
 {
 public:
 	Actor();
-	Actor(float x, float z);
+	Actor(float x, float z,Physics* physics);
 	virtual ~Actor();
 	virtual void update(float dt, const Vector3& targetPos);
 	virtual void setUpActor() = 0 {};

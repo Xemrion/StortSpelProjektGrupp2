@@ -12,7 +12,7 @@ Actor::Actor()
 
 }
 
-Actor::Actor(float x, float z)
+Actor::Actor(float x, float z,Physics* physics)
 {
 	this->mesh = Game::getGraphics().getMeshPointer("Cube");
 
@@ -20,6 +20,7 @@ Actor::Actor(float x, float z)
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, -1.0f, z);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+
 
 }
 Actor::~Actor()

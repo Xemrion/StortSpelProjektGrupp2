@@ -4,8 +4,8 @@ Boss::Boss()
 {
 }
 
-Boss::Boss(float x, float z, int weaponType)
-	:DynamicActor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity,&this->deltaTime, weaponType)
+Boss::Boss(float x, float z, int weaponType, Physics* physics)
+	:DynamicActor(x, z,physics), Ranged(&this->position, &this->targetPos, &this->velocity,&this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.05f, 0.05f, 0.05f));
 	setUpActor();

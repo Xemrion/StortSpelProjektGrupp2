@@ -23,7 +23,7 @@ void Spitfire::setUpActor()
 }
 
 Spitfire::Spitfire(float x, float z, Physics* physics)
-	: DynamicActor(x, z)
+	: DynamicActor(x, z,physics)
 {
 	velocity = Vector2(0.0f, 0.0f);
 

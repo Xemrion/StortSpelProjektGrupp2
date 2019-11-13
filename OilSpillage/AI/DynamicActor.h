@@ -4,7 +4,7 @@ class DynamicActor : public Actor
 {
 public:
 	DynamicActor();
-	DynamicActor(float x,float z);
+	DynamicActor(float x,float z, Physics* physics);
 	virtual ~DynamicActor();
 	void setPath(std::vector<Vector3>* path);
 	virtual void update(float dt, const Vector3& targetPos);

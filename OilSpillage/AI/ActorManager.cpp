@@ -75,15 +75,15 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	frameCount++;
 }
 
-void ActorManager::createAttacker(float x, float z, int weaponType)
+void ActorManager::createAttacker(float x, float z, int weaponType, Physics* physics)
 {
-	this->actors.push_back(new Attacker(x, z, weaponType));
+	this->actors.push_back(new Attacker(x, z, weaponType,physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createTurret(float x, float z, int weaponType)
+void ActorManager::createTurret(float x, float z, int weaponType,Physics* physics)
 {
-	turretHandler.createTurret(x, z, weaponType);
+	turretHandler.createTurret(x, z, weaponType,physics);
 }
 
 void ActorManager::createSpitFire(float x, float z, Physics* physics)
@@ -98,15 +98,15 @@ void ActorManager::createChaseCar(float x, float z, Physics* physics)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createSwarm(float x, float z, int weaponType)
+void ActorManager::createSwarm(float x, float z, int weaponType, Physics* physics)
 {
-	this->actors.push_back(new Swarm(x, z, weaponType));
+	this->actors.push_back(new Swarm(x, z, weaponType,physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createBoss(float x, float z, int weaponType)
+void ActorManager::createBoss(float x, float z, int weaponType, Physics* physics)
 {
-	this->actors.push_back(new Boss(x, z, weaponType));
+	this->actors.push_back(new Boss(x, z, weaponType,physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
@@ -184,9 +184,9 @@ void ActorManager::spawnAttackers(const Vector3& originPos, int weaponType)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createAttacker(originPos.x + i, originPos.z, weaponType);
+	/*	createAttacker(originPos.x + i, originPos.z, weaponType);
 		createAttacker(originPos.x, originPos.z + 1, weaponType);
-		createAttacker(originPos.x - i, originPos.z, weaponType);
+		createAttacker(originPos.x - i, originPos.z, weaponType);*/
 	}
 }
 
@@ -195,18 +195,18 @@ void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float an
 	if (angle != 0)
 	{
 		Vector2& newPosition = generateAroundaPoint(position.x, position.z, angle);
-		createTurret(newPosition.x, newPosition.y, weaponType);
+	//	createTurret(newPosition.x, newPosition.y, weaponType);
 	}
 	else
 	{
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
-		createTurret(newPosition.x, newPosition.y, weaponType);
+	//	createTurret(newPosition.x, newPosition.y, weaponType);
 	}
 }
 
 void ActorManager::spawnBoss(const Vector3& originPos, int weaponType)
 {
-	createBoss(originPos.x, originPos.z, weaponType);
+	//createBoss(originPos.x, originPos.z, weaponType);
 }
 
 Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)
