@@ -208,7 +208,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	graphics.setVectorField(4.5f, 3.0f);
 
-	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
+	powerUps.push_back(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
 
 	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
@@ -556,20 +556,20 @@ void PlayingGameState::update(float deltaTime)
 				powerUps.begin(),
 				powerUps.end(),
 				[&](PowerUp& p) {
-			p.update(time);
-			if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
-			{
-				player->powerUp(p.getPowerUpType());
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
+					p.update(time);
+					if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
+					{
+						player->addPowerUp(p.getPowerUpType());
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
 			),
 			powerUps.end()
-			);
+		);
 
 		if (time == 0)
 		{

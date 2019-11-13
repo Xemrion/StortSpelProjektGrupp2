@@ -166,6 +166,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		{
 			this->resetHealth();
 			this->immortal = true;
+			this->immortalTimer = 5.0f;
 			this->vehicle->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getRespawnPosition());
 			this->vehicleBody1->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getRespawnPosition() + Vector3(0.0f, 0.65f, 0.0f));
 
@@ -177,20 +178,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	{
 		this->respawnTimer = 0.0f;
 	}
-	for (int i = 0; i < (int)PowerUpType::Length; ++i)
-	{
-		powerUpTimers[i] = max(powerUpTimers[i] - deltaTime, 0.0f);
-	}
-	if (powerUpTimers[(int)PowerUpType::Speed] > 0.0)
-	{
-		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate * 3.0f;
-		this->vehicle->setColor(Vector4(0.0, 1.0, 0.0, 1.0));
-	}
-	else
-	{
-		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate;
-		this->vehicle->setColor(Vector4(0.0, 0.0, 0.0, 1.0));
-	}
+	updatePowerUpEffects(deltaTime);
 	
 	tempTargetRotation = targetRotation;
 
@@ -455,11 +443,11 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 	if (this->immortal)
 	{
-		this->immortalTimer += deltaTime;
+		this->immortalTimer -= deltaTime;
 		float sine = sin((this->immortalTimer - 0) / 0.3f) - 0.5f;
 		float color = max(sine, 0.0f);
 		this->vehicleBody1->setColor(Vector4(color, color, color, color));
-		if (this->immortalTimer > 5)
+		if (this->immortalTimer <= 0)
 		{
 			this->immortalTimer = 0.0f;
 			this->immortal = false;
@@ -659,7 +647,7 @@ void Vehicle::resetHealth()
 
 void Vehicle::changeHealth(int amount)
 {
-	if (!this->immortal)
+	if (!this->immortal && powerUpTimers[(int)PowerUpType::Star] <= 0.0)
 	{
 		if (amount < 0) {
 			dmg = true;
@@ -804,7 +792,7 @@ Bullet* Vehicle::getBulletArray(size_t& count)
 	return bullets;
 }
 
-void Vehicle::powerUp(PowerUpType type)
+void Vehicle::addPowerUp(PowerUpType type)
 {
 	if (type == PowerUpType::Time)
 	{
@@ -817,6 +805,58 @@ void Vehicle::powerUp(PowerUpType type)
 	else if (type == PowerUpType::Speed)
 	{
 		this->powerUpTimers[(int)PowerUpType::Speed] += 30.0;
+	}
+	else if (type == PowerUpType::Star)
+	{
+		this->powerUpTimers[(int)PowerUpType::Star] += 30.0;
+	}
+}
 
+void Vehicle::updatePowerUpEffects(float deltaTime)
+{
+	// star power up
+	if (powerUpTimers[(int)PowerUpType::Star] > 0.0)
+	{
+		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate * 3.0f;
+		this->updatedStats.handlingRate = this->defaultStats.handlingRate * 3.0f;
+
+		// animation
+		float time = dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime();
+		this->vehicleBody1->setColor(Vector4(fmod(time * 3.14, 1.0), fmod(time * 2.33, 1.0), fmod(time * 2.81, 1.0), 1.0));
+		btVector3 btVelocity = vehicle->getRigidBody()->getLinearVelocity();
+		Vector3 velocity = Vector3(btVelocity.getX(), btVelocity.getY(), btVelocity.getZ());
+		Game::getGraphics().addParticle(this->vehicleBody1->getPosition(),
+			Vector3(0.0, 10.0, 0.0) + velocity,
+			1,
+			10.5f,
+			11.f);
+		Game::getGraphics().addParticle(this->vehicleBody1->getPosition(),
+			Vector3(0.0, 0.0, 10.0) + velocity,
+			1,
+			10.5f,
+			10.f);
+		Game::getGraphics().addParticle(this->vehicleBody1->getPosition(),
+			Vector3(10.0, 0.0, 0.0) + velocity,
+			1,
+			10.5f,
+			10.f);
+	}
+	// speed power up
+	else if (powerUpTimers[(int)PowerUpType::Speed] > 0.0)
+	{
+		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate * 3.0f;
+		this->vehicleBody1->setColor(Vector4(0.0, 1.0, 0.0, 1.0));
+	}
+	// reset stats if no power up
+	else
+	{
+		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate;
+		this->updatedStats.handlingRate = this->defaultStats.handlingRate;
+		this->vehicleBody1->setColor(Vector4(0.0, 0.0, 0.0, 1.0));
+	}
+
+	for (int i = 0; i < (int)PowerUpType::Length; ++i)
+	{
+		powerUpTimers[i] = max(powerUpTimers[i] - deltaTime, 0.0f);
 	}
 }

@@ -83,7 +83,6 @@ private:
 	float velocitySimple;
 	float velocitySpeed;
 	class Physics* physics;
-
 public:
 	Vehicle();
 	virtual ~Vehicle();
@@ -125,7 +124,8 @@ public:
 	float getHeading(Quaternion qt);
 
 	Bullet* getBulletArray(size_t& count);
-	void powerUp(PowerUpType p);
+	void addPowerUp(PowerUpType p);
+	void updatePowerUpEffects(float deltaTime);
 };
 
 #endif // !VEHICLE_H
