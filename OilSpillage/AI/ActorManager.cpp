@@ -60,8 +60,8 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		{
 			if (actors[i]->isDead())
 			{
-				delete actors[i];
-				actors.erase(actors.begin() + i);
+				destroyActor(i);
+				
 			}
 		}
 	}
@@ -456,6 +456,16 @@ void ActorManager::updateGroups()
 			i = 0;
 		}
 	}
+}
+
+void ActorManager::destroyActor(int index)
+{
+	if (actors[index]->getRigidBody() != nullptr)
+	{
+		physics->DeleteRigidBody(actors[index]->getRigidBody());
+	}
+	delete actors[index];
+	actors.erase(actors.begin() + index);
 }
 
 void ActorManager::initGroupForActor(DynamicActor* actor)

@@ -14,7 +14,7 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 	this->path = nullptr;
 	this->state = State::Idle;
 	this->aggroRange = 80;
-	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(x, position.y, z), 1.0f);
+	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(x, position.y, z),0.5f);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
@@ -25,6 +25,7 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 
 DynamicActor::~DynamicActor()
 {
+	
 }
 
 void DynamicActor::move()
