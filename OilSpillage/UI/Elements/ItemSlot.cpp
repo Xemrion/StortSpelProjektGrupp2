@@ -17,11 +17,8 @@ void ItemSlot::addTextbox()
 ItemSlot::ItemSlot(Vector2 position, bool showTextBox) : Element(position), showTextBox(showTextBox), slot(nullptr), rotationTimer(0)
 {
 	Game::getGraphics().loadTexture("UI/itemSlot");
-	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
 	this->textureSlot = Game::getGraphics().getTexturePointer("UI/itemSlot");
-	this->textureIndicator = Game::getGraphics().getTexturePointer("UI/itemSelectorIndicator");
 	assert(textureSlot && "Texture failed to load!");
-	assert(textureIndicator && "Texture failed to load!");
 }
 
 ItemSlot::~ItemSlot()
@@ -32,14 +29,9 @@ void ItemSlot::draw(bool selected)
 {
 	UserInterface::getSpriteBatch()->Draw(this->textureSlot->getShaderResView(), this->position);
 
-	if (selected)
+	if (selected && this->textBox)
 	{
-		UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position);
-
-		if (this->textBox)
-		{
-			this->textBox->draw(selected);
-		}
+		this->textBox->draw(selected);
 	}
 }
 

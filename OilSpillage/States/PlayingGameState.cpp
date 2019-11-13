@@ -646,6 +646,7 @@ void PlayingGameState::update(float deltaTime)
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
 
+	graphics.clearScreen(Vector4(0, 0, 0, 1));
 	graphics.setSpotLighShadow(playerLight);
 	graphics.render(camera.get(), deltaTime);
 

@@ -56,7 +56,6 @@ void UIUpgrading::updateUI(float deltaTime)
 void UIUpgrading::drawUI()
 {
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	this->itemSelector->draw(false);
 	this->gadgetSelector->draw(!this->selectingItem);
 	this->statBox->draw(!this->selectingItem);
 
@@ -77,7 +76,12 @@ void UIUpgrading::drawUI()
 		break;
 	}
 
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), type, Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2 - 200.0f, SCREEN_HEIGHT - ItemSelector::size.y + 65.0f), Colors::White, 0, Vector2::Zero, 0.5f);
+	UserInterface::getSpriteBatch()->Draw(this->textureSelectorTitleBG->getShaderResView(), this->itemSelector->getPosition() + Vector2(-250.0f, 0.0f));
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), type, Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2 - 180.0f, SCREEN_HEIGHT - ItemSelector::size.y + 65.0f), Colors::White, 0, Vector2::Zero, 0.5f);
+	this->itemSelector->draw(false);
+
+	Vector2 textSize = UserInterface::getFontArial()->MeasureString("Upgrading");
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Upgrading", Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 0), Colors::White);
 	UserInterface::getSpriteBatch()->End();
 }
 
@@ -91,9 +95,13 @@ UIUpgrading::~UIUpgrading()
 
 void UIUpgrading::init()
 {
+	Game::getGraphics().loadTexture("UI/itemSelectorTitleBG");
+	this->textureSelectorTitleBG = Game::getGraphics().getTexturePointer("UI/itemSelectorTitleBG");
+	assert(textureSelectorTitleBG && "Texture failed to load!");
+
 	this->itemSelector = std::make_unique<ItemSelector>(Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2, SCREEN_HEIGHT - ItemSelector::size.y));
-	this->gadgetSelector = std::make_unique<CarGadgetSelector>(Vector2(ItemSlot::size.x + 20.0f, ItemSlot::size.x + 20.0f));
-	this->statBox = std::make_unique<VehicleStatBox>(Vector2(SCREEN_WIDTH - VehicleStatBox::size.x - 10.0f, SCREEN_HEIGHT / 2 - VehicleStatBox::size.y / 2));
+	this->gadgetSelector = std::make_unique<CarGadgetSelector>(Vector2::Zero);
+	this->statBox = std::make_unique<VehicleStatBox>(Vector2(SCREEN_WIDTH - VehicleStatBox::size.x, 0));
 
 	this->itemSelector->setUsed(this->gadgetSelector->getUsed());
 }

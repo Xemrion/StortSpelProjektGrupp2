@@ -4,19 +4,25 @@
 #include <cassert>
 #include "../../States/UpgradingGameState.h"
 
-Vector2 CarGadgetSelector::size = Vector2(180, 300);
+Vector2 CarGadgetSelector::size = Vector2(325, 490);
 
 CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position)
 {
+	Game::getGraphics().loadTexture("UI/statBG");
 	Game::getGraphics().loadTexture("UI/carTopdown");
-	this->textureBG = Game::getGraphics().getTexturePointer("UI/carTopdown");
+	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
+	this->textureBG = Game::getGraphics().getTexturePointer("UI/statBG");
+	this->textureCar = Game::getGraphics().getTexturePointer("UI/carTopdown");
+	this->textureIndicator = Game::getGraphics().getTexturePointer("UI/itemSelectorIndicator");
 	assert(textureBG && "Texture failed to load!");
+	assert(textureCar && "Texture failed to load!");
+	assert(textureIndicator && "Texture failed to load!");
 
-	this->slots[Slots::FRONT] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x / 2 - ItemSlot::size.x / 2, -ItemSlot::size.y - 10.0f), false);
+	this->slots[Slots::FRONT] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x / 2 - ItemSlot::size.x / 2, 32.0f), false);
 	this->slots[Slots::MOUNTED] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x / 2 - ItemSlot::size.x / 2, CarGadgetSelector::size.y / 2 - ItemSlot::size.y / 2), false);
-	this->slots[Slots::BACK] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x / 2 - ItemSlot::size.x / 2, CarGadgetSelector::size.y + 10.0f), false);
-	this->slots[Slots::LEFT] = std::make_unique<ItemSlot>(position + Vector2(-ItemSlot::size.x - 10.0f, CarGadgetSelector::size.y / 2 - ItemSlot::size.y / 2), false);
-	this->slots[Slots::RIGHT] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x + 10.0f, CarGadgetSelector::size.y / 2 - ItemSlot::size.y / 2), false);
+	this->slots[Slots::BACK] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x / 2 - ItemSlot::size.x / 2, CarGadgetSelector::size.y - ItemSlot::size.y - 32.0f), false);
+	this->slots[Slots::LEFT] = std::make_unique<ItemSlot>(position + Vector2(21.0f, CarGadgetSelector::size.y / 2 - ItemSlot::size.y / 2), false);
+	this->slots[Slots::RIGHT] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x - ItemSlot::size.y - 21.0f, CarGadgetSelector::size.y / 2 - ItemSlot::size.y / 2), false);
 
 	this->slots[Slots::FRONT]->setNeighbours(this->slots[Slots::LEFT].get(), this->slots[Slots::RIGHT].get(), this->slots[Slots::BACK].get(), this->slots[Slots::MOUNTED].get());
 	this->slots[Slots::MOUNTED]->setNeighbours(this->slots[Slots::LEFT].get(), this->slots[Slots::RIGHT].get(), this->slots[Slots::FRONT].get(), this->slots[Slots::BACK].get());
@@ -35,10 +41,16 @@ CarGadgetSelector::~CarGadgetSelector()
 void CarGadgetSelector::draw(bool selected)
 {
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), this->position);
+	UserInterface::getSpriteBatch()->Draw(this->textureCar->getShaderResView(), this->position + (CarGadgetSelector::size * 0.5f - this->textureCar->getCenter()));
 
 	for (int i = 0; i < Slots::SIZEOF; i++)
 	{
-		this->slots[i]->draw(selected && this->selected == this->slots[i].get());
+		this->slots[i]->draw(slots[i].get() == this->selected);
+	}
+
+	if (selected)
+	{
+		UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->selected->getPosition());
 	}
 }
 

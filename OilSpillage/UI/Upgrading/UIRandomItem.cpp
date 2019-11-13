@@ -43,11 +43,12 @@ void UIRandomItem::drawUI()
 	{
 		slots[i]->draw(slots[i].get() == this->selected);
 	}
-	
+
+	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->selected->getPosition());
 	UserInterface::getSpriteBatch()->End();
 }
 
-UIRandomItem::UIRandomItem() : selected(nullptr), slots{}
+UIRandomItem::UIRandomItem() : textureIndicator(nullptr), selected(nullptr), slots{}
 {
 }
 
@@ -57,6 +58,10 @@ UIRandomItem::~UIRandomItem()
 
 void UIRandomItem::init()
 {
+	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
+	this->textureIndicator = Game::getGraphics().getTexturePointer("UI/itemSelectorIndicator");
+	assert(textureIndicator && "Texture failed to load!");
+
 	for (int i = 0; i < UIRandomItem::slotCount; i++)
 	{
 		slots[i] = std::make_unique<ItemSlot>(Vector2(SCREEN_WIDTH / 2 - (UIRandomItem::slotCount / 2.0f) * (ItemSlot::size.x + 20) + i * 20.0f, SCREEN_HEIGHT / 2) + Vector2(i, -0.5f) * ItemSlot::size);

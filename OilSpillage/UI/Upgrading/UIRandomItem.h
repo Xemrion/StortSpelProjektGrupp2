@@ -12,6 +12,7 @@ private:
 	void updateUI(float deltaTime);
 	void drawUI();
 
+	Texture* textureIndicator;
 	Element* selected;
 	std::unique_ptr<ItemSlot> slots[slotCount];
 	Container::Slot container[slotCount];

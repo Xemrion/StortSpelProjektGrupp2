@@ -8,6 +8,7 @@
 class VehicleStatBox : public Element
 {
 private:
+	Texture* textureBackground;
 	Texture* textureFG;
 	Texture* textureBG;
 	float amounts[6];

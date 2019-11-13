@@ -9,6 +9,9 @@ class CarGadgetSelector : public Element
 {
 private:
 	Texture* textureBG;
+	Texture* textureCar;
+	Texture* textureIndicator;
+
 	Element* selected;
 	std::unique_ptr<ItemSlot> slots[Slots::SIZEOF];
 	std::unique_ptr<Container::Slot*[]> used;

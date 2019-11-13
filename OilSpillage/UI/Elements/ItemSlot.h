@@ -16,7 +16,6 @@ private:
 	std::unique_ptr<TextBox> textBox;
 	bool showTextBox;
 	Texture* textureSlot;
-	Texture* textureIndicator;
 	Container::Slot* slot;
 
 	float rotationTimer;

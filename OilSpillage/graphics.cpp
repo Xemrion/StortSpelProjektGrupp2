@@ -376,7 +376,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	float color[4] = {
 		0,0,0,1
 	};
-	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	//deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);

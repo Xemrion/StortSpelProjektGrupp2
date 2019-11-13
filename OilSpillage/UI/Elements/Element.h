@@ -29,6 +29,7 @@ public:
 	Element* getRight() const;
 	Element* getUp() const;
 	Element* getDown() const;
+	Vector2 getPosition() const;
 };
 
 #endif // !ELEMENT_H
