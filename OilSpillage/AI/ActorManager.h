@@ -12,6 +12,7 @@ public:
 	enum Radius { CLOSE, MIDDLE, OUTER };
 	void update(float dt, const Vector3& targetPos);
 	void createAttacker(float x, float z, int weaponType);
+	void createSniper(float x, float z, int weaponType);
 	void createTurret(float x, float z, int weaponType);
 	void createSwarm(float x, float z, int weaponType);
 	void createBoss(float x, float z, int weaponType);
