@@ -30,7 +30,7 @@ Turret::~Turret()
 	Game::getGraphics().removeFromDraw(&this->body);
 }
 
-void Turret::update(float dt, Vector3 targetPos)
+void Turret::update(float dt, const Vector3& targetPos)
 {
 	Actor::update(dt, targetPos);
 	updateBullets(dt);

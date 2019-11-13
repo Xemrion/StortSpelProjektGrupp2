@@ -17,8 +17,8 @@ void PlayingGameState::initAI()
 	{
 		for (int j = 0; j < 1; j++)
 		{
-			actorManager->createSniper(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
-			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j,1);
+			//actorManager->createSniper(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
+			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j,1);
 		}
 	}
 }

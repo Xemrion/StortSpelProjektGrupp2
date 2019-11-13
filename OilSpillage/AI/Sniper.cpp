@@ -25,7 +25,7 @@ Sniper::~Sniper()
 	Game::getGraphics().removeFromDraw(this);
 }
 
-void Sniper::update(float dt, Vector3 targetPos)
+void Sniper::update(float dt, const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	this->updateBullets(dt);

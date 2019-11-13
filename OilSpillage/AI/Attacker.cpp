@@ -5,7 +5,7 @@ Attacker::Attacker()
 }
 
 Attacker::Attacker(float x, float z, int weaponType)
-	:DynamicActor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity,&this->deltaTime, weaponType)
+	:DynamicActor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
@@ -16,10 +16,10 @@ Attacker::Attacker(float x, float z, int weaponType)
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
-
+	this->attackRange = 10;
 }
 
-void Attacker::update(float dt, Vector3 targetPos)
+void Attacker::update(float dt, const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	this->updateBullets(dt);
