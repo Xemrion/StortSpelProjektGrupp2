@@ -5,6 +5,7 @@
 #include "Swarm.h"
 #include "Car_Spitfire.h"
 #include "Boss.h"
+#include "Sniper.h"
 
 ActorManager::ActorManager()
 {
@@ -78,6 +79,12 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 void ActorManager::createAttacker(float x, float z, int weaponType)
 {
 	this->actors.push_back(new Attacker(x, z, weaponType));
+	initGroupForActor(actors.at(actors.size() - 1));
+}
+
+void ActorManager::createSniper(float x, float z, int weaponType)
+{
+	this->actors.push_back(new Sniper(x, z, weaponType));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
