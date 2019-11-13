@@ -84,9 +84,10 @@ void ActorManager::createAttacker(float x, float z, int weaponType, Physics* phy
 
 void ActorManager::createSniper(float x, float z, int weaponType, Physics* physics)
 {
-	this->actors.push_back(new Sniper(x, z, weaponType));
+	this->actors.push_back(new Sniper(x, z, weaponType, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
+
 void ActorManager::createTurret(float x, float z, int weaponType,Physics* physics)
 {
 	turretHandler.createTurret(x, z, weaponType,physics);
