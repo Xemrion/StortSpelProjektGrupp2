@@ -89,17 +89,11 @@ UIUpgrading::~UIUpgrading()
 {
 }
 
-VehicleSlots* UIUpgrading::getVehicleSlots()
-{
-	return this->vehicleSlots.get();
-}
-
 void UIUpgrading::init()
 {
-	this->vehicleSlots = std::make_unique<VehicleSlots>();
 	this->itemSelector = std::make_unique<ItemSelector>(Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2, SCREEN_HEIGHT - ItemSelector::size.y));
 	this->gadgetSelector = std::make_unique<CarGadgetSelector>(Vector2(ItemSlot::size.x + 20.0f, ItemSlot::size.x + 20.0f));
 	this->statBox = std::make_unique<VehicleStatBox>(Vector2(SCREEN_WIDTH - VehicleStatBox::size.x - 10.0f, SCREEN_HEIGHT / 2 - VehicleStatBox::size.y / 2));
 
-	this->itemSelector->setUsedSlots(this->gadgetSelector->getUsedSlots());
+	this->itemSelector->setUsed(this->gadgetSelector->getUsed());
 }

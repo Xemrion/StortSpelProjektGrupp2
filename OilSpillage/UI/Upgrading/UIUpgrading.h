@@ -17,12 +17,10 @@ private:
 	std::unique_ptr<ItemSelector> itemSelector;
 	std::unique_ptr<CarGadgetSelector> gadgetSelector;
 	std::unique_ptr<VehicleStatBox> statBox;
-	std::unique_ptr<VehicleSlots> vehicleSlots;
 public:
 	UIUpgrading();
 	virtual ~UIUpgrading();
 
-	VehicleSlots* getVehicleSlots();
 	void init();
 };
 

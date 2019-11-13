@@ -6,7 +6,7 @@
 
 Vector2 CarGadgetSelector::size = Vector2(180, 300);
 
-CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position), used{ InventorySlot() }
+CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position)
 {
 	Game::getGraphics().loadTexture("UI/carTopdown");
 	this->textureBG = Game::getGraphics().getTexturePointer("UI/carTopdown");
@@ -23,8 +23,9 @@ CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position), used
 	this->slots[Slots::BACK]->setNeighbours(this->slots[Slots::LEFT].get(), this->slots[Slots::RIGHT].get(), this->slots[Slots::MOUNTED].get(), this->slots[Slots::FRONT].get());
 	this->slots[Slots::LEFT]->setNeighbours(this->slots[Slots::RIGHT].get(), this->slots[Slots::MOUNTED].get(), this->slots[Slots::FRONT].get(), this->slots[Slots::BACK].get());
 	this->slots[Slots::RIGHT]->setNeighbours(this->slots[Slots::MOUNTED].get(), this->slots[Slots::LEFT].get(), this->slots[Slots::FRONT].get(), this->slots[Slots::BACK].get());
-
 	this->selected = this->slots[Slots::FRONT].get();
+
+	this->used = std::make_unique<Container::Slot*[]>(Slots::SIZEOF);
 }
 
 CarGadgetSelector::~CarGadgetSelector()
@@ -49,43 +50,42 @@ void CarGadgetSelector::update(bool selected, float deltaTime)
 	}
 }
 
-void CarGadgetSelector::setSlotOfSelected(InventorySlot slot)
+void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
 {
 	for (int i = 0; i < Slots::SIZEOF; i++)
 	{
-		if (this->slots[i]->getInventorySlot() == slot)
+		if (this->slots[i]->getSlot() == slot)
 		{
-			this->slots[i]->setItem(nullptr);
-			this->used[i] = InventorySlot();
+			this->slots[i]->setSlot(nullptr);
+			this->used[i] = nullptr;
 			static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(static_cast<Slots>(i), nullptr);
 		}
 	}
 
 	if (this->selected == this->slots[Slots::LEFT].get() || this->selected == this->slots[Slots::RIGHT].get())
 	{
-		this->slots[Slots::LEFT]->setInventorySlot(slot);
-		this->slots[Slots::RIGHT]->setInventorySlot(slot);
+		this->slots[Slots::LEFT]->setSlot(slot);
+		this->slots[Slots::RIGHT]->setSlot(slot);
 		this->used[Slots::LEFT] = slot;
 		this->used[Slots::RIGHT] = slot;
 
-		Item* newItem = new Item(*this->slots[Slots::RIGHT]->getItem());
+		Item* newItem = new Item(*this->slots[Slots::RIGHT]->getSlot()->item);
 		static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots::RIGHT, newItem);
 
-		newItem = new Item(*this->slots[Slots::LEFT]->getItem());
+		newItem = new Item(*this->slots[Slots::LEFT]->getSlot()->item);
 		static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots::LEFT, newItem);
 	}
 	else
 	{
 		ItemSlot* itemSlot = static_cast<ItemSlot*>(this->selected);
-		itemSlot->setInventorySlot(slot);
+		itemSlot->setSlot(slot);
 
 		for (int i = 0; i < Slots::SIZEOF; i++)
 		{
 			if (this->slots[i].get() == this->selected)
 			{
 				this->used[i] = slot;
-
-				Item* newItem = 
+				Item* newItem = new Item(*itemSlot->getSlot()->item);
 				static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(static_cast<Slots>(i), newItem);
 				break;
 			}
@@ -93,7 +93,7 @@ void CarGadgetSelector::setSlotOfSelected(InventorySlot slot)
 	}
 }
 
-InventorySlot* CarGadgetSelector::getUsedSlots()
+Container::Slot** CarGadgetSelector::getUsed()
 {
-	return this->used;
+	return this->used.get();
 }
