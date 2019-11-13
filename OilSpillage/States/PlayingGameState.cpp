@@ -1,6 +1,6 @@
 #include "PlayingGameState.h"
-#include "../Input.h"
 #include "../Sound.h"
+#include "../Input.h"
 #include "../UI/UIPlaying.h"
 #include "../UI/UIPaused.h"
 #include "../UI/UIOptions.h"

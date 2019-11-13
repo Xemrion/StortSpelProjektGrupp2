@@ -1,35 +1,36 @@
-#include "Attacker.h"
-#include"../States/PlayingGameState.h"
-Attacker::Attacker()
+#include "Sniper.h"
+#include "..//States/PlayingGameState.h"
+Sniper::Sniper()
 {
+
 }
 
-Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
-	:DynamicActor(x, z,physics), Ranged(&this->position, &this->targetPos, &this->velocity,&this->deltaTime, weaponType)
+Sniper::Sniper(float x, float z, int weaponType)
+	:DynamicActor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
 	Game::getGraphics().addToDraw(this);
 
-	this->stats = VehicleStats::AIAttacker;
+	this->stats = VehicleStats::AISniper;
 	setHealth(this->stats.maxHealth);
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
-
 }
 
-void Attacker::update(float dt, Vector3 targetPos)
+Sniper::~Sniper()
+{
+	Game::getGraphics().removeFromDraw(this);
+}
+
+void Sniper::update(float dt, Vector3 targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	this->updateBullets(dt);
 }
 
-Attacker::~Attacker()
-{
-	Game::getGraphics().removeFromDraw(this);
-}
-void Attacker::setUpActor()
+void Sniper::setUpActor()
 {
 	this->root = &bt.getSelector();
 	Sequence& sequence = bt.getSequence();
@@ -37,17 +38,17 @@ void Attacker::setUpActor()
 	Sequence& seq2 = bt.getSequence();
 
 	Behavior& inRange = bt.getAction();
-	inRange.addAction(std::bind(&Attacker::inAttackRange, std::ref(*this)));
+	inRange.addAction(std::bind(&Sniper::inAttackRange, std::ref(*this)));
 	//Behavior& waitTimer = bt.getAction();
-	//waitTimer.addAction(std::bind(&Attacker::WaitTime, std::ref(*this)));
+	//waitTimer.addAction(std::bind(&Sniper::WaitTime, std::ref(*this)));
 	Behavior& chase = bt.getAction();
-	chase.addAction(std::bind(&Attacker::setChaseState, std::ref(*this)));
+	chase.addAction(std::bind(&Sniper::setChaseState, std::ref(*this)));
 	Behavior& roam = bt.getAction();
-	roam.addAction(std::bind(&Attacker::setIdleState, std::ref(*this)));
+	roam.addAction(std::bind(&Sniper::setIdleState, std::ref(*this)));
 	Behavior& shoot = bt.getAction();
-	shoot.addAction(std::bind(&Attacker::shoot, std::ref(*this)));
+	shoot.addAction(std::bind(&Sniper::shoot, std::ref(*this)));
 	Behavior& inAggroRange = bt.getAction();
-	inAggroRange.addAction(std::bind(&Attacker::inAggroRange, std::ref(*this)));
+	inAggroRange.addAction(std::bind(&Sniper::inAggroRange, std::ref(*this)));
 
 	root->addChildren(sequence);
 	root->addChildren(roam);
@@ -59,13 +60,22 @@ void Attacker::setUpActor()
 	selector.addChildren(chase);
 
 	seq2.addChildren(inRange);
-	
+
 	//seq2.addChildren(waitTimer);
 	seq2.addChildren(shoot);
 }
 
-Vector3 Attacker::seek()
+Vector3 Sniper::seek()
 {
+	////static_cast<PlayingGameState*>(Game::getCurrentState());
+	//Vector3 aimRay = Vector3(Input::getDirectionR().x, 0.0f, Input::getDirectionR().y);
+	////Ray casting stuff
+	//if(this->getAABB().intersect(targetPos, aimRay, 0))
+	//{
+	//	
+	//}
+	////
+
 	Vector3 desiredDirection;
 	Vector3 offsetVec;
 	Vector3 eliminatingVec = Vector3(0.0f, -1.0f, 0.0f) - Vector3(0.0f, 1.0f, 0.0f);
@@ -88,7 +98,7 @@ Vector3 Attacker::seek()
 		crossVector *= -10;
 		desiredDirection -= position - (destination - crossVector);
 	}
-	
+
 
 	acceleration = desiredDirection - velocity;
 	if (acceleration.Length() > maxForce)
@@ -97,5 +107,5 @@ Vector3 Attacker::seek()
 	}
 	//vActive = false;
 	return acceleration;
+	
 }
-
