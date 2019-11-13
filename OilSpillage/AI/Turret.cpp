@@ -19,7 +19,7 @@ Turret::Turret(float x, float z, int weaponType, Physics* physics)
 	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
 	Game::getGraphics().addToDraw(&this->body);
 	Game::getGraphics().addToDraw(this);
-	btRigidBody* tempo = physics->addBox(btVector3(position.x, position.y, position.z), btVector3(1, 1, 1), 0);
+	btRigidBody* tempo = physics->addSphere(0.5f, btVector3(position.x, position.y, position.z), 0);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
