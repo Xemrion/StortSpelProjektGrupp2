@@ -607,7 +607,7 @@ Vector3 Map::getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcep
    return result;
 }
 
-District::Type const *Map::getDistrictAt( U32 x, U32 y ) const noexcept {
+District::Type const *Map::districtAt( U32 x, U32 y ) const noexcept {
 	auto tileIdx = districtMap->diagramIndex(x,y);
 	auto cellIdx = districtMap->diagram[ tileIdx ];
 	return districtLookupTable[ cellIdx ];
@@ -658,7 +658,7 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 			auto &entry        = results[ tilemap.index(x,y) ];
 			entry.origin       = tilemap.convertTilePositionToWorldPosition(x,y);
 			entry.tileType     = tilemap.tileAt(x,y);
-			entry.districtType = map.getDistrictAt(x,y);
+			entry.districtType = map.districtAt(x,y);
 			if ( (y > 0) and (tilemap.tileAt(x,y-1)==Tile::road) )
 				entry.roadmap.n  = true;
 			if ( (x < tilemap.width-1) and (y > 0) and (tilemap.tileAt(x+1,y-1)==Tile::road) )
@@ -724,7 +724,7 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 					// check bounds:
 					if ( (nX < tilemap.width) and (nY < tilemap.height) ) {
 						// in-bounds:
-						auto nDistrict = map.getDistrictAt(nX,nY);
+						auto nDistrict = map.districtAt(nX,nY);
 						auto nTile     = tilemap.tileAt(nX,nY);
 
 						if ( (entry.districtType == &District::residential or entry.districtType == &District::downtown)
@@ -858,13 +858,10 @@ static U8  constexpr pred3Way { 0b0100'0101 };
 //     x1x     010     010
 static U8  constexpr pred4Way { 0b0101'0101 };
 
-static F32 constexpr baseOffsetY     { -1.50f };
-static F32 constexpr sidewalkOffsetY { -1.49f };
-static F32 constexpr markerOffsetY   { -1.49f };
-
-Biome Map::getBiome() const noexcept {
-	return biome;
-}
+static F32 constexpr baseOffsetY       { -1.50f };
+static F32 constexpr markerOffsetY     { -1.49f };
+static F32 constexpr transitionOffsetY { -1.48f };
+static F32 constexpr sidewalkOffsetY   { -1.47f };
 
 Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 {
@@ -989,6 +986,29 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 			// TODO: park roads using L-systems
 		}
 	}
+
+	// generate transitions:
+	for ( auto y=0;  y < tilemap->height;  ++y ) {
+		for ( auto x=0;  x < tilemap->width;  ++x ) {
+			if ( tilemap->tileAt(x,y) == Tile::road ) {
+				auto thisDistrict = districtAt(x,y);
+				auto thisPos      = tilemap->convertTilePositionToWorldPosition(x,y);
+				if ( thisDistrict == &District::suburban or thisDistrict == &District::park ) {
+					if ( y-1 < tilemap->height and tilemap->tileAt(x,y-1) == Tile::road and districtAt(x,y-1) != &District::park and districtAt(x,y-1) != &District::suburban )
+						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x,y-1))/2,    .0f, transitionOffsetY );
+					if ( x+1 < tilemap->width  and tilemap->tileAt(x+1,y) == Tile::road and districtAt(x+1,y) != &District::park and districtAt(x+1,y) != &District::suburban )
+						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x+1,y))/2,  90.0f, transitionOffsetY );
+					if ( y+1 < tilemap->height and tilemap->tileAt(x,y+1) == Tile::road and districtAt(x,y+1) != &District::park and districtAt(x,y+1) != &District::suburban )
+						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x,y+1))/2, 180.0f, transitionOffsetY );
+					if ( x-1 < tilemap->width  and tilemap->tileAt(x-1,y) == Tile::road and districtAt(x-1,y) != &District::park and districtAt(x-1,y) != &District::suburban )
+						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x-1,y))/2, 270.0f, transitionOffsetY );
+				}
+			}
+		}
+	}
 	return models;
 }
 
+Biome Map::getBiome() const noexcept {
+	return biome;
+}

@@ -1179,7 +1179,7 @@ String createMinimapTexture( Map const &map, Bool isDistrictColoured ) {
    // main loop:
    for ( U16 tileY = 0;  tileY < tilemap.height;  ++tileY ) {
       for ( U16 tileX = 0;  tileX < tilemap.width;  ++tileX ) {
-			RGBA districtColor = districtColors[ map.getDistrictAt(tileX,tileY)->index ];
+			RGBA districtColor = districtColors[ map.districtAt(tileX,tileY)->index ];
 
          // TODO: add district borders?
          switch ( tilemap.tileAt(tileX, tileY) ) {

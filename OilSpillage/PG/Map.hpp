@@ -29,7 +29,7 @@ public:
 	Opt<V2u>                getNearestFoundHospitalTilePos( Vector3 const &sourceWorldPos, UIPlaying const & ) const noexcept;
 	Direction               getHospitalOrientation(   V2u const hospitalTilePos ) const noexcept;
 	Vector3                 getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept;
-	District::Type const   *getDistrictAt( U32 x, U32 y ) const noexcept;
+	District::Type const   *districtAt( U32 x, U32 y ) const noexcept;
 	Biome getBiome() const noexcept;
 private:
 	void                     generateDistricts();
@@ -37,7 +37,7 @@ private:
 	void                     generateBuildings();
 	Opt<Vector<V2u>>         findValidHouseLot( RNG &, U16 districtCellID, Voronoi const &, TileMap & );
 	Vector<UPtr<GameObject>> instantiateTilesAsModels() noexcept;
-
+	void                     generateTransitions() noexcept;
 	Graphics                      &graphics;
 	V2u                            startPositionInTileSpace;
 	UPtr<TileMap>                  tilemap;

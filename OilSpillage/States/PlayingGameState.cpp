@@ -89,6 +89,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("Tiles/desert");
 	graphics.loadTexture("Tiles/desert_nor");
 // graphics.loadTexture("Tiles/desert_spec");
+	graphics.loadTexture("Tiles/road_trans_2file2metro");
+	graphics.loadTexture("Tiles/road_trans_2file2metro_nor");
 	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne");
 	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne_nor");
 	graphics.loadTexture("Tiles/sidewalk_side_n");
