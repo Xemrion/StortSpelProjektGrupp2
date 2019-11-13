@@ -18,7 +18,7 @@ class Item
 {
 private:
 	static std::shared_ptr<GameObject> machineGun;
-	static std::vector<Item> allItems;
+	static std::vector<std::shared_ptr<Item>> allItems;
 protected:
 	std::string name;
 	std::string description;

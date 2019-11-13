@@ -81,10 +81,10 @@ void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
 		this->used[Slots::LEFT] = slot;
 		this->used[Slots::RIGHT] = slot;
 
-		Item* newItem = new Item(*this->slots[Slots::RIGHT]->getSlot()->item);
+		Item* newItem = slot->item->clone();
 		static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots::RIGHT, newItem);
 
-		newItem = new Item(*this->slots[Slots::LEFT]->getSlot()->item);
+		newItem = slot->item->clone();
 		static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots::LEFT, newItem);
 	}
 	else
@@ -97,7 +97,7 @@ void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
 			if (this->slots[i].get() == this->selected)
 			{
 				this->used[i] = slot;
-				Item* newItem = new Item(*itemSlot->getSlot()->item);
+				Item* newItem = slot->item->clone();
 				static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(static_cast<Slots>(i), newItem);
 				break;
 			}
