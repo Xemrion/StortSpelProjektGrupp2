@@ -11,9 +11,10 @@ ActorManager::ActorManager()
 	this->aStar = nullptr;
 }
 
-ActorManager::ActorManager(AStar* aStar)
+ActorManager::ActorManager(AStar* aStar, Physics* physics)
 {
 	this->aStar = aStar;
+	this->physics = physics;
 }
 
 ActorManager::~ActorManager()
@@ -33,7 +34,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	for (int i = 0; i < this->groups.size(); i++)
 	{
 		groups[i].formationP(targetPos);
-		for(int j = 0; j < groups[i].actors.size(); j++)
+		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
 			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
 			{
@@ -75,38 +76,38 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	frameCount++;
 }
 
-void ActorManager::createAttacker(float x, float z, int weaponType, Physics* physics)
+void ActorManager::createAttacker(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Attacker(x, z, weaponType,physics));
+	this->actors.push_back(new Attacker(x, z, weaponType, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createTurret(float x, float z, int weaponType,Physics* physics)
+void ActorManager::createTurret(float x, float z, int weaponType)
 {
-	turretHandler.createTurret(x, z, weaponType,physics);
+	turretHandler.createTurret(x, z, weaponType, physics);
 }
 
-void ActorManager::createSpitFire(float x, float z, Physics* physics)
+void ActorManager::createSpitFire(float x, float z)
 {
 	this->actors.push_back(new Spitfire(x, z, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createChaseCar(float x, float z, Physics* physics)
+void ActorManager::createChaseCar(float x, float z)
 {
 	this->actors.push_back(new ChaseCar(x, z, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createSwarm(float x, float z, int weaponType, Physics* physics)
+void ActorManager::createSwarm(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Swarm(x, z, weaponType,physics));
+	this->actors.push_back(new Swarm(x, z, weaponType, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createBoss(float x, float z, int weaponType, Physics* physics)
+void ActorManager::createBoss(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Boss(x, z, weaponType,physics));
+	this->actors.push_back(new Boss(x, z, weaponType, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
@@ -184,9 +185,9 @@ void ActorManager::spawnAttackers(const Vector3& originPos, int weaponType)
 {
 	for (int i = 0; i < 2; i++)
 	{
-	/*	createAttacker(originPos.x + i, originPos.z, weaponType);
-		createAttacker(originPos.x, originPos.z + 1, weaponType);
-		createAttacker(originPos.x - i, originPos.z, weaponType);*/
+		/*	createAttacker(originPos.x + i, originPos.z, weaponType);
+			createAttacker(originPos.x, originPos.z + 1, weaponType);
+			createAttacker(originPos.x - i, originPos.z, weaponType);*/
 	}
 }
 
@@ -195,12 +196,12 @@ void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float an
 	if (angle != 0)
 	{
 		Vector2& newPosition = generateAroundaPoint(position.x, position.z, angle);
-	//	createTurret(newPosition.x, newPosition.y, weaponType);
+		//	createTurret(newPosition.x, newPosition.y, weaponType);
 	}
 	else
 	{
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
-	//	createTurret(newPosition.x, newPosition.y, weaponType);
+		//	createTurret(newPosition.x, newPosition.y, weaponType);
 	}
 }
 
@@ -247,10 +248,10 @@ void ActorManager::seperation(const Vector3& targetPos)
 {
 	std::vector<Vector3> buildings;
 	float desiredSeparationDistance;
-	for(int i = 0; i < groups.size(); i++)
+	for (int i = 0; i < groups.size(); i++)
 	{
 		buildings = static_cast<PlayingGameState*>(Game::getCurrentState())->map->getTileMap().getAllTilePositionsInRadius(groups[i].getAveragePos(), 300, Tile::building);
-		for(int j = 0; j < groups[i].actors.size(); j++)
+		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
 			// Distance of field of vision for separation between boids
 			desiredSeparationDistance = groups[i].actors[j]->getBoidOffset();
@@ -327,7 +328,7 @@ void ActorManager::seperation(const Vector3& targetPos)
 				}
 
 			}
-			groups[i].actors[j]->applyForce(direction*4);
+			groups[i].actors[j]->applyForce(direction * 4);
 		}
 	}
 }
