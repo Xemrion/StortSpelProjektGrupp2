@@ -29,6 +29,7 @@ Attacker::~Attacker()
 {
 	Game::getGraphics().removeFromDraw(this);
 }
+
 void Attacker::setUpActor()
 {
 	this->root = &bt.getSelector();

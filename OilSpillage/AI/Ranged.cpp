@@ -5,6 +5,12 @@ void Ranged::updateBullets(float deltaTime)
 	this->timeSinceLastShot += deltaTime;
 	for (int i = 0; i < Ranged::bulletCount; i++)
 	{
+		if (bullets[i].getWeaponType() == WeaponType::aiLaser)
+		{
+			bullets[i].getGameObject()->setPosition(*positionPtr);
+			//Vector3 selfToTarget = (*positionPtr - *targetPosPtr);
+			//bullets[i].setDirection(selfToTarget);
+		}
 		bullets[i].update(deltaTime);
 	}
 }
@@ -75,19 +81,39 @@ Status Ranged::shoot()
 			{
 				if (bullets[i].getTimeLeft() == 0.0)
 				{
-					Vector3 dir = (*targetPosPtr - *this->positionPtr);
-					dir.Normalize();
-					Vector3 bulletOrigin = *this->positionPtr + dir;
-					dir = (offsetPos - bulletOrigin);
-					dir.Normalize();
+					if(weapon.type != WeaponType::aiLaser)
+					{
+						Vector3 dir = (*targetPosPtr - *this->positionPtr);
+						dir.Normalize();
+						Vector3 bulletOrigin = *this->positionPtr + dir;
+						dir = (offsetPos - bulletOrigin);
+						dir.Normalize();
 
-					this->bullets[i].shoot(
-						weapon,
-						bulletOrigin,
-						dir,
-						*velocityPtr,
-						*deltaTimePtr
-					);
+						this->bullets[i].shoot(
+							weapon,
+							bulletOrigin,
+							dir,
+							*velocityPtr,
+							*deltaTimePtr
+						);
+					}
+					else
+					{
+						Vector3 dir = (*targetPosPtr - *this->positionPtr);
+						dir.Normalize();
+						Vector3 bulletOrigin = *this->positionPtr + dir;
+						dir = (*targetPosPtr - bulletOrigin);
+						dir.Normalize();
+
+						this->bullets[i].shoot(
+							weapon,
+							bulletOrigin,
+							dir,
+							Vector3(0.0f),
+							*deltaTimePtr
+						);
+					}
+
 					break;
 				}
 			}

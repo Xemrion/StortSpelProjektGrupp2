@@ -57,13 +57,11 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	}
 	if (hasDied)
 	{
-
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
 			if (actors[i]->isDead())
 			{
 				destroyActor(i);
-
 			}
 		}
 	}
