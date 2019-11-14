@@ -217,10 +217,13 @@ bool Physics::DeleteRigidBody(btRigidBody * rb)
 bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, 
 	int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
-	if (obj1->getCollisionObject()->getUserPointer() == ((Vehicle*)obj1->getCollisionObject()->getUserPointer()))
+	if ((obj1->getCollisionObject()->getUserPointer() == ((Vehicle*)obj1->getCollisionObject()->getUserPointer())) &&
+		(obj2->getCollisionObject()->getUserPointer() == ((Vehicle*)obj2->getCollisionObject()->getUserPointer())))
 	{
-		if (((Vehicle*)obj1->getCollisionObject()->getUserPointer()) != nullptr &&
-			((Vehicle*)obj2->getCollisionObject()->getUserPointer()) != nullptr)
+		Vehicle* vec1 = ((Vehicle*)obj1->getCollisionObject()->getUserPointer());
+		Vehicle* vec2 = ((Vehicle*)obj2->getCollisionObject()->getUserPointer());
+
+		if ( (vec1 != nullptr)&& (vec2 != nullptr))
 		{
 			//bool ishit = ((Player*)obj1->getCollisionObject()->getUserPointer())->getHit();
 			std::cout << "Looool" << std::endl;
