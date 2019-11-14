@@ -56,6 +56,9 @@ Spitfire::~Spitfire()
 	Game::getGraphics().removeFromDraw(wheel2);
 	Game::getGraphics().removeFromDraw(wheel3);
 	Game::getGraphics().removeFromDraw(wheel4);
+	physics->DeleteRigidBody(vehicleBody1->getRigidBody());
+	physics->deletePointJoint(pointJoint);
+	
 	delete vehicleBody1;
 	delete wheel1;
 	delete wheel2;
@@ -70,8 +73,12 @@ void Spitfire::updateVehicle()
 	Vector3 accelForce = Vector3(getRigidBody()->getLinearVelocity()) - prevAccelForce;
 	setAccelForce(accelForce, deltaTime);
 	setWheelRotation();
-	this->setPosition(getPosition());
 
+}
+
+btPoint2PointConstraint* Spitfire::getPointJoint()
+{
+	return this->pointJoint;
 }
 
 void Spitfire::move()
@@ -183,7 +190,7 @@ void Spitfire::init(Physics* physics)
 	vehicleBody1->getRigidBody()->activate();
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicleBody1->getRigidBody()->setFriction(1);
-	physics->addPointJoint(getRigidBody(), this->vehicleBody1->getRigidBody());
+	pointJoint = physics->addPointJoint(getRigidBody(), this->vehicleBody1->getRigidBody());
 }
 
 void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)

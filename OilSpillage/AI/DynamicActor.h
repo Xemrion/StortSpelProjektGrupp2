@@ -17,6 +17,7 @@ public:
 	int duty;
 	bool vActive;
 	Vector3 groupPos;
+	virtual btPoint2PointConstraint* getPointJoint();
 protected:	
 	int aggroRange;
 	int boidOffset;
@@ -30,6 +31,7 @@ protected:
 	float maxSpeed;
 	float maxForce;
 	
+
 	enum class State { Idle, Chasing, Circulate };
 	State state;
 

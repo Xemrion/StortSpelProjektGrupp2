@@ -40,6 +40,7 @@ public:
 	/*btRigidBody* addPlayer(btVector3 Origin, btVector3 size, float mass,Player *player);*/
 
 	bool DeleteRigidBody(btRigidBody * rb);
+	bool deletePointJoint(btPoint2PointConstraint* pointJoint);
 	//static bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2);
 	//void renderSphere(btRigidBody* sphere);
 	//void renderPlane(btRigidBody* plane);

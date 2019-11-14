@@ -25,17 +25,20 @@ private:
 	float velocitySpeed;
 	class Physics* physics;
 
-
+	btPoint2PointConstraint* pointJoint;
 	void setUpActor();
 
 	Vector3 direction;
 	float throttleInputStrength;
 	Vector3 accelForce;
 	void updateVehicle(); 
+protected:
 public:
+
 	Spitfire(float x, float z,Physics* physics);
 	Spitfire();
 	virtual ~Spitfire();
+	virtual btPoint2PointConstraint* getPointJoint();
 
 	void init(Physics* physics);
 	void vehicleMovement(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput);

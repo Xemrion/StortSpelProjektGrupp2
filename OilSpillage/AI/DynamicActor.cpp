@@ -28,6 +28,11 @@ DynamicActor::~DynamicActor()
 	
 }
 
+btPoint2PointConstraint* DynamicActor::getPointJoint()
+{
+	return nullptr;
+}
+
 void DynamicActor::move()
 {
 	//To make the slow down not as abrupt
