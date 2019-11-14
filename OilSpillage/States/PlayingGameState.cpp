@@ -228,7 +228,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.setVectorField(4.5f, 3.0f);
 
 	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
-	Game::getGraphics().addToDraw(&*powerUps.begin());
+	graphics.addToDraw(&*powerUps.begin());
 
 	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
@@ -246,9 +246,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
-	Game::getGraphics().loadModel("Vehicles/Player");
-	buildingTest->mesh = Game::getGraphics().getMeshPointer("Vehicles/Player");
-	Game::getGraphics().addToDraw(buildingTest.get());
+	graphics.loadModel("Vehicles/Player");
+	buildingTest->mesh = graphics.getMeshPointer("Vehicles/Player");
+	graphics.addToDraw(buildingTest.get());
 	btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
 	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
 	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
@@ -465,8 +465,13 @@ void PlayingGameState::ImGui_ProcGen()
 	ImGui::NewLine();
 	if (ImGui::Button("Re-generate")) {
 		// (TODO: refactor) hacky, but:
-		map = std::make_unique<Map>(graphics, config, physics.get());
-		player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
+		player->getVehicle()->getRigidBody()->setLinearFactor( btVector3(.0,.0f,.0f) );
+
+		map = nullptr; // clear, then regenerate:
+		map = std::make_unique<Map>( graphics, config, physics.get() );
+
+		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
+		player->getVehicleBody1()->setPosition( map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f) );
 		map->setDistrictColorCoding(shouldColorCodeDistricts);
 		minimap = createMinimapTexture(*map);
 		aStar->generateTileData(map->getTileMap());
@@ -477,6 +482,7 @@ void PlayingGameState::ImGui_ProcGen()
 
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
+		player->getVehicle()->getRigidBody()->setLinearFactor( btVector3(1.0f, .0f, 1.0f) );
 	}
 	ImGui::End();
 }
@@ -673,8 +679,8 @@ void PlayingGameState::update(float deltaTime)
 
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
-#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   /*ImGui_ImplDX11_NewFrame();
+//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	   ImGui_ImplDX11_NewFrame();
 	   ImGui_ImplWin32_NewFrame();
 	   ImGui::NewFrame();
 	   ImGui_Driving();
@@ -683,8 +689,8 @@ void PlayingGameState::update(float deltaTime)
 	   ImGui_Particles();
 	   ImGui_Camera();
 	   ImGui::Render();
-	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());*/
-#endif // !_DEBUG
+	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+//#endif // !_DEBUG
 
 	graphics.presentScene();
 }
@@ -730,9 +736,9 @@ Vector3 PlayingGameState::getBottomRight() const
 
 void PlayingGameState::spawnObjects()
 {
-	Game::getGraphics().loadModel("Entities/Barrel");
-	Game::getGraphics().loadModel("Entities/Garbage_Bag");
-	Game::getGraphics().loadModel("Entities/Quad");
+	graphics.loadModel("Entities/Barrel");
+	graphics.loadModel("Entities/Garbage_Bag");
+	graphics.loadModel("Entities/Quad");
 	physicsObjID = 0;
 	physicsObjects.reserve(300);
 	btRigidBody* tempo2;
@@ -740,11 +746,11 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 20; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		Game::getGraphics().loadModel("Cube");
-		objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+		graphics.loadModel("Cube");
+		objPtr->mesh = graphics.getMeshPointer("Cube");
 		graphics.loadTexture("brownPaperCardboard");
-		objPtr->setTexture(Game::getGraphics().getTexturePointer("brownPaperCardboard"));
-		Game::getGraphics().addToDraw(objPtr);
+		objPtr->setTexture(graphics.getTexturePointer("brownPaperCardboard"));
+		graphics.addToDraw(objPtr);
 		randomValue = (rand() % 3 + 8) * 0.125f;
 		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue), 0.01f);
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
@@ -762,9 +768,9 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 15; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
-		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Barrel").diffuse);
-		Game::getGraphics().addToDraw(objPtr);
+		objPtr->mesh = graphics.getMeshPointer("Entities/Barrel");
+		objPtr->setTexture(graphics.getMaterial("Entities/Barrel").diffuse);
+		graphics.addToDraw(objPtr);
 		tempo2 = physics->addCylinder(btVector3(-200, 0.2f + i, -200), btVector3(size, size, size), 0.01f);
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
 		objPtr->setScale(Vector3(size, size, size));
@@ -780,9 +786,9 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 15; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Garbage_Bag");
-		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Garbage_Bag").diffuse);
-		Game::getGraphics().addToDraw(objPtr);
+		objPtr->mesh = graphics.getMeshPointer("Entities/Garbage_Bag");
+		objPtr->setTexture(graphics.getMaterial("Entities/Garbage_Bag").diffuse);
+		graphics.addToDraw(objPtr);
 		objPtr->setPosition(Vector3(0, 0, 0));
 		randomValue = (rand() % 3 + 8) * 0.125f;
 		size = 0.30f * randomValue;
@@ -799,8 +805,8 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 250; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Quad");
-		Game::getGraphics().addToDraw(objPtr);
+		objPtr->mesh = graphics.getMeshPointer("Entities/Quad");
+		graphics.addToDraw(objPtr);
 		size = rand() % 3 + 8;
 		size *= 0.125f;
 		randomValue = randomValue = (rand() % 5) * 0.125f;
@@ -813,9 +819,9 @@ void PlayingGameState::spawnObjects()
 
 	//physicsObjects.emplace_back(std::make_unique<GameObject>());
 	//auto objPtr = physicsObjects.back().get();
-	//Game::getGraphics().loadModel("Cube");
-	//objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//Game::getGraphics().addToDraw(objPtr);
+	//graphics.loadModel("Cube");
+	//objPtr->mesh = graphics.getMeshPointer("Cube");
+	//graphics.addToDraw(objPtr);
 	//tempo2 = physics->addBox(btVector3(20, 0.2f, -20), btVector3(5.5f, 12.5f, 5.5f), 0);
 	//objPtr->setPosition(Vector3(20, 0.2f, -20));
 	//objPtr->setScale(Vector3(5.5f, 12.5f, 5.5f));
@@ -841,9 +847,9 @@ void PlayingGameState::spawnObjects()
 	//			/*for (int i = 0; i < 4; i++) {
 	//				physicsObjects.emplace_back(std::make_unique<GameObject>());
 	//				auto objPtr = physicsObjects.back().get();
-	//				Game::getGraphics().loadModel("Cube");
-	//				objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//				Game::getGraphics().addToDraw(objPtr);
+	//				graphics.loadModel("Cube");
+	//				objPtr->mesh = graphics.getMeshPointer("Cube");
+	//				graphics.addToDraw(objPtr);
 	//				tempo2 = physics->addBox(btVector3(min.x, 0.2f+i, min.z), btVector3(0.5f, 0.5f, 0.5f), 3.0f);
 	//				objPtr->setPosition(Vector3(min.x, 0.2f+i, min.z));
 	//				objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));

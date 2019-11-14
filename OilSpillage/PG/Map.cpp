@@ -18,13 +18,23 @@
 //       ii. place composite buildings
 
 
+// for transition screen
+struct MapInfo {
+   U8       act, stage;
+	Biome    biome;
+	Size     size;
+	//Weather  weather;
+	//Time     time;
+	String   name;
+	// ...
+};
+
 
 Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	graphics        ( graphics                                                                                      ),
 	physics         ( physics                                                                                       ),
 	config          ( config                                                                                        ),
 	tilemap         ( std::make_unique<TileMap>( config )                                                           ),
-	groundTiles     ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y                             ),
    roadDistanceMap ( config.dimensions.x * config.dimensions.y                                                     ),
 	buildingIDs     ( config.dimensions.x * config.dimensions.y                                                     ),
 	hospitalTable	 ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide )
@@ -38,15 +48,21 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	generateBuildings();
 
 	groundTiles = instantiateTilesAsModels();
-	for ( auto &e : groundTiles )
-		graphics.addToDraw( e.get() , true );
+	for ( auto &e : groundTiles ) 
+		graphics.addToDrawStatic( e.get() );
 }
 
 
 Map::~Map() noexcept
 {
 	graphics.clearStaticObjects();
-   #ifdef _DEBUG
+	for ( auto &e : houseTiles )
+		physics->DeleteRigidBody( e.getRigidBody() );
+	//for ( auto &e : houseTiles )
+	//	graphics.removeFromDraw( &e );
+	//for ( auto &e : groundTiles )
+	//	graphics.removeFromDraw( e.get() );
+   #ifdef _DEBUG_MAP
 		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?
 		assert(profilerLogs.is_open());
 		DBG_PROFILE_OUTPUT(profilerLogs); // outputs profiler logs (if in debug mode)
@@ -64,7 +80,7 @@ void  Map::generateRoads()
 	rng.seed(config.seed);
 	
 	MapConfig  roadConfig { config };
-	while (true) { // TODO: add MAX_TRIES?
+	for(;;) { // TODO: add MAX_TRIES?
 		RoadGenerator roadGenerator{ *tilemap };
 		roadGenerator.generate(roadConfig);
 		if (tilemap->getRoadCoverage() < roadConfig.roadMinTotalCoverage) {
@@ -170,7 +186,7 @@ void  Map::generateBuildings( )
 	textureArr[1] = "Houses/houseMaterial2";
 	textureArr[2] = "Houses/houseMaterial3";
 
-	#ifdef _DEBUG
+	#ifdef _DEBUG_MAP
 	   U32            total_building_count{ 0 };
 	   U32            total_building_tile_count{ 0 };
 	   std::ofstream  buildingLogs{ String("PG/logs/building_generation_") + mapConfigToFilename(config, ".txt") };
@@ -187,7 +203,7 @@ void  Map::generateBuildings( )
 		Size        currentArea{ 0 };
 		Size const  cellArea{ districtMap->computeCellRealEstateArea(cellId,*tilemap) };
 		
-		#ifdef _DEBUG
+		#ifdef _DEBUG_MAP
 		   U64  currrentDistrictBuildingCount { 0 };
 		   buildingLogs << "\n\t" "Generating buildings for district #"
 		                << cellId << " (TYPE: \"" << district->name << "\")\n";
@@ -205,7 +221,7 @@ void  Map::generateBuildings( )
                currentTries = 0; // reset try counter
 					auto &building     = potentialLot.value();
 					auto  buildingSize = building.size();
-               #ifdef _DEBUG
+               #ifdef _DEBUG_MAP
 					   buildingLogs << "\t\t"   "Generating building #" << currrentDistrictBuildingCount++
 						   << ". (Map total building count: " << total_building_count++ << ")\n"
 						   << "\t\t\t" "Building size: " << buildingSize << " tiles. (Map total tile count: "
@@ -280,7 +296,7 @@ void  Map::generateBuildings( )
 							                     .048f * config.tileScaleFactor.y,
 							                     .048f * config.tileScaleFactor.z });
 							houseTile.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePosition) } );
-							#ifndef _DEBUG
+							#ifndef _DEBUG_MAP
 								btRigidBody *tmp = physics->addBox( btVector3( houseTile.getPosition().x,
 																							  houseTile.getPosition().y,
 																							  houseTile.getPosition().z ),
@@ -291,7 +307,7 @@ void  Map::generateBuildings( )
 								houseTile.setRigidBody( tmp, physics );
 							#endif
 						}
-						#ifdef _DEBUG
+						#ifdef _DEBUG_MAP
 							++total_building_tile_count;
 						#endif
 					}
@@ -303,9 +319,9 @@ void  Map::generateBuildings( )
 
 	// adding all the tiles to draw:
 	for ( auto &e : houseTiles )
-		graphics.addToDraw(&e , true);
+		graphics.addToDrawStatic(&e);
 
-   #ifdef _DEBUG
+   #ifdef _DEBUG_MAP
 	   if (buildingLogs.is_open())
 		   buildingLogs.close();
    #endif
@@ -863,10 +879,136 @@ static F32 constexpr markerOffsetY     { -1.49f };
 static F32 constexpr transitionOffsetY { -1.48f };
 static F32 constexpr sidewalkOffsetY   { -1.47f };
 
+//1x1
+//1x2 / 2x2
+//2x2
+//3x2 / 2x3
+//4x4
+//
+//
+//_00000000_50
+//0/1
+//
+//Houses/Prefabs/4x4_namn_/mesh.bin
+// struct PrefabHouse {
+// 	GameObject house;
+// 	Vector2u   
+// };
+/*
+struct HouseTileset {
+	String                        name;
+	F32                           floorHeight;
+	Vector<District::Type const*>	validInDistricts;
+};
+
+struct CompositeHouse {
+	GameObject  roof, walls, windows;
+	Bounds      bounds;
+};
+
+struct SingleTileHouse {
+	GameObject  house;
+	V2u         tilePos;
+};
+
+struct MultiTileHouse {
+	Vector<GameObject>  tiles;
+	
+	Bounds              bounds;
+	U8                  floorLayout;
+};
+
+struct HouseData {
+	Vector<SingleTileHouse>  singles;
+	Vector<MultiTileHouse>   multis;
+	Vector<CompositeHouse>   composites;
+};
+
+
+Vector<Vector<GameObject>> Map::instantiateHousesAaModels() noexcept {
+	// multi-tile houses:
+	auto instantiatePart = [&]( std::string_view name, Vector3 const &pos, F32 deg=.0f, F32 yOffset=baseOffsetY, Bool hasNormal=true, Bool noShadowcasting=false ) {
+		models.push_back( std::make_unique<GameObject>() );
+      auto &model     =  *models.back();
+		model.mesh      =   graphics.getMeshPointer( "Tiles/Quad_SS" );
+		model.setTexture(   graphics.getTexturePointer(name.data()) );
+		if ( hasNormal )
+			model.setNormalMap( graphics.getTexturePointer( (std::string(name)+"_nor").c_str() ) );
+		if ( deg > 1.0f )
+			model.setRotation({ .0f, util::degToRad(deg), .0f });
+		model.setPosition( pos + Vector3{.0f, yOffset, .0f} );
+		model.setColor({ .0f, .0f, .0f, .0f });
+		model.setScale({ tilemap->config.tileScaleFactor.x, 1.0f, tilemap->config.tileScaleFactor.z });
+		model.setSpotShadow( noShadowcasting );
+		model.setSunShadow(  noShadowcasting );
+	};
+	for ( auto &building : buildings ) {
+		for ( auto &pos : building.positions ) {
+			U8 tilemask = 0x00
+			if ( (pos.y-1 < tilemap->height) and (buildingIDs[tilemap->index(pos.x, pos.y-1)]==building.id) )
+				tilemask += 1 << 0; // N
+			if ( (pos.y-1 < tilemap->height) and (pos.x+1 < tilemap->width)
+				  and (buildingIDs[tilemap->index(pos.x+1, pos.y-1)]==building.id) )
+				tilemask += 1 << 1; // NE
+			if ( (pos.x+1 < tilemap->width)
+				  and (buildingIDs[tilemap->index(pos.x+1, pos.y)]==building.id) )
+				tilemask += 1 << 2; // E
+			if ( (pos.y+1 < tilemap->height) and (pos.x+1 < tilemap->width)
+				  and (buildingIDs[tilemap->index(pos.x+1, pos.y-1)]==building.id) )
+				tilemask += 1 << 3; // SE
+			if ( (pos.y+1 < tilemap->height)
+				  and (buildingIDs[tilemap->index(pos.x, pos.y+1)]==building.id) )
+				tilemask += 1 << 4; // S
+			if ( (pos.y+1 < tilemap->height) and (pos.x-1 < tilemap->width)
+				  and (buildingIDs[tilemap->index(pos.x-1, pos.y-1)]==building.id) )
+				tilemask += 1 << 5; // SW
+			if ( (pos.x-1 < tilemap->width)
+				  and (buildingIDs[tilemap->index(pos.x-1, pos.y)]==building.id) )
+				tilemask += 1 << 6; // W
+			if ( (pos.y-1 < tilemap->height) and (pos.x-1 < tilemap->width)
+				  and (buildingIDs[tilemap->index(pos.x-1, pos.y-1)]==building.id) )
+				tilemask += 1 << 1; // NW
+
+			for ( auto q=0; q<4; ++q ) { // quadrants
+				U8 quadmask = tilemask >> (2 * q);
+				if ( quadmask & 0b101 == 0x00 ) {
+					instantiateModel( "/Buildings/"+building.tileset+"/f_oc", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, .0f );
+					for ( auto currFloor = 0; currFloor < building.numFloors; ++currFloor )
+						instantiateModel( "/Buildings/"+building.tileset+"/w_oc", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, currFloor*building.floorHeight );
+					instantiateModel( "/Buildings/"+building.tileset+"/r_oc", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, building.numFloors*building.floorHeight );
+				}
+				else if ( quadmask == 0b101 ) {
+					 instantiateModel( "/Buildings/"+building.tileset+"/f_ic", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, .0f );
+					for ( auto currFloor = 0; currFloor < building.numFloors; ++currFloor )
+						instantiateModel( "/Buildings/"+building.tileset+"/w_ic", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, currFloor*building.floorHeight );
+					instantiateModel( "/Buildings/"+building.tileset+"/r_ic", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, building.numFloors*building.floorHeight );
+				}
+				else if ( quadmask == 0b100 ) {
+					instantiateModel( "/Buildings/"+building.tileset+"/f_sa", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, .0f );
+					for ( auto currFloor = 0; currFloor < building.numFloors; ++currFloor )
+						instantiateModel( "/Buildings/"+building.tileset+"/w_sa", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, currFloor*building.floorHeight );
+					instantiateModel( "/Buildings/"+building.tileset+"/r_sa", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, building.numFloors*building.floorHeight );
+				}
+				else if ( quadmask == 0b001 ) {
+					instantiateModel( "/Buildings/"+building.tileset+"/f_sb", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, .0f );
+					for ( auto currFloor = 0; currFloor < building.numFloors; ++currFloor )
+						instantiateModel( "/Buildings/"+building.tileset+"/w_sb", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, currFloor*building.floorHeight );
+					instantiateModel( "/Buildings/"+building.tileset+"/r_sb", tilemap->convertTilePositionToWorldPosition(x,y), 45.0f*q, building.numFloors*building.floorHeight );
+				}
+				else if ( quadmask = 0b111 ) {
+					instantiateModel( "/Buildings/"+building.tileset+"/r_m", tilemap->convertTilePositionToWorldPosition(x,y), .0f, building.numFloors*building.floorHeight );
+				}
+			}
+		}
+	}
+
+
+}
+*/
 Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 {
 	Vector<UPtr<GameObject>> models;
-	models.reserve( tilemap->data.size() * 6 );// worst case scenario: 6 quads per tile
+	models.reserve( tilemap->data.size() * 3 );// TODO: use worst case scenario: 6 quads per tile?
 	auto instantiatePart = [&]( std::string_view name, Vector3 const &pos, F32 deg=.0f, F32 yOffset=baseOffsetY, Bool hasNormal=true, Bool noShadowcasting=false ) {
 		models.push_back( std::make_unique<GameObject>() );
       auto &model     =  *models.back();
