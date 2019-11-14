@@ -77,7 +77,7 @@ private:
 	bool flameBool;
 	bool dmg;
 
-	
+
 	Vector2 curDir;
 	Vector2 currentDir;
 	float velocitySimple;
@@ -88,11 +88,11 @@ public:
 	Vehicle();
 	virtual ~Vehicle();
 
-	void init(Physics *physics);
+	void init(Physics* physics);
 	void updatePlayer(float deltaTime);
 	void update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput);
 	void updateWeapon(float deltaTime);
-	
+
 	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();

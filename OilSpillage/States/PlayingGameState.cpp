@@ -13,15 +13,13 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar, physics.get());
 	aStar->generateTileData(map->getTileMap());
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		for (int j = 0; j < 1; j++)
+		for (int j = 0; j < 3; j++)
 		{
 		//actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j,physics.get());
 			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-		
-
+			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, (rand()%4)+1);
 		}
 	}
 
@@ -967,6 +965,7 @@ void PlayingGameState::addTime(float time)
 {
 	this->time += time;
 }
+
 void PlayingGameState::updateObjects()
 {
 	if (abs(player->getVelocitySpeed()) > 1.0f) {
