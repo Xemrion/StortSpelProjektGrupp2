@@ -47,7 +47,7 @@ float noise(in float2 x)
 
 PS_OUT main(VS_OUT input) : SV_TARGET
 {
-	float n = noise(input.Tex.xy * scale);
+	float n = noise(input.Tex.xy * scale) * 0.5 + 0.5;
 	float alpha = n > densityThreshold ? density : 0.0;
 	PS_OUT output;
 	output.color = float4(color.r, color.g, color.b, max(alpha, ambientDensity));
