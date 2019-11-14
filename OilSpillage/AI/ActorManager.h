@@ -31,6 +31,7 @@ public:
 private:
 	float soundTimer = 0;
 	int frameCount = 0;
+	void updateActors(const Vector3& targetPos, float dt);
 	Physics* physics;
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members

@@ -30,42 +30,8 @@ ActorManager::~ActorManager()
 void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
-	bool hasDied = false;
-	//seperation(targetPos);
-	for (int i = 0; i < this->groups.size(); i++)
-	{
-		groups[i].formationP(targetPos);
-		for (int j = 0; j < groups[i].actors.size(); j++)
-		{
-			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
-			{
-				groups[i].actors[j]->update(dt, targetPos);
-			}
-			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
-			{
-				Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
-				if (ptr != nullptr)
-				{
-					if (ptr->getType() == TypeOfMission::KillingSpree)
-					{
-						ptr->killEnemy();
-					}
-				}
-				hasDied = true;
-			}
-		}
-	}
-	if (hasDied)
-	{
-		for (int i = this->actors.size() - 1; i >= 0; i--)
-		{
-			if (actors[i]->isDead())
-			{
-				destroyActor(i);
-				
-			}
-		}
-	}
+	updateActors(targetPos, dt);
+
 	updateGroups();
 	turretHandler.update(dt, targetPos);
 	if (frameCount % 20 == 0)
@@ -300,6 +266,44 @@ void ActorManager::seperation(const Vector3& targetPos)
 
 			}
 			groups[i].actors[j]->applyForce(direction * 4);
+		}
+	}
+}
+
+void ActorManager::updateActors(const Vector3& targetPos, float dt)
+{
+	bool hasDied = false;
+	for (int i = 0; i < this->groups.size(); i++)
+	{
+		for (int j = 0; j < groups[i].actors.size(); j++)
+		{
+			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
+			{
+				groups[i].actors[j]->update(dt, targetPos);
+			}
+			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
+			{
+				Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+				if (ptr != nullptr)
+				{
+					if (ptr->getType() == TypeOfMission::KillingSpree)
+					{
+						ptr->killEnemy();
+					}
+				}
+				hasDied = true;
+			}
+		}
+	}
+	if (hasDied)
+	{
+		for (int i = this->actors.size() - 1; i >= 0; i--)
+		{
+			if (actors[i]->isDead())
+			{
+				destroyActor(i);
+
+			}
 		}
 	}
 }
