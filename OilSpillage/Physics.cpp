@@ -1,4 +1,5 @@
 #include "Physics.h"
+#include "Vehicle.h"
 
 Physics::Physics() :broadphase(new btDbvtBroadphase()),
 collisionConfig(new btDefaultCollisionConfiguration()),
@@ -28,7 +29,7 @@ solver(new btSequentialImpulseConstraintSolver)
 	world->addRigidBody(body);
 	bodies.push_back(body);
 
-	//gContactAddedCallback = callbackFunc;
+	gContactAddedCallback = callbackFunc;
 }
 
 
@@ -89,7 +90,7 @@ btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass)
 //	return nullptr;
 //}
 
-btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass)
+btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass, void* objects)
 {
 	//add object set transform
 	btTransform t; //
@@ -108,7 +109,7 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass)
 	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	this->world->addRigidBody(body);
 	bodies.push_back(body);
-	//body->setUserPointer(objects);
+	body->setUserPointer(objects);
 	return body;
 }
 
@@ -163,7 +164,6 @@ btRaycastVehicle* Physics::addVehicle(btRaycastVehicle* vehicle)
 {
 	this->world->addVehicle(vehicle);
 	vehicles.push_back(vehicle);
-
 	return vehicle;
 }
 
@@ -209,6 +209,21 @@ bool Physics::DeleteRigidBody(btRigidBody * rb)
 			}
 		}
 	return false;
+}
+
+bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, 
+	int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
+{
+	if (obj1->getCollisionObject()->getUserPointer() == ((Vehicle*)obj1->getCollisionObject()->getUserPointer()))
+	{
+		if (((Vehicle*)obj1->getCollisionObject()->getUserPointer()) != nullptr &&
+			((Vehicle*)obj2->getCollisionObject()->getUserPointer()) != nullptr)
+		{
+			//bool ishit = ((Player*)obj1->getCollisionObject()->getUserPointer())->getHit();
+			std::cout << "Looool" << std::endl;
+		}
+	}
+		return false;
 }
 
 //bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
