@@ -5,6 +5,7 @@
 #include "../Elements/Button.h"
 #include "../Elements/CheckBox.h"
 #include "../Elements/Slider.h"
+#include "../Elements/ButtonPromtBar.h"
 
 class UIMainMenu : public UserInterface
 {
@@ -16,6 +17,7 @@ private:
 	std::unique_ptr<Button> buttonOptions;
 	std::unique_ptr<Button> buttonCredits;
 	std::unique_ptr<Button> buttonQuit;
+	std::unique_ptr<ButtonPromptBar> promptBar;
 	Element* selected;
 
 public:

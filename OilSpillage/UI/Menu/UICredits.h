@@ -5,6 +5,7 @@
 #include "../Elements/Button.h"
 #include "../Elements/CheckBox.h"
 #include "../Elements/Slider.h"
+#include "../Elements/ButtonPromtBar.h"
 #include <vector>
 #include <string>
 
@@ -15,6 +16,7 @@ private:
 	void drawUI();
 
 	std::unique_ptr<Button> buttonBack;
+	std::unique_ptr<ButtonPromptBar> promptBar;
 	std::vector<std::string> creditsText;
 public:
 	UICredits();

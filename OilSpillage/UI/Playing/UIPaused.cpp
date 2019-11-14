@@ -34,6 +34,7 @@ void UIPaused::drawUI()
 	this->buttonUnpause->draw(this->selected == this->buttonUnpause.get());
 	this->buttonOptions->draw(this->selected == this->buttonOptions.get());
 	this->buttonMainMenu->draw(this->selected == this->buttonMainMenu.get());
+	this->promptBar->draw(false);
 	UserInterface::getSpriteBatch()->End();
 }
 
@@ -47,7 +48,7 @@ UIPaused::~UIPaused()
 
 void UIPaused::init()
 {
-	this->buttonUnpause = std::make_unique<Button>(Text("Unpause", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2));
+	this->buttonUnpause = std::make_unique<Button>(Text("Resume", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2));
 	this->buttonOptions = std::make_unique<Button>(Text("Options", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y / 2));
 	this->buttonMainMenu = std::make_unique<Button>(Text("Main Menu", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y));
 
@@ -56,4 +57,14 @@ void UIPaused::init()
 	this->buttonMainMenu->setNeighbours(nullptr, nullptr, this->buttonOptions.get(), this->buttonUnpause.get());
 
 	this->selected = this->buttonUnpause.get();
+
+	Prompt prompts[] = {
+		{ Keys::L_PRESS, "Move", Color(Colors::White) },
+		{ Keys::CONFIRM, "Confirm", Color(Colors::White) },
+		{ Keys::CANCEL, "Resume", Color(Colors::White) },
+		{ Keys::MENU, "Resume", Color(Colors::White) }
+	};
+
+	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 4);
+	this->promptBar->setPositon(Vector2(SCREEN_WIDTH / 2 - this->promptBar->getSize().x / 2, SCREEN_HEIGHT - this->promptBar->getSize().y - 8.0f));
 }

@@ -38,6 +38,7 @@ void UIRandomItem::updateUI(float deltaTime)
 void UIRandomItem::drawUI()
 {
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
+	this->promptBar->draw(false);
 
 	for (int i = 0; i < UIRandomItem::slotCount; i++)
 	{
@@ -45,6 +46,8 @@ void UIRandomItem::drawUI()
 	}
 
 	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->selected->getPosition());
+	Vector2 textSize = UserInterface::getFontArial()->MeasureString("Select Reward") * 0.5f;
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Select Reward", Vector2((SCREEN_WIDTH / 2) - (textSize.x / 2), (SCREEN_HEIGHT / 2) - 110.0f), Colors::White, 0.0f, Vector2::Zero, 0.5f);
 	UserInterface::getSpriteBatch()->End();
 }
 
@@ -75,4 +78,12 @@ void UIRandomItem::init()
 	}
 
 	this->selected = slots[0].get();
+
+	Prompt prompts[] = {
+		{ Keys::L_PRESS, "Move", Color(Colors::White) },
+		{ Keys::CONFIRM, "Select Item", Color(Colors::White) }
+	};
+
+	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 2);
+	this->promptBar->setPositon(Vector2(SCREEN_WIDTH / 2 - this->promptBar->getSize().x / 2, SCREEN_HEIGHT - this->promptBar->getSize().y - 8.0f));
 }

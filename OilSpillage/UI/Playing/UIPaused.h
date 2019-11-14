@@ -3,6 +3,7 @@
 
 #include "../UserInterface.h"
 #include "../Elements/Button.h"
+#include "../Elements/ButtonPromtBar.h"
 
 class UIPaused : public UserInterface
 {
@@ -15,6 +16,7 @@ private:
 	std::unique_ptr<Button> buttonUnpause;
 	std::unique_ptr<Button> buttonOptions;
 	std::unique_ptr<Button> buttonMainMenu;
+	std::unique_ptr<ButtonPromptBar> promptBar;
 public:
 	UIPaused();
 	virtual ~UIPaused();

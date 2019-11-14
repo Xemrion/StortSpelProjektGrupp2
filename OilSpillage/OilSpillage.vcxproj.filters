@@ -91,6 +91,7 @@
     <ClCompile Include="AI\Car_Spitfire.cpp" />
     <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="Inventory\Container.cpp" />
+    <ClCompile Include="UI\Elements\ButtonPromtBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -185,6 +186,7 @@
     <ClInclude Include="AI\Swarm.h" />
     <ClInclude Include="AI\Car_Spitfire.h" />
     <ClInclude Include="Inventory\Container.h" />
+    <ClInclude Include="UI\Elements\ButtonPromtBar.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

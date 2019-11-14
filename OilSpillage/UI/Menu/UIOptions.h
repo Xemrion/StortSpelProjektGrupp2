@@ -5,6 +5,7 @@
 #include "../Elements/Button.h"
 #include "../Elements/CheckBox.h"
 #include "../Elements/Slider.h"
+#include "../Elements/ButtonPromtBar.h"
 
 class UIOptions : public UserInterface
 {
@@ -15,6 +16,7 @@ private:
 	std::unique_ptr<Button> buttonBack;
 	std::unique_ptr<CheckBox> checkBoxTest;
 	std::unique_ptr<Slider> sliderTest;
+	std::unique_ptr<ButtonPromptBar> promptBar;
 	Element* selected;
 
 public:

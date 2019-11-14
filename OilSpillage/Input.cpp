@@ -457,6 +457,46 @@ Vector2 Input::getDirectionR(/*int player*/)
 	return dir;
 }
 
+Vector2 Input::getDirectionRnoMouse(/*int player*/)
+{
+	Vector2 dir;
+
+	//if (player >= Input::PLAYER_COUNT || player < 0) return dir;
+
+	/*if (player == instance->playerKeyboard)
+	{
+		float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
+		float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
+
+		dir = Vector2(mX, -mY);
+	}
+	else
+	{
+		if (instance->playerKeyboard != -1 && player > instance->playerKeyboard)
+		{
+			player--;
+		}*/
+
+	GamePad::State gamepadState = instance->gamePad.GetState(/*player*/0);
+
+	if (gamepadState.IsConnected())
+	{
+		dir = Vector2(gamepadState.thumbSticks.rightX, gamepadState.thumbSticks.rightY);
+	}
+	//}
+
+	if (dir == Vector2())
+	{
+		if (checkButtonKeyboard(Keys::R_LEFT, States::HELD)) dir.x -= 1.0f;
+		if (checkButtonKeyboard(Keys::R_RIGHT, States::HELD)) dir.x += 1.0f;
+		if (checkButtonKeyboard(Keys::R_UP, States::HELD)) dir.y += 1.0f;
+		if (checkButtonKeyboard(Keys::R_DOWN, States::HELD)) dir.y -= 1.0f;
+	}
+
+	dir.Normalize();
+	return dir;
+}
+
 float Input::getStrengthR(/*int player*/)
 {
 	float strength = 0.0f;
@@ -505,6 +545,16 @@ float Input::getStrengthRnoMouse()
 	{
 		strength = min(Vector2(gamepadState.thumbSticks.rightX, gamepadState.thumbSticks.rightY).Length(), 1.0f);
 	}
+
+	if (strength == 0.0f)
+	{
+		if (checkButtonKeyboard(Keys::R_LEFT, States::HELD) || checkButtonKeyboard(Keys::R_RIGHT, States::HELD) ||
+			checkButtonKeyboard(Keys::R_UP, States::HELD) || checkButtonKeyboard(Keys::R_DOWN, States::HELD))
+		{
+			strength = 1.0f;
+		}
+	}
+
 	return strength;
 }
 

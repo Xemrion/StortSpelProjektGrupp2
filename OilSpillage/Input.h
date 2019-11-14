@@ -85,6 +85,7 @@ public:
 	static Vector2 getDirectionL(/*int player*/);
 	static float getStrengthL(/*int player*/);
 	static Vector2 getDirectionR(/*int player*/);
+	static Vector2 getDirectionRnoMouse(/*int player*/);
 	static float getStrengthR(/*int player*/);
 	static float getStrengthRnoMouse(/*int player*/);
 
