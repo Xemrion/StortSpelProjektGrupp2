@@ -257,7 +257,6 @@ void ActorManager::seperation(const Vector3& targetPos)
 	float desiredSeparationDistance;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		buildings = static_cast<PlayingGameState*>(Game::getCurrentState())->map->getTileMap().getAllTilePositionsInRadius(groups[i].getAveragePos(), 300, Tile::building);
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
 			// Distance of field of vision for separation between boids
@@ -282,41 +281,6 @@ void ActorManager::seperation(const Vector3& targetPos)
 					direction += difference;
 					nrInProximity++;
 				}
-			}
-			for (int k = 0; k < buildings.size(); k++)
-			{
-				// Calculate distance from current boid to boid we're looking at
-				Vector3 curBoidPos = buildings[k];
-				float deltaX = groups[i].actors[j]->getPosition().x - curBoidPos.x;
-				float deltaZ = groups[i].actors[j]->getPosition().z - curBoidPos.z;
-				float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-				// If this is a fellow boid and it's too close, move away from it
-				if ((distance < 110) && distance != 0)
-				{
-					Vector3 difference(0.0f);
-					difference = groups[i].actors[j]->getPosition() - buildings[k];
-					difference.Normalize();
-					difference;      // Weight by distance
-					direction += difference;
-					nrInProximity++;
-				}
-			}
-			// Calculate distance from current boid to player
-			float deltaX = groups[i].actors[j]->getPosition().x - targetPos.x;
-			float deltaZ = groups[i].actors[j]->getPosition().z - targetPos.z;
-			float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-			// If this is a fellow boid and it's too close, move away from it
-			if (distance < desiredSeparationDistance)
-			{
-				Vector3 difference(0.0f);
-				difference = groups[i].actors[j]->getPosition() - targetPos;
-				difference.Normalize();
-				if (distance != 0)
-				{
-					difference /= distance;      // Weight by distance
-				}
-				direction += difference;
-				nrInProximity++;
 			}
 			// Adds average difference of location to acceleration
 			if (nrInProximity > 0)
