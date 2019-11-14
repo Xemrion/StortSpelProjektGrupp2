@@ -85,7 +85,7 @@ Vector3 Swarm::seek()
 		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
 		offsetVec = crossVector.Cross(eliminatingVec);
 		offsetVec.Normalize();
-		offsetVec *= 8;
+		offsetVec *= 10;
 		desiredDirection -= position - (destination - offsetVec);
 	}
 
@@ -99,7 +99,7 @@ Vector3 Swarm::seek()
 		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
 		offsetVec = crossVector.Cross(eliminatingVec);
 		offsetVec.Normalize();
-		offsetVec *= 8;
+		offsetVec *= 10;
 		desiredDirection -= position - (destination + offsetVec);
 	}
 

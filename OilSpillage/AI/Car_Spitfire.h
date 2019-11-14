@@ -27,7 +27,7 @@ private:
 
 
 	void setUpActor();
-
+	btPoint2PointConstraint* pointJoint;
 	Vector3 direction;
 	float throttleInputStrength;
 	Vector3 accelForce;

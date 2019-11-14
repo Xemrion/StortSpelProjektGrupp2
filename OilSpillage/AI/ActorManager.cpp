@@ -57,13 +57,11 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	}
 	if (hasDied)
 	{
-
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
 			if (actors[i]->isDead())
 			{
 				destroyActor(i);
-
 			}
 		}
 	}
@@ -173,7 +171,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					}
 				}
-				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
+				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
 						/*int randomSound = rand() % 3 + 1;
@@ -301,7 +299,6 @@ void ActorManager::seperation(const Vector3& targetPos)
 				{
 					direction /= direction.Length();
 				}
-
 			}
 			groups[i].actors[j]->applyForce(direction * 4);
 		}

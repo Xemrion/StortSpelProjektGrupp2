@@ -27,7 +27,6 @@
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
-    <ClCompile Include="PG\District.cpp" />
     <ClCompile Include="UI\Button.cpp" />
     <ClCompile Include="UI\CheckBox.cpp" />
     <ClCompile Include="UI\Element.cpp" />
@@ -159,7 +158,6 @@
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
     <ClInclude Include="UI\ObjectiveBox.h" />
     <ClInclude Include="AI\AIGroup.h" />
-    <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="UI\UIControls.h" />
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="AI\Swarm.h" />
@@ -171,7 +169,7 @@
     <ClInclude Include="AI\Boss.h" />
     <ClInclude Include="AI\Sniper.h" />
     <ClInclude Include="AI\ChaseCar.h" />
-    <ClInclude Include="player.h" />
+    <ClInclude Include="PG\Biome.hpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

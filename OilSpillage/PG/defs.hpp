@@ -23,7 +23,8 @@ template <typename T> using SPtr = std::shared_ptr<T>;
 template <typename T> using Opt = std::optional<T>;
 
 // string
-using String = std::basic_string<char>;
+using String     = std::basic_string<char>;
+using StringView = std::basic_string_view<char>;
 
 // primitives
 using U8   = std::uint8_t;
@@ -38,6 +39,8 @@ using F32  = float;
 using F64  = double;
 using Bool = bool;
 using Size = size_t;
+
+using RGBA = U32;
 
 #ifdef _DEBUG
    Bool constexpr isDebugging {  true };
