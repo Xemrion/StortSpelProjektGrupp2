@@ -38,12 +38,12 @@ Physics::~Physics()
 	//osäker på om man deletar på detta sätt
 	for (int i = 0; i < bodies.size(); i++)
 	{
-		this->world->removeRigidBody(bodies[i]);
 		btMotionState* motionState = bodies[i]->getMotionState();
 		btCollisionShape* shape = bodies[i]->getCollisionShape();
-		delete bodies[i];
 		delete shape;
 		delete motionState;
+		this->world->removeRigidBody(bodies[i]);
+		delete bodies[i];
 	}
 	for (int i = 0; i < pointJoints.size(); i++)
 	{
@@ -202,18 +202,23 @@ bool Physics::DeleteRigidBody(btRigidBody * rb)
 			if (bodies[i] == rb)
 			{
 				this->world->removeRigidBody(bodies[i]);
-				btMotionState* motionState = bodies[i]->getMotionState();
-				btCollisionShape* shape = bodies[i]->getCollisionShape();
-				delete bodies[i];
-				this->bodies.erase(this->bodies.begin() + i);
-				delete shape;
-				delete motionState;
 				return true;
 			}
 		}
 	return false;
 }
-
+bool Physics::deletePointJoint(btPoint2PointConstraint* pointJoint)
+{
+	for (int i = 0; i < this->pointJoints.size(); i++)
+	{
+		if (pointJoints[i] == pointJoint)
+		{
+			this->world->removeConstraint(pointJoint);
+			return true;
+		}
+	}
+	return false;
+}
 bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, 
 	int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
