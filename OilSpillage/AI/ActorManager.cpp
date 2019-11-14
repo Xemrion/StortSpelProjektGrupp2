@@ -299,7 +299,6 @@ void ActorManager::seperation(const Vector3& targetPos)
 				{
 					direction /= direction.Length();
 				}
-
 			}
 			groups[i].actors[j]->applyForce(direction * 4);
 		}
