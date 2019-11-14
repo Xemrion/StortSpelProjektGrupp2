@@ -151,9 +151,13 @@ void Bullet::update(float deltaTime)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}
-	else if (this->weapon.type == WeaponType::Laser or this->weapon.type == WeaponType::aiLaser)
+	else if (this->weapon.type == WeaponType::Laser)
 	{
 		laserUpdate(deltaTime);
+	}
+	else if (this->weapon.type == WeaponType::aiLaser)
+	{
+		laserEnemyUpdate(deltaTime);
 	}
 	else
 	{
@@ -195,6 +199,32 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 			this->timeLeft = 0.f;
 		}
 
+		timeLeft = max(timeLeft - deltaTime, 0.0f);
+	}
+}
+
+void Bullet::laserEnemyUpdate(float& deltaTime)
+{
+	GameObject* laserObject = this->getGameObject();
+	Vector3 rayDir = this->getDirection();
+	Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
+	if (static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getAABB().intersect(rayOrigin, rayDir, 1000))
+	{
+		if (soundTimer > 0.05f) {
+			/*int randomSound = rand() % 3 + 1;
+			std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
+			Sound::PlaySoundEffect(soundEffect);*/
+			Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+			soundTimer = 0;
+		}
+		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage());
+	}
+	this->obj->setScale(weapon.bulletScale * Vector3(timeLeft / weapon.bulletLifetime, timeLeft / weapon.bulletLifetime, 1.0));
+	if (timeLeft > 0.0f)
+	{
+		obj->move(dir * this->obj->getScale().z + dir);
+		float newRot = atan2(dir.x, dir.z);
+		this->obj->setRotation(Vector3(0, newRot, 0));
 		timeLeft = max(timeLeft - deltaTime, 0.0f);
 	}
 }
