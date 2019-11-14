@@ -13,7 +13,7 @@ void AIGroup::update(const Vector3& targetPos)
 {
 	removeDeadActors();
 	updateAveragePos();
-	formationP(targetPos);
+	formation(targetPos);
 }
 
 const Vector3& AIGroup::getAveragePos() const
@@ -44,13 +44,13 @@ void AIGroup::setPath(std::vector<Vector3> path)
 {
 	this->path = path;
 }
-void AIGroup::formationP(const Vector3& targetPos)
+void AIGroup::formation(const Vector3& targetPos)
 {
 	float deltaX = averagePos.x - targetPos.x;
 	float deltaZ = averagePos.z - targetPos.z;
 	float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 
-	if (distance < 50 && distance > 2)
+	if (distance < 50 && distance > 3)
 	{
 		this->groupRadius = groupRadius * 2;
 		for (int i = 0; i < actors.size(); i++)
