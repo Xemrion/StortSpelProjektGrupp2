@@ -1,8 +1,21 @@
 #include "TurretHandler.h"
 #include"..//Objectives/Objective.h"
 #include"..//States/PlayingGameState.h"
+void TurretHandler::destroyTurret(int index)
+{
+	if (turrets[index]->getRigidBody() != nullptr)
+	{
+		physics->DeleteRigidBody(turrets[index]->getRigidBody());
+	}
+	delete turrets[index];
+	turrets.erase(turrets.begin() + index);
+}
 TurretHandler::TurretHandler()
 {
+}
+TurretHandler::TurretHandler(Physics* physics)
+{
+	this->physics = physics;
 }
 TurretHandler::~TurretHandler()
 {
@@ -12,7 +25,7 @@ TurretHandler::~TurretHandler()
 	}
 	turrets.clear();
 }
-void TurretHandler::update(float dt, DirectX::SimpleMath::Vector3 targetPos)
+void TurretHandler::update(float dt,const Vector3& targetPos)
 {
 	bool turretDied = false;
 	for (int i = 0; i < this->turrets.size(); i++)
@@ -40,20 +53,18 @@ void TurretHandler::update(float dt, DirectX::SimpleMath::Vector3 targetPos)
 		{
 			if (turrets[i]->isDead())
 			{
-				turrets[i]->death();
-				delete turrets[i];
-				turrets.erase(turrets.begin() + i);
+				destroyTurret(i);
 			}
 		}
 	}
 }
 
-void TurretHandler::createTurret(float x, float z, int weaponType)
+void TurretHandler::createTurret(float x, float z, int weaponType,Physics* physics)
 {
-	this->turrets.emplace_back(new Turret(x, z, weaponType));
+	this->turrets.push_back(new Turret(x, z, weaponType,physics));
 }
 
-float TurretHandler::distanceToPlayer(DirectX::SimpleMath::Vector3 position)
+float TurretHandler::distanceToPlayer(const Vector3& position)
 {
 	float minDistance = -1;
 	for (int i = 0; i < this->turrets.size(); i++)
@@ -75,12 +86,9 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 		{
 			if (!this->turrets[i]->isDead())
 			{
-				if (bulletArray[j].getGameObject()->getAABB().intersect(this->turrets[i]->getAABB()))
+				if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->turrets[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						/*int randomSound = rand() % 3 + 1;
-						std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
-						Sound::PlaySoundEffect(soundEffect);*/
 						Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
