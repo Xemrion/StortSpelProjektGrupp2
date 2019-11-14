@@ -62,7 +62,7 @@ Element* UserInterface::changeSelected(Element* selected)
 		if (selected->getRight() != nullptr)
 		{
 			selected = selected->getRight();
-			Sound::PlaySoundEffect("./data/sound/FlameLoop1.wav");
+			Sound::PlaySoundEffect("./data/sound/MenuMove.wav");
 		}
 	}
 
