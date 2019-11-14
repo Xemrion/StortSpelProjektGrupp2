@@ -16,6 +16,8 @@ SkyscraperFloor::SkyscraperFloor(const SkyscraperFloor& other)
 	this->nrOfEdges = other.nrOfEdges;
 	this->indices.clear();
 	this->indices = other.indices;
+	this->debugInfo.clear();
+	this->debugInfo = other.debugInfo;
 }
 
 SkyscraperFloor::~SkyscraperFloor()
@@ -117,6 +119,34 @@ bool SkyscraperFloor::evenOddCheck( Vector3 pointB1,Vector3 pointB2, Vector3 poi
 	return intersect;
 }
 
+bool SkyscraperFloor::evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA, Vector3 pointTowards) const
+{
+	bool intersect = false;
+
+	float divider, t1, t2;
+	Vector3 direction = pointTowards - pointA;
+
+	divider = (((pointB2.x - pointB1.x) * (pointA.z - direction.z))
+		- ((pointA.x - direction.x) * (pointB2.z - pointB1.z)));
+
+	if (divider != 0) {
+
+		t1 = (((pointB1.z - pointB2.z) * (pointA.x - pointB1.x)) +
+			((pointB2.x - pointB1.x) * (pointA.z - pointB1.z)))
+			/ divider;
+
+		t2 = (((pointA.z - direction.z) * (pointA.x - pointB1.x)) +
+			((direction.x - pointA.x) * (pointA.z - pointB1.z)))
+			/ divider;
+
+		if (t1 > 0 && t2 > 0 && t2 <= 1) {
+			intersect = true;
+		}
+	}
+
+	return intersect;
+}
+
 void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 {
 	/* Union
@@ -129,9 +159,21 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 	Repeat for B
 	Add points of B between the intersecting points added to A
 	You have a union.
+
+	Better?
+	Go through lines and points.
+	If first point is outside, add it and following points to a vector until intersection.
+	If first point is inside, start putting points into vector after the first intersection
+	Switch on or off the adding of points depending on intersection.
+	Save a bool depending on first outside or inside.
+	If first outside, and ending with intersection outside, add last vector to the first.
+
 	*/
+
+
 	//Might need fixing
 	//Phase 1: Intersections.
+	std::vector<std::vector<Vector3>> vectorsOfPoints;
 	toUnion.translate(newCenter);
 	this->debugInfo.push_back("Union <");
 	this->debugInfo.insert(this->debugInfo.end(), toUnion.debugInfo.begin(), toUnion.debugInfo.end());
@@ -283,6 +325,7 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 bool SkyscraperFloor::getTriangleIndices()
 { 
 	this->indices.clear();
+	this->triangleGenFail = false;
 	int triangleIndiciesCounter = 0, failedAttempts = 0;
 	std::vector<int> triangleIndices;
 	std::vector<bool> usedIndices;
@@ -560,21 +603,21 @@ std::vector<Vertex3D> SkyscraperFloor::getRoofVertices()
 
 		temp.position = this->verticies[this->indices[i]];
 		temp.normal = normal;
-		temp.uv = Vector2(temp.position.x, temp.position.z);
+		temp.uv = Vector2(temp.position.x, temp.position.z) * 5;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 1]];
 		temp.normal = normal;
-		temp.uv = Vector2(temp.position.x, temp.position.z);
+		temp.uv = Vector2(temp.position.x, temp.position.z) * 5;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 2]];
 		temp.normal = normal;
-		temp.uv = Vector2(temp.position.x, temp.position.z);
+		temp.uv = Vector2(temp.position.x, temp.position.z) * 5;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
@@ -592,8 +635,10 @@ std::vector<Vertex3D> SkyscraperFloor::getDifferenceAsRoofVerticies(const Skyscr
 	bool exists = false;
 	int insertPos = -1;
 	int postErasePoint = -1;
+	bool startInside = false, reboundFirst = false;
 	int onPointIntersectCheck1 = -1, onPointIntersectCheck2 = -1;
 	int onPointIntersectCheck3 = -1, onPointIntersectCheck4 = -1;
+	float result = -1.0f;
 	
 	for (size_t i = 0; i < other.nrOfEdges; i++) {
 		exists = false;
@@ -613,18 +658,28 @@ std::vector<Vertex3D> SkyscraperFloor::getDifferenceAsRoofVerticies(const Skyscr
 		}
 		if (!exists) {
 			if (insertPos == -1) {
+				startInside = true;
 				pointsToAdd.insert(pointsToAdd.begin(), shifted);
-				onPointIntersectCheck1 = i;
-				if (onPointIntersectCheck2 == -1) {
-					onPointIntersectCheck2 = i;
-				}
-			}
-			else {
 				if (onPointIntersectCheck1 == -1) {
 					onPointIntersectCheck1 = i;
 				}
 				onPointIntersectCheck2 = i;
-				pointsToAdd.insert(pointsToAdd.begin() + postErasePoint, shifted);
+			}
+			else {
+				if (!startInside) {
+					if (onPointIntersectCheck1 == -1) {
+						onPointIntersectCheck1 = i;
+					}
+					onPointIntersectCheck2 = i;
+					pointsToAdd.insert(pointsToAdd.begin() + postErasePoint, shifted);
+				}
+				else {
+					if (!reboundFirst) {
+						onPointIntersectCheck1 = i;
+						reboundFirst = true;
+					}
+					pointsToAdd.insert(pointsToAdd.begin() + postErasePoint, shifted);
+				}
 			}
 		}
 	}
@@ -633,28 +688,31 @@ std::vector<Vertex3D> SkyscraperFloor::getDifferenceAsRoofVerticies(const Skyscr
 	onPointIntersectCheck3 = (insertPos - 1 + temp.nrOfEdges) % temp.nrOfEdges;
 	onPointIntersectCheck4 = insertPos;
 
-	Vector3 shiftedDot1(0.0f, shifted.y, 0.0f), shiftedDot2(0.0f, shifted.y, 0.0f);
-	shiftedDot1.x = other.verticies[onPointIntersectCheck1].x;
-	shiftedDot1.z = other.verticies[onPointIntersectCheck1].z;
-	shiftedDot2.x = other.verticies[(onPointIntersectCheck1 + 1) % other.nrOfEdges].x;
-	shiftedDot2.z = other.verticies[(onPointIntersectCheck1 + 1) % other.nrOfEdges].z;
+	Vector3 shiftedDot1(0.0f, shifted.y, 0.0f);
+	Vector3 shiftedDot2(0.0f, shifted.y, 0.0f);
+	shiftedDot1.x = other.verticies[onPointIntersectCheck2].x;
+	shiftedDot1.z = other.verticies[onPointIntersectCheck2].z;
+	shiftedDot2.x = other.verticies[(onPointIntersectCheck2 + 1) % other.nrOfEdges].x;
+	shiftedDot2.z = other.verticies[(onPointIntersectCheck2 + 1) % other.nrOfEdges].z;
 	Vector3 line1 = shiftedDot2 - shiftedDot1;
 	Vector3 line2 = shiftedDot2 - temp.verticies[onPointIntersectCheck3];
 	line1.Normalize();
 	line2.Normalize();
-	if (line1.Dot(line2) != 1) {
-		pointsToAdd.insert(pointsToAdd.begin(), other.verticies[(onPointIntersectCheck1 + 1) % other.nrOfEdges]);
+	result = line1.Dot(line2);
+	if (result <= 0.9f) {
+		pointsToAdd.insert(pointsToAdd.begin(), shiftedDot2);
 	}
-	shiftedDot1.x = other.verticies[onPointIntersectCheck2].x;
-	shiftedDot1.z = other.verticies[onPointIntersectCheck2].z;
+	shiftedDot1.x = other.verticies[onPointIntersectCheck1].x;
+	shiftedDot1.z = other.verticies[onPointIntersectCheck1].z;
 	shiftedDot2.x = other.verticies[(onPointIntersectCheck1 - 1 + other.nrOfEdges) % other.nrOfEdges].x;
 	shiftedDot2.z = other.verticies[(onPointIntersectCheck1 - 1 + other.nrOfEdges) % other.nrOfEdges].z;
 	line1 = shiftedDot2 - shiftedDot1;
 	line2 = shiftedDot2 - temp.verticies[onPointIntersectCheck4];
 	line1.Normalize();
 	line2.Normalize();
-	if (line1.Dot(line2) != 1) {
-		pointsToAdd.insert(pointsToAdd.end(), other.verticies[(onPointIntersectCheck1 - 1 + other.nrOfEdges) % other.nrOfEdges]);
+	result = line1.Dot(line2);
+	if (result <= 0.9f) {
+		pointsToAdd.insert(pointsToAdd.end(), shiftedDot2);
 	}
 
 	temp.verticies.insert(temp.verticies.begin() + insertPos, pointsToAdd.begin(), pointsToAdd.end());

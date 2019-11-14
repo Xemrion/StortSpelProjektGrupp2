@@ -16,14 +16,12 @@ void Skyscraper::generateSkyscraper()
 {
 	this->floors.clear();
 	Vector3 modifyBy(0.0f, 2.0f, 0.0f);
-	I32_Dist floorPoints(4, 8), rotation(1, 360), height(4, 9), vectorPoint(1, 500);
+	I32_Dist floorPoints(4, 8), rotation(1, 360), height(3, 8), vectorPoint(1, 500);
 	I32_Dist floors(2 , 4);
 	int nrOfFloors = 0;
 	//Random
-	/*SkyscraperFloor toAdd(floorPoints(rng));
-	SkyscraperFloor roof(floorPoints(rng));*/
-	SkyscraperFloor toAdd(5);
-	SkyscraperFloor roof(8);
+	SkyscraperFloor toAdd(floorPoints(rng));
+	SkyscraperFloor roof(floorPoints(rng));
 
 	//Random
 	toAdd.rotateDeg(rotation(rng));
@@ -157,7 +155,7 @@ void Skyscraper::testDraw(std::string name)
 			this->roof->setPosition(Vector3(30.0f, 0.0f, -30.0f));
 			this->roof->setScale(Vector3(2.0f, 1.0f, 2.0f));
 			this->roof->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
-			this->roof->setTexture(Game::getGraphics().getTexturePointer("brickwall"));
+			this->roof->setTexture(Game::getGraphics().getTexturePointer("test"));
 			this->roof->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
 
 			this->windows->setPosition(Vector3(30.0f, 0.0f, -30.0f));

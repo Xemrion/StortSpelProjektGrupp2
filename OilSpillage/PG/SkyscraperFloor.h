@@ -43,6 +43,7 @@ private:
 	void generateShape(int edges);
 	Vector3 intersectingLines(Vector3 pointA1, Vector3 pointA2, Vector3 pointB1, Vector3 pointB2) const;
 	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA) const;
+	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA, Vector3 pointTowards) const;
 };
 
 /*	Display a complex shape with triangles
