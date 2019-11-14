@@ -23,7 +23,6 @@ Bullet::Bullet(Weapon weapon)
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
 	this->weapon = weapon;
 	this->obj->setScale(weapon.bulletScale);
-	this->obj->setScale(Vector3(5,5,5));
 	this->obj->setColor(Vector4(0, 0, 0, 1));
 }
 
@@ -40,11 +39,11 @@ void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::Flamethrower || this->weapon.type == WeaponType::aiFlamethrower)
+	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower)
 	{
 		flamethrowerShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
-	else if (this->weapon.type == WeaponType::Laser || this->weapon.type == WeaponType::aiLaser)
+	else if (this->weapon.type == WeaponType::Laser or this->weapon.type == WeaponType::aiLaser)
 	{
 		laserShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
@@ -72,6 +71,7 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& dir
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
+
 	Game::getGraphics().addToDraw(this->obj);
 }
 
@@ -101,7 +101,7 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition()+Vector3(0,1,0),
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
@@ -144,14 +144,14 @@ void Bullet::update(float deltaTime)
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::aiMachineGun || 
-		this->weapon.type == WeaponType::aiFlamethrower || 
-		this->weapon.type == WeaponType::aiMissileLauncher || 
-		this->weapon.type == WeaponType::aiMelee)
+	else if (this->weapon.type == WeaponType::aiMachineGun or
+		this->weapon.type == WeaponType::aiFlamethrower or
+		this->weapon.type == WeaponType::aiMelee or
+		this->weapon.type == WeaponType::aiMissileLauncher)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}
-	else if (this->weapon.type == WeaponType::Laser || this->weapon.type == WeaponType::aiLaser)
+	else if (this->weapon.type == WeaponType::Laser or this->weapon.type == WeaponType::aiLaser)
 	{
 		laserUpdate(deltaTime);
 	}
@@ -221,7 +221,7 @@ void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direc
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 1), Vector4(4.5, 0.5, 0.5, 1), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread*vehicleWeapon.maxSpread)));
+	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.02), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread * vehicleWeapon.maxSpread)));
 
 	Game::getGraphics().addToDraw(this->obj);
 	if (vehicleWeapon.currentSpreadIncrease > vehicleWeapon.maxSpread)
@@ -248,7 +248,7 @@ float Bullet::getTimeLeft() const
 	return timeLeft;
 }
 
-void Bullet::setWeapon(Weapon weapon) 
+void Bullet::setWeapon(Weapon weapon)
 {
 	this->weapon = weapon;
 }
@@ -275,7 +275,7 @@ GameObject* Bullet::getGameObject()
 
 void Bullet::updateSoundTimer(float deltaTime)
 {
-	soundTimer +=  deltaTime;
+	soundTimer += deltaTime;
 }
 
 void Bullet::destroy()
