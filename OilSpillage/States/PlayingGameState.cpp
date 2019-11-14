@@ -17,13 +17,13 @@ void PlayingGameState::initAI()
 	{
 		for (int j = 0; j < 3; j++)
 		{
-		actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
+			//actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
 			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
 			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
 		}
 	}
 			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
-	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
+	//actorManager->createSpitFire(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
 	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
 	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
 	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
