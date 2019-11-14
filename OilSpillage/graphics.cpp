@@ -342,20 +342,17 @@ bool Graphics::init(Window* window)
 	this->particleSystem.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
 	this->particleSystem2.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
 
-	/*for (int i = 0; i < 150; i++)
-	{
-		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
-		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
-		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
-		this->particleSystem.addParticle(1, 10, Vector3(0, 0, 3), Vector3(1, 0, 0), Vector4(1, 1, 0, 1), 0.1f);
-	}*/
 	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
-	fogMaterial.scale = 5.0;
-	fog->initialize(device, deviceContext, 5, 1.945, fogMaterial);
+	fogMaterial.scale = 50.0;
+	fogMaterial.density = 0.03;
+	fogMaterial.ambientDensity = 0.025;
+	fogMaterial.densityThreshold = 0.05;
+
+	fog->initialize(device, deviceContext, 3, 1.25, fogMaterial);
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	deviceContext->RSSetViewports(1, &this->vp);
 
@@ -1478,7 +1475,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
-		Vector4 t = Vector4(time, 0.0005 * (i % 4), 0.00047 * (i % 5), 0.0);
+		Vector4 t = Vector4(time, 0.0005 + (i % 3) * 0.00003, 0.0005 + (i % 2) * 0.000045, 0.0);
 		deviceContext->Map(fogAnimationBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &t, sizeof(Vector4));
 		deviceContext->Unmap(fogAnimationBuffer.Get(), 0);

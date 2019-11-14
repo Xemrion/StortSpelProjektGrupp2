@@ -30,7 +30,7 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 	Game::getGraphics().loadShape(SHAPE_QUAD);
 	Game::getGraphics().loadTexture("perlin_s4_e8");
 	noiseTexture = Game::getGraphics().getTexturePointer("perlin_s4_e8");
-
+	
 	//Game::getGraphics().loadTexture("brickwall");
 	//noiseTexture = Game::getGraphics().getTexturePointer("brickwall");
 
@@ -181,8 +181,8 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		
 		materialCopy.densityThreshold = material.densityThreshold;
 		materialCopy.ambientDensity = material.ambientDensity / quads.size();
-		materialCopy.density = material.density / (i + 1);
-		materialCopy.scale = material.scale * (i + 1);
+		materialCopy.density = material.density / (1 + i * 0.05);
+		materialCopy.scale = material.scale;
 
 		hr = deviceContext->Map(materialBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &materialCopy, sizeof(FogMaterial));
