@@ -3,13 +3,16 @@
 
 #include "Element.h"
 #include "TextBox.h"
-#include "../../Inventory/Inventory.h"
+#include "../../Inventory/Container.h"
+#include "../../Vehicle.h"
 
 class ItemSelector : public Element
 {
 private:
 	static const int tileLength = 6;
 	void addTextbox();
+
+	Container::Slot** used;
 
 	Texture* textureBG;
 	Texture* textureIndicator;
@@ -37,7 +40,9 @@ public:
 	void changeSelectedType(bool down);
 	void changeSelectedIndex(bool right);
 	ItemType getSelectedType() const;
-	Item* getSelectedItem() const;
+	Container::Slot* getSelectedSlot() const;
+	bool isSelectedValid() const;
+	void setUsed(Container::Slot** used);
 };
 
 

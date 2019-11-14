@@ -3,7 +3,7 @@
 #include "../game.h"
 
 std::shared_ptr<GameObject> Item::machineGun;
-std::vector<Item> Item::allItems;
+std::vector<std::shared_ptr<Item>> Item::allItems;
 
 Item::Item(std::string name, std::string description, ItemType type, std::shared_ptr<GameObject> object)
 	: name(name), description(description), type(type), object(object)
@@ -31,6 +31,11 @@ Item::Item(const Item& obj)
 	}
 }
 
+Item* Item::clone() const
+{
+	return new Item(*this);
+}
+
 void Item::init()
 {
 	Graphics& graphics = Game::getGraphics();
@@ -44,23 +49,23 @@ void Item::init()
 	Item::machineGun->setRotation(Vector3(0.0f, 0.0f, 0.0f));
 
 	Item::allItems = {
-		Item("Test Item", "A very useless thing!", ItemType::WEAPON, nullptr),
-		Item("Test Item 2", "A very useless thing 2!", ItemType::GADGET, nullptr),
-		Item("Test Item 3", "A very useless thing 3!", ItemType::GADGET, nullptr),
-		ItemWeapon("Machine Gun", WeaponHandler::getWeapon(WeaponType::MachineGun), Item::machineGun)
+		std::make_shared<Item>("Test Item", "A very useless thing!", ItemType::WEAPON, nullptr),
+		std::make_shared<Item>("Test Item 2", "A very useless thing 2!", ItemType::GADGET, nullptr),
+		std::make_shared<Item>("Test Item 3", "A very useless thing 3!", ItemType::GADGET, nullptr),
+		std::make_shared<ItemWeapon>("Flamethrower", WeaponHandler::getWeapon(WeaponType::MachineGun), Item::machineGun)
 	};
 
 	//Sort so we can use getItemByName later if needed.
-	std::sort(allItems.begin(), allItems.end(), [](const Item& a, const Item& b) { return std::strcmp(a.getName().c_str(), b.getName().c_str()) < 0; });
+	std::sort(allItems.begin(), allItems.end(), [](const std::shared_ptr<Item>& a, const std::shared_ptr<Item>& b) { return std::strcmp(a->getName().c_str(), b->getName().c_str()) < 0; });
 }
 
 Item* Item::getItemByName(std::string name)
 {
-	auto item = std::lower_bound(allItems.begin(), allItems.end(), name, [](const Item& item, std::string name) { return std::strcmp(item.getName().c_str(), name.c_str()) < 0; });
+	auto item = std::lower_bound(allItems.begin(), allItems.end(), name, [](const std::shared_ptr<Item>& item, std::string name) { return std::strcmp(item->getName().c_str(), name.c_str()) < 0; });
 
 	if (item != allItems.end())
 	{
-		return &(*item);
+		return (*item).get();
 	}
 
 	return nullptr;
@@ -68,7 +73,7 @@ Item* Item::getItemByName(std::string name)
 
 Item* Item::getRandom()
 {
-	return &allItems[rand() % allItems.size()];
+	return allItems[rand() % allItems.size()].get();
 }
 
 Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale, Quaternion rotation, bool ignoreObjectRotation)

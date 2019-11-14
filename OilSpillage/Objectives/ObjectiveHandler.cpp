@@ -69,11 +69,12 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 			Vector3 pos(rand() % 10 + 10, 0, rand() % 10 - 20);
 			pos.x += i * 10;
 			pos.z += i * -10;
-			targets[i]->setPosition(pos);
 			targets[i]->mesh = Game::getGraphics().getMeshPointer("Cube");
 			targets[i]->setRotation(Vector3(0, (23 + 0.3f * 3.14 * (rand() % 200))-(23+0.3f*3.14*(rand()%400)),0));
 			targets[i]->setScale(Vector3((rand() % 7) * 0.1f + 0.4f));
 			pos.y = -1.5f + targets[i]->getScale().y * 0.5f;
+			targets[i]->setPosition(pos);
+
 			
 			if (TypeOfTarget(typeInt) == TypeOfTarget::Crate)
 			{

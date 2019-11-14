@@ -9,8 +9,12 @@ class CarGadgetSelector : public Element
 {
 private:
 	Texture* textureBG;
+	Texture* textureCar;
+	Texture* textureIndicator;
+
 	Element* selected;
 	std::unique_ptr<ItemSlot> slots[Slots::SIZEOF];
+	std::unique_ptr<Container::Slot*[]> used;
 public:
 	static Vector2 size;
 
@@ -20,8 +24,8 @@ public:
 	void draw(bool selected);
 	void update(bool selected, float deltaTime);
 
-	void setItemOfSelected(Item* item);
-	Item* getItemOfSelected() const;
+	void setSlotOfSelected(Container::Slot* slot);
+	Container::Slot** getUsed();
 };
 
 #endif // !CAR_GADGET_SELECTOR_H

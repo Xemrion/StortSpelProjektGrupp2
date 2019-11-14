@@ -3,6 +3,7 @@
 
 #include "../UserInterface.h"
 #include "../Elements/ItemSlot.h"
+#include "../Elements/ButtonPromtBar.h"
 
 class UIRandomItem : public UserInterface
 {
@@ -12,8 +13,11 @@ private:
 	void updateUI(float deltaTime);
 	void drawUI();
 
+	Texture* textureIndicator;
 	Element* selected;
 	std::unique_ptr<ItemSlot> slots[slotCount];
+	std::unique_ptr<ButtonPromptBar> promptBar;
+	Container::Slot container[slotCount];
 public:
 	UIRandomItem();
 	virtual ~UIRandomItem();

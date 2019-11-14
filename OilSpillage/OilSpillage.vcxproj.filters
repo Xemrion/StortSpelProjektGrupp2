@@ -65,7 +65,6 @@
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="AI\AIGroup.cpp" />
     <ClCompile Include="Inventory\Item.cpp" />
-    <ClCompile Include="Inventory\Inventory.cpp" />
     <ClCompile Include="States\UpgradingGameState.cpp" />
     <ClCompile Include="Inventory\ItemWeapon.cpp" />
     <ClCompile Include="UI\Menu\UIControls.cpp" />
@@ -119,6 +118,12 @@
     <ClCompile Include="SoLoud\src\audiosource\wav\stb_vorbis.c" />
     <ClCompile Include="SoLoud\src\audiosource\wav\dr_impl.cpp" />
     <ClCompile Include="SoLoud\src\backend\winmm\soloud_winmm.cpp" />
+    <ClCompile Include="AI\TurretHandler.cpp" />
+    <ClCompile Include="AI\Swarm.cpp" />
+    <ClCompile Include="AI\Car_Spitfire.cpp" />
+    <ClCompile Include="PG\Modelizer.cpp" />
+    <ClCompile Include="Inventory\Container.cpp" />
+    <ClCompile Include="UI\Elements\ButtonPromtBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -187,7 +192,6 @@
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
     <ClInclude Include="AI\AIGroup.h" />
     <ClInclude Include="Inventory\Item.h" />
-    <ClInclude Include="Inventory\Inventory.h" />
     <ClInclude Include="States\UpgradingGameState.h" />
     <ClInclude Include="Inventory\ItemWeapon.h" />
     <ClInclude Include="UI\Menu\UIControls.h" />
@@ -245,6 +249,12 @@
     <ClInclude Include="SoLoud\src\audiosource\wav\dr_wav.h" />
     <ClInclude Include="SoLoud\src\audiosource\wav\dr_flac.h" />
     <ClInclude Include="SoLoud\src\audiosource\wav\dr_mp3.h" />
+    <ClInclude Include="PG\Modelizer.hpp" />
+    <ClInclude Include="AI\TurretHandler.h" />
+    <ClInclude Include="AI\Swarm.h" />
+    <ClInclude Include="AI\Car_Spitfire.h" />
+    <ClInclude Include="Inventory\Container.h" />
+    <ClInclude Include="UI\Elements\ButtonPromtBar.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

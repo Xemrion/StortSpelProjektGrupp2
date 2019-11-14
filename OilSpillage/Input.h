@@ -29,7 +29,7 @@ enum class Keys {
 	R_PRESS, //Right stick pressed. Keyboard: ?
 
 	CONFIRM, //A (PS: X) button. Keyboard: Enter
-	CANCEL, //B (PS: O) button. Keyboard: Q
+	CANCEL, //B (PS: O) button. Keyboard: Return
 	ACTION_1, //X (PS: Square) button. Keyboard: Space
 	ACTION_2, //Y (PS: Triangle) button. Keyboard: Left shift
 
@@ -85,12 +85,14 @@ public:
 	static Vector2 getDirectionL(/*int player*/);
 	static float getStrengthL(/*int player*/);
 	static Vector2 getDirectionR(/*int player*/);
+	static Vector2 getDirectionRnoMouse(/*int player*/);
 	static float getStrengthR(/*int player*/);
 	static float getStrengthRnoMouse(/*int player*/);
 
 	static void setWindowSize(int width, int height);
 	static bool checkButtonMouse(MouseKeys key, States state);
 	static Vector2 getMousePosition();
+	static void getControllerProductName();
 
 	//static void setKeyboardPlayerID(int player);
 };

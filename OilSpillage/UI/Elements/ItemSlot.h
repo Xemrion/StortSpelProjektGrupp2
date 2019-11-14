@@ -4,6 +4,7 @@
 #include "Element.h"
 #include "../../Texture.h"
 #include "../../Inventory/Item.h"
+#include "../../Inventory/Container.h"
 #include "TextBox.h"
 
 
@@ -15,8 +16,7 @@ private:
 	std::unique_ptr<TextBox> textBox;
 	bool showTextBox;
 	Texture* textureSlot;
-	Texture* textureIndicator;
-	Item* item;
+	Container::Slot* slot;
 
 	float rotationTimer;
 	Quaternion rotation;
@@ -30,8 +30,8 @@ public:
 	void draw(bool selected);
 	void update(bool selected, float deltaTime);
 
-	Item* getItem() const;
-	void setItem(Item* item);
+	Container::Slot* getSlot() const;
+	void setSlot(Container::Slot* slot);
 };
 
 #endif // !ITEM_SLOT_H

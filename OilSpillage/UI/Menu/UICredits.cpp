@@ -23,6 +23,7 @@ void UICredits::drawUI()
 	}
 
 	this->buttonBack->draw(true);
+	this->promptBar->draw(false);
 	UserInterface::getSpriteBatch()->End();
 }
 
@@ -50,4 +51,12 @@ void UICredits::init()
 	creditsFile.close();
 
 	this->buttonBack = std::make_unique<Button>(Text("Back", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH - Button::size.x - 10, SCREEN_HEIGHT - Button::size.y - 10));
+
+	Prompt prompts[] = {
+		{ Keys::CONFIRM, "Confirm", Color(Colors::White) },
+		{ Keys::CANCEL, "Cancel/Back", Color(Colors::White) }
+	};
+
+	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 2);
+	this->promptBar->setPositon(Vector2(10, SCREEN_HEIGHT - this->promptBar->getSize().y - 8.0f));
 }

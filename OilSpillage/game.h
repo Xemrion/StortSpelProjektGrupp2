@@ -4,7 +4,7 @@
 #include "graphics.h"
 #include "States/GameState.h"
 #include "physics.h"
-
+#include"Vehicle.h"
 //#define RELEASE_DEBUG
 
 class Game
@@ -39,6 +39,7 @@ private:
 	long long							prevTime     = 0;
 	long long							countsPerSec = 0;
 	float								secPerCount  = 0.0f;
+	Vehicle*							thePlayer = nullptr;
 public:
 	Game();
 	~Game();

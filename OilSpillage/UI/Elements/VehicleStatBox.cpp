@@ -2,14 +2,17 @@
 #include "../UserInterface.h"
 #include "../../game.h"
 
-Vector2 VehicleStatBox::size = Vector2(256, 6 * 64);
+Vector2 VehicleStatBox::size = Vector2(325, 490);
 
 VehicleStatBox::VehicleStatBox(Vector2 position) : Element(position), amounts{ 0 }
 {
+	Game::getGraphics().loadTexture("UI/statBG");
 	Game::getGraphics().loadTexture("UI/sliderBG");
 	Game::getGraphics().loadTexture("UI/statFG");
+	this->textureBackground = Game::getGraphics().getTexturePointer("UI/statBG");
 	this->textureBG = Game::getGraphics().getTexturePointer("UI/sliderBG");
 	this->textureFG = Game::getGraphics().getTexturePointer("UI/statFG");
+	assert(textureBackground && "Texture failed to load!");
 	assert(textureBG && "Texture failed to load!");
 	assert(textureFG && "Texture failed to load!");
 
@@ -29,23 +32,27 @@ void VehicleStatBox::draw(bool selected)
 	SpriteFont* font = UserInterface::getFontArial();
 	RECT bgDest;
 	RECT amountDest;
+	Vector2 offset(32, 96);
+
+	sb->Draw(this->textureBackground->getShaderResView(), this->position);
+	font->DrawString(sb, "Vehicle Stats", this->position + Vector2(32, 32), Colors::White, 0.0f, Vector2::Zero, 0.5f);
 
 	for (int i = 0; i < 6; i++)
 	{
-		bgDest = SimpleMath::Rectangle(static_cast<long>(this->position.x + 8), static_cast<long>(this->position.y + 8 + i * 54 + 22), static_cast<long>(this->textureFG->getWidth() - 16), static_cast<long>(this->textureBG->getHeight()));
-		amountDest = SimpleMath::Rectangle(static_cast<long>(this->position.x + 8), static_cast<long>(this->position.y + 8 + i * 54 + 22), static_cast<long>((this->textureFG->getWidth() - 16) * this->amounts[i]), static_cast<long>(this->textureBG->getHeight()));
+		bgDest = SimpleMath::Rectangle(static_cast<long>(this->position.x + offset.x + 8), static_cast<long>(this->position.y + offset.y + 8 + i * 54 + 22), static_cast<long>(this->textureFG->getWidth() - 16), static_cast<long>(this->textureBG->getHeight()));
+		amountDest = SimpleMath::Rectangle(static_cast<long>(this->position.x + offset.x + 8), static_cast<long>(this->position.y + offset.y + 8 + i * 54 + 22), static_cast<long>((this->textureFG->getWidth() - 16) * this->amounts[i]), static_cast<long>(this->textureBG->getHeight()));
 
 		sb->Draw(this->textureBG->getShaderResView(), bgDest, Colors::White);
 		sb->Draw(this->textureBG->getShaderResView(), amountDest, Colors::LimeGreen);
-		sb->Draw(this->textureFG->getShaderResView(), this->position + Vector2(0, i * 54 + 22));
+		sb->Draw(this->textureFG->getShaderResView(), this->position + offset + Vector2(0, i * 54 + 22));
 	}
 
-	font->DrawString(sb, "Health",			this->position + Vector2(8, 0 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
-	font->DrawString(sb, "Durability",		this->position + Vector2(8, 1 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
-	font->DrawString(sb, "Armour",			this->position + Vector2(8, 2 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
-	font->DrawString(sb, "Acceleration",	this->position + Vector2(8, 3 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
-	font->DrawString(sb, "Max Speed",		this->position + Vector2(8, 4 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
-	font->DrawString(sb, "Handling",		this->position + Vector2(8, 5 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
+	font->DrawString(sb, "Health",			this->position + offset + Vector2(8, 0 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
+	font->DrawString(sb, "Durability",		this->position + offset + Vector2(8, 1 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
+	font->DrawString(sb, "Armour",			this->position + offset + Vector2(8, 2 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
+	font->DrawString(sb, "Acceleration",	this->position + offset + Vector2(8, 3 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
+	font->DrawString(sb, "Max Speed",		this->position + offset + Vector2(8, 4 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
+	font->DrawString(sb, "Handling",		this->position + offset + Vector2(8, 5 * 54), Colors::White, 0.0f, Vector2::Zero, 0.2f);
 }
 
 void VehicleStatBox::update(const Stats& stats)

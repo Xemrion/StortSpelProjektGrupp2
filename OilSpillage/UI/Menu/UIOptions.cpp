@@ -70,6 +70,7 @@ void UIOptions::drawUI()
 	this->buttonBack->draw(this->selected == this->buttonBack.get());
 	this->checkBoxTest->draw(this->selected == this->checkBoxTest.get());
 	this->sliderTest->draw(this->selected == this->sliderTest.get());
+	this->promptBar->draw(false);
 	UserInterface::getSpriteBatch()->End();
 }
 
@@ -94,4 +95,13 @@ void UIOptions::init()
 	this->sliderTest->setAmount(0.5f);
 
 	this->selected = this->buttonBack.get();
+
+	Prompt prompts[] = {
+		{ Keys::L_PRESS, "Move", Color(Colors::White) },
+		{ Keys::CONFIRM, "Confirm", Color(Colors::White) },
+		{ Keys::CANCEL, "Cancel/Back", Color(Colors::White) }
+	};
+
+	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 3);
+	this->promptBar->setPositon(Vector2(SCREEN_WIDTH / 2 - this->promptBar->getSize().x / 2, SCREEN_HEIGHT - this->promptBar->getSize().y - 8.0f));
 }

@@ -1,6 +1,8 @@
+#include "utils.hpp"
 #include "Map.hpp"
 #include "Profiler.hpp"
-#include "utils.hpp"
+#include "Modelizer.hpp"
+
 
 // TODO: 1. make road coverage affect district type
 //       2. scale up road maps
@@ -22,7 +24,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	config          ( config                                                                                        ),
 	tilemap         ( std::make_unique<TileMap>( config )                                                           ),
 	districtMarkers ( static_cast<Size>( config.districtCellSide) * config.districtCellSide                         ),
-	roadTiles       ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y                             ),
+	groundTiles     ( static_cast<Size>( config.dimensions.x)     * config.dimensions.y                             ),
    roadDistanceMap ( config.dimensions.x * config.dimensions.y                                                     ),
 	buildingIDs     ( config.dimensions.x * config.dimensions.y                                                     ),
 	hospitalTable	 ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide )
@@ -33,6 +35,10 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 	generateRoads();
 	generateRoadDistanceMap();
 	generateBuildings();
+
+	groundTiles = instantiateTilesAsModels( graphics, *tilemap );
+	for ( auto &e : groundTiles )
+		graphics.addToDraw( e.get() , true );
 }
 
 
@@ -77,10 +83,6 @@ void  Map::generateRoads()
 		   roadGenerationLog.close();
 		}
 	}
-	
-	roadTiles = tilemap->loadAsModels(graphics); // GameObject instantiation
-	for ( auto &e : roadTiles )
-		graphics.addToDraw( &e , true );
 }
 
 void  Map::generateDistricts()
@@ -106,8 +108,8 @@ void  Map::generateDistricts()
 			districtMarkers.emplace_back();
 			auto &marker = districtMarkers.back();
 			marker.mesh  = graphics.getMeshPointer("Cube");
-			marker.setColor({ 1, 0,  0, 1 });
-			marker.setScale({ .2f, 4.0f, .2f });
+			marker.setColor(Vector4{ 1.0f, .0f, .0f, 1.0f });
+			marker.setScale(Vector3{ .2f, 4.0f, .2f });
 			marker.setPosition({ tilemap->convertTilePositionToWorldPosition( static_cast<U16>(cellCentre.x),
 			                                                                  static_cast<U16>(cellCentre.y)) });
 			graphics.addToDraw(&marker, true);
@@ -150,16 +152,18 @@ void  Map::generateBuildings( )
 	F32_Dist smallProbabilityDist {};
 
 	//Array of possible buildings
-	std::string buildingArr[5];
+	std::string buildingArr[6];
 	buildingArr[0] = "Houses/testHouse";
 	buildingArr[1] = "Houses/testHouse2";
 	buildingArr[2] = "Houses/testHouse3";
 	buildingArr[3] = "Houses/testHouse4";
 	buildingArr[4] = "Houses/testHouse5";
+	buildingArr[5] = "Houses/testHouse6";
 	
-	std::string textureArr[2];
+	std::string textureArr[3];
 	textureArr[0] = "Houses/houseMaterial";
 	textureArr[1] = "Houses/houseMaterial2";
+	textureArr[2] = "Houses/houseMaterial3";
 
 	#ifdef _DEBUG
 	   U32            total_building_count{ 0 };
@@ -237,9 +241,9 @@ void  Map::generateBuildings( )
 						tilemap->tileAt(tilePosition) = Tile::building;
 						// TODO: assign proper meshes when tilesets have been created
 						if ( not isHospital ) {
-							int randomHouse = rand() % 5; // decides the house
+							int randomHouse = rand() % 6; // decides the house
 							houseTile.mesh = graphics.getMeshPointer(data(buildingArr[randomHouse]));
-							int randomTex = rand() % 2;
+							int randomTex = rand() % 3;
 							houseTile.setMaterial(graphics.getMaterial(data(textureArr[randomTex])));
 
 							//houseTile.setColor( {.75f, .75f, .75f, 1.0f} );
@@ -319,8 +323,8 @@ Opt<Vector<V2u>>  Map::findValidHouseLot( RNG &rng, U16 cellId, Voronoi const &d
 
 	Bounds    cellBounds      { districtMap.computeCellBounds(cellId) };
 	U16_Dist  generateOffset  { 0x0, 0xFF };
-	U16_Dist  generateX       { cellBounds.min.x, cellBounds.max.x };
-	U16_Dist  generateY       { cellBounds.min.y, cellBounds.max.y };
+	U16_Dist  generateX       ( cellBounds.min.x, cellBounds.max.x );
+	U16_Dist  generateY       ( cellBounds.min.y, cellBounds.max.y );
 	District const  districtType       { districtLookUpTable[cellId] }; // TODO: refactor? (and param)
 	auto      isValidPosition { [&](V2u const &tilePosition ) -> Bool {
 	                               return  (districtMap.diagram[districtMap.diagramIndex(tilePosition)] != cellId)
@@ -434,7 +438,7 @@ void  Map::setDistrictColorCoding( Bool useColorCoding ) noexcept
 		for ( U16 y = 0;  y < tilemap->height;  ++y ) {
 			for ( U16 x = 0;  x < tilemap->width;  ++x ) {
 				assert( tilemap->data.size() == districtMap->diagram.size() and "BUG!" );
-				auto       &tile      = roadTiles[ tilemap->index(x, y) ];
+				auto       &tile      = *groundTiles[ tilemap->index(x, y) ];
 				auto        cellIndex = districtMap->diagramIndex(x, y);
 				auto        cellId    = districtMap->diagram[ cellIndex ];
 				auto const &color     = districtColorTable[ cellId % districtColorTable.size() ];
@@ -536,7 +540,7 @@ void Map::generateRoadDistanceMap() noexcept
 							foundRoadDistance = it->distance;
 
 					// assign found distance or some default distance
-					roadDistanceMap[tilemap->index(centerPos)] = foundRoadDistance.value_or( distance_f({0,0}, {searchRadius+1, searchRadius+1}) );
+					roadDistanceMap[tilemap->index(centerPos)] = foundRoadDistance.value_or( distance_f({0,0}, {U32(searchRadius)+1, U32(searchRadius)+1}) );
 				}
 			}
 		}

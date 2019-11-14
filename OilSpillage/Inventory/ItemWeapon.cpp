@@ -14,13 +14,25 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 
 ItemWeapon::ItemWeapon(std::string name, Weapon weapon, std::shared_ptr<GameObject> object) : Item(name, generateDescription(weapon), ItemType::WEAPON, object), weapon(weapon)
 {
+
 }
 
 ItemWeapon::~ItemWeapon()
 {
+
 }
 
-Weapon ItemWeapon::getWeapon() const
+ItemWeapon::ItemWeapon(const ItemWeapon& obj) : Item(obj)
+{
+	this->weapon = obj.weapon;
+}
+
+Item* ItemWeapon::clone() const
+{
+	return new ItemWeapon(*this);
+}
+
+Weapon& ItemWeapon::getWeapon()
 {
 	return this->weapon;
 }

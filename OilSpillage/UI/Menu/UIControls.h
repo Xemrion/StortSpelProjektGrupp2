@@ -3,6 +3,7 @@
 
 #include "../UserInterface.h"
 #include "../../Texture.h"
+#include "../Elements/ButtonPromtBar.h"
 
 class UIControls : public UserInterface
 {
@@ -11,6 +12,7 @@ private:
 	void drawUI();
 
 	Texture* textureControls;
+	std::unique_ptr<ButtonPromptBar> promptBar;
 public:
 	UIControls();
 	virtual ~UIControls();

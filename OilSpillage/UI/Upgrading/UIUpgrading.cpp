@@ -6,7 +6,11 @@ void UIUpgrading::updateUI(float deltaTime)
 {
 	if (this->selectingItem)
 	{
-		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
+		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
+		{
+			Game::setState(Game::STATE_PLAYING);
+		}
+		else if (Input::checkButton(Keys::CONFIRM, States::PRESSED) && this->itemSelector->isSelectedValid())
 		{
 			this->selectingItem = false;
 		}
@@ -37,7 +41,8 @@ void UIUpgrading::updateUI(float deltaTime)
 
 		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 		{
-			this->gadgetSelector->setItemOfSelected(this->itemSelector->getSelectedItem());
+			this->gadgetSelector->setSlotOfSelected(this->itemSelector->getSelectedSlot());
+			this->selectingItem = true;
 		}
 		else if (Input::checkButton(Keys::CANCEL, States::PRESSED))
 		{
@@ -51,7 +56,6 @@ void UIUpgrading::updateUI(float deltaTime)
 void UIUpgrading::drawUI()
 {
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	this->itemSelector->draw(false);
 	this->gadgetSelector->draw(!this->selectingItem);
 	this->statBox->draw(!this->selectingItem);
 
@@ -72,11 +76,17 @@ void UIUpgrading::drawUI()
 		break;
 	}
 
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), type, Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2 - 200.0f, SCREEN_HEIGHT - ItemSelector::size.y + 65.0f), Colors::White, 0, Vector2::Zero, 0.5f);
+	UserInterface::getSpriteBatch()->Draw(this->textureSelectorTitleBG->getShaderResView(), this->itemSelector->getPosition() + Vector2(-250.0f, 0.0f));
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), type, Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2 - 180.0f, SCREEN_HEIGHT - ItemSelector::size.y + 65.0f - 20.0f), Colors::White, 0, Vector2::Zero, 0.5f);
+	this->itemSelector->draw(false);
+	this->selectingItem ? this->promptBar->draw(false) : this->promptBarGadget->draw(false);
+
+	Vector2 textSize = UserInterface::getFontArial()->MeasureString("Upgrading");
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Upgrading", Vector2(SCREEN_WIDTH / 2 - textSize.x / 2, 0), Colors::White);
 	UserInterface::getSpriteBatch()->End();
 }
 
-UIUpgrading::UIUpgrading() : selectingItem(true)
+UIUpgrading::UIUpgrading() : textureSelectorTitleBG(nullptr), selectingItem(true)
 {
 }
 
@@ -84,15 +94,36 @@ UIUpgrading::~UIUpgrading()
 {
 }
 
-VehicleSlots* UIUpgrading::getVehicleSlots()
-{
-	return this->vehicleSlots.get();
-}
-
 void UIUpgrading::init()
 {
-	this->vehicleSlots = std::make_unique<VehicleSlots>();
-	this->itemSelector = std::make_unique<ItemSelector>(Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2, SCREEN_HEIGHT - ItemSelector::size.y));
-	this->gadgetSelector = std::make_unique<CarGadgetSelector>(Vector2(ItemSlot::size.x + 20.0f, ItemSlot::size.x + 20.0f));
-	this->statBox = std::make_unique<VehicleStatBox>(Vector2(SCREEN_WIDTH - VehicleStatBox::size.x - 10.0f, SCREEN_HEIGHT / 2 - VehicleStatBox::size.y / 2));
+	Game::getGraphics().loadTexture("UI/itemSelectorTitleBG");
+	this->textureSelectorTitleBG = Game::getGraphics().getTexturePointer("UI/itemSelectorTitleBG");
+	assert(textureSelectorTitleBG && "Texture failed to load!");
+
+	this->itemSelector = std::make_unique<ItemSelector>(Vector2(SCREEN_WIDTH / 2 - ItemSelector::size.x / 2, SCREEN_HEIGHT - ItemSelector::size.y - 20.0f));
+	this->gadgetSelector = std::make_unique<CarGadgetSelector>(Vector2::Zero);
+	this->statBox = std::make_unique<VehicleStatBox>(Vector2(SCREEN_WIDTH - VehicleStatBox::size.x, 0));
+
+	this->itemSelector->setUsed(this->gadgetSelector->getUsed());
+
+	Prompt prompts[] = {
+		{ Keys::L_PRESS, "Move", Color(Colors::White) },
+		{ Keys::CONFIRM, "Select Item", Color(Colors::White) },
+		{ Keys::CANCEL, "Delete From Inventory", Color(Colors::White) },
+		{ Keys::R_PRESS, "Rotate Car", Color(Colors::White) },
+		{ Keys::ACTION_1, "Confirm Upgrading", Color(Colors::White) }
+	};
+
+	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 5);
+	this->promptBar->setPositon(Vector2(SCREEN_WIDTH / 2 - this->promptBar->getSize().x / 2, SCREEN_HEIGHT - this->promptBar->getSize().y - 8.0f));
+
+	Prompt promptsGadget[] = {
+		{ Keys::L_PRESS, "Move", Color(Colors::White) },
+		{ Keys::CONFIRM, "Add To Car", Color(Colors::White) },
+		{ Keys::CANCEL, "Cancel/Back", Color(Colors::White) },
+		{ Keys::R_PRESS, "Rotate Car", Color(Colors::White) },
+	};
+
+	this->promptBarGadget = std::make_unique<ButtonPromptBar>(promptsGadget, 4);
+	this->promptBarGadget->setPositon(Vector2(SCREEN_WIDTH / 2 - this->promptBarGadget->getSize().x / 2, SCREEN_HEIGHT - this->promptBarGadget->getSize().y - 8.0f));
 }

@@ -7,12 +7,12 @@ Vector2 ItemSelector::size = Vector2(736, 192);
 void ItemSelector::addTextbox()
 {
 	int selectedIndex = this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType];
-	Item* item = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->at(this->selectedIndex[this->selectedType]);
-	this->textBox = std::make_unique<TextBox>("-- " + item->getName() + " --\n" + item->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::BOTTOM);
+	Container::Slot* slot = Container::playerInventory->getItemSlot(static_cast<ItemType>(this->selectedType), this->selectedIndex[this->selectedType]);
+	this->textBox = std::make_unique<TextBox>("-- " + slot->item->getName() + " --\n" + slot->item->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::BOTTOM);
 	this->textBox->setPosition(this->position + Vector2(145.0f + 96.0f * selectedIndex - this->textBox->getSize().x * 0.5f, -this->textBox->getSize().y + 40.0f));
 }
 
-ItemSelector::ItemSelector(Vector2 position) : Element(position), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimers{ 0 }
+ItemSelector::ItemSelector(Vector2 position) : Element(position), used(nullptr), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimers{ 0 }
 {
 	Game::getGraphics().loadTexture("UI/itemSelectorBG");
 	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
@@ -31,6 +31,20 @@ void ItemSelector::draw(bool selected)
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), this->position);
 	UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->position + Vector2(96.0f + 96.0f * (this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType]), 47.0f));
 
+	std::vector<Container::Slot*>* list = Container::playerInventory->getItemStack(static_cast<ItemType>(this->selectedType));
+	for (int i = 0; i < Slots::SIZEOF && list->size() > 0; i++)
+	{
+		if (this->used[i] == nullptr) continue;
+
+		for (int j = 0; j < min(list->size() - this->startIndex[this->selectedType], ItemSelector::tileLength); j++)
+		{
+			if (this->used[i] == list->at(this->startIndex[this->selectedType] + j))
+			{
+				UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Used", this->position + Vector2(145.0f + 96.0f * j, 128.0f), Colors::White, 0.0f, Vector2::Zero, 0.2f);
+			}
+		}
+	}
+
 	if (this->textBox)
 	{
 		this->textBox->draw(false);
@@ -39,7 +53,7 @@ void ItemSelector::draw(bool selected)
 
 void ItemSelector::update(float deltaTime)
 {
-	std::vector<Item*>* list = nullptr;
+	std::vector<Container::Slot*>* list = nullptr;
 
 	if (this->selectedTypeLastDraw == -1)
 	{
@@ -50,11 +64,11 @@ void ItemSelector::update(float deltaTime)
 	{
 		if (this->selectedTypeLastDraw != -1)
 		{
-			list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedTypeLastDraw));
+			list = Container::playerInventory->getItemStack(static_cast<ItemType>(this->selectedTypeLastDraw));
 
 			for (int i = 0; i < min(list->size() - this->startIndexLastDraw, ItemSelector::tileLength); i++)
 			{
-				GameObject* object = list->at(this->startIndexLastDraw + i)->getObject();
+				GameObject* object = list->at(this->startIndexLastDraw + i)->item->getObject();
 				if (object)
 				{
 					Game::getGraphics().removeFromUIDraw(object, &transforms[i]);
@@ -62,11 +76,11 @@ void ItemSelector::update(float deltaTime)
 			}
 		}
 
-		list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType));
+		list = Container::playerInventory->getItemStack(static_cast<ItemType>(this->selectedType));
 
 		for (int i = 0; i < min(list->size() - this->startIndex[this->selectedType], ItemSelector::tileLength); i++)
 		{
-			GameObject* object = list->at(this->startIndex[this->selectedType] + i)->getObject();
+			GameObject* object = list->at(this->startIndex[this->selectedType] + i)->item->getObject();
 			if (object)
 			{
 				rotationTimers[i] = 190 * XM_PI/180;
@@ -79,11 +93,11 @@ void ItemSelector::update(float deltaTime)
 	}
 
 	int selectedIndex = this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType];
-	list = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType));
+	list = Container::playerInventory->getItemStack(static_cast<ItemType>(this->selectedType));
 
 	for (int i = 0; i < min(list->size(), ItemSelector::tileLength); i++)
 	{
-		GameObject* object = list->at(this->startIndex[this->selectedType] + i)->getObject();
+		GameObject* object = list->at(this->startIndex[this->selectedType] + i)->item->getObject();
 		if (object == nullptr) continue;
 
 		if (i == selectedIndex)
@@ -116,7 +130,7 @@ void ItemSelector::changeSelectedType(bool down)
 		this->selectedType = (this->selectedType - 1 + ItemType::TYPES_SIZE) % ItemType::TYPES_SIZE;
 	}
 
-	int listSize = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->size();
+	int listSize = Container::playerInventory->getItemStack(static_cast<ItemType>(this->selectedType))->size();
 	if (listSize > 0)
 	{
 		this->addTextbox();
@@ -129,7 +143,7 @@ void ItemSelector::changeSelectedType(bool down)
 
 void ItemSelector::changeSelectedIndex(bool right)
 {
-	int listSize = Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->size();
+	int listSize = Container::playerInventory->getItemStack(static_cast<ItemType>(this->selectedType))->size();
 	if (listSize == 0)
 	{ 
 		this->selectedIndex[this->selectedType] = 0;
@@ -162,7 +176,18 @@ ItemType ItemSelector::getSelectedType() const
 	return static_cast<ItemType>(this->selectedType);
 }
 
-Item* ItemSelector::getSelectedItem() const
+Container::Slot* ItemSelector::getSelectedSlot() const
 {
-	return Inventory::instance->getItemList(static_cast<ItemType>(this->selectedType))->at(this->selectedIndex[this->selectedType]);
+	return Container::playerInventory->getItemSlot(static_cast<ItemType>(this->selectedType), this->selectedIndex[this->selectedType]);
+}
+
+bool ItemSelector::isSelectedValid() const
+{
+	int listSize = Container::playerInventory->getItemStack(static_cast<ItemType>(this->selectedType))->size();
+	return this->selectedIndex[this->selectedType] >= 0 && this->selectedIndex[this->selectedType] < listSize;
+}
+
+void ItemSelector::setUsed(Container::Slot** used)
+{
+	this->used = used;
 }

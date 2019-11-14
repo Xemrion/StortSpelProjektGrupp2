@@ -13,7 +13,7 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 
 	for (int i = 0; i < 20; i++)
 	{
-		Inventory::instance->addItem(Item::getRandom());
+		Container::playerInventory->addItem(Item::getRandom());
 	}
 
 	this->lightList = std::make_unique<LightList>();
@@ -21,28 +21,21 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 	this->lightList->addLight(PointLight(Vector3(0, 5, 0), Vector3(0.5, 0, 0), 10));
 	this->graphics.setLightList(lightList.get());
 	this->graphics.setUISun(Vector3(0, 0, 1), Vector4(1, 1, 1, 1));
+	graphics.loadShape(SHAPE_CUBE);
 
-	this->camera = std::make_unique<DynamicCamera>(Vector3(0, 0.5f, -8.0f),Vector3(/*3.14/4*/0,0,0));
+	this->camera = std::make_unique<DynamicCamera>(Vector3(0, 0.5f, -5.0f),Vector3(0,0,0));
 
 	this->theVehicle = std::make_unique<Vehicle>();
-	this->graphics.loadModel("Entities/Dummy_Player_Car", Vector3(3.14f / 2, 0, 0));
+	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
+
 	this->physics = std::make_unique<Physics>();
 	this->theVehicle->init(physics.get());
 	this->theVehicle->getVehicle()->setPosition(Vector3(0, 0, 0));
 	this->theVehicle->getVehicleBody1()->setPosition(Vector3(0, 0.55, 0));
 
-	this->background = std::make_unique<GameObject>();
-	auto objPtr = background.get();
-	this->graphics.loadModel("Entities/Quad");
-	objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Quad");
-	graphics.loadTexture("garageThing");
-	objPtr->setTexture(Game::getGraphics().getTexturePointer("garageThing"));
-	Game::getGraphics().addToDraw(objPtr);
-	objPtr->setPosition(Vector3(0, 0.5f, +2));
-	objPtr->setRotation(Vector3(90.0f * (XM_PI / 180.0f), 180.0f * (XM_PI / 180.0f), 0/*180 * XM_PI / 180*/));
-	objPtr->setScale(Vector3(16, 1, 9)*1.2f);
-	//objPtr->setColor(Vector4(0.4, 0.4, 0.4,1));
-	objPtr->setShading(false);
+	Game::getGraphics().loadTexture("UI/garageThing");
+	this->textureBG = Game::getGraphics().getTexturePointer("UI/garageThing");
+	assert(textureBG && "Could not load texture!");
 }
 
 UpgradingGameState::~UpgradingGameState()
@@ -59,18 +52,33 @@ void UpgradingGameState::update(float deltaTime)
 	timer += deltaTime;
 	timer = fmod(timer, XM_2PI);
 	
-	this->theVehicle->getVehicle()->getRigidBody()->setAngularVelocity(btVector3(0,100*deltaTime, 0));
 	this->theVehicle->updateWeapon(deltaTime);
-	this->theVehicle->update(deltaTime);
+	this->theVehicle->update(deltaTime, 0, 0, 0, Vector2(0, 0));
+
+	if (Input::getStrengthRnoMouse() > 0.0f)
+	{
+		Quaternion rotationNow = this->theVehicle->getVehicle()->getRotationQuaternion();
+		Quaternion rotationDest = Quaternion::Lerp(rotationNow, Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), std::atan2f(Input::getDirectionRnoMouse().x, Input::getDirectionRnoMouse().y)), deltaTime * 4);
+
+		btQuaternion trams(rotationDest.x, rotationDest.y, rotationDest.z, rotationDest.w);
+		this->theVehicle->getVehicle()->getRigidBody()->getWorldTransform().setRotation(trams);
+	}
+	else
+	{
+		this->theVehicle->getVehicle()->getRigidBody()->setAngularVelocity(btVector3(0, deltaTime * 150, 0));
+	}
 	
 	this->theVehicle->setWheelRotation();
 	this->physics->update(deltaTime);
 
 	this->graphics.clearScreen(Vector4(Colors::Red));
+	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
+	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2());
+	UserInterface::getSpriteBatch()->End();
+
 	this->graphics.render(this->camera.get(), deltaTime);
 
 	this->menues[currentMenu]->update(deltaTime);
-	
 	this->graphics.renderUI(deltaTime);
 
 	this->graphics.presentScene();
@@ -79,4 +87,14 @@ void UpgradingGameState::update(float deltaTime)
 void UpgradingGameState::setCurrentMenu(Menu menu)
 {
 	this->currentMenu = static_cast<int>(menu);
+}
+
+std::unique_ptr<Vehicle>& UpgradingGameState::getPlayer()
+{
+	return this->theVehicle;
+}
+
+void UpgradingGameState::setPlayer(Vehicle* theVehicle)
+{
+	this->theVehicle.reset(theVehicle);// = std::make_unique<Vehicle>(theVehicle);
 }

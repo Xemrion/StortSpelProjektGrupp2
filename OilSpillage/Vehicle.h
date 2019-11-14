@@ -21,7 +21,7 @@ enum Slots
 };
 struct VehicleSlots
 {
-	Item** slots = new Item * [Slots::SIZEOF];
+	Item** slots;
 	void setSlot(Slots slot, Item* item)
 	{
 		if (this->slots[int(slot)] != nullptr)
@@ -51,6 +51,7 @@ struct VehicleSlots
 	};
 	VehicleSlots()
 	{
+		slots = new Item * [Slots::SIZEOF];
 		for (int i = 0; i < Slots::SIZEOF; i++)
 		{
 			this->slots[i] = nullptr;
@@ -67,6 +68,21 @@ struct VehicleSlots
 		}
 		delete[] this->slots;
 	};
+	VehicleSlots(const VehicleSlots& obj)
+	{
+		this->slots = new Item * [Slots::SIZEOF];
+		for (int i = 0; i < Slots::SIZEOF; i++)
+		{
+			if (obj.slots[i] != nullptr)
+			{
+				this->slots[i] = obj.slots[i]->clone();//will make new item/itemWeapon
+			}
+			else
+			{
+				this->slots[i] = nullptr;
+			}
+		}
+	}
 
 };
 class Vehicle
@@ -97,11 +113,7 @@ private:
 	float totRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
 
-	GameObject* mountedWeapon;//Mounted on top of the car
-	GameObject* frontWeapon;
-	Item** slots;
 	VehicleSlots* vehicleSlots;
-	GameObject test;
 
 	float timeSinceLastShot;
 	float timeSinceLastShot2;
@@ -153,16 +165,18 @@ public:
 	virtual ~Vehicle();
 
 	void init(Physics *physics);
-	void update(float deltaTime);
+	void updatePlayer(float deltaTime);
+	void update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput);
 	void updateWeapon(float deltaTime);
 	void setVehicleSlots(VehicleSlots* slots);
 	void setSpecSlot(Slots slot, Item* item);
-
+	VehicleSlots* getSlots();
 	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
 
 	void setSpotLight(SpotLight* theLight);
+	SpotLight* getSpotLight();
 	void setDrivingMode(int i);
 	bool getDrivingMode();
 	Vector3 getVelocity();

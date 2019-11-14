@@ -186,7 +186,7 @@ bool Graphics::init(Window* window)
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = 32;//static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16)));
+	desc.ByteWidth = static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16)));
 	desc.StructureByteStride = 0;
 
 	hr = device->CreateBuffer(&desc, 0, &colorBuffer);
@@ -376,7 +376,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	float color[4] = {
 		0,0,0,1
 	};
-	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	//deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
@@ -522,52 +522,45 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 void Graphics::renderShadowmap(DynamicCamera* camera)
 {
-	Frustum frustum = camera->getFrustum();
+	//Frustum frustum = camera->getFrustum();
 	shadowMap.prepare();//clear depth
 	shadowMap.prepareSpot();//clear depth
 	shadowMap.setViewProjSun(camera, Vector3(lightList->getSun().getDirection().x, lightList->getSun().getDirection().y, lightList->getSun().getDirection().z));
 	//Setting the viewprojSpot in playinggamestate cause playerlight is there
-
+	Frustum frustum = shadowMap.getSunFrustum();
+	Frustum spotFrustum = shadowMap.getSpotFrustum();
 
 	for (GameObject* object : drawableObjects)
 	{
-		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		AABB boundingBox = object->getAABB();
+		if (frustum.intersect(boundingBox, 0.0f))
 		{
-			AABB boundingBox = object->getAABB();
-
-			if (frustum.intersect(boundingBox, 100.0f))
+			UINT vertexCount = object->mesh->getVertexCount();
+			UINT stride = sizeof(Vertex3D);
+			UINT offset = 0;
+			SimpleMath::Matrix world = object->getTransform();
+			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+			shadowMap.setWorld(worldTr);
+			deviceContext->PSSetShader(nullptr, nullptr, 0);
+			deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+			shadowMap.setDSun();
+			if (object->getSunShadow())
 			{
-				UINT vertexCount = object->mesh->getVertexCount();
-				UINT stride = sizeof(Vertex3D);
-				UINT offset = 0;
-				SimpleMath::Matrix world = object->getTransform();
-				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-				shadowMap.setWorld(worldTr);
-				deviceContext->PSSetShader(nullptr, nullptr, 0);
-				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-				shadowMap.setDSun();
-				if (object->getSunShadow())
-				{
-					deviceContext->Draw(vertexCount, 0);
-				}
-				shadowMap.setDSpot();
-				if (object->getSpotShadow())
-				{
-					deviceContext->Draw(vertexCount, 0);
-				}
+				deviceContext->Draw(vertexCount, 0);
+			}
+			shadowMap.setDSpot();
+			if (object->getSpotShadow() && spotFrustum.intersect(boundingBox, 10.0f))
+			{
+				deviceContext->Draw(vertexCount, 0);
 			}
 		}
 	}
 
 	std::vector<GameObject*> objects;
-	quadTree->getGameObjects(objects, frustum, 100.0f);
+	quadTree->getGameObjects(objects, frustum, 0.0f);
 	for (GameObject* o : objects)
 	{
-		/*if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
-		{*/
 		AABB boundingBox = o->getAABB();
-		//if (frustum.intersect(boundingBox, 1000.0f))
-		//{
 		UINT vertexCount = o->mesh->getVertexCount();
 		UINT stride = sizeof(Vertex3D);
 		UINT offset = 0;
@@ -582,12 +575,10 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 			deviceContext->Draw(vertexCount, 0);
 		}
 		shadowMap.setDSpot();
-		if (o->getSpotShadow())
+		if (o->getSpotShadow() && spotFrustum.intersect(boundingBox, 10.0f))
 		{
 			deviceContext->Draw(vertexCount, 0);
 		}
-		//}
-
 	}
 }
 
@@ -1268,11 +1259,11 @@ void Graphics::renderUI(float deltaTime)
 	CopyMemory(mappedResource.pData, &uiSun, sizeof(Sun));
 	deviceContext->Unmap(sunBuffer.Get(), 0);
 	
+	
 	Matrix viewProj = (uiCamera.getViewMatrix() * uiCamera.getProjectionMatrix()).Transpose();
 	hr = deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
-
 	
 
 	deviceContext->RSSetViewports(1, &this->vp);
@@ -1328,6 +1319,8 @@ void Graphics::renderUI(float deltaTime)
 		hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
 		deviceContext->Unmap(colorBuffer.Get(), 0);
+
+		
 
 		deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1537,7 +1530,7 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 
 void Graphics::setSpotLighShadow(SpotLight* spotLight)
 {
-	shadowMap.setViweProjSpot(spotLight->getPos(), spotLight->getDirection(), spotLight->getLuminance());//REMOVE LUMINANCE
+	shadowMap.setViewProjSpot(spotLight->getPos(), spotLight->getDirection(), spotLight->getLuminance());//REMOVE LUMINANCE
 	UINT index = (static_cast<Light*>(spotLight) - lightList->lights.data());
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(indexSpot.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);

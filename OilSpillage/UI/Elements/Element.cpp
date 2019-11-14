@@ -35,3 +35,8 @@ Element* Element::getDown() const
 {
 	return this->down;
 }
+
+Vector2 Element::getPosition() const
+{
+	return this->position;
+}
