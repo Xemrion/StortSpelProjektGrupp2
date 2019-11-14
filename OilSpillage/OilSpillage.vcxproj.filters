@@ -19,7 +19,6 @@
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
-    <ClCompile Include="AI\Node.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
     <ClCompile Include="PG\MapConfig.cpp" />
@@ -76,6 +75,13 @@
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
+    <ClCompile Include="PG\Modelizer.cpp" />
+    <ClCompile Include="AI\Ranged.cpp" />
+    <ClCompile Include="AI\Melee.cpp" />
+    <ClCompile Include="AI\DynamicActor.cpp" />
+    <ClCompile Include="AI\Boss.cpp" />
+    <ClCompile Include="AI\ChaseCar.cpp" />
+    <ClCompile Include="AI\Sniper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -84,7 +90,6 @@
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
-    <ClInclude Include="AI\Node.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />
     <ClInclude Include="PG\Map.hpp" />
     <ClInclude Include="PG\MinimapTextureGenerator.hpp" />
@@ -137,7 +142,6 @@
     <ClInclude Include="UI\UIPaused.h" />
     <ClInclude Include="UI\UIPlaying.h" />
     <ClInclude Include="UI\UserInterface.h" />
-    <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="window.h" />
@@ -158,6 +162,13 @@
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="AI\Swarm.h" />
     <ClInclude Include="AI\Car_Spitfire.h" />
+    <ClInclude Include="AI\Ranged.h" />
+    <ClInclude Include="AI\Melee.h" />
+    <ClInclude Include="Vehicle.h" />
+    <ClInclude Include="AI\DynamicActor.h" />
+    <ClInclude Include="AI\Boss.h" />
+    <ClInclude Include="AI\Sniper.h" />
+    <ClInclude Include="AI\ChaseCar.h" />
     <ClInclude Include="PG\Biome.hpp" />
   </ItemGroup>
   <ItemGroup>

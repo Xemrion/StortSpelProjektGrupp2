@@ -2,7 +2,6 @@
 #include<vector>
 #include<d3d11.h>
 #include<SimpleMath.h>
-#include"Node.h"
 #include "../PG/Tile.hpp"
 #include "../PG/TileMap.hpp"
 using namespace DirectX::SimpleMath;
