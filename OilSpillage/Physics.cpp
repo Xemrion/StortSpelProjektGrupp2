@@ -34,7 +34,6 @@ solver(new btSequentialImpulseConstraintSolver)
 
 Physics::~Physics()
 {
-
 	//osäker på om man deletar på detta sätt
 	for (int i = 0; i < bodies.size(); i++)
 	{
@@ -44,6 +43,10 @@ Physics::~Physics()
 		delete bodies[i];
 		delete shape;
 		delete motionState;
+	}
+	for (int i = 0; i < pointJoints.size(); i++)
+	{
+		delete pointJoints[i];
 	}
 	delete dispatcher;
 	delete collisionConfig;
@@ -57,10 +60,10 @@ Physics::~Physics()
 void Physics::update(float deltaTime)
 {
 	//this->world->stepSimulation(deltaTime);
-	this->world->stepSimulation(deltaTime, 1000, 1. / 120.);
+	this->world->stepSimulation(deltaTime, 2, 1. / 120.);
 	//this->world->stepSimulation(deltaTime, 0);
 	//this->world->stepSimulation(btScalar(deltaTime));
-}
+}   
 
 btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass)
 {	//add object set transform
@@ -201,8 +204,8 @@ bool Physics::DeleteRigidBody(btRigidBody * rb)
 				this->world->removeRigidBody(bodies[i]);
 				btMotionState* motionState = bodies[i]->getMotionState();
 				btCollisionShape* shape = bodies[i]->getCollisionShape();
+				delete bodies[i];
 				this->bodies.erase(this->bodies.begin() + i);
-				//delete bodies[i];
 				delete shape;
 				delete motionState;
 				return true;
@@ -210,7 +213,6 @@ bool Physics::DeleteRigidBody(btRigidBody * rb)
 		}
 	return false;
 }
-
 //bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
 //{
 //	

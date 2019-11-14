@@ -118,7 +118,6 @@ public:
 	{
 		return data[ index(tilePosition.x, tilePosition.y) ];
 	}
-
 	inline Tile& tileAt( U16 x, U16 y ) noexcept
 	{
 		return data[ index(x, y) ];

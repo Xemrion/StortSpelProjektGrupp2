@@ -39,11 +39,11 @@ void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::Flamethrower)
+	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower)
 	{
 		flamethrowerShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
-	else if (this->weapon.type == WeaponType::Laser)
+	else if (this->weapon.type == WeaponType::Laser or this->weapon.type == WeaponType::aiLaser)
 	{
 		laserShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
@@ -101,7 +101,7 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition()+Vector3(0,1,0),
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
@@ -144,11 +144,14 @@ void Bullet::update(float deltaTime)
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::aiMachineGun)
+	else if (this->weapon.type == WeaponType::aiMachineGun or
+		this->weapon.type == WeaponType::aiFlamethrower or
+		this->weapon.type == WeaponType::aiMelee or
+		this->weapon.type == WeaponType::aiMissileLauncher)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}
-	else if (this->weapon.type == WeaponType::Laser)
+	else if (this->weapon.type == WeaponType::Laser or this->weapon.type == WeaponType::aiLaser)
 	{
 		laserUpdate(deltaTime);
 	}
@@ -183,7 +186,7 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 		{
 			if (soundTimer > 0.05f) {
 				int randomSound = rand() % 3 + 1;
-				std::wstring soundEffect = L"data/sound/CarGlass" + to_wstring(randomSound) + L".wav";
+				std::wstring soundEffect = L"data/sound/CarGlass" + std::to_wstring(randomSound) + L".wav";
 				Sound::PlaySoundEffect(soundEffect);
 				Sound::PlaySoundEffect(L"data/sound/MetalImpact1.wav");
 				soundTimer = 0;
@@ -218,7 +221,7 @@ void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direc
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.02), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread*vehicleWeapon.maxSpread)));
+	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.02), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread * vehicleWeapon.maxSpread)));
 
 	Game::getGraphics().addToDraw(this->obj);
 	if (vehicleWeapon.currentSpreadIncrease > vehicleWeapon.maxSpread)
