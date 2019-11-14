@@ -171,6 +171,7 @@
     <ClInclude Include="AI\Boss.h" />
     <ClInclude Include="AI\Sniper.h" />
     <ClInclude Include="AI\ChaseCar.h" />
+    <ClInclude Include="player.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

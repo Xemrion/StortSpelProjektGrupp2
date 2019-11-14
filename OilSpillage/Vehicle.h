@@ -76,6 +76,7 @@ private:
 	float soundTimer;
 	bool flameBool;
 	bool dmg;
+	bool player = false;
 
 
 	Vector2 curDir;
@@ -116,8 +117,10 @@ public:
 	void resetHealth();
 	void changeHealth(int amount);
 	bool isDead() const;
-	float getTotRespawnTime()const;
+	float getTotalRespawnTime()const;
 	float getRespawnTimer()const;
+	void makePlayer();
+	bool isPlayer() const;
 
 	float getPitch(DirectX::XMVECTOR Quaternion);
 	float getYaw(DirectX::XMVECTOR Quaternion);
@@ -126,6 +129,7 @@ public:
 
 	Bullet* getBulletArray(size_t& count);
 	void powerUp(PowerUpType p);
+	float getPowerUpTimer(PowerUpType p);
 };
 
 #endif // !VEHICLE_H

@@ -23,7 +23,7 @@ void PlayingGameState::initAI()
 		}
 	}
 			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
-	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5,physics.get());
+	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
 	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
 	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
 	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
@@ -117,7 +117,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 
 	player = std::make_unique<Vehicle>();
-
+	player->makePlayer();
 	//if constexpr ( isDebugging ) {
 		// light tests
 	lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
