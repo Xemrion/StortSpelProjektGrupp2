@@ -210,7 +210,8 @@ void Bullet::laserEnemyUpdate(float& deltaTime)
 	Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
 	if (static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getAABB().intersect(rayOrigin, rayDir, 1000))
 	{
-		if (soundTimer > 0.05f) {
+		if (soundTimer > 0.05f) 
+		{
 			/*int randomSound = rand() % 3 + 1;
 			std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
 			Sound::PlaySoundEffect(soundEffect);*/
