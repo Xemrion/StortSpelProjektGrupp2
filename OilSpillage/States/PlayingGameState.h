@@ -81,6 +81,7 @@ private:
 	ObjectiveHandler objectives;
 	RNG rng{ RD()() };        // gör privat klassmedlem istället
 	int frameCount = 0;
+	int nrOfEnemies = 0;
 
 	//Bullet
 	std::unique_ptr<Physics>		physics;

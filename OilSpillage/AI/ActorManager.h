@@ -14,7 +14,7 @@ public:
 	void createAttacker(float x, float z, int weaponType);
 	void createSniper(float x, float z, int weaponType);
 	void createTurret(float x, float z, int weaponType);
-	void createSwarm(float x, float z, int weaponType);
+	void createSwarm(float x, float z);
 	void createBoss(float x, float z, int weaponType);
 
 	void createSpitFire(float x, float z);
@@ -23,6 +23,8 @@ public:
 	float distanceToPlayer(const Vector3& position);
 	const std::vector<AIGroup>& getGroups() const;
 	void spawnAttackers(const Vector3& originPos, int weaponType);
+	void spawnChaseCars(const Vector3& originPos);
+	void spawnSwarm(const Vector3& originPos);
 	void spawnTurrets(const Vector3& position, Radius radius, float angle, int weaponType);
 	void spawnBoss(const Vector3& originPos, int weaponType);
 

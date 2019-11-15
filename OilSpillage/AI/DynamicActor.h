@@ -17,12 +17,12 @@ public:
 	int duty;
 	bool vActive;
 	Vector3 groupPos;
+	std::vector<Vector3>* path;
 protected:	
 	int aggroRange;
 	int boidOffset;
 
 	Vector3 predictedTargetPos;
-	std::vector<Vector3>* path;
 	Vector3 destination;
 	Vector3 acceleration;
 	Vector3 velocity;

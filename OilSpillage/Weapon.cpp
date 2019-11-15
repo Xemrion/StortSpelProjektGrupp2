@@ -299,6 +299,11 @@ int Bullet::getDamage() const
 	return weapon.damage;
 }
 
+bool Bullet::getMelee() const
+{
+	return weapon.melee;
+}
+
 GameObject* Bullet::getGameObject()
 {
 	return obj;

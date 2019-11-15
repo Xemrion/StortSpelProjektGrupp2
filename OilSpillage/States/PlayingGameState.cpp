@@ -13,22 +13,16 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar, physics.get());
 	aStar->generateTileData(map->getTileMap());
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 30; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			//actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
-			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
+			//	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
+				//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
+			//	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
+			//actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
 		}
 	}
-			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
-	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
@@ -78,13 +72,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("Tiles/asphalt_nor");
 	graphics.loadTexture("Tiles/grass");
 	graphics.loadTexture("Tiles/grass_nor");
-// graphics.loadTexture("Tiles/grass_spec");
+	// graphics.loadTexture("Tiles/grass_spec");
 	graphics.loadTexture("Tiles/snow");
 	graphics.loadTexture("Tiles/snow_nor");
-// graphics.loadTexture("Tiles/snow_spec");
+	// graphics.loadTexture("Tiles/snow_spec");
 	graphics.loadTexture("Tiles/desert");
 	graphics.loadTexture("Tiles/desert_nor");
-// graphics.loadTexture("Tiles/desert_spec");
+	// graphics.loadTexture("Tiles/desert_spec");
 	graphics.loadTexture("Tiles/road_trans_2file2metro");
 	graphics.loadTexture("Tiles/road_trans_2file2metro_nor");
 	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne");
@@ -303,6 +297,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
 	ImGui::Text(("R Str: " + std::to_string(rStr)).c_str());
 	ImGui::Text(("Accelerator: " + std::to_string(player->getAcceleratorX())).c_str());
+	ImGui::Text(("nr of enemies: " + std::to_string(nrOfEnemies)).c_str());
 	ImGui::End();
 }
 
@@ -477,13 +472,13 @@ void PlayingGameState::ImGui_ProcGen()
 	ImGui::NewLine();
 	if (ImGui::Button("Re-generate")) {
 		// (TODO: refactor) hacky, but:
-		player->getVehicle()->getRigidBody()->setLinearFactor( btVector3(.0,.0f,.0f) );
+		player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
 
 		map = nullptr; // clear, then regenerate:
-		map = std::make_unique<Map>( graphics, config, physics.get() );
+		map = std::make_unique<Map>(graphics, config, physics.get());
 
-		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
-		player->getVehicleBody1()->setPosition( map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f) );
+		player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
+		player->getVehicleBody1()->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
 		map->setDistrictColorCoding(shouldColorCodeDistricts);
 		minimap = createMinimapTexture(*map);
 		aStar->generateTileData(map->getTileMap());
@@ -494,7 +489,7 @@ void PlayingGameState::ImGui_ProcGen()
 
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
-		player->getVehicle()->getRigidBody()->setLinearFactor( btVector3(1.0f, .0f, 1.0f) );
+		player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
 	}
 	ImGui::End();
 }
@@ -580,13 +575,16 @@ void PlayingGameState::update(float deltaTime)
 		auto playerVehicle{ player->getVehicle() };
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
-		
-	/*	if(spawnTimer % 200 == 0)
+
+		if (spawnTimer % 200 == 0)
 		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
+			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
+			nrOfEnemies += 12;
+			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
 			spawnTimer = 0;
 		}
-		spawnTimer++;*/
+		spawnTimer++;
 		//spawn Boss
 		//if (spawnTimer % 10 == 0)
 		//{
@@ -702,17 +700,17 @@ void PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 //#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   ImGui_ImplDX11_NewFrame();
-	   ImGui_ImplWin32_NewFrame();
-	   ImGui::NewFrame();
-	   //ImGui_Driving();
-	   ImGui_ProcGen();
-	   ImGui_AI();
-	   //ImGui_Particles();
-	   ImGui_Camera();
-	   ImGui::Render();
-	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-//#endif // !_DEBUG
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	ImGui_Driving();
+	//ImGui_ProcGen();
+	//ImGui_AI();
+	//ImGui_Particles();
+	ImGui_Camera();
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	//#endif // !_DEBUG
 
 	graphics.presentScene();
 }

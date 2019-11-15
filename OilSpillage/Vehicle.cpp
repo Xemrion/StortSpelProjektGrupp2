@@ -576,7 +576,7 @@ void Vehicle::updateWeapon(float deltaTime)
 
 	for (int i = 0; i < Vehicle::bulletCount; i++)
 	{
-		if (bullets[i].getWeaponType() == WeaponType::Laser)
+		if (bullets[i].getWeaponType() == WeaponType::Laser || bullets->getMelee() == true)
 		{
 			bullets[i].getGameObject()->setPosition(this->vehicleBody1->getPosition());
 			bullets[i].setDirection(Vector3(curDir.x, 0, curDir.y));
