@@ -1,9 +1,15 @@
 #include "UIUpgrading.h"
 #include "../../Input.h"
 #include "../../game.h"
+#include "../../States/UpgradingGameState.h"
 
 void UIUpgrading::updateUI(float deltaTime)
 {
+	if (!this->hasInitStats)
+	{
+		this->statBox->update(dynamic_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getStats());
+		this->hasInitStats = true;
+	}
 	if (this->selectingItem)
 	{
 		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
@@ -88,6 +94,7 @@ void UIUpgrading::drawUI()
 
 UIUpgrading::UIUpgrading() : textureSelectorTitleBG(nullptr), selectingItem(true)
 {
+	this->hasInitStats = false;
 }
 
 UIUpgrading::~UIUpgrading()

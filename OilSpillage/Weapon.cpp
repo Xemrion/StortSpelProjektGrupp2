@@ -68,6 +68,7 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& dir
 	this->dir += additionalVelocity;
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
+	this->obj->setColor(Vector4(1.2f, 1.2f, 0, 1));
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));

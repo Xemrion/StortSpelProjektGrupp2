@@ -129,7 +129,6 @@ void Game::createCurrentState()
 
 		if (oldState == STATE_PLAYING)
 		{
-			
 			static_cast<UpgradingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
 		}
 	}
