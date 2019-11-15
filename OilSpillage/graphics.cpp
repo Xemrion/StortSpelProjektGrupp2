@@ -710,8 +710,9 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 Vector3 Graphics::screenToWorldSpaceUI(Vector2 screenPos)
 {
 	Vector2 s0((screenPos * 2.0f) / Vector2(1280, 720) - Vector2::One);
-
-	Vector4 w0(Vector4::Transform(Vector4(s0.x, -s0.y, 0.0f, 1.0f), this->uiCamera.getProjectionMatrix().Invert()));
+	Matrix ortho = Matrix::CreateOrthographic(1280, 720, 50.0f, 100.0f);
+	//ortho = uiCamera.getProjectionMatrix().Invert();
+	Vector4 w0(Vector4::Transform(Vector4(s0.x, -s0.y, 0.0f, 1.0f), uiCamera.getProjectionMatrix().Invert()/*this->uiCamera.getProjectionMatrix().Invert()*/));
 	w0 *= w0.w;
 	w0.w = 1.0f;
 	w0 = Vector4::Transform(w0, this->uiCamera.getViewMatrix().Invert());
@@ -1259,8 +1260,9 @@ void Graphics::renderUI(float deltaTime)
 	CopyMemory(mappedResource.pData, &uiSun, sizeof(Sun));
 	deviceContext->Unmap(sunBuffer.Get(), 0);
 	
-	
-	Matrix viewProj = (uiCamera.getViewMatrix() * uiCamera.getProjectionMatrix()).Transpose();
+	Matrix ortho = Matrix::CreateOrthographic(1280, 720, 50.0f, 100.0f);
+	ortho = uiCamera.getProjectionMatrix();
+	Matrix viewProj = (uiCamera.getViewMatrix() * ortho).Transpose();
 	hr = deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
