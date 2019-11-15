@@ -36,7 +36,7 @@ private:
 	bool immortal;
 	float immortalTimer;
 	float respawnTimer;
-	float totRespawnTime;
+	float totalRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
 
 	float timeSinceLastShot;

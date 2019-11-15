@@ -197,18 +197,18 @@ bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* 
 	int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
 	Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
+	Actor* enemyPtr = static_cast<Actor*>(obj2->getCollisionObject()->getUserPointer());
 	
-	if (playerPtr == nullptr ? true : !playerPtr->isPlayer())
+	if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
 	{
-		std::swap(obj1, obj2);
-		Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
-		if (playerPtr == nullptr ? true : !playerPtr->isPlayer())
+		playerPtr = static_cast<Vehicle*>(obj2->getCollisionObject()->getUserPointer());
+		enemyPtr = static_cast<Actor*>(obj1->getCollisionObject()->getUserPointer());
+
+		if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
 		{
 			return false;
 		}
 	}
-
-	Actor* enemyPtr = static_cast<Actor*>(obj2->getCollisionObject()->getUserPointer());
 
 	if (enemyPtr != nullptr)
 	{

@@ -13,7 +13,7 @@ Vehicle::Vehicle()
 	this->dmg = false;
 	this->deadImpulse = false;
 	this->respawnTimer = 0.0f;
-	this->totRespawnTime = 5.0f;
+	this->totalRespawnTime = 5.0f;
 	this->immortalTimer = 0.0f;
 	this->immortal = false;
 
@@ -690,7 +690,7 @@ bool Vehicle::isPlayer() const
 
 float Vehicle::getTotalRespawnTime() const
 {
-	return this->totRespawnTime;
+	return this->totalRespawnTime;
 }
 
 float Vehicle::getRespawnTimer() const
