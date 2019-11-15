@@ -64,7 +64,6 @@ void DynamicActor::move()
 void DynamicActor::setPath(std::vector<Vector3>* path)
 {
 	this->path = path;
-
 }
 
 void DynamicActor::update(float dt, const Vector3& targetPos)
@@ -73,7 +72,6 @@ void DynamicActor::update(float dt, const Vector3& targetPos)
 	if (this->state != State::Idle)
 	{
 		followPath();
-
 	}
 	else
 	{

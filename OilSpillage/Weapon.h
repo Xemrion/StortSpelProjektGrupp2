@@ -68,8 +68,10 @@ public:
 class Bullet
 {
 	void defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
+	void meleeShoot(Vector3& position, Vector3& direction);
 	void defaultUpdate(float& deltaTime);
 	void defaultEnemyUpdate(float& deltaTime);
+	void enemyMeleeUpdate(float& deltaTime);
 	void laserEnemyUpdate(float& deltaTime);
 	void flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
 	void laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);

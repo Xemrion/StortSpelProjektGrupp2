@@ -3,11 +3,17 @@
 
 class Melee
 {
+private:
+	Vector3* positionPtr;
+	Vector3* targetPosPtr;
+	Vector3* velocityPtr;
+	float* deltaTimePtr;
 protected:
-	virtual void assignWeapon(int weaponType);
 	Weapon weapon;
+	Bullet bullet;
+	void meleeAttack();
 public:
 	Melee();
-	Melee(int weaponType);
+	Melee(Vector3* pos,Vector3* velocity, float* deltaTimePtr);
 	virtual ~Melee();
 };

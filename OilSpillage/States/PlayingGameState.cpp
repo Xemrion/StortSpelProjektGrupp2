@@ -13,14 +13,14 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar, physics.get());
 	aStar->generateTileData(map->getTileMap());
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 1; i++)
 	{
-		for (int j = 0; j < 3; j++)
+		for (int j = 0; j < 1; j++)
 		{
 			//	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
 				//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
 			//	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
-			//actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
+			actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
 		}
 	}
 }
@@ -578,8 +578,8 @@ void PlayingGameState::update(float deltaTime)
 
 		if (spawnTimer % 200 == 0)
 		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
+		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
+			//actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
 			nrOfEnemies += 12;
 			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
 			spawnTimer = 0;
