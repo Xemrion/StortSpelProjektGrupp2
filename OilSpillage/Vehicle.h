@@ -76,8 +76,9 @@ private:
 	float soundTimer;
 	bool flameBool;
 	bool dmg;
+	bool player = false;
 
-	
+
 	Vector2 curDir;
 	Vector2 currentDir;
 	float velocitySimple;
@@ -87,11 +88,11 @@ public:
 	Vehicle();
 	virtual ~Vehicle();
 
-	void init(Physics *physics);
+	void init(Physics* physics);
 	void updatePlayer(float deltaTime);
 	void update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput);
 	void updateWeapon(float deltaTime);
-	
+
 	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
@@ -115,8 +116,10 @@ public:
 	void resetHealth();
 	void changeHealth(int amount);
 	bool isDead() const;
-	float getTotRespawnTime()const;
+	float getTotalRespawnTime()const;
 	float getRespawnTimer()const;
+	void makePlayer();
+	bool isPlayer() const;
 
 	float getPitch(DirectX::XMVECTOR Quaternion);
 	float getYaw(DirectX::XMVECTOR Quaternion);
@@ -126,6 +129,7 @@ public:
 	Bullet* getBulletArray(size_t& count);
 	void addPowerUp(PowerUpType p);
 	void updatePowerUpEffects(float deltaTime);
+	float getPowerUpTimer(PowerUpType p);
 };
 
 #endif // !VEHICLE_H

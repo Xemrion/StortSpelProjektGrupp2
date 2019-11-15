@@ -1,4 +1,6 @@
 #include "Physics.h"
+#include "Vehicle.h"
+#include "AI/Actor.h"
 
 Physics::Physics() :broadphase(new btDbvtBroadphase()),
 collisionConfig(new btDefaultCollisionConfiguration()),
@@ -28,22 +30,25 @@ solver(new btSequentialImpulseConstraintSolver)
 	world->addRigidBody(body);
 	bodies.push_back(body);
 
-	//gContactAddedCallback = callbackFunc;
+	gContactAddedCallback = callbackFunc;
 }
 
 
 Physics::~Physics()
 {
-
 	//osäker på om man deletar på detta sätt
 	for (int i = 0; i < bodies.size(); i++)
 	{
-		this->world->removeRigidBody(bodies[i]);
 		btMotionState* motionState = bodies[i]->getMotionState();
 		btCollisionShape* shape = bodies[i]->getCollisionShape();
-		delete bodies[i];
 		delete shape;
 		delete motionState;
+		this->world->removeRigidBody(bodies[i]);
+		delete bodies[i];
+	}
+	for (int i = 0; i < pointJoints.size(); i++)
+	{
+		delete pointJoints[i];
 	}
 	delete dispatcher;
 	delete collisionConfig;
@@ -57,10 +62,10 @@ Physics::~Physics()
 void Physics::update(float deltaTime)
 {
 	//this->world->stepSimulation(deltaTime);
-	this->world->stepSimulation(deltaTime, 1000, 1. / 120.);
+	this->world->stepSimulation(deltaTime, 2, 1. / 120.);
 	//this->world->stepSimulation(deltaTime, 0);
 	//this->world->stepSimulation(btScalar(deltaTime));
-}
+}   
 
 btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass)
 {	//add object set transform
@@ -89,7 +94,7 @@ btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass)
 //	return nullptr;
 //}
 
-btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass)
+btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass, void* objects)
 {
 	//add object set transform
 	btTransform t; //
@@ -108,7 +113,7 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass)
 	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	this->world->addRigidBody(body);
 	bodies.push_back(body);
-	//body->setUserPointer(objects);
+	body->setUserPointer(objects);
 	return body;
 }
 
@@ -163,7 +168,6 @@ btRaycastVehicle* Physics::addVehicle(btRaycastVehicle* vehicle)
 {
 	this->world->addVehicle(vehicle);
 	vehicles.push_back(vehicle);
-
 	return vehicle;
 }
 
@@ -199,15 +203,44 @@ bool Physics::DeleteRigidBody(btRigidBody * rb)
 			if (bodies[i] == rb)
 			{
 				this->world->removeRigidBody(bodies[i]);
-				btMotionState* motionState = bodies[i]->getMotionState();
-				btCollisionShape* shape = bodies[i]->getCollisionShape();
-				this->bodies.erase(this->bodies.begin() + i);
-				//delete bodies[i];
-				delete shape;
-				delete motionState;
 				return true;
 			}
 		}
+	return false;
+}
+bool Physics::deletePointJoint(btPoint2PointConstraint* pointJoint)
+{
+	for (int i = 0; i < this->pointJoints.size(); i++)
+	{
+		if (pointJoints[i] == pointJoint)
+		{
+			this->world->removeConstraint(pointJoint);
+			return true;
+		}
+	}
+	return false;
+}
+bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, 
+	int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
+{
+	Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
+	
+	if (playerPtr == nullptr || !playerPtr->isPlayer())
+	{
+		std::swap(obj1, obj2);
+		Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
+		if (playerPtr == nullptr || !playerPtr->isPlayer())
+		{
+			return false;
+		}
+	}
+
+	Actor* enemyPtr = static_cast<Actor*>(obj2->getCollisionObject()->getUserPointer());
+
+	if (enemyPtr != nullptr)
+	{
+		
+	}
 	return false;
 }
 

@@ -1,14 +1,22 @@
 #include "ActorManager.h"
 #include "../game.h"
 #include "../States/PlayingGameState.h"
+#include "Attacker.h"
+#include "Swarm.h"
+#include "ChaseCar.h"
+#include "Boss.h"
+#include "Sniper.h"
+
 ActorManager::ActorManager()
 {
 	this->aStar = nullptr;
 }
 
-ActorManager::ActorManager(AStar* aStar)
+ActorManager::ActorManager(AStar* aStar, Physics* physics)
+	:turretHandler(physics)
 {
 	this->aStar = aStar;
+	this->physics = physics;
 }
 
 ActorManager::~ActorManager()
@@ -17,39 +25,34 @@ ActorManager::~ActorManager()
 	{
 		delete actors[i];
 	}
-
-	for (int i = 0; i < cars.size(); i++)
-	{
-		delete cars[i];
-	}
-	cars.clear();
 	actors.clear();
 }
 
-void ActorManager::update(float dt, Vector3 targetPos)
+void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
 	bool hasDied = false;
-	bool turretDied = false;
-	bool carsDied = false;
-	for (int i = 0; i < this->actors.size(); i++)
+	//seperation(targetPos);
+	for (int i = 0; i < this->groups.size(); i++)
 	{
-
-		if (!actors[i]->isDead() && actors[i] != nullptr)
+		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
-			actors[i]->run(actors, dt, targetPos);
-		}
-		else if (actors[i]->isDead() && actors[i] != nullptr)
-		{
-			Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
-			if (ptr != nullptr)
+			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
 			{
-				if (ptr->getType() == TypeOfMission::KillingSpree)
-				{
-					ptr->killEnemy();
-				}
+				groups[i].actors[j]->update(dt, targetPos);
 			}
-			hasDied = true;
+			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
+			{
+				Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+				if (ptr != nullptr)
+				{
+					if (ptr->getType() == TypeOfMission::KillingSpree)
+					{
+						ptr->killEnemy();
+					}
+				}
+				hasDied = true;
+			}
 		}
 	}
 	if (hasDied)
@@ -58,87 +61,66 @@ void ActorManager::update(float dt, Vector3 targetPos)
 		{
 			if (actors[i]->isDead())
 			{
-				actors[i]->death();
-				delete actors[i];
-				actors.erase(actors.begin() + i);
+				destroyActor(i);
 			}
 		}
 	}
-
-	for (int i = 0; i < this->cars.size(); i++)
+	for (int i = 0; i < groups.size(); i++)
 	{
-		if (!cars[i]->isDead() && cars[i] != nullptr)
-		{
-		}
-			cars[i]->update(dt, targetPos);
-		/*else if (cars[i]->isDead() && cars[i] != nullptr)
-		{
-			Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
-			if (ptr != nullptr)
-			{
-				if (ptr->getType() == TypeOfMission::KillingSpree)
-				{
-					ptr->killEnemy();
-				}
-			}
-			carsDied = true;
-		}*/
+		groups[i].update(targetPos);
 	}
-	if (carsDied)
-	{
-		for (int i = this->cars.size() - 1; i >= 0; i--)
-		{
-			if (cars[i]->isDead())
-			{
-				cars[i]->death();
-				delete cars[i];
-				cars.erase(cars.begin() + i);
-			}
-		}
-		carsDied = false;
-	}
-	//
 	updateGroups();
-	if (frameCount % 60 == 0)
+	turretHandler.update(dt, targetPos);
+	if (frameCount % 20 == 0)
 	{
 		assignPathsToGroups(targetPos);
 		frameCount = 0;
 	}
-	//if (frameCount % 200 == 0)
-	//{
-	//	for(int i = 0; i < groups.size(); i++)
-	//	{
-	//		groups[i].updateBoidDistance();
-	//	}
-	//}
-	updateAveragePos();
 	frameCount++;
 }
 
 void ActorManager::createAttacker(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Attacker(x, z, weaponType));
+	this->actors.push_back(new Attacker(x, z, weaponType, physics));
+	initGroupForActor(actors.at(actors.size() - 1));
+}
+
+void ActorManager::createSniper(float x, float z, int weaponType)
+{
+	this->actors.push_back(new Sniper(x, z, weaponType, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
 void ActorManager::createTurret(float x, float z, int weaponType)
 {
-	turretHandler.createTurret(x, z, weaponType);
+	turretHandler.createTurret(x, z, weaponType, physics);
 }
 
-void ActorManager::createSpitFire(float x, float z, Physics* physics)
+void ActorManager::createSpitFire(float x, float z)
 {
-	this->cars.push_back(new Spitfire(x, z));
-	this->cars[cars.size() - 1]->Init(physics);
+	this->actors.push_back(new Spitfire(x, z, physics));
+	initGroupForActor(actors.at(actors.size() - 1));
+}
+
+void ActorManager::createChaseCar(float x, float z)
+{
+	this->actors.push_back(new ChaseCar(x, z, physics));
+	initGroupForActor(actors.at(actors.size() - 1));
 }
 
 void ActorManager::createSwarm(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Swarm(x, z, weaponType));
+	this->actors.push_back(new Swarm(x, z, weaponType, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-float ActorManager::distanceToPlayer(Vector3 position)
+void ActorManager::createBoss(float x, float z, int weaponType)
+{
+	this->actors.push_back(new Boss(x, z, weaponType, physics));
+	initGroupForActor(actors.at(actors.size() - 1));
+}
+
+float ActorManager::distanceToPlayer(const Vector3& position)
 {
 	float minDistance = 99999999999;
 	for (int i = 0; i < this->actors.size(); i++)
@@ -157,6 +139,11 @@ float ActorManager::distanceToPlayer(Vector3 position)
 	{
 		return minDistance;
 	}
+}
+
+const std::vector<AIGroup>& ActorManager::getGroups() const
+{
+	return this->groups;
 }
 
 void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
@@ -184,7 +171,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					}
 				}
-				else if (bulletArray[j].getGameObject()->getAABB().intersect(this->actors[i]->getAABB()))
+				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
 						/*int randomSound = rand() % 3 + 1;
@@ -203,17 +190,17 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 
 }
 
-void ActorManager::spawnAttackers(Vector3 originPos, int weaponType)
+void ActorManager::spawnAttackers(const Vector3& originPos, int weaponType)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createAttacker(originPos.x + i, originPos.z, weaponType);
-		createAttacker(originPos.x, originPos.z + 1, weaponType);
-		createAttacker(originPos.x - i, originPos.z, weaponType);
+		/*	createAttacker(originPos.x + i, originPos.z, weaponType);
+			createAttacker(originPos.x, originPos.z + 1, weaponType);
+			createAttacker(originPos.x - i, originPos.z, weaponType);*/
 	}
 }
 
-void ActorManager::spawnTurrets(Vector3 position, Radius radius, float angle, int weaponType)
+void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float angle, int weaponType)
 {
 	if (angle != 0)
 	{
@@ -225,6 +212,11 @@ void ActorManager::spawnTurrets(Vector3 position, Radius radius, float angle, in
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
 		createTurret(newPosition.x, newPosition.y, weaponType);
 	}
+}
+
+void ActorManager::spawnBoss(const Vector3& originPos, int weaponType)
+{
+	//createBoss(originPos.x, originPos.z, weaponType);
 }
 
 Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)
@@ -261,16 +253,67 @@ Vector2& ActorManager::generateAroundaPoint(const float& x, const float& z, floa
 	return newPosition;
 }
 
+void ActorManager::seperation(const Vector3& targetPos)
+{
+	std::vector<Vector3> buildings;
+	float desiredSeparationDistance;
+	for (int i = 0; i < groups.size(); i++)
+	{
+		for (int j = 0; j < groups[i].actors.size(); j++)
+		{
+			// Distance of field of vision for separation between boids
+			desiredSeparationDistance = groups[i].actors[j]->getBoidOffset();
+			Vector3 direction(0.0f);
+			float nrInProximity = 0.0f;
+			// For every boid in the system, check if it's too close
+			for (int k = 0; k < actors.size(); k++)
+			{
+				// Calculate distance from current boid to boid we're looking at
+				Vector3 curBoidPos = actors[k]->getPosition();
+				float deltaX = groups[i].actors[j]->getPosition().x - curBoidPos.x;
+				float deltaZ = groups[i].actors[j]->getPosition().z - curBoidPos.z;
+				float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+				// If this is a fellow boid and it's too close, move away from it
+				if ((distance < desiredSeparationDistance) && distance != 0)
+				{
+					Vector3 difference(0.0f);
+					difference = groups[i].actors[j]->getPosition() - actors[k]->getPosition();
+					difference.Normalize();
+					difference /= distance;      // Weight by distance
+					direction += difference;
+					nrInProximity++;
+				}
+			}
+			// Adds average difference of location to acceleration
+			if (nrInProximity > 0)
+			{
+				direction /= nrInProximity;
+			}
+			if (direction.Length() > 0.0f)
+			{
+				// Steering = Desired - Velocity
+				direction.Normalize();
+				direction *= groups[i].actors[j]->getMaxSpeed();
+				direction -= groups[i].actors[j]->getVelocity();
+				if (direction.Length() > groups[i].actors[j]->getMaxForce())
+				{
+					direction /= direction.Length();
+				}
+			}
+			groups[i].actors[j]->applyForce(direction * 4);
+		}
+	}
+}
+
 void ActorManager::updateAveragePos()
 {
-	Vector3 totalPos;
 	for (int i = 0; i < groups.size(); i++)
 	{
 		groups[i].updateAveragePos();
 	}
 }
 
-int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
+int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 {
 	int biggestGroupSize = currentGroupSize;
 	int returnIndex = -1;
@@ -291,10 +334,10 @@ int ActorManager::groupInRange(Vector3 actorPos, int currentGroupSize)
 	return returnIndex;
 }
 
-void ActorManager::joinGroup(Actor* actor, int groupIndex)
+void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 {
-	actor->joinGroup();
 	groups.at(groupIndex).actors.push_back(actor);
+	groups[groupIndex].updateDuty();
 }
 
 void ActorManager::leaveGroup(int groupIndex, int where)
@@ -302,15 +345,28 @@ void ActorManager::leaveGroup(int groupIndex, int where)
 	groups[groupIndex].actors.erase(groups[groupIndex].actors.begin() + where);
 }
 
-void ActorManager::assignPathsToGroups(Vector3 targetPos)
+void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 {
+	std::vector<Vector3> pathToPlayer;
+	std::vector<Vector3> pathToPredicted;
+	std::vector<Vector3>* pathToUse;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		aStar->algorithm(groups[i].getAveragePos(), targetPos, groups[i].getPathRef());
+		aStar->algorithm(groups[i].getAveragePos(), targetPos, pathToPlayer);
+		aStar->algorithm(groups[i].getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
 
+		if (pathToPlayer.size() < pathToPredicted.size())
+		{
+			pathToUse = &pathToPlayer;
+		}
+		else
+		{
+			pathToUse = &pathToPredicted;
+		}
+		groups[i].setPath(*pathToUse);
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
-			groups[i].actors[j]->setPath(&groups[i].getPathRef());
+			groups[i].actors[j]->setPath(groups[i].getPathPtr());
 		}
 	}
 }
@@ -321,8 +377,8 @@ void ActorManager::updateGroups()
 	{
 		for (int k = 0; k < groups[i].actors.size(); k++)
 		{
-			Actor* current = groups[i].actors[k];
-			if (current->isDead() or current == nullptr)
+			DynamicActor* current = groups[i].actors[k];
+			if (current->isDead() || current == nullptr)
 			{
 				leaveGroup(i, k);
 			}
@@ -374,7 +430,17 @@ void ActorManager::updateGroups()
 	}
 }
 
-void ActorManager::initGroupForActor(Actor* actor)
+void ActorManager::destroyActor(int index)
+{
+	if (actors[index]->getRigidBody() != nullptr)
+	{
+		physics->DeleteRigidBody(actors[index]->getRigidBody());
+	}
+	delete actors[index];
+	actors.erase(actors.begin() + index);
+}
+
+void ActorManager::initGroupForActor(DynamicActor* actor)
 {
 	//Is there a group nearby? (Join biggest)
 	int groupIndex = groupInRange(actor->getPosition(), 0);
@@ -389,11 +455,19 @@ void ActorManager::initGroupForActor(Actor* actor)
 	}
 }
 
-void ActorManager::createGroup(Actor* actor)
+void ActorManager::createGroup(DynamicActor* actor)
 {
 	AIGroup temp;
 	temp.actors.push_back(actor);
 	temp.updateAveragePos();
-	actor->joinGroup();
 	groups.push_back(temp);
+	groups[groups.size() - 1].updateDuty();
+}
+
+Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
+{
+	Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
+	targetVelocity.Normalize();
+	Vector3 predictedPos = targetPos + targetVelocity * 20;
+	return predictedPos;
 }
