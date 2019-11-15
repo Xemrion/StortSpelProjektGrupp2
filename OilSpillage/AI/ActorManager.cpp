@@ -80,8 +80,22 @@ void ActorManager::createSwarm(float x, float z, int weaponType)
 
 void ActorManager::createBoss(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Boss(x, z, weaponType, physics));
+	std::vector<Weakspot*> weakspots = createWeakspot(x, z, weaponType);
+
+	this->actors.push_back(new Boss(x, z, weaponType, physics, weakspots));
 	initGroupForActor(actors.at(actors.size() - 1));
+}
+
+std::vector<Weakspot*> ActorManager::createWeakspot(float x, float z, int weaponType)
+{
+	std::vector<Weakspot*> weakspots;
+	Weakspot* weakspot1 = new Weakspot(x, z, weaponType, physics);
+	weakspots.push_back(weakspot1);
+
+	this->actors.push_back(weakspot1);
+	initGroupForActor(actors.at(actors.size() - 1));
+
+	return weakspots;
 }
 
 float ActorManager::distanceToPlayer(const Vector3& position)

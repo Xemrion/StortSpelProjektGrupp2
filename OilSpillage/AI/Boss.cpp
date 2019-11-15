@@ -14,8 +14,8 @@ Boss::Boss()
 	this->frontVector = Vector3{ 0, 0, 0 };
 }
 
-Boss::Boss(float x, float z, int, Physics* physics) //, std::vector<Weakspot*> weakspots
-	:DynamicActor(x, z, physics) // , BossAblilities(&this->position, &this->targetPos, &this->velocity, weaponType)
+Boss::Boss(float x, float z, int weaponType, Physics* physics, std::vector<Weakspot*> weakspots)
+	:DynamicActor(x, z, physics), BossAblilities(&this->position, &this->targetPos, &this->velocity, weaponType, &this->deltaTime)
 {
 	this->setScale(Vector3(0.05f, 0.05f, 0.05f));
 	setUpActor();
@@ -27,7 +27,7 @@ Boss::Boss(float x, float z, int, Physics* physics) //, std::vector<Weakspot*> w
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 
-	//this->attackRange = 35;
+	this->attackRange = 35;
 
 	this->timeTilNextPoint = 0.0f;
 	this->timeTilRotationChange = 0.0f;
@@ -36,7 +36,7 @@ Boss::Boss(float x, float z, int, Physics* physics) //, std::vector<Weakspot*> w
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
 
-	//this->weakSpots = weakspots;
+	this->weakSpots = weakspots;
 }
 
 Boss::~Boss()
@@ -50,9 +50,9 @@ void Boss::update(float dt, const Vector3& targetPos)
 	this->movementVariables(dt);
 	this->circulatePlayer(targetPos);
 
-	//this->updateBullets(dt);
+	this->updateBullets(dt);
 
-	//this->updateWeakPoints(targetPos);
+	this->updateWeakPoints(targetPos);
 }
 
 void Boss::setUpActor()
@@ -74,31 +74,30 @@ void Boss::setUpActor()
 	Sequence& sequence5 = bt.getSequence();
 	Sequence& sequence6 = bt.getSequence();
 
-	////Range
-	//Behavior& inRange = bt.getAction();
-	//inRange.addAction(std::bind(&Boss::inAttackRange, std::ref(*this)));
+	//Range
+	Behavior& inRange = bt.getAction();
+	inRange.addAction(std::bind(&Boss::inAttackRange, std::ref(*this)));
 
-	////Attacks
-	//Behavior& shoot = bt.getAction();
-	//shoot.addAction(std::bind(&Boss::shoot, std::ref(*this)));
+	//Attacks
+	Behavior& shoot = bt.getAction();
+	shoot.addAction(std::bind(&Boss::shoot, std::ref(*this)));
 
 	//Behavior& ability1 = bt.getAction();
 	//ability1.addAction(std::bind(&BossAblilities::ability1, std::ref(*this)));
 
 	//Behaviour Tree
 	//attack and run,				selector
-	//root->addChildren(sequence1);
-	//root->addChildren(selector2);
+	root->addChildren(sequence1);
+	root->addChildren(selector2);
 
-	////check range					sequence
-	//sequence1.addChildren(inRange);
-	//sequence1.addChildren(shoot); //another sequence
+	//check range					sequence
+	sequence1.addChildren(inRange);
+	sequence1.addChildren(shoot); //another sequence
 
 	//abilities outside range		selector
 	//selector2.addChildren(idle);
 
 	//timer to switch weapon
-
 }
 
 void Boss::movementVariables(float dt)
@@ -205,33 +204,33 @@ void Boss::circulatePlayer(Vector3 targetPos)
 	move();
 }
 
-//void Boss::updateWeakPoints(Vector3 targetPos)
-//{
-//	Vector3 upVector = { 0, 1, 0 };
-//	//frontvector is backwards in x and z for placement
-//	Vector3 correctFrontVector = { (this->frontVector.x * -1), this->frontVector.y, (this->frontVector.z * -1) };
-//	Vector3 rightVector = XMVector3Cross(correctFrontVector, upVector);
-//
-//	Vector3 bossPos = this->position;
-//	Vector3 offset = Vector3(rightVector.x, upVector.y, rightVector.z);
-//	Vector3 newPos = { 0, 0, 0 };
-//	Vector3 newPos2 = { 0, 0, 0 };
-//	//works
-//	newPos.x = (bossPos.x + 5.0f);
-//	newPos.y = bossPos.y;
-//	newPos.z = (bossPos.z + 5.0f);
-//	//doesnt work
-//	newPos2.x = (bossPos.x + offset.x);
-//	newPos2.y = bossPos.y;
-//	newPos2.z = (bossPos.z + offset.z);
-//
-//	this->weakSpots[0]->place(newPos);
-//
-//
-//	//this->weakSpots[1].setUpPosition(Vector3(-rightVector.x, upVector.y, rightVector.z));
-//	//this->weakSpots[2].setUpPosition(Vector3(rightVector.x, upVector.y, rightVector.z));
-//	//this->weakSpots[3].setUpPosition(Vector3(-rightVector.x, upVector.y, rightVector.z));
-//}
+void Boss::updateWeakPoints(Vector3 targetPos)
+{
+	Vector3 upVector = { 0, 1, 0 };
+	//frontvector is backwards in x and z for placement
+	Vector3 correctFrontVector = { (this->frontVector.x * -1), this->frontVector.y, (this->frontVector.z * -1) };
+	Vector3 rightVector = XMVector3Cross(correctFrontVector, upVector);
+
+	Vector3 bossPos = this->position;
+	Vector3 offset = Vector3(rightVector.x, upVector.y, rightVector.z);
+	Vector3 newPos = { 0, 0, 0 };
+	Vector3 newPos2 = { 0, 0, 0 };
+	//works
+	newPos.x = (bossPos.x + 5.0f);
+	newPos.y = bossPos.y;
+	newPos.z = (bossPos.z + 5.0f);
+	//doesnt work
+	newPos2.x = (bossPos.x + offset.x);
+	newPos2.y = bossPos.y;
+	newPos2.z = (bossPos.z + offset.z);
+
+	this->weakSpots[0]->place(newPos);
+
+
+	//this->weakSpots[1].setUpPosition(Vector3(-rightVector.x, upVector.y, rightVector.z));
+	//this->weakSpots[2].setUpPosition(Vector3(rightVector.x, upVector.y, rightVector.z));
+	//this->weakSpots[3].setUpPosition(Vector3(-rightVector.x, upVector.y, rightVector.z));
+}
 
 //void Boss::saveWeakspots(std::vector<Weakspot*> weakspots)
 //{

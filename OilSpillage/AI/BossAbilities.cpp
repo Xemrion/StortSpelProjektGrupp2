@@ -7,11 +7,12 @@ BossAblilities::BossAblilities()
 
 }
 
-BossAblilities::BossAblilities(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType)
+BossAblilities::BossAblilities(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType, float* deltaTimePtr)
 {
 	this->positionPtr = pos;
 	this->targetPosPtr = targetPos;
 	this->velocityPtr = velocity;
+	this->deltaTimePtr = deltaTimePtr;
 	this->attackRange = 8;
 	assignWeapon(weaponType);
 }
@@ -83,16 +84,17 @@ Status BossAblilities::shoot()
 	else
 	{
 		Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
+
 		float predictionFactor = 0.4f;
 		offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
 	}
 	if ((*positionPtr - *targetPosPtr).Length() < 23)
 	{
-		if (this->timeSinceLastShot >= (this->weapon.fireRate))
+		if (this->timeSinceLastShot >= this->weapon.fireRate)
 		{
-			this->timeSinceLastShot = fmod(this->timeSinceLastShot, (this->weapon.fireRate));
+			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
 
-			for (int i = 0; i < this->bulletCount; i++)
+			for (int i = 0; i < BossAblilities::bulletCount; i++)
 			{
 				if (bullets[i].getTimeLeft() == 0.0)
 				{
@@ -102,12 +104,12 @@ Status BossAblilities::shoot()
 					dir = (offsetPos - bulletOrigin);
 					dir.Normalize();
 
-					this->bullets[i].setWeaponType(this->weapon.type);
 					this->bullets[i].shoot(
 						weapon,
 						bulletOrigin,
 						dir,
-						*velocityPtr
+						*velocityPtr,
+						*deltaTimePtr
 					);
 					break;
 				}
@@ -131,6 +133,7 @@ Status BossAblilities::ability1()
 	else
 	{
 		Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
+
 		float predictionFactor = 0.4f;
 		offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
 	}
@@ -140,7 +143,7 @@ Status BossAblilities::ability1()
 		{
 			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
 
-			for (int i = 0; i < this->bulletCount; i++)
+			for (int i = 0; i < BossAblilities::bulletCount; i++)
 			{
 				if (bullets[i].getTimeLeft() == 0.0)
 				{
@@ -150,12 +153,12 @@ Status BossAblilities::ability1()
 					dir = (offsetPos - bulletOrigin);
 					dir.Normalize();
 
-					this->bullets[i].setWeaponType(this->weapon.type);
 					this->bullets[i].shoot(
 						weapon,
 						bulletOrigin,
 						dir,
-						*velocityPtr
+						*velocityPtr,
+						*deltaTimePtr
 					);
 					break;
 				}

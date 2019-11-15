@@ -33,6 +33,8 @@ public:
 	static constexpr Stats AICar      = { 200,		2.0f,	2.0f,				1.0f,	0.7f,		10.0f };
 
 	static constexpr Stats AIBoss	  = { 2000,		5.0f,	5.0f,				5.0f,	20.0f,		1.0f };
+
+	static constexpr Stats AIPart     = { 500,		5.0f,	5.0f,				0.0f,	0.0f,		0.0f };
 };
 
 #endif // !VEHICLE_STATS_H

@@ -6,7 +6,7 @@ class BossAblilities
 {
 public:
 	BossAblilities();
-	BossAblilities(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType);
+	BossAblilities(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType, float* deltaTimePtr);
 	virtual ~BossAblilities();
 
 	Status ability1(); //should prob be protected/private but didnt work in boss.cpp then
@@ -14,6 +14,7 @@ private:
 	Vector3* positionPtr;
 	Vector3* targetPosPtr;
 	Vector3* velocityPtr;
+	float* deltaTimePtr;
 	float timeSinceLastShot;
 	bool predicting = false;
 	Weapon weapon;
