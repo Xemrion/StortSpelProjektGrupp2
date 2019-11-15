@@ -115,6 +115,7 @@ void Spitfire::followPath()
 			destination = path->at(path->size() - 1);
 			if ((destination - this->position).Length() < 15)
 			{
+
 				path->pop_back();
 			}
 		}

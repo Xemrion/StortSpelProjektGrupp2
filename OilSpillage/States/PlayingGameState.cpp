@@ -17,18 +17,12 @@ void PlayingGameState::initAI()
 	{
 		for (int j = 0; j < 3; j++)
 		{
-		actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
+		//	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
 			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
+		//	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
+			actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
 		}
 	}
-			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
-	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
@@ -78,13 +72,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("Tiles/asphalt_nor");
 	graphics.loadTexture("Tiles/grass");
 	graphics.loadTexture("Tiles/grass_nor");
-// graphics.loadTexture("Tiles/grass_spec");
+	// graphics.loadTexture("Tiles/grass_spec");
 	graphics.loadTexture("Tiles/snow");
 	graphics.loadTexture("Tiles/snow_nor");
-// graphics.loadTexture("Tiles/snow_spec");
+	// graphics.loadTexture("Tiles/snow_spec");
 	graphics.loadTexture("Tiles/desert");
 	graphics.loadTexture("Tiles/desert_nor");
-// graphics.loadTexture("Tiles/desert_spec");
+	// graphics.loadTexture("Tiles/desert_spec");
 	graphics.loadTexture("Tiles/road_trans_2file2metro");
 	graphics.loadTexture("Tiles/road_trans_2file2metro_nor");
 	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne");
@@ -477,13 +471,13 @@ void PlayingGameState::ImGui_ProcGen()
 	ImGui::NewLine();
 	if (ImGui::Button("Re-generate")) {
 		// (TODO: refactor) hacky, but:
-		player->getVehicle()->getRigidBody()->setLinearFactor( btVector3(.0,.0f,.0f) );
+		player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
 
 		map = nullptr; // clear, then regenerate:
-		map = std::make_unique<Map>( graphics, config, physics.get() );
+		map = std::make_unique<Map>(graphics, config, physics.get());
 
-		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
-		player->getVehicleBody1()->setPosition( map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f) );
+		player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
+		player->getVehicleBody1()->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
 		map->setDistrictColorCoding(shouldColorCodeDistricts);
 		minimap = createMinimapTexture(*map);
 		aStar->generateTileData(map->getTileMap());
@@ -494,7 +488,7 @@ void PlayingGameState::ImGui_ProcGen()
 
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
-		player->getVehicle()->getRigidBody()->setLinearFactor( btVector3(1.0f, .0f, 1.0f) );
+		player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
 	}
 	ImGui::End();
 }
@@ -580,22 +574,22 @@ void PlayingGameState::update(float deltaTime)
 		auto playerVehicle{ player->getVehicle() };
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
-		
-	/*	if(spawnTimer % 200 == 0)
-		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-			spawnTimer = 0;
-		}
-		spawnTimer++;*/
-		//spawn Boss
-		//if (spawnTimer % 10 == 0)
-		//{
-		//	actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
-		//		player->getVehicle()->getPosition().y,
-		//		player->getVehicle()->getPosition().z + 5), 1);
-		//	spawnTimer = 0;
-		//}
-		//spawnTimer = 1;
+
+		/*	if(spawnTimer % 200 == 0)
+			{
+				actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+				spawnTimer = 0;
+			}
+			spawnTimer++;*/
+			//spawn Boss
+			//if (spawnTimer % 10 == 0)
+			//{
+			//	actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
+			//		player->getVehicle()->getPosition().y,
+			//		player->getVehicle()->getPosition().z + 5), 1);
+			//	spawnTimer = 0;
+			//}
+			//spawnTimer = 1;
 
 		powerUps.erase(
 			std::remove_if(
@@ -683,7 +677,7 @@ void PlayingGameState::update(float deltaTime)
 			timerForParticle = 0;
 		}*/
 
-	}
+		}
 
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
@@ -702,20 +696,20 @@ void PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 //#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   ImGui_ImplDX11_NewFrame();
-	   ImGui_ImplWin32_NewFrame();
-	   ImGui::NewFrame();
-	   //ImGui_Driving();
-	   ImGui_ProcGen();
-	   ImGui_AI();
-	   //ImGui_Particles();
-	   ImGui_Camera();
-	   ImGui::Render();
-	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-//#endif // !_DEBUG
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	ImGui_Driving();
+	//ImGui_ProcGen();
+	//ImGui_AI();
+	//ImGui_Particles();
+	ImGui_Camera();
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	//#endif // !_DEBUG
 
 	graphics.presentScene();
-}
+	}
 
 F32 const& PlayingGameState::getTimeRef() const noexcept {
 	return time;
