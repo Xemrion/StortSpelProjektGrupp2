@@ -78,11 +78,11 @@ void ActorManager::createSwarm(float x, float z, int weaponType)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createBoss(float x, float z, int weaponType)
-{
-	this->actors.push_back(new Boss(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
-}
+//void ActorManager::createBoss(float x, float z, int weaponType)
+//{
+//	this->actors.push_back(new Boss(x, z, weaponType, physics));
+//	initGroupForActor(actors.at(actors.size() - 1));
+//}
 
 float ActorManager::distanceToPlayer(const Vector3& position)
 {
