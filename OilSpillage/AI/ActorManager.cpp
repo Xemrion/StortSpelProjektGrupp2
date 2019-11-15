@@ -183,6 +183,15 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					bulletArray[j].destroy();
 				}
+				if (bulletArray[j].getMelee() == true && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
+				{
+					if (soundTimer > 0.05f) {
+						Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+						soundTimer = 0;
+					}
+					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
+					// dont remove the melee weapon
+				}
 			}
 		}
 	}
