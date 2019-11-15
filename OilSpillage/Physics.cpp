@@ -1,5 +1,6 @@
 #include "Physics.h"
 #include "Vehicle.h"
+#include "AI/Actor.h"
 
 Physics::Physics() :broadphase(new btDbvtBroadphase()),
 collisionConfig(new btDefaultCollisionConfiguration()),
@@ -222,19 +223,25 @@ bool Physics::deletePointJoint(btPoint2PointConstraint* pointJoint)
 bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, 
 	int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
-	if ((obj1->getCollisionObject()->getUserPointer() == ((Vehicle*)obj1->getCollisionObject()->getUserPointer())) &&
-		(obj2->getCollisionObject()->getUserPointer() == ((Vehicle*)obj2->getCollisionObject()->getUserPointer())))
+	Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
+	
+	if (playerPtr == nullptr || !playerPtr->isPlayer())
 	{
-		Vehicle* vec1 = ((Vehicle*)obj1->getCollisionObject()->getUserPointer());
-		Vehicle* vec2 = ((Vehicle*)obj2->getCollisionObject()->getUserPointer());
-
-		if ( (vec1 != nullptr)&& (vec2 != nullptr))
+		std::swap(obj1, obj2);
+		Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
+		if (playerPtr == nullptr || !playerPtr->isPlayer())
 		{
-			//bool ishit = ((Player*)obj1->getCollisionObject()->getUserPointer())->getHit();
-			std::cout << "Looool" << std::endl;
+			return false;
 		}
 	}
-		return false;
+
+	Actor* enemyPtr = static_cast<Actor*>(obj2->getCollisionObject()->getUserPointer());
+
+	if (enemyPtr != nullptr)
+	{
+		
+	}
+	return false;
 }
 
 //bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
