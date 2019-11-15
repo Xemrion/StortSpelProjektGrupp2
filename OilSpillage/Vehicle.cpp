@@ -238,11 +238,11 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	velocitySpeed = (this->vehicle->getRigidBody()->getLinearVelocity().getX() * (dx)) + (-this->vehicle->getRigidBody()->getLinearVelocity().getZ() * (dy));
 
 	Vector3 steering = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
-		throttleInputStrength * /*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.15f, 1),
+		throttleInputStrength * updatedStats.handlingRate * /*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.15f, 1),
 		vehicle->getRigidBody()->getAngularVelocity().getZ());
 
 	Vector3 steering2 = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
-		throttleInputStrength * /*deltaTime*/0.035f * 80 * max(velocitySpeed * 0.15f, -1),
+		throttleInputStrength * updatedStats.handlingRate * /*deltaTime*/0.035f * 80 * max(velocitySpeed * 0.15f, -1),
 		vehicle->getRigidBody()->getAngularVelocity().getZ());
 
 	//Driving mode: Throttle and turning, realistic
@@ -326,7 +326,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	else if (drivingMode == 1) {
 
 		Vector3 steering3 = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
-			/*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.15f, 1),
+			/*deltaTime*/0.035f * updatedStats.handlingRate * 80 * min(velocitySpeed * 0.15f, 1),
 			vehicle->getRigidBody()->getAngularVelocity().getZ());
 
 		if (throttleInputStrength > 0 && this->health > 0) {
@@ -835,7 +835,7 @@ void Vehicle::updatePowerUpEffects(float deltaTime)
 	if (powerUpTimers[(int)PowerUpType::Star] > 0.0)
 	{
 		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate * 3.0f;
-		this->updatedStats.handlingRate = this->defaultStats.handlingRate * 3.0f;
+		this->updatedStats.handlingRate = this->defaultStats.handlingRate * 1.3f;
 
 		// animation
 		float time = dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime();

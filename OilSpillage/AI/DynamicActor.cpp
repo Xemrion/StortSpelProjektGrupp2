@@ -14,12 +14,13 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 	this->path = nullptr;
 	this->state = State::Idle;
 	this->aggroRange = 80;
-	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(x, position.y, z),0.5f);
+	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(x, position.y, z), 0.5f, this);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);
 	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+
 
 }
 

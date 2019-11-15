@@ -31,7 +31,7 @@ public:
 	Physics();
 	~Physics();
 	void update(float deltaTime);
-	btRigidBody* addSphere(float radius, btVector3 Origin, float mass);
+	btRigidBody* addSphere(float radius, btVector3 Origin, float mass, void* obj = nullptr);
 	btRigidBody* addBox(btVector3 Origin, btVector3 size, float mass, void* obj = nullptr);
 	btRigidBody* addCylinder(btVector3 Origin, btVector3 size, float mass);
 	btGeneric6DofSpring2Constraint* addSpring(btRigidBody*box1, btRigidBody* box2);
