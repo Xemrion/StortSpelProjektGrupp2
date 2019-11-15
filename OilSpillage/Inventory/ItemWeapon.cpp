@@ -8,7 +8,7 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 	stream << "Fire Rate: " << weapon.fireRate << "\n";
 	stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
 	stream << "Max Spread: " << weapon.maxSpread << "\n";
-
+	
 	return stream.str();
 }
 
