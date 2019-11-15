@@ -80,7 +80,7 @@ void ItemSlot::setSlot(Container::Slot* slot)
 		{
 			rotationTimer = 190 * XM_PI / 180;
 			rotation = Quaternion::CreateFromYawPitchRoll(XM_PI + 0.3f, 0.26f, 0.0f);
-			transform = Item::generateTransform(this->slot->item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.0f), rotation, true);
+			transform = Item::generateTransform(this->slot->item->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.5f), rotation, true);
 			Game::getGraphics().addToUIDraw(this->slot->item->getObject(), &this->transform);
 		}
 
