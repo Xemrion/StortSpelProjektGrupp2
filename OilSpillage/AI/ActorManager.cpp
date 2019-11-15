@@ -45,8 +45,8 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 
 void ActorManager::createAttacker(float x, float z, int weaponType)
 {
-	/*this->actors.push_back(new Attacker(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));*/
+	this->actors.push_back(new Attacker(x, z, weaponType, physics));
+	initGroupForActor(actors.at(actors.size() - 1));
 }
 
 void ActorManager::createSniper(float x, float z, int weaponType)
@@ -62,8 +62,8 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 
 void ActorManager::createSpitFire(float x, float z)
 {
-	/*this->actors.push_back(new Spitfire(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));*/
+	this->actors.push_back(new Spitfire(x, z, physics));
+	initGroupForActor(actors.at(actors.size() - 1));
 }
 
 void ActorManager::createChaseCar(float x, float z)
@@ -194,7 +194,7 @@ void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float an
 
 void ActorManager::spawnBoss(const Vector3& originPos, int weaponType)
 {
-	createBoss(originPos.x, originPos.z, weaponType);
+	//createBoss(originPos.x, originPos.z, weaponType);
 }
 
 Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)
