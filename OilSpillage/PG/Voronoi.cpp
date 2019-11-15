@@ -116,6 +116,35 @@ Size  Voronoi::computeCellRealEstateArea( U32 const cellId, TileMap const &map )
    return counter;
 }
 
+// TODO: merge with computeCellRealEstateArea?
+F32 Voronoi::computeCellRoadCoverage( U32 const cellId, TileMap const &map ) const noexcept {
+	assert( cellId < (width * height) && "Cell ID is too low!" );
+
+	Size    roadCounter { 0 },
+	        tileCounter { 0 };
+
+	Bounds  cell; {  /* first we calculate the relevant 1x1~3x3 cell matrix: */
+		V2u  centerCell { cellId % width, cellId / width };
+		cell.min.x = centerCell.x > 0        ?  centerCell.x-1  :  centerCell.x;
+		cell.max.x = centerCell.x < width-1  ?  centerCell.x+1  :  centerCell.x;
+		cell.min.y = centerCell.y > 0        ?  centerCell.y-1  :  centerCell.y;
+		cell.max.y = centerCell.y < height-1 ?  centerCell.y+1  :  centerCell.y;
+	};
+
+	for ( U32  y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y ) {
+		for ( U32  x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x ) {
+			if ( diagram[diagramIndex( x, y )] == cellId ) {
+				++tileCounter;
+				if ( map.tileAt( x, y ) == Tile::road )
+					++roadCounter;
+			}
+		}
+	}
+
+   return F32(roadCounter) / tileCounter;
+}
+
+
 // TODO: refactor out?
 Bounds  Voronoi::computeCellBounds( U32 const cellId ) const noexcept {
    assert( cellId < (width * height) && "Cell ID is too low!" );

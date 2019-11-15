@@ -71,4 +71,17 @@ namespace util {
 	Numeral constexpr degToRad( Numeral deg ) noexcept {
 		return 3.1415926535f / 180.0f * deg;
 	}
+
+	template <class Container, class T_RNG=RNG>
+	auto &randomElementOf( Container &c, T_RNG &rng={RD()()} ) noexcept {
+		auto const idx = U32_Dist{}( rng ) % c.size();
+		return c[idx];
+	}
+
+	RGBA constexpr blendColor( RGBA a, RGBA b, F32 fac ) noexcept {
+		return (RGBA(((a & 0x00'00'00'FF) >>  0) * fac) + RGBA(((b & 0x00'00'00'FF) >>  0) * (1.0f - fac)) <<  0)+ // R
+             (RGBA(((a & 0x00'00'FF'00) >>  8) * fac) + RGBA(((b & 0x00'00'FF'00) >>  8) * (1.0f - fac)) <<  8)+ // G
+             (RGBA(((a & 0x00'FF'00'00) >> 16) * fac) + RGBA(((b & 0x00'FF'00'00) >> 16) * (1.0f - fac)) << 16)+ // B
+             (RGBA(((a & 0xFF'00'00'00) >> 24) * fac) + RGBA(((b & 0xFF'00'00'00) >> 24) * (1.0f - fac)) << 24); // A
+	}
 }

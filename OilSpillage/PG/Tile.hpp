@@ -11,7 +11,6 @@ enum class Tile : U8
    water
 };
 
-using RGBA = U32;
 #pragma warning( disable : 4715 )
 [[deprecated]] inline RGBA constexpr  minimapColorLookUpTable( Tile t ) noexcept {
    switch (t) {

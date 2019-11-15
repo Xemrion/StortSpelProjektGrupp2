@@ -1189,17 +1189,16 @@ Material Graphics::getMaterial(const char* modelPath)
 	return material;
 }
 
-void Graphics::addToDraw(GameObject* o, bool isStatic)
+void Graphics::addToDrawStatic(GameObject* o)
 {
 	assert( o != nullptr );
-	if (!isStatic)
-	{
-		drawableObjects.push_back(o);
-	}
-	else
-	{
-		quadTree->insert(o);
-	}
+	quadTree->insert(o);
+}
+
+void Graphics::addToDraw(GameObject* o)
+{
+	assert( o != nullptr );
+	drawableObjects.push_back(o);
 }
 
 void Graphics::removeFromDraw(GameObject* o)
@@ -1220,7 +1219,7 @@ void Graphics::clearDraw()
 
 void Graphics::clearStaticObjects()
 {
-	quadTree->clearGameObjects();
+	quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
 }
 
 void Graphics::setLightList(LightList* lightList)
@@ -1369,7 +1368,7 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
 	std::vector<GameObject*> objects;
-	quadTree->getGameObjects(objects, frustum, frustumBias);
+	quadTree->getGameObjects(objects, frustum, frustumBias );
 
 	for (GameObject* object : objects)
 	{

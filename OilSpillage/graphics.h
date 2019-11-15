@@ -108,7 +108,8 @@ public:
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path);
 	Material getMaterial(const char* modelPath);
-	void addToDraw(GameObject* o, bool isStatic = false);
+	void addToDraw(GameObject* o);
+	void addToDrawStatic(GameObject* o);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
 	void clearStaticObjects();

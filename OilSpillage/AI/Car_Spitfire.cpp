@@ -56,6 +56,8 @@ Spitfire::~Spitfire()
 	Game::getGraphics().removeFromDraw(wheel2);
 	Game::getGraphics().removeFromDraw(wheel3);
 	Game::getGraphics().removeFromDraw(wheel4);
+	physics->DeleteRigidBody(vehicleBody1->getRigidBody());
+	physics->deletePointJoint(pointJoint);
 	delete vehicleBody1;
 	delete wheel1;
 	delete wheel2;
@@ -167,7 +169,11 @@ void Spitfire::init(Physics* physics)
 	wheel4->setTexture(vehicleTexture);
 
 
-	btRigidBody* tempo = physics->addBox(btVector3(getPosition().x, getPosition().y, getPosition().z), btVector3(getScale().x, getScale().y, getScale().z), 10.0f);
+	btRigidBody* tempo = physics->addBox(
+		btVector3(getPosition().x, getPosition().y, getPosition().z),
+		btVector3(getScale().x, getScale().y, getScale().z),
+		10.0f,
+		this);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
@@ -178,12 +184,12 @@ void Spitfire::init(Physics* physics)
 	btVector3 size = btVector3(vehicleBodyAABB.maxPos.x - vehicleBodyAABB.minPos.x,
 		(vehicleBodyAABB.maxPos.y - vehicleBodyAABB.minPos.y) * 0.2f,
 		vehicleBodyAABB.maxPos.z - vehicleBodyAABB.minPos.z) * 0.5f;
-	tempo = physics->addBox(origin, size, 1.0f);
+	tempo = physics->addBox(origin, size, 1.0f,this);
 	vehicleBody1->setRigidBody(tempo, physics);
 	vehicleBody1->getRigidBody()->activate();
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicleBody1->getRigidBody()->setFriction(1);
-	physics->addPointJoint(getRigidBody(), this->vehicleBody1->getRigidBody());
+	pointJoint = physics->addPointJoint(getRigidBody(), this->vehicleBody1->getRigidBody());
 }
 
 void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)

@@ -17,9 +17,9 @@ void PlayingGameState::initAI()
 	{
 		for (int j = 0; j < 3; j++)
 		{
-		//actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j,physics.get());
+			//actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
 			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, (rand()%4)+1);
+			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
 		}
 	}
 			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
@@ -73,11 +73,20 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	//graphics.loadModel("Roads/Metro/1110");
 	//graphics.loadModel("Roads/Metro/1111");
 
-	graphics.loadModel("Tiles/Quad_SS"); // one-sided
+	graphics.loadModel("Tiles/Quad_SS"); // single-sided
 	graphics.loadTexture("Tiles/asphalt");
 	graphics.loadTexture("Tiles/asphalt_nor");
 	graphics.loadTexture("Tiles/grass");
 	graphics.loadTexture("Tiles/grass_nor");
+// graphics.loadTexture("Tiles/grass_spec");
+	graphics.loadTexture("Tiles/snow");
+	graphics.loadTexture("Tiles/snow_nor");
+// graphics.loadTexture("Tiles/snow_spec");
+	graphics.loadTexture("Tiles/desert");
+	graphics.loadTexture("Tiles/desert_nor");
+// graphics.loadTexture("Tiles/desert_spec");
+	graphics.loadTexture("Tiles/road_trans_2file2metro");
+	graphics.loadTexture("Tiles/road_trans_2file2metro_nor");
 	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne");
 	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne_nor");
 	graphics.loadTexture("Tiles/sidewalk_side_n");
@@ -96,7 +105,17 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("Tiles/concrete");
 	graphics.loadTexture("Tiles/concrete_nor");
 
-
+	graphics.loadTexture("Tiles/road_2file_deadend_n");
+	graphics.loadTexture("Tiles/road_2file_deadend_n_nor");
+	graphics.loadTexture("Tiles/road_2file_turn_ne");
+	graphics.loadTexture("Tiles/road_2file_turn_ne_nor");
+	graphics.loadTexture("Tiles/road_2file_straight_n");
+	graphics.loadTexture("Tiles/road_2file_straight_n_nor");
+	graphics.loadTexture("Tiles/road_2file_3way_n");
+	graphics.loadTexture("Tiles/road_2file_3way_n_nor");
+	graphics.loadTexture("Tiles/road_2file_4way");
+	graphics.loadTexture("Tiles/road_2file_4way_nor");
+	// missing: single tile road!
 
 	graphics.loadModel("Hospital");
 	//graphics.loadModel("Roads/Road_pavement");
@@ -117,7 +136,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 
 	player = std::make_unique<Vehicle>();
-
+	player->makePlayer();
 	//if constexpr ( isDebugging ) {
 		// light tests
 	lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
@@ -204,7 +223,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	graphics.setVectorField(4.5f, 3.0f);
 
-	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
+	powerUps.push_back(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
 
 	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
@@ -223,9 +242,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
-	Game::getGraphics().loadModel("Vehicles/Player");
-	buildingTest->mesh = Game::getGraphics().getMeshPointer("Vehicles/Player");
-	Game::getGraphics().addToDraw(buildingTest.get());
+	graphics.loadModel("Vehicles/Player");
+	buildingTest->mesh = graphics.getMeshPointer("Vehicles/Player");
+	graphics.addToDraw(buildingTest.get());
 	btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
 	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
 	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
@@ -458,8 +477,13 @@ void PlayingGameState::ImGui_ProcGen()
 	ImGui::NewLine();
 	if (ImGui::Button("Re-generate")) {
 		// (TODO: refactor) hacky, but:
-		map = std::make_unique<Map>(graphics, config, physics.get());
-		player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
+		player->getVehicle()->getRigidBody()->setLinearFactor( btVector3(.0,.0f,.0f) );
+
+		map = nullptr; // clear, then regenerate:
+		map = std::make_unique<Map>( graphics, config, physics.get() );
+
+		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
+		player->getVehicleBody1()->setPosition( map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f) );
 		map->setDistrictColorCoding(shouldColorCodeDistricts);
 		minimap = createMinimapTexture(*map);
 		aStar->generateTileData(map->getTileMap());
@@ -470,6 +494,7 @@ void PlayingGameState::ImGui_ProcGen()
 
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
+		player->getVehicle()->getRigidBody()->setLinearFactor( btVector3(1.0f, .0f, 1.0f) );
 	}
 	ImGui::End();
 }
@@ -577,20 +602,20 @@ void PlayingGameState::update(float deltaTime)
 				powerUps.begin(),
 				powerUps.end(),
 				[&](PowerUp& p) {
-			p.update(time);
-			if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
-			{
-				player->powerUp(p.getPowerUpType());
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
+					p.update(time);
+					if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
+					{
+						player->addPowerUp(p.getPowerUpType());
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
 			),
 			powerUps.end()
-			);
+		);
 
 		if (time == 0)
 		{
@@ -676,18 +701,18 @@ void PlayingGameState::update(float deltaTime)
 
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
-#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	//   ImGui_Driving();
-	//   ImGui_ProcGen();
-	ImGui_AI();
-	//   ImGui_Particles();
-	ImGui_Camera();
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-#endif // !_DEBUG
+//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	   ImGui_ImplDX11_NewFrame();
+	   ImGui_ImplWin32_NewFrame();
+	   ImGui::NewFrame();
+	   //ImGui_Driving();
+	   ImGui_ProcGen();
+	   ImGui_AI();
+	   //ImGui_Particles();
+	   ImGui_Camera();
+	   ImGui::Render();
+	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+//#endif // !_DEBUG
 
 	graphics.presentScene();
 }
@@ -733,9 +758,9 @@ Vector3 PlayingGameState::getBottomRight() const
 
 void PlayingGameState::spawnObjects()
 {
-	Game::getGraphics().loadModel("Entities/Barrel");
-	Game::getGraphics().loadModel("Entities/Garbage_Bag");
-	Game::getGraphics().loadModel("Entities/Quad");
+	graphics.loadModel("Entities/Barrel");
+	graphics.loadModel("Entities/Garbage_Bag");
+	graphics.loadModel("Entities/Quad");
 	physicsObjID = 0;
 	physicsObjects.reserve(300);
 	btRigidBody* tempo2;
@@ -743,11 +768,11 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 20; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		Game::getGraphics().loadModel("Cube");
-		objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
+		graphics.loadModel("Cube");
+		objPtr->mesh = graphics.getMeshPointer("Cube");
 		graphics.loadTexture("brownPaperCardboard");
-		objPtr->setTexture(Game::getGraphics().getTexturePointer("brownPaperCardboard"));
-		Game::getGraphics().addToDraw(objPtr);
+		objPtr->setTexture(graphics.getTexturePointer("brownPaperCardboard"));
+		graphics.addToDraw(objPtr);
 		randomValue = (rand() % 3 + 8) * 0.125f;
 		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue), 0.01f);
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
@@ -765,9 +790,9 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 15; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
-		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Barrel").diffuse);
-		Game::getGraphics().addToDraw(objPtr);
+		objPtr->mesh = graphics.getMeshPointer("Entities/Barrel");
+		objPtr->setTexture(graphics.getMaterial("Entities/Barrel").diffuse);
+		graphics.addToDraw(objPtr);
 		tempo2 = physics->addCylinder(btVector3(-200, 0.2f + i, -200), btVector3(size, size, size), 0.01f);
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
 		objPtr->setScale(Vector3(size, size, size));
@@ -783,9 +808,9 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 15; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Garbage_Bag");
-		objPtr->setTexture(Game::getGraphics().getMaterial("Entities/Garbage_Bag").diffuse);
-		Game::getGraphics().addToDraw(objPtr);
+		objPtr->mesh = graphics.getMeshPointer("Entities/Garbage_Bag");
+		objPtr->setTexture(graphics.getMaterial("Entities/Garbage_Bag").diffuse);
+		graphics.addToDraw(objPtr);
 		objPtr->setPosition(Vector3(0, 0, 0));
 		randomValue = (rand() % 3 + 8) * 0.125f;
 		size = 0.30f * randomValue;
@@ -802,8 +827,8 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 250; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		objPtr->mesh = Game::getGraphics().getMeshPointer("Entities/Quad");
-		Game::getGraphics().addToDraw(objPtr);
+		objPtr->mesh = graphics.getMeshPointer("Entities/Quad");
+		graphics.addToDraw(objPtr);
 		size = rand() % 3 + 8;
 		size *= 0.125f;
 		randomValue = randomValue = (rand() % 5) * 0.125f;
@@ -816,9 +841,9 @@ void PlayingGameState::spawnObjects()
 
 	//physicsObjects.emplace_back(std::make_unique<GameObject>());
 	//auto objPtr = physicsObjects.back().get();
-	//Game::getGraphics().loadModel("Cube");
-	//objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//Game::getGraphics().addToDraw(objPtr);
+	//graphics.loadModel("Cube");
+	//objPtr->mesh = graphics.getMeshPointer("Cube");
+	//graphics.addToDraw(objPtr);
 	//tempo2 = physics->addBox(btVector3(20, 0.2f, -20), btVector3(5.5f, 12.5f, 5.5f), 0);
 	//objPtr->setPosition(Vector3(20, 0.2f, -20));
 	//objPtr->setScale(Vector3(5.5f, 12.5f, 5.5f));
@@ -844,9 +869,9 @@ void PlayingGameState::spawnObjects()
 	//			/*for (int i = 0; i < 4; i++) {
 	//				physicsObjects.emplace_back(std::make_unique<GameObject>());
 	//				auto objPtr = physicsObjects.back().get();
-	//				Game::getGraphics().loadModel("Cube");
-	//				objPtr->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//				Game::getGraphics().addToDraw(objPtr);
+	//				graphics.loadModel("Cube");
+	//				objPtr->mesh = graphics.getMeshPointer("Cube");
+	//				graphics.addToDraw(objPtr);
 	//				tempo2 = physics->addBox(btVector3(min.x, 0.2f+i, min.z), btVector3(0.5f, 0.5f, 0.5f), 3.0f);
 	//				objPtr->setPosition(Vector3(min.x, 0.2f+i, min.z));
 	//				objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
