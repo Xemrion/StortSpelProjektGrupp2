@@ -108,9 +108,9 @@ void ActorManager::createChaseCar(float x, float z)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createSwarm(float x, float z, int weaponType)
+void ActorManager::createSwarm(float x, float z)
 {
-	this->actors.push_back(new Swarm(x, z, weaponType, physics));
+	this->actors.push_back(new Swarm(x, z, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
@@ -159,7 +159,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 					GameObject* laserObject = bulletArray[j].getGameObject();
 					Vector3 rayDir = bulletArray[j].getDirection();
 					Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
-					if (this->actors[i]->getAABB().intersect(rayOrigin, rayDir, laserObject->getScale().z * 2))
+					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z * 2))
 					{
 						if (soundTimer > 0.05f) {
 							/*int randomSound = rand() % 3 + 1;
@@ -194,9 +194,29 @@ void ActorManager::spawnAttackers(const Vector3& originPos, int weaponType)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		/*	createAttacker(originPos.x + i, originPos.z, weaponType);
+			createAttacker(originPos.x + i, originPos.z, weaponType);
 			createAttacker(originPos.x, originPos.z + 1, weaponType);
-			createAttacker(originPos.x - i, originPos.z, weaponType);*/
+			createAttacker(originPos.x - i, originPos.z, weaponType);
+	}
+}
+
+void ActorManager::spawnChaseCars(const Vector3& originPos)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		createChaseCar(originPos.x + i, originPos.z);
+		createChaseCar(originPos.x, originPos.z + 1);
+		createChaseCar(originPos.x - i, originPos.z);
+	}
+}
+
+void ActorManager::spawnSwarm(const Vector3& originPos)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		createSwarm(originPos.x + i, originPos.z);
+		createSwarm(originPos.x, originPos.z + 1);
+		createSwarm(originPos.x - i, originPos.z);
 	}
 }
 
@@ -352,8 +372,8 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 	std::vector<Vector3>* pathToUse;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		aStar->algorithm(groups[i].getAveragePos(), targetPos, pathToPlayer);
-		aStar->algorithm(groups[i].getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
+		aStar->algorithm(groups[i].getAveragePos(), targetPos, groups[i].path);
+		/*aStar->algorithm(groups[i].getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
 
 		if (pathToPlayer.size() < pathToPredicted.size())
 		{
@@ -363,10 +383,10 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 		{
 			pathToUse = &pathToPredicted;
 		}
-		groups[i].setPath(*pathToUse);
+		groups[i].setPath(*pathToUse);*/
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
-			groups[i].actors[j]->setPath(groups[i].getPathPtr());
+			groups[i].actors[j]->setPath(&groups[i].path);
 		}
 	}
 }

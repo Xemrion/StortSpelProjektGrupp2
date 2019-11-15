@@ -13,14 +13,14 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar, physics.get());
 	aStar->generateTileData(map->getTileMap());
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 30; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-		//	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
-			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-		//	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
-			actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
+			//	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
+				//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
+			//	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
+			//actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
 		}
 	}
 }
@@ -297,6 +297,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
 	ImGui::Text(("R Str: " + std::to_string(rStr)).c_str());
 	ImGui::Text(("Accelerator: " + std::to_string(player->getAcceleratorX())).c_str());
+	ImGui::Text(("nr of enemies: " + std::to_string(nrOfEnemies)).c_str());
 	ImGui::End();
 }
 
@@ -575,21 +576,24 @@ void PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 
-		/*	if(spawnTimer % 200 == 0)
-			{
-				actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
-				spawnTimer = 0;
-			}
-			spawnTimer++;*/
-			//spawn Boss
-			//if (spawnTimer % 10 == 0)
-			//{
-			//	actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
-			//		player->getVehicle()->getPosition().y,
-			//		player->getVehicle()->getPosition().z + 5), 1);
-			//	spawnTimer = 0;
-			//}
-			//spawnTimer = 1;
+		if (spawnTimer % 200 == 0)
+		{
+			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
+			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
+			nrOfEnemies += 12;
+			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
+			spawnTimer = 0;
+		}
+		spawnTimer++;
+		//spawn Boss
+		//if (spawnTimer % 10 == 0)
+		//{
+		//	actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
+		//		player->getVehicle()->getPosition().y,
+		//		player->getVehicle()->getPosition().z + 5), 1);
+		//	spawnTimer = 0;
+		//}
+		//spawnTimer = 1;
 
 		powerUps.erase(
 			std::remove_if(
@@ -677,7 +681,7 @@ void PlayingGameState::update(float deltaTime)
 			timerForParticle = 0;
 		}*/
 
-		}
+	}
 
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
@@ -709,7 +713,7 @@ void PlayingGameState::update(float deltaTime)
 	//#endif // !_DEBUG
 
 	graphics.presentScene();
-	}
+}
 
 F32 const& PlayingGameState::getTimeRef() const noexcept {
 	return time;

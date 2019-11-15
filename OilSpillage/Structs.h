@@ -28,7 +28,7 @@ struct AABB
 		return scaledAABB;
 	};
 
-	
+
 
 	bool intersect(AABB other)
 	{
@@ -55,6 +55,20 @@ struct AABB
 
 		float maxtmin = max(tmin.x, max(tmin.y, tmin.z));
 		float mintmax = min(tmax.x, min(tmax.y, tmax.z));
+
+		return maxtmin <= mintmax && maxtmin <= dist;
+	}
+
+	bool intersectXZ(DirectX::SimpleMath::Vector3 rayOrigin, DirectX::SimpleMath::Vector3 rayDir, float dist)
+	{
+		DirectX::SimpleMath::Vector3 tminPos = (minPos - rayOrigin) / rayDir;
+		DirectX::SimpleMath::Vector3 tmaxPos = (maxPos - rayOrigin) / rayDir;
+
+		DirectX::SimpleMath::Vector3 tmin = DirectX::SimpleMath::Vector3::Min(tminPos, tmaxPos);
+		DirectX::SimpleMath::Vector3 tmax = DirectX::SimpleMath::Vector3::Max(tminPos, tmaxPos);
+
+		float maxtmin = max(tmin.x, tmin.z);
+		float mintmax = min(tmax.x, tmax.z);
 
 		return maxtmin <= mintmax && maxtmin <= dist;
 	}

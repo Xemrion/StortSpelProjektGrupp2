@@ -174,14 +174,14 @@ void DynamicActor::followPath()
 		{
 			destination = targetPos;
 		}
-		else if (path->size() > 0)
-		{
-			destination = path->at(path->size() - 1);
-			if (position.Distance(path->at(path->size() - 1), position) < 2)
+			else if (path->size() > 0)
 			{
-				path->pop_back();
+				destination = path->at(path->size() - 1);
+				if((path->at(path->size() -1) - position).Length() < 2)
+				{
+					path->pop_back();
+				}
 			}
-		}
 	}
 }
 
