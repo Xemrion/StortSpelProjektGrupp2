@@ -11,6 +11,12 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+enum class Controllers {
+	NONE,
+	XBOX,
+	PLAYSTATION
+};
+
 enum class Keys {
 	L_UP, //Left stick up. Keyboard: W
 	L_DOWN, //Left stick down. Keyboard: S
@@ -67,6 +73,11 @@ private:
 	float wHeight;
 	float wWidth;
 
+	float resetTimer;
+	bool checkController;
+	Controllers controller;
+
+	void updateController();
 	static bool checkButtonKeyboard(Keys key, States state);
 	static bool checkButtonGamePad(Keys key, GamePad::ButtonStateTracker::ButtonState state/*, int playerId*/);
 public:
@@ -76,7 +87,7 @@ public:
 	static bool isKeyDown_DEBUG(Keyboard::Keys key);
 
 	static void init(Window* window);
-	static void update();
+	static void update(float deltaTime);
 	static void reset();
 
 	static void setRumble(/*int player, */float leftMotor, float rightMotor, float leftTrigger = 0.f, float rightTrigger = 0.f);
@@ -92,7 +103,7 @@ public:
 	static void setWindowSize(int width, int height);
 	static bool checkButtonMouse(MouseKeys key, States state);
 	static Vector2 getMousePosition();
-	static void getControllerProductName();
+	static Controllers getControllerID();
 
 	//static void setKeyboardPlayerID(int player);
 };

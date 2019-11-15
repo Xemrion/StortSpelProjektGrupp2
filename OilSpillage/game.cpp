@@ -156,7 +156,7 @@ void Game::run()
 		//Calculate deltaTime
 		deltaTime = (curTime - prevTime) * secPerCount;
 
-		Input::update();
+		Input::update(deltaTime);
 		Sound::Update(deltaTime);
 		state->update(deltaTime);
 

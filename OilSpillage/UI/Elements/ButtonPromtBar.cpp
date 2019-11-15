@@ -75,10 +75,22 @@ void ButtonPromptBar::draw(bool selected)
 	SpriteFont* font = UserInterface::getFontArial();
 	Texture* texture = nullptr;
 	float offset = 0.0f;
+	Controllers controller = Input::getControllerID();
 
 	for (int i = 0; i < this->length; i++)
 	{
-		texture = this->textures[static_cast<int>(this->prompts[i].key)];
+		switch (controller)
+		{
+		case Controllers::NONE:
+			texture = this->texturesKb[static_cast<int>(this->prompts[i].key)];
+			break;
+		case Controllers::XBOX:
+			texture = this->textures[static_cast<int>(this->prompts[i].key)];
+			break;
+		case Controllers::PLAYSTATION:
+			texture = this->texturesPs[static_cast<int>(this->prompts[i].key)];
+			break;
+		}
 
 		if (texture == nullptr)
 		{
