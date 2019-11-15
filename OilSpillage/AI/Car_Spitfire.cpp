@@ -170,7 +170,11 @@ void Spitfire::init(Physics* physics)
 	wheel4->setTexture(vehicleTexture);
 
 
-	btRigidBody* tempo = physics->addBox(btVector3(getPosition().x, getPosition().y, getPosition().z), btVector3(getScale().x, getScale().y, getScale().z), 10.0f);
+	btRigidBody* tempo = physics->addBox(
+		btVector3(getPosition().x, getPosition().y, getPosition().z),
+		btVector3(getScale().x, getScale().y, getScale().z),
+		10.0f,
+		this);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
