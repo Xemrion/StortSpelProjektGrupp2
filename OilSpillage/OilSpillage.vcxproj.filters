@@ -82,6 +82,7 @@
     <ClCompile Include="AI\DynamicActor.cpp" />
     <ClCompile Include="AI\ChaseCar.cpp" />
     <ClCompile Include="AI\Sniper.cpp" />
+    <ClCompile Include="AI\Boss.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="AI\DynamicActor.h" />
     <ClInclude Include="AI\Sniper.h" />
     <ClInclude Include="AI\ChaseCar.h" />
+    <ClInclude Include="AI\Boss.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
