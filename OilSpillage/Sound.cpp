@@ -27,6 +27,7 @@ Sound::~Sound()
 	{
 		i->second.effectInstance.reset();
 	}
+	instance->soloud.deinit(); // Clean up!
 }
 
 void Sound::ShouldReset()
@@ -37,6 +38,7 @@ void Sound::ShouldReset()
 void Sound::Init()
 {
 	instance = std::make_unique<Sound>();
+	instance->soloud.init();
 }
 
 void Sound::Update(float deltaTime)
@@ -76,9 +78,26 @@ void Sound::Reset()
 	instance->engine->Reset();
 }
 
-void Sound::loadSound(std::wstring fileName)
+void Sound::loadSound(std::string fileName)
 {
-	if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
+	/*if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
+	{
+		try
+		{
+			instance->soundEffects[fileName].sound = std::make_unique<SoundEffect>(instance->engine.get(), fileName.c_str());
+			instance->soundEffects[fileName].effectInstance = instance->soundEffects[fileName].sound->CreateInstance();
+		}
+		catch (const std::exception&)
+		{
+			return;
+		}
+	}*/
+	instance->soundTemp.load(fileName.c_str()); // Load a f i l e
+}
+
+void Sound::PlaySoundEffect(std::string fileName)
+{
+	/*if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
 	{
 		try
 		{
@@ -90,29 +109,16 @@ void Sound::loadSound(std::wstring fileName)
 			return;
 		}
 	}
+
+	instance->soundEffects[fileName].sound->Play();*/
+	instance->soundTemp.setLooping(false);
+	instance->soundTemp.load(fileName.c_str()); // Load a f i l e
+	instance->soloud.play(instance->soundTemp); // Pl ay i t
 }
 
-void Sound::PlaySoundEffect(std::wstring fileName)
+void Sound::PlayLoopingSound(std::string fileName)
 {
-	if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
-	{
-		try
-		{
-			instance->soundEffects[fileName].sound = std::make_unique<SoundEffect>(instance->engine.get(), fileName.c_str());
-			instance->soundEffects[fileName].effectInstance = instance->soundEffects[fileName].sound->CreateInstance();
-		}
-		catch (const std::exception&)
-		{
-			return;
-		}
-	}
-
-	instance->soundEffects[fileName].sound->Play();
-}
-
-void Sound::PlayLoopingSound(std::wstring fileName)
-{
-	if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
+	/*if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
 	{
 		try
 		{
@@ -127,16 +133,21 @@ void Sound::PlayLoopingSound(std::wstring fileName)
 
 	instance->soundEffects[fileName].effectInstance->Stop(true);
 	instance->soundEffects[fileName].effectInstance->Play(true);
-	instance->soundEffects[fileName].isLooping = true;
+	instance->soundEffects[fileName].isLooping = true;*/
+	instance->soundTemp2.load(fileName.c_str()); // Load a f i l e
+	instance->soundTemp2.setLooping(true);
+	instance->soloud.play(instance->soundTemp2); // Pl ay i t
+	
 }
 
-void Sound::StopLoopingSound(std::wstring fileName, bool immediate)
+void Sound::StopLoopingSound(std::string fileName, bool immediate)
 {
-	if (instance->soundEffects.find(fileName) != instance->soundEffects.end())
+	/*if (instance->soundEffects.find(fileName) != instance->soundEffects.end())
 	{
 		instance->soundEffects[fileName].effectInstance->Stop(immediate);
 		instance->soundEffects[fileName].isLooping = false;
-	}
+	}*/
+	
 }
 
 void Sound::changeVolume(std::wstring fileName, float volume)

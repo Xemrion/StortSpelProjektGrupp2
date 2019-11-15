@@ -84,9 +84,9 @@ public:
 			if (weapon.soundTimer > 4.0f) {
 				int randomSound = rand() % 6 + 1;
 				int rand2 = rand() % 2;
-				std::wstring soundEffect = L"data/sound/MachineGunSound" + std::to_wstring(randomSound) + L".wav";
+				std::string soundEffect = "./data/sound/MachineGunSound" + std::to_string(randomSound) + ".wav";
 				if (rand2 < 1) {
-					soundEffect = L"data/sound/MachineGunSound1.wav";
+					soundEffect = "./data/sound/MachineGunSound1.wav";
 				}
 				Sound::PlaySoundEffect(soundEffect);
 				weapon.soundTimer = 0;
@@ -96,9 +96,9 @@ public:
 		{
 			if (weapon.flameBool == true) {
 				int randomSound = rand() % 2 + 1;
-				std::wstring soundEffect = L"data/sound/FlameLoop" + std::to_wstring(randomSound) + L".wav";
+				std::string soundEffect = "./data/sound/FlameLoop" + std::to_string(randomSound) + ".wav";
 				Sound::PlayLoopingSound(soundEffect);
-				Sound::PlaySoundEffect(L"data/sound/FlameStart.wav");
+				Sound::PlaySoundEffect("./data/sound/FlameStart.wav");
 				weapon.flameBool = false;
 			}
 		}
@@ -113,8 +113,8 @@ public:
 		else if (weapon.type == WeaponType::Flamethrower)
 		{
 			weapon.flameBool = true;
-			Sound::StopLoopingSound(L"data/sound/FlameLoop1.wav", true);
-			Sound::StopLoopingSound(L"data/sound/FlameLoop2.wav", true);
+			Sound::StopLoopingSound("./data/sound/FlameLoop1.wav", true);
+			Sound::StopLoopingSound("./data/sound/FlameLoop2.wav", true);
 		}
 	};
 

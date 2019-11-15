@@ -944,13 +944,13 @@ void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 	//AccelForce
 	if ((max(abs(accelForce.x), abs(accelForce.z)) > 5.0f)) {
 		int randomSound = rand() % 3 + 1;
-		std::wstring soundEffect = L"data/sound/CarImpact" + to_wstring(randomSound) + L".wav";
+		std::string soundEffect = "./data/sound/CarImpact" + to_string(randomSound) + ".wav";
 		int randomSound2 = rand() % 3 + 1;
-		std::wstring soundEffect2 = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
+		std::string soundEffect2 = "./data/sound/MetalImpactPitched" + to_string(randomSound) + ".wav";
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
 			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-20.0f);
-			Sound::PlaySoundEffect(L"data/sound/CarCrash.wav");
+			Sound::PlaySoundEffect("./data/sound/CarCrash.wav");
 			Sound::PlaySoundEffect(soundEffect2);
 		}
 		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
@@ -960,7 +960,7 @@ void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 			Sound::PlaySoundEffect(soundEffect2);
 		}
 		else {
-			Sound::PlaySoundEffect(L"data/sound/CarImpactSoft.wav");
+			Sound::PlaySoundEffect("./data/sound/CarImpactSoft.wav");
 			Sound::PlaySoundEffect(soundEffect2);
 		}
 	}

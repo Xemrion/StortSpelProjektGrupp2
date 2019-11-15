@@ -178,7 +178,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 							/*int randomSound = rand() % 3 + 1;
 							std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
 							Sound::PlaySoundEffect(soundEffect);*/
-							Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+							Sound::PlaySoundEffect("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
@@ -190,7 +190,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 						/*int randomSound = rand() % 3 + 1;
 						std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
 						Sound::PlaySoundEffect(soundEffect);*/
-						Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+						Sound::PlaySoundEffect("./data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
