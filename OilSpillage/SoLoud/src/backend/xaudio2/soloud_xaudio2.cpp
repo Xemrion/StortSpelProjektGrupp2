@@ -25,17 +25,17 @@ freely, subject to the following restrictions:
 #include "soloud.h"
 #include "soloud_thread.h"
 
-#if !defined(WITH_XAUDIO2)
-
-namespace SoLoud
-{
-	result xaudio2_init(Soloud *aSoloud, unsigned int aFlags, unsigned int aSamplerate, unsigned int aBuffer)
-	{
-		return NOT_IMPLEMENTED;
-	}
-};
-
-#else
+//#if !defined(WITH_XAUDIO2)
+//
+//namespace SoLoud
+//{
+//	result xaudio2_init(Soloud *aSoloud, unsigned int aFlags, unsigned int aSamplerate, unsigned int aBuffer)
+//	{
+//		return NOT_IMPLEMENTED;
+//	}
+//};
+//
+//#else
 
 #include <windows.h>
 
@@ -244,4 +244,4 @@ namespace SoLoud
     }
 };
 
-#endif
+//#endif

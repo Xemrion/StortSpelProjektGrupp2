@@ -117,13 +117,13 @@
     <ClCompile Include="SoLoud\src\filter\soloud_waveshaperfilter.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\wav\stb_vorbis.c" />
     <ClCompile Include="SoLoud\src\audiosource\wav\dr_impl.cpp" />
-    <ClCompile Include="SoLoud\src\backend\winmm\soloud_winmm.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
     <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="Inventory\Container.cpp" />
     <ClCompile Include="UI\Elements\ButtonPromtBar.cpp" />
+    <ClCompile Include="SoLoud\src\backend\xaudio2\soloud_xaudio2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />

@@ -55,8 +55,10 @@ void Game::start(Window* window)
 	Sound::loadSound("./data/sound/MetalImpactPitched2.wav");
 	Sound::loadSound("./data/sound/MetalImpactPitched3.wav");*/
 
+	Sound::loadSound2Temp("./data/sound/OilSpillageSoundtrack1_Aggressive.mp3"); // Pl ay i t
+	Sound::loadSound("./data/sound/OilSpillageSoundtrack1_Calm.mp3"); // Pl ay i t
 	Sound::PlayLoopingSound("./data/sound/OilSpillageSoundtrack1_Aggressive.mp3"); // Pl ay i t
-	Sound::PlayLoopingSound("./data/sound/OilSpillageSoundtrack1_Calm.mp3"); // Pl ay i t
+	Sound::PlaySoundEffect("./data/sound/OilSpillageSoundtrack1_Calm.mp3"); // Pl ay i t
 
 	//Input::setKeyboardPlayerID(0);
 	instance->running = true;
@@ -66,6 +68,7 @@ void Game::start(Window* window)
 void Game::quit()
 {
 	instance->running = false;
+	
 }
 
 GameState* Game::getCurrentState()

@@ -23,8 +23,13 @@ private:
 	std::unique_ptr<AudioEngine> engine;
 	std::unordered_map<std::wstring, SoundInstance> soundEffects;
 
-	/*static std::unique_ptr<Sound> instance;*/
+	struct SoundInstanceSoloud
+	{
+		SoLoud::Wav soundTemp;
+		int soundId;
+	};
 
+	std::unordered_map<std::string, std::unique_ptr<SoundInstanceSoloud>> soloudSounds;
 	SoLoud::Soloud soloud; // Engine core
 	SoLoud::Wav soundTrackCalm; // One sample
 	SoLoud::Wav soundTrackAggro; // One sample
@@ -42,6 +47,7 @@ public:
 	static void Reset();
 
 	static void loadSound(std::string fileName);
+	static void loadSound2Temp(std::string fileName);
 	static void PlaySoundEffect(std::string fileName);
 	static void PlayLoopingSound(std::string fileName);
 	static void StopLoopingSound(std::string fileName, bool immediate);

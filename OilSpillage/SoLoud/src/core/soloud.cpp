@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #include "soloud_internal.h"
 #include "soloud_thread.h"
 #include "soloud_fft.h"
-#define WITH_WINMM
+#define WITH_XAUDIO2
 #ifdef SOLOUD_SSE_INTRINSICS
 #include <xmmintrin.h>
 #endif

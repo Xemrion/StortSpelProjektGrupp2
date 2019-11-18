@@ -4,7 +4,7 @@ std::unique_ptr<Sound> Sound::instance;
 
 Sound::Sound()
 {
-	this->resetTimer = 0.0f;
+	/*this->resetTimer = 0.0f;
 	this->shouldReset = false;
 
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
@@ -16,17 +16,17 @@ Sound::Sound()
 	{
 		this->engine = std::make_unique<AudioEngine>(eflags);
 	}
-	catch (const std::exception&) {}
+	catch (const std::exception&) {}*/
 }
 
 Sound::~Sound()
 {
-	this->engine->Suspend();
+	/*this->engine->Suspend();
 
 	for (auto i = this->soundEffects.begin(); i != this->soundEffects.end(); i++)
 	{
 		i->second.effectInstance.reset();
-	}
+	}*/
 	instance->soloud.deinit(); // Clean up!
 }
 
@@ -43,34 +43,34 @@ void Sound::Init()
 
 void Sound::Update(float deltaTime)
 {
-	if (!instance->engine)
-		return;
+	//if (!instance->engine)
+	//	return;
 
-	if (instance->shouldReset)
-	{
-		instance->resetTimer += deltaTime;
+	//if (instance->shouldReset)
+	//{
+	//	instance->resetTimer += deltaTime;
 
-		if (instance->resetTimer > 3.0f) //3 second wait time until reset.
-		{
-			instance->resetTimer = 0;
-			instance->shouldReset = false;
+	//	if (instance->resetTimer > 3.0f) //3 second wait time until reset.
+	//	{
+	//		instance->resetTimer = 0;
+	//		instance->shouldReset = false;
 
-			if (instance->engine->Reset())
-			{
-				for (auto i = instance->soundEffects.begin(); i != instance->soundEffects.end(); i++)
-				{
-					if (i->second.isLooping)
-					{
-						i->second.effectInstance->Play(true);
-					}
-				}
-			}
-		}
-	}
-	else if (!instance->engine->Update() && instance->engine->IsCriticalError())
-	{
-		instance->shouldReset = true;
-	}
+	//		if (instance->engine->Reset())
+	//		{
+	//			for (auto i = instance->soundEffects.begin(); i != instance->soundEffects.end(); i++)
+	//			{
+	//				if (i->second.isLooping)
+	//				{
+	//					i->second.effectInstance->Play(true);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+	//else if (!instance->engine->Update() && instance->engine->IsCriticalError())
+	//{
+	//	instance->shouldReset = true;
+	//}
 }
 
 void Sound::Reset()
@@ -95,6 +95,11 @@ void Sound::loadSound(std::string fileName)
 	instance->soundTemp.load(fileName.c_str()); // Load a f i l e
 }
 
+void Sound::loadSound2Temp(std::string fileName)
+{
+	instance->soundTemp2.load(fileName.c_str()); // Load a f i l e
+}
+
 void Sound::PlaySoundEffect(std::string fileName)
 {
 	/*if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
@@ -111,8 +116,10 @@ void Sound::PlaySoundEffect(std::string fileName)
 	}
 
 	instance->soundEffects[fileName].sound->Play();*/
-	instance->soundTemp.setLooping(false);
-	instance->soundTemp.load(fileName.c_str()); // Load a f i l e
+
+
+	//instance->soundTemp.setLooping(false);
+	//instance->soundTemp.load(fileName.c_str()); // Load a f i l e
 	instance->soloud.play(instance->soundTemp); // Pl ay i t
 }
 
@@ -134,7 +141,7 @@ void Sound::PlayLoopingSound(std::string fileName)
 	instance->soundEffects[fileName].effectInstance->Stop(true);
 	instance->soundEffects[fileName].effectInstance->Play(true);
 	instance->soundEffects[fileName].isLooping = true;*/
-	instance->soundTemp2.load(fileName.c_str()); // Load a f i l e
+	//instance->soundTemp2.load(fileName.c_str()); // Load a f i l e
 	instance->soundTemp2.setLooping(true);
 	instance->soloud.play(instance->soundTemp2); // Pl ay i t
 	

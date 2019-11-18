@@ -177,7 +177,7 @@
     <ClCompile Include="SoLoud\src\audiosource\wav\soloud_wav.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\wav\soloud_wavstream.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\wav\stb_vorbis.c" />
-    <ClCompile Include="SoLoud\src\backend\winmm\soloud_winmm.cpp" />
+    <ClCompile Include="SoLoud\src\backend\xaudio2\soloud_xaudio2.cpp" />
     <ClCompile Include="SoLoud\src\core\soloud.cpp" />
     <ClCompile Include="SoLoud\src\core\soloud_audiosource.cpp" />
     <ClCompile Include="SoLoud\src\core\soloud_bus.cpp" />
