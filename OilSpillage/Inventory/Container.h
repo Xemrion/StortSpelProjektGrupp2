@@ -7,10 +7,20 @@
 class Container
 {
 public:
-	struct Slot
+	class Slot
 	{
-		Container* owner = nullptr;
-		Item* item = nullptr;
+	private:
+		Container* owner;
+		Item* item;
+	public:
+		Slot() : owner(nullptr), item(nullptr) {}
+		Slot(Container* owner, Item* item) : owner(owner), item(item) {}
+		virtual ~Slot() { delete item; }
+
+		Container* getOwner() const { return owner; }
+		Item* getItem() const { return item; }
+		void setOwner(Container* owner) { this->owner = owner; }
+		void setItem(Item* item) { this->item = item; }
 	};
 
 	static std::unique_ptr<Container> playerInventory;
