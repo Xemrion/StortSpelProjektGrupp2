@@ -41,15 +41,16 @@ float4 fadeOverTime(float4 startColor, float4 endColor, float time, float totTim
 	return fadedColor;
 
 };
-[maxvertexcount(3)]
+[maxvertexcount(4)]
 void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 {
 	GSOutput output;
 
-	float3 toCamera =  normalize(camPos.xyz - input[0].pos.xyz);
+	float3 toCamera = normalize(camPos.xyz - input[0].pos.xyz);
 
-	float3 right = cross(toCamera, upp.xyz);
-	
+	float3 trailDirection = normalize(input[0].direction.xyz);
+	float3 right = -normalize(cross(trailDirection, float3(0.0f, 1.0f, 0.0f)));
+
 	float3 up = normalize(cross(right, toCamera));
 	float3 vert[4];
 	float time = input[0].time.x;
@@ -63,10 +64,10 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	float endSize = config.z;
 	size = lerp(startSize, endSize, smoothstep(0.0, totalLifeTime - 1.0f, time)) * (1.0 - smoothstep(totalLifeTime - 1.0f, totalLifeTime, time));
 
-	
+
 	float nrOfColors = config.x;
 	float4 testColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
-	float halfTime = totalLifeTime / (nrOfColors-1);
+	float halfTime = totalLifeTime / (nrOfColors - 1);
 	if (time < halfTime)
 	{
 		testColor = fadeOverTime(colors[0], colors[1], time, halfTime);
@@ -75,38 +76,30 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	{
 		testColor = fadeOverTime(colors[1], colors[2], time % halfTime, halfTime);
 	}
-	else if(time  < halfTime * 3)
+	else if (time < halfTime * 3)
 	{
 		testColor = fadeOverTime(colors[2], colors[3], time % halfTime, halfTime);
 	}
-	
-	//vert[0] = input[0].pos - right *size + up * size; // Top middle
-	//vert[1] = input[0].pos + right *size + up * size; // Top right
-	//vert[3] = input[0].pos + right *size - up * size; // Bottom right
-	//vert[2] = input[0].pos - right *size - up * size; // Top right 
-	float3 testUp = up;//float3(0, 0, 1);
-	float3 testRight = right;//float3(1, 0, 0);
-	//Change every frame between up-pointy triangle and down-pointy triangle
-	if (upp.w>0.9f)
+	if (nrOfColors < 2)
 	{
-		vert[0] = input[0].pos.xyz + testUp * size; // Top middle
-		vert[1] = input[0].pos.xyz + testRight * size - testUp * size; // Top right
-		vert[2] = input[0].pos.xyz - testRight * size - testUp * size; // Top right 
-	}						  
-	else					  
-	{						 
-		vert[0] = input[0].pos.xyz - testRight * size + testUp * 0.50f * size; // Top middle
-		vert[1] = input[0].pos.xyz + testRight * size + testUp * size*0.50f; // Top right
-		vert[2] = input[0].pos.xyz - testUp * 1.50f *size; // Top right 
+		testColor = colors[0];
 	}
 	
+	float3 testUp = trailDirection;//float3(0, 0, 1);
+	float3 testRight = right;//float3(1, 0, 0);
+	//Change every frame between up-pointy triangle and down-pointy triangle
+	vert[0] = input[0].pos - testRight *size*2 + testUp * size; // Top middle
+	vert[1] = input[0].pos + testRight *size*2 + testUp * size; // Top right
+	vert[3] = input[0].pos + testRight *size*2 - testUp * size; // Bottom right
+	vert[2] = input[0].pos - testRight *size*2 - testUp * size; // Top right 
+
 	float2 texCoord[4];
 	texCoord[2] = float2(0, 1);//2
 	texCoord[3] = float2(1, 1);//3
 	texCoord[0] = float2(0, 0);//0
 	texCoord[1] = float2(1, 0);//1
-	
-	for (int i = 0; i < 3; i++)
+
+	for (int i = 0; i < 4; i++)
 	{
 		output.pos = mul(float4(vert[i], 1.0f), viewProj);
 		output.uv = texCoord[i];

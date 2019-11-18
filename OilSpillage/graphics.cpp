@@ -339,11 +339,30 @@ bool Graphics::init(Window* window)
 	ImGui_ImplDX11_Init(this->device.Get(), this->deviceContext.Get());
 	ImGui::StyleColorsDark();
 
-	this->particleSystem.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
-	this->particleSystem2.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
+	this->particleSystem.setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
+	this->particleSystem2.setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
+	this->particleTrail.setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso");
+
+	this->particleSystem.setNameofSystem("fire");
+	this->particleSystem2.setNameofSystem("smoke");
+	this->particleTrail.setNameofSystem("trail");
+
+	Vector4 colors[4];
+	colors[0] = Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+	this->particleTrail.changeColornSize(colors, 1, 0.1f, 0.1f);
+
+	this->particleSystem.loadSystem();
+	this->particleSystem2.loadSystem();
+
+
+	this->particleSystem.initiateParticles(device.Get(), deviceContext.Get());
+	this->particleSystem2.initiateParticles(device.Get(), deviceContext.Get());
+	this->particleTrail.initiateParticles(device.Get(), deviceContext.Get());
 
 	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleTrail.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+
 	
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
@@ -420,6 +439,8 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	this->particleSystem2.drawAll(camera);
 
+
+	
 	//set up Shaders
 	
 
@@ -504,6 +525,9 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	}
 	
 	drawStaticGameObjects(camera, frustum, 10.0);
+	this->particleTrail.updateParticles(deltaTime, viewProj);
+
+	this->particleTrail.drawAll(camera);
 	drawFog(camera, deltaTime);
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
@@ -709,7 +733,7 @@ void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float st
 {
 	if (nrOfColors < 5)
 	{
-		this->particleSystem.changeColornSize(colors, nrOfColors, startSize, endSize);
+		//this->particleSystem.changeColornSize(colors, nrOfColors, startSize, endSize);
 	}
 }
 
@@ -717,18 +741,23 @@ void Graphics::setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float s
 {
 	if (nrOfColors < 5)
 	{
-		this->particleSystem2.changeColornSize(colors, nrOfColors, startSize, endSize);
+		//this->particleSystem2.changeColornSize(colors, nrOfColors, startSize, endSize);
 	}
 }
 
 void Graphics::setVectorField(float vectorFieldSize, float vectorFieldPower)
 {
-	this->particleSystem.changeVectorField(vectorFieldPower, vectorFieldSize);
+	//this->particleSystem.changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
 void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 {
-	this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
+	//this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
+}
+
+void Graphics::addTrail(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime)
+{
+	this->particleTrail.addParticle(nrOfParticles, lifeTime, pos, initialDirection);
 }
 
 void Graphics::clearScreen()

@@ -15,6 +15,7 @@ struct VS_INPUT
 struct VS_OUT
 {
 	float4 pos : POSITION;
+	float4 direction : DIRECTION;
 	float2 time : TIME;
 	uint ind : VAR;
 };
@@ -27,6 +28,6 @@ VS_OUT main(in VS_INPUT input)
 	output.pos.w = SimulationState[input.vertexId].direction.w;
 	output.ind = input.vertexId;
 	output.time = SimulationState[input.vertexId].time;
-
+	output.direction = SimulationState[input.vertexId].direction;
 	return output;
 }

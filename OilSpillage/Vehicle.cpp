@@ -398,7 +398,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 	//Drifting
 	float hypoC = sqrt(pow(dx, 2) + (pow(dy, 2)));
-	float driftForce = this->vehicle->getRigidBody()->getLinearVelocity().getX() * (dy / hypoC) + -this->vehicle->getRigidBody()->getLinearVelocity().getZ() * -(dx / hypoC);
+	this->driftForce = this->vehicle->getRigidBody()->getLinearVelocity().getX() * (dy / hypoC) + -this->vehicle->getRigidBody()->getLinearVelocity().getZ() * -(dx / hypoC);
 	Vector2 driftResistance = Vector2(-((dy / hypoC) * 4000 * deltaTime) * updatedStats.handlingRate, -(-((dx / hypoC) * 4000 * deltaTime)) * updatedStats.handlingRate);
 	if (abs(driftForce) < 250) {
 		driftResistance = driftResistance * (abs(driftForce) * 0.005f);
@@ -464,9 +464,22 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 void Vehicle::updateWeapon(float deltaTime)
 {
-
+	this->trailTimer += deltaTime;
 	this->mountedWeapon->setPosition(this->vehicleBody1->getPosition());
 	Vector3 frontTempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+	Vector3 rightDir = frontTempDir.Cross(Vector3(0.0f, 1.0f, 0.0f));
+	rightDir.Normalize();
+
+	//Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - this->vehicleBody1->getPosition() + rightDir*0.5f, -frontTempDir, 1, 20.0f);
+	//Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - this->vehicleBody1->getPosition() - rightDir * 0.5f, -frontTempDir, 1, 20.0f);
+	if (this->trailTimer > 0.01f && abs(this->driftForce)>5.0f)
+	{
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() + rightDir * 0.5f, -frontTempDir, 1, 5.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() - rightDir * 0.5f, -frontTempDir, 1, 5.0f);
+		this->trailTimer = 0;
+	}
+	
+
 	this->frontWeapon->setPosition(this->vehicleBody1->getPosition() + 1.15f * frontTempDir - Vector3(0.0f, 1.0f, 0.0f));
 	this->frontWeapon->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14 / 2, 0));
 	Vector2 dir = Input::getDirectionR();

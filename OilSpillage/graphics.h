@@ -80,7 +80,7 @@ class Graphics {
 
 	ParticleSystem particleSystem;
 	ParticleSystem particleSystem2;
-
+	ParticleSystem particleTrail;
 	std::unique_ptr<Fog> fog;
 	float time = 0.0;
 	ShaderClass shaderDefault;
@@ -132,6 +132,7 @@ public:
 	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setVectorField(float vectorFieldSize,float vectorFieldPower);
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
+	void addTrail(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f);
 
 	float farZTempShadow;
 	void setSpotLightShadow(SpotLight* spotLight);

@@ -578,8 +578,8 @@ void PlayingGameState::update(float deltaTime)
 
 		if (spawnTimer % 200 == 0)
 		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
+			//actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
+			//actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
 			nrOfEnemies += 12;
 			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
 			spawnTimer = 0;

@@ -14,6 +14,9 @@
     <FxCompile Include="FogPS.hlsl" />
     <FxCompile Include="FogDrawPS.hlsl" />
     <FxCompile Include="FogDrawVS.hlsl" />
+    <FxCompile Include="Particle\TrailUpdateCS.hlsl" />
+    <FxCompile Include="Particle\TrailCreateCS.hlsl" />
+    <FxCompile Include="Particle\TrailGS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="physics.cpp" />
@@ -78,7 +81,6 @@
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
-    <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="fog.cpp" />
     <ClCompile Include="AI\Ranged.cpp" />
     <ClCompile Include="AI\Melee.cpp" />
@@ -175,6 +177,8 @@
     <ClInclude Include="AI\ChaseCar.h" />
     <ClInclude Include="fog.h" />
     <ClInclude Include="PG\Biome.hpp" />
+    <ClInclude Include="PG\Modelizer.hpp" />
+    <ClInclude Include="Particle\ParticleHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
