@@ -11,12 +11,11 @@ Boss::Boss()
 
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
-	this->nrOfWeakpoints = 2;
 
 	this->frontVector = Vector3{ 0, 0, 0 };
 }
 
-Boss::Boss(float x, float z, int weaponType, Physics* physics, std::vector<Weakspot*> &weakspots)
+Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	:DynamicActor(x, z, physics), BossAblilities(&this->position, &this->targetPos, &this->velocity, weaponType, &this->deltaTime)
 {
 	this->setScale(Vector3(0.04f, 0.04f, 0.04f));
@@ -39,12 +38,9 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics, std::vector<Weaks
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
 
-	this->weakSpots = weakspots;
-
-
-	this->weakSpots[0]->setPosition(Vector3(0, 0, 0));
-	this->weakSpots[1]->setPosition(Vector3 (0, 10, 0));
-	
+	this->weakSpots.push_back(Weakspot(0));
+	this->weakSpots.push_back(Weakspot(0));
+	this->initiateWeakPoints();
 }
 
 Boss::~Boss()
@@ -214,36 +210,68 @@ void Boss::circulatePlayer(Vector3 targetPos)
 	move();
 }
 
+void Boss::initiateWeakPoints()
+{
+	int yPos = 0;
+	for (int i = 0; i < this->weakSpots.size(); i++)
+	{
+		this->weakSpots[i].setPosition(Vector3(0, yPos, 0));
+		yPos += 10;
+
+		this->weakSpots[i].setWeakspotNr(i);
+	}
+}
+
 void Boss::updateWeakPoints(Vector3 targetPos)
 {
-	Vector3 bossPos = this->getPosition();
-
-	this->weakSpots[0]->startPos(bossPos);
-	this->weakSpots[1]->startPos(bossPos);
-
-	Vector3 upVector = { 0, 1, 0 };
-	//frontvector is backwards in x and z for placement
-	//Vector3 correctFrontVector = { (this->frontVector.x * -1), this->frontVector.y, (this->frontVector.z * -1) };
-	Vector3 rightVector = XMVector3Cross(this->frontVector, upVector);
-
-	float sideVar = 2.5;
-	Vector3 sideOffset = Vector3((rightVector.x * sideVar), 0.0f, (rightVector.z * sideVar));
-	Vector3 frontOffset = Vector3((-this->frontVector.x * 5.5), 0.0f, (-this->frontVector.z * 5.5));
-	Vector3 heightOffset = Vector3(0, -4.5, 0);
-
-	this->weakSpots[0]->shortMove(sideOffset);
-	this->weakSpots[0]->shortMove(frontOffset); //moves y, should just move x and z
-	this->weakSpots[0]->shortMove(heightOffset);
-
-
-	this->weakSpots[1]->shortMove(-(sideOffset));
-	this->weakSpots[1]->shortMove(frontOffset);
-	this->weakSpots[1]->shortMove(heightOffset);
-
+	//check if any weakpoint dead
 	//their own update
-	for (int i = 0; i < this->nrOfWeakpoints; i++)
+	for (int i = 0; i < this->weakSpots.size(); i++)
 	{
-		this->weakSpots[i]->updateSelf();
+		this->weakSpots[i].updateSelf();
+		if (this->weakSpots[i].getDead())
+		{
+			this->weakSpots[i] = this->weakSpots.back();
+			this->weakSpots.pop_back();
+			i--;
+		}
+	}
+
+	if (this->weakSpots.size() > 0)
+	{
+		Vector3 bossPos = this->getPosition();
+
+		for (int i = 0; i < this->weakSpots.size(); i++)
+		{
+			this->weakSpots[i].startPos(bossPos);
+		}
+
+		//Vectors for position
+		Vector3 upVector = { 0, 1, 0 };
+		Vector3 rightVector = XMVector3Cross(this->frontVector, upVector);
+
+		//make the offsets
+		float sideVar = 2.5;
+		Vector3 sideOffset = Vector3((rightVector.x * sideVar), 0.0f, (rightVector.z * sideVar));
+		Vector3 frontOffset = Vector3((-this->frontVector.x * 5.5), 0.0f, (-this->frontVector.z * 5.5));
+		Vector3 heightOffset = Vector3(0, -4.5, 0);
+
+		//update position
+		for (int i = 0; i < this->weakSpots.size(); i++)
+		{
+			if (this->weakSpots[i].getWeakspotNr() == 0)
+			{
+				this->weakSpots[0].shortMove(sideOffset);
+				this->weakSpots[0].shortMove(frontOffset); //moves y, should just move x and z
+				this->weakSpots[0].shortMove(heightOffset);
+			}
+			else if (this->weakSpots[i].getWeakspotNr() == 1)
+			{
+				this->weakSpots[1].shortMove(-(sideOffset));
+				this->weakSpots[1].shortMove(frontOffset);
+				this->weakSpots[1].shortMove(heightOffset);
+			}
+		}
 	}
 }
 

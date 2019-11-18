@@ -7,7 +7,7 @@ class Boss : public DynamicActor, public BossAblilities
 {
 public:
 	Boss();
-	Boss(float x, float z, int weaponType, Physics* physics, std::vector<Weakspot*> &weakspots); //, std::vector<Weakspot*>
+	Boss(float x, float z, int weaponType, Physics* physics); //, std::vector<Weakspot*>
 	virtual ~Boss();
 	void update(float dt, const Vector3& targetPos);
 private:
@@ -18,8 +18,7 @@ private:
 	int rotationVar; //which way to rotate
 	Vector3 currentPoint;
 	Vector3 playerPos;
-	int nrOfWeakpoints;
-	std::vector<Weakspot*> weakSpots; //How to add these to actormanager
+	std::vector<Weakspot> weakSpots; //need to be pointers?
 	Vector3 frontVector;
 	btVector3 currentVelocityVector;
 
@@ -29,5 +28,7 @@ private:
 	void move();
 	Vector3 seek();
 	void circulatePlayer(Vector3 targetPos);
+
+	void initiateWeakPoints();
 	void updateWeakPoints(Vector3 targetPos);
 };

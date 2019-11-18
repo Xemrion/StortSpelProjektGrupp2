@@ -18,7 +18,6 @@ public:
 	void createTurret(float x, float z, int weaponType);
 	void createSwarm(float x, float z, int weaponType);
 	void createBoss(float x, float z, int weaponType);
-	std::vector<Weakspot*> createWeakspot(float x, float z, int weaponType);
 
 	void createSpitFire(float x, float z);
 	void createChaseCar(float x, float z);

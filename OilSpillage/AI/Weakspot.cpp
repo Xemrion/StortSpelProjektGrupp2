@@ -5,15 +5,17 @@ Weakspot::Weakspot()
 
 }
 
-Weakspot::Weakspot(float x, float z, int weaponType, Physics* physics)
-	:DynamicActor(x, z, physics)
+Weakspot::Weakspot(int weaponType, Stats stats):stats(stats)
 {
+	this->dead = 0;
+	this->weakspotNr = 0;
+
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
 	this->setUpActor();
 	Game::getGraphics().addToDraw(this);
 
-	this->stats = VehicleStats::AIPart;
-	setHealth(this->stats.maxHealth);
+	//this->stats = VehicleStats::AIPart;
+	//setHealth(this->stats.maxHealth);
 	Game::getGraphics().loadModel("Entities/Barrel");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Barrel"));
@@ -48,36 +50,36 @@ void Weakspot::shortMove(Vector3 posVec)
 void Weakspot::updateSelf()
 {
 	//this->getRigidBody()->setLinearVelocity(btVector3(0.0f, 0.0f, 0.0f));
-	whenImDead();
-}
-
-void Weakspot::whenImDead()
-{
-	bool amDead = this->isDead();
-	if (amDead)
-	{
-		//reduce health of boss and change texture of this?
-	}
 }
 
 void Weakspot::setUpActor()
 {
-	//Selectors
-	this->root = &bt.getSelector();
-	Selector& selector2 = bt.getSelector();
-	//Sequences
-	Sequence& sequence1 = bt.getSequence();
-
-	//Movement
-	Behavior& roam = bt.getAction();
-	roam.addAction(std::bind(&Weakspot::setIdleState, std::ref(*this)));
-
-	//Behaviour Tree
-	root->addChildren(roam);
-	root->addChildren(selector2);
+	
 }
 
 void Weakspot::move(btVector3 velocityVec) //not used
 {
 	//this->getRigidBody()->setLinearVelocity(velocityVec);
 }
+
+void Weakspot::setWeakspotNr(int weakspotNr)
+{
+	this->weakspotNr = weakspotNr;
+}
+
+const bool Weakspot::getDead()
+{
+	if (this->stats.maxHealth <= 0)
+		return 1;
+	else
+		return 0;
+}
+
+const int Weakspot::getWeakspotNr()
+{
+	return this->weakspotNr;
+}
+
+//Probem
+//kan den bli skadad av skott? hur ändras health?
+//Spawnar inte: 0 hp, drawn?
