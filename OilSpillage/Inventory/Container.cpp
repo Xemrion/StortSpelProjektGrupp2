@@ -19,23 +19,23 @@ Container::~Container()
 
 void Container::addItem(Item* item)
 {
-	this->itemLists[item->getType()].push_back(new Slot{this, item});
+	this->itemLists[item->getType()].push_back(new Slot(this, item));
 }
 
 void Container::removeItem(Slot* slot)
 {
-	auto found = std::lower_bound(this->itemLists[slot->item->getType()].begin(), this->itemLists[slot->item->getType()].end(), slot);
+	auto found = std::lower_bound(this->itemLists[slot->getItem()->getType()].begin(), this->itemLists[slot->getItem()->getType()].end(), slot);
 
-	if (found != this->itemLists[slot->item->getType()].end())
+	if (found != this->itemLists[slot->getItem()->getType()].end())
 	{
 		delete *found;
-		this->itemLists[slot->item->getType()].erase(found);
+		this->itemLists[slot->getItem()->getType()].erase(found);
 	}
 }
 
 bool Container::containsItem(Slot* slot)
 {
-	return this->containsItem(slot->item);
+	return this->containsItem(slot->getItem());
 }
 
 bool Container::containsItem(Item* item)
@@ -44,7 +44,7 @@ bool Container::containsItem(Item* item)
 	{
 		for (Container::Slot* slot : this->itemLists[i])
 		{
-			if (slot->item == item)
+			if (slot->getItem() == item)
 			{
 				return true;
 			}

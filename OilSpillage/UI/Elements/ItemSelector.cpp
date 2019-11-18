@@ -8,7 +8,7 @@ void ItemSelector::addTextbox()
 {
 	int selectedIndex = this->selectedIndex[this->selectedType] - this->startIndex[this->selectedType];
 	Container::Slot* slot = Container::playerInventory->getItemSlot(static_cast<ItemType>(this->selectedType), this->selectedIndex[this->selectedType]);
-	this->textBox = std::make_unique<TextBox>("-- " + slot->item->getName() + " --\n" + slot->item->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::BOTTOM);
+	this->textBox = std::make_unique<TextBox>("-- " + slot->getItem()->getName() + " --\n" + slot->getItem()->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::BOTTOM);
 	this->textBox->setPosition(this->position + Vector2(145.0f + 96.0f * selectedIndex - this->textBox->getSize().x * 0.5f, -this->textBox->getSize().y + 40.0f));
 }
 
@@ -68,7 +68,7 @@ void ItemSelector::update(float deltaTime)
 
 			for (int i = 0; i < min(list->size() - this->startIndexLastDraw, ItemSelector::tileLength); i++)
 			{
-				GameObject* object = list->at(this->startIndexLastDraw + i)->item->getObject();
+				GameObject* object = list->at(this->startIndexLastDraw + i)->getItem()->getObject();
 				if (object)
 				{
 					Game::getGraphics().removeFromUIDraw(object, &transforms[i]);
@@ -80,7 +80,7 @@ void ItemSelector::update(float deltaTime)
 
 		for (int i = 0; i < min(list->size() - this->startIndex[this->selectedType], ItemSelector::tileLength); i++)
 		{
-			GameObject* object = list->at(this->startIndex[this->selectedType] + i)->item->getObject();
+			GameObject* object = list->at(this->startIndex[this->selectedType] + i)->getItem()->getObject();
 			if (object)
 			{
 				rotationTimers[i] = 190 * XM_PI/180;
@@ -97,7 +97,7 @@ void ItemSelector::update(float deltaTime)
 
 	for (int i = 0; i < min(list->size(), ItemSelector::tileLength); i++)
 	{
-		GameObject* object = list->at(this->startIndex[this->selectedType] + i)->item->getObject();
+		GameObject* object = list->at(this->startIndex[this->selectedType] + i)->getItem()->getObject();
 		if (object == nullptr) continue;
 
 		if (i == selectedIndex)

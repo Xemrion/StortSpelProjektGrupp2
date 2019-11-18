@@ -11,10 +11,12 @@ private:
 
 	Weapon weapon;
 public:
-	ItemWeapon(std::string name, Weapon weapon, std::shared_ptr<GameObject> object);
+	ItemWeapon(std::string name, Weapon weapon, GameObject* object);
 	virtual ~ItemWeapon();
 	ItemWeapon(const ItemWeapon& obj);
 	Item* clone()const;
+
+	virtual void randomize();
 
 	Weapon& getWeapon();
 };

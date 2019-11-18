@@ -79,9 +79,9 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 				{
 					if (soundTimer > 0.05f) {
 						/*int randomSound = rand() % 3 + 1;
-						std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
-						Sound::PlaySoundEffect(soundEffect);*/
-						Sound::PlaySoundEffect("./data/sound/HitSound.wav");
+						std::string soundEffect = "data/sound/MetalImpactPitched" + to_string(randomSound) + ".wav";
+						Sound::play(soundEffect);*/
+						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
 					this->turrets[i]->changeHealth(-bulletArray[j].getDamage());

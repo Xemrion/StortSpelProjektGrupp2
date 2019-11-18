@@ -185,8 +185,8 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 			if (soundTimer > 0.05f) {
 				int randomSound = rand() % 3 + 1;
 				std::string soundEffect = "./data/sound/CarGlass" + to_string(randomSound) + ".wav";
-				Sound::PlaySoundEffect(soundEffect);
-				Sound::PlaySoundEffect("./data/sound/MetalImpact1.wav");
+				Sound::play(soundEffect);
+				Sound::play("./data/sound/MetalImpact1.wav");
 				soundTimer = 0;
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);

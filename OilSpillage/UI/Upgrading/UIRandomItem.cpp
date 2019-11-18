@@ -19,7 +19,7 @@ void UIRandomItem::updateUI(float deltaTime)
 		{
 			if (slots[i].get() == this->selected)
 			{
-				Container::playerInventory->addItem(slots[i]->getSlot()->item);
+				Container::playerInventory->addItem(slots[i]->getSlot()->getItem()->clone());
 
 				for (int j = 0; j < UIRandomItem::slotCount; j++)
 				{
@@ -68,7 +68,7 @@ void UIRandomItem::init()
 	for (int i = 0; i < UIRandomItem::slotCount; i++)
 	{
 		slots[i] = std::make_unique<ItemSlot>(Vector2(SCREEN_WIDTH / 2 - (UIRandomItem::slotCount / 2.0f) * (ItemSlot::size.x + 20) + i * 20.0f, SCREEN_HEIGHT / 2) + Vector2(i, -0.5f) * ItemSlot::size);
-		this->container[i].item = Item::getRandom();
+		this->container[i].setItem(Item::getRandom());
 	}
 
 	for (int i = 0; i < UIRandomItem::slotCount; i++)
