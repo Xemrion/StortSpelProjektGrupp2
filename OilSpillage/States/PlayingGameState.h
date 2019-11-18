@@ -40,8 +40,12 @@ public:
 	void spawnObjects();
 	Vector3 generateObjectivePos(float minDistance, float maxDistance) noexcept;
 	Vector3 generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept;
-	PointLight* addPointLight(PointLight& light);
-	void removeLight(PointLight* theLight);
+	PointLight* addLight(PointLight& light);
+	void removeLight(PointLight* light);
+	SpotLight* addLight(SpotLight& light);
+	void removeLight(SpotLight* light);
+	LaserLight* addLight(LaserLight& light);
+	void removeLight(LaserLight* light);
 	void		 moveObjects();
 	void		 updateObjects();
 	void		 paperCollision(float deltaTime);

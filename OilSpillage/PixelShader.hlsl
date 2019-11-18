@@ -91,7 +91,7 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float bias)
 	visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
 	visibility += shadowCoord.z - bias > pcfDepth.b ? 1.0f : 0.0;
 	visibility += shadowCoord.z - bias > pcfDepth.a ? 1.0f : 0.0;
-	
+
 	visibility *= 0.25 * 0.25;
 
 	return visibility;
@@ -118,7 +118,7 @@ float4 main(VS_OUT input) : SV_Target
 	uint2 lightTileIndex = uint2(input.Pos.x * 0.0625f, input.Pos.y * 0.0625f);
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 
-	float4 ambient = max(-dot(sunDir, normal)*(1- shadowVisible(input.shadowPos, ShadowMap, 0.00015f) * texColor.a), float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
+	float4 ambient = max(-dot(sunDir, normal) * (1 - shadowVisible(input.shadowPos, ShadowMap, 0.00015f) * texColor.a), float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
 	float shadowSpotVisible = 1.0f;
 
 	float4 diffuseLight = float4(0.0, 0.0, 0.0, 1.0);
@@ -128,13 +128,12 @@ float4 main(VS_OUT input) : SV_Target
 	{
 		Light l = lights[lightTileData.indices[i]];
 		float3 lightVector = l.pos.xyz - input.wPos.xyz;
-		float attenuation = l.color.w / dot(lightVector, lightVector);
-
+		float attenuation;
 		float nDotL = max(dot(normal, normalize(lightVector)), 0.0);
 		float directional = 1.0;
 		shadowSpotVisible = 1.0f;
 		//if the light is a spot light
-		if (l.directionWidth.w > 0.0)
+		if (l.pos.w == 1.0)
 		{
 			directional = 0.0;
 			float s = dot(-normalize(lightVector), l.directionWidth.xyz);
@@ -150,8 +149,40 @@ float4 main(VS_OUT input) : SV_Target
 				shadowSpotVisible = 1 - shadowSpotVisible * texColor.a;
 			}
 		}
+		if (l.pos.w == 2.0)
+		{
+			float3 rayPointVector = (l.pos.xyz - input.wPos.xyz) - dot(l.pos.xyz - input.wPos.xyz, l.directionWidth.xyz) * l.directionWidth.xyz;
+			float dist = dot(rayPointVector, rayPointVector);
+			
+			float startDist = dot(lightVector, lightVector);
+			float3 endVector = (l.pos.xyz + l.directionWidth.xyz * l.directionWidth.w) - input.wPos.xyz;
+			float endDist = dot(endVector, endVector);
+			
+			if (startDist < l.directionWidth.w * l.directionWidth.w && endDist < l.directionWidth.w * l.directionWidth.w)
+			{
+				attenuation = l.color.w / (dist * dist);
+				nDotL = max(dot(normal, normalize(rayPointVector)), 0.0);
+			}
+			else
+			{
+				attenuation = l.color.w / (min(startDist, endDist) * min(startDist, endDist));
+				if (startDist < endDist)
+				{
+					nDotL = max(dot(normal, normalize(lightVector)), 0.0);
+				}
+				else {
+					nDotL = max(dot(normal, normalize(endVector.xyz)), 0.0);
+				}
+			}
+		}
+		else
+		{
+			attenuation = l.color.w / dot(lightVector, lightVector);
+			nDotL = max(dot(normal, normalize(lightVector)), 0.0);
+		}
 
 		diffuseLight.rgb += max(l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible, 0.0);
+		
 		float3 cameraVector = normalize(cameraPos.xyz - input.wPos.xyz);
 		float3 halfway = normalize(normalize(lightVector) + cameraVector);
 		specularLight.rgb += l.color.rgb * pow(max(dot(normal, halfway), 0.0), gloss) * attenuation * directional * shadowSpotVisible;

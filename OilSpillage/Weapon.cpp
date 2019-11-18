@@ -239,22 +239,13 @@ void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direc
 	}
 	direction.Normalize();
 	this->dir = direction;
-	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
-	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
 	vehicleWeapon.currentSpreadIncrease += vehicleWeapon.spreadIncreasePerSecond * vehicleWeapon.maxSpread * deltaTime;
-
-	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
-	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
 
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setScale(weapon.bulletScale);
-	this->obj->setPosition(position + direction * this->obj->getScale().z);
-
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.02), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread * vehicleWeapon.maxSpread)));
 
-	Game::getGraphics().addToDraw(this->obj);
 	if (vehicleWeapon.currentSpreadIncrease > vehicleWeapon.maxSpread)
 	{
 		vehicleWeapon.remainingCooldown = 4.0;

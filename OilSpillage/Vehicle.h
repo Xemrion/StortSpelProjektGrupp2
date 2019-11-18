@@ -49,6 +49,7 @@ private:
 
 	static const int bulletCount = 512;
 	Bullet bullets[bulletCount];
+	LaserLight* laserLight;
 
 	float gunRotation;
 	DirectX::XMFLOAT2 velocity;
@@ -98,6 +99,7 @@ public:
 	float getAcceleratorX();
 
 	void setSpotLight(SpotLight* theLight);
+	void setLaserLight(LaserLight* light);
 	void setDrivingMode(int i);
 	bool getDrivingMode();
 	Vector3 getVelocity();

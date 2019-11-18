@@ -170,6 +170,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.setLightList(lightList.get());
 	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.4f);
 	this->player->setSpotLight(lightList->addLight(tempLight));
+
+	LaserLight tempLaserLight(Vector3(0.0, 0.0, 0.0), Vector3(0.9, 0.1, 0.9), 10.0, Vector3(1.0, 0.0, 0.0), 10.0);
+	this->player->setLaserLight(lightList->addLight(tempLaserLight));
+
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
 
@@ -975,14 +979,34 @@ Vector3 PlayingGameState::generateObjectivePos(Vector3 origin, float minDistance
 
 }
 
-PointLight* PlayingGameState::addPointLight(PointLight& light)
+PointLight* PlayingGameState::addLight(PointLight& light)
 {
 	return this->lightList->addLight(light);
 }
 
-void PlayingGameState::removeLight(PointLight* theLight)
+void PlayingGameState::removeLight(PointLight* light)
 {
-	this->lightList->removeLight(theLight);
+	this->lightList->removeLight(light);
+}
+
+SpotLight* PlayingGameState::addLight(SpotLight& light)
+{
+	return this->lightList->addLight(light);
+}
+
+void PlayingGameState::removeLight(SpotLight* light)
+{
+	this->lightList->removeLight(light);
+}
+
+LaserLight* PlayingGameState::addLight(LaserLight& light)
+{
+	return this->lightList->addLight(light);
+}
+
+void PlayingGameState::removeLight(LaserLight* light)
+{
+	this->lightList->removeLight(light);
 }
 
 ObjectiveHandler& PlayingGameState::getObjHandler()
