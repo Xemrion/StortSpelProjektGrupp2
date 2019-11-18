@@ -35,6 +35,7 @@ struct VehicleSlots
 			{
 				item->getObject()->setRotation(Vector3(0,0.0f,0));
 				item->getObject()->setScale(Vector3(0.25f));
+				item->getObject()->setSpotShadow(false);
 			}
 		}
 	};
@@ -174,6 +175,8 @@ public:
 	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
+
+	Stats getStats()const; 
 
 	void setSpotLight(SpotLight* theLight);
 	SpotLight* getSpotLight();

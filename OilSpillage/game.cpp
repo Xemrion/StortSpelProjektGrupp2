@@ -132,7 +132,6 @@ void Game::createCurrentState()
 
 		if (oldState == STATE_PLAYING)
 		{
-			
 			static_cast<UpgradingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
 		}
 	}
@@ -159,7 +158,7 @@ void Game::run()
 		//Calculate deltaTime
 		deltaTime = (curTime - prevTime) * secPerCount;
 
-		Input::update();
+		Input::update(deltaTime);
 		Sound::Update(deltaTime);
 		state->update(deltaTime);
 

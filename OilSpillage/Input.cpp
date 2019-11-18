@@ -1,12 +1,44 @@
 #include "Input.h"
+#include <Xinput.h>
 std::unique_ptr<Input> Input::instance;
 
-Input::Input() : wWidth(0), wHeight(0)//, playerKeyboard(-1)
+Input::Input() : wWidth(0), wHeight(0), controller(Controllers::NONE), checkController(false), resetTimer(0.0f)//, playerKeyboard(-1)
 {
+	this->updateController();
 }
 
 Input::~Input()
 {
+}
+
+void Input::updateController()
+{
+	if (!this->gamePad.GetState(0).IsConnected())
+	{
+		this->controller = Controllers::NONE;
+		return;
+	}
+
+	JOYINFOEX info = {};
+	JOYCAPS caps = {};
+
+	if (joyGetPosEx(JOYSTICKID1, &info) != JOYERR_NOERROR)
+	{
+		joyGetDevCaps(JOYSTICKID1, &caps, sizeof(caps));
+	}
+
+	switch (caps.wMid)
+	{
+	/*case 0x0000:
+		this->controller = Controllers::NONE;
+		break;*/
+	case 0x054C:
+		this->controller = Controllers::PLAYSTATION;
+		break;
+	default:
+		this->controller = Controllers::XBOX;
+		break;
+	}
 }
 
 bool Input::checkButtonKeyboard(Keys key, States state)
@@ -253,8 +285,20 @@ void Input::init(Window* window)
 
 }
 
-void Input::update()
+void Input::update(float deltaTime)
 {
+	if (instance->checkController)
+	{
+		instance->resetTimer += deltaTime;
+
+		if (instance->resetTimer >= 2.0f)
+		{
+			instance->updateController();
+			instance->checkController = false;
+			instance->resetTimer = 0.0f;
+		}
+	}
+
 	Keyboard::State keyboardState = instance->keyboard.GetState();
 	Mouse::State mouseState = instance->mouse.GetState();
 
@@ -299,6 +343,8 @@ void Input::reset()
 	//{
 		instance->gamePadTrackers/*[i]*/.Reset();
 	//}
+
+	instance->checkController = true;
 }
 
 void Input::setRumble(/*int player,*/ float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
@@ -592,16 +638,9 @@ Vector2 Input::getMousePosition()
 	return Vector2(instance->mouse.GetState().x, instance->mouse.GetState().y);
 }
 
-void Input::getControllerProductName()
+Controllers Input::getControllerID()
 {
-	JOYINFOEX info = {};
-	JOYCAPS caps = {};
-
-	if (joyGetPosEx(JOYSTICKID1, &info) != JOYERR_NOERROR)
-	{
-		joyGetDevCaps(JOYSTICKID1, &caps, sizeof(caps));
-		std::string productName(caps.szPname);
-	}
+	return instance->controller;
 }
 
 /*void Input::setKeyboardPlayerID(int player)

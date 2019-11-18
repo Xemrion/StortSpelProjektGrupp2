@@ -3,7 +3,6 @@
 
 class Window {
 public:
-	HDEVNOTIFY hNewAudio = nullptr;
 	HWND handle;
 	int width;
 	int height;

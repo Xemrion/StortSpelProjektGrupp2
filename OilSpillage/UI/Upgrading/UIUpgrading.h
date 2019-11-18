@@ -13,7 +13,7 @@ class UIUpgrading : public UserInterface
 private:
 	void updateUI(float deltaTime);
 	void drawUI();
-
+	bool hasInitStats;
 	bool selectingItem;
 	Texture* textureSelectorTitleBG;
 	std::unique_ptr<ItemSelector> itemSelector;

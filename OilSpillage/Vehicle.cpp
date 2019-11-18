@@ -494,7 +494,7 @@ void Vehicle::updateWeapon(float deltaTime)
 				if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) == nullptr)
 				{
 					//in upgradingstate 
-					this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y, acos(angleWP)));
+					this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y, 0));// acos(angleWP)));
 				}
 				this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setPosition(vehicleBody1->getPosition()+Vector3(0,0.5f,0));
 			}
@@ -600,7 +600,7 @@ void Vehicle::updateWeapon(float deltaTime)
 										this->bullets[i].shoot(temp->getWeapon(),
 											this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
 											Vector3(curDir.x, 0.0, curDir.y),
-											Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 0.5f, deltaTime);
+											Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 1.0f, deltaTime);
 
 										WeaponHandler::weaponStartSound(temp->getWeapon());
 										break;
@@ -769,7 +769,7 @@ void Vehicle::updateWeapon(float deltaTime)
 				if (bullets[i].getWeaponType() == WeaponType::Laser)
 				{
 					bullets[i].getGameObject()->setPosition(this->vehicleBody1->getPosition());
-					bullets[i].setDirection(Vector3(curDir.x, 0, curDir.y));
+					//bullets[i].setDirection(Vector3(curDir.x, 0, curDir.y));
 				}
 				bullets[i].update(deltaTime);
 			}
@@ -831,6 +831,11 @@ VehicleSlots* Vehicle::getSlots()
 float Vehicle::getAcceleratorX()
 {
 	return accelerator.x;
+}
+
+Stats Vehicle::getStats() const
+{
+	return this->updatedStats;
 }
 
 void Vehicle::setSpotLight(SpotLight* theLight)
