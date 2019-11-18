@@ -45,17 +45,3 @@ private:
 	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA) const;
 	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA, Vector3 pointTowards) const;
 };
-
-/*	Display a complex shape with triangles
-
-	pick a point
-	make a line between neighboors
-		if a neighboor is unavailable, move one step further away from start point in the neighboors direction
-		repeat until both neighboor are available
-	make a line from one neighboor to all other points
-	cross product to check the side the start point is one
-	cross product with the other ones, if any other is on the same side as the start point, it cannot be
-	if yes, change start point and repeat
-		if (point - unavailable points) is two or lower, end loop
-	if no, make triangle, set start point to unavailable
-*/

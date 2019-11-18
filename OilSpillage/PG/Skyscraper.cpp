@@ -155,20 +155,20 @@ void Skyscraper::testDraw(std::string name)
 			this->roof->setPosition(Vector3(30.0f, 0.0f, -30.0f));
 			this->roof->setScale(Vector3(2.0f, 1.0f, 2.0f));
 			this->roof->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
-			this->roof->setTexture(Game::getGraphics().getTexturePointer("test"));
-			this->roof->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
+			this->roof->setTexture(Game::getGraphics().getTexturePointer("testWood"));
+			this->roof->setNormalMap(Game::getGraphics().getTexturePointer("felting_normal"));
 
 			this->windows->setPosition(Vector3(30.0f, 0.0f, -30.0f));
 			this->windows->setScale(Vector3(2.0f, 1.0f, 2.0f));
 			this->windows->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
-			this->windows->setTexture(Game::getGraphics().getTexturePointer("fireball"));
-			this->windows->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
+			this->windows->setTexture(Game::getGraphics().getTexturePointer("fullside-window"));
+			//this->windows->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
 
 			this->walls->setPosition(Vector3(30.0f, 0.0f, -30.0f));
 			this->walls->setScale(Vector3(2.0f, 1.0f, 2.0f));
 			this->walls->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
 			this->walls->setTexture(Game::getGraphics().getTexturePointer("testWood"));
-			this->walls->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
+			//this->walls->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
 			success = true;
 		}
 		else {

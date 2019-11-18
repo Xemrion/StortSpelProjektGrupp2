@@ -38,9 +38,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(125.0
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
+	graphics.loadTexture("felting_diffuse_01");
+	graphics.loadTexture("felting_normal");
+	graphics.loadTexture("fullside-window");
 	graphics.loadTexture("testWood");
-	graphics.loadTexture("test");
-	graphics.loadTexture("fireball");
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Dummy_Roller_Melee");
 	graphics.loadModel("Entities/Dummy_Turret");

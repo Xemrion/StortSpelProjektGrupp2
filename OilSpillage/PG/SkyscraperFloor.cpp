@@ -603,21 +603,21 @@ std::vector<Vertex3D> SkyscraperFloor::getRoofVertices()
 
 		temp.position = this->verticies[this->indices[i]];
 		temp.normal = normal;
-		temp.uv = Vector2(temp.position.x, temp.position.z) * 5;
+		temp.uv = Vector2(temp.position.x, temp.position.z) * 0.25;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 1]];
 		temp.normal = normal;
-		temp.uv = Vector2(temp.position.x, temp.position.z) * 5;
+		temp.uv = Vector2(temp.position.x, temp.position.z) * 0.25;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
 
 		temp.position = this->verticies[this->indices[size_t(i) + 2]];
 		temp.normal = normal;
-		temp.uv = Vector2(temp.position.x, temp.position.z) * 5;
+		temp.uv = Vector2(temp.position.x, temp.position.z) * 0.25;
 		temp.tangent = temp.normal;
 		temp.bitangent = temp.normal;
 		meshData.push_back(temp);
