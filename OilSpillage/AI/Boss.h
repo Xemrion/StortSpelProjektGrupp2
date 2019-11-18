@@ -18,8 +18,10 @@ private:
 	int rotationVar; //which way to rotate
 	Vector3 currentPoint;
 	Vector3 playerPos;
+	int nrOfWeakpoints;
 	std::vector<Weakspot*> weakSpots; //How to add these to actormanager
 	Vector3 frontVector;
+	btVector3 currentVelocityVector;
 
 	void setUpActor();
 	void movementVariables(float dt);
@@ -28,5 +30,4 @@ private:
 	Vector3 seek();
 	void circulatePlayer(Vector3 targetPos);
 	void updateWeakPoints(Vector3 targetPos);
-	//void saveWeakspots(std::vector<Weakspot*> weakspots);
 };

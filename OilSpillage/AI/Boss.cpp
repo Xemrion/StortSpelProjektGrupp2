@@ -8,8 +8,10 @@ Boss::Boss()
 	this->timeRotateDelay = 0;
 	this->rotationVar = 0;
 	this->currentPointNr = 0;
+
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
+	this->nrOfWeakpoints = 2;
 
 	this->frontVector = Vector3{ 0, 0, 0 };
 }
@@ -51,8 +53,6 @@ void Boss::update(float dt, const Vector3& targetPos)
 	this->circulatePlayer(targetPos);
 
 	this->updateBullets(dt);
-
-	this->updateWeakPoints(targetPos);
 }
 
 void Boss::setUpActor()
@@ -150,6 +150,7 @@ void Boss::move()
 	//move rigid body
 	//Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed;
 	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 200);
+	this->currentVelocityVector = (btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 200);
 	Vector3 targetToSelf = (this->playerPos - position);
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)
@@ -161,6 +162,9 @@ void Boss::move()
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
 
 		this->setRotation(Vector3(0, newRot - (DirectX::XM_PI / 2), 0));
+
+		//update weakpoints
+		this->updateWeakPoints(targetPos);
 	}
 
 	//position = temp;, DOESNT SET BODY ANYMORE, JUST MOVING THE RIGID BODY
@@ -206,36 +210,22 @@ void Boss::circulatePlayer(Vector3 targetPos)
 
 void Boss::updateWeakPoints(Vector3 targetPos)
 {
+	Vector3 bossPos = this->getPosition();
+
+	this->weakSpots[0]->startPos(bossPos);
+	this->weakSpots[1]->startPos(bossPos);
+
 	Vector3 upVector = { 0, 1, 0 };
 	//frontvector is backwards in x and z for placement
 	Vector3 correctFrontVector = { (this->frontVector.x * -1), this->frontVector.y, (this->frontVector.z * -1) };
-	Vector3 rightVector = XMVector3Cross(correctFrontVector, upVector);
+	Vector3 rightVector = XMVector3Cross(this->frontVector, upVector);
 
-	Vector3 bossPos = this->position;
-	Vector3 offset = Vector3(rightVector.x, upVector.y, rightVector.z);
-	Vector3 newPos = { 0, 0, 0 };
-	Vector3 newPos2 = { 0, 0, 0 };
-	//works
-	newPos.x = (bossPos.x + 5.0f);
-	newPos.y = bossPos.y;
-	newPos.z = (bossPos.z + 5.0f);
-	//doesnt work
-	newPos2.x = (bossPos.x + offset.x);
-	newPos2.y = bossPos.y;
-	newPos2.z = (bossPos.z + offset.z);
+	Vector3 offset = Vector3(rightVector.x, 1.0f, rightVector.z);
+	Vector3 offset2 = Vector3(rightVector.x, -1.0f, rightVector.z);
 
-	this->weakSpots[0]->place(newPos);
-
-
-	//this->weakSpots[1].setUpPosition(Vector3(-rightVector.x, upVector.y, rightVector.z));
-	//this->weakSpots[2].setUpPosition(Vector3(rightVector.x, upVector.y, rightVector.z));
-	//this->weakSpots[3].setUpPosition(Vector3(-rightVector.x, upVector.y, rightVector.z));
+	this->weakSpots[0]->shortMove(offset * 5);
+	this->weakSpots[1]->shortMove(- (offset2 * 5));
 }
-
-//void Boss::saveWeakspots(std::vector<Weakspot*> weakspots)
-//{
-//	this->weakSpots[0] = weakspots[0];
-//}
 
 //ADD WEAPONSWITCH, BOSSWEAPONS, MORE WEAPON SPOTS ON MESH
 //MORE BOSS SPOTS THAT TAKE DAMAGE AND SHOOT, BOSS DEAD IF ALL DEAD

@@ -24,10 +24,25 @@ Weakspot::~Weakspot()
 	Game::getGraphics().removeFromDraw(this);
 }
 
-void Weakspot::update(float dt, Vector3 targetPos)
+void Weakspot::update(float dt, btVector3 velocityVec)
 {
 	//Calls this update and not place, where, how?
-	//this->position = targetPos;
+	//this->move(velocityVec);
+}
+
+void Weakspot::startPos(Vector3 startPos)
+{
+	this->setPosition(startPos);
+}
+
+void Weakspot::shortMove(Vector3 posVec)
+{
+	Vector3 newPos;
+	newPos.x = this->getPosition().x + posVec.x;
+	newPos.y = this->getPosition().y + posVec.y;
+	newPos.z = this->getPosition().z + posVec.z;
+
+	this->setPosition(newPos);
 }
 
 void Weakspot::setUpActor()
@@ -47,8 +62,7 @@ void Weakspot::setUpActor()
 	root->addChildren(selector2);
 }
 
-void Weakspot::place(Vector3 thisPosition)
+void Weakspot::move(btVector3 velocityVec) //not used
 {
-	this->setPosition(thisPosition);
-	//this->position = thisPosition;
+	this->getRigidBody()->setLinearVelocity(velocityVec);
 }
