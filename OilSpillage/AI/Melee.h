@@ -5,12 +5,13 @@ class Melee
 {
 private:
 	Vector3* positionPtr;
-	Vector3* targetPosPtr;
 	Vector3* velocityPtr;
 	float* deltaTimePtr;
 protected:
 	Weapon weapon;
 	Bullet bullet;
+	float attackCooldown = 1;
+	float curCooldown;
 	void meleeAttack();
 public:
 	Melee();
