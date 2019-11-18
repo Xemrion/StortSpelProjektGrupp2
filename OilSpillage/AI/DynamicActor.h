@@ -6,7 +6,7 @@ public:
 	DynamicActor();
 	DynamicActor(float x,float z, Physics* physics);
 	virtual ~DynamicActor();
-	void setPath(std::vector<Vector3>* path);
+	void setPath(Vector3* path);
 	virtual void update(float dt, const Vector3& targetPos);
 	void applyForce(const Vector3& force);
 	int getBoidOffset()const;
@@ -14,10 +14,11 @@ public:
 	float getMaxForce()const;
 	const Vector3& getVelocity()const;
 
-	int duty;
+	int duty; 
 	bool vActive;
 	Vector3 groupPos;
-	std::vector<Vector3>* path;
+	Vector3* path;
+	int pathSize;
 protected:	
 	int aggroRange;
 	int boidOffset;

@@ -2,20 +2,18 @@
 
 void ChaseCar::followPath()
 {
-	if (path != nullptr)
+	if (pathSize >= 0 && (position - targetPos).Length() > 40)
 	{
-		if (path->size() > 0 && (position - targetPos).Length() > 40)
+		destination = *path;
+		if ((destination - position).Length() < 15)
 		{
-			destination = path->at(path->size() - 1);
-			if (position.Distance(path->at(path->size() - 1), position) < 2)
-			{
-				path->pop_back();
-			}
+			path--;
+			pathSize--;
 		}
-		else
-		{
-			destination = targetPos;
-		}
+	}
+	else
+	{
+		destination = targetPos;
 	}
 }
 

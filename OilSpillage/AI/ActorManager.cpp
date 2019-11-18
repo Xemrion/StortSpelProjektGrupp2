@@ -203,9 +203,9 @@ void ActorManager::spawnAttackers(const Vector3& originPos, int weaponType)
 {
 	for (int i = 0; i < 2; i++)
 	{
-			createAttacker(originPos.x + i, originPos.z, weaponType);
-			createAttacker(originPos.x, originPos.z + 1, weaponType);
-			createAttacker(originPos.x - i, originPos.z, weaponType);
+		createAttacker(originPos.x + i, originPos.z, weaponType);
+		createAttacker(originPos.x, originPos.z + 1, weaponType);
+		createAttacker(originPos.x - i, originPos.z, weaponType);
 	}
 }
 
@@ -395,7 +395,8 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 		groups[i].setPath(*pathToUse);
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
-			groups[i].actors[j]->setPath(&groups[i].path);
+			groups[i].actors[j]->setPath(groups[i].path.data() + groups[i].path.size() -1);
+			groups[i].actors[j]->pathSize = groups[i].path.size() - 1;
 		}
 	}
 }

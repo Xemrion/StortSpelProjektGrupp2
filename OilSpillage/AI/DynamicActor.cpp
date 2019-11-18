@@ -5,15 +5,15 @@ DynamicActor::DynamicActor()
 }
 
 DynamicActor::DynamicActor(float x, float z, Physics* physics)
-	:Actor(x, z,physics)
+	:Actor(x, z, physics)
 {
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
 	this->acceleration = Vector3(0.0f);
 	this->boidOffset = 9;
-	this->path = nullptr;
 	this->state = State::Idle;
-	this->aggroRange = 80;
+	this->pathSize = -1;
+	this->aggroRange = 1000;
 	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(x, position.y, z), 0.5f, this);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
@@ -26,7 +26,7 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 
 DynamicActor::~DynamicActor()
 {
-	
+
 }
 
 void DynamicActor::move()
@@ -43,7 +43,7 @@ void DynamicActor::move()
 	}
 
 	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed;
-	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * (stats.maxSpeed * 100)*0.9);
+	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * (stats.maxSpeed * 100) * 0.9);
 	Vector3 targetToSelf = (temp - position);
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)
@@ -61,7 +61,7 @@ void DynamicActor::move()
 	acceleration *= 0;
 }
 
-void DynamicActor::setPath(std::vector<Vector3>* path)
+void DynamicActor::setPath(Vector3* path)
 {
 	this->path = path;
 }
@@ -69,6 +69,7 @@ void DynamicActor::setPath(std::vector<Vector3>* path)
 void DynamicActor::update(float dt, const Vector3& targetPos)
 {
 	Actor::update(dt, targetPos);
+	this->state = State::Chasing;
 	if (this->state != State::Idle)
 	{
 		followPath();
@@ -167,21 +168,27 @@ Vector3 DynamicActor::seekCirculate(const Vector3& desiredDirection)
 
 void DynamicActor::followPath()
 {
-	if (path != nullptr)
+	if ((position - targetPos).Length() < 15)
 	{
-		if ((position - targetPos).Length() < 15)
-		{
-			destination = targetPos;
-		}
-			else if (path->size() > 0)
-			{
-				destination = path->at(path->size() - 1);
-				if((path->at(path->size() -1) - position).Length() < 2)
-				{
-					path->pop_back();
-				}
-			}
+		destination = targetPos;
 	}
+	else if (pathSize >= 0)
+	{
+		destination = *path;
+		if ((destination - position).Length() < 2)
+		{
+			path--;
+			pathSize--;
+		}
+	}
+	/*else if (path.size() > 0)
+	{
+		destination = *path[path.size() - 1];
+		if ((*path[path.size() - 1] - position).Length() < 2)
+		{
+			path.pop_back();
+		}
+	}*/
 }
 
 void DynamicActor::circulatePlayer()

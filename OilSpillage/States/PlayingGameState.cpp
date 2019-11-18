@@ -20,7 +20,7 @@ void PlayingGameState::initAI()
 			//	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
 				//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
 			//	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
-			actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
+			//actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
 		}
 	}
 }
@@ -578,10 +578,10 @@ void PlayingGameState::update(float deltaTime)
 
 		if (spawnTimer % 200 == 0)
 		{
-		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-			//actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
+			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
+			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
 			nrOfEnemies += 12;
-			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
+			actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
 			spawnTimer = 0;
 		}
 		spawnTimer++;

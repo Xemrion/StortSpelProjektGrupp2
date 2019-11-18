@@ -107,22 +107,18 @@ void Spitfire::update(float dt,const Vector3& targetPos)
 
 void Spitfire::followPath()
 {
-	if (path != nullptr)
+	if (pathSize >= 0)
 	{
-
-		if (path->size() > 0)
+		destination = *path;
+		if ((destination - position).Length() < 15)
 		{
-			destination = path->at(path->size() - 1);
-			if ((destination - this->position).Length() < 15)
-			{
-
-				path->pop_back();
-			}
+			path--;
+			pathSize--;
 		}
-		else
-		{
-			destination = targetPos;
-		}
+	}
+	else
+	{
+		destination = targetPos;
 	}
 }
 

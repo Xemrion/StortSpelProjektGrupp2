@@ -13,7 +13,7 @@ void AIGroup::update(const Vector3& targetPos)
 {
 	removeDeadActors();
 	updateAveragePos();
-	//formation(targetPos);
+	formation(targetPos);
 }
 
 const Vector3& AIGroup::getAveragePos() const
