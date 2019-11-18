@@ -9,6 +9,7 @@
 #include "States/UpgradingGameState.h"
 
 std::unique_ptr<Game> Game::instance;
+float Game::deltaTime = 0.0f;
 
 void Game::start(Window* window)
 {
@@ -17,46 +18,38 @@ void Game::start(Window* window)
 	instance->graphics.init(window);
 
 	Input::init(instance->window);
-	Sound::Init();
+	Sound::init();
 	UserInterface::initStaticVariables();
 	Container::playerInventory = std::make_unique<Container>();
 	Item::init();
 
-	//Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
-	//Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");
+	Sound::load("./data/sound/CarCrash.wav");
+	Sound::load("./data/sound/CarGlass1.wav");
+	Sound::load("./data/sound/CarGlass2.wav");
+	Sound::load("./data/sound/CarGlass3.wav");
+	Sound::load("./data/sound/CarGlass4.wav");
+	Sound::load("./data/sound/CarImpact1.wav");
+	Sound::load("./data/sound/CarImpact2.wav");
+	Sound::load("./data/sound/CarImpact3.wav");
+	Sound::load("./data/sound/CarImpact4.wav");
+	Sound::load("./data/sound/CarImpactSoft.wav");
+	Sound::load("./data/sound/FlameLoop1.wav");
+	Sound::load("./data/sound/FlameLoop2.wav");
+	Sound::load("./data/sound/HitSound.wav");
+	Sound::load("./data/sound/MachineGunSound1.wav");
+	Sound::load("./data/sound/MachineGunSound2.wav");
+	Sound::load("./data/sound/MachineGunSound3.wav");
+	Sound::load("./data/sound/MachineGunSound4.wav");
+	Sound::load("./data/sound/MachineGunSound5.wav");
+	Sound::load("./data/sound/MachineGunSound6.wav");
+	Sound::load("./data/sound/MetalImpact1.wav");
+	Sound::load("./data/sound/MetalImpact2.wav");
+	Sound::load("./data/sound/MetalImpact3.wav");
+	Sound::load("./data/sound/MetalImpactPitched1.wav");
+	Sound::load("./data/sound/MetalImpactPitched2.wav");
+	Sound::load("./data/sound/MetalImpactPitched3.wav");
 
-	//Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
-	//Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");
-	//Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav",0);
-
-	/*Sound::loadSound("./data/sound/CarCrash.wav");
-	Sound::loadSound("./data/sound/CarGlass1.wav");
-	Sound::loadSound("./data/sound/CarGlass2.wav");
-	Sound::loadSound("./data/sound/CarGlass3.wav");
-	Sound::loadSound("./data/sound/CarGlass4.wav");
-	Sound::loadSound("./data/sound/CarImpact1.wav");
-	Sound::loadSound("./data/sound/CarImpact2.wav");
-	Sound::loadSound("./data/sound/CarImpact3.wav");
-	Sound::loadSound("./data/sound/CarImpact4.wav");
-	Sound::loadSound("./data/sound/CarImpactSoft.wav");
-	Sound::loadSound("./data/sound/FlameLoop1.wav");
-	Sound::loadSound("./data/sound/FlameLoop2.wav");
-	Sound::loadSound("./data/sound/HitSound.wav");
-	Sound::loadSound("./data/sound/MachineGunSound1.wav");
-	Sound::loadSound("./data/sound/MachineGunSound2.wav");
-	Sound::loadSound("./data/sound/MachineGunSound3.wav");
-	Sound::loadSound("./data/sound/MachineGunSound4.wav");
-	Sound::loadSound("./data/sound/MachineGunSound5.wav");
-	Sound::loadSound("./data/sound/MachineGunSound6.wav");
-	Sound::loadSound("./data/sound/MetalImpact1.wav");
-	Sound::loadSound("./data/sound/MetalImpact2.wav");
-	Sound::loadSound("./data/sound/MetalImpact3.wav");
-	Sound::loadSound("./data/sound/MetalImpactPitched1.wav");
-	Sound::loadSound("./data/sound/MetalImpactPitched2.wav");
-	Sound::loadSound("./data/sound/MetalImpactPitched3.wav");*/
-
-	Sound::PlayLoopingSound("./data/sound/OilSpillageSoundtrack1_Aggressive.mp3"); // Pl ay i t
-	Sound::PlayLoopingSound("./data/sound/OilSpillageSoundtrack1_Calm.mp3"); // Pl ay i t
+	Sound::playSoundtrack("./data/sound/OilSpillageSoundtrack1_Calm.mp3", "./data/sound/OilSpillageSoundtrack1_Aggressive.mp3");
 
 	//Input::setKeyboardPlayerID(0);
 	instance->running = true;
@@ -156,7 +149,7 @@ void Game::run()
 		deltaTime = (curTime - prevTime) * secPerCount;
 
 		Input::update(deltaTime);
-		Sound::Update(deltaTime);
+		Sound::update(deltaTime);
 		state->update(deltaTime);
 
 		if (oldState != -1) {
@@ -173,6 +166,8 @@ void Game::run()
 		//deltaTime reset
 		prevTime = curTime;
 	}
+
+	Sound::deinit();
 }
 
 Game::Game() : currentState(STATE_UPGRADING), oldState(-1), running(false) {}

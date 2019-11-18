@@ -642,13 +642,22 @@ void PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos(spotlightPos);
 
-		if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
+		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f || this->time <= 20.0f)
+		{
+			Sound::fadeSoundtrack(true, 1.0f);
+		}
+		else
+		{
+			Sound::fadeSoundtrack(false, 3.0f);
+		}
+
+		/*if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
 			soundAggro += 0.2f * deltaTime;
 		}
 		else if (soundAggro > 0.0f) {
 			soundAggro -= 0.1f * deltaTime;
 		}
-		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);
+		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);*/
 
 		/*timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )

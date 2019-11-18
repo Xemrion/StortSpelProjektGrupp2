@@ -959,18 +959,18 @@ void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
 			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-20.0f);
-			Sound::PlaySoundEffect("./data/sound/CarCrash.wav");
-			Sound::PlaySoundEffect(soundEffect2);
+			Sound::play("./data/sound/CarCrash.wav");
+			Sound::play(soundEffect2);
 		}
 		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
 			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-10.0f);
-			Sound::PlaySoundEffect(soundEffect);
-			Sound::PlaySoundEffect(soundEffect2);
+			Sound::play(soundEffect);
+			Sound::play(soundEffect2);
 		}
 		else {
-			Sound::PlaySoundEffect("./data/sound/CarImpactSoft.wav");
-			Sound::PlaySoundEffect(soundEffect2);
+			Sound::play("./data/sound/CarImpactSoft.wav");
+			Sound::play(soundEffect2);
 		}
 	}
 	/*else {

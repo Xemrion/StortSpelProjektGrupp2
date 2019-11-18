@@ -24,7 +24,7 @@ public:
 	static void							setState(State);
 	static Graphics					   &getGraphics() noexcept;
 	static float						lerp(float v0, float v1, float t);
-
+	static float						deltaTime;
 private:
 	void								createCurrentState();
 	void								run();
@@ -34,7 +34,7 @@ private:
 	int									currentState;
 	int									oldState;                         
 	Window                             *window       = nullptr;
-	float								deltaTime    = 0.0f;
+	
 	long long							curTime      = 0;
 	long long							prevTime     = 0;
 	long long							countsPerSec = 0;

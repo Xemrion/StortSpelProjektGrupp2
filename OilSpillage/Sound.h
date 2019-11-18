@@ -1,53 +1,56 @@
 #ifndef SOUND_H
 #define SOUND_H
-#include <Audio.h>
+
+#include <memory>
 #include <unordered_map>
+#include <vector>
+#include <d3d11.h>
+#include <SimpleMath.h>
 #include "soloud.h"
 #include "soloud_wav.h"
-using namespace DirectX;
+
+using namespace DirectX::SimpleMath;
 
 class Sound
 {
 private:
-	struct SoundInstance
+	struct Soundtrack
 	{
-		std::unique_ptr<SoundEffect> sound;
-		std::unique_ptr<SoundEffectInstance> effectInstance;
-		bool isLooping = false;
+		float volume = 1.0f;
+		int handleGroup = 0;
+		int handleCalm = 0;
+		int handleAggressive = 0;
 	};
-
 	static std::unique_ptr<Sound> instance;
 
-	float resetTimer;
-	bool shouldReset;
-	std::unique_ptr<AudioEngine> engine;
-	std::unordered_map<std::wstring, SoundInstance> soundEffects;
-
-	/*static std::unique_ptr<Sound> instance;*/
-
-	SoLoud::Soloud soloud; // Engine core
-	SoLoud::Wav soundTrackCalm; // One sample
-	SoLoud::Wav soundTrackAggro; // One sample
-	SoLoud::Wav soundTemp; // One sample
-	SoLoud::Wav soundTemp2; // One sample
-
+	SoLoud::Soloud soloud;
+	std::unordered_map<std::string, std::unique_ptr<SoLoud::Wav>> sounds;
+	std::vector<std::unique_ptr<int>> loopingSounds;
+	Soundtrack soundtrack;
 public:
 	Sound();
 	virtual ~Sound();
 
-	static void Init();
+	static void init();
+	static void deinit();
+	static void update(float deltaTime);
+	static void stopAll();
+	static void load(const std::string& fileName);
 
-	static void ShouldReset();
-	static void Update(float deltaTime);
-	static void Reset();
+	static void play(const std::string& fileName, float volume = 1.0f);
+	static void play3d(const std::string& fileName, Vector3 position = Vector3::Zero, Vector3 velocity = Vector3::Zero, float volume = 1.0f);
 
-	static void loadSound(std::string fileName);
-	static void PlaySoundEffect(std::string fileName);
-	static void PlayLoopingSound(std::string fileName);
-	static void StopLoopingSound(std::string fileName, bool immediate);
-	static void changeVolume(std::wstring fileName, float volume);
-	static void StopAllLoops(bool immediate);
-	static void PauseSound(bool isPaused);
+	static int* playLooping(const std::string& fileName, float volume = 1.0f);
+	static int* play3dLooping(const std::string& fileName, Vector3 position = Vector3::Zero, Vector3 velocity = Vector3::Zero, float volume = 1.0f);
+	static void update3dLooping(int* handle, Vector3 position, Vector3 velocity);
+	static bool changeLoopingVolume(int* handle, float volume);
+	static bool stopLooping(int* handle, float fadeOutTime = 0.0f);
+
+	static void playSoundtrack(std::string fileNameCalm, std::string fileNameAggressive, float volume = 1.0f);
+	static void fadeSoundtrack(bool toAgressive, float fadeTime);
+	static void stopSoundtrack(float fadeOutTime = 0.0f);
+
+	static void updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity);
 };
 
 #endif // !SOUND_H

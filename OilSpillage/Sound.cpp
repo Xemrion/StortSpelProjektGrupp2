@@ -1,172 +1,188 @@
 #include "Sound.h"
+#include "Game.h"
 
 std::unique_ptr<Sound> Sound::instance;
 
 Sound::Sound()
 {
-	this->resetTimer = 0.0f;
-	this->shouldReset = false;
-
-	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
-	#ifdef _DEBUG
-	eflags = eflags | AudioEngine_Debug;
-	#endif
-
-	try
-	{
-		this->engine = std::make_unique<AudioEngine>(eflags);
-	}
-	catch (const std::exception&) {}
 }
 
 Sound::~Sound()
 {
-	this->engine->Suspend();
-
-	for (auto i = this->soundEffects.begin(); i != this->soundEffects.end(); i++)
-	{
-		i->second.effectInstance.reset();
-	}
-	instance->soloud.deinit(); // Clean up!
 }
 
-void Sound::ShouldReset()
-{
-	instance->shouldReset = true;
-}
-
-void Sound::Init()
+void Sound::init()
 {
 	instance = std::make_unique<Sound>();
-	instance->soloud.init();
+	instance->soloud.init(SoLoud::Soloud::FLAGS::LEFT_HANDED_3D);
 }
 
-void Sound::Update(float deltaTime)
+void Sound::deinit()
 {
-	if (!instance->engine)
-		return;
+	instance->soloud.deinit();
+}
 
-	if (instance->shouldReset)
+void Sound::update(float deltaTime)
+{
+	instance->soloud.update3dAudio();
+}
+
+void Sound::stopAll()
+{
+	instance->soloud.stopAll();
+	instance->loopingSounds.clear();
+}
+
+void Sound::load(const std::string& fileName)
+{
+	if (instance->sounds.find(fileName) == instance->sounds.end())
 	{
-		instance->resetTimer += deltaTime;
-
-		if (instance->resetTimer > 3.0f) //3 second wait time until reset.
-		{
-			instance->resetTimer = 0;
-			instance->shouldReset = false;
-
-			if (instance->engine->Reset())
-			{
-				for (auto i = instance->soundEffects.begin(); i != instance->soundEffects.end(); i++)
-				{
-					if (i->second.isLooping)
-					{
-						i->second.effectInstance->Play(true);
-					}
-				}
-			}
-		}
-	}
-	else if (!instance->engine->Update() && instance->engine->IsCriticalError())
-	{
-		instance->shouldReset = true;
+		instance->sounds[fileName] = std::make_unique<SoLoud::Wav>();
+		instance->sounds[fileName]->load(fileName.c_str());
 	}
 }
 
-void Sound::Reset()
+void Sound::play(const std::string& fileName, float volume)
 {
-	instance->engine->Reset();
+	if (instance->sounds.find(fileName) == instance->sounds.end())
+	{
+		instance->sounds[fileName] = std::make_unique<SoLoud::Wav>();
+		instance->sounds[fileName]->load(fileName.c_str());
+	}
+
+	int handle = instance->soloud.playClocked(Game::deltaTime, *instance->sounds[fileName].get(), max(volume, 0.0f));
 }
 
-void Sound::loadSound(std::string fileName)
+void Sound::play3d(const std::string& fileName, Vector3 position, Vector3 velocity, float volume)
 {
-	/*if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
+	if (instance->sounds.find(fileName) == instance->sounds.end())
 	{
-		try
+		instance->sounds[fileName] = std::make_unique<SoLoud::Wav>();
+		instance->sounds[fileName]->load(fileName.c_str());
+	}
+
+	int handle = instance->soloud.play3d(*instance->sounds[fileName].get(), position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, max(volume, 0.0f));
+}
+
+int* Sound::playLooping(const std::string& fileName, float volume)
+{
+	if (instance->sounds.find(fileName) == instance->sounds.end())
+	{
+		instance->sounds[fileName] = std::make_unique<SoLoud::Wav>();
+		instance->sounds[fileName]->load(fileName.c_str());
+	}
+
+	int handle = instance->soloud.play(*instance->sounds[fileName].get(), max(volume, 0.0f));
+	instance->soloud.setLooping(handle, true);
+
+	instance->loopingSounds.push_back(std::make_unique<int>(handle));
+	return instance->loopingSounds.back().get();
+}
+
+int* Sound::play3dLooping(const std::string& fileName, Vector3 position, Vector3 velocity, float volume)
+{
+	if (instance->sounds.find(fileName) == instance->sounds.end())
+	{
+		instance->sounds[fileName] = std::make_unique<SoLoud::Wav>();
+		instance->sounds[fileName]->load(fileName.c_str());
+	}
+
+	int handle = instance->soloud.play3d(*instance->sounds[fileName].get(), position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, max(volume, 0.0f));
+	instance->soloud.setLooping(handle, true);
+
+	instance->loopingSounds.push_back(std::make_unique<int>(handle));
+	return instance->loopingSounds.back().get();
+}
+
+void Sound::update3dLooping(int* handle, Vector3 position, Vector3 velocity)
+{
+	for (auto loop = instance->loopingSounds.begin(); loop != instance->loopingSounds.end(); loop++)
+	{
+		if ((*loop).get() == handle)
 		{
-			instance->soundEffects[fileName].sound = std::make_unique<SoundEffect>(instance->engine.get(), fileName.c_str());
-			instance->soundEffects[fileName].effectInstance = instance->soundEffects[fileName].sound->CreateInstance();
-		}
-		catch (const std::exception&)
-		{
+			instance->soloud.set3dSourceParameters(*handle, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z);
 			return;
 		}
-	}*/
-	instance->soundTemp.load(fileName.c_str()); // Load a f i l e
-}
-
-void Sound::PlaySoundEffect(std::string fileName)
-{
-	/*if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
-	{
-		try
-		{
-			instance->soundEffects[fileName].sound = std::make_unique<SoundEffect>(instance->engine.get(), fileName.c_str());
-			instance->soundEffects[fileName].effectInstance = instance->soundEffects[fileName].sound->CreateInstance();
-		}
-		catch (const std::exception&)
-		{
-			return;
-		}
-	}
-
-	instance->soundEffects[fileName].sound->Play();*/
-	instance->soundTemp.setLooping(false);
-	instance->soundTemp.load(fileName.c_str()); // Load a f i l e
-	instance->soloud.play(instance->soundTemp); // Pl ay i t
-}
-
-void Sound::PlayLoopingSound(std::string fileName)
-{
-	/*if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
-	{
-		try
-		{
-			instance->soundEffects[fileName].sound = std::make_unique<SoundEffect>(instance->engine.get(), fileName.c_str());
-			instance->soundEffects[fileName].effectInstance = instance->soundEffects[fileName].sound->CreateInstance();
-		}
-		catch (const std::exception&)
-		{
-			return;
-		}
-	}
-
-	instance->soundEffects[fileName].effectInstance->Stop(true);
-	instance->soundEffects[fileName].effectInstance->Play(true);
-	instance->soundEffects[fileName].isLooping = true;*/
-	instance->soundTemp2.load(fileName.c_str()); // Load a f i l e
-	instance->soundTemp2.setLooping(true);
-	instance->soloud.play(instance->soundTemp2); // Pl ay i t
-	
-}
-
-void Sound::StopLoopingSound(std::string fileName, bool immediate)
-{
-	/*if (instance->soundEffects.find(fileName) != instance->soundEffects.end())
-	{
-		instance->soundEffects[fileName].effectInstance->Stop(immediate);
-		instance->soundEffects[fileName].isLooping = false;
-	}*/
-	
-}
-
-void Sound::changeVolume(std::wstring fileName, float volume)
-{
-	if (instance->soundEffects.find(fileName) != instance->soundEffects.end())
-	{
-		instance->soundEffects[fileName].effectInstance->SetVolume(volume);
 	}
 }
 
-void Sound::StopAllLoops(bool immediate)
+bool Sound::changeLoopingVolume(int* handle, float volume)
 {
-	for (auto i = instance->soundEffects.begin(); i != instance->soundEffects.end(); i++)
+	for (auto loop = instance->loopingSounds.begin(); loop != instance->loopingSounds.end(); loop++)
 	{
-		i->second.effectInstance->Stop(immediate);
+		if ((*loop).get() == handle)
+		{
+			instance->soloud.setVolume(*handle, max(volume, 0.0f));
+			return true;
+		}
 	}
+
+	return false;
 }
 
-void Sound::PauseSound(bool isPaused)
+bool Sound::stopLooping(int* handle, float fadeOutTime)
 {
-	isPaused ? instance->engine->Suspend() : instance->engine->Resume();
+	for (auto loop = instance->loopingSounds.begin(); loop != instance->loopingSounds.end(); loop++)
+	{
+		if ((*loop).get() == handle)
+		{
+			instance->soloud.fadeVolume(*handle, 0, fadeOutTime);
+			instance->soloud.scheduleStop(*handle, fadeOutTime);
+			instance->loopingSounds.erase(loop);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void Sound::playSoundtrack(std::string fileNameCalm, std::string fileNameAggressive, float volume)
+{
+	if (instance->sounds.find(fileNameCalm) == instance->sounds.end())
+	{
+		instance->sounds[fileNameCalm] = std::make_unique<SoLoud::Wav>();
+		instance->sounds[fileNameCalm]->load(fileNameCalm.c_str());
+	}
+
+	if (instance->sounds.find(fileNameAggressive) == instance->sounds.end())
+	{
+		instance->sounds[fileNameAggressive] = std::make_unique<SoLoud::Wav>();
+		instance->sounds[fileNameAggressive]->load(fileNameAggressive.c_str());
+	}
+
+	Sound::stopSoundtrack();
+	instance->soloud.destroyVoiceGroup(instance->soundtrack.handleGroup);
+
+	instance->soundtrack.volume = volume;
+	instance->soundtrack.handleCalm = instance->soloud.playBackground(*instance->sounds[fileNameCalm].get(), max(volume, 0.0f), true);
+	instance->soundtrack.handleAggressive = instance->soloud.playBackground(*instance->sounds[fileNameAggressive].get(), 0.0f, true);
+
+	instance->soundtrack.handleGroup = instance->soloud.createVoiceGroup();
+	instance->soloud.addVoiceToGroup(instance->soundtrack.handleGroup, instance->soundtrack.handleCalm);
+	instance->soloud.addVoiceToGroup(instance->soundtrack.handleGroup, instance->soundtrack.handleAggressive);
+
+	instance->soloud.setPause(instance->soundtrack.handleGroup, false);
+}
+
+void Sound::fadeSoundtrack(bool toAgressive, float fadeTime)
+{
+	float aggressiveFactor = instance->soloud.getVolume(instance->soundtrack.handleAggressive) / instance->soundtrack.volume;
+
+	if (toAgressive)
+	{
+		aggressiveFactor = 1 - aggressiveFactor;
+	}
+
+	instance->soloud.fadeVolume(instance->soundtrack.handleAggressive, toAgressive ? instance->soundtrack.volume : 0.0f, fadeTime * aggressiveFactor);
+}
+
+void Sound::stopSoundtrack(float fadeOutTime)
+{
+	instance->soloud.fadeVolume(instance->soundtrack.handleGroup, 0, fadeOutTime);
+	instance->soloud.scheduleStop(instance->soundtrack.handleGroup, fadeOutTime);
+}
+
+void Sound::updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity)
+{
+	instance->soloud.set3dListenerParameters(position.x, position.y, position.z, lookAt.x, lookAt.y, lookAt.z, up.x, up.y, up.z, velocity.x, velocity.y, velocity.z);
 }

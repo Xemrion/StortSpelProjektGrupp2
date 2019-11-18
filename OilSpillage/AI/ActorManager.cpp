@@ -149,7 +149,7 @@ float ActorManager::distanceToPlayer(Vector3 position)
 		}
 	}
 	float turretMinDist = turretHandler.distanceToPlayer(position);
-	if (turretMinDist < minDistance)
+	if (turretMinDist < minDistance && turretMinDist != -1)
 	{
 		return turretMinDist;
 	}
@@ -176,9 +176,9 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 					{
 						if (soundTimer > 0.05f) {
 							/*int randomSound = rand() % 3 + 1;
-							std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
-							Sound::PlaySoundEffect(soundEffect);*/
-							Sound::PlaySoundEffect("./data/sound/HitSound.wav");
+							std::string soundEffect = "data/sound/MetalImpactPitched" + to_string(randomSound) + ".wav";
+							Sound::play(soundEffect);*/
+							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
@@ -188,9 +188,9 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 				{
 					if (soundTimer > 0.05f) {
 						/*int randomSound = rand() % 3 + 1;
-						std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
-						Sound::PlaySoundEffect(soundEffect);*/
-						Sound::PlaySoundEffect("./data/sound/HitSound.wav");
+						std::string soundEffect = "data/sound/MetalImpactPitched" + to_string(randomSound) + ".wav";
+						Sound::play(soundEffect);*/
+						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
