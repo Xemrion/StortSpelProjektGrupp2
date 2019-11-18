@@ -92,7 +92,7 @@ void Item::randomize()
 {
 	if (this->object)
 	{
-		this->object->setColor(Vector4((rand() % 256) / 255.0f, (rand() % 256) / 255.0f, (rand() % 256) / 255.0f, 1));
+		this->object->setColor(Vector4((rand() % 64) / 63.0f, (rand() % 64) / 63.0f, (rand() % 64) / 63.0f, 1));
 	}
 }
 
