@@ -45,6 +45,21 @@ void Weakspot::shortMove(Vector3 posVec)
 	this->setPosition(newPos);
 }
 
+void Weakspot::updateSelf()
+{
+	//this->getRigidBody()->setLinearVelocity(btVector3(0.0f, 0.0f, 0.0f));
+	whenImDead();
+}
+
+void Weakspot::whenImDead()
+{
+	bool amDead = this->isDead();
+	if (amDead)
+	{
+		//reduce health of boss and change texture of this?
+	}
+}
+
 void Weakspot::setUpActor()
 {
 	//Selectors
@@ -64,5 +79,5 @@ void Weakspot::setUpActor()
 
 void Weakspot::move(btVector3 velocityVec) //not used
 {
-	this->getRigidBody()->setLinearVelocity(velocityVec);
+	//this->getRigidBody()->setLinearVelocity(velocityVec);
 }

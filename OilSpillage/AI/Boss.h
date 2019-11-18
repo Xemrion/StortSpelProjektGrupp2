@@ -7,7 +7,7 @@ class Boss : public DynamicActor, public BossAblilities
 {
 public:
 	Boss();
-	Boss(float x, float z, int weaponType, Physics* physics, std::vector<Weakspot*> weakspots); //, std::vector<Weakspot*>
+	Boss(float x, float z, int weaponType, Physics* physics, std::vector<Weakspot*> &weakspots); //, std::vector<Weakspot*>
 	virtual ~Boss();
 	void update(float dt, const Vector3& targetPos);
 private:

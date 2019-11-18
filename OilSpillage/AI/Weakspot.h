@@ -10,6 +10,8 @@ public:
 	void update(float dt, btVector3 velocityVec);
 	void startPos(Vector3 startPos);
 	void shortMove(Vector3 posVec);
+	void updateSelf();
+	void whenImDead();
 
 private:
 	void setUpActor();

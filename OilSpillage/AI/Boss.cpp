@@ -16,10 +16,11 @@ Boss::Boss()
 	this->frontVector = Vector3{ 0, 0, 0 };
 }
 
-Boss::Boss(float x, float z, int weaponType, Physics* physics, std::vector<Weakspot*> weakspots)
+Boss::Boss(float x, float z, int weaponType, Physics* physics, std::vector<Weakspot*> &weakspots)
 	:DynamicActor(x, z, physics), BossAblilities(&this->position, &this->targetPos, &this->velocity, weaponType, &this->deltaTime)
 {
-	this->setScale(Vector3(0.05f, 0.05f, 0.05f));
+	this->setScale(Vector3(0.04f, 0.04f, 0.04f));
+	this->setPosition(Vector3(position.x, position.y + 4.5f, position.z));
 	setUpActor();
 	Game::getGraphics().addToDraw(this);
 
@@ -39,6 +40,11 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics, std::vector<Weaks
 	this->playerPos = { 0, 0, 0 };
 
 	this->weakSpots = weakspots;
+
+
+	this->weakSpots[0]->setPosition(Vector3(0, 0, 0));
+	this->weakSpots[1]->setPosition(Vector3 (0, 10, 0));
+	
 }
 
 Boss::~Boss()
@@ -217,14 +223,28 @@ void Boss::updateWeakPoints(Vector3 targetPos)
 
 	Vector3 upVector = { 0, 1, 0 };
 	//frontvector is backwards in x and z for placement
-	Vector3 correctFrontVector = { (this->frontVector.x * -1), this->frontVector.y, (this->frontVector.z * -1) };
+	//Vector3 correctFrontVector = { (this->frontVector.x * -1), this->frontVector.y, (this->frontVector.z * -1) };
 	Vector3 rightVector = XMVector3Cross(this->frontVector, upVector);
 
-	Vector3 offset = Vector3(rightVector.x, 1.0f, rightVector.z);
-	Vector3 offset2 = Vector3(rightVector.x, -1.0f, rightVector.z);
+	float sideVar = 2.5;
+	Vector3 sideOffset = Vector3((rightVector.x * sideVar), 0.0f, (rightVector.z * sideVar));
+	Vector3 frontOffset = Vector3((-this->frontVector.x * 5.5), 0.0f, (-this->frontVector.z * 5.5));
+	Vector3 heightOffset = Vector3(0, -4.5, 0);
 
-	this->weakSpots[0]->shortMove(offset * 5);
-	this->weakSpots[1]->shortMove(- (offset2 * 5));
+	this->weakSpots[0]->shortMove(sideOffset);
+	this->weakSpots[0]->shortMove(frontOffset); //moves y, should just move x and z
+	this->weakSpots[0]->shortMove(heightOffset);
+
+
+	this->weakSpots[1]->shortMove(-(sideOffset));
+	this->weakSpots[1]->shortMove(frontOffset);
+	this->weakSpots[1]->shortMove(heightOffset);
+
+	//their own update
+	for (int i = 0; i < this->nrOfWeakpoints; i++)
+	{
+		this->weakSpots[i]->updateSelf();
+	}
 }
 
 //ADD WEAPONSWITCH, BOSSWEAPONS, MORE WEAPON SPOTS ON MESH

@@ -95,6 +95,7 @@ std::vector<Weakspot*> ActorManager::createWeakspot(float x, float z, int weapon
 	weakspots.push_back(weakspot2);
 
 	this->actors.push_back(weakspot1);
+	initGroupForActor(actors.at(actors.size() - 1));
 	this->actors.push_back(weakspot2);
 	initGroupForActor(actors.at(actors.size() - 1));
 
