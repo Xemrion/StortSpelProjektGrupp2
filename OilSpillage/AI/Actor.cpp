@@ -32,6 +32,14 @@ void Actor::update(float dt, const Vector3& targetPos)
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
 	this->root->func();
+	if(isHit)
+	{
+		setColor(Vector4(getColor().x / (1 + 15.0f * deltaTime), getColor().y, getColor().z, 1));
+		if (getColor().x <= 0.01f) 
+		{
+			isHit = false;
+		}
+	}
 }
 //
 //void Actor::run(vector<Actor*>& boids, float deltaTime, vector<Vector3> buildings, Vector3 targetPos)
@@ -51,6 +59,10 @@ void Actor::setHealth(int health)
 
 void Actor::changeHealth(int amount)
 {
+	if (amount < 0) {
+		isHit = true;
+	}
+	setColor(Vector4(max(getColor().x + -amount * 0.1f, 0), getColor().y, getColor().z, 1));
 	this->health = std::clamp(this->health + amount, 0, this->stats.maxHealth);
 	Game::getGraphics().addParticle2(this->getPosition(), Vector3(0, 0, 0), 2, 1);
 }

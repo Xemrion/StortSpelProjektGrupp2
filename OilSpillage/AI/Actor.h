@@ -23,6 +23,7 @@ public:
 
 private:
 	int health;
+	bool isHit = false;
 protected:
 	float deltaTime;
 	Vector3 targetPos;
