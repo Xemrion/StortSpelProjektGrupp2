@@ -40,14 +40,19 @@ public:
 	void spawnObjects();
 	Vector3 generateObjectivePos(float minDistance, float maxDistance) noexcept;
 	Vector3 generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept;
-	PointLight* addPointLight(PointLight& light);
-	void removeLight(PointLight* theLight);
+	PointLight* addLight(PointLight& light);
+	void removeLight(PointLight* light);
+	SpotLight* addLight(SpotLight& light);
+	void removeLight(SpotLight* light);
+	LaserLight* addLight(LaserLight& light);
+	void removeLight(LaserLight* light);
 	void		 moveObjects();
 	void		 updateObjects();
+	void		 paperCollision(float deltaTime);
 	Vector3   getRespawnPosition() const noexcept;
 
-
 	ActorManager* actorManager;
+	std::unique_ptr<Map>            map;
 
 private:
 	friend class Game;
@@ -64,7 +69,6 @@ private:
 	MapConfig                       config;
 	Graphics                       &graphics;
 	AStar                          *aStar;
-	std::unique_ptr<Map>            map;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
@@ -80,7 +84,9 @@ private:
 	GameObject** objArray = new GameObject * [3];
 	ObjectiveHandler objectives;
 	RNG rng{ RD()() };        // gör privat klassmedlem istället
-	
+	int frameCount = 0;
+	int nrOfEnemies = 0;
+
 	//Bullet
 	std::unique_ptr<Physics>		physics;
 	std::unique_ptr<GameObject>		buildingTest;

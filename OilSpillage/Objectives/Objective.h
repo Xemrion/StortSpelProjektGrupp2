@@ -48,11 +48,13 @@ public:
 	int getRewardTime()const;
 	std::string getInfo()const;
 	Vector3 getAveragePosition()const;
+	Vector3 getClosestToPlayer()const;
 	bool isDone();
 	void update(Vector3 playerPosition);
 	int getNrOfMax()const;
 private:
 	Mission* mission;
+	Vector3 closestToPlayer;
 	bool done;
 	bool started;
 	int nrOfMax;

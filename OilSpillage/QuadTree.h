@@ -26,7 +26,12 @@ class QuadTree
 	};
 	std::unique_ptr<Node> root;
 public:
-	QuadTree(DirectX::SimpleMath::Vector2 minBound, DirectX::SimpleMath::Vector2 maxBound, UINT treeDepth);
+	explicit  QuadTree(DirectX::SimpleMath::Vector2 minBound, DirectX::SimpleMath::Vector2 maxBound, UINT treeDepth);
+	QuadTree()                            = delete;
+	QuadTree( QuadTree const &)           = delete;
+	QuadTree( QuadTree &&)                = delete;
+	QuadTree &operator=(QuadTree const &) = delete;
+	QuadTree &operator=(QuadTree &&)      = delete;
 	void insert(GameObject* o);
 	void getGameObjects(std::vector<GameObject*>& objects, Frustum viewFrustum, float frustumBias);
 	void clearGameObjects();

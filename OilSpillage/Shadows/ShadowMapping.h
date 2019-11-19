@@ -14,7 +14,7 @@ public:
 	bool initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 	void setWorld(const Matrix& world);
 	void setViewProjSun(DynamicCamera* camera, Vector3 sunDir, float farPlaneTest=1000.0f);
-	void setViweProjSpot(Vector3 pos, Vector3 dir, float fov);
+	void setViewProjSpot(Vector3 pos, Vector3 dir, float fov);
 	//uses the rendershader in Shader
 	void prepare();
 	void prepareSpot();
@@ -26,6 +26,9 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> getViewProj();
 	Microsoft::WRL::ComPtr<ID3D11Buffer> getViewProjSpot();
+
+	Frustum getSpotFrustum() { return spotFrustum; };
+	Frustum getSunFrustum() { return sunFrustum; };
 
 private:
 
@@ -55,6 +58,9 @@ private:
 	DynamicCamera camera;
 	Matrix view;
 	Matrix orthoProj;
+
+	Frustum spotFrustum;
+	Frustum sunFrustum;
 };
 
 

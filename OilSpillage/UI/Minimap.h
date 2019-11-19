@@ -21,6 +21,8 @@ private:
 	Texture* texturePlayerMarker;
 	Texture* textureObjectiveMarker;
 	Texture* textureEnemyMarker;
+	Texture* textureCompass;
+	float compassRot;
 
 public:
 	static Vector2 size;
