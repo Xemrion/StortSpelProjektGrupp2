@@ -10,19 +10,19 @@ private:
 	std::vector<Vertex3D> meshWindows;
 	std::vector<Vertex3D> meshWalls;
 	RNG rng { RD() () };
-	GameObject* roof;
-	GameObject* windows;
-	GameObject* walls;
 
 	bool generateSkyscraperMesh();
 	void scrapSkyScraper();
+	void generateSkyscraper();
+	bool saveSkyscraper(std::string name);
 public:
 	Skyscraper(I32 input = -1);
 	~Skyscraper();
 
-	void generateSkyscraper();
-	bool saveSkyscraper(std::string name);
-	void testDraw(std::string name);
+	void generateASkyscraper(std::string name);
+	void setRoofMesh(std::string name, GameObject& roof);
+	void setWallMesh(std::string name, GameObject& roof);
+	void setWindowMesh(std::string name, GameObject& roof);
 };
 
 /* Pseudocode

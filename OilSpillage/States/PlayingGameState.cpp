@@ -153,6 +153,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	}
 
 	testSkyscraper = std::make_unique<Skyscraper>();
+	//testSkyscraper.get()->generateASkyscraper("test");
 
 	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 

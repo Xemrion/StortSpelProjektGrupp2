@@ -11,6 +11,41 @@ Skyscraper::~Skyscraper()
 {
 }
 
+void Skyscraper::generateASkyscraper(std::string name)
+{
+	bool success = false;
+	do {
+		if (this->floors.size() == 0) {
+			generateSkyscraper();
+		}
+		if (saveSkyscraper(name)) {
+			success = true;
+		}
+		else {
+			scrapSkyScraper();
+			generateSkyscraper();
+		}
+	} while (!success);
+}
+
+void Skyscraper::setRoofMesh(std::string name, GameObject& roof)
+{
+	std::string meshName = name + "-roof";
+	roof.mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
+}
+
+void Skyscraper::setWallMesh(std::string name, GameObject& roof)
+{
+	std::string meshName = name + "-wall";
+	roof.mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
+}
+
+void Skyscraper::setWindowMesh(std::string name, GameObject& roof)
+{
+	std::string meshName = name + "-wind";
+	roof.mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
+}
+
 void Skyscraper::generateSkyscraper()
 {
 	this->floors.clear();
@@ -136,44 +171,3 @@ bool Skyscraper::saveSkyscraper(std::string name)
 	return success;
 }
 
-void Skyscraper::testDraw(std::string name)
-{
-	bool success = false;
-	do {
-		if (saveSkyscraper(name)) {
-			this->roof = new GameObject;
-			std::string ss_roof = name + "-roof", ss_windows = name + "-wind", ss_walls = name + "-wall";
-			this->roof->mesh = Game::getGraphics().getPGMeshPointer(ss_roof.c_str());
-			this->windows = new GameObject;
-			this->windows->mesh = Game::getGraphics().getPGMeshPointer(ss_windows.c_str());
-			this->walls = new GameObject;
-			this->walls->mesh = Game::getGraphics().getPGMeshPointer(ss_walls.c_str());
-			Game::getGraphics().addToDraw(this->roof);
-			Game::getGraphics().addToDraw(this->windows);
-			Game::getGraphics().addToDraw(this->walls);
-			this->roof->setPosition(Vector3(30.0f, 0.0f, -30.0f));
-			this->roof->setScale(Vector3(2.0f, 1.0f, 2.0f));
-			this->roof->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
-			this->roof->setTexture(Game::getGraphics().getTexturePointer("testWood"));
-			this->roof->setNormalMap(Game::getGraphics().getTexturePointer("felting_normal"));
-
-			this->windows->setPosition(Vector3(30.0f, 0.0f, -30.0f));
-			this->windows->setScale(Vector3(2.0f, 1.0f, 2.0f));
-			this->windows->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
-			this->windows->setTexture(Game::getGraphics().getTexturePointer("fullside-window"));
-			//this->windows->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
-
-			this->walls->setPosition(Vector3(30.0f, 0.0f, -30.0f));
-			this->walls->setScale(Vector3(2.0f, 1.0f, 2.0f));
-			this->walls->setColor(Vector4(0.2f, 0.2f, 0.1f, 1.0f));
-			this->walls->setTexture(Game::getGraphics().getTexturePointer("testWood"));
-			//this->walls->setNormalMap(Game::getGraphics().getTexturePointer("brickwallnormal"));
-			success = true;
-		}
-		else {
-			scrapSkyScraper();
-			generateSkyscraper();
-		}
-	} while (!success);
-	scrapSkyScraper();
-}
