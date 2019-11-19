@@ -3,7 +3,7 @@
 #include "utils.hpp"
 #include "Voronoi.hpp"
 
-Voronoi::Voronoi( RNG &rng, U8 cellSize, U16 width, U16 height, EuclideanDistanceTag ):
+Voronoi::Voronoi( RNG &rng, U8 cellSize, U32 width, U32 height, EuclideanDistanceTag ):
    cellSize ( cellSize ),
    width    ( width    ),
    height   ( height   ),
@@ -17,7 +17,7 @@ Voronoi::Voronoi( RNG &rng, U8 cellSize, U16 width, U16 height, EuclideanDistanc
    generateDiagram( rng, euclideanDistance );
 }
 
-Voronoi::Voronoi( RNG &rng, U8 cellSize, U16 width, U16 height, ManhattanDistanceTag ):
+Voronoi::Voronoi( RNG &rng, U8 cellSize, U32 width, U32 height, ManhattanDistanceTag ):
    cellSize ( cellSize ),
    width    ( width    ),
    height   ( height   ),
@@ -60,8 +60,8 @@ void  Voronoi::generateDiagram( RNG &rng, std::function<F32(V2f const&, V2f cons
                diagramHeight  { Size(cellSize) * height };
    for ( currentPosition.x = 0;  currentPosition.x < diagramWidth;  ++currentPosition.x ) {
       for ( currentPosition.y = 0;  currentPosition.y < diagramHeight;  ++currentPosition.y ) {
-         U16  cellX  { U16(currentPosition.x / cellSize) },
-              cellY  { U16(currentPosition.y / cellSize) };
+         U32  cellX  { U32(currentPosition.x / cellSize) },
+              cellY  { U32(currentPosition.y / cellSize) };
          // start with center cell (current cell):
          bestMatch       = noiseIndex( cellX, cellY );
          nearestDistance = distanceFunction( noise[bestMatch], currentPosition );
@@ -88,13 +88,13 @@ void  Voronoi::generateDiagram( RNG &rng, std::function<F32(V2f const&, V2f cons
             process( noiseIndex( cellX-1, cellY ) );
          if ( not isBorderingEast )
             process( noiseIndex( cellX+1, cellY ) );
-         diagram[diagramIndex( U16(currentPosition.x), U16(currentPosition.y))] = bestMatch;
+         diagram[diagramIndex( U32(currentPosition.x), U32(currentPosition.y))] = bestMatch;
       }
    }
 }
 
 // TODO: refactor out?
-Size  Voronoi::computeCellRealEstateArea( U16 const cellId, TileMap const &map ) const noexcept {
+Size  Voronoi::computeCellRealEstateArea( U32 const cellId, TileMap const &map ) const noexcept {
    assert( cellId < (width * height) && "Cell ID is too low!" );
 
    Size    counter { 0 };
@@ -107,8 +107,8 @@ Size  Voronoi::computeCellRealEstateArea( U16 const cellId, TileMap const &map )
       cell.max.y = centerCell.y < height-1 ?  centerCell.y+1  :  centerCell.y;
    };
 
-   for ( U16  y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y )
-      for ( U16  x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x )
+   for ( U32  y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y )
+      for ( U32  x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x )
             if ( (diagram[diagramIndex( x, y )] == cellId)
             and (map.tileAt( x, y ) == Tile::ground) )
                ++counter;
@@ -116,8 +116,37 @@ Size  Voronoi::computeCellRealEstateArea( U16 const cellId, TileMap const &map )
    return counter;
 }
 
+// TODO: merge with computeCellRealEstateArea?
+F32 Voronoi::computeCellRoadCoverage( U32 const cellId, TileMap const &map ) const noexcept {
+	assert( cellId < (width * height) && "Cell ID is too low!" );
+
+	Size    roadCounter { 0 },
+	        tileCounter { 0 };
+
+	Bounds  cell; {  /* first we calculate the relevant 1x1~3x3 cell matrix: */
+		V2u  centerCell { cellId % width, cellId / width };
+		cell.min.x = centerCell.x > 0        ?  centerCell.x-1  :  centerCell.x;
+		cell.max.x = centerCell.x < width-1  ?  centerCell.x+1  :  centerCell.x;
+		cell.min.y = centerCell.y > 0        ?  centerCell.y-1  :  centerCell.y;
+		cell.max.y = centerCell.y < height-1 ?  centerCell.y+1  :  centerCell.y;
+	};
+
+	for ( U32  y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y ) {
+		for ( U32  x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x ) {
+			if ( diagram[diagramIndex( x, y )] == cellId ) {
+				++tileCounter;
+				if ( map.tileAt( x, y ) == Tile::road )
+					++roadCounter;
+			}
+		}
+	}
+
+   return F32(roadCounter) / tileCounter;
+}
+
+
 // TODO: refactor out?
-Voronoi::Bounds  Voronoi::computeCellBounds( U16 const cellId ) const noexcept {
+Bounds  Voronoi::computeCellBounds( U32 const cellId ) const noexcept {
    assert( cellId < (width * height) && "Cell ID is too low!" );
 
    Bounds result {};
@@ -131,8 +160,8 @@ Voronoi::Bounds  Voronoi::computeCellBounds( U16 const cellId ) const noexcept {
    };
 
 //min_x_search: // find min x by probing column by column from the left
-   for ( U16 x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x ) {
-      for ( U16 y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y ) {
+   for ( U32 x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x ) {
+      for ( U32 y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y ) {
          if ( diagram[diagramIndex( x, y )] == cellId ) {
             result.min.x = x;
             goto max_x_search;
@@ -141,8 +170,8 @@ Voronoi::Bounds  Voronoi::computeCellBounds( U16 const cellId ) const noexcept {
    }
 
 max_x_search: // find max x by probing column by column from the right
-   for ( U16 x = (cell.max.x+1) * cellSize - 1, xEnd = cell.min.x * cellSize;  x > xEnd;  --x ) {
-      for ( U16 y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y ) {
+   for ( U32 x = (cell.max.x+1) * cellSize - 1, xEnd = cell.min.x * cellSize;  x > xEnd;  --x ) {
+      for ( U32 y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y ) {
          if ( diagram[diagramIndex( x, y )] == cellId ) {
             result.max.x = x;
             goto min_y_search;
@@ -151,8 +180,8 @@ max_x_search: // find max x by probing column by column from the right
    }
 
 min_y_search: // find min y by probing row by row from the top
-   for ( U16 y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y ) {
-      for ( U16 x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x ) {
+   for ( U32 y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y ) {
+      for ( U32 x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x ) {
          if ( diagram[diagramIndex( x, y )] == cellId ) {
             result.min.y = y;
             goto max_y_search;;
@@ -161,8 +190,8 @@ min_y_search: // find min y by probing row by row from the top
    }
 
 max_y_search: // find max y by probing row by row from the bottom
-   for ( U16 y = (cell.max.y+1) * cellSize - 1, yEnd = cell.min.y * cellSize;  y > yEnd;  --y ) {
-      for ( U16 x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x ) {
+   for ( U32 y = (cell.max.y+1) * cellSize - 1, yEnd = cell.min.y * cellSize;  y > yEnd;  --y ) {
+      for ( U32 x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x ) {
          if ( diagram[diagramIndex( x, y )] == cellId ) {
             result.max.y = y;
             goto end;

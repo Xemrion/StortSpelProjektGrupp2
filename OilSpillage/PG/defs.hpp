@@ -23,21 +23,24 @@ template <typename T> using SPtr = std::shared_ptr<T>;
 template <typename T> using Opt = std::optional<T>;
 
 // string
-using String = std::basic_string<char>;
+using String     = std::basic_string<char>;
+using StringView = std::basic_string_view<char>;
 
 // primitives
-using U8   = std::uint_fast8_t;
-using U16  = std::uint_fast16_t;
-using U32  = std::uint_fast32_t;
-using U64  = std::uint_fast64_t;
-using I8   = std::int_fast8_t;
-using I16  = std::int_fast16_t;
-using I32  = std::int_fast32_t;
-using I64  = std::int_fast64_t;
+using U8   = std::uint8_t;
+using U16  = std::uint16_t;
+using U32  = std::uint32_t;
+using U64  = std::uint64_t;
+using I8   = std::int8_t;
+using I16  = std::int16_t;
+using I32  = std::int32_t;
+using I64  = std::int64_t;
 using F32  = float;
 using F64  = double;
 using Bool = bool;
 using Size = size_t;
+
+using RGBA = U32;
 
 #ifdef _DEBUG
    Bool constexpr isDebugging {  true };
@@ -66,6 +69,11 @@ template <typename T> union V2 {
       }
       return *this;
    }
+
+   inline V2<T> operator+( V2<T> const &other ) const noexcept {
+      return { x + other.x,   y + other.y };
+   }
+
 };
 using V2f = V2<F32>;
 using V2u = V2<U32>;
@@ -92,6 +100,10 @@ template <typename T> union V3 {
          z = other.z;
       }
       return *this;
+   }
+
+	inline V3<T> operator+( V3<T> const &other ) const noexcept {
+      return { x + other.x,   y + other.y,   z + other.z };
    }
 
 };
@@ -121,10 +133,16 @@ template <typename T> union V4 {
       }
       return *this;
    }
+
+	inline V4<T> operator+( V4<T> const &other ) const noexcept {
+      return { x + other.x,   y + other.y,   z + other.z,   w + other.w };
+   }
 };
 using V4f = V4<F32>;
 using V4u = V4<U32>;
 using V4i = V4<I32>;
+
+struct Bounds { V2u min, max; };
 
 
 // random number generation

@@ -4,6 +4,7 @@
 #include "UserInterface.h"
 #include "Slider.h"
 #include "Minimap.h"
+#include "ObjectiveBox.h"
 
 class UIPlaying : public UserInterface
 {
@@ -12,14 +13,19 @@ private:
 	void updateUI(float deltaTime);
 	void drawUI();
 
-	bool initMinimap;
+	bool shouldInit;
+	float respawnTimer;
+
 	std::unique_ptr<Slider> healthBar;
 	std::unique_ptr<Minimap> minimap;
+	std::unique_ptr<ObjectiveBox> objectiveBox;
 public:
 	UIPlaying();
 	virtual ~UIPlaying();
 
 	void init();
+	void resetMinimapFog();
+	bool hasExploredOnMinimap(Vector3 worldPosition) const;
 };
 
 #endif // !UI_PLAYING_H

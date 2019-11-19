@@ -72,6 +72,8 @@ void QuadTree::Node::insert(GameObject* o)
 	else
 	{
 		objects.push_back(o);
+		auto comp = [](GameObject* a, GameObject* b) {return a->getAABB().maxPos.y < b->getAABB().maxPos.y; };
+		std::sort(objects.begin(), objects.end(), comp);
 	}
 }
 
@@ -95,7 +97,7 @@ void QuadTree::Node::getGameObjects(std::vector<GameObject*>& objects, Frustum& 
 		{
 			for (GameObject* o : this->objects)
 			{
-				if (viewFrustum.intersect(o->getAABB(), frustumBias))
+				if (viewFrustum.intersect(o->getAABB(), 0.0))
 				{
 					objects.push_back(o);
 				}

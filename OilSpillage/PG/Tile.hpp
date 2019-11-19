@@ -3,15 +3,14 @@
 #include <iostream>
 #include "defs.hpp"
 
-enum class Tile : U8 {
-   // 2 ints, 1 bool, 1 pekare
+enum class Tile : U8 
+{
    ground,
    road,
    building,
    water
 };
 
-using RGBA = U32;
 #pragma warning( disable : 4715 )
 [[deprecated]] inline RGBA constexpr  minimapColorLookUpTable( Tile t ) noexcept {
    switch (t) {

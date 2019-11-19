@@ -76,6 +76,22 @@ void Sound::Reset()
 	instance->engine->Reset();
 }
 
+void Sound::loadSound(std::wstring fileName)
+{
+	if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
+	{
+		try
+		{
+			instance->soundEffects[fileName].sound = std::make_unique<SoundEffect>(instance->engine.get(), fileName.c_str());
+			instance->soundEffects[fileName].effectInstance = instance->soundEffects[fileName].sound->CreateInstance();
+		}
+		catch (const std::exception&)
+		{
+			return;
+		}
+	}
+}
+
 void Sound::PlaySoundEffect(std::wstring fileName)
 {
 	if (instance->soundEffects.find(fileName) == instance->soundEffects.end())
@@ -120,6 +136,14 @@ void Sound::StopLoopingSound(std::wstring fileName, bool immediate)
 	{
 		instance->soundEffects[fileName].effectInstance->Stop(immediate);
 		instance->soundEffects[fileName].isLooping = false;
+	}
+}
+
+void Sound::changeVolume(std::wstring fileName, float volume)
+{
+	if (instance->soundEffects.find(fileName) != instance->soundEffects.end())
+	{
+		instance->soundEffects[fileName].effectInstance->SetVolume(volume);
 	}
 }
 

@@ -9,6 +9,16 @@ GameObject::~GameObject()
 	}*/
 }
 
+bool GameObject::getSpotShadow() const
+{
+	return this->spotShadow;
+}
+
+bool GameObject::getSunShadow() const
+{
+	return this->sunShadow;
+}
+
 Matrix GameObject::getTransform()
 {
 	if (this->rigidBody)
@@ -18,7 +28,16 @@ Matrix GameObject::getTransform()
 	}
 
 	Matrix transform(Matrix::CreateScale(scale));
-	transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
+	if (!this->rigidBody) {
+		transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
+	}
+	else {
+		btQuaternion rot = rigidBody->getWorldTransform().getRotation();
+		Quaternion d3drotation(rot.x(), rot.y(), rot.z(), rot.w());
+		this->rotationQt = d3drotation;
+		
+		transform *= Matrix::CreateFromQuaternion(d3drotation);
+	}
 	transform *= Matrix::CreateTranslation(position);
 
 	if (this->parent != nullptr)
@@ -27,6 +46,52 @@ Matrix GameObject::getTransform()
 	}
 
 	return transform;
+
+	//if (rigidBody == nullptr) {
+	//	Matrix transform(Matrix::CreateScale(scale));
+	//	transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
+	//	transform *= Matrix::CreateTranslation(position);
+
+	//	if (this->parent != nullptr)
+	//	{
+	//		transform *= this->parent->getTransform();
+	//	}
+
+	//	return transform;
+	//}
+	//else {
+
+	//	//btVector3 pos = btVector3(rigidBody->getWorldTransform().getOrigin());
+	//	//this->position = Vector3(pos.getX(),pos.getY(),pos.getZ());
+
+	//	Matrix transform(Matrix::CreateScale(scale));
+
+	//	position = Vector3(rigidBody->getWorldTransform().getOrigin());
+	//	btQuaternion rot = rigidBody->getWorldTransform().getRotation();
+	//	Quaternion d3drotation(rot.x(), rot.y(), rot.z(), rot.w());
+
+	//	this->rotationQt = d3drotation;
+
+	//	transform *= Matrix::CreateFromQuaternion(d3drotation);
+	//	transform *= Matrix::CreateTranslation(position);
+
+	//	if (this->parent != nullptr)
+	//	{
+	//		transform *= this->parent->getTransform();
+	//	}
+
+	//	return transform;
+	//}
+}
+
+void GameObject::setSunShadow(bool arg)
+{
+	this->sunShadow = arg;
+}
+
+void GameObject::setSpotShadow(bool arg)
+{
+	this->spotShadow = arg;
 }
 
 void GameObject::setPosition(Vector3 newPos)
@@ -103,23 +168,54 @@ void GameObject::setScale(Vector3 newScale)
 
 Texture* GameObject::getTexture()
 {
-	return this->texture;
+	return this->material.diffuse;
 }
 
-void GameObject::setTexture(Texture* aTexture)
+void GameObject::setTexture(Texture* diffuseTexture)
 {
-	this->texture = aTexture;
+	this->material.diffuse = diffuseTexture;
 }
 
 Texture* GameObject::getNormalMap()
 {
-	return this->normalMap;
+	return this->material.normal;
 }
 
 void GameObject::setNormalMap(Texture* normalMap)
 {
-	this->normalMap = normalMap;
+	this->material.normal = normalMap;
 }
+
+Texture* GameObject::getSpecularMap()
+{
+	return this->material.specular;
+}
+
+void GameObject::setSpecularMap(Texture* specularMap)
+{
+	this->material.specular = specularMap;
+}
+
+Texture* GameObject::getGlossMap()
+{
+	return this->material.gloss;
+}
+
+void GameObject::setGlossMap(Texture* glossMap)
+{
+	this->material.gloss = glossMap;
+}
+
+Material GameObject::getMaterial()
+{
+	return material;
+}
+
+void GameObject::setMaterial(Material mat)
+{
+	this->material = mat;
+}
+
 
 void GameObject::setColor(Vector4 aColor)
 {
@@ -194,6 +290,27 @@ void GameObject::setRigidBody(btRigidBody* body, Physics* physics)
 	this->physics = physics;
 }
 
+void GameObject::setVelocity(Vector3 velocity)
+{
+	this->velocity = velocity;
+}
+
+void GameObject::updateObject(float deltaTime)
+{
+	if (this->getPosition().y > -1.4f) {
+		velocity.y -= 9.82f*deltaTime;
+		velocity /= 1 + (1.5f * deltaTime);
+	}
+	else {
+		this->setPosition(Vector3(this->getPosition().x,-1.4f, this->getPosition().z));
+		velocity.y = 0;
+		velocity /= 1 + (4.5f * deltaTime);
+	}
+	this->setRotation(Vector3(velocity.y*0.12f*this->getRotation().y,this->getRotation().y, velocity.y * 0.2f * -this->getRotation().y));
+
+	this->setPosition(this->getPosition() + this->velocity * deltaTime);
+}
+
 /*Matrix GameObject::btTransformToMatrix(btTransform const& trans) const
 {
 	//store btTranform in 4x4 Matrix
@@ -226,7 +343,7 @@ Vector3 GameObject::btTransformGetRotation(btTransform const& trans) const
 	return Vector3(
 		std::atan2(2 * qt.getX() * qt.getW() + 2 * qt.getY() * qt.getZ(), 1 - 2 * qt.getX() * qt.getX() - 2 * qt.getZ() * qt.getZ()),
 		std::atan2(2 * qt.getY() * qt.getW() + 2 * qt.getX() * qt.getZ(), 1 - 2 * qt.getY() * qt.getY() - 2 * qt.getZ() * qt.getZ()),
-		std::asin(2 * qt.getX() * qt.getY() + 2 * qt.getZ() * qt.getW())
+		std::asin(-2 * qt.getX() * qt.getY() - qt.getZ() * qt.getW())
 	);
 }
 

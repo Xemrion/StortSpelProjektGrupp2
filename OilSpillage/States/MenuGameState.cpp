@@ -2,6 +2,8 @@
 #include "../UI/UIMainMenu.h"
 #include "../UI/UIOptions.h"
 #include "../UI/UICredits.h"
+#include "../UI/UIControls.h"
+#include <cassert>
 
 MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU_MAIN)
 {
@@ -11,6 +13,12 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->menues[MENU_OPTIONS]->init();
 	this->menues[MENU_CREDITS] = std::make_unique<UICredits>();
 	this->menues[MENU_CREDITS]->init();
+	this->menues[MENU_CONTROLS] = std::make_unique<UIControls>();
+	this->menues[MENU_CONTROLS]->init();
+
+	Game::getGraphics().loadTexture("UI/menuBG");
+	this->textureBG = Game::getGraphics().getTexturePointer("UI/menuBG");
+	assert(textureBG && "Could not load texture!");
 }
 
 MenuGameState::~MenuGameState() {}
@@ -18,6 +26,11 @@ MenuGameState::~MenuGameState() {}
 void MenuGameState::update(float deltaTime)
 {
 	this->graphics.clearScreen();
+
+	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
+	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2());
+	UserInterface::getSpriteBatch()->End();
+
 	this->menues[this->currentMenu]->update(deltaTime);
 	this->graphics.presentScene();
 }

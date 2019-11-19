@@ -1,147 +1,147 @@
 #include "Input.h"
-
 std::unique_ptr<Input> Input::instance;
 
-Input::Input() : keyboardState(), gamePadStates()
+Input::Input() : wWidth(0), wHeight(0)//, playerKeyboard(-1)
 {
-	this->playerKeyboard = -1;
 }
 
 Input::~Input()
 {
 }
 
-bool Input::CheckButtonKeyboard(Keys key, States state)
+bool Input::checkButtonKeyboard(Keys key, States state)
 {
-	if (state == UP)
+	Keyboard::State keyboardState = instance->keyboard.GetState();
+
+	if (state == States::UP)
 	{
 		switch (key)
 		{
-		case L_UP:
-			return !instance->keyboardState.W;
-		case L_DOWN:
-			return !instance->keyboardState.S;
-		case L_LEFT:
-			return !instance->keyboardState.A;
-		case L_RIGHT:
-			return !instance->keyboardState.D;
-		case L_TRIGGER:
+		case Keys::L_UP:
+			return !keyboardState.W;
+		case Keys::L_DOWN:
+			return !keyboardState.S;
+		case Keys::L_LEFT:
+			return !keyboardState.A;
+		case Keys::L_RIGHT:
+			return !keyboardState.D;
+		case Keys::L_TRIGGER:
 			return false;
-		case L_SHOULDER:
+		case Keys::L_SHOULDER:
+			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::UP;
+		case Keys::L_PRESS:
 			return false;
-		case L_PRESS:
+		case Keys::R_UP:
+			return !keyboardState.Up;
+		case Keys::R_DOWN:
+			return !keyboardState.Down;
+		case Keys::R_LEFT:
+			return !keyboardState.Left;
+		case Keys::R_RIGHT:
+			return !keyboardState.Right;
+		case Keys::R_TRIGGER:
 			return false;
-		case R_UP:
-			return !instance->keyboardState.Up;
-		case R_DOWN:
-			return !instance->keyboardState.Down;
-		case R_LEFT:
-			return !instance->keyboardState.Left;
-		case R_RIGHT:
-			return !instance->keyboardState.Right;
-		case R_TRIGGER:
+		case Keys::R_SHOULDER:
+			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::UP;
+		case Keys::R_PRESS:
 			return false;
-		case R_SHOULDER:
-			return false;
-		case R_PRESS:
-			return false;
-		case CONFIRM:
-			return !instance->keyboardState.Enter;
-		case CANCEL:
-			return !instance->keyboardState.Back;
-		case ACTION_1:
-			return !instance->keyboardState.Space;
-		case ACTION_2:
-			return !instance->keyboardState.LeftShift;
-		case MENU:
-			return !instance->keyboardState.Escape;
+		case Keys::CONFIRM:
+			return !keyboardState.Enter;
+		case Keys::CANCEL:
+			return !keyboardState.Q;
+		case Keys::ACTION_1:
+			return !keyboardState.Space;
+		case Keys::ACTION_2:
+			return !keyboardState.LeftShift;
+		case Keys::MENU:
+			return !keyboardState.Escape;
 		}
 	}
-	else if (state == HELD)
+	else if (state == States::HELD)
 	{
 		switch (key)
 		{
-		case L_UP:
-			return instance->keyboardState.W;
-		case L_DOWN:
-			return instance->keyboardState.S;
-		case L_LEFT:
-			return instance->keyboardState.A;
-		case L_RIGHT:
-			return instance->keyboardState.D;
-		case L_TRIGGER:
+		case Keys::L_UP:
+			return keyboardState.W;
+		case Keys::L_DOWN:
+			return keyboardState.S;
+		case Keys::L_LEFT:
+			return keyboardState.A;
+		case Keys::L_RIGHT:
+			return keyboardState.D;
+		case Keys::L_TRIGGER:
 			return false;
-		case L_SHOULDER:
+		case Keys::L_SHOULDER:
+			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::HELD;
+		case Keys::L_PRESS:
 			return false;
-		case L_PRESS:
+		case Keys::R_UP:
+			return keyboardState.Up;
+		case Keys::R_DOWN:
+			return keyboardState.Down;
+		case Keys::R_LEFT:
+			return keyboardState.Left;
+		case Keys::R_RIGHT:
+			return keyboardState.Right;
+		case Keys::R_TRIGGER:
 			return false;
-		case R_UP:
-			return instance->keyboardState.Up;
-		case R_DOWN:
-			return instance->keyboardState.Down;
-		case R_LEFT:
-			return instance->keyboardState.Left;
-		case R_RIGHT:
-			return instance->keyboardState.Right;
-		case R_TRIGGER:
+		case Keys::R_SHOULDER:
+			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::HELD;
+		case Keys::R_PRESS:
 			return false;
-		case R_SHOULDER:
-			return false;
-		case R_PRESS:
-			return false;
-		case CONFIRM:
-			return instance->keyboardState.Enter;
-		case CANCEL:
-			return instance->keyboardState.Back;
-		case ACTION_1:
-			return instance->keyboardState.Space;
-		case ACTION_2:
-			return instance->keyboardState.LeftShift;
-		case MENU:
-			return instance->keyboardState.Escape;
+		case Keys::CONFIRM:
+			return keyboardState.Enter;
+		case Keys::CANCEL:
+			return keyboardState.Q;
+		case Keys::ACTION_1:
+			return keyboardState.Space;
+		case Keys::ACTION_2:
+			return keyboardState.LeftShift;
+		case Keys::MENU:
+			return keyboardState.Escape;
 		}
 	}
-	else if (state == PRESSED)
+	else if (state == States::PRESSED)
 	{
 		switch (key)
 		{
-		case L_UP:
+		case Keys::L_UP:
 			return instance->keyboardTracker.pressed.W;
-		case L_DOWN:
+		case Keys::L_DOWN:
 			return instance->keyboardTracker.pressed.S;
-		case L_LEFT:
+		case Keys::L_LEFT:
 			return instance->keyboardTracker.pressed.A;
-		case L_RIGHT:
+		case Keys::L_RIGHT:
 			return instance->keyboardTracker.pressed.D;
-		case L_TRIGGER:
+		case Keys::L_TRIGGER:
 			return false;
-		case L_SHOULDER:
+		case Keys::L_SHOULDER:
+			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::PRESSED;
+		case Keys::L_PRESS:
 			return false;
-		case L_PRESS:
-			return false;
-		case R_UP:
+		case Keys::R_UP:
 			return instance->keyboardTracker.pressed.Up;
-		case R_DOWN:
+		case Keys::R_DOWN:
 			return instance->keyboardTracker.pressed.Down;
-		case R_LEFT:
+		case Keys::R_LEFT:
 			return instance->keyboardTracker.pressed.Left;
-		case R_RIGHT:
+		case Keys::R_RIGHT:
 			return instance->keyboardTracker.pressed.Right;
-		case R_TRIGGER:
+		case Keys::R_TRIGGER:
 			return false;
-		case R_SHOULDER:
+		case Keys::R_SHOULDER:
+			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::PRESSED;
+		case Keys::R_PRESS:
 			return false;
-		case R_PRESS:
-			return false;
-		case CONFIRM:
+		case Keys::CONFIRM:
 			return instance->keyboardTracker.pressed.Enter;
-		case CANCEL:
-			return instance->keyboardTracker.pressed.Back;
-		case ACTION_1:
+		case Keys::CANCEL:
+			return instance->keyboardTracker.pressed.Q;
+		case Keys::ACTION_1:
 			return instance->keyboardTracker.pressed.Space;
-		case ACTION_2:
+		case Keys::ACTION_2:
 			return instance->keyboardTracker.pressed.LeftShift;
-		case MENU:
+		case Keys::MENU:
 			return instance->keyboardTracker.pressed.Escape;
 		}
 	}
@@ -149,43 +149,43 @@ bool Input::CheckButtonKeyboard(Keys key, States state)
 	{
 		switch (key)
 		{
-		case L_UP:
+		case Keys::L_UP:
 			return instance->keyboardTracker.released.W;
-		case L_DOWN:
+		case Keys::L_DOWN:
 			return instance->keyboardTracker.released.S;
-		case L_LEFT:
+		case Keys::L_LEFT:
 			return instance->keyboardTracker.released.A;
-		case L_RIGHT:
+		case Keys::L_RIGHT:
 			return instance->keyboardTracker.released.D;
-		case L_TRIGGER:
+		case Keys::L_TRIGGER:
 			return false;
-		case L_SHOULDER:
+		case Keys::L_SHOULDER:
+			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::RELEASED;
+		case Keys::L_PRESS:
 			return false;
-		case L_PRESS:
-			return false;
-		case R_UP:
+		case Keys::R_UP:
 			return instance->keyboardTracker.released.Up;
-		case R_DOWN:
+		case Keys::R_DOWN:
 			return instance->keyboardTracker.released.Down;
-		case R_LEFT:
+		case Keys::R_LEFT:
 			return instance->keyboardTracker.released.Left;
-		case R_RIGHT:
+		case Keys::R_RIGHT:
 			return instance->keyboardTracker.released.Right;
-		case R_TRIGGER:
+		case Keys::R_TRIGGER:
 			return false;
-		case R_SHOULDER:
+		case Keys::R_SHOULDER:
+			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::RELEASED;
+		case Keys::R_PRESS:
 			return false;
-		case R_PRESS:
-			return false;
-		case CONFIRM:
+		case Keys::CONFIRM:
 			return instance->keyboardTracker.released.Enter;
-		case CANCEL:
-			return instance->keyboardTracker.released.Back;
-		case ACTION_1:
+		case Keys::CANCEL:
+			return instance->keyboardTracker.released.Q;
+		case Keys::ACTION_1:
 			return instance->keyboardTracker.released.Space;
-		case ACTION_2:
+		case Keys::ACTION_2:
 			return instance->keyboardTracker.released.LeftShift;
-		case MENU:
+		case Keys::MENU:
 			return instance->keyboardTracker.released.Escape;
 		}
 	}
@@ -193,128 +193,144 @@ bool Input::CheckButtonKeyboard(Keys key, States state)
 	return false;
 }
 
-bool Input::CheckButtonGamePad(Keys key, GamePad::ButtonStateTracker::ButtonState bState, int playerId)
+bool Input::checkButtonGamePad(Keys key, GamePad::ButtonStateTracker::ButtonState bState/*, int playerId*/)
 {
 	switch (key)
 	{
-	case L_UP:
-		return instance->gamePadTrackers[playerId].leftStickUp == bState;
-	case L_DOWN:
-		return instance->gamePadTrackers[playerId].leftStickDown == bState;
-	case L_LEFT:
-		return instance->gamePadTrackers[playerId].leftStickLeft == bState;
-	case L_RIGHT:
-		return instance->gamePadTrackers[playerId].leftStickRight == bState;
-	case L_TRIGGER:
-		return instance->gamePadTrackers[playerId].leftTrigger == bState;
-	case L_SHOULDER:
-		return instance->gamePadTrackers[playerId].leftShoulder == bState;
-	case L_PRESS:
-		return instance->gamePadTrackers[playerId].leftStick == bState;
-	case R_UP:
-		return instance->gamePadTrackers[playerId].rightStickUp == bState;
-	case R_DOWN:
-		return instance->gamePadTrackers[playerId].rightStickDown == bState;
-	case R_LEFT:
-		return instance->gamePadTrackers[playerId].rightStickLeft == bState;
-	case R_RIGHT:
-		return instance->gamePadTrackers[playerId].rightStickRight == bState;
-	case R_TRIGGER:
-		return instance->gamePadTrackers[playerId].rightTrigger == bState;
-	case R_SHOULDER:
-		return instance->gamePadTrackers[playerId].rightShoulder == bState;
-	case R_PRESS:
-		return instance->gamePadTrackers[playerId].rightStick == bState;
-	case CONFIRM:
-		return instance->gamePadTrackers[playerId].a == bState;
-	case CANCEL:
-		return instance->gamePadTrackers[playerId].b == bState;
-	case ACTION_1:
-		return instance->gamePadTrackers[playerId].x == bState;
-	case ACTION_2:
-		return instance->gamePadTrackers[playerId].y == bState;
-	case MENU:
-		return instance->gamePadTrackers[playerId].menu == bState;
+	case Keys::L_UP:
+		return instance->gamePadTrackers/*[playerId]*/.leftStickUp == bState;
+	case Keys::L_DOWN:
+		return instance->gamePadTrackers/*[playerId]*/.leftStickDown == bState;
+	case Keys::L_LEFT:
+		return instance->gamePadTrackers/*[playerId]*/.leftStickLeft == bState;
+	case Keys::L_RIGHT:
+		return instance->gamePadTrackers/*[playerId]*/.leftStickRight == bState;
+	case Keys::L_TRIGGER:
+		return instance->gamePadTrackers/*[playerId]*/.leftTrigger == bState;
+	case Keys::L_SHOULDER:
+		return instance->gamePadTrackers/*[playerId]*/.leftShoulder == bState;
+	case Keys::L_PRESS:
+		return instance->gamePadTrackers/*[playerId]*/.leftStick == bState;
+	case Keys::R_UP:
+		return instance->gamePadTrackers/*[playerId]*/.rightStickUp == bState;
+	case Keys::R_DOWN:
+		return instance->gamePadTrackers/*[playerId]*/.rightStickDown == bState;
+	case Keys::R_LEFT:
+		return instance->gamePadTrackers/*[playerId]*/.rightStickLeft == bState;
+	case Keys::R_RIGHT:
+		return instance->gamePadTrackers/*[playerId]*/.rightStickRight == bState;
+	case Keys::R_TRIGGER:
+		return instance->gamePadTrackers/*[playerId]*/.rightTrigger == bState;
+	case Keys::R_SHOULDER:
+		return instance->gamePadTrackers/*[playerId]*/.rightShoulder == bState;
+	case Keys::R_PRESS:
+		return instance->gamePadTrackers/*[playerId]*/.rightStick == bState;
+	case Keys::CONFIRM:
+		return instance->gamePadTrackers/*[playerId]*/.a == bState;
+	case Keys::CANCEL:
+		return instance->gamePadTrackers/*[playerId]*/.b == bState;
+	case Keys::ACTION_1:
+		return instance->gamePadTrackers/*[playerId]*/.x == bState;
+	case Keys::ACTION_2:
+		return instance->gamePadTrackers/*[playerId]*/.y == bState;
+	case Keys::MENU:
+		return instance->gamePadTrackers/*[playerId]*/.menu == bState;
 	}
 
 	return false;
 }
 
-bool Input::IsKeyDown_DEBUG(Keyboard::Keys key)
+bool Input::isKeyDown_DEBUG(Keyboard::Keys key)
 {
-	return instance->keyboardState.IsKeyDown(key);
+	return instance->keyboard.GetState().IsKeyDown(key);
 }
 
-void Input::Init()
+void Input::init(Window* window)
 {
 	instance = std::make_unique<Input>();
+	instance->mouse.SetWindow(window->handle);
+	instance->wHeight = window->height;
+	instance->wWidth = window->width;
+
 }
 
-void Input::Update()
+void Input::update()
 {
-	instance->keyboardState = instance->keyboard.GetState();
+	Keyboard::State keyboardState = instance->keyboard.GetState();
+	Mouse::State mouseState = instance->mouse.GetState();
 
 	if (instance->keyboard.IsConnected())
 	{
-		instance->keyboardTracker.Update(instance->keyboardState);
+		instance->keyboardTracker.Update(keyboardState);
 	}
 	else
 	{
 		instance->keyboardTracker.Reset();
 	}
 
-	for (int i = 0; i < Input::PLAYER_COUNT; i++)
+	if (instance->mouse.IsConnected())
 	{
-		instance->gamePadStates[i] = instance->gamePad.GetState(0);
+		instance->mouseTracker.Update(mouseState);
+	}
+	else
+	{
+		instance->mouseTracker.Reset();
+	}
 
-		if (instance->gamePadStates[i].IsConnected())
+	//for (int i = 0; i < Input::PLAYER_COUNT; i++)
+	{
+		GamePad::State gamepadState = instance->gamePad.GetState(/*i*/0);
+
+		if (gamepadState.IsConnected())
 		{
-			instance->gamePadTrackers[i].Update(instance->gamePadStates[i]);
+			instance->gamePadTrackers/*[i]*/.Update(gamepadState);
 		}
 		else
 		{
-			instance->gamePadTrackers[i].Reset();
+			instance->gamePadTrackers/*[i]*/.Reset();
 		}
 	}
 }
 
-void Input::Reset()
+void Input::reset()
 {
 	instance->keyboardTracker.Reset();
 
-	for (int i = 0; i < Input::PLAYER_COUNT; i++)
-	{
-		instance->gamePadTrackers[i].Reset();
-	}
+	//for (int i = 0; i < Input::PLAYER_COUNT; i++)
+	//{
+		instance->gamePadTrackers/*[i]*/.Reset();
+	//}
 }
 
-void Input::SetRumble(int player, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
+void Input::setRumble(/*int player,*/ float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
 {
-	if (player >= Input::PLAYER_COUNT || player < 0 || player == instance->playerKeyboard) return;
+	/*if (player >= Input::PLAYER_COUNT || player < 0 || player == instance->playerKeyboard) return;
 
 	if (instance->playerKeyboard != -1 && player > instance->playerKeyboard)
 	{
 		player--;
-	}
+	}*/
 
-	instance->gamePad.SetVibration(player, leftMotor, rightMotor, leftTrigger, rightTrigger);
+	instance->gamePad.SetVibration(/*player*/0, leftMotor, rightMotor, leftTrigger, rightTrigger);
 }
 
-void Input::ResetRumble(int player)
+void Input::resetRumble(/*int player*/)
 {
-	if (player >= Input::PLAYER_COUNT || player < 0 || player == instance->playerKeyboard) return;
+	/*if (player >= Input::PLAYER_COUNT || player < 0 || player == instance->playerKeyboard) return;
 
 	if (instance->playerKeyboard != -1 && player > instance->playerKeyboard)
 	{
 		player--;
-	}
+	}*/
 
-	instance->gamePad.SetVibration(0, 0.0f, 0.0f);
+	instance->gamePad.SetVibration(/*player*/0, 0.0f, 0.0f);
 }
 
-bool Input::CheckButton(Keys key, States state, int player)
+bool Input::checkButton(Keys key, States state/*, int player*/)
 {
-	if (player >= Input::PLAYER_COUNT || player < 0) return false;
+	return checkButtonKeyboard(key, state) | checkButtonGamePad(key, static_cast<GamePad::ButtonStateTracker::ButtonState>(state));
+
+	/*if (player >= Input::PLAYER_COUNT || player < -1) return false;
 
 	if (player == instance->playerKeyboard)
 	{
@@ -327,32 +343,35 @@ bool Input::CheckButton(Keys key, States state, int player)
 	}
 
 	GamePad::ButtonStateTracker::ButtonState bState = static_cast<GamePad::ButtonStateTracker::ButtonState>(state);
-	return CheckButtonGamePad(key, bState, player);
+	return CheckButtonGamePad(key, bState, player);*/
 }
 
-Vector2 Input::GetDirectionL(int player)
+Vector2 Input::getDirectionL(/*int player*/)
 {
 	Vector2 dir;
 
-	if (player >= Input::PLAYER_COUNT || player < 0) return dir;
+	//if (player >= Input::PLAYER_COUNT || player < 0) return dir;
 
-	if (player == instance->playerKeyboard)
+	//if (player == instance->playerKeyboard)
 	{
-		if (CheckButtonKeyboard(L_LEFT, HELD)) dir.x -= 1.0f;
-		if (CheckButtonKeyboard(L_RIGHT, HELD)) dir.x += 1.0f;
-		if (CheckButtonKeyboard(L_UP, HELD)) dir.y += 1.0f;
-		if (CheckButtonKeyboard(L_DOWN, HELD)) dir.y -= 1.0f;
+		if (checkButtonKeyboard(Keys::L_LEFT, States::HELD)) dir.x -= 1.0f;
+		if (checkButtonKeyboard(Keys::L_RIGHT, States::HELD)) dir.x += 1.0f;
+		if (checkButtonKeyboard(Keys::L_UP, States::HELD)) dir.y += 1.0f;
+		if (checkButtonKeyboard(Keys::L_DOWN, States::HELD)) dir.y -= 1.0f;
+		
 	}
-	else 
+	if (dir == Vector2())//else 
 	{
-		if (instance->playerKeyboard != -1 && player > instance->playerKeyboard)
+		/*if (instance->playerKeyboard != -1 && player > instance->playerKeyboard)
 		{
 			player--;
-		}
+		}*/
 
-		if (instance->gamePadStates[player].IsConnected())
+		GamePad::State gamepadState = instance->gamePad.GetState(/*player*/0);
+
+		if (gamepadState.IsConnected())
 		{
-			dir = Vector2(instance->gamePadStates[player].thumbSticks.leftX, instance->gamePadStates[player].thumbSticks.leftY);
+			dir = Vector2(gamepadState.thumbSticks.leftX, gamepadState.thumbSticks.leftY);
 		}
 	}
 
@@ -360,18 +379,18 @@ Vector2 Input::GetDirectionL(int player)
 	return dir;
 }
 
-float Input::GetStrengthL(int player)
+float Input::getStrengthL(/*int player*/)
 {
 	float strength = 0.0f;
 
-	if (player >= Input::PLAYER_COUNT || player < 0) return strength;
+	//if (player >= Input::PLAYER_COUNT || player < 0) return strength;
 
-	if (player == instance->playerKeyboard)
+	//if (trueplayer == instance->playerKeyboard)
 	{
-		bool left = CheckButtonKeyboard(L_LEFT, HELD);
-		bool right = CheckButtonKeyboard(L_RIGHT, HELD);
-		bool up = CheckButtonKeyboard(L_UP, HELD);
-		bool down = CheckButtonKeyboard(L_DOWN, HELD);
+		bool left = checkButtonKeyboard(Keys::L_LEFT, States::HELD);
+		bool right = checkButtonKeyboard(Keys::L_RIGHT, States::HELD);
+		bool up = checkButtonKeyboard(Keys::L_UP, States::HELD);
+		bool down = checkButtonKeyboard(Keys::L_DOWN, States::HELD);
 
 		strength = 1.0f;
 
@@ -380,93 +399,153 @@ float Input::GetStrengthL(int player)
 			strength = 0.0f;
 		}
 	}
-	else
+	if (strength == 0.0f)//else
 	{
-		if (instance->playerKeyboard != -1 && player > instance->playerKeyboard)
+		/*if (instance->playerKeyboard != -1 && player > instance->playerKeyboard)
 		{
 			player--;
-		}
+		}*/
 
-		if (instance->gamePadStates[player].IsConnected())
+		GamePad::State gamepadState = instance->gamePad.GetState(/*player*/0);
+
+		if (gamepadState.IsConnected())
 		{
-			strength = Vector2(instance->gamePadStates[player].thumbSticks.leftX, instance->gamePadStates[player].thumbSticks.leftY).Length();
-			if (strength > 1.0f) strength = 1.0f;
+			strength = min(Vector2(gamepadState.thumbSticks.leftX, gamepadState.thumbSticks.leftY).Length(), 1.0f);
 		}
 	}
 
 	return strength;
 }
 
-Vector2 Input::GetDirectionR(int player)
+Vector2 Input::getDirectionR(/*int player*/)
 {
 	Vector2 dir;
 
-	if (player >= Input::PLAYER_COUNT || player < 0) return dir;
+	//if (player >= Input::PLAYER_COUNT || player < 0) return dir;
 
-	if (player == instance->playerKeyboard)
+	/*if (player == instance->playerKeyboard)
 	{
-		if (CheckButtonKeyboard(R_LEFT, HELD)) dir.x -= 1.0f;
-		if (CheckButtonKeyboard(R_RIGHT, HELD)) dir.x += 1.0f;
-		if (CheckButtonKeyboard(R_UP, HELD)) dir.y += 1.0f;
-		if (CheckButtonKeyboard(R_DOWN, HELD)) dir.y -= 1.0f;
+		float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
+		float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
+
+		dir = Vector2(mX, -mY);
 	}
 	else
 	{
 		if (instance->playerKeyboard != -1 && player > instance->playerKeyboard)
 		{
 			player--;
-		}
+		}*/
 
-		if (instance->gamePadStates[player].IsConnected())
+		GamePad::State gamepadState = instance->gamePad.GetState(/*player*/0);
+
+		if (gamepadState.IsConnected())
 		{
-			dir = Vector2(instance->gamePadStates[player].thumbSticks.rightX, instance->gamePadStates[player].thumbSticks.rightY);
+			dir = Vector2(gamepadState.thumbSticks.rightX, gamepadState.thumbSticks.rightY);
 		}
+	//}
+
+	if (dir == Vector2())
+	{
+		float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
+		float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
+
+		dir = Vector2(mX, -mY);
 	}
 
 	dir.Normalize();
 	return dir;
 }
 
-float Input::GetStrengthR(int player)
+float Input::getStrengthR(/*int player*/)
 {
 	float strength = 0.0f;
 
-	if (player >= Input::PLAYER_COUNT || player < 0) return strength;
+	//if (player >= Input::PLAYER_COUNT || player < 0) return strength;
 
-	if (player == instance->playerKeyboard)
+	/*if (player == instance->playerKeyboard)
 	{
-		bool left = CheckButtonKeyboard(R_LEFT, HELD);
-		bool right = CheckButtonKeyboard(R_RIGHT, HELD);
-		bool up = CheckButtonKeyboard(R_UP, HELD);
-		bool down = CheckButtonKeyboard(R_DOWN, HELD);
+		float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
+		float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
 
-		strength = 1.0f;
-
-		if ((left && right && !up && !down) || (!left && !right && up && down) || (left && right && up && down) || (!left && !right && !up && !down))
-		{
-			strength = 0.0f;
-		}
+		strength = min(Vector2(mX, -mY).Length() / 300.0f, 1.0f);
 	}
 	else
 	{
 		if (instance->playerKeyboard != -1 && player > instance->playerKeyboard)
 		{
 			player--;
-		}
+		}*/
 
-		if (instance->gamePadStates[player].IsConnected())
+		GamePad::State gamepadState = instance->gamePad.GetState(/*player*/0);
+
+		if (gamepadState.IsConnected())
 		{
-			strength = Vector2(instance->gamePadStates[player].thumbSticks.rightX, instance->gamePadStates[player].thumbSticks.rightY).Length();
-			if (strength > 1.0f) strength = 1.0f;
+			strength = min(Vector2(gamepadState.thumbSticks.rightX, gamepadState.thumbSticks.rightY).Length(), 1.0f);
 		}
+	//}
+
+	if (strength == 0.0f)
+	{
+		float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
+		float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
+
+		strength = min(Vector2(mX, -mY).Length() / 300.0f, 1.0f);
 	}
 
 	return strength;
 }
 
-void Input::SetKeyboardPlayerID(int player)
+float Input::getStrengthRnoMouse()
+{
+	float strength = 0.0f;
+	GamePad::State gamepadState = instance->gamePad.GetState(/*player*/0);
+
+	if (gamepadState.IsConnected())
+	{
+		strength = min(Vector2(gamepadState.thumbSticks.rightX, gamepadState.thumbSticks.rightY).Length(), 1.0f);
+	}
+	return strength;
+}
+
+void Input::setWindowSize(int width, int height)
+{
+	if (instance.get())
+	{
+		instance->wWidth = width;
+		instance->wHeight = height;
+	}
+}
+
+bool Input::checkButtonMouse(MouseKeys key, States state)
+{
+	Mouse::ButtonStateTracker::ButtonState buttonState = static_cast<Mouse::ButtonStateTracker::ButtonState>(state);
+
+	switch (key)
+	{
+	case MouseKeys::LEFT:
+		return instance->mouseTracker.leftButton == buttonState;
+	case MouseKeys::MIDDLE:
+		return instance->mouseTracker.middleButton == buttonState;
+	case MouseKeys::RIGHT:
+		return instance->mouseTracker.rightButton == buttonState;
+	case MouseKeys::X_BUTTON1:
+		return instance->mouseTracker.xButton1 == buttonState;
+	case MouseKeys::X_BUTTON2:
+		return instance->mouseTracker.xButton2 == buttonState;
+	}
+
+	return false;
+}
+
+Vector2 Input::getMousePosition()
+{
+	return Vector2(instance->mouse.GetState().x, instance->mouse.GetState().y);
+}
+
+/*void Input::setKeyboardPlayerID(int player)
 {
 	if (player >= Input::PLAYER_COUNT || player < -1) return;
 
 	instance->playerKeyboard = player;
-}
+}*/

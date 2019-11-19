@@ -153,8 +153,8 @@ void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float 
 {
 	Vector3 target;
 	Vector3 eye = Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
-	eye += -sunDir * 6.0f*(camera->getPosition().y / -sunDir.y);
-	target= Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
+	eye += -sunDir * 6.0f * (camera->getPosition().y / -sunDir.y);
+	target = Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z);
 	Matrix viewMatrix;
 	Matrix proj;
 	Vector3 camToGroundNor = Vector3(camera->getPosition().x, 0.0f, camera->getPosition().z) - camera->getPosition();
@@ -182,24 +182,36 @@ void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float 
 	Vector3 camToRightGround = camera->getPosition().y * dirFarTopRight;
 
 	float width = (camToLeftGround - camToRightGround).Length();
-	width *= 3.0f;
+	width *= 2.0f;
 	float height = (camToLeftBotGround - camToLeftGround).Length();
-	height *= 3.0f;
+	height *= 2.0f;
 
 	viewMatrix = DirectX::XMMatrixLookAtLH(eye, target, Vector3(0, 1, 0));
-	proj = DirectX::XMMatrixOrthographicLH(width, height, 10.0f, farPlaneTest);
+	float nearDist = 10.0f;
+	proj = DirectX::XMMatrixOrthographicLH(width, height, nearDist, farPlaneTest);
 	Matrix viewProj = viewMatrix * proj;
 	viewProj = viewProj.Transpose();
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(perFrameCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(perFrameCB.Get(), 0);
+
+	Vector3 farPoint = eye + sunDir * farPlaneTest;
+	sunFrustum.farPlane = DirectX::XMPlaneFromPointNormal(eye + sunDir * farPlaneTest, sunDir);
+	sunFrustum.nearPlane = DirectX::XMPlaneFromPointNormal(eye + sunDir * nearDist, -sunDir);
+	Vector3 rightVector = Vector3::Reflect(sunDir, Vector3(1.0, 0.0, 1.0));
+	Vector3 upVector = Vector3::Reflect(sunDir, Vector3(0.0, 1.0, 0.0));
+	
+	sunFrustum.leftPlane = DirectX::XMPlaneFromPointNormal(eye - rightVector * width, -rightVector);
+	sunFrustum.rightPlane = DirectX::XMPlaneFromPointNormal(eye + rightVector * width, rightVector);
+	sunFrustum.bottomPlane = DirectX::XMPlaneFromPointNormal(eye - upVector * height, -upVector);
+	sunFrustum.topPlane = DirectX::XMPlaneFromPointNormal(eye + upVector * height, upVector);
 }
 
-void ShadowMapping::setViweProjSpot(Vector3 pos,Vector3 dir, float fov)
+void ShadowMapping::setViewProjSpot(Vector3 pos,Vector3 dir, float fov)
 {
 	Vector3 tempPos = pos + Vector3(0, 0, 0);
-	tempPos -= dir;
+	tempPos -= dir*1.0f;
 	Vector3 target = tempPos + dir;
 	Vector3 eye = tempPos;
 
@@ -207,7 +219,7 @@ void ShadowMapping::setViweProjSpot(Vector3 pos,Vector3 dir, float fov)
 	Matrix proj;
 	float fovTemp = 90 * (DirectX::XM_PI / 180);
 	viewMatrix = DirectX::XMMatrixLookAtLH(eye, target, Vector3(0, 1, 0));
-	proj = DirectX::XMMatrixPerspectiveFovLH(fovTemp, 1.0f, 1.0f, 400.0f);
+	proj = DirectX::XMMatrixPerspectiveFovLH(fovTemp, 1.0f, 1.0f, 60.0f);
 	Matrix viewProj = viewMatrix * proj;
 	viewProj = viewProj.Transpose();
 	
@@ -215,8 +227,10 @@ void ShadowMapping::setViweProjSpot(Vector3 pos,Vector3 dir, float fov)
 	HRESULT hr = deviceContext->Map(perFrameCBSpot.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(perFrameCBSpot.Get(), 0);
-}
 
+	DynamicCamera spotCamera(pos, dir, fovTemp, 0.05f, 20.0f);
+	spotFrustum = spotCamera.getFrustum();
+}
 
 void ShadowMapping::prepare()
 {

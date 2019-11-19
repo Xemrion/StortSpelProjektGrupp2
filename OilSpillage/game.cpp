@@ -13,11 +13,44 @@ void Game::start(Window* window)
 	instance->window = window;
 	instance->graphics.init(window);
 
-	Input::Init();
+	Input::init(instance->window);
 	Sound::Init();
 	UserInterface::initStaticVariables();
 
-	Input::SetKeyboardPlayerID(0);
+	Sound::loadSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
+	Sound::loadSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");
+
+	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Calm.wav");
+	Sound::PlayLoopingSound(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav");
+	Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav",0);
+
+	Sound::loadSound(L"data/sound/CarCrash.wav");
+	Sound::loadSound(L"data/sound/CarGlass1.wav");
+	Sound::loadSound(L"data/sound/CarGlass2.wav");
+	Sound::loadSound(L"data/sound/CarGlass3.wav");
+	Sound::loadSound(L"data/sound/CarGlass4.wav");
+	Sound::loadSound(L"data/sound/CarImpact1.wav");
+	Sound::loadSound(L"data/sound/CarImpact2.wav");
+	Sound::loadSound(L"data/sound/CarImpact3.wav");
+	Sound::loadSound(L"data/sound/CarImpact4.wav");
+	Sound::loadSound(L"data/sound/CarImpactSoft.wav");
+	Sound::loadSound(L"data/sound/FlameLoop1.wav");
+	Sound::loadSound(L"data/sound/FlameLoop2.wav");
+	Sound::loadSound(L"data/sound/HitSound.wav");
+	Sound::loadSound(L"data/sound/MachineGunSound1.wav");
+	Sound::loadSound(L"data/sound/MachineGunSound2.wav");
+	Sound::loadSound(L"data/sound/MachineGunSound3.wav");
+	Sound::loadSound(L"data/sound/MachineGunSound4.wav");
+	Sound::loadSound(L"data/sound/MachineGunSound5.wav");
+	Sound::loadSound(L"data/sound/MachineGunSound6.wav");
+	Sound::loadSound(L"data/sound/MetalImpact1.wav");
+	Sound::loadSound(L"data/sound/MetalImpact2.wav");
+	Sound::loadSound(L"data/sound/MetalImpact3.wav");
+	Sound::loadSound(L"data/sound/MetalImpactPitched1.wav");
+	Sound::loadSound(L"data/sound/MetalImpactPitched2.wav");
+	Sound::loadSound(L"data/sound/MetalImpactPitched3.wav");
+
+	//Input::setKeyboardPlayerID(0);
 	instance->running = true;
 	instance->run();
 }
@@ -77,7 +110,7 @@ void Game::run()
 		//Calculate deltaTime
 		deltaTime = (curTime - prevTime) * secPerCount;
 
-		Input::Update();
+		Input::update();
 		Sound::Update(deltaTime);
 		state->update(deltaTime);
 
