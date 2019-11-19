@@ -45,6 +45,8 @@ struct ParticleShaders
 	char csUpdate[128];
 	char csCreate[128];
 	char gsPrimitive[128];
+	char pixelShader[128];
+	char vertexShader[128];
 };
 struct ParticleSData
 {
@@ -60,15 +62,17 @@ public:
 	ParticleSystem();
 	~ParticleSystem();
 	void setNameofSystem(std::string name);
+	std::string getName()const;
 	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 	bool addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection);
+	bool addParticle(int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection);
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void changeVectorField(float vectorFieldPower, float vectorFieldSize);
-	void setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive);
+	void setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader = "ParticlePS.cso", std::string vertexShader = "ParticleVS.cso");
 	void drawAll(DynamicCamera* camera);
-	void loadSystem();
-	void saveSystem();
+	bool loadSystem();
+	bool saveSystem();
 private:
 
 	std::wstring StringToWString(const std::string& s)

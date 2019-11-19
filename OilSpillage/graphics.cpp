@@ -21,6 +21,19 @@ Graphics::Graphics()
 
 	lightBufferContents = new LightBufferContents;
 
+	this->particleHandler = new ParticleHandler;
+	this->particleSystem = new ParticleSystem;
+	this->particleSystem2 = new ParticleSystem;
+	this->particleTrail = new ParticleSystem;
+
+	this->particleSystem->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
+	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
+	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso");
+
+	this->particleHandler->addParticleSystem(this->particleSystem, "fire");
+	this->particleHandler->addParticleSystem(this->particleSystem2, "smoke");
+	this->particleHandler->addParticleSystem(this->particleTrail, "trail");
+
 	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
 }
 
@@ -36,7 +49,7 @@ Graphics::~Graphics()
 		i->second->Shutdown();
 		delete i->second;
 	}
-
+	delete this->particleHandler;
 	delete this->lightBufferContents;
 }
 
@@ -339,29 +352,22 @@ bool Graphics::init(Window* window)
 	ImGui_ImplDX11_Init(this->device.Get(), this->deviceContext.Get());
 	ImGui::StyleColorsDark();
 
-	this->particleSystem.setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
-	this->particleSystem2.setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
-	this->particleTrail.setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso");
-
-	this->particleSystem.setNameofSystem("fire");
-	this->particleSystem2.setNameofSystem("smoke");
-	this->particleTrail.setNameofSystem("trail");
 
 	Vector4 colors[4];
-	colors[0] = Vector4(0.0f, 0.0f, 0.0f, 1.0f);
-	this->particleTrail.changeColornSize(colors, 1, 0.1f, 0.1f);
+	/*OIL = 0.3f, 0.2f, 0.0f, 1.0f*/
+	colors[0] = Vector4(0.1f, 0.1f, 0.1f, 1.0f);
+	this->particleTrail->changeColornSize(colors, 1, 0.1f, 0.1f);
 
-	this->particleSystem.loadSystem();
-	this->particleSystem2.loadSystem();
+	this->particleHandler->loadParticleSystems();
 
 
-	this->particleSystem.initiateParticles(device.Get(), deviceContext.Get());
-	this->particleSystem2.initiateParticles(device.Get(), deviceContext.Get());
-	this->particleTrail.initiateParticles(device.Get(), deviceContext.Get());
+	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleSystem2->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleTrail->initiateParticles(device.Get(), deviceContext.Get());
 
-	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleTrail.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem2->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleTrail->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 
 	
 	FogMaterial fogMaterial;
@@ -431,15 +437,15 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->Unmap(cameraBuffer.Get(), 0);
 
 	deviceContext->RSSetViewports(1, &this->vp);
-	this->particleSystem.updateParticles(deltaTime, viewProj);
+	this->particleSystem->updateParticles(deltaTime, viewProj);
 
-	this->particleSystem.drawAll(camera);
+	this->particleSystem->drawAll(camera);
 
-	this->particleSystem2.updateParticles(deltaTime, viewProj);
+	this->particleSystem2->updateParticles(deltaTime, viewProj);
 
-	this->particleSystem2.drawAll(camera);
+	this->particleSystem2->drawAll(camera);
 
-
+	
 	
 	//set up Shaders
 	
@@ -525,9 +531,13 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	}
 	
 	drawStaticGameObjects(camera, frustum, 10.0);
-	this->particleTrail.updateParticles(deltaTime, viewProj);
+	this->particleTrail->updateParticles(deltaTime, viewProj);
 
-	this->particleTrail.drawAll(camera);
+	deviceContext->PSSetShaderResources(3, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
+
+	this->particleTrail->drawAll(camera);
 	drawFog(camera, deltaTime);
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
@@ -715,7 +725,7 @@ void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfPartic
 	randomPos += pos;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleSystem.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+	this->particleSystem->addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
 }
 
 void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime, float randomPower)
@@ -726,7 +736,7 @@ void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParti
 	randomPos += pos;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleSystem2.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+	this->particleSystem2->addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
 }
 
 void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
@@ -755,9 +765,17 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 	//this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
-void Graphics::addTrail(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime)
+void Graphics::addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime)
 {
-	this->particleTrail.addParticle(nrOfParticles, lifeTime, pos, initialDirection);
+	this->particleTrail->addParticle(nrOfParticles, lifeTime, pos, initialDirection);
+}
+
+void Graphics::changeTrailColor(Vector3 color)
+{
+	Vector4 colors[4];
+	/*OIL = 0.3f, 0.2f, 0.0f, 1.0f*/
+	colors[0] = Vector4(color.x,color.y,color.z, 1.0f);
+	this->particleTrail->changeColornSize(colors, 1, 0.1f, 0.1f);
 }
 
 void Graphics::clearScreen()

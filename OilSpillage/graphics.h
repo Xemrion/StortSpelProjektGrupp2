@@ -22,9 +22,9 @@
 #include <array>
 #include"Shadows/ShadowMapping.h"
 #include"Particle/ParticleSystem.h"
+#include"Particle/ParticleHandler.h"
 #include "Structs.h"
 #include "Fog.h"
-
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
 
@@ -78,9 +78,10 @@ class Graphics {
 	LightBufferContents* lightBufferContents = nullptr;
 	std::unique_ptr<QuadTree> quadTree;
 
-	ParticleSystem particleSystem;
-	ParticleSystem particleSystem2;
-	ParticleSystem particleTrail;
+	ParticleHandler* particleHandler;
+	ParticleSystem* particleSystem;
+	ParticleSystem* particleSystem2;
+	ParticleSystem* particleTrail;
 	std::unique_ptr<Fog> fog;
 	float time = 0.0;
 	ShaderClass shaderDefault;
@@ -132,8 +133,8 @@ public:
 	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setVectorField(float vectorFieldSize,float vectorFieldPower);
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
-	void addTrail(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f);
-
+	void addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f);
+	void changeTrailColor(Vector3 color);
 	float farZTempShadow;
 	void setSpotLightShadow(SpotLight* spotLight);
 };

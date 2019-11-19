@@ -28,6 +28,11 @@ void ParticleSystem::setNameofSystem(std::string name)
 	strcpy(this->systemData.name, name.c_str());
 }
 
+std::string ParticleSystem::getName() const
+{
+	return this->systemData.name;
+}
+
 void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
 {
 	
@@ -61,7 +66,7 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	
 
 
-	std::wstring filePath = shaderfolder + L"ParticleVS.cso";
+	std::wstring filePath = shaderfolder + StringToWString(this->particleShaders.vertexShader);;
 
 	HRESULT hr = D3DReadFileToBlob(filePath.c_str(), this->vertexShaderBlob.GetAddressOf());
 	hr = device->CreateVertexShader(this->vertexShaderBlob->GetBufferPointer(), this->vertexShaderBlob->GetBufferSize(), NULL, this->vertexShader.GetAddressOf());
@@ -71,7 +76,7 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	hr = D3DReadFileToBlob(filePath.c_str(), this->geometryShaderBlob.GetAddressOf());
 	hr = device->CreateGeometryShader(this->geometryShaderBlob->GetBufferPointer(), this->geometryShaderBlob->GetBufferSize(), NULL, this->geometryShader.GetAddressOf());
 
-	filePath = shaderfolder + L"ParticlePS.cso";
+	filePath = shaderfolder + StringToWString(this->particleShaders.pixelShader);
 	hr = D3DReadFileToBlob(filePath.c_str(), this->pixelShaderBlob.GetAddressOf());
 	hr = device->CreatePixelShader(this->pixelShaderBlob->GetBufferPointer(), this->pixelShaderBlob->GetBufferSize(), NULL, this->pixelShader.GetAddressOf());
 
@@ -197,7 +202,7 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 
 }
 
-bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection)
+bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection)
 {
 	UINT initialCount;
 	if (firstAdd == 0)
@@ -209,7 +214,7 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	{
 		initialCount = -1;
 	}
-	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, float(frameID));
+	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, initialDirection.w);
 	pParams.emitterLocation = Vector4(position.x,position.y,position.z, lifeTime);
 	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX,1.0f);
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -226,6 +231,56 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	this->deviceContext->CSSetConstantBuffers(0, 1, &nB);
 	deviceContext->CSSetConstantBuffers(0, 1, this->particleParamCB.GetAddressOf());
 	if (otherFrame==1)
+	{
+		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
+	}
+	else
+	{
+		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
+	}
+	deviceContext->CSSetShader(this->createComputeShader.Get(), 0, 0);
+	if (nrOf <= 0)
+	{
+		deviceContext->Dispatch(1, 1, 1);
+	}
+	else
+	{
+		deviceContext->Dispatch(nrOf, 1, 1);
+	}
+	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
+
+	return true;
+}
+
+bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection)
+{
+	UINT initialCount;
+	if (firstAdd == 0)
+	{
+		initialCount = 0;
+		firstAdd = 1;
+	}
+	else
+	{
+		initialCount = -1;
+	}
+	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f);
+	pParams.emitterLocation = Vector4(position.x, position.y, position.z, lifeTime);
+	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, 1.0f);
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &pParams, sizeof(ParticleParams));
+	deviceContext->Unmap(particleParamCB.Get(), 0);
+	ID3D11UnorderedAccessView* n = nullptr;
+	//run create particle compute shader here
+
+	ID3D11Buffer* nB = nullptr;
+
+	this->deviceContext->CSSetConstantBuffers(2, 1, &nB);
+	this->deviceContext->CSSetConstantBuffers(1, 1, &nB);
+	this->deviceContext->CSSetConstantBuffers(0, 1, &nB);
+	deviceContext->CSSetConstantBuffers(0, 1, this->particleParamCB.GetAddressOf());
+	if (otherFrame == 1)
 	{
 		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
 	}
@@ -324,15 +379,21 @@ void ParticleSystem::changeVectorField(float vectorFieldPower, float vectorField
 	this->sP.vectorField.y = this->systemData.vectorFieldSize;
 	this->sP.vectorField.z = this->systemData.vectorFieldPower;
 }
-void ParticleSystem::setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive)
+void ParticleSystem::setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader = "ParticlePS.cso", std::string vertexShader = "ParticleVS.cso")
 {
 	strcpy(this->particleShaders.csUpdate, csUpdate.c_str());
 	strcpy(this->particleShaders.csCreate, csCreate.c_str());
 	strcpy(this->particleShaders.gsPrimitive, gsPrimitive.c_str());
+	strcpy(this->particleShaders.pixelShader, pixelShader.c_str());
+	strcpy(this->particleShaders.vertexShader, vertexShader.c_str());
+
 
 	strcpy(this->systemData.shaders.csUpdate, csUpdate.c_str());
 	strcpy(this->systemData.shaders.csCreate, csCreate.c_str());
 	strcpy(this->systemData.shaders.gsPrimitive, gsPrimitive.c_str());
+	strcpy(this->systemData.shaders.pixelShader, pixelShader.c_str());
+	strcpy(this->systemData.shaders.vertexShader, vertexShader.c_str());
+
 }
 void ParticleSystem::drawAll(DynamicCamera* camera)
 {
@@ -399,25 +460,26 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 	}
 }
 
-void ParticleSystem::loadSystem()
+bool ParticleSystem::loadSystem()
 {
 	std::string nameTemp = systemData.name;
 	std::string fileName = "data/ParticleSystems/" + nameTemp + "Particle.dat";
 	std::ifstream readFile(fileName.c_str(), std::ios::out | std::ios::binary);
 	if (!readFile)
 	{
-		return;
+		return false;
 	}
 	readFile.read((char*)& this->systemData, sizeof(ParticleSData));
 	readFile.close();
 	if (!readFile.good())
 	{
 		//assert(false && ("Failed to read to file,, particleSystem!" + systemData.name).c_str());
-		return;
+		return false;
 	}
+	return true;
 }
 
-void ParticleSystem::saveSystem()
+bool ParticleSystem::saveSystem()
 {
 	std::string nameTemp = systemData.name;
 
@@ -426,7 +488,7 @@ void ParticleSystem::saveSystem()
 	if (!writeFile)
 	{
 		//assert(false && ("Failed to open file, particleSystem!" + systemData.name).c_str());
-		return;
+		return false;
 	}
 
 	writeFile.write((char*)& this->systemData, sizeof(ParticleSData));
@@ -435,7 +497,8 @@ void ParticleSystem::saveSystem()
 	if (!writeFile.good())
 	{
 		//assert(false && ("Failed to write to file, particleSystem!" + systemData.name).c_str());
-		return;
+		return false;
 	}
+	return true;
 }
 

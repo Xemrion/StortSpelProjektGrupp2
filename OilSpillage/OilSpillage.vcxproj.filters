@@ -17,6 +17,8 @@
     <FxCompile Include="Particle\TrailUpdateCS.hlsl" />
     <FxCompile Include="Particle\TrailCreateCS.hlsl" />
     <FxCompile Include="Particle\TrailGS.hlsl" />
+    <FxCompile Include="Particle\TrailPS.hlsl" />
+    <FxCompile Include="Particle\TrailVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="physics.cpp" />
@@ -88,6 +90,7 @@
     <ClCompile Include="AI\Boss.cpp" />
     <ClCompile Include="AI\ChaseCar.cpp" />
     <ClCompile Include="AI\Sniper.cpp" />
+    <ClCompile Include="Particle\ParticleHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
