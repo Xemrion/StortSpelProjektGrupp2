@@ -10,6 +10,8 @@ public:
 	Boss(float x, float z, int weaponType, Physics* physics); //, std::vector<Weakspot*>
 	virtual ~Boss();
 	void update(float dt, const Vector3& targetPos);
+	void checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTimer);
+
 private:
 	float timeTilNextPoint;
 	float timeTilRotationChange;
@@ -30,5 +32,5 @@ private:
 	void circulatePlayer(Vector3 targetPos);
 
 	void initiateWeakPoints();
-	void updateWeakPoints(Vector3 playerPos);
+	void updateWeakPoints();
 };

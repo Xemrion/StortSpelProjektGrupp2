@@ -4,7 +4,6 @@
 #include "Attacker.h"
 #include "Swarm.h"
 #include "ChaseCar.h"
-#include "Boss.h"
 #include "Sniper.h"
 
 ActorManager::ActorManager()
@@ -80,7 +79,9 @@ void ActorManager::createSwarm(float x, float z, int weaponType)
 
 void ActorManager::createBoss(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Boss(x, z, weaponType, physics));
+	Boss* boss = new Boss(x, z, weaponType, physics); //need move operator?
+	this->actors.push_back(boss);
+	this->bosses.push_back(boss);
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
@@ -151,6 +152,11 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 		}
 	}
 	turretHandler.intersectPlayerBullets(bulletArray, size, soundTimer);
+
+	for (int i = 0; i < this->bosses.size(); i++)
+	{
+		bosses[i]->checkIfWeakPointHit(bulletArray, size, soundTimer);
+	}
 
 }
 

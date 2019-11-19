@@ -2,7 +2,9 @@
 
 Weakspot::Weakspot()
 {
-
+	this->weakspotNr = 0;
+	this->stats = VehicleStats::AIPart;
+	this->health = this->stats.maxHealth;
 }
 
 Weakspot::Weakspot(Weakspot&& weakspot) //move constructor for ex. vectors
@@ -35,12 +37,19 @@ Weakspot::Weakspot(int weaponType)
 	Game::getGraphics().addToDraw(this);
 }
 
+//Weakspot::Weakspot(const Weakspot& other)	//copy constructor
+//{
+//	this->weakspotNr = other.weakspotNr;
+//	this->stats = other.stats;
+//	this->health = other.health;
+//}
+
 Weakspot::~Weakspot()
 {
 	Game::getGraphics().removeFromDraw(this);
 }
 
-Weakspot& Weakspot::operator=(const Weakspot& other)	//copy constructor
+Weakspot& Weakspot::operator=(const Weakspot& other)	//equal operator
 {
 	if (this != &other)
 	{
@@ -66,6 +75,11 @@ void Weakspot::shortMove(Vector3 posVec)
 	this->setPosition(newPos);
 }
 
+void Weakspot::changeHealth(int damage)
+{
+	this->health -= damage;
+}
+
 void Weakspot::setWeakspotNr(int weakspotNr)
 {
 	this->weakspotNr = weakspotNr;
@@ -83,6 +97,13 @@ const int Weakspot::getWeakspotNr()
 {
 	return this->weakspotNr;
 }
-//Probem
+
+const int Weakspot::getHealth()
+{
+	return this->health;
+}
+
+//Problem
 //kan den bli skadad av skott? hur ändras health?
-//spawnar inte: inte drawn?
+//boss vector i actormanager
+//function i boss som kallas i actor manager

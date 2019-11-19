@@ -55,6 +55,9 @@ void Boss::update(float dt, const Vector3& targetPos)
 	this->circulatePlayer(targetPos);
 
 	this->updateBullets(dt);
+
+	//update weakpoints
+	this->updateWeakPoints();
 }
 
 void Boss::setUpActor()
@@ -165,8 +168,7 @@ void Boss::move()
 
 		this->setRotation(Vector3(0, newRot - (DirectX::XM_PI / 2), 0));
 
-		//update weakpoints
-		this->updateWeakPoints(this->playerPos);
+		
 	}
 
 	//position = temp;, DOESNT SET BODY ANYMORE, JUST MOVING THE RIGID BODY
@@ -222,20 +224,9 @@ void Boss::initiateWeakPoints()
 	}
 }
 
-void Boss::updateWeakPoints(Vector3 playerPos)
+void Boss::updateWeakPoints()
 {
-	//check if any weakpoint dead
 	//their own update
-	for (int i = 0; i < this->weakSpots.size(); i++)
-	{
-		if (this->weakSpots[i].getDead())
-		{
-			this->weakSpots[i] = this->weakSpots.back();
-			this->weakSpots.pop_back();
-			i--;
-		}
-	}
-
 	if (this->weakSpots.size() > 0)
 	{
 		Vector3 bossPos = this->getPosition();
@@ -263,8 +254,6 @@ void Boss::updateWeakPoints(Vector3 playerPos)
 				this->weakSpots[0].shortMove(sideOffset);
 				this->weakSpots[0].shortMove(frontOffset); //moves y, should just move x and z
 				this->weakSpots[0].shortMove(heightOffset);
-				Vector3 pos = this->weakSpots[0].getPosition();
-				int stop = 1;
 			}
 			else if (this->weakSpots[i].getWeakspotNr() == 1)
 			{
@@ -272,6 +261,33 @@ void Boss::updateWeakPoints(Vector3 playerPos)
 				this->weakSpots[1].shortMove(frontOffset);
 				this->weakSpots[1].shortMove(heightOffset);
 			}
+		}
+	}
+}
+
+void Boss::checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTimer)
+{
+	for (int i = 0; i < this->weakSpots.size(); i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->weakSpots[i].getAABB()))
+			{
+				if (soundTimer > 0.05f)
+				{
+					Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+					soundTimer = 0;
+				}
+				this->weakSpots[i].changeHealth(bulletArray[j].getDamage());
+				bulletArray[j].destroy();
+			}
+		}
+		//check if any weakpoint died
+		if (this->weakSpots[i].getDead())
+		{
+			this->weakSpots[i] = this->weakSpots.back();
+			this->weakSpots.pop_back();
+			i--;
 		}
 	}
 }
