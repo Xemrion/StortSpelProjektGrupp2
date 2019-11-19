@@ -7,6 +7,7 @@ Boss::Boss()
 	this->timeTilRotationChange = 0.0f;
 	this->timeRotateDelay = 0;
 	this->rotationVar = 0;
+	this->phase = 1;
 	this->currentPointNr = 0;
 
 	this->currentPoint = { 0, 0, 0 };
@@ -33,6 +34,7 @@ Boss::Boss(Boss&& boss)
 	this->timeTilNextPoint = boss.timeTilNextPoint;
 	this->timeTilRotationChange = boss.timeTilRotationChange;
 	this->rotationVar = boss.rotationVar;
+	this->phase = boss.rotationVar;
 	this->currentPointNr = boss.currentPointNr;
 	this->currentPoint = boss.currentPoint;
 	this->playerPos = boss.playerPos;
@@ -60,6 +62,7 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	this->timeTilNextPoint = 0.0f;
 	this->timeTilRotationChange = 0.0f;
 	this->rotationVar = 0;
+	this->phase = 1;
 	this->currentPointNr = 0;
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
@@ -82,8 +85,13 @@ void Boss::update(float dt, const Vector3& targetPos)
 
 	this->updateBullets(dt);
 
-	//update weakpoints
-	this->updateWeakPoints();
+	if (this->phase == 1)
+		this->updateWeakPoints();
+	else if (this->phase == 2)
+	{
+		this->enterPhase2();
+	}
+
 }
 
 void Boss::setUpActor()
@@ -238,6 +246,11 @@ void Boss::circulatePlayer(Vector3 targetPos)
 	move();
 }
 
+void Boss::enterPhase2()
+{
+	this->stats = VehicleStats::AIBossWeak;
+}
+
 void Boss::initiateWeakPoints()
 {
 	int yPos = 0;
@@ -289,6 +302,8 @@ void Boss::updateWeakPoints()
 			}
 		}
 	}
+	else if (this->weakSpots.size() == 0)
+		this->phase = 2;
 }
 
 void Boss::checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTimer)

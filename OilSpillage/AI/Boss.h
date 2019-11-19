@@ -19,6 +19,7 @@ private:
 	int timeRotateDelay;
 	int currentPointNr;
 	int rotationVar; //which way to rotate
+	int phase;
 	Vector3 currentPoint;
 	Vector3 playerPos;
 	std::vector<Weakspot> weakSpots; //need to be pointers?
@@ -31,6 +32,7 @@ private:
 	void move();
 	Vector3 seek();
 	void circulatePlayer(Vector3 targetPos);
+	void enterPhase2();
 
 	void initiateWeakPoints();
 	void updateWeakPoints();
