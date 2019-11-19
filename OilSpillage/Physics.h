@@ -9,11 +9,12 @@
 #include<d3d11.h>
 #include<SimpleMath.h>
 #include <algorithm>
-
 using namespace DirectX::SimpleMath;
 class Physics
 {
 private:
+	btClock realClock;
+
 	btDynamicsWorld* world;
 	btDispatcher* dispatcher;
 	btBroadphaseInterface* broadphase;

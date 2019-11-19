@@ -276,6 +276,8 @@ void  Map::generateBuildings( )
 																							  15.5f * houseTile.getScale().z ),
 																				.0f );
 								houseTile.setRigidBody( tmp, physics );
+								houseTile.getRigidBody()->setActivationState(DISABLE_SIMULATION);
+
 							#endif
 						}
 						else { // is hospital

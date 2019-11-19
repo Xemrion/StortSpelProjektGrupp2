@@ -12,7 +12,12 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
 	Game::getGraphics().addToDraw(this);
-
+	btRigidBody* tempo = physics->addSphere(0.7f, btVector3(x, position.y, z), 0.5f, this);
+	setRigidBody(tempo, physics);
+	getRigidBody()->activate();
+	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	getRigidBody()->setFriction(0);
+	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
 	this->stats = VehicleStats::AISwarm;
 	setHealth(this->stats.maxHealth);
 	Game::getGraphics().loadModel("Entities/Drone");

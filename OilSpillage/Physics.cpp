@@ -6,9 +6,11 @@ Physics::Physics() :broadphase(new btDbvtBroadphase()),
 collisionConfig(new btDefaultCollisionConfiguration()),
 solver(new btSequentialImpulseConstraintSolver)
 {
-	
+
 	dispatcher = new btCollisionDispatcher(collisionConfig);
+	
 	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
+	world->setForceUpdateAllAabbs(false);
 	this->world->setGravity(btVector3(0, -10, 0));
 	//temp plane inf
 	btTransform t;
@@ -18,7 +20,7 @@ solver(new btSequentialImpulseConstraintSolver)
 
 	////set shape for object
 	plane = new btStaticPlaneShape(btVector3(0, 1, 0), -1.5f);
-	
+
 	//set motionshape aka set postion
 	btMotionState* motion = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0)));
 	////body definition check doc
@@ -61,18 +63,19 @@ Physics::~Physics()
 
 void Physics::update(float deltaTime)
 {
+
 	//this->world->stepSimulation(deltaTime);
 	this->world->stepSimulation(deltaTime, 2, 1. / 120.);
 	//this->world->stepSimulation(deltaTime, 0);
 	//this->world->stepSimulation(btScalar(deltaTime));
-}   
+}
 
 btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, void* obj)
 {	//add object set transform
 	btTransform t; //
 	t.setIdentity();
 	t.setOrigin(btVector3(Origin));
-	btSphereShape * sphere = new btSphereShape(radius); //raduius
+	btSphereShape* sphere = new btSphereShape(radius); //raduius
 
 	btVector3 inertia(0, 0, 0);
 	if (mass != 0.0f) {
@@ -90,14 +93,14 @@ btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, void
 	return body;
 }
 
-btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size,float mass, void* objects)
+btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass, void* objects)
 {
 	//add object set transform
 	btTransform t; //
 	t.setIdentity();
 	t.setOrigin(btVector3(Origin));
 	btBoxShape* box = new btBoxShape(size);
-	
+
 
 	btVector3 inertia(0, 0, 0);
 	if (mass != 0.0f) {
@@ -149,7 +152,7 @@ btGeneric6DofSpring2Constraint* Physics::addSpring(btRigidBody* box1, btRigidBod
 
 btPoint2PointConstraint* Physics::addPointJoint(btRigidBody* box1, btRigidBody* box2)
 {
-	btPoint2PointConstraint* pointJoint = new btPoint2PointConstraint(*box1,*box2,btVector3(0,0.00f,0),btVector3(0, -0.55f, 0));
+	btPoint2PointConstraint* pointJoint = new btPoint2PointConstraint(*box1, *box2, btVector3(0, 0.00f, 0), btVector3(0, -0.55f, 0));
 	//pointJoint->enableFeedback(true);
 	/*btJointFeedback* hej = new btJointFeedback;
 	hej->m_appliedForceBodyA = btVector3(1, 0, 1);
@@ -167,17 +170,17 @@ btRaycastVehicle* Physics::addVehicle(btRaycastVehicle* vehicle)
 	return vehicle;
 }
 
-bool Physics::DeleteRigidBody(btRigidBody * rb)
+bool Physics::DeleteRigidBody(btRigidBody* rb)
 {
-	
-		for (int i = 0; i < this->bodies.size(); i++)
+
+	for (int i = 0; i < this->bodies.size(); i++)
+	{
+		if (bodies[i] == rb)
 		{
-			if (bodies[i] == rb)
-			{
-				this->world->removeRigidBody(bodies[i]);
-				return true;
-			}
+			this->world->removeRigidBody(bodies[i]);
+			return true;
 		}
+	}
 	return false;
 }
 bool Physics::deletePointJoint(btPoint2PointConstraint* pointJoint)
@@ -193,32 +196,32 @@ bool Physics::deletePointJoint(btPoint2PointConstraint* pointJoint)
 	return false;
 }
 
-bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, 
+bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1,
 	int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
 	Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
 	Actor* enemyPtr = static_cast<Actor*>(obj2->getCollisionObject()->getUserPointer());
-	
-	if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
-	{
-		playerPtr = static_cast<Vehicle*>(obj2->getCollisionObject()->getUserPointer());
-		enemyPtr = static_cast<Actor*>(obj1->getCollisionObject()->getUserPointer());
 
-		if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
-		{
-			return false;
-		}
-	}
+	//if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
+	//{
+	//	playerPtr = static_cast<Vehicle*>(obj2->getCollisionObject()->getUserPointer());
+	//	enemyPtr = static_cast<Actor*>(obj1->getCollisionObject()->getUserPointer());
 
-	if (enemyPtr != nullptr)
-	{
-		if (playerPtr->getPowerUpTimer(PowerUpType::Star) > 0.0)
-		{
-			enemyPtr->setHealth(0);
-		}
+	//	if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
+	//	{
+	//		return false;
+	//	}
+	//}
 
-		return true;
-	}
+	//if (enemyPtr != nullptr)
+	//{
+	//	if (playerPtr->getPowerUpTimer(PowerUpType::Star) > 0.0)
+	//	{
+	//		enemyPtr->setHealth(0);
+	//	}
+
+	//	return true;
+	//}
 	return false;
 }
 
