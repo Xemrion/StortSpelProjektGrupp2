@@ -42,18 +42,13 @@ void Sound::load(const std::string& fileName)
 	}
 }
 
-void Sound::play(const std::string& fileName, float volume)
+void Sound::sayText(const std::string& text)
 {
-	if (instance->sounds.find(fileName) == instance->sounds.end())
-	{
-		instance->sounds[fileName] = std::make_unique<SoLoud::Wav>();
-		instance->sounds[fileName]->load(fileName.c_str());
-	}
-
-	int handle = instance->soloud.playClocked(Game::deltaTime, *instance->sounds[fileName].get(), max(volume, 0.0f));
+	instance->speech.setText(text.c_str());
+	instance->soloud.play(instance->speech);
 }
 
-void Sound::play3d(const std::string& fileName, Vector3 position, Vector3 velocity, float volume)
+void Sound::play(const std::string& fileName, float volume, float pitch)
 {
 	if (instance->sounds.find(fileName) == instance->sounds.end())
 	{
@@ -61,10 +56,15 @@ void Sound::play3d(const std::string& fileName, Vector3 position, Vector3 veloci
 		instance->sounds[fileName]->load(fileName.c_str());
 	}
 
-	int handle = instance->soloud.play3d(*instance->sounds[fileName].get(), position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, max(volume, 0.0f));
+	int handle = instance->soloud.playClocked(Game::getDeltaTime(), *instance->sounds[fileName].get(), max(volume, 0.0f));
+
+	if (pitch != 1.0f)
+	{
+		instance->soloud.setRelativePlaySpeed(handle, pitch);
+	}
 }
 
-int* Sound::playLooping(const std::string& fileName, float volume)
+void Sound::play3d(const std::string& fileName, Vector3 position, Vector3 velocity, float volume, float pitch)
 {
 	if (instance->sounds.find(fileName) == instance->sounds.end())
 	{
@@ -72,14 +72,37 @@ int* Sound::playLooping(const std::string& fileName, float volume)
 		instance->sounds[fileName]->load(fileName.c_str());
 	}
 
-	int handle = instance->soloud.play(*instance->sounds[fileName].get(), max(volume, 0.0f));
+	int handle = instance->soloud.play3dClocked(Game::getDeltaTime(), *instance->sounds[fileName].get(), position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, max(volume, 0.0f));
+	instance->soloud.set3dSourceMinMaxDistance(handle, 20.0f, 40.0f);
+	instance->soloud.set3dSourceAttenuation(handle, SoLoud::AudioSource::LINEAR_DISTANCE, 1.0f);
+
+	if (pitch != 1.0f)
+	{
+		instance->soloud.setRelativePlaySpeed(handle, pitch);
+	}
+}
+
+int* Sound::playLooping(const std::string& fileName, float volume, float pitch)
+{
+	if (instance->sounds.find(fileName) == instance->sounds.end())
+	{
+		instance->sounds[fileName] = std::make_unique<SoLoud::Wav>();
+		instance->sounds[fileName]->load(fileName.c_str());
+	}
+
+	int handle = instance->soloud.playClocked(Game::getDeltaTime(), *instance->sounds[fileName].get(), max(volume, 0.0f));
 	instance->soloud.setLooping(handle, true);
+
+	if (pitch != 1.0f)
+	{
+		instance->soloud.setRelativePlaySpeed(handle, pitch);
+	}
 
 	instance->loopingSounds.push_back(std::make_unique<int>(handle));
 	return instance->loopingSounds.back().get();
 }
 
-int* Sound::play3dLooping(const std::string& fileName, Vector3 position, Vector3 velocity, float volume)
+int* Sound::play3dLooping(const std::string& fileName, Vector3 position, Vector3 velocity, float volume, float pitch)
 {
 	if (instance->sounds.find(fileName) == instance->sounds.end())
 	{
@@ -87,8 +110,15 @@ int* Sound::play3dLooping(const std::string& fileName, Vector3 position, Vector3
 		instance->sounds[fileName]->load(fileName.c_str());
 	}
 
-	int handle = instance->soloud.play3d(*instance->sounds[fileName].get(), position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, max(volume, 0.0f));
+	int handle = instance->soloud.play3dClocked(Game::getDeltaTime(), *instance->sounds[fileName].get(), position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, max(volume, 0.0f));
+	instance->soloud.set3dSourceMinMaxDistance(handle, 20.0f, 40.0f);
+	instance->soloud.set3dSourceAttenuation(handle, SoLoud::AudioSource::LINEAR_DISTANCE, 1.0f);
 	instance->soloud.setLooping(handle, true);
+
+	if (pitch != 1.0f)
+	{
+		instance->soloud.setRelativePlaySpeed(handle, pitch);
+	}
 
 	instance->loopingSounds.push_back(std::make_unique<int>(handle));
 	return instance->loopingSounds.back().get();
@@ -113,6 +143,20 @@ bool Sound::changeLoopingVolume(int* handle, float volume)
 		if ((*loop).get() == handle)
 		{
 			instance->soloud.setVolume(*handle, max(volume, 0.0f));
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Sound::changeLoopingPitch(int* handle, float pitch)
+{
+	for (auto loop = instance->loopingSounds.begin(); loop != instance->loopingSounds.end(); loop++)
+	{
+		if ((*loop).get() == handle)
+		{
+			instance->soloud.setRelativePlaySpeed(*handle, pitch);
 			return true;
 		}
 	}

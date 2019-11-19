@@ -124,6 +124,12 @@
     <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="Inventory\Container.cpp" />
     <ClCompile Include="UI\Elements\ButtonPromtBar.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\soloud_speech.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\darray.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\klatt.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\resonator.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\tts.cpp" />
+    <ClCompile Include="SoLoud\src\backend\xaudio2\soloud_xaudio2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -255,6 +261,10 @@
     <ClInclude Include="AI\Car_Spitfire.h" />
     <ClInclude Include="Inventory\Container.h" />
     <ClInclude Include="UI\Elements\ButtonPromtBar.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\darray.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\klatt.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\resonator.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\tts.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
@@ -275,5 +285,9 @@
   <ItemGroup>
     <None Include="ShaderDefines.hlsli" />
     <None Include="packages.config" />
+    <None Include="SoLoud\src\audiosource\speech\Elements.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="SoLoud\src\audiosource\speech\legal_readme.txt" />
   </ItemGroup>
 </Project>

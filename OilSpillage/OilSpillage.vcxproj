@@ -173,11 +173,19 @@
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\darray.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\klatt.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\resonator.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\soloud_speech.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\tts.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\wav\dr_impl.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\wav\soloud_wav.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\wav\soloud_wavstream.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\wav\stb_vorbis.c" />
-    <ClCompile Include="SoLoud\src\backend\winmm\soloud_winmm.cpp" />
+    <ClCompile Include="SoLoud\src\backend\winmm\soloud_winmm.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="SoLoud\src\backend\xaudio2\soloud_xaudio2.cpp" />
     <ClCompile Include="SoLoud\src\core\soloud.cpp" />
     <ClCompile Include="SoLoud\src\core\soloud_audiosource.cpp" />
     <ClCompile Include="SoLoud\src\core\soloud_bus.cpp" />
@@ -313,6 +321,10 @@
     <ClInclude Include="SoLoud\include\soloud_wav.h" />
     <ClInclude Include="SoLoud\include\soloud_waveshaperfilter.h" />
     <ClInclude Include="SoLoud\include\soloud_wavstream.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\darray.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\klatt.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\resonator.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\tts.h" />
     <ClInclude Include="SoLoud\src\audiosource\wav\dr_flac.h" />
     <ClInclude Include="SoLoud\src\audiosource\wav\dr_mp3.h" />
     <ClInclude Include="SoLoud\src\audiosource\wav\dr_wav.h" />
@@ -483,6 +495,12 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="ShaderDefines.hlsli" />
+    <None Include="SoLoud\src\audiosource\speech\Elements.def">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="SoLoud\src\audiosource\speech\legal_readme.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

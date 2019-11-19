@@ -8,6 +8,7 @@
 #include <SimpleMath.h>
 #include "soloud.h"
 #include "soloud_wav.h"
+#include "soloud_speech.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -26,6 +27,7 @@ private:
 	SoLoud::Soloud soloud;
 	std::unordered_map<std::string, std::unique_ptr<SoLoud::Wav>> sounds;
 	std::vector<std::unique_ptr<int>> loopingSounds;
+	SoLoud::Speech speech;
 	Soundtrack soundtrack;
 public:
 	Sound();
@@ -37,13 +39,16 @@ public:
 	static void stopAll();
 	static void load(const std::string& fileName);
 
-	static void play(const std::string& fileName, float volume = 1.0f);
-	static void play3d(const std::string& fileName, Vector3 position = Vector3::Zero, Vector3 velocity = Vector3::Zero, float volume = 1.0f);
+	static void sayText(const std::string& text);
 
-	static int* playLooping(const std::string& fileName, float volume = 1.0f);
-	static int* play3dLooping(const std::string& fileName, Vector3 position = Vector3::Zero, Vector3 velocity = Vector3::Zero, float volume = 1.0f);
+	static void play(const std::string& fileName, float volume = 1.0f, float pitch = 1.0f);
+	static void play3d(const std::string& fileName, Vector3 position = Vector3::Zero, Vector3 velocity = Vector3::Zero, float volume = 1.0f, float pitch = 1.0f);
+
+	static int* playLooping(const std::string& fileName, float volume = 1.0f, float pitch = 1.0f);
+	static int* play3dLooping(const std::string& fileName, Vector3 position = Vector3::Zero, Vector3 velocity = Vector3::Zero, float volume = 1.0f, float pitch = 1.0f);
 	static void update3dLooping(int* handle, Vector3 position, Vector3 velocity);
 	static bool changeLoopingVolume(int* handle, float volume);
+	static bool changeLoopingPitch(int* handle, float pitch);
 	static bool stopLooping(int* handle, float fadeOutTime = 0.0f);
 
 	static void playSoundtrack(std::string fileNameCalm, std::string fileNameAggressive, float volume = 1.0f);
