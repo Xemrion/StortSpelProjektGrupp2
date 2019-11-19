@@ -26,13 +26,17 @@ Graphics::Graphics()
 	this->particleSystem2 = new ParticleSystem;
 	this->particleTrail = new ParticleSystem;
 
+
+
 	this->particleSystem->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
 	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
-	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso");
+	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso", "TrailPS.cso");
 
 	this->particleHandler->addParticleSystem(this->particleSystem, "fire");
 	this->particleHandler->addParticleSystem(this->particleSystem2, "smoke");
 	this->particleHandler->addParticleSystem(this->particleTrail, "trail");
+
+	this->particleHandler->loadParticleSystems();
 
 	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
 }
@@ -356,9 +360,17 @@ bool Graphics::init(Window* window)
 	Vector4 colors[4];
 	/*OIL = 0.3f, 0.2f, 0.0f, 1.0f*/
 	colors[0] = Vector4(0.1f, 0.1f, 0.1f, 1.0f);
-	this->particleTrail->changeColornSize(colors, 1, 0.1f, 0.1f);
+	Vector4 colorFire[4] = {
+		Vector4(1.0f,1.0f,0.0f,1.0f),
+		Vector4(1.0f,0.4f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f)
+	};
 
-	this->particleHandler->loadParticleSystems();
+	this->particleTrail->changeColornSize(colors, 1, 0.1f, 0.1f);
+	this->particleSystem->changeColornSize(colorFire, 4, 0.05f, 0.1f);
+
+	this->particleHandler->saveParticleSystems();
 
 
 	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());
@@ -445,7 +457,13 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	this->particleSystem2->drawAll(camera);
 
-	
+	this->particleTrail->updateParticles(deltaTime, viewProj);
+
+	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
+
+	this->particleTrail->drawAll(camera);
 	
 	//set up Shaders
 	
@@ -531,13 +549,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	}
 	
 	drawStaticGameObjects(camera, frustum, 10.0);
-	this->particleTrail->updateParticles(deltaTime, viewProj);
-
-	deviceContext->PSSetShaderResources(3, 1, this->shadowMap.getShadowMap().GetAddressOf());
-	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
-	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
-
-	this->particleTrail->drawAll(camera);
+	
 	drawFog(camera, deltaTime);
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());

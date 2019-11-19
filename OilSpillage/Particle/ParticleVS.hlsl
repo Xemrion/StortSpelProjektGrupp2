@@ -15,7 +15,6 @@ struct VS_INPUT
 struct VS_OUT
 {
 	float4 pos : POSITION;
-	float4 shadowPos : SHADOWPOS;
 	float4 direction : DIRECTION;
 	float2 time : TIME;
 	uint ind : VAR;

@@ -379,7 +379,7 @@ void ParticleSystem::changeVectorField(float vectorFieldPower, float vectorField
 	this->sP.vectorField.y = this->systemData.vectorFieldSize;
 	this->sP.vectorField.z = this->systemData.vectorFieldPower;
 }
-void ParticleSystem::setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader = "ParticlePS.cso", std::string vertexShader = "ParticleVS.cso")
+void ParticleSystem::setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader, std::string vertexShader)
 {
 	strcpy(this->particleShaders.csUpdate, csUpdate.c_str());
 	strcpy(this->particleShaders.csCreate, csCreate.c_str());

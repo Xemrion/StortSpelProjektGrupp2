@@ -20,6 +20,7 @@ void Spitfire::setUpActor()
 
 	sequence.addChildren(inRange);
 	sequence.addChildren(chase);
+
 }
 
 Spitfire::Spitfire(float x, float z, Physics* physics)
@@ -43,6 +44,8 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	this->stats = VehicleStats::AICar;
 	setHealth(this->stats.maxHealth);
 	this->aggroRange = 500; //TODO: Find better aggro range
+	this->trailTimer = 0.0f;
+
 }
 
 Spitfire::Spitfire()
@@ -73,6 +76,8 @@ void Spitfire::updateVehicle()
 	setAccelForce(accelForce, deltaTime);
 	setWheelRotation();
 	this->setPosition(getPosition());
+
+	
 
 }
 
@@ -357,6 +362,25 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 	}
 	else {
 		soundTimer += 100.0f;
+	}
+
+	this->trailTimer += deltaTime;
+
+	Vector3 frontTempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+	Vector3 rightDir = frontTempDir.Cross(Vector3(0.0f, 1.0f, 0.0f));
+	rightDir.Normalize();
+	Vector3 initialDir = -Vector3(getRigidBody()->getLinearVelocity());
+	initialDir.Normalize();
+	//Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - this->vehicleBody1->getPosition() + rightDir*0.5f, -frontTempDir, 1, 20.0f);
+	//Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - this->vehicleBody1->getPosition() - rightDir * 0.5f, -frontTempDir, 1, 20.0f);
+	if (this->trailTimer > 0.01f && abs(driftForce) > 5.0f)
+	{
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
+
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
+		this->trailTimer = 0;
 	}
 
 }

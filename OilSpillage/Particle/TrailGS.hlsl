@@ -24,17 +24,17 @@ static const float4 position[4] =
 };
 struct GSInput
 {
-	float4 pos : POSITION;
-	float4 direction : DIRECTION;
-	float2 time : TIME;
-	uint ind : VAR;
+    float4 pos : POSITION;
+    float4 direction : DIRECTION;
+    float2 time : TIME;
+    uint ind : VAR;
 };
 struct GSOutput
 {
-	float4 pos : SV_POSITION;
-	float4 shadowPos : SHADOWPOS;
-	float4 color : COLOR;
-	float2 uv : UV;
+    float4 pos : SV_POSITION;
+    float4 shadowPos : SHADOWPOS;
+    float4 color : COLOR;
+    float2 uv : UV;
 };
 float4 fadeOverTime(float4 startColor, float4 endColor, float time, float totTime)
 {
@@ -107,6 +107,7 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	for (int i = 0; i < 4; i++)
 	{
 		output.pos = mul(float4(vert[i], 1.0f), viewProj);
+        output.shadowPos = mul(float4(vert[i], 1.0f), viewProjShadow);
 		output.uv = texCoord[i];
 		output.color = testColor;
 		theOutput.Append(output);
