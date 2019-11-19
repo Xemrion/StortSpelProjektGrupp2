@@ -38,6 +38,7 @@ Graphics::~Graphics()
 	}
 
 	delete this->lightBufferContents;
+	swapChain->SetFullscreenState(false, NULL);
 }
 
 bool Graphics::init(Window* window)
@@ -1233,13 +1234,15 @@ void Graphics::setLightList(LightList* lightList)
 
 void Graphics::presentScene()
 {
-	deviceContext->OMSetRenderTargets(0, NULL, NULL);
+	if (window->resized)
+	{
+		swapChain->ResizeBuffers(2, window->width, window->height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+		window->resized = false;
+	}
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBufferPtr;
 	swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
-	//deviceContext->CopyResource(backBufferPtr.Get(), renderTarget.Get());
 	deviceContext->ResolveSubresource(backBufferPtr.Get(), 0, renderTarget.Get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 	swapChain->Present(0, 0);
-	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
 void Graphics::fillLightBuffers()

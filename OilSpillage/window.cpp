@@ -7,6 +7,8 @@
 #include <Dbt.h>
 #include <Audio.h>
 
+bool Window::resized = false;
+
 bool Window::init(HINSTANCE hInstance, int width, int height) 
 {
 
@@ -120,6 +122,7 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		int height = static_cast<int>(lParam >> 16);
 		int width = static_cast<int>(lParam & 0xFFFF);
 		Input::setWindowSize(width, height);
+		resized = true;
 		break;
 	}
 
