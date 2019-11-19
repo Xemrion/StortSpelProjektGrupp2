@@ -1,5 +1,5 @@
 #include "Melee.h"
-
+#include"../States/PlayingGameState.h"
 void Melee::meleeAttack()
 {
 	if (curCooldown <= 0)
@@ -7,6 +7,10 @@ void Melee::meleeAttack()
 		bullet.shoot(weapon, *positionPtr, *velocityPtr, Vector3(), *deltaTimePtr);
 		bullet.update(*deltaTimePtr);
 		curCooldown = attackCooldown;
+		for (int i = 0; i < 30; i++)
+		{
+			Game::getGraphics().addParticle(*positionPtr, *velocityPtr, 15.0f, 0.75f);
+		}
 	}
 	curCooldown -= *deltaTimePtr;
 }
