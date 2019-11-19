@@ -20,8 +20,6 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);
 	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
-
-
 }
 
 DynamicActor::~DynamicActor()

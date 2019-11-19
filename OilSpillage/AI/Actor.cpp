@@ -12,8 +12,6 @@ Actor::Actor()
 
 Actor::Actor(float x, float z,Physics* physics)
 {
-	this->mesh = Game::getGraphics().getMeshPointer("Cube");
-
 	this->setUpActor();
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, -1.0f, z);
@@ -29,16 +27,6 @@ void Actor::update(float dt, const Vector3& targetPos)
 	this->targetPos = targetPos;
 	this->root->func();
 }
-//
-//void Actor::run(vector<Actor*>& boids, float deltaTime, vector<Vector3> buildings, Vector3 targetPos)
-//{
-//	applyForce(separation(boids, buildings, targetPos) * 4);
-//	update(deltaTime, targetPos);
-//	if (this->state != State::Idle)
-//	{
-//		move();
-//	}
-//}
 
 void Actor::setHealth(int health)
 {

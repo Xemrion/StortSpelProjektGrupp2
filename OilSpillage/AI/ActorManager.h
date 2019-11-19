@@ -3,11 +3,12 @@
 class Physics;
 #include "TurretHandler.h"
 #include "AStar.h"
+#include "..//PG/Map.hpp"
 class ActorManager
 {
 public:
 	ActorManager();
-	ActorManager(AStar* aStar,Physics* physics);
+	ActorManager(AStar* aStar,Physics* physics, Map* map, std::mt19937* RNG);
 	~ActorManager();
 	enum Radius { CLOSE, MIDDLE, OUTER };
 	void update(float dt, const Vector3& targetPos);
@@ -34,7 +35,10 @@ private:
 	float soundTimer = 0;
 	int frameCount = 0;
 	Physics* physics;
+	Map* map;
+	std::mt19937* rng;
 	void updateAveragePos();
+	void updateActors(float dt, Vector3 targetPos);
 	//Returns index for the group within the radius with the most members
 	int groupInRange(const Vector3& actorPos, int currentGroupSize);
 	void joinGroup(DynamicActor* actor, int groupIndex);
@@ -45,6 +49,7 @@ private:
 	void initGroupForActor(DynamicActor* actor);
 	void createGroup(DynamicActor* actor);
 	Vector3 predictPlayerPos(const Vector3& targetPos);
+	Vector3 generateObjectivePos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept;
 	std::vector<AIGroup> groups;
 	Vector2& generateRandom(const float& x, const float& z, Radius radius);
 	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);

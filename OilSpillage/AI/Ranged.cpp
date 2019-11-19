@@ -83,11 +83,10 @@ Status Ranged::shoot()
 				{
 					if(weapon.type != WeaponType::aiLaser)
 					{
-						Vector3 dir = (*targetPosPtr - *this->positionPtr);
+						Vector3 dir = (offsetPos - *this->positionPtr);
 						dir.Normalize();
 						Vector3 bulletOrigin = *this->positionPtr + dir;
-						dir = (offsetPos - bulletOrigin);
-						dir.Normalize();
+
 
 						this->bullets[i].shoot(
 							weapon,
@@ -102,14 +101,12 @@ Status Ranged::shoot()
 						Vector3 dir = (*targetPosPtr - *this->positionPtr);
 						dir.Normalize();
 						Vector3 bulletOrigin = *this->positionPtr + dir;
-						dir = (*targetPosPtr - bulletOrigin);
-						dir.Normalize();
 
 						this->bullets[i].shoot(
 							weapon,
 							bulletOrigin,
 							dir,
-							Vector3(0.0f),
+							Vector3(),
 							*deltaTimePtr
 						);
 					}

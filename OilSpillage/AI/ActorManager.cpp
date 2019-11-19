@@ -12,11 +12,13 @@ ActorManager::ActorManager()
 	this->aStar = nullptr;
 }
 
-ActorManager::ActorManager(AStar* aStar, Physics* physics)
+ActorManager::ActorManager(AStar* aStar, Physics* physics, Map* map, std::mt19937* RNG)
 	:turretHandler(physics)
 {
 	this->aStar = aStar;
 	this->physics = physics;
+	this->map = map;
+	this->rng = RNG;
 }
 
 ActorManager::~ActorManager()
@@ -31,43 +33,30 @@ ActorManager::~ActorManager()
 void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
-	bool hasDied = false;
-	//seperation(targetPos);
-	for (int i = 0; i < this->groups.size(); i++)
-	{
-		for (int j = 0; j < groups[i].actors.size(); j++)
-		{
-			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
-			{
-				groups[i].actors[j]->update(dt, targetPos);
-			}
-			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
-			{
-				Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
-				if (ptr != nullptr)
-				{
-					if (ptr->getType() == TypeOfMission::KillingSpree)
-					{
-						ptr->killEnemy();
-					}
-				}
-				hasDied = true;
-			}
-		}
-	}
-	if (hasDied)
-	{
-		for (int i = this->actors.size() - 1; i >= 0; i--)
-		{
-			if (actors[i]->isDead())
-			{
-				destroyActor(i);
-			}
-		}
-	}
+	updateActors(dt,targetPos);
+	Vector3 newPos;
+	float deltaX;
+	float deltaZ;
+	float distance;
 	for (int i = 0; i < groups.size(); i++)
 	{
 		groups[i].update(targetPos);
+		deltaX = groups[i].averagePos.x - targetPos.x;
+		deltaZ = groups[i].averagePos.z - targetPos.z;
+		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+					   //(TileSize * nrOfTiles)^2
+		if (distance > (20 * 10) * (20*10))
+		{
+			newPos = generateObjectivePos(targetPos,50,100);
+			for (int j = 0; j < groups[i].actors.size(); j++)
+			{
+				groups[i].actors[j]->setPosition(newPos);
+				if (j % 5 == 0)
+				{
+					newPos = generateObjectivePos(targetPos, 50, 100);
+				}
+			}
+		}
 	}
 	updateGroups();
 	turretHandler.update(dt, targetPos);
@@ -342,6 +331,43 @@ void ActorManager::updateAveragePos()
 	}
 }
 
+void ActorManager::updateActors(float dt, Vector3 targetPos)
+{
+	bool hasDied = false;
+	for (int i = 0; i < this->groups.size(); i++)
+	{
+		for (int j = 0; j < groups[i].actors.size(); j++)
+		{
+			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
+			{
+				groups[i].actors[j]->update(dt, targetPos);
+			}
+			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
+			{
+				Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+				if (ptr != nullptr)
+				{
+					if (ptr->getType() == TypeOfMission::KillingSpree)
+					{
+						ptr->killEnemy();
+					}
+				}
+				hasDied = true;
+			}
+		}
+	}
+	if (hasDied)
+	{
+		for (int i = this->actors.size() - 1; i >= 0; i--)
+		{
+			if (actors[i]->isDead())
+			{
+				destroyActor(i);
+			}
+		}
+	}
+}
+
 int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 {
 	int biggestGroupSize = currentGroupSize;
@@ -395,7 +421,7 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 		groups[i].setPath(*pathToUse);
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
-			groups[i].actors[j]->setPath(groups[i].path.data() + groups[i].path.size() -1);
+			groups[i].actors[j]->setPath(groups[i].path.data() + groups[i].path.size() - 1);
 			groups[i].actors[j]->pathSize = groups[i].path.size() - 1;
 		}
 	}
@@ -500,4 +526,19 @@ Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 	targetVelocity.Normalize();
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
+}
+Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos,float minDistance, float maxDistance) noexcept
+{
+
+	for (;;) {
+		Vector3 position = map->generateRoadPositionInWorldSpace(*rng);
+		float distance = (position - targetPos).Length();
+		if ((distance <= maxDistance) && (distance >= minDistance))
+		{
+			return position;
+		}
+	}
+	assert(false and "BUG: Shouldn't be possible!");
+	return { -1.0f, -1.0f, -1.0f }; //  silences a warning
+
 }
