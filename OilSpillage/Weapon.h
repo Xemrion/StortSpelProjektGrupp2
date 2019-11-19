@@ -35,7 +35,7 @@ struct Weapon
 	float soundTimer = 0.0f;
 	float timeSinceLastShot = 0.0f;
 	bool flameBool = false;
-	int* soundHandle = nullptr;
+	int soundHandle = 0;
 	void updateWeapon(float deltaTime)
 	{
 		if (deltaTime > 0.01f) {
@@ -98,6 +98,7 @@ public:
 			if (weapon.flameBool == true) {
 				int randomSound = rand() % 2 + 1;
 				std::string soundEffect = "./data/sound/FlameLoop" + std::to_string(randomSound) + ".wav";
+				Sound::stopLooping(weapon.soundHandle);
 				weapon.soundHandle = Sound::playLooping(soundEffect);
 				Sound::play("./data/sound/FlameStart.wav");
 				weapon.flameBool = false;
@@ -115,6 +116,7 @@ public:
 		{
 			weapon.flameBool = true;
 			Sound::stopLooping(weapon.soundHandle);
+			weapon.soundHandle = 0;
 		}
 	};
 

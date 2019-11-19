@@ -192,7 +192,6 @@
     <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="PG\Profiler.hpp" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
-    <ClInclude Include="Weapon.h" />
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
@@ -266,6 +265,7 @@
     <ClInclude Include="SoLoud\src\audiosource\speech\resonator.h" />
     <ClInclude Include="SoLoud\src\audiosource\speech\tts.h" />
     <ClInclude Include="UI\Playing\UIBefore.h" />
+    <ClInclude Include="Weapon.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
