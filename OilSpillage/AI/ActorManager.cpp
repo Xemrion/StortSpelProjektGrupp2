@@ -157,7 +157,6 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 	{
 		bosses[i]->checkIfWeakPointHit(bulletArray, size, soundTimer);
 	}
-
 }
 
 void ActorManager::spawnAttackers(const Vector3& originPos, int weaponType)

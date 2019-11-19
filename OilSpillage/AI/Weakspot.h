@@ -10,7 +10,7 @@ public:
 	Weakspot();
 	Weakspot(Weakspot&& weakspot);
 	Weakspot(int weapontype);
-	//Weakspot(const Weakspot& other);
+	Weakspot(const Weakspot& other);
 	~Weakspot();
 	Weakspot& operator=(const Weakspot& other);
 

@@ -37,12 +37,20 @@ Weakspot::Weakspot(int weaponType)
 	Game::getGraphics().addToDraw(this);
 }
 
-//Weakspot::Weakspot(const Weakspot& other)	//copy constructor
-//{
-//	this->weakspotNr = other.weakspotNr;
-//	this->stats = other.stats;
-//	this->health = other.health;
-//}
+Weakspot::Weakspot(const Weakspot& other)	//copy constructor
+{
+	this->weakspotNr = other.weakspotNr;
+	this->stats = other.stats;
+	this->health = other.health;
+
+	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
+
+	Game::getGraphics().loadModel("Entities/Barrel");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Barrel"));
+
+	Game::getGraphics().addToDraw(this);
+}
 
 Weakspot::~Weakspot()
 {

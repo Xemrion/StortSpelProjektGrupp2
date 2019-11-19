@@ -15,6 +15,32 @@ Boss::Boss()
 	this->frontVector = Vector3{ 0, 0, 0 };
 }
 
+Boss::Boss(Boss&& boss)
+{
+	this->setScale(Vector3(0.04f, 0.04f, 0.04f));
+	this->setPosition(Vector3(boss.position.x, boss.position.y + 4.5f, boss.position.z));
+	setUpActor();
+	Game::getGraphics().addToDraw(this);
+
+	this->stats = VehicleStats::AIBoss;
+	setHealth(this->stats.maxHealth);
+	Game::getGraphics().loadModel("Entities/Roller_Melee");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
+
+	this->attackRange = boss.attackRange;
+
+	this->timeTilNextPoint = boss.timeTilNextPoint;
+	this->timeTilRotationChange = boss.timeTilRotationChange;
+	this->rotationVar = boss.rotationVar;
+	this->currentPointNr = boss.currentPointNr;
+	this->currentPoint = boss.currentPoint;
+	this->playerPos = boss.playerPos;
+
+	this->weakSpots.push_back(boss.weakSpots[0]);
+	this->weakSpots.push_back(boss.weakSpots[1]);
+}
+
 Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	:DynamicActor(x, z, physics), BossAblilities(&this->position, &this->targetPos, &this->velocity, weaponType, &this->deltaTime)
 {
@@ -251,15 +277,15 @@ void Boss::updateWeakPoints()
 		{
 			if (this->weakSpots[i].getWeakspotNr() == 0)
 			{
-				this->weakSpots[0].shortMove(sideOffset);
-				this->weakSpots[0].shortMove(frontOffset); //moves y, should just move x and z
-				this->weakSpots[0].shortMove(heightOffset);
+				this->weakSpots[i].shortMove(sideOffset);
+				this->weakSpots[i].shortMove(frontOffset); //moves y, should just move x and z
+				this->weakSpots[i].shortMove(heightOffset);
 			}
 			else if (this->weakSpots[i].getWeakspotNr() == 1)
 			{
-				this->weakSpots[1].shortMove(-sideOffset);
-				this->weakSpots[1].shortMove(frontOffset);
-				this->weakSpots[1].shortMove(heightOffset);
+				this->weakSpots[i].shortMove(-sideOffset);
+				this->weakSpots[i].shortMove(frontOffset);
+				this->weakSpots[i].shortMove(heightOffset);
 			}
 		}
 	}
@@ -282,8 +308,12 @@ void Boss::checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTime
 				bulletArray[j].destroy();
 			}
 		}
+	}
+
+	for (int i = 0; i < this->weakSpots.size(); i++)
+	{
 		//check if any weakpoint died
-		if (this->weakSpots[i].getDead())
+		if (this->weakSpots[i].getDead()) //ERROR!? when [0] is killed first?
 		{
 			this->weakSpots[i] = this->weakSpots.back();
 			this->weakSpots.pop_back();
