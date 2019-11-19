@@ -502,9 +502,29 @@ bool ParticleSystem::saveSystem()
 	return true;
 }
 
-Vector4& ParticleSystem::getColor(int index)
+float ParticleSystem::getStartSize() const
 {
-	return this->colorNSize.colors[index];
+	return this->systemData.renderParams.config.y;
+}
+
+float ParticleSystem::getEndSize() const
+{
+	return this->systemData.renderParams.config.z;
+}
+
+float ParticleSystem::getVectorFieldPower() const
+{
+	return this->systemData.vectorFieldPower;
+}
+
+float ParticleSystem::getVectorFieldSize() const
+{
+	return this->systemData.vectorFieldSize;
+}
+
+Vector4 ParticleSystem::getColor(int index)const
+{
+	return this->systemData.renderParams.colors[index];
 }
 
 

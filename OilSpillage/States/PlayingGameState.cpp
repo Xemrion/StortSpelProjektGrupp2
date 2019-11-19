@@ -214,7 +214,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
-	graphics.setVectorField(4.5f, 3.0f);
 
 	powerUps.push_back(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star));
 	Game::getGraphics().addToDraw(&*powerUps.begin());
@@ -249,7 +248,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	this->colors3[2] = this->graphics.getParticleSystem("explosion")->getColor(2).z;
 	this->colors4[2] = this->graphics.getParticleSystem("explosion")->getColor(3).z;
 
-	
+	this->size1= this->graphics.getParticleSystem("explosion")->getStartSize();
+	this->size2 = this->graphics.getParticleSystem("explosion")->getEndSize();
+	this->vectorFieldPower = this->graphics.getParticleSystem("explosion")->getVectorFieldPower();
+	this->vectorFieldSize = this->graphics.getParticleSystem("explosion")->getVectorFieldSize();
+
+
+
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	graphics.loadModel("Vehicles/Player");

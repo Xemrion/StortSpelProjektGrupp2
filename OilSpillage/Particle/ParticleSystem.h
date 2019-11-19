@@ -74,7 +74,11 @@ public:
 	bool loadSystem();
 	bool saveSystem();
 
-	Vector4& getColor(int index);
+	float getStartSize()const;
+	float getEndSize()const;
+	float getVectorFieldPower()const;
+	float getVectorFieldSize()const;
+	Vector4 getColor(int index)const;
 private:
 
 	std::wstring StringToWString(const std::string& s)
