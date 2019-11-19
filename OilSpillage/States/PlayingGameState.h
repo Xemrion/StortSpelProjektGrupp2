@@ -74,8 +74,7 @@ private:
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
-	std::unique_ptr<RoadNetwork>    testNetwork;
-	std::unique_ptr<Skyscraper>		testFloorMain;
+	std::unique_ptr<Skyscraper>		testSkyscraper;
 	std::vector<CinematicPos>       points;
 	std::vector<PowerUp>		    powerUps;
 	SpotLight                      *playerLight;

@@ -884,7 +884,7 @@ void Graphics::loadMesh(std::string fileName, Vector3 rotation)
 	
 }
 
-void Graphics::loadMesh(std::string name, std::vector<Vertex3D>& vertices)
+void Graphics::loadMesh(std::string name, std::vector<Vertex3D>& vertices, Vector3 rotation)
 {
 	Mesh newMesh;
 	if (meshes.find(name) == meshes.end())
@@ -895,7 +895,28 @@ void Graphics::loadMesh(std::string name, std::vector<Vertex3D>& vertices)
 
 		AABB aabb;
 		Vector3 max = vertices[0].position, min = vertices[0].position;
-		for (int i = 1; i < vertices.size(); i++) {
+		Vector4 temp(0.0f);
+		for (int i = 0; i < vertices.size(); i++) {
+			temp = Vector4::Transform(Vector4(vertices[i].position.x, vertices[i].position.y, vertices[i].position.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+			vertices[i].position.x = temp.x;
+			vertices[i].position.y = temp.y;
+			vertices[i].position.z = temp.z;
+
+			temp = Vector4::Transform(Vector4(vertices[i].normal.x, vertices[i].normal.y, vertices[i].normal.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+			vertices[i].normal.x = temp.x;
+			vertices[i].normal.y = temp.y;
+			vertices[i].normal.z = temp.z;
+
+			temp = Vector4::Transform(Vector4(vertices[i].tangent.x, vertices[i].tangent.y, vertices[i].tangent.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+			vertices[i].tangent.x = temp.x;
+			vertices[i].tangent.y = temp.y;
+			vertices[i].tangent.z = temp.z;
+
+			temp = Vector4::Transform(Vector4(vertices[i].bitangent.x, vertices[i].bitangent.y, vertices[i].bitangent.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+			vertices[i].bitangent.x = temp.x;
+			vertices[i].bitangent.y = temp.y;
+			vertices[i].bitangent.z = temp.z;
+
 			if (vertices[i].position.x > max.x) {
 				max.x = vertices[i].position.x;
 			}
@@ -938,6 +959,7 @@ void Graphics::loadMesh(std::string name, std::vector<Vertex3D>& vertices)
 		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[name].vertexBuffer.GetAddressOf());
 		meshes[name].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
 	}
+
 }
 
 
@@ -1190,7 +1212,7 @@ const Mesh* Graphics::getMeshPointer(const char* localPath)
 }
 
 const Mesh* Graphics::getPGMeshPointer(const char* localPath)
-{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
+{
 	std::string meshPath;
 	if (localPath != nullptr)
 	{
@@ -1200,19 +1222,9 @@ const Mesh* Graphics::getPGMeshPointer(const char* localPath)
 	if (meshes.find(meshPath) == meshes.end()) {
 		return nullptr;
 	}
-	else {
-		return &meshes[meshPath];
-	}
+	return &meshes[meshPath];
 }
 
-Texture* Graphics::getTexturePointer(const char* path, bool isModel )
-{  // TEMP! TODO: add separate function for primitives (e.g. "Cube")
-   std::string texturePath;
-   if (!isModel) {
-      texturePath += TEXTURE_ROOT_DIR;
-      texturePath += path;
-      texturePath += ".tga";
-   } else texturePath = MODEL_ROOT_DIR + std::string(path) + "/_diffuse.tga";
 Texture* Graphics::getTexturePointer(const char* path)
 {
 	std::string texturePath;

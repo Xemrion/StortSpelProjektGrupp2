@@ -5,7 +5,6 @@ Skyscraper::Skyscraper(I32 input)
 	if (input != -1) {
 		rng.seed(input);
 	}
-	generateSkyscraper();
 }
 
 Skyscraper::~Skyscraper()

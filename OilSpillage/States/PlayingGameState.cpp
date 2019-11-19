@@ -152,19 +152,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 				10.0f));
 	}
 
-	/*
-	 //Road Network Turtlewalker
-	 testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-	 testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-	 testNetwork.get()->setAngle(45);
-	 for (int i = 0; i < 5; i++) {
-		 testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
-		 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	 }
-	 testNetwork.get()->cleanRoadNetwork();
-	 testNetwork.get()->saveTestNetwork("test-network");
-	*/
-	//}
+	testSkyscraper = std::make_unique<Skyscraper>();
+
 	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 
 	graphics.setLightList(lightList.get());
