@@ -50,6 +50,8 @@ public:
 	void		 updateObjects();
 	void		 paperCollision(float deltaTime);
 	Vector3   getRespawnPosition() const noexcept;
+	void addPowerUp(PowerUp p);
+	void clearPowerUps();
 
 	ActorManager* actorManager;
 	std::unique_ptr<Map>            map;
@@ -75,7 +77,7 @@ private:
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::vector<CinematicPos>       points;
-	std::vector<PowerUp>		    powerUps;
+	std::vector<std::unique_ptr<PowerUp>> powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
 	GameObject* objTestPickUp;

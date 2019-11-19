@@ -51,7 +51,18 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 						ptr->killEnemy();
 					}
 				}
+
 				hasDied = true;
+
+				float normalizedRandom = float(rand()) / RAND_MAX;
+
+				if (normalizedRandom >= 0.95)
+				{
+					static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
+						PowerUp(groups[i].actors[j]->getPosition(),
+							    PowerUpType::Health)
+					);
+				}
 			}
 		}
 	}

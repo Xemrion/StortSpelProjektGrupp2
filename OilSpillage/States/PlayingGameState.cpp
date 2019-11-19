@@ -221,8 +221,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	graphics.setVectorField(4.5f, 3.0f);
 
-	powerUps.push_back(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star));
-	Game::getGraphics().addToDraw(&*powerUps.begin());
+	addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 30.0));
 
 	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
@@ -599,25 +598,18 @@ void PlayingGameState::update(float deltaTime)
 		//}
 		//spawnTimer = 1;
 
-		powerUps.erase(
-			std::remove_if(
-				powerUps.begin(),
-				powerUps.end(),
-				[&](PowerUp& p) {
-					p.update(time);
-					if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
-					{
-						player->addPowerUp(p.getPowerUpType());
-						return true;
-					}
-					else
-					{
-						return false;
-					}
+		for (std::unique_ptr<PowerUp>& p : powerUps)
+		{
+			p->update(deltaTime);
+			if (p->isActive())
+			{
+				if (p->getAABB().intersectXZ(player->getVehicle()->getAABB()))
+				{
+					player->addPowerUp(p->getPowerUpType());
+					p->deactivate();
 				}
-			),
-			powerUps.end()
-		);
+			}
+		}
 
 		if (time == 0)
 		{
@@ -1048,4 +1040,15 @@ void PlayingGameState::paperCollision(float deltaTime)
 			obj->updateObject(deltaTime);
 		}
 	}
+}
+
+void PlayingGameState::addPowerUp(PowerUp p)
+{
+	powerUps.push_back(std::make_unique<PowerUp>(p));
+	powerUps[powerUps.size() - 1]->activate();
+}
+
+void PlayingGameState::clearPowerUps()
+{
+	powerUps.clear();
 }

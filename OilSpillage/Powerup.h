@@ -7,17 +7,28 @@ enum class PowerUpType
 	Health,
 	Speed,
 	Star,
-	Length
+	Length // only for creating arrays
 };
 
 class PowerUp : public GameObject
 {
 	PowerUpType type;
+	static float powerUpDurations[(int)PowerUpType::Length];
+	float respawnTime;
+	float currentRespawnTimer;
+	float time;
 public:
 	PowerUp();
-	PowerUp(Vector3 position, PowerUpType type = PowerUpType::Time);
+	PowerUp(Vector3 position, PowerUpType type = PowerUpType::Time, float respawnTime = 10000000.0);
+	PowerUp(const PowerUp& p);
+	PowerUp(PowerUp&& p) noexcept;
 	~PowerUp();
-	void init(PowerUpType type);
+	PowerUp& operator=(const PowerUp& p);
+	PowerUp& operator=(PowerUp&& p) noexcept;
 	void update(float time);
-	PowerUpType getPowerUpType();
+	void activate();
+	void deactivate();
+	bool isActive() const;
+	float getCurrentRespawnTimer() const;
+	PowerUpType getPowerUpType() const;
 };
