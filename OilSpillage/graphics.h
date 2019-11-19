@@ -41,6 +41,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;
 	D3D11_VIEWPORT vp;
 
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> renderTarget;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;

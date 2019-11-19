@@ -51,12 +51,13 @@ bool Graphics::init(Window* window)
 	ZeroMemory(&swapchainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapchainDesc.BufferDesc.Width = this->window->width;
 	swapchainDesc.BufferDesc.Height = this->window->height;
-	swapchainDesc.BufferCount = 1;
+	swapchainDesc.BufferCount = 2;
 	swapchainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapchainDesc.OutputWindow = this->window->handle;
-	swapchainDesc.SampleDesc.Count = 4;
+	swapchainDesc.SampleDesc.Count = 1;
 	swapchainDesc.Windowed = true;
+	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
 	D3D11_CREATE_DEVICE_FLAG deviceFlags = (D3D11_CREATE_DEVICE_FLAG)0;
 #if _DEBUG
@@ -75,73 +76,75 @@ bool Graphics::init(Window* window)
 		device.ReleaseAndGetAddressOf(),
 		NULL,
 		deviceContext.ReleaseAndGetAddressOf());
+	
+	D3D11_TEXTURE2D_DESC descRenderTarget;
+	descRenderTarget.Width = (UINT)this->window->width;
+	descRenderTarget.Height = (UINT)this->window->height;
+	descRenderTarget.MipLevels = 1;
+	descRenderTarget.ArraySize = 1;
+	descRenderTarget.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	descRenderTarget.SampleDesc.Count = 4;
+	descRenderTarget.SampleDesc.Quality = 0;
+	descRenderTarget.Usage = D3D11_USAGE_DEFAULT;
+	descRenderTarget.BindFlags = D3D11_BIND_RENDER_TARGET;
+	descRenderTarget.CPUAccessFlags = 0;
+	descRenderTarget.MiscFlags = 0;
 
+	result = device->CreateTexture2D(&descRenderTarget, NULL, &renderTarget);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
-		// get the address of the back buffer
-		ID3D11Texture2D* backBufferPtr = nullptr;
-		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)& backBufferPtr);
-		if (FAILED(result) || backBufferPtr == nullptr)
-		{
-			MessageBox(this->window->handle, "Could not ID3D11Texture2D* backBufferPtr", "Error", MB_OK); //L"", L"", ;
-			return false;
-		}
+	device->CreateRenderTargetView(renderTarget.Get(), NULL, renderTargetView.ReleaseAndGetAddressOf());
+	if (FAILED(result))
+	{
+		MessageBox(this->window->handle, "Could not ID3D11Texture2D* backBufferPtr", "Error", MB_OK);
+		return false;
+	}
 
-		// use the back buffer address to create the render target
-		device->CreateRenderTargetView(backBufferPtr, NULL, renderTargetView.ReleaseAndGetAddressOf());
-		if (FAILED(result))
-		{
-			MessageBox(this->window->handle, "Could not ID3D11Texture2D* backBufferPtr", "Error", MB_OK);
-			return false;
-		}
-		backBufferPtr->Release();
-		backBufferPtr = nullptr;
+	D3D11_TEXTURE2D_DESC descDepth;
+	descDepth.Width = (UINT)this->window->width;
+	descDepth.Height = (UINT)this->window->height;
+	descDepth.MipLevels = 1;
+	descDepth.ArraySize = 1;
+	descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	descDepth.SampleDesc.Count = 4;
+	descDepth.SampleDesc.Quality = 0;
+	descDepth.Usage = D3D11_USAGE_DEFAULT;
+	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	descDepth.CPUAccessFlags = 0;
+	descDepth.MiscFlags = 0;
 
-		//swapChain->SetFullscreenState(true, nullptr);//testing fullscreen
-
-		D3D11_TEXTURE2D_DESC descDepth;
-		descDepth.Width = (UINT)this->window->width;
-		descDepth.Height = (UINT)this->window->height;
-		descDepth.MipLevels = 1;
-		descDepth.ArraySize = 1;
-		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		descDepth.SampleDesc.Count = 4;
-		descDepth.SampleDesc.Quality = 0;
-		descDepth.Usage = D3D11_USAGE_DEFAULT;
-		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		descDepth.CPUAccessFlags = 0;
-		descDepth.MiscFlags = 0;
-
-
-		
-		result = device->CreateTexture2D(&descDepth, NULL, &depthStencilBuffer);
-		if (FAILED(result))
-		{
-			return false;
-		}
-		result = device->CreateDepthStencilView(depthStencilBuffer.Get(), NULL, &depthStencilView);
-		if (FAILED(result))
-		{
-			return false;
-		}
-		deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
-
-		//the depth Stencil State
-		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-
-		ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-		// Depth test parameters
-		depthStencilDesc.DepthEnable = true;
-		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-
-		// Create depth stencil state
-		result = device->CreateDepthStencilState(&depthStencilDesc, depthStencilState.ReleaseAndGetAddressOf());
-		if (FAILED(result))
-		{
-			return false;
-		}
 
 	
+	result = device->CreateTexture2D(&descDepth, NULL, &depthStencilBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+	result = device->CreateDepthStencilView(depthStencilBuffer.Get(), NULL, &depthStencilView);
+	if (FAILED(result))
+	{
+		return false;
+	}
+	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
+
+	//the depth Stencil State
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+	// Depth test parameters
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+
+	// Create depth stencil state
+	result = device->CreateDepthStencilState(&depthStencilDesc, depthStencilState.ReleaseAndGetAddressOf());
+	if (FAILED(result))
+	{
+		return false;
+	}
 
 	this->vp.Width = (float)this->window->width;
 	this->vp.Height = (float)this->window->height;
@@ -1230,7 +1233,13 @@ void Graphics::setLightList(LightList* lightList)
 
 void Graphics::presentScene()
 {
+	deviceContext->OMSetRenderTargets(0, NULL, NULL);
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBufferPtr;
+	swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	//deviceContext->CopyResource(backBufferPtr.Get(), renderTarget.Get());
+	deviceContext->ResolveSubresource(backBufferPtr.Get(), 0, renderTarget.Get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 	swapChain->Present(0, 0);
+	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
 void Graphics::fillLightBuffers()
