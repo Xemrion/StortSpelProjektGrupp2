@@ -22,6 +22,8 @@
 #include <array>
 #include"Shadows/ShadowMapping.h"
 #include"Particle/ParticleSystem.h"
+#include "Structs.h"
+#include "Fog.h"
 
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
@@ -55,6 +57,8 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Buffer> frustumBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> culledLightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexSpot;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> cameraBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> fogAnimationBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> culledLightBufferUAV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> culledLightBufferSRV;
@@ -77,6 +81,8 @@ class Graphics {
 	ParticleSystem particleSystem;
 	ParticleSystem particleSystem2;
 
+	std::unique_ptr<Fog> fog;
+	float time = 0.0;
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
@@ -84,8 +90,9 @@ class Graphics {
 	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
-	void cullLights();
+	void cullLights(Matrix view);
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
+	void drawFog(DynamicCamera* camera, float deltaTime);
 public:
 	Graphics();
 	~Graphics();
@@ -96,13 +103,19 @@ public:
 	void loadMesh(std::string path); //Load a model using filename.
 	void loadMesh(std::string name, std::vector<Vertex3D>& vertices); //Construct mesh from vector of Vertex3D.
 	void loadModel(std::string path);
+	void loadMesh(std::string path, Vector3 rotation = Vector3(0, 0, 0));
+	void loadModel(std::string path, Vector3 rotation = Vector3(0,0,0));
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
-	bool loadTexture(std::string fileName, bool overridePath=false);
+	bool loadTexture(std::string fileName, bool overridePath = false, bool cpuOnly = false);
 	bool reloadTexture(std::string fileName, bool overridePath=false);
 	const Mesh* getMeshPointer(const char *path);
 	const Mesh* getPGMeshPointer(const char* path);
 	Texture* getTexturePointer(const char *path, bool isModel=false);
 	void addToDraw(GameObject* o, bool isStatic = false);
+	Texture* getTexturePointer(const char *path);
+	Material getMaterial(const char* modelPath);
+	void addToDraw(GameObject* o);
+	void addToDrawStatic(GameObject* o);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
 	void clearStaticObjects();
@@ -119,14 +132,13 @@ public:
 	void setCullingDistance(float dist);
 	float getCullingDistance();
 	//Randompower means hom large the random position area is. 
-	void addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, int lifeTime = 2, float randomPower = 0.5f);
-	void addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, int lifeTime = 2, float randomPower = 0.5f);
+	void addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
+	void addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
 	void setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setVectorField(float vectorFieldSize,float vectorFieldPower);
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
 
-
 	float farZTempShadow;
-	void setSpotLighShadow(SpotLight* spotLight);
+	void setSpotLightShadow(SpotLight* spotLight);
 };

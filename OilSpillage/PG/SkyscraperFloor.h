@@ -32,10 +32,10 @@ public:
 private:
 	std::vector<Vector3> verticies;
 	std::vector<int> indices;
-	std::vector<std::string> debugInfo;
 	int nrOfEdges;
 	bool triangleGenFail = false;
 	Vector3 center;
+	GameObject* roof;
 
 	float pi = 3.141592653f;
 

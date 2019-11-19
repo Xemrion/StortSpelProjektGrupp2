@@ -10,22 +10,30 @@ using namespace DirectX::SimpleMath;
 class GameObject
 {
 private:
-	btRigidBody* rigidBody;
-	Physics* physics;
+	btRigidBody* rigidBody = nullptr;
+	Physics* physics = nullptr;
+	bool spotShadow = true;
+	bool sunShadow = true;
 protected:
    Vector3  position { 1.0f, 1.0f, 1.0f };
 	Vector3  scale    { 1.0f, 1.0f, 1.0f };
 	Vector3  rotation;
+	Quaternion rotationQt;
 	Vector4  color;
-	Texture* texture   = nullptr;
-	Texture* normalMap = nullptr;
+	Material material;
+	Vector3 velocity;
 public:
 	~GameObject();
 
 	const Mesh *mesh   = nullptr;
 	GameObject *parent = nullptr;
 	
+
+	bool getSpotShadow()const;
+	bool getSunShadow()const;
 	Matrix   getTransform();
+	void setSunShadow(bool arg);
+	void setSpotShadow(bool arg);
 	void     setPosition(Vector3);
 	void     move(Vector3 offset);
 	void     addRotation(Vector3);
@@ -35,6 +43,12 @@ public:
 	void     setTexture(Texture *);
 	Texture* getNormalMap();
 	void     setNormalMap(Texture*);
+	Texture* getSpecularMap();
+	void setSpecularMap(Texture*);
+	Texture* getGlossMap();
+	void setGlossMap(Texture*);
+	Material getMaterial();
+	void setMaterial(Material);
 	void     setColor(Vector4 aColor);
 	Vector4  getColor()    const;
 	Vector3  getPosition();
@@ -45,6 +59,8 @@ public:
 	AABB     getAABB();
 	btRigidBody* getRigidBody() const;
 	void setRigidBody(btRigidBody* body, Physics* physics);
+	void setVelocity(Vector3 velocity);
+	void updateObject(float deltaTime);
 
 	//Matrix btTransformToMatrix(btTransform const& trans) const;
 	Vector3 btTransformGetRotation(btTransform const& trans) const;

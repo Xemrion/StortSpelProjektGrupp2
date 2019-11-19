@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -143,16 +143,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AI\AIGroup.cpp" />
     <ClCompile Include="AI\Actor.cpp" />
     <ClCompile Include="AI\ActorManager.cpp" />
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
-    <ClCompile Include="AI\Boid.cpp" />
-    <ClCompile Include="AI\Defender.cpp" />
-    <ClCompile Include="AI\Node.cpp" />
+    <ClCompile Include="AI\Boss.cpp" />
+    <ClCompile Include="AI\Car_Spitfire.cpp" />
+    <ClCompile Include="AI\ChaseCar.cpp" />
+    <ClCompile Include="AI\DynamicActor.cpp" />
+    <ClCompile Include="AI\Melee.cpp" />
+    <ClCompile Include="AI\Ranged.cpp" />
+    <ClCompile Include="AI\Sniper.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
+    <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
+    <ClCompile Include="fog.cpp" />
+    <ClCompile Include="Objectives\Objective.cpp" />
+    <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
     <ClCompile Include="PG\MapConfig.cpp" />
     <ClCompile Include="PG\Map.cpp" />
@@ -160,12 +169,14 @@
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="PG\Skyscraper.cpp" />
+    <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="PG\District.cpp" />
     <ClCompile Include="PG\SkyscraperFloor.cpp" />
+    <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="UI\Button.cpp" />
     <ClCompile Include="UI\CheckBox.cpp" />
     <ClCompile Include="UI\Element.cpp" />
@@ -188,13 +199,12 @@
     <ClCompile Include="PG\Voronoi.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="Sound.cpp" />
-    <ClCompile Include="TestAI.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UI\Minimap.cpp" />
+    <ClCompile Include="UI\ObjectiveBox.cpp" />
     <ClCompile Include="UI\Slider.cpp" />
+    <ClCompile Include="UI\UIControls.cpp" />
     <ClCompile Include="UI\UICredits.cpp" />
     <ClCompile Include="UI\UIMainMenu.cpp" />
     <ClCompile Include="UI\UIOptions.cpp" />
@@ -202,18 +212,31 @@
     <ClCompile Include="UI\UIPlaying.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
+    <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="physics.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AI\AIGroup.h" />
     <ClInclude Include="AI\Actor.h" />
     <ClInclude Include="AI\ActorManager.h" />
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
-    <ClInclude Include="AI\Boid.h" />
-    <ClInclude Include="AI\Defender.h" />
-    <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="AI\Boss.h" />
+    <ClInclude Include="AI\Car_Spitfire.h" />
+    <ClInclude Include="AI\ChaseCar.h" />
+    <ClInclude Include="AI\DynamicActor.h" />
+    <ClInclude Include="AI\Melee.h" />
+    <ClInclude Include="AI\Ranged.h" />
+    <ClInclude Include="AI\Sniper.h" />
+    <ClInclude Include="AI\TurretHandler.h" />
+    <ClInclude Include="fog.h" />
+    <ClInclude Include="PG\Biome.hpp" />
+    <ClInclude Include="PG\Modelizer.hpp" />
+    <ClInclude Include="Powerup.h" />
+    <ClInclude Include="Objectives\Objective.h" />
+    <ClInclude Include="Objectives\ObjectiveHandler.h" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
     <ClInclude Include="AI\Turret.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />
@@ -228,6 +251,7 @@
     <ClInclude Include="PG\District.hpp" />
     <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="STB\stb_image_write.h" />
+    <ClInclude Include="AI\Swarm.h" />
     <ClInclude Include="UI\Button.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DynamicCamera.h" />
@@ -266,12 +290,11 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Road Network\RoadNet.h" />
     <ClInclude Include="Structs.h" />
-    <ClInclude Include="TestAI.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="Texture.h" />
     <ClInclude Include="UI\Minimap.h" />
+    <ClInclude Include="UI\ObjectiveBox.h" />
     <ClInclude Include="UI\Slider.h" />
+    <ClInclude Include="UI\UIControls.h" />
     <ClInclude Include="UI\UICredits.h" />
     <ClInclude Include="UI\UIMainMenu.h" />
     <ClInclude Include="UI\UIOptions.h" />
@@ -307,6 +330,30 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="FogDrawPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="FogDrawVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="FogPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Particle\ParticleCreateCS.hlsl">
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
@@ -367,19 +414,14 @@
     <None Include="packages.config" />
     <None Include="ShaderDefines.hlsli" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="brickwall.tga" />
-    <Image Include="CarTemp.tga" />
-    <Image Include="CarTest.tga" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\directxtk_desktop_2015.2019.8.23.1\build\native\directxtk_desktop_2015.targets" Condition="Exists('..\packages\directxtk_desktop_2015.2019.8.23.1\build\native\directxtk_desktop_2015.targets')" />
+    <Import Project="..\packages\directxtk_desktop_2015.2019.10.17.1\build\native\directxtk_desktop_2015.targets" Condition="Exists('..\packages\directxtk_desktop_2015.2019.10.17.1\build\native\directxtk_desktop_2015.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\directxtk_desktop_2015.2019.8.23.1\build\native\directxtk_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2015.2019.8.23.1\build\native\directxtk_desktop_2015.targets'))" />
+    <Error Condition="!Exists('..\packages\directxtk_desktop_2015.2019.10.17.1\build\native\directxtk_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2015.2019.10.17.1\build\native\directxtk_desktop_2015.targets'))" />
   </Target>
 </Project>

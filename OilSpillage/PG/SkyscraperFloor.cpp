@@ -16,8 +16,6 @@ SkyscraperFloor::SkyscraperFloor(const SkyscraperFloor& other)
 	this->nrOfEdges = other.nrOfEdges;
 	this->indices.clear();
 	this->indices = other.indices;
-	this->debugInfo.clear();
-	this->debugInfo = other.debugInfo;
 }
 
 SkyscraperFloor::~SkyscraperFloor()
