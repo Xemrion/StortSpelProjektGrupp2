@@ -30,5 +30,5 @@ private:
 	void circulatePlayer(Vector3 targetPos);
 
 	void initiateWeakPoints();
-	void updateWeakPoints(Vector3 targetPos);
+	void updateWeakPoints(Vector3 playerPos);
 };

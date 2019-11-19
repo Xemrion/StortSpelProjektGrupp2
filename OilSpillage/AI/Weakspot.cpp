@@ -5,20 +5,34 @@ Weakspot::Weakspot()
 
 }
 
-Weakspot::Weakspot(int weaponType, Stats stats):stats(stats)
+Weakspot::Weakspot(Weakspot&& weakspot) //move constructor for ex. vectors
 {
-	this->dead = 0;
-	this->weakspotNr = 0;
+	this->weakspotNr = weakspot.weakspotNr;
+	this->stats = VehicleStats::AIPart;
+	this->health = this->stats.maxHealth;
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
-	this->setUpActor();
-	Game::getGraphics().addToDraw(this);
 
-	//this->stats = VehicleStats::AIPart;
-	//setHealth(this->stats.maxHealth);
 	Game::getGraphics().loadModel("Entities/Barrel");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Barrel"));
+
+	Game::getGraphics().addToDraw(this);
+}
+
+Weakspot::Weakspot(int weaponType)
+{
+	this->weakspotNr = 0;
+	this->stats = VehicleStats::AIPart;
+	this->health = this->stats.maxHealth;
+
+	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
+
+	Game::getGraphics().loadModel("Entities/Barrel");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Barrel"));
+
+	Game::getGraphics().addToDraw(this);
 }
 
 Weakspot::~Weakspot()
@@ -26,10 +40,15 @@ Weakspot::~Weakspot()
 	Game::getGraphics().removeFromDraw(this);
 }
 
-void Weakspot::update(float dt, btVector3 velocityVec)
+Weakspot& Weakspot::operator=(const Weakspot& other)	//copy constructor
 {
-	//Calls this update and not place, where, how?
-	//this->move(velocityVec);
+	if (this != &other)
+	{
+		this->weakspotNr = other.weakspotNr;
+		this->stats = other.stats;
+		this->health = other.health;
+	}
+	return *this;
 }
 
 void Weakspot::startPos(Vector3 startPos)
@@ -47,21 +66,6 @@ void Weakspot::shortMove(Vector3 posVec)
 	this->setPosition(newPos);
 }
 
-void Weakspot::updateSelf()
-{
-	//this->getRigidBody()->setLinearVelocity(btVector3(0.0f, 0.0f, 0.0f));
-}
-
-void Weakspot::setUpActor()
-{
-	
-}
-
-void Weakspot::move(btVector3 velocityVec) //not used
-{
-	//this->getRigidBody()->setLinearVelocity(velocityVec);
-}
-
 void Weakspot::setWeakspotNr(int weakspotNr)
 {
 	this->weakspotNr = weakspotNr;
@@ -69,7 +73,7 @@ void Weakspot::setWeakspotNr(int weakspotNr)
 
 const bool Weakspot::getDead()
 {
-	if (this->stats.maxHealth <= 0)
+	if (this->health <= 0)
 		return 1;
 	else
 		return 0;
@@ -79,7 +83,6 @@ const int Weakspot::getWeakspotNr()
 {
 	return this->weakspotNr;
 }
-
 //Probem
 //kan den bli skadad av skott? hur ändras health?
-//Spawnar inte: 0 hp, drawn?
+//spawnar inte: inte drawn?

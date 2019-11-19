@@ -166,7 +166,7 @@ void Boss::move()
 		this->setRotation(Vector3(0, newRot - (DirectX::XM_PI / 2), 0));
 
 		//update weakpoints
-		this->updateWeakPoints(targetPos);
+		this->updateWeakPoints(this->playerPos);
 	}
 
 	//position = temp;, DOESNT SET BODY ANYMORE, JUST MOVING THE RIGID BODY
@@ -222,13 +222,12 @@ void Boss::initiateWeakPoints()
 	}
 }
 
-void Boss::updateWeakPoints(Vector3 targetPos)
+void Boss::updateWeakPoints(Vector3 playerPos)
 {
 	//check if any weakpoint dead
 	//their own update
 	for (int i = 0; i < this->weakSpots.size(); i++)
 	{
-		this->weakSpots[i].updateSelf();
 		if (this->weakSpots[i].getDead())
 		{
 			this->weakSpots[i] = this->weakSpots.back();
@@ -264,10 +263,12 @@ void Boss::updateWeakPoints(Vector3 targetPos)
 				this->weakSpots[0].shortMove(sideOffset);
 				this->weakSpots[0].shortMove(frontOffset); //moves y, should just move x and z
 				this->weakSpots[0].shortMove(heightOffset);
+				Vector3 pos = this->weakSpots[0].getPosition();
+				int stop = 1;
 			}
 			else if (this->weakSpots[i].getWeakspotNr() == 1)
 			{
-				this->weakSpots[1].shortMove(-(sideOffset));
+				this->weakSpots[1].shortMove(-sideOffset);
 				this->weakSpots[1].shortMove(frontOffset);
 				this->weakSpots[1].shortMove(heightOffset);
 			}

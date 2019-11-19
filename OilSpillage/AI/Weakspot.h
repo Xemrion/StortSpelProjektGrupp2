@@ -6,24 +6,23 @@
 class Weakspot : public GameObject
 {
 public:
+	//operators
 	Weakspot();
-	Weakspot(int weapontype, Stats stats = VehicleStats::AIPart);
+	Weakspot(Weakspot&& weakspot);
+	Weakspot(int weapontype);
 	~Weakspot();
-	void update(float dt, btVector3 velocityVec);
+	Weakspot& operator=(const Weakspot& other);
+
 	void startPos(Vector3 startPos);
 	void shortMove(Vector3 posVec);
-	void updateSelf();
 
+	//gets and sets
 	void setWeakspotNr(int weakspotNr);
-
 	const bool getDead();
 	const int getWeakspotNr();
 
 private:
-	bool dead;
 	int weakspotNr;
 	Stats stats;
-
-	void setUpActor();
-	void move(btVector3 velocityVec);
+	int health;
 };
