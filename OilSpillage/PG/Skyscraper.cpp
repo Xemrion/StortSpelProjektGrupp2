@@ -176,4 +176,5 @@ void Skyscraper::testDraw(std::string name)
 			generateSkyscraper();
 		}
 	} while (!success);
+	scrapSkyScraper();
 }

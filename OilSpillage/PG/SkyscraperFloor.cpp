@@ -26,7 +26,6 @@ SkyscraperFloor::~SkyscraperFloor()
 
 void SkyscraperFloor::rotateDeg(float degrees)
 {
-	this->debugInfo.push_back("Rotate " + std::to_string(degrees) + " degrees");
 	float rotX = 0.0f, rotZ = 0.0f;
 	float angle = degrees * (pi / 180.0f);
 	for (int i = 0; i < this->verticies.size(); i++) {
@@ -52,7 +51,6 @@ void SkyscraperFloor::rotateRad(float radians)
 void SkyscraperFloor::generateShape(int edges)
 {
 	if (edges >= 3) {
-		this->debugInfo.push_back("Generate shape with " + std::to_string(edges) + " corners");
 		this->nrOfEdges = edges;
 		Vector3 temp = this->center + Vector3(0.0f, 0.0f, 3.0f);
 		float angle = ((pi * 2) / float(edges));
@@ -149,35 +147,7 @@ bool SkyscraperFloor::evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 poi
 
 void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 {
-	/* Union
-	This Shape A
-	Other Shape B
-	Go through lines in A and see if they intersect with lines from B
-	If they intersect, add a point between the lines in A & B.
-	After all lines are done, compare points in A to Shape B
-	If inside, remove from Copy A
-	Repeat for B
-	Add points of B between the intersecting points added to A
-	You have a union.
-
-	Better?
-	Go through lines and points.
-	If first point is outside, add it and following points to a vector until intersection.
-	If first point is inside, start putting points into vector after the first intersection
-	Switch on or off the adding of points depending on intersection.
-	Save a bool depending on first outside or inside.
-	If first outside, and ending with intersection outside, add last vector to the first.
-
-	*/
-
-
-	//Might need fixing
-	//Phase 1: Intersections.
-	std::vector<std::vector<Vector3>> vectorsOfPoints;
 	toUnion.translate(newCenter);
-	this->debugInfo.push_back("Union <");
-	this->debugInfo.insert(this->debugInfo.end(), toUnion.debugInfo.begin(), toUnion.debugInfo.end());
-	toUnion.debugInfo.clear();
 	std::vector<Vector3> intersections;
 	Vector3 intersectionA(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < toUnion.nrOfEdges; i++) {
@@ -263,7 +233,6 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 		}
 		if (indicesOfIntersections[0].first == 0) { //If first is 0, then it is connected to second
 			for (int i = 0; i < indicesOfIntersections.size(); i+=2) {
-				this->debugInfo.push_back("Union: insert (First is zero)");
 				this->verticies.insert(
 						this->verticies.begin() + indicesOfIntersections[i].second + 1,
 						toUnion.verticies.begin() + indicesOfIntersections[i].first + 1,
@@ -272,7 +241,6 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 		}
 		else { //If first is not 0, then first and last are connected.
 			for (size_t i = 1; i < indicesOfIntersections.size(); i+=2) {
-				this->debugInfo.push_back("Union: insert (First is not zero)");
 				if (i == indicesOfIntersections.size() - 1) {
 					this->verticies.insert(
 						this->verticies.begin() + indicesOfIntersections[i].second + 1,
@@ -295,11 +263,9 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 			}
 		}
 		this->nrOfEdges = int(this->verticies.size());
-		this->debugInfo.push_back("> Union ended");
 	}
 	else {
 		//Even-Odd Rule on one point in
-		this->debugInfo.push_back("Union: No intersections");
 		int evenOddCount = 0;
 		for (int i = 0; i < toUnion.nrOfEdges; i++) {
 			evenOddCount = 0;
@@ -317,7 +283,6 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 			this->verticies.clear();
 			this->verticies = toUnion.verticies;
 		}
-		this->debugInfo.push_back("> Union ended");
 	}
 
 }
@@ -742,7 +707,6 @@ int SkyscraperFloor::getNrOfEdges() const
 
 void SkyscraperFloor::translate(Vector3 newCenter)
 {
-	this->debugInfo.push_back("Translate to X:" + std::to_string(newCenter.x) + " Z:" + std::to_string(newCenter.z) + "!");
 	Vector3 translation = newCenter - this->center;
 	this->center = this->center + translation;
 	for (int i = 0; i < this->nrOfEdges; i++) {
