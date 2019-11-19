@@ -135,6 +135,7 @@ public:
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
 	void addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f);
 	void changeTrailColor(Vector3 color);
+	ParticleSystem* getParticleSystem(std::string name);
 	float farZTempShadow;
 	void setSpotLightShadow(SpotLight* spotLight);
 };

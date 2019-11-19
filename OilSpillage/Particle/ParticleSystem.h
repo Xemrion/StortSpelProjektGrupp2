@@ -73,6 +73,8 @@ public:
 	void drawAll(DynamicCamera* camera);
 	bool loadSystem();
 	bool saveSystem();
+
+	Vector4& getColor(int index);
 private:
 
 	std::wstring StringToWString(const std::string& s)

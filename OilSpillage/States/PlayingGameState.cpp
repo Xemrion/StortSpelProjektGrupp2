@@ -212,7 +212,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 		Vector4(0.9f, 0.9f, 0.05f, 1)
 	};
 
-	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
 	graphics.setVectorField(4.5f, 3.0f);
@@ -234,6 +233,23 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
 
+
+	this->colors[0] = this->graphics.getParticleSystem("explosion")->getColor(0).x;
+	this->colors2[0] = this->graphics.getParticleSystem("explosion")->getColor(1).x;
+	this->colors3[0] = this->graphics.getParticleSystem("explosion")->getColor(2).x;
+	this->colors4[0] = this->graphics.getParticleSystem("explosion")->getColor(3).x;
+	
+	this->colors[1] = this->graphics.getParticleSystem("explosion")->getColor(0).y;
+	this->colors2[1] = this->graphics.getParticleSystem("explosion")->getColor(1).y;
+	this->colors3[1] = this->graphics.getParticleSystem("explosion")->getColor(2).y;
+	this->colors4[1] = this->graphics.getParticleSystem("explosion")->getColor(3).y;
+
+	this->colors[2] = this->graphics.getParticleSystem("explosion")->getColor(0).z;
+	this->colors2[2] = this->graphics.getParticleSystem("explosion")->getColor(1).z;
+	this->colors3[2] = this->graphics.getParticleSystem("explosion")->getColor(2).z;
+	this->colors4[2] = this->graphics.getParticleSystem("explosion")->getColor(3).z;
+
+	
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	graphics.loadModel("Vehicles/Player");
@@ -366,7 +382,7 @@ void PlayingGameState::ImGui_Particles()
 	graphics.setVectorField(vectorFieldSize, vectorFieldPower);
 	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
-
+	graphics.getParticleSystem("explosion")->saveSystem();
 	ImGui::End();
 }
 
@@ -706,7 +722,7 @@ void PlayingGameState::update(float deltaTime)
 	ImGui_Driving();
 	//ImGui_ProcGen();
 	//ImGui_AI();
-	//ImGui_Particles();
+	ImGui_Particles();
 	ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

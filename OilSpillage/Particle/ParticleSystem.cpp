@@ -376,8 +376,8 @@ void ParticleSystem::changeVectorField(float vectorFieldPower, float vectorField
 {
 	this->systemData.vectorFieldSize = vectorFieldSize;
 	this->systemData.vectorFieldPower = vectorFieldPower;
-	this->sP.vectorField.y = this->systemData.vectorFieldSize;
-	this->sP.vectorField.z = this->systemData.vectorFieldPower;
+	this->sP.vectorField.y = this->systemData.vectorFieldPower;
+	this->sP.vectorField.z = this->systemData.vectorFieldSize;
 }
 void ParticleSystem::setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader, std::string vertexShader)
 {
@@ -501,4 +501,10 @@ bool ParticleSystem::saveSystem()
 	}
 	return true;
 }
+
+Vector4& ParticleSystem::getColor(int index)
+{
+	return this->colorNSize.colors[index];
+}
+
 
