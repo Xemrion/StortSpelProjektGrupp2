@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #include "soloud_internal.h"
 #include "soloud_thread.h"
 #include "soloud_fft.h"
-#define WITH_WINMM
+
 #ifdef SOLOUD_SSE_INTRINSICS
 #include <xmmintrin.h>
 #endif
@@ -177,6 +177,7 @@ namespace SoLoud
 			delete[] mVoiceGroup[i];
 		delete[] mVoiceGroup;
 		delete[] mResampleData;
+		delete[] mResampleDataOwner;
 	}
 
 	void Soloud::deinit()
