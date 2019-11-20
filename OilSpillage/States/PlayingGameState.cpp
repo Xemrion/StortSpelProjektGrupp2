@@ -677,7 +677,7 @@ void PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos(spotlightPos);
 
-		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f || this->time <= 20.0f)
+		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 25.0f || this->time <= 20.0f)
 		{
 			Sound::fadeSoundtrack(true, 1.0f);
 		}
