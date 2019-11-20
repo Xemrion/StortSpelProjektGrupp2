@@ -21,13 +21,12 @@ ShootCar::ShootCar()
 {
 }
 
-ShootCar::ShootCar(float x, float z, Physics* physics)
-	: Spitfire(x, z, physics)
+ShootCar::ShootCar(float x, float z, int weaponType, Physics* physics)
+	: Spitfire(x, z, physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->stats = VehicleStats::fastCar;
 	setHealth(this->stats.maxHealth);
-	attackRange = 10;
-	this->weapon = WeaponHandler::getWeapon(WeaponType::aiFlamethrower);
+	attackRange = 15;
 }
 
 ShootCar::~ShootCar()
@@ -58,19 +57,48 @@ Status ShootCar::shoot()
 			{
 				if (bullets[i].getTimeLeft() == 0.0)
 				{
-					Vector3 dir = Vector3(vehicleBody1->getRigidBody()->getLinearVelocity());
-					dir.Normalize();
-					Vector3 bulletOrigin = position + dir;
-					dir = (offsetPos - bulletOrigin);
-					dir.Normalize();
+					if(weapon.type == WeaponType::aiFlamethrower)
+					{
+						Vector3 dir = Vector3(vehicleBody1->getRigidBody()->getLinearVelocity());
+						dir.Normalize();
+						Vector3 bulletOrigin = position + dir;
 
-					this->bullets[i].shoot(
-						weapon,
-						bulletOrigin,
-						dir,
-						Vector3(vehicleBody1->getRigidBody()->getLinearVelocity())*1.2,
-						deltaTime
-					);
+						this->bullets[i].shoot(
+							weapon,
+							bulletOrigin,
+							dir,
+							Vector3(vehicleBody1->getRigidBody()->getLinearVelocity()) * 1.2,
+							deltaTime
+						);
+					}
+					else if(weapon.type == WeaponType::aiLaser)
+					{
+						Vector3 dir = (targetPos - position);
+						dir.Normalize();
+						Vector3 bulletOrigin = position + dir;
+
+						this->bullets[i].shoot(
+							weapon,
+							bulletOrigin,
+							dir,
+							Vector3(0.0f),
+							deltaTime
+						);
+					}
+					else
+					{
+						Vector3 dir = (targetPos - position);
+						dir.Normalize();
+						Vector3 bulletOrigin = position + dir;
+
+						this->bullets[i].shoot(
+							weapon,
+							bulletOrigin,
+							dir,
+							Vector3(vehicleBody1->getRigidBody()->getLinearVelocity()),
+							deltaTime
+						);
+					}
 					break;
 				}
 			}

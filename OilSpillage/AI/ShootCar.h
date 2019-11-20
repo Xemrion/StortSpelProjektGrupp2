@@ -8,7 +8,7 @@ protected:
 	virtual void followPath();
 public:
 	ShootCar();
-	ShootCar(float x, float z, Physics* physics);
+	ShootCar(float x, float z, int weaponType, Physics* physics);
 	~ShootCar();
 	void update(float dt, const Vector3& targetPos);
 	Status shoot();

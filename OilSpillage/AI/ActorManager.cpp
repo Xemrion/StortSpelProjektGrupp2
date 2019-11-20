@@ -109,9 +109,9 @@ void ActorManager::createChaseCar(float x, float z)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createShootCar(float x, float z)
+void ActorManager::createShootCar(float x, float z, int weaponType)
 {
-	this->actors.push_back(new ShootCar(x, z, physics));
+	this->actors.push_back(new ShootCar(x, z, weaponType, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
@@ -226,13 +226,13 @@ void ActorManager::spawnChaseCars(const Vector3& originPos)
 	}
 }
 
-void ActorManager::spawnShootCars(const Vector3& originPos)
+void ActorManager::spawnShootCars(const Vector3& originPos, int weaponType)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createShootCar(originPos.x + i, originPos.z);
-		createShootCar(originPos.x, originPos.z + i);
-		createShootCar(originPos.x - i, originPos.z);
+		createShootCar(originPos.x + i, originPos.z, weaponType);
+		createShootCar(originPos.x, originPos.z + i, weaponType);
+		createShootCar(originPos.x - i, originPos.z, weaponType);
 	}
 }
 
