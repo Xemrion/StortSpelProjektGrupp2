@@ -101,6 +101,7 @@ void Spitfire::update(float dt,const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	updateVehicle();
+	vehicleBody1->setColor(this->getColor());
 }
 
 void Spitfire::followPath()
