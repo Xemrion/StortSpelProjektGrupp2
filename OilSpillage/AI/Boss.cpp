@@ -9,6 +9,7 @@ Boss::Boss()
 	this->rotationVar = 0;
 	this->phase = 1;
 	this->currentPointNr = 0;
+	this->dt = 0;
 
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
@@ -38,13 +39,15 @@ Boss::Boss(Boss&& boss)
 	this->currentPointNr = boss.currentPointNr;
 	this->currentPoint = boss.currentPoint;
 	this->playerPos = boss.playerPos;
+	this->dt = boss.dt;
 
+	//weakspots
 	this->weakSpots.push_back(boss.weakSpots[0]);
 	this->weakSpots.push_back(boss.weakSpots[1]);
 }
 
 Boss::Boss(float x, float z, int weaponType, Physics* physics)
-	:DynamicActor(x, z, physics), BossAblilities(&this->position, &this->targetPos, &this->velocity, weaponType, &this->deltaTime)
+	:DynamicActor(x, z, physics), BossAbilities(&this->position, &this->targetPos, &this->velocity, weaponType)
 {
 	this->setScale(Vector3(0.04f, 0.04f, 0.04f));
 	this->setPosition(Vector3(position.x, position.y + 4.5f, position.z));
@@ -57,7 +60,7 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 
-	this->attackRange = 35;
+	this->attackRange = 150;
 
 	this->timeTilNextPoint = 0.0f;
 	this->timeTilRotationChange = 0.0f;
@@ -66,7 +69,9 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	this->currentPointNr = 0;
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
+	this->dt = 0;
 
+	//weakpoints
 	this->weakSpots.push_back(Weakspot(0));
 	this->weakSpots.push_back(Weakspot(0));
 	this->initiateWeakPoints();
@@ -79,6 +84,7 @@ Boss::~Boss()
 
 void Boss::update(float dt, const Vector3& targetPos)
 {
+	this->dt = dt;
 	Actor::update(dt, targetPos);
 	this->movementVariables(dt);
 	this->circulatePlayer(targetPos);
@@ -113,7 +119,15 @@ void Boss::setUpActor()
 	Sequence& sequence5 = bt.getSequence();
 	Sequence& sequence6 = bt.getSequence();
 
-	//Range
+	//Wait
+	Behavior& wait = bt.getAction();
+	wait.addAction(std::bind(&Boss::waitForStart, std::ref(*this)));
+
+	//Other actions
+	Behavior& switchWeapon = bt.getAction();
+	switchWeapon.addAction(std::bind(&Boss::switchWeapon, std::ref(*this)));
+	
+	//Check Range
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Boss::inAttackRange, std::ref(*this)));
 
@@ -121,17 +135,28 @@ void Boss::setUpActor()
 	Behavior& shoot = bt.getAction();
 	shoot.addAction(std::bind(&Boss::shoot, std::ref(*this)));
 
-	//Behavior& ability1 = bt.getAction();
-	//ability1.addAction(std::bind(&BossAblilities::ability1, std::ref(*this)));
+	Behavior& ability1 = bt.getAction();
+	ability1.addAction(std::bind(&Boss::ability1, std::ref(*this)));
 
 	//Behaviour Tree
 	//attack and run,				selector
 	root->addChildren(sequence1);
-	root->addChildren(selector2);
+	//root->addChildren(selector2);
 
-	//check range					sequence
+	//sequence2.addChildren(wait); //another sequence //wait works
+
 	sequence1.addChildren(inRange);
-	sequence1.addChildren(shoot); //another sequence
+	sequence1.addChildren(selector2); //another sequence
+	
+	selector2.addChildren(sequence2); //needs to be sequence -> selector  -> sequence etc.
+
+	sequence2.addChildren(shoot);
+	sequence2.addChildren(switchWeapon);
+
+	//sequence2.addChildren(shoot);
+	//sequence2.addChildren(wait); //another sequence
+
+	
 
 	//abilities outside range		selector
 	//selector2.addChildren(idle);
@@ -191,6 +216,7 @@ void Boss::move()
 	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 200);
 	this->currentVelocityVector = (btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 200);
 	Vector3 targetToSelf = (this->playerPos - position);
+	this->targetToSelf = targetToSelf;
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)
 	{

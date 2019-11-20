@@ -79,7 +79,7 @@ void ActorManager::createSwarm(float x, float z, int weaponType)
 
 void ActorManager::createBoss(float x, float z, int weaponType)
 {
-	Boss* boss = new Boss(x, z, weaponType, physics); //need move operator?
+	Boss* boss = new Boss(x, z, weaponType, physics);
 	this->actors.push_back(boss);
 	this->bosses.push_back(boss);
 	initGroupForActor(actors.at(actors.size() - 1));

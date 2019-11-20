@@ -2,27 +2,63 @@
 #include"../States/PlayingGameState.h"
 
 
-BossAblilities::BossAblilities()
+BossAbilities::BossAbilities()
 {
+	Vector3 *vec = { 0 };
+	this->positionPtr = vec;
+	this->targetPosPtr = vec;
+	this->velocityPtr = vec;
+	WaitTimer waitTimer;
 
+	this->timeSinceLastShot = 0;
+	this->predicting = 0;
+	this->weaponNr = 0;
+	this->weapon = Weapon();
+
+	this->waitTimer.wait_time = 2;
+	this->waitTimer.time_left = 2;
+	this->waitTimer.repeatable = true;
 }
 
-BossAblilities::BossAblilities(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType, float* deltaTimePtr)
+BossAbilities::BossAbilities(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType)
 {
 	this->positionPtr = pos;
 	this->targetPosPtr = targetPos;
 	this->velocityPtr = velocity;
-	this->deltaTimePtr = deltaTimePtr;
 	this->attackRange = 8;
+	this->weaponNr = weaponType;
 	assignWeapon(weaponType);
+
+	this->waitTimer.wait_time = 2;
+	this->waitTimer.time_left = 2;
+	this->waitTimer.repeatable = 1;
 }
 
-BossAblilities::~BossAblilities()
+BossAbilities::~BossAbilities()
 {
 
 }
 
-void BossAblilities::updateBullets(float deltaTime)
+BossAbilities& BossAbilities::operator=(const BossAbilities& other)
+{
+	if (this != &other)
+	{
+		this->positionPtr = other.positionPtr;
+		this->targetPosPtr = other.positionPtr;
+		this->velocityPtr = other.velocityPtr;
+		this->timeSinceLastShot = other.timeSinceLastShot;
+		this->predicting = other.predicting;
+		this->weaponNr = other.weaponNr;
+		this->weapon = other.weapon;
+		for (int i = 0; i < other.bulletCount; i++)
+		{
+			this->bullets[i] = other.bullets[i];
+		}
+	}
+	return *this;
+}
+
+void BossAbilities::updateBullets(float deltaTime)
 {
 	this->timeSinceLastShot += deltaTime;
 	for (int i = 0; i < this->bulletCount; i++)
@@ -31,7 +67,7 @@ void BossAblilities::updateBullets(float deltaTime)
 	}
 }
 
-Status BossAblilities::inAttackRange()
+Status BossAbilities::inAttackRange()
 {
 	Status status;
 
@@ -46,11 +82,11 @@ Status BossAblilities::inAttackRange()
 	return status;
 }
 
-void BossAblilities::assignWeapon(int weaponType)
+void BossAbilities::assignWeapon(int weaponType)
 {
 	if (weaponType == 1) // MachineGun
 	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiBossMachineGun);
 		//this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	}
 	else if (weaponType == 2)// MissileLauncher
@@ -66,12 +102,12 @@ void BossAblilities::assignWeapon(int weaponType)
 	}
 	else if (weaponType == 4)// Flamethrower
 	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::aiFlamethrower);
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiBossFlamethrower);
 		//	this->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
 	}
 }
 
-Status BossAblilities::shoot()
+Status BossAbilities::shoot()
 {
 	float offset;
 	Vector3 offsetPos;
@@ -94,7 +130,7 @@ Status BossAblilities::shoot()
 		{
 			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
 
-			for (int i = 0; i < BossAblilities::bulletCount; i++)
+			for (int i = 0; i < BossAbilities::bulletCount; i++)
 			{
 				if (bullets[i].getTimeLeft() == 0.0)
 				{
@@ -109,7 +145,7 @@ Status BossAblilities::shoot()
 						bulletOrigin,
 						dir,
 						*velocityPtr,
-						*deltaTimePtr
+						dt
 					);
 					break;
 				}
@@ -120,7 +156,7 @@ Status BossAblilities::shoot()
 	return Status::SUCCESS;
 }
 
-Status BossAblilities::ability1()
+Status BossAbilities::ability1() //not done
 {
 	float offset;
 	Vector3 offsetPos;
@@ -143,7 +179,7 @@ Status BossAblilities::ability1()
 		{
 			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
 
-			for (int i = 0; i < BossAblilities::bulletCount; i++)
+			for (int i = 0; i < BossAbilities::bulletCount; i++)
 			{
 				if (bullets[i].getTimeLeft() == 0.0)
 				{
@@ -158,7 +194,7 @@ Status BossAblilities::ability1()
 						bulletOrigin,
 						dir,
 						*velocityPtr,
-						*deltaTimePtr
+						dt
 					);
 					break;
 				}
@@ -167,4 +203,44 @@ Status BossAblilities::ability1()
 	}
 
 	return Status::SUCCESS;
+}
+
+Status BossAbilities::switchWeapon()
+{
+	//Fix the length of player to boss
+	float length = sqrt(pow(this->targetToSelf.x, 2) + pow(this->targetToSelf.y, 2) + pow(this->targetToSelf.z, 2));
+
+	if (length <= 15.0f)
+		assignWeapon(4);
+	else
+		assignWeapon(1);
+
+
+	//assignWeapon(this->weaponNr);
+	//this->weaponNr++;
+
+	//if (this->weaponNr == 5)
+	//	this->weaponNr = 1;
+
+	return Status::SUCCESS;
+}
+
+Status BossAbilities::waitForStart()
+{
+	std::cout << "Patrol wait time : " << waitTimer.wait_time << std::endl;
+	std::cout << "Patrol time left on patrol : " << waitTimer.time_left << std::endl;
+	Status status = Status::WAIT;
+	if (waitTimer.time_left <= 0.0f)
+	{
+		std::cout << "Patrol continue : " << waitTimer.time_left << std::endl;
+		//switchWeapon();
+		status = Status::SUCCESS;
+		waitTimer.time_left = 0;
+		if (waitTimer.repeatable)
+		{
+			waitTimer.time_left = waitTimer.wait_time;
+		}
+	}
+	waitTimer.time_left -= this->dt;
+	return status;
 }

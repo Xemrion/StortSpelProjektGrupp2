@@ -34,9 +34,9 @@ public:
 
 	static constexpr Stats AIBoss	  = { 99999,		5.0f,	5.0f,				5.0f,	20.0f,		1.0f };
 
-	static constexpr Stats AIBossWeak = { 250,		1.0f,	1.0f,				10.0f,	40.0f,		10.0f };
+	static constexpr Stats AIBossWeak = { 500,		1.0f,	1.0f,				10.0f,	40.0f,		10.0f };
 
-	static constexpr Stats AIPart     = { 20,		5.0f,	5.0f,				0.0f,	0.0f,		0.0f };
+	static constexpr Stats AIPart     = { 50,		5.0f,	5.0f,				0.0f,	0.0f,		0.0f };
 };
 
 #endif // !VEHICLE_STATS_H

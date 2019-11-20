@@ -3,7 +3,7 @@
 #include "BossAbilities.h"
 #include "Weakspot.h"
 
-class Boss : public DynamicActor, public BossAblilities
+class Boss : public DynamicActor, public BossAbilities
 {
 public:
 	Boss();
