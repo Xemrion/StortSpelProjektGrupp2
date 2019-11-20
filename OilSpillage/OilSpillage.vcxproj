@@ -346,6 +346,7 @@
     <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="STB\stb_image_write.h" />
     <ClInclude Include="AI\Swarm.h" />
+    <ClInclude Include="UI\Elements\AnimatedText.h" />
     <ClInclude Include="UI\Elements\Button.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DynamicCamera.h" />

@@ -32,9 +32,6 @@
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
-    <ClCompile Include="UI\Button.cpp" />
-    <ClCompile Include="UI\CheckBox.cpp" />
-    <ClCompile Include="UI\Element.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="graphics.cpp" />
@@ -124,7 +121,6 @@
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
-    <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="fog.cpp" />
     <ClCompile Include="AI\Ranged.cpp" />
     <ClCompile Include="AI\Melee.cpp" />
@@ -283,6 +279,8 @@
     <ClInclude Include="SoLoud\src\audiosource\speech\tts.h" />
     <ClInclude Include="UI\Playing\UIBefore.h" />
     <ClInclude Include="Weapon.h" />
+    <ClInclude Include="Vehicle.h" />
+    <ClInclude Include="UI\Elements\AnimatedText.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

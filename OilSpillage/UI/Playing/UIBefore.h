@@ -10,12 +10,11 @@ private:
 	void updateUI(float deltaTime);
 	void drawUI();
 
-	/*Texture* textureSun;
 	Texture* textureSun;
-	Texture* textureSun;
-	Texture* textureSun;
-	Texture* textureSun;
-	Texture* textureSun;*/
+	Texture* textureRain;
+	Texture* textureStorm;
+	Texture* textureSnow;
+	Texture* textureSandstorm;
 public:
 	UIBefore();
 	virtual ~UIBefore();
