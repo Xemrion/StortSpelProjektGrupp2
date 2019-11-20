@@ -8,6 +8,7 @@ Actor::Actor()
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(0, 0.0f, 0);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+	this->points = 0;
 }
 
 Actor::Actor(float x, float z,Physics* physics)
@@ -18,6 +19,7 @@ Actor::Actor(float x, float z,Physics* physics)
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, -1.0f, z);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
+	this->points = 0;
 }
 Actor::~Actor()
 {
@@ -70,4 +72,14 @@ void Actor::changeHealth(int amount)
 bool Actor::isDead() const
 {
 	return this->health <= 0;
+}
+
+int Actor::getPoints()
+{
+	return points;
+}
+
+void Actor::setPoints(int amount)
+{
+	this->points = amount;
 }

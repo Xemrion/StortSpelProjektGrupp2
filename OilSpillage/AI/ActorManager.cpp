@@ -33,7 +33,6 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
 	bool hasDied = false;
-	//seperation(targetPos);
 	for (int i = 0; i < this->groups.size(); i++)
 	{
 		for (int j = 0; j < groups[i].actors.size(); j++)
@@ -52,6 +51,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 						ptr->killEnemy();
 					}
 				}
+				groups[i].actors[j]->getPoints();
 				hasDied = true;
 			}
 		}

@@ -17,6 +17,7 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 	this->attackRange = 10;
+	this->setPoints(100);
 }
 
 void Attacker::update(float dt, const Vector3& targetPos)

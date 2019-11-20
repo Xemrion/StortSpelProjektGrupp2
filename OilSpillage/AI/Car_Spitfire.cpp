@@ -41,6 +41,7 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	this->stats = VehicleStats::AICar;
 	setHealth(this->stats.maxHealth);
 	this->aggroRange = 500; //TODO: Find better aggro range
+	this->setPoints(150);
 }
 
 Spitfire::Spitfire()

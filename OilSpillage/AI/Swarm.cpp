@@ -20,8 +20,8 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Drone"));
 	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMelee);
 
-	this->boidOffset = 2.5;
 	this->aggroRange = 40;
+	this->setPoints(50);
 }
 
 void Swarm::update(float dt, const Vector3& targetPos)
