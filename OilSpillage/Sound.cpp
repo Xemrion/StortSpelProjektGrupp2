@@ -14,7 +14,13 @@ Sound::~Sound()
 void Sound::init()
 {
 	instance = std::make_unique<Sound>();
-	instance->soloud.init(SoLoud::Soloud::FLAGS::LEFT_HANDED_3D);
+	SoLoud::result result = instance->soloud.init(SoLoud::Soloud::FLAGS::LEFT_HANDED_3D);
+
+	if (result == SoLoud::UNKNOWN_ERROR)
+	{
+		instance->soloud.init(SoLoud::Soloud::FLAGS::LEFT_HANDED_3D, SoLoud::Soloud::NULLDRIVER);
+	}
+
 	instance->soloud.setMaxActiveVoiceCount(64);
 }
 
@@ -183,47 +189,54 @@ bool Sound::stopLooping(int handle, float fadeOutTime)
 
 void Sound::playSoundtrack(std::string fileNameCalm, std::string fileNameAggressive, float volume)
 {
-	if (instance->sounds.find(fileNameCalm) == instance->sounds.end())
-	{
-		instance->sounds[fileNameCalm] = std::make_unique<SoLoud::Wav>();
-		instance->sounds[fileNameCalm]->load(fileNameCalm.c_str());
-	}
-
-	if (instance->sounds.find(fileNameAggressive) == instance->sounds.end())
-	{
-		instance->sounds[fileNameAggressive] = std::make_unique<SoLoud::Wav>();
-		instance->sounds[fileNameAggressive]->load(fileNameAggressive.c_str());
-	}
-
-	Sound::stopSoundtrack();
+	//Stop all instances
+	if (instance->soundtrack.soundCalm.get()) instance->soundtrack.soundCalm->stop();
+	if (instance->soundtrack.soundAggressive.get()) instance->soundtrack.soundAggressive->stop();
+	//Remove the voice group
 	instance->soloud.destroyVoiceGroup(instance->soundtrack.handleGroup);
 
-	instance->soundtrack.volume = volume;
-	instance->soundtrack.handleCalm = instance->soloud.playBackground(*instance->sounds[fileNameCalm].get(), max(volume, 0.0f), true);
-	instance->soundtrack.handleAggressive = instance->soloud.playBackground(*instance->sounds[fileNameAggressive].get(), 0.0f, true);
+	//Load both tracks
+	instance->soundtrack.soundCalm = std::make_unique<SoLoud::WavStream>();
+	instance->soundtrack.soundCalm->load(fileNameCalm.c_str());
+	instance->soundtrack.soundAggressive = std::make_unique<SoLoud::WavStream>();
+	instance->soundtrack.soundAggressive->load(fileNameAggressive.c_str());
 
+	//Create the LOWPASS filter
+	instance->soundtrack.filter = std::make_unique<SoLoud::BiquadResonantFilter>();
+	instance->soundtrack.filter->setParams(SoLoud::BiquadResonantFilter::LOWPASS, 44100, 10000.0f, 2.0f);
+	instance->soundtrack.soundAggressive->setFilter(0, instance->soundtrack.filter.get());
+
+	//Get the volume and handle for each track
+	instance->soundtrack.volume = volume;
+	instance->soundtrack.handleCalm = instance->soloud.playBackground(*instance->soundtrack.soundCalm.get(), max(volume, 0.0f), true);
+	instance->soundtrack.handleAggressive = instance->soloud.playBackground(*instance->soundtrack.soundAggressive.get(), max(volume, 0.0f), true);
+
+	//Set up the filter parameters
+	instance->soloud.setFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::WET, 1.0f);
+	instance->soloud.setFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY, 10.0f);
+
+	//Create a new voice group and add them to it
 	instance->soundtrack.handleGroup = instance->soloud.createVoiceGroup();
 	instance->soloud.addVoiceToGroup(instance->soundtrack.handleGroup, instance->soundtrack.handleCalm);
 	instance->soloud.addVoiceToGroup(instance->soundtrack.handleGroup, instance->soundtrack.handleAggressive);
 
+	//Make it protected so it won't be overridden by some newly loaded sounds
 	instance->soloud.setProtectVoice(instance->soundtrack.handleCalm, true);
 	instance->soloud.setProtectVoice(instance->soundtrack.handleAggressive, true);
 	instance->soloud.setProtectVoice(instance->soundtrack.handleGroup, true);
 
+	//Set the looping and make it play!
 	instance->soloud.setLooping(instance->soundtrack.handleGroup, true);
 	instance->soloud.setPause(instance->soundtrack.handleGroup, false);
 }
 
 void Sound::fadeSoundtrack(bool toAgressive, float fadeTime)
 {
-	float aggressiveFactor = instance->soloud.getVolume(instance->soundtrack.handleAggressive) / instance->soundtrack.volume;
+	//Get the aggressive factor (the time of the fade that is left) so this function can be called every frame if needed.
+	float aggressiveFactor = (instance->soloud.getFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY) - 10.0f) / 10000.0f;
+	if (toAgressive) aggressiveFactor = 1 - aggressiveFactor; 
 
-	if (toAgressive)
-	{
-		aggressiveFactor = 1 - aggressiveFactor;
-	}
-
-	instance->soloud.fadeVolume(instance->soundtrack.handleAggressive, toAgressive ? instance->soundtrack.volume : 0.0f, fadeTime * aggressiveFactor);
+	instance->soloud.fadeFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY, toAgressive ? 10000.0f : 10.0f, fadeTime * aggressiveFactor);
 }
 
 void Sound::stopSoundtrack(float fadeOutTime)

@@ -187,6 +187,7 @@
     <ClCompile Include="SoLoud\src\audiosource\wav\soloud_wav.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\wav\soloud_wavstream.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\wav\stb_vorbis.c" />
+    <ClCompile Include="SoLoud\src\backend\null\soloud_null.cpp" />
     <ClCompile Include="SoLoud\src\backend\xaudio2\soloud_xaudio2.cpp" />
     <ClCompile Include="SoLoud\src\core\soloud.cpp" />
     <ClCompile Include="SoLoud\src\core\soloud_audiosource.cpp" />
@@ -346,6 +347,7 @@
     <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="STB\stb_image_write.h" />
     <ClInclude Include="AI\Swarm.h" />
+    <ClInclude Include="UI\Elements\AnimatedText.h" />
     <ClInclude Include="UI\Elements\Button.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DynamicCamera.h" />

@@ -26,6 +26,7 @@ freely, subject to the following restrictions:
 #define SOLOUD_H
 
 #define WITH_XAUDIO2
+#define WITH_NULL
 
 #include <stdlib.h> // rand
 #include <math.h> // sin

@@ -139,6 +139,11 @@ namespace SoLoud
             return;
         }
         XAudio2Data *data = static_cast<XAudio2Data*>(aSoloud->mBackendData);
+		if (0 == data->thread)
+		{
+			delete data;
+			return;
+		}
         SetEvent(data->audioProcessingDoneEvent);
         SetEvent(data->bufferEndEvent);
         Thread::wait(data->thread);

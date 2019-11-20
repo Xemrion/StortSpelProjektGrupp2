@@ -8,7 +8,9 @@
 #include <SimpleMath.h>
 #include "soloud.h"
 #include "soloud_wav.h"
+#include "soloud_wavstream.h"
 #include "soloud_speech.h"
+#include "soloud_biquadresonantfilter.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -17,11 +19,15 @@ class Sound
 private:
 	struct Soundtrack
 	{
+		std::unique_ptr<SoLoud::WavStream> soundCalm;
+		std::unique_ptr<SoLoud::WavStream> soundAggressive;
+		std::unique_ptr<SoLoud::BiquadResonantFilter> filter;
 		float volume = 1.0f;
 		int handleGroup = 0;
 		int handleCalm = 0;
 		int handleAggressive = 0;
 	};
+
 	static std::unique_ptr<Sound> instance;
 
 	SoLoud::Soloud soloud;

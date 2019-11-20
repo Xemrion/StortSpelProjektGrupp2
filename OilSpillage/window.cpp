@@ -38,13 +38,6 @@ bool Window::init(HINSTANCE hInstance, int width, int height)
 		hInstance,
 		nullptr);
 
-	//Init this for xAudio2 to work.
-	HRESULT result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-	if (FAILED(result))
-	{
-		MessageBox(handle, "Could not initialize COINIT_MULTITHREADED.\nAudio will not work for some systems.", "Warning", MB_OK);
-	}
-
 	return true;
 }
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lParam);
@@ -93,7 +86,6 @@ LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 	case WM_DEVICECHANGE:
 		if (wParam == DBT_DEVNODES_CHANGED)
 		{
-			//Sound::ShouldReset();
 			Input::reset();
 		}
 		break;
@@ -127,7 +119,6 @@ bool Window::update()
 
 void Window::shutdown()
 {
-	CoUninitialize();
 }
 
 
