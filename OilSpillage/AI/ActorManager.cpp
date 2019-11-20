@@ -162,9 +162,6 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z * 2))
 					{
 						if (soundTimer > 0.05f) {
-							/*int randomSound = rand() % 3 + 1;
-							std::string soundEffect = "data/sound/MetalImpactPitched" + to_string(randomSound) + ".wav";
-							Sound::play(soundEffect);*/
 							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
@@ -174,9 +171,6 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						/*int randomSound = rand() % 3 + 1;
-						std::string soundEffect = "data/sound/MetalImpactPitched" + to_string(randomSound) + ".wav";
-						Sound::play(soundEffect);*/
 						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
@@ -186,7 +180,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 				if (bulletArray[j].getMelee() == true && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+						Sound::play("data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());

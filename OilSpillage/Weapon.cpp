@@ -34,6 +34,9 @@ Bullet::~Bullet()
 
 void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity, float deltaTime)
 {
+	this->initPos = position;
+	this->initDir = direction;
+
 	this->weapon = Weapon(weapon);
 	if (this->weapon.type == WeaponType::None)
 	{
@@ -141,6 +144,12 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 
 void Bullet::update(float deltaTime)
 {
+	if (this->weapon.type == WeaponType::Laser || this->weapon.melee)
+	{
+		this->obj->setPosition(initPos);
+		this->dir = initDir;
+	}
+
 	if (this->weapon.type == WeaponType::None)
 	{
 
@@ -191,7 +200,7 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 		{
 			if (soundTimer > 0.05f) {
 				int randomSound = rand() % 3 + 1;
-				std::string soundEffect = "./data/sound/CarGlass" + to_string(randomSound) + ".wav";
+				std::string soundEffect = "./data/sound/CarGlass" + std::to_string(randomSound) + ".wav";
 				Sound::play(soundEffect);
 				Sound::play("./data/sound/MetalImpact1.wav");
 				soundTimer = 0;

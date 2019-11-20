@@ -95,10 +95,10 @@ private:
 	GameObject* wheel2;
 	GameObject* wheel3;
 	GameObject* wheel4;
-	btGeneric6DofSpring2Constraint* spring1;
-	btGeneric6DofSpring2Constraint* spring2;
-	btGeneric6DofSpring2Constraint* spring3;
-	btGeneric6DofSpring2Constraint* spring4;
+	//btGeneric6DofSpring2Constraint* spring1;
+	//btGeneric6DofSpring2Constraint* spring2;
+	//btGeneric6DofSpring2Constraint* spring3;
+	//btGeneric6DofSpring2Constraint* spring4;
 	GameObject* vehicleBody1;
 	btPoint2PointConstraint* pointJoint;
 	//btRaycastVehicle* vehicleBody;

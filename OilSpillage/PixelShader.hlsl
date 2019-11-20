@@ -119,8 +119,6 @@ float4 main(VS_OUT input) : SV_Target
 		normal = normalize(mul(normalMap, TBN));
 	}
 
-	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
-
 	uint2 lightTileIndex = uint2(input.Pos.x * 0.0625f, input.Pos.y * 0.0625f);
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 

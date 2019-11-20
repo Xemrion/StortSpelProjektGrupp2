@@ -51,7 +51,7 @@ struct Weapon
 		}
 		timeSinceLastShot += deltaTime;
 		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * maxSpread * 2.0, 0.0);
-		remainingCooldown = max(this->weapon.remainingCooldown - deltaTime, 0.0);
+		remainingCooldown = max(remainingCooldown - deltaTime, 0.0);
 	};
 
 	bool updateFireRate()
@@ -145,6 +145,8 @@ class Bullet
 	void laserUpdate(float& deltaTime);
 	GameObject* obj = nullptr;
 	Vector3 dir;
+	Vector3 initDir;
+	Vector3 initPos;
 	float timeLeft = 0.0f;
 	Weapon weapon;
 	static float soundTimer;

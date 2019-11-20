@@ -353,8 +353,8 @@ bool Graphics::init(Window* window)
 	this->particleSystem.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
 	this->particleSystem2.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
 
-	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem.addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem2.addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
@@ -410,7 +410,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->OMSetRenderTargets(0,nullptr, nulDSV);
 
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
-	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	//deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
 
 	fillLightBuffers();
 	cullLights(camera->getViewMatrix());

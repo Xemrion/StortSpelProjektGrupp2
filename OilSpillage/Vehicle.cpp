@@ -57,8 +57,8 @@ Vehicle::~Vehicle()
 	delete wheel2;
 	delete wheel3;
 	delete wheel4;
-	delete spring1;
-	delete pointJoint;
+	//delete spring1;
+	//delete pointJoint;
 	delete this->vehicleSlots;
 }
 
@@ -151,26 +151,33 @@ void Vehicle::updatePlayer(float deltaTime)
 
 void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)
 {
-	if (this->deadImpulse == true && this->health <= 0)
-	{
-		this->respawnTimer += deltaTime;
-		if (this->respawnTimer > 5)
-		{
-			this->resetHealth();
-			this->immortal = true;
-			this->immortalTimer = 5.0f;
-			this->vehicle->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getRespawnPosition());
-			this->vehicleBody1->setPosition(dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getRespawnPosition() + Vector3(0.0f, 0.65f, 0.0f));
+	PlayingGameState* playing = dynamic_cast<PlayingGameState*>(Game::getCurrentState());
 
-					this->deadImpulse = false;
-					this->respawnTimer = 0.0f;
-		}
-	}
-	if (dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime() == 0)
+	if (playing != nullptr)
 	{
-		this->respawnTimer = 0.0f;
+		if (this->deadImpulse == true && this->health <= 0)
+		{
+			this->respawnTimer += deltaTime;
+			if (this->respawnTimer > 5)
+			{
+				this->resetHealth();
+				this->immortal = true;
+				this->immortalTimer = 5.0f;
+				this->vehicle->setPosition(playing->getRespawnPosition());
+				this->vehicleBody1->setPosition(playing->getRespawnPosition() + Vector3(0.0f, 0.65f, 0.0f));
+
+				this->deadImpulse = false;
+				this->respawnTimer = 0.0f;
+			}
+		}
+		if (playing->getTime() == 0)
+		{
+			this->respawnTimer = 0.0f;
+		}
+
+		updatePowerUpEffects(deltaTime);
 	}
-	updatePowerUpEffects(deltaTime);
+	
 	
 	tempTargetRotation = targetRotation;
 
@@ -750,11 +757,6 @@ void Vehicle::updateWeapon(float deltaTime)
 		{
 			for (int i = 0; i < Vehicle::bulletCount; i++)
 			{
-				if (bullets[i].getWeaponType() == WeaponType::Laser)
-				{
-					bullets[i].getGameObject()->setPosition(this->vehicleBody1->getPosition());
-					//bullets[i].setDirection(Vector3(curDir.x, 0, curDir.y));
-				}
 				bullets[i].update(deltaTime);
 			}
 			if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
@@ -957,9 +959,9 @@ void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 	//AccelForce
 	if ((max(abs(accelForce.x), abs(accelForce.z)) > 5.0f)) {
 		int randomSound = rand() % 3 + 1;
-		std::string soundEffect = "./data/sound/CarImpact" + to_string(randomSound) + ".wav";
+		std::string soundEffect = "./data/sound/CarImpact" + std::to_string(randomSound) + ".wav";
 		int randomSound2 = rand() % 3 + 1;
-		std::string soundEffect2 = "./data/sound/MetalImpactPitched" + to_string(randomSound) + ".wav";
+		std::string soundEffect2 = "./data/sound/MetalImpactPitched" + std::to_string(randomSound) + ".wav";
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
 			Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-20.0f);
