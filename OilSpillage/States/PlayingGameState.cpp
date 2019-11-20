@@ -50,9 +50,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
 	graphics.loadTexture("grass3");
-
 	graphics.loadTexture("brickwallnormal");
-	graphics.loadModel("Roller_Melee");
 	graphics.loadModel("Entities/Turret");
 	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
 
@@ -117,6 +115,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("Tiles/road_2file_4way_nor");
 	// missing: single tile road!
 
+	for ( auto &tileset: houseTilesets )
+		for ( auto &part: std::vector{ "f_ic", "f_oc", "f_sa", "f_sb", "w_ic", "w_oc", "w_sa", "w_sb",
+                                     "r_ic", "r_oc", "r_sa", "r_sb", "r_m" } )
+			graphics.loadModel( "Houses/tilesets/" + tileset.name + "/" + part );
+
+	loadMultitileLayouts("data/layouts/multitilePrefabs.dat");
+
 	graphics.loadModel("Hospital");
 	//graphics.loadModel("Roads/Road_pavement");
 	//graphics.loadModel("Roads/Road_deadend");
@@ -130,9 +135,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadModel("Houses/testHouse4");
 	graphics.loadModel("Houses/testHouse5");
 	graphics.loadModel("Houses/testHouse6");
-	graphics.loadModel("Houses/houseMaterial");
-	graphics.loadModel("Houses/houseMaterial2");
-	graphics.loadModel("Houses/houseMaterial3");
+	graphics.loadMaterial("Houses/houseMaterial");
+	graphics.loadMaterial("Houses/houseMaterial2");
+	graphics.loadMaterial("Houses/houseMaterial3");
 
 
 	player = std::make_unique<Vehicle>();
@@ -180,7 +185,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	player->init(physics.get());
 
 	map = std::make_unique<Map>(graphics, config, physics.get());
-	map->setDistrictColorCoding(isDebugging);
 	// Minimap stuff
 	auto tilemap = map->getTileMap();
 	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
@@ -378,21 +382,12 @@ void PlayingGameState::ImGui_Particles()
 #include "../PG/MinimapTextureGenerator.hpp"
 void PlayingGameState::ImGui_ProcGen()
 {
-	static Bool shouldColorCodeDistricts{ true };
 	ImGui::Begin("Map Generation:");
 	if (static bool isFirstFrame = true;  isFirstFrame) {
 		ImGui::SetWindowPos({ 0,  75 });
 		ImGui::SetWindowSize({ 525, 475 });
 		isFirstFrame = false;
 	}
-
-	ImGui::Separator();
-
-	// debug colors toggle:
-	bool shouldColorCodeDistrictsPrevFrame = shouldColorCodeDistricts;
-	ImGui::Checkbox("Show district colors", &shouldColorCodeDistricts);
-	if (shouldColorCodeDistricts != shouldColorCodeDistrictsPrevFrame)
-		map->setDistrictColorCoding(shouldColorCodeDistricts);
 
 	ImGui::Separator();
 
@@ -484,7 +479,6 @@ void PlayingGameState::ImGui_ProcGen()
 
 		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
 		player->getVehicleBody1()->setPosition( map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f) );
-		map->setDistrictColorCoding(shouldColorCodeDistricts);
 		minimap = createMinimapTexture(*map);
 		aStar->generateTileData(map->getTileMap());
 		// minimap stuff

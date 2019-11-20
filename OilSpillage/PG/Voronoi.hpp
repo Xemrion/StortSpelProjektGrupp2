@@ -19,6 +19,8 @@ public:
 	Size         computeCellRealEstateArea( U32 const cellId, TileMap const & ) const noexcept;
 	F32          computeCellRoadCoverage( U32 const cellId, TileMap const & ) const noexcept;
 	Bounds       computeCellBounds( U32 const cellId ) const noexcept;
+	inline Size  idAt( U32 x, U32 y ) const noexcept { return diagram[diagramIndex(x,y)]; }
+	inline Size  idAt( V2u xy ) const noexcept { return idAt(xy.x, xy.y); }
 
 	U8  const          cellSize;
 	U32 const          width,

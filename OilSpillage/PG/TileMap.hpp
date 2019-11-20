@@ -35,6 +35,7 @@ public:
 	Vector<Size>        getNeighbouringIndices( V2u tilePosition ) const noexcept;	
 	Vector<V2u>         getNeighbouringTilePositions( V2u tilePosition ) const noexcept;
 	Vector<GameObject>  loadAsModels( Graphics & ) const;
+	void                applyLot( Lot const &, Tile ) noexcept;
 
 	// returns the proper look-up index for the tile @ x,y in the graphics table
 	inline Size  getTileLookupIndex( U16 tileX, U16 tileY ) const noexcept

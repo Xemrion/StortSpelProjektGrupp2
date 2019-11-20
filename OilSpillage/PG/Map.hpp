@@ -10,6 +10,51 @@
 #include "../UI/UIPlaying.h"
 #include "Biome.hpp"
 
+struct HouseTileset {
+	String                  name;
+	F32                     floorHeight;
+	Vector<District::Enum>	validInDistricts;
+};
+
+extern Vector<HouseTileset> const houseTilesets;
+
+auto getCompatibleTilesets( District::Enum d ) noexcept;
+
+struct MultitileLayout {
+   U32        width, length; // size() => width*length
+   Vector<U8> floors;        // floors[y * width +x]
+};
+
+extern Vector<MultitileLayout> multitileLayouts;
+
+void loadMultitileLayouts( String const &path );
+
+Opt<const MultitileLayout *> getMultitileLayout( District::Enum, RNG & ) noexcept;
+
+// struct PrefabHouse {
+// 	TODO
+// };
+
+struct CompositeHouse {
+	GameObject  walls, windows, roof;
+	Bounds      bounds;
+};
+
+struct SingleTileHouse {
+	GameObject   object;
+};
+
+struct MultiTileHouse {
+	Vector<GameObject> parts;
+	Bounds             bounds;
+};
+
+struct HouseGenData {
+	Vector<SingleTileHouse>  singles;
+	Vector<MultiTileHouse>   multis;
+	Vector<CompositeHouse>   composites;
+};
+
 class Map {
 public:
 	Map( Graphics &, MapConfig const &, Physics * );
@@ -24,7 +69,6 @@ public:
 
 	V2u                        generateRoadPositionInTileSpace(  RNG & ) const noexcept;
 	Vector3                    generateRoadPositionInWorldSpace( RNG & ) const noexcept;
-	void                       setDistrictColorCoding ( Bool useColorCoding ) noexcept;
 	V2u                        getStartPositionInTileSpace()  const noexcept;
 	Vector3                    getStartPositionInWorldSpace() const noexcept;
 	TileMap const &            getTileMap() const noexcept;
@@ -34,24 +78,27 @@ public:
 	Opt<V2u>                   getNearestFoundHospitalTilePos( Vector3 const &sourceWorldPos, UIPlaying const & ) const noexcept;
 	Direction                  getHospitalOrientation(   V2u const hospitalTilePos ) const noexcept;
 	Vector3                    getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept;
-	District::Type const *     districtAt( U32 x, U32 y ) const noexcept;
+	District::Enum             districtAt( U32 x, U32 y ) const noexcept;
 	Biome                      getBiome() const noexcept;
 private:
 	void                       generateDistricts();
 	void                       generateRoads();
 	void                       generateBuildings();
-	Opt<Vector<V2u>>           findValidHouseLot( RNG &, U16 districtCellID, Voronoi const &, TileMap & );
+	void                       generateMultitileBuildings();
+	Opt<Lot>                   findRandomLot( U16 districtId ) noexcept;
+	Opt<Lot>                   findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
 	Vector<UPtr<GameObject>>   instantiateTilesAsModels() noexcept;
-	Vector<Vector<GameObject>> instantiateHousesAaModels() noexcept;
-	void                       generateTransitions() noexcept;
-	Graphics &                     graphics;
-	V2u                            startPositionInTileSpace;
-	UPtr<TileMap>                  tilemap;
-	UPtr<Voronoi>                  districtMap;
-	Vector<District::Type const *> districtLookupTable;
-	Vector<UPtr<GameObject>>       groundTiles;
-	Vector<GameObject>             houseTiles;
-	Physics * const                physics;
+	void                       instantiateHousesAsModels() noexcept;
+	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout const &, HouseTileset const & ) const noexcept;
+	//void                       generateTransitions() noexcept;
+	Graphics &               graphics;
+	V2u                      startPositionInTileSpace;
+	UPtr<TileMap>            tilemap;
+	UPtr<Voronoi>            districtMap;
+	Vector<District::Enum>   districtLookupTable;
+	Vector<UPtr<GameObject>> groundTiles;
+	Vector<GameObject>       houseTiles;
+	Physics * const          physics;
 	// TODO: refactor out:
 	using DistrictID = U16;
 	using BuildingID = U16;                         // 0 = unused tile
@@ -62,4 +109,6 @@ private:
 	void                     generateRoadDistanceMap() noexcept;
 	Vector<Opt<V2u>>         hospitalTable;
 	Biome                    biome;
+	HouseGenData             houses;
+	RNG                      rng; // TODO, instantiate in ctor
 };

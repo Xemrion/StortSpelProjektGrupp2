@@ -703,11 +703,12 @@ ID3D11Device* Graphics::getDevice()
 	return this->device.Get();
 }
 
-void Graphics::loadMesh(std::string fileName, Vector3 rotation)
+void Graphics::loadMesh( std::string const &fileName, Vector3 rotation )
 {
+	if ( fileName == "Cube" ) return;
+
 	Mesh newMesh;
 
-	
 	Importer imp;
 	std::string meshBinPath = fileName + "/mesh.bin";
 	if (imp.loadMesh(meshBinPath.c_str()))
@@ -836,20 +837,26 @@ void Graphics::loadMesh(std::string fileName, Vector3 rotation)
 		}
 
 	}
-	
+	else assert( false and "Failed to load mesh!" );
+}
+
+void Graphics::loadModel( std::string const &path, Vector3 rotation )
+{
+   std::string  modelDir {MODEL_ROOT_DIR};
+                modelDir += path;
+	loadMesh(    modelDir, rotation );
+	loadMaterial( path );
 }
 
 
-void Graphics::loadModel(std::string path, Vector3 rotation)
+void Graphics::loadMaterial( std::string const &path )
 {
-   std::string modelDir {MODEL_ROOT_DIR};
-               modelDir += path;
-	loadMesh( modelDir ,rotation);
-	loadTexture( modelDir+"/_diffuse.tga", true );
-   // TODO: load other texture channels
-	loadTexture(modelDir + "/_specular.tga", true);
-	loadTexture(modelDir + "/_normal.tga", true);
-	loadTexture(modelDir + "/_gloss.tga", true);
+	std::string  modelDir {MODEL_ROOT_DIR};
+                modelDir += path;
+	loadTexture( modelDir + "/_diffuse.tga",  true );
+	loadTexture( modelDir + "/_specular.tga", true );
+	loadTexture( modelDir + "/_normal.tga",   true );
+	loadTexture( modelDir + "/_gloss.tga",    true );
 }
 
 void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)

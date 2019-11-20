@@ -44,6 +44,8 @@ Bool  TileMap::walk( U16 &x, U16 &y, Direction d, Tile tile )
 	}
 }
 
+
+// deprecate?
 Vector<GameObject>  TileMap::loadAsModels( Graphics &graphics ) const
 {
 	Vector<GameObject> tiles( width * height ); // reserve
@@ -88,6 +90,14 @@ currentTileType += ((y < height-1) and (tileAt(x,y+1) == Tile::road))? '1' : '0'
 	}
 	return tiles; // RVO/Copy Elision
 */
+}
+
+void  TileMap::applyLot( Lot const &lot, Tile tile ) noexcept
+{
+	for ( auto x = lot.nw.x;  x < lot.nw.x+lot.width;  ++x )
+		for ( auto y = lot.nw.y;  y < lot.nw.y+lot.length;  ++y )
+			if ( lot.intersects(x,y) )
+				data[index(x,y)] = tile;
 }
 
 Bool  TileMap::neighbourIsRoad(Direction dir, U16 x, U16 y) const noexcept
