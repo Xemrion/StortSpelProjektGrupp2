@@ -22,7 +22,6 @@ public:
 protected:	
 	int aggroRange;
 	int boidOffset;
-
 	Vector3 predictedTargetPos;
 	Vector3 destination;
 	Vector3 acceleration;

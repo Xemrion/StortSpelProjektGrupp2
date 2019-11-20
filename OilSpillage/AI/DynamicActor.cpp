@@ -5,7 +5,7 @@ DynamicActor::DynamicActor()
 }
 
 DynamicActor::DynamicActor(float x, float z, Physics* physics)
-	:Actor(x, z, physics)
+	:Actor(x, z,physics)
 {
 	this->maxSpeed = 3.5f;
 	this->maxForce = 0.5f;
@@ -14,12 +14,6 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 	this->state = State::Idle;
 	this->pathSize = -1;
 	this->aggroRange = 1000;
-	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(x, position.y, z), 0.5f, this);
-	setRigidBody(tempo, physics);
-	getRigidBody()->activate();
-	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	getRigidBody()->setFriction(0);
-	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
 }
 
 DynamicActor::~DynamicActor()
@@ -108,6 +102,8 @@ const Vector3& DynamicActor::getVelocity()const
 {
 	return this->velocity;
 }
+
+
 
 Vector3 DynamicActor::seek()
 {

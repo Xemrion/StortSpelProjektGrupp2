@@ -8,7 +8,8 @@ public:
 	Swarm(float x, float z, Physics* physics);
 	~Swarm();
 	void update(float dt, const Vector3& targetPos);
-
+protected:
+	void createRigidbody(Physics* physics);
 private:
 	void setUpActor();
 	Vector3 seek();

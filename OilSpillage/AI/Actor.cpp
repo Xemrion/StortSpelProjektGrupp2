@@ -12,7 +12,6 @@ Actor::Actor()
 
 Actor::Actor(float x, float z,Physics* physics)
 {
-	this->setUpActor();
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, -1.0f, z);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
@@ -43,3 +42,6 @@ bool Actor::isDead() const
 {
 	return this->health <= 0;
 }
+
+
+
