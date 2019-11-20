@@ -14,7 +14,13 @@ Sound::~Sound()
 void Sound::init()
 {
 	instance = std::make_unique<Sound>();
-	instance->soloud.init(SoLoud::Soloud::FLAGS::LEFT_HANDED_3D);
+	SoLoud::result result = instance->soloud.init(SoLoud::Soloud::FLAGS::LEFT_HANDED_3D);
+
+	if (result == SoLoud::UNKNOWN_ERROR)
+	{
+		instance->soloud.init(SoLoud::Soloud::FLAGS::LEFT_HANDED_3D, SoLoud::Soloud::NULLDRIVER);
+	}
+
 	instance->soloud.setMaxActiveVoiceCount(64);
 }
 
