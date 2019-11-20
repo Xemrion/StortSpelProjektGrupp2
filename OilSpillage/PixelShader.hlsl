@@ -28,6 +28,7 @@ struct TileData
 cbuffer MaterialBuffer : register(b0)
 {
 	float4 color;
+	float4 shadeTrue;
 }
 
 cbuffer Lights : register(b1)
@@ -98,6 +99,11 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float bias)
 };
 float4 main(VS_OUT input) : SV_Target
 {
+	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
+	/*if (shadeTrue.x == 0)
+	{
+		return texColor;
+	}*/
 	float3 normal = input.NormalWS.xyz;
 	float3 tangent = input.TangentWS.xyz;
 	float3 bitangent = input.BitangentWS.xyz;
@@ -112,8 +118,6 @@ float4 main(VS_OUT input) : SV_Target
 		float3x3 TBN = float3x3(tangent, bitangent, normal);
 		normal = normalize(mul(normalMap, TBN));
 	}
-
-	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
 
 	uint2 lightTileIndex = uint2(input.Pos.x * 0.0625f, input.Pos.y * 0.0625f);
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];

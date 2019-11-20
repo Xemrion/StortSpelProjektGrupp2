@@ -123,6 +123,17 @@ bool Graphics::init(Window* window)
 		{
 			return false;
 		}
+		result = device->CreateTexture2D(&descDepth, NULL, &this->uiDSB);
+		if (FAILED(result))
+		{
+			return false;
+		}
+		result = device->CreateDepthStencilView(this->uiDSB.Get(), NULL, &uiDSV);
+		if (FAILED(result))
+		{
+			return false;
+		}
+
 		deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 
 		//the depth Stencil State
@@ -175,7 +186,7 @@ bool Graphics::init(Window* window)
 	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
-	desc.ByteWidth = static_cast<UINT>(sizeof(Vector4) + (16 - (sizeof(Vector4) % 16)));
+	desc.ByteWidth = static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16)));
 	desc.StructureByteStride = 0;
 
 	hr = device->CreateBuffer(&desc, 0, &colorBuffer);
@@ -342,8 +353,8 @@ bool Graphics::init(Window* window)
 	this->particleSystem.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
 	this->particleSystem2.initiateParticles(device.Get(), deviceContext.Get(), L"ParticleUpdateCS.cso", L"ParticleCreateCS.cso", L"ParticleGS.cso");
 
-	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem.addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem2.addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
@@ -351,6 +362,10 @@ bool Graphics::init(Window* window)
 	fogMaterial.density = 0.03;
 	fogMaterial.ambientDensity = 0.025;
 	fogMaterial.densityThreshold = 0.05;
+
+	uiCamera= DynamicCamera(20, 0.1f, 1000);
+	uiCamera.setPosition(Vector3(0, 0, -10));
+
 
 	fog->initialize(device, deviceContext, 3, 1.25, fogMaterial);
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
@@ -377,7 +392,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	float color[4] = {
 		0,0,0,1
 	};
-	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	//deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
 	// Clear the depth buffer.
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
@@ -395,7 +410,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->OMSetRenderTargets(0,nullptr, nulDSV);
 
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
-	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	//deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
 
 	fillLightBuffers();
 	cullLights(camera->getViewMatrix());
@@ -484,9 +499,11 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 					glossSRV = material.gloss->getShaderResView();
 				}
 
-				Vector4 modColor = object->getColor();
+				MaterialColor modColor;
+				modColor.color = object->getColor();
+				modColor.shading.x = object->getShading();
 				hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-				CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
+				CopyMemory(mappedResource.pData, &modColor, static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16))));
 				deviceContext->Unmap(colorBuffer.Get(), 0);
 
 				deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
@@ -645,6 +662,10 @@ bool Graphics::createShaders()
 	UINT numElements = ARRAYSIZE(inputDesc);
 	this->shaderDefault.createVS(device.Get(), shaderfolder + L"VertexShader.cso", inputDesc, numElements);
 	this->shaderDefault.createPS(device.Get(), shaderfolder + L"PixelShader.cso");
+	if (!this->uiVertexShader.initialize(device.Get(), shaderfolder + L"VertexUI.cso", inputDesc, numElements))
+	{
+		return false;
+	}
 
 	D3D11_INPUT_ELEMENT_DESC inputDesc2[] =
 	{
@@ -679,6 +700,8 @@ bool Graphics::createShaders()
 	}
 
 	this->lightCullingShader.initialize(device.Get(), shaderfolder + L"ComputeLightCulling.cso");
+	this->uiPixelShader.initialize(device.Get(), shaderfolder + L"PixelUI.cso");
+
 
 	return true;
 }
@@ -731,10 +754,22 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 	this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
-void Graphics::clearScreen()
+Vector3 Graphics::screenToWorldSpaceUI(Vector2 screenPos)
 {
-	float color[4] = { 0,0,0,1 };
-	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	Vector2 s0((screenPos * 2.0f) / Vector2(1280, 720) - Vector2::One);
+	Matrix ortho = Matrix::CreateOrthographic(1280, 720, 50.0f, 100.0f);
+	//ortho = uiCamera.getProjectionMatrix().Invert();
+	Vector4 w0(Vector4::Transform(Vector4(s0.x, -s0.y, 0.0f, 1.0f), uiCamera.getProjectionMatrix().Invert()/*this->uiCamera.getProjectionMatrix().Invert()*/));
+	w0 *= w0.w;
+	w0.w = 1.0f;
+	w0 = Vector4::Transform(w0, this->uiCamera.getViewMatrix().Invert());
+
+	return Vector3(w0.x, w0.y, 0);
+}
+
+void Graphics::clearScreen(Vector4 color)
+{
+	deviceContext->ClearRenderTargetView(renderTargetView.Get(), &color.x);
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 }
 
@@ -1222,6 +1257,139 @@ void Graphics::clearStaticObjects()
 	quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
 }
 
+void Graphics::addToUIDraw(GameObject* obj, Matrix* world)
+{
+	assert(obj != nullptr);
+	uiObjects.push_back(std::pair<GameObject*, Matrix*>(obj, world));
+}
+
+void Graphics::removeFromUIDraw(GameObject* obj, Matrix* world)
+{
+	for (auto pair = uiObjects.begin(); pair != uiObjects.end(); pair++)
+	{
+		if ((*pair).first == obj && (*pair).second == world)
+		{
+			uiObjects.erase(pair);
+			break;
+		}
+	}
+}
+
+void Graphics::removeAllUIDraw()
+{
+	uiObjects.clear();
+}
+
+void Graphics::setUISun(Vector3 direction, Vector4 color)
+{
+	this->uiSun.setColor(Vector3(color.x, color.y, color.z));
+	this->uiSunDir = direction;
+	this->uiSun.setDirection(this->uiSunDir);
+}
+
+void Graphics::renderUI(float deltaTime)
+{
+	float color[4] = {
+		0,0,0,1
+	};
+	//deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	// Clear the depth buffer.
+	deviceContext->ClearDepthStencilView(this->uiDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
+	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceContext->RSSetState(rasterState.Get());
+
+
+	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), this->uiDSV.Get());
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+
+	HRESULT hr = deviceContext->Map(sunBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &uiSun, sizeof(Sun));
+	deviceContext->Unmap(sunBuffer.Get(), 0);
+	
+	Matrix ortho = Matrix::CreateOrthographic(1280, 720, 50.0f, 100.0f);
+	ortho = uiCamera.getProjectionMatrix();
+	Matrix viewProj = (uiCamera.getViewMatrix() * ortho).Transpose();
+	hr = deviceContext->Map(viewProjBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
+	deviceContext->Unmap(viewProjBuffer.Get(), 0);
+	
+
+	deviceContext->RSSetViewports(1, &this->vp);
+
+	//set up Shaders
+
+
+	deviceContext->PSSetShader(this->uiPixelShader.getShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->uiVertexShader.getShader(), nullptr, 0);
+	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
+
+	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
+
+	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	int index = 0;
+	for (std::pair<GameObject*,Matrix*> object : this->uiObjects)
+	{
+		SimpleMath::Matrix world = *object.second;//worlds[]
+		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
+		deviceContext->Unmap(worldBuffer.Get(), 0);
+		UINT vertexCount = object.first->mesh->getVertexCount();
+		UINT stride = sizeof(Vertex3D);
+		UINT offset = 0;
+		Material material = object.first->getMaterial();
+
+		ID3D11ShaderResourceView* textureSRV = nullptr;
+		if (material.diffuse != nullptr)
+		{
+			textureSRV = material.diffuse->getShaderResView();
+		}
+		ID3D11ShaderResourceView* normalSRV = nullptr;
+		if (material.normal != nullptr)
+		{
+			normalSRV = material.normal->getShaderResView();
+		}
+		ID3D11ShaderResourceView* specularSRV = nullptr;
+		if (material.specular != nullptr)
+		{
+			specularSRV = material.specular->getShaderResView();
+		}
+		ID3D11ShaderResourceView* glossSRV = nullptr;
+		if (material.gloss != nullptr)
+		{
+			glossSRV = material.gloss->getShaderResView();
+		}
+
+		Vector4 modColor = object.first->getColor();
+		hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
+		deviceContext->Unmap(colorBuffer.Get(), 0);
+
+		
+
+		deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		deviceContext->IASetVertexBuffers(0, 1, object.first->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+		deviceContext->PSSetShaderResources(0, 1, &textureSRV);
+		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
+		deviceContext->PSSetShaderResources(5, 1, &specularSRV);
+		deviceContext->PSSetShaderResources(6, 1, &glossSRV);
+		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
+
+		deviceContext->Draw(vertexCount, 0);
+		index++;
+	}
+
+	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
+	deviceContext->PSSetShader(this->shaderDebug.ps.getShader(), nullptr, 0);
+	deviceContext->VSSetShader(this->shaderDebug.vs.getShader(), nullptr, 0);
+}
+
 void Graphics::setLightList(LightList* lightList)
 {
 	this->lightList = lightList;
@@ -1230,7 +1398,7 @@ void Graphics::setLightList(LightList* lightList)
 
 void Graphics::presentScene()
 {
-	swapChain->Present(0, 0);
+	swapChain->Present(1, 0);
 }
 
 void Graphics::fillLightBuffers()

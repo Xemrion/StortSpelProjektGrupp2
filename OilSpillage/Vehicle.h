@@ -7,23 +7,98 @@
 #include "Powerup.h"
 #include "Sound.h"
 #include"Lights.h"
+#include"Inventory/Item.h"
+#include"Inventory/ItemWeapon.h"
 using namespace DirectX::SimpleMath;
+enum Slots
+{
+	FRONT,
+	LEFT,
+	RIGHT,
+	MOUNTED,
+	BACK,
+	SIZEOF
+};
+struct VehicleSlots
+{
+	Item** slots;
+	void setSlot(Slots slot, Item* item)
+	{
+		if (this->slots[int(slot)] != nullptr)
+		{
+			delete this->slots[int(slot)];
+		}
+		this->slots[int(slot)] = item;
+		if (item != nullptr)
+		{
+			if (item->getObject() != nullptr)
+			{
+				item->getObject()->setRotation(Vector3(0,0.0f,0));
+				item->getObject()->setScale(Vector3(0.25f));
+				item->getObject()->setSpotShadow(false);
+			}
+		}
+	};
+	Item* getSlot(Slots slot)
+	{
+		if (this->slots[int(slot)] != nullptr)
+		{
+			return this->slots[int(slot)];
+		}
+		else
+		{
+			return nullptr;
+		}
+	};
+	VehicleSlots()
+	{
+		slots = new Item * [Slots::SIZEOF];
+		for (int i = 0; i < Slots::SIZEOF; i++)
+		{
+			this->slots[i] = nullptr;
+		}
+	};
+	~VehicleSlots()
+	{
+		for (int i = 0; i < Slots::SIZEOF; i++)
+		{
+			if (this->slots[i] != nullptr)
+			{
+				delete this->slots[i];
+			}
+		}
+		delete[] this->slots;
+	};
+	VehicleSlots(const VehicleSlots& obj)
+	{
+		this->slots = new Item * [Slots::SIZEOF];
+		for (int i = 0; i < Slots::SIZEOF; i++)
+		{
+			if (obj.slots[i] != nullptr)
+			{
+				this->slots[i] = obj.slots[i]->clone();//will make new item/itemWeapon
+			}
+			else
+			{
+				this->slots[i] = nullptr;
+			}
+		}
+	}
 
+};
 class Vehicle
 {
 private:
 	GameObject* vehicle;
 	btScalar mRotation;
-	GameObject* mountedWeapon;//Mounted on top of the car
-	GameObject* frontWeapon;
 	GameObject* wheel1;
 	GameObject* wheel2;
 	GameObject* wheel3;
 	GameObject* wheel4;
-	btGeneric6DofSpring2Constraint* spring1;
-	btGeneric6DofSpring2Constraint* spring2;
-	btGeneric6DofSpring2Constraint* spring3;
-	btGeneric6DofSpring2Constraint* spring4;
+	//btGeneric6DofSpring2Constraint* spring1;
+	//btGeneric6DofSpring2Constraint* spring2;
+	//btGeneric6DofSpring2Constraint* spring3;
+	//btGeneric6DofSpring2Constraint* spring4;
 	GameObject* vehicleBody1;
 	btPoint2PointConstraint* pointJoint;
 	//btRaycastVehicle* vehicleBody;
@@ -38,6 +113,8 @@ private:
 	float respawnTimer;
 	float totalRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
+
+	VehicleSlots* vehicleSlots;
 
 	float timeSinceLastShot;
 	float timeSinceLastShot2;
@@ -93,12 +170,17 @@ public:
 	void updatePlayer(float deltaTime);
 	void update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput);
 	void updateWeapon(float deltaTime);
-
+	void setVehicleSlots(VehicleSlots* slots);
+	void setSpecSlot(Slots slot, Item* item);
+	VehicleSlots* getSlots();
 	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
 
+	Stats getStats()const; 
+
 	void setSpotLight(SpotLight* theLight);
+	SpotLight* getSpotLight();
 	void setLaserLight(LaserLight* light);
 	void setDrivingMode(int i);
 	bool getDrivingMode();

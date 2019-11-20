@@ -53,8 +53,9 @@ public:
 	void addPowerUp(PowerUp p);
 	void clearPowerUps();
 
+	std::unique_ptr<Vehicle>& getPlayer();
+	void setPlayer(Vehicle* theVehicle);
 	ActorManager* actorManager;
-	std::unique_ptr<Map>            map;
 
 private:
 	friend class Game;
@@ -71,6 +72,7 @@ private:
 	MapConfig                       config;
 	Graphics                       &graphics;
 	AStar                          *aStar;
+	std::unique_ptr<Map>            map;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
@@ -80,6 +82,8 @@ private:
 	std::vector<std::unique_ptr<PowerUp>> powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
+	GameObject* testObjective2; //Test
+
 	GameObject* objTestPickUp;
 	GameObject* objTestPickUp2;
 	GameObject* objTestPickUp3;
@@ -99,7 +103,6 @@ private:
 	Vector3 accelForce;
 
 	int								spawnTimer = 0;
-	float							soundAggro;
 
 	int                             addNrOfParticles  {     2 };
 	int                             lifeTime          {     1 };

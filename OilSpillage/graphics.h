@@ -33,7 +33,11 @@ enum Shapes
 	SHAPE_CUBE,
 	SHAPE_QUAD
 };
-
+struct MaterialColor
+{
+	Vector4 color;
+	Vector4 shading;
+};
 class Graphics {
 	Window* window;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
@@ -77,7 +81,7 @@ class Graphics {
 	};
 	LightBufferContents* lightBufferContents = nullptr;
 	std::unique_ptr<QuadTree> quadTree;
-
+	
 	ParticleSystem particleSystem;
 	ParticleSystem particleSystem2;
 
@@ -89,6 +93,16 @@ class Graphics {
 	Debug* debugger;
 	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
+
+	DynamicCamera uiCamera;
+	PixelShader uiPixelShader;
+	VertexShader uiVertexShader;
+	Sun uiSun;
+	Vector3 uiSunDir = Vector3(0.0, 1.0, 0.0);
+	std::vector<std::pair<GameObject*,Matrix*>> uiObjects;
+
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> uiDSV;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> uiDSB;
 
 	void cullLights(Matrix view);
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
@@ -113,13 +127,20 @@ public:
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
 	void clearStaticObjects();
+
+	void addToUIDraw(GameObject* obj, Matrix* world);
+	void removeFromUIDraw(GameObject* obj, Matrix* world);
+	void removeAllUIDraw();
+	void setUISun(Vector3 direction, Vector4 color);
+	void renderUI(float deltaTime);
+
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera, float deltaTime);
 	void renderShadowmap(DynamicCamera* camera);
 	bool createShaders();
 	void fillLightBuffers();
-	void clearScreen();
+	void clearScreen(Vector4 color);
 	ID3D11DeviceContext* getDeviceContext();
 	ID3D11Device* getDevice();
 	//culling by distance from camera
@@ -132,6 +153,7 @@ public:
 	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setVectorField(float vectorFieldSize,float vectorFieldPower);
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
+	Vector3 screenToWorldSpaceUI(Vector2 screenPos);
 
 	float farZTempShadow;
 	void setSpotLightShadow(SpotLight* spotLight);

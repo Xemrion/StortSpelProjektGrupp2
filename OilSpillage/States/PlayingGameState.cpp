@@ -1,9 +1,9 @@
 #include "PlayingGameState.h"
 #include "../Sound.h"
 #include "../Input.h"
-#include "../UI/UIPlaying.h"
-#include "../UI/UIPaused.h"
-#include "../UI/UIOptions.h"
+#include "../UI/Playing/UIPlaying.h"
+#include "../UI/Playing/UIPaused.h"
+#include "../UI/Menu/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
 #include <future>
@@ -200,6 +200,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	initAI();
 
+
+
+	Game::getGraphics().setUISun(Vector3(1.0f, -1.0f, 0.1f), Vector4(0.84, 0.83, 0, 1));
+
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
@@ -236,7 +240,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
-
+	
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	graphics.loadModel("Vehicles/Player");
@@ -254,14 +258,14 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	count = 0;
 	prevAccelForce = Vector3(0, 0, 0);
 	accelForce = Vector3(0, 0, 0);
-	soundAggro = 0;
 }
 
 PlayingGameState::~PlayingGameState()
 {
 	delete aStar;
 	delete actorManager;
-	delete testObjective;
+
+
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
 	delete this->objTestPickUp3;
@@ -527,6 +531,18 @@ Vector3 PlayingGameState::getRespawnPosition() const noexcept
 	else return map->getStartPositionInWorldSpace() + Vector3(0, -1.2f, 0);
 }
 
+std::unique_ptr<Vehicle>& PlayingGameState::getPlayer()
+{
+	return this->player;
+}
+
+void PlayingGameState::setPlayer(Vehicle* theVehicle)
+{
+	SpotLight* temp = this->player->getSpotLight();
+	this->player.reset(theVehicle);// = std::make_unique<Vehicle>(theVehicle);
+	this->player->setSpotLight(temp);
+}
+
 void PlayingGameState::update(float deltaTime)
 {
 	/*-------------------------UPDATING-------------------------*/
@@ -535,7 +551,7 @@ void PlayingGameState::update(float deltaTime)
 		if (Input::isKeyDown_DEBUG(Keyboard::E)) {
 			deltaTime /= 4;
 		}
-		if (Input::checkButton(Keys::CANCEL, States::PRESSED)) {
+		if (Input::isKeyDown_DEBUG(Keyboard::Q)) {
 			if (player->getDrivingMode() == 0) {
 				player->setDrivingMode(1);
 			}
@@ -545,7 +561,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
-		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
+		if (Input::isKeyDown_DEBUG(Keyboard::LeftAlt))
 		{
 			pausedTime = !pausedTime;
 		}
@@ -569,25 +585,33 @@ void PlayingGameState::update(float deltaTime)
 		}
 #endif // !_DEBUG
 
-		//Bullet
-		//player->getVehicle()->getRigidBody()->(btVector3(Input::GetDirectionL(0).x * deltaTime * 1000, 0, Input::GetDirectionL(0).y * deltaTime * 1000), btVector3(0, 0, 0));
-
-		//player->getVehicle()->setPosition(Vector3(player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getX(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getY(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getZ()));
-		//player->getVehicle()->updateRigidBody();
-
 		auto playerVehicle{ player->getVehicle() };
+		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
+		player->updatePlayer(deltaTime);
+		physics->update(deltaTime);
+
+		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
+		btVector3 positionCam{ playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
+		camera->setPosition(Vector3(positionCam.getX(),
+			positionCam.getY() / 3,
+			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z));
+		camera->update(deltaTime);
+
+		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
+		Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
+		
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 
-		if (spawnTimer % 200 == 0)
-		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
-			nrOfEnemies += 12;
-			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
-			spawnTimer = 0;
-		}
-		spawnTimer++;
+		//if (spawnTimer % 200 == 0)
+		//{
+		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
+		//	actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
+		//	nrOfEnemies += 12;
+		//	//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
+		//	spawnTimer = 0;
+		//}
+		//spawnTimer++;
 		//spawn Boss
 		//if (spawnTimer % 10 == 0)
 		//{
@@ -616,16 +640,13 @@ void PlayingGameState::update(float deltaTime)
 			deltaTime /= 4;
 			this->player->setHealth(0);
 		}
-		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
-		player->updatePlayer(deltaTime);
-
-		physics->update(deltaTime);
 
 		actorManager->update(deltaTime, playerVehicle->getPosition());
 		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation();
+		//actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		Bullet::updateSoundTimer(deltaTime);
@@ -636,12 +657,8 @@ void PlayingGameState::update(float deltaTime)
 		updateObjects();
 		paperCollision(deltaTime);
 #endif
-		btVector3 positionCam{ playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
-		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
-		camera->setPosition(Vector3(positionCam.getX(),
-			positionCam.getY() / 3,
-			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z));
+		
 
 		btVector3 spotlightDir{ 0,
 								 0,
@@ -660,13 +677,22 @@ void PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos(spotlightPos);
 
-		if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
+		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f || this->time <= 20.0f)
+		{
+			Sound::fadeSoundtrack(true, 1.0f);
+		}
+		else
+		{
+			Sound::fadeSoundtrack(false, 3.0f);
+		}
+
+		/*if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
 			soundAggro += 0.2f * deltaTime;
 		}
 		else if (soundAggro > 0.0f) {
 			soundAggro -= 0.1f * deltaTime;
 		}
-		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);
+		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);*/
 
 		/*timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
@@ -681,15 +707,18 @@ void PlayingGameState::update(float deltaTime)
 
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
+
+	graphics.clearScreen(Vector4(0, 0, 0, 1));
 	graphics.setSpotLightShadow(playerLight);
 	graphics.render(camera.get(), deltaTime);
 
 	// render UI
-	menues[MENU_PLAYING]->update(deltaTime);
-	if (currentMenu != MENU_PLAYING)
-		menues[currentMenu]->update(deltaTime);
-	else if (Input::checkButton(Keys::MENU, States::PRESSED))
-		setCurrentMenu(PlayingGameState::MENU_PAUSED);
+	menues[MENU_PLAYING]->update( deltaTime );
+	if ( currentMenu != MENU_PLAYING )
+		menues[currentMenu]->update( deltaTime );
+	else if ( Input::checkButton(Keys::MENU, States::PRESSED) )
+		setCurrentMenu( PlayingGameState::MENU_PAUSED );
+	
 
 	//Render all objects
 

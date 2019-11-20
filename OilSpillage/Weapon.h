@@ -3,8 +3,7 @@
 #include <d3d11.h>
 #include "SimpleMath.h"
 #include "GameObject.h"
-
-
+#include "Sound.h"
 enum class WeaponType
 {
 	Default,
@@ -38,6 +37,32 @@ struct Weapon
 	float remainingCooldown = 0.0;
 	WeaponType type = WeaponType::Default;
 	bool melee = false;
+	float soundTimer = 0.0f;
+	float timeSinceLastShot = 0.0f;
+	bool flameBool = false;
+	int soundHandle = 0;
+	void updateWeapon(float deltaTime)
+	{
+		if (deltaTime > 0.01f) {
+			soundTimer += 100.0f * deltaTime;
+		}
+		else {
+			soundTimer += 100.0f;
+		}
+		timeSinceLastShot += deltaTime;
+		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * maxSpread * 2.0, 0.0);
+		remainingCooldown = max(remainingCooldown - deltaTime, 0.0);
+	};
+
+	bool updateFireRate()
+	{
+		if (timeSinceLastShot >= fireRate)
+		{
+			timeSinceLastShot = fmod(timeSinceLastShot, fireRate);
+			return true;
+		}
+		return false;
+	};
 };
 
 class WeaponHandler
@@ -63,6 +88,50 @@ public:
 	static Weapon getWeapon(WeaponType type) {
 		return weapons[(int)type];
 	};
+
+	static void weaponStartSound(Weapon& weapon)
+	{
+		if (weapon.type == WeaponType::MachineGun)
+		{
+			if (weapon.soundTimer > 4.0f) {
+				int randomSound = rand() % 6 + 1;
+				int rand2 = rand() % 2;
+				std::string soundEffect = "./data/sound/MachineGunSound" + std::to_string(randomSound) + ".wav";
+				if (rand2 < 1) {
+					soundEffect = "./data/sound/MachineGunSound1.wav";
+				}
+				Sound::play(soundEffect);
+				weapon.soundTimer = 0;
+			}
+		}
+		else if (weapon.type == WeaponType::Flamethrower)
+		{
+			if (weapon.flameBool == true) {
+				int randomSound = rand() % 2 + 1;
+				std::string soundEffect = "./data/sound/FlameLoop" + std::to_string(randomSound) + ".wav";
+				Sound::stopLooping(weapon.soundHandle);
+				weapon.soundHandle = Sound::playLooping(soundEffect);
+				Sound::play("./data/sound/FlameStart.wav");
+				weapon.flameBool = false;
+			}
+		}
+	};
+
+	static void weaponEndSound(Weapon& weapon)
+	{
+		if (weapon.type == WeaponType::MachineGun)
+		{
+			return;
+		}
+		else if (weapon.type == WeaponType::Flamethrower)
+		{
+			weapon.flameBool = true;
+			Sound::stopLooping(weapon.soundHandle);
+			weapon.soundHandle = 0;
+		}
+	};
+
+
 };
 
 class Bullet
@@ -76,6 +145,8 @@ class Bullet
 	void laserUpdate(float& deltaTime);
 	GameObject* obj = nullptr;
 	Vector3 dir;
+	Vector3 initDir;
+	Vector3 initPos;
 	float timeLeft = 0.0f;
 	Weapon weapon;
 	static float soundTimer;

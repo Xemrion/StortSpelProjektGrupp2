@@ -7,7 +7,8 @@
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
 #include <CommonStates.h>
-#include "Element.h"
+#include "Elements/Element.h"
+#include "../Sound.h"
 
 class UserInterface
 {
@@ -20,9 +21,9 @@ public:
 	static SpriteBatch* getSpriteBatch();
 	static SpriteFont* getFontArial();
 	static void initStaticVariables();
+	static Element* changeSelected(Element* selected);
 
 protected:
-	Element* changeSelected(Element* selected) const;
 	virtual void updateUI(float deltaTime) = 0;
 	virtual void drawUI() = 0;
 private:
