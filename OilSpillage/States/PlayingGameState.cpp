@@ -585,6 +585,7 @@ void PlayingGameState::update(float deltaTime)
 		auto playerVehicle{ player->getVehicle() };
 		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
 		player->updatePlayer(deltaTime);
+		physics->update(deltaTime);
 
 		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
 		btVector3 positionCam{ playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
@@ -643,7 +644,6 @@ void PlayingGameState::update(float deltaTime)
 			deltaTime /= 4;
 			this->player->setHealth(0);
 		}
-		physics->update(deltaTime);
 
 		actorManager->update(deltaTime, playerVehicle->getPosition());
 		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
