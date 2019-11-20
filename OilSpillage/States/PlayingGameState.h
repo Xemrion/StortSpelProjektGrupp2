@@ -94,7 +94,10 @@ private:
 
 	int								spawnTimer = 0;
 	float							soundAggro;
-
+	const char* current_item;
+	void fillTestParticle();
+	const char* items;
+	float timer = 0.0f;
 	int                             addNrOfParticles  {     2 };
 	int                             lifeTime          {     1 };
 	float                           timerForParticle  {   .0f };

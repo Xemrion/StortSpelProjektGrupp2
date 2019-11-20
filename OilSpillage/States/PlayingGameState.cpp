@@ -8,6 +8,29 @@
 #include "../PG/Profiler.hpp"
 #include <future>
 
+void PlayingGameState::fillTestParticle()
+{
+	this->colors[0] = this->graphics.getTestParticleSystem()->getColor(0).x;
+	this->colors2[0] = this->graphics.getTestParticleSystem()->getColor(1).x;
+	this->colors3[0] = this->graphics.getTestParticleSystem()->getColor(2).x;
+	this->colors4[0] = this->graphics.getTestParticleSystem()->getColor(3).x;
+
+	this->colors[1] = this->graphics.getTestParticleSystem()->getColor(0).y;
+	this->colors2[1] = this->graphics.getTestParticleSystem()->getColor(1).y;
+	this->colors3[1] = this->graphics.getTestParticleSystem()->getColor(2).y;
+	this->colors4[1] = this->graphics.getTestParticleSystem()->getColor(3).y;
+
+	this->colors[2] = this->graphics.getTestParticleSystem()->getColor(0).z;
+	this->colors2[2] = this->graphics.getTestParticleSystem()->getColor(1).z;
+	this->colors3[2] = this->graphics.getTestParticleSystem()->getColor(2).z;
+	this->colors4[2] = this->graphics.getTestParticleSystem()->getColor(3).z;
+
+	this->size1 = this->graphics.getTestParticleSystem()->getStartSize();
+	this->size2 = this->graphics.getTestParticleSystem()->getEndSize();
+	this->vectorFieldPower = this->graphics.getTestParticleSystem()->getVectorFieldPower();
+	this->vectorFieldSize = this->graphics.getTestParticleSystem()->getVectorFieldSize();
+}
+
 void PlayingGameState::initAI()
 {
 	aStar = new AStar(map->getTileMap());
@@ -31,7 +54,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	pausedTime = false;
 #endif // _DEBUG
-
+	this->current_item = NULL;
 
 	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
@@ -233,26 +256,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
 
 
-	this->colors[0] = this->graphics.getParticleSystem("explosion")->getColor(0).x;
-	this->colors2[0] = this->graphics.getParticleSystem("explosion")->getColor(1).x;
-	this->colors3[0] = this->graphics.getParticleSystem("explosion")->getColor(2).x;
-	this->colors4[0] = this->graphics.getParticleSystem("explosion")->getColor(3).x;
-	
-	this->colors[1] = this->graphics.getParticleSystem("explosion")->getColor(0).y;
-	this->colors2[1] = this->graphics.getParticleSystem("explosion")->getColor(1).y;
-	this->colors3[1] = this->graphics.getParticleSystem("explosion")->getColor(2).y;
-	this->colors4[1] = this->graphics.getParticleSystem("explosion")->getColor(3).y;
-
-	this->colors[2] = this->graphics.getParticleSystem("explosion")->getColor(0).z;
-	this->colors2[2] = this->graphics.getParticleSystem("explosion")->getColor(1).z;
-	this->colors3[2] = this->graphics.getParticleSystem("explosion")->getColor(2).z;
-	this->colors4[2] = this->graphics.getParticleSystem("explosion")->getColor(3).z;
-
-	this->size1= this->graphics.getParticleSystem("explosion")->getStartSize();
-	this->size2 = this->graphics.getParticleSystem("explosion")->getEndSize();
-	this->vectorFieldPower = this->graphics.getParticleSystem("explosion")->getVectorFieldPower();
-	this->vectorFieldSize = this->graphics.getParticleSystem("explosion")->getVectorFieldSize();
-
+	this->graphics.setTestParticleSystem(this->graphics.getParticleSystem("explosion"));
+	this->fillTestParticle();
 
 
 	//Bullet
@@ -365,6 +370,28 @@ void PlayingGameState::ImGui_AI()
 void PlayingGameState::ImGui_Particles()
 {
 	ImGui::Begin("Particle");
+	
+
+	if (ImGui::BeginCombo("##ParticleSystems", current_item)) // The second parameter is the label previewed before opening the combo.
+	{
+		for (int i = 0; i < this->graphics.getParticleHandler()->getNames().size(); i++)
+		{
+			bool is_selected = (current_item == this->graphics.getParticleHandler()->getNames().at(i).c_str()); // You can store your selection however you want, outside or inside your objects
+			if (ImGui::Selectable(this->graphics.getParticleHandler()->getNames().at(i).c_str(), is_selected))
+			{
+				current_item = this->graphics.getParticleHandler()->getNames().at(i).c_str();
+				this->graphics.setTestParticleSystem(this->graphics.getParticleSystem(current_item));
+				this->fillTestParticle();
+			}
+				
+			if (is_selected)
+			{
+				ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+			}
+					
+		}
+		ImGui::EndCombo();
+	}
 	ImGui::ColorPicker4("Color Slider", colors);
 	ImGui::ColorPicker4("Color 1 Slider", colors2);
 	ImGui::ColorPicker4("Color 2 Slider", colors3);
@@ -376,6 +403,7 @@ void PlayingGameState::ImGui_Particles()
 	ImGui::SliderFloat("Vectorfield size", &vectorFieldSize, 0.0f, 10.0f);
 	ImGui::SliderFloat("Vectorfield power", &vectorFieldPower, 0.0f, 10.0f);
 	ImGui::SliderFloat("Random power", &randomPosPower, 0.0f, 10.0f);
+	
 	colorsP[0] = Vector4(colors);
 	colorsP[1] = Vector4(colors2);
 	colorsP[2] = Vector4(colors3);
@@ -384,10 +412,9 @@ void PlayingGameState::ImGui_Particles()
 	colorsP[1].w = 1.0f;
 	colorsP[2].w = 1.0f;
 	colorsP[3].w = 1.0f;
-	graphics.setVectorField(vectorFieldSize, vectorFieldPower);
-	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-	graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
-	graphics.getParticleSystem("explosion")->saveSystem();
+	graphics.setTestVectorField(vectorFieldSize, vectorFieldPower);
+	graphics.setTestColorNSize(colorsP, 4, size1, size2);
+	graphics.saveTestParticleSystem();
 	ImGui::End();
 }
 
@@ -656,7 +683,12 @@ void PlayingGameState::update(float deltaTime)
 		Bullet::updateSoundTimer(deltaTime);
 		bulletThread.get();
 		player->updateWeapon(deltaTime);
-
+		timer += deltaTime;
+		if (timer > 0.001f)
+		{
+			timer = 0.0f;
+			this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition() + Vector3(0.0f, 1.0f, 0.0f)), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+		}
 #ifndef _DEBUG
 		updateObjects();
 		paperCollision(deltaTime);

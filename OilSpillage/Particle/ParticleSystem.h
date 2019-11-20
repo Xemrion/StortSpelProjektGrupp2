@@ -62,7 +62,7 @@ public:
 	ParticleSystem();
 	~ParticleSystem();
 	void setNameofSystem(std::string name);
-	std::string getName()const;
+	std::string getName();
 	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 	bool addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection);
 	bool addParticle(int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection);

@@ -45,6 +45,7 @@ Graphics::Graphics()
 	this->particleHandler->addParticleSystem("explosion","ParticleUpdateCS.cso", "ExplosionCreateCS.cso");
 
 
+
 	this->particleHandler->loadParticleSystems();
 
 	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
@@ -769,7 +770,7 @@ void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfPartic
 	randomPos += pos;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleHandler->getParticleSystem("explosion")->addParticle(10, 1, randomPos, Vector4(1, 0, 0, 10.0f));
+	this->particleHandler->getParticleSystem("fire")->addParticle(nrOfParticles, lifeTime, randomPos,initialDirection);
 }
 
 void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime, float randomPower)
@@ -825,6 +826,59 @@ void Graphics::changeTrailColor(Vector3 color)
 ParticleSystem* Graphics::getParticleSystem(std::string name)
 {
 	return this->particleHandler->getParticleSystem(name);
+}
+
+ParticleHandler* Graphics::getParticleHandler() const
+{
+	return this->particleHandler;
+}
+
+void Graphics::addTestParticle(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime, float randomPower)
+{
+	if (this->testParticle != nullptr)
+	{
+		Vector3 randomPos = randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+		Vector3 randomPos2 = -1.0f * randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
+		randomPos += pos;
+		randomPos += randomPos2;
+		float grey = float(rand()) / RAND_MAX;
+		this->testParticle->addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+	}
+}
+
+void Graphics::setTestParticleSystem(ParticleSystem* test)
+{
+	this->testParticle = test;
+}
+
+ParticleSystem* Graphics::getTestParticleSystem() const
+{
+	return this->testParticle;
+}
+
+void Graphics::saveTestParticleSystem()
+{
+	if (this->testParticle != nullptr)
+	{
+		this->testParticle->saveSystem();
+	}
+}
+
+void Graphics::setTestVectorField(float vectorFieldSize, float vectorFieldPower)
+{
+	if (this->testParticle != nullptr)
+	{
+		this->testParticle->changeVectorField(vectorFieldPower, vectorFieldSize);
+	}
+}
+
+void Graphics::setTestColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
+{
+	if (this->testParticle != nullptr)
+	{
+		this->testParticle->changeColornSize(colors, nrOfColors, startSize, endSize);
+	}
 }
 
 void Graphics::clearScreen()

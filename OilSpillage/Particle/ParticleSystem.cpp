@@ -28,7 +28,7 @@ void ParticleSystem::setNameofSystem(std::string name)
 	strcpy(this->systemData.name, name.c_str());
 }
 
-std::string ParticleSystem::getName() const
+std::string ParticleSystem::getName()
 {
 	return this->systemData.name;
 }

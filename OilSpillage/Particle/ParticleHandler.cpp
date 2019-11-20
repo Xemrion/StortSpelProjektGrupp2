@@ -24,6 +24,7 @@ void ParticleHandler::addParticleSystem(ParticleSystem* system, std::string name
 		system->setNameofSystem(name);
 		this->particleSystems[name] = system;
 	}
+	names.push_back(system->getName());
 }
 
 void ParticleHandler::addParticleSystem(std::string name, std::string csUpdate, std::string csCreate, std::string gs)
@@ -31,7 +32,8 @@ void ParticleHandler::addParticleSystem(std::string name, std::string csUpdate, 
 	ParticleSystem* newSystem = new ParticleSystem;
 	newSystem->setNameofSystem(name);
 	newSystem->setParticleShaders(csUpdate, csCreate, gs);
-	
+	names.push_back(newSystem->getName());
+
 	this->particleSystems[newSystem->getName()] = newSystem;
 }
 
@@ -42,6 +44,7 @@ void ParticleHandler::addParticleSystem(std::string name, Vector4 colors[4], int
 	newSystem->setParticleShaders(csUpdate, csCreate, gs);
 	newSystem->changeColornSize(colors, nrOfColors, startSize, endSize);
 	newSystem->changeVectorField(vectorFieldPower, vectorFieldSize);
+	names.push_back(newSystem->getName());
 
 	this->particleSystems[newSystem->getName()] = newSystem;
 }
@@ -49,6 +52,11 @@ void ParticleHandler::addParticleSystem(std::string name, Vector4 colors[4], int
 ParticleSystem* ParticleHandler::getParticleSystem(std::string name) const
 {
 	return this->particleSystems.at(name) != nullptr ? this->particleSystems.at(name) : nullptr;
+}
+
+const std::vector<std::string>& ParticleHandler::getNames()const
+{
+	return names;
 }
 
 bool ParticleHandler::loadParticleSystem(std::string name)

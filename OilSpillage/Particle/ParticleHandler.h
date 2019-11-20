@@ -13,14 +13,14 @@ public:
 		std::string csUpdate = "ParticleUpdateCS.cso", std::string csCreate = "ParticleCreateCS.cso", std::string gs = "ParticleGS.cso");
 
 	ParticleSystem* getParticleSystem(std::string name)const;
-
+	const std::vector<std::string>& getNames()const;
 	bool loadParticleSystem(std::string name);
 	bool loadParticleSystems();//load particleSystems
 	bool saveParticleSystem(std::string name);
 	bool saveParticleSystems();//save particleSystems
 private:
 	std::unordered_map<std::string, ParticleSystem*> particleSystems;
-	
+	std::vector<std::string> names;
 
 };
 

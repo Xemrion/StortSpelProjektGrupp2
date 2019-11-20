@@ -82,6 +82,7 @@ class Graphics {
 	ParticleSystem* particleSystem;
 	ParticleSystem* particleSystem2;
 	ParticleSystem* particleTrail;
+	ParticleSystem* testParticle;
 	std::unique_ptr<Fog> fog;
 	float time = 0.0;
 	ShaderClass shaderDefault;
@@ -136,6 +137,14 @@ public:
 	void addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f);
 	void changeTrailColor(Vector3 color);
 	ParticleSystem* getParticleSystem(std::string name);
+	ParticleSystem* getParticleSystem(int index);
+	ParticleHandler* getParticleHandler()const;
+	void addTestParticle(Vector3 pos, Vector4 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
+	void setTestParticleSystem(ParticleSystem* test);
+	ParticleSystem* getTestParticleSystem()const;
+	void saveTestParticleSystem();
+	void setTestVectorField(float vectorFieldSize, float vectorFieldPower);
+	void setTestColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	float farZTempShadow;
 	void setSpotLightShadow(SpotLight* spotLight);
 };
