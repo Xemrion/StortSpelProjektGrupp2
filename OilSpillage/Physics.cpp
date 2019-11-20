@@ -124,6 +124,13 @@ Physics::~Physics()
 
 }
 
+void Physics::moveBody(btRigidBody* rigidbody, float x,float y,float z)
+{
+	btTransform transform = rigidbody->getCenterOfMassTransform();
+	transform.setOrigin(btVector3(x,y,z));
+	rigidbody->setCenterOfMassTransform(transform);
+}
+
 void Physics::update(float deltaTime)
 {
 

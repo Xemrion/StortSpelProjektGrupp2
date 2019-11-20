@@ -33,7 +33,6 @@ void DynamicActor::move()
 	{
 		velocity /= velocity.Length();
 	}
-
 	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed;
 	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * (stats.maxSpeed * 100) * 0.9);
 	Vector3 targetToSelf = (temp - position);
