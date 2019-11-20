@@ -9,7 +9,6 @@
 #include "States/UpgradingGameState.h"
 
 std::unique_ptr<Game> Game::instance;
-float Game::deltaTime = 0.0f;
 
 void Game::start(Window* window)
 {
@@ -48,7 +47,7 @@ void Game::start(Window* window)
 	Sound::load("./data/sound/MetalImpactPitched1.wav");
 	Sound::load("./data/sound/MetalImpactPitched2.wav");
 	Sound::load("./data/sound/MetalImpactPitched3.wav");
-
+	
 	Sound::playSoundtrack("./data/sound/OilSpillageSoundtrack1_Calm.mp3", "./data/sound/OilSpillageSoundtrack1_Aggressive.mp3");
 
 	//Input::setKeyboardPlayerID(0);
@@ -85,6 +84,11 @@ Graphics& Game::getGraphics() noexcept
 float Game::lerp(float v0, float v1, float t)
 {
 	return (1 - t) * v0 + t * v1;
+}
+
+float Game::getDeltaTime()
+{
+	return instance->deltaTime;
 }
 
 
