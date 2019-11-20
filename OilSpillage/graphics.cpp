@@ -116,20 +116,45 @@ bool Graphics::init(Window* window)
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	descDepth.CPUAccessFlags = 0;
 	descDepth.MiscFlags = 0;
-
-
 	
 	result = device->CreateTexture2D(&descDepth, NULL, &depthStencilBuffer);
 	if (FAILED(result))
 	{
 		return false;
 	}
+
 	result = device->CreateDepthStencilView(depthStencilBuffer.Get(), NULL, &depthStencilView);
 	if (FAILED(result))
 	{
 		return false;
 	}
-	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
+
+	descDepth.Format = DXGI_FORMAT_R16_UNORM;
+	descDepth.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+	result = device->CreateTexture2D(&descDepth, NULL, &depthBufferCopy);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC depthSrvDesc;
+	depthSrvDesc.Format = DXGI_FORMAT_R16_UNORM;
+	depthSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+	depthSrvDesc.Texture2D.MostDetailedMip = 0;
+	depthSrvDesc.Texture2D.MipLevels = 1;
+	
+	result = device->CreateShaderResourceView(depthBufferCopy.Get(), &depthSrvDesc, &depthSRV);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	D3D11_RENDER_TARGET_VIEW_DESC RTVdesc;
+	RTVdesc.Format = DXGI_FORMAT_R16_UNORM;
+	RTVdesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+
+	device->CreateRenderTargetView(depthBufferCopy.Get(), &RTVdesc, depthCopyRTV.ReleaseAndGetAddressOf());
 
 	//the depth Stencil State
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -352,12 +377,13 @@ bool Graphics::init(Window* window)
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
 	fogMaterial.scale = 50.0;
-	fogMaterial.density = 0.03;
+	fogMaterial.density = 0.3;
 	fogMaterial.ambientDensity = 0.025;
-	fogMaterial.densityThreshold = 0.05;
+	fogMaterial.densityThreshold = 0.0;
 
-	fog->initialize(device, deviceContext, 3, 1.25, fogMaterial);
-	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
+	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
+	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
+	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
 	deviceContext->RSSetViewports(1, &this->vp);
 
 	// Turn on the alpha blending.
@@ -382,9 +408,15 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 		0,0,0,1
 	};
 	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	
+	color[0] = 1.0;
+	color[1] = 1.0;
+	color[2] = 1.0;
+
+	deviceContext->ClearRenderTargetView(depthCopyRTV.Get(), color);
 	// Clear the depth buffer.
-	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
 	Frustum frustum = camera->getFrustum();
 
@@ -396,10 +428,9 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	ID3D11DepthStencilView* nulDSV = nullptr;
 	ID3D11ShaderResourceView* nulSRV = nullptr;
-	deviceContext->OMSetRenderTargets(0,nullptr, nulDSV);
-
-	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
-	deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
+	//deviceContext->OMSetRenderTargets(0, nullptr, nulDSV);
+	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
+	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
 
 	fillLightBuffers();
 	cullLights(camera->getViewMatrix());
@@ -425,7 +456,6 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	this->particleSystem2.drawAll(camera);
 
 	//set up Shaders
-	
 
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDefault.ps.getShader(), nullptr, 0);
@@ -1441,12 +1471,14 @@ void Graphics::setSpotLightShadow(SpotLight* spotLight)
 
 void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 {
+	time += deltaTime;
+	
 	deviceContext->VSSetShader(fog->drawShader.vs.getShader(), NULL, 0);
 	deviceContext->PSSetShader(fog->drawShader.ps.getShader(), NULL, 0);
-	time += deltaTime;
-
+	
+	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
+	deviceContext->PSSetShaderResources(7, 1, depthSRV.GetAddressOf());
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-
 	int i = 1;
 	for (GameObject* object : fog->getQuads())
 	{
@@ -1495,4 +1527,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		deviceContext->Draw(vertexCount, 0);
 		i += 1;
 	}
+
+	ID3D11ShaderResourceView* nullSRV = NULL;
+	deviceContext->PSSetShaderResources(7, 1, &nullSRV);
 }

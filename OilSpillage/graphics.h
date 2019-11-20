@@ -43,9 +43,12 @@ class Graphics {
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> renderTarget;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> depthCopyRTV;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthBufferCopy;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> depthSRV;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterState;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterStateShadow;
 
