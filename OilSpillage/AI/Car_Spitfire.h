@@ -10,10 +10,6 @@ private:
 	GameObject* wheel3;
 	GameObject* wheel4;
 
-	GameObject* vehicleBody1;
-
-	DirectX::XMFLOAT2 velocity;
-
 	float targetRotation;
 	float rotateAcceleration;
 	bool rotationDirection;
@@ -32,6 +28,9 @@ private:
 	float throttleInputStrength;
 	Vector3 accelForce;
 	void updateVehicle(); 
+protected:
+	GameObject* vehicleBody1;
+
 public:
 	Spitfire(float x, float z,Physics* physics);
 	Spitfire();

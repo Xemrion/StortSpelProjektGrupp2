@@ -25,8 +25,6 @@ void Spitfire::setUpActor()
 Spitfire::Spitfire(float x, float z, Physics* physics)
 	: DynamicActor(x, z,physics)
 {
-	velocity = Vector2(0.0f, 0.0f);
-
 	targetRotation = 0.0f;
 	this->rotateAcceleration = 0.0f;
 	this->velocitySpeed = 0.0f;

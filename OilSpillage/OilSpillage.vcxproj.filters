@@ -78,7 +78,6 @@
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
-    <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="fog.cpp" />
     <ClCompile Include="AI\Ranged.cpp" />
     <ClCompile Include="AI\Melee.cpp" />
@@ -86,6 +85,7 @@
     <ClCompile Include="AI\Boss.cpp" />
     <ClCompile Include="AI\ChaseCar.cpp" />
     <ClCompile Include="AI\Sniper.cpp" />
+    <ClCompile Include="AI\ShootCar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -175,6 +175,8 @@
     <ClInclude Include="AI\ChaseCar.h" />
     <ClInclude Include="fog.h" />
     <ClInclude Include="PG\Biome.hpp" />
+    <ClInclude Include="PG\Modelizer.hpp" />
+    <ClInclude Include="AI\ShootCar.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
