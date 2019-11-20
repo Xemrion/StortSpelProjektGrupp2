@@ -161,6 +161,7 @@ void Sound::playSoundtrack(std::string fileNameCalm, std::string fileNameAggress
 	instance->soloud.addVoiceToGroup(instance->soundtrack.handleGroup, instance->soundtrack.handleCalm);
 	instance->soloud.addVoiceToGroup(instance->soundtrack.handleGroup, instance->soundtrack.handleAggressive);
 
+	instance->soloud.setLooping(instance->soundtrack.handleGroup, true);
 	instance->soloud.setPause(instance->soundtrack.handleGroup, false);
 }
 

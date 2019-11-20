@@ -78,26 +78,26 @@ void Vehicle::init(Physics *physics)
 	Game::getGraphics().loadModel("Entities/Turret");
 	
 
-	this->vehicleBody1 = new GameObject;
-	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player1");
-	vehicleBody1->setSpotShadow(false);
-	Game::getGraphics().addToDraw(vehicleBody1);
-	vehicleBody1->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
-	//vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
-
-	vehicleBody1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
-	
 	//this->vehicleBody1 = new GameObject;
-	//Game::getGraphics().loadModel("Entities/Player_Car_Parts/Chassi1");
-	//vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Chassi1");
+	//vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player1");
 	//vehicleBody1->setSpotShadow(false);
 	//Game::getGraphics().addToDraw(vehicleBody1);
-	//vehicleBody1->setScale(Vector3(0.005f, 0.005f, 0.005f));	
+	//vehicleBody1->setScale(Vector3(0.005f, 0.005f, 0.005f));
 	////vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
 	////vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
 
-	//vehicleBody1->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Chassi1"));
+	//vehicleBody1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	
+	this->vehicleBody1 = new GameObject;
+	Game::getGraphics().loadModel("Entities/Player_Car_Parts/Chassi1");
+	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Chassi1");
+	vehicleBody1->setSpotShadow(false);
+	Game::getGraphics().addToDraw(vehicleBody1);
+	vehicleBody1->setScale(Vector3(0.35f, 0.35f, 0.35f));	
+	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
+	//vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
+
+	vehicleBody1->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Chassi1"));
 
 	this->wheel1 = new GameObject;
 	this->wheel2 = new GameObject;
