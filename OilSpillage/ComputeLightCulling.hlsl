@@ -41,7 +41,7 @@ groupshared Frustum groupFrustum;
 
 inline bool testPlane(float3 lightPos, float4 plane, float radius)
 {
-	float dist = (dot(lightPos, plane.xyz) + plane.w);
+	float dist = dot(lightPos, plane.xyz);
 	return dist < radius;
 }
 
@@ -79,19 +79,22 @@ void main( uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID )
 			continue;
 		}
 
-		float4 pos = mul(float4(l.pos.xyz, 1.0), view);
-		float radius = max(sqrt(l.luminance), 1.0) * 7.0;
+		float4 pos = float4(l.pos.xyz, 1.0);
+		pos.y = -pos.y;
+		pos = mul(pos, view);
+		float radius = sqrt(l.luminance / 0.05);
 
 		if (l.width > 0.0)
 		{
-			//l.direction = mul(float4(l.direction, 0.0), view);
+			l.direction = mul(float4(l.direction, 0.0), view);
 			radius *= 2.0;
+			pos.xyz += l.direction * radius;
 		}
-
-		inside = testPlane(pos.xyz + l.direction * radius, groupFrustum.left, radius);
-		if (inside) inside = testPlane(pos.xyz + l.direction * radius, groupFrustum.right, radius);
-		if (inside) inside = testPlane(pos.xyz + l.direction * radius, groupFrustum.top, radius);
-		if (inside) inside = testPlane(pos.xyz + l.direction * radius, groupFrustum.bottom, radius);
+		
+		inside = testPlane(pos.xyz, groupFrustum.left, radius);
+		if (inside) inside = testPlane(pos.xyz, groupFrustum.right, radius);
+		if (inside) inside = testPlane(pos.xyz, groupFrustum.top, radius);
+		if (inside) inside = testPlane(pos.xyz, groupFrustum.bottom, radius);
 
 		if (inside)
 		{

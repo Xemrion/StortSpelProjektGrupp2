@@ -1,45 +1,55 @@
 #pragma once
 #include "AIGroup.h"
-#include "Car_Spitfire.h"
 class Physics;
 #include "TurretHandler.h"
-#include "Swarm.h"
+#include "AStar.h"
 class ActorManager
 {
 public:
 	ActorManager();
-	ActorManager(AStar* aStar);
+	ActorManager(AStar* aStar,Physics* physics);
 	~ActorManager();
 	enum Radius { CLOSE, MIDDLE, OUTER };
-	void update(float dt, Vector3 targetPos);
-	void createAttacker(float x, float z, int weaponType = 1);
-	void createTurret(float x, float z, int weaponType = 1);
-	void createSwarm(float x, float z, int weaponType = 1);
+	void update(float dt, const Vector3& targetPos);
+	void createAttacker(float x, float z, int weaponType);
+	void createSniper(float x, float z, int weaponType);
+	void createTurret(float x, float z, int weaponType);
+	void createSwarm(float x, float z);
+	void createBoss(float x, float z, int weaponType);
 
-	void createSpitFire(float x, float z, Physics* physics);
-	std::vector<AIGroup> groups;
-	float distanceToPlayer(Vector3 position);
+	void createSpitFire(float x, float z);
+	void createChaseCar(float x, float z);
+
+	float distanceToPlayer(const Vector3& position);
+	const std::vector<AIGroup>& getGroups() const;
+	void spawnAttackers(const Vector3& originPos, int weaponType);
+	void spawnChaseCars(const Vector3& originPos);
+	void spawnSwarm(const Vector3& originPos);
+	void spawnTurrets(const Vector3& position, Radius radius, float angle, int weaponType);
+	void spawnBoss(const Vector3& originPos, int weaponType);
+
+	void seperation(const Vector3& targetPos);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
-
-	void spawnAttackers(Vector3 originPos, int weaponType);
-	void spawnTurrets(Vector3 position, Radius radius, float angle, int weaponType);
-	Vector2& generateRandom(const float& x, const float& z, Radius radius);
-	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
 private:
 	float soundTimer = 0;
 	int frameCount = 0;
+	Physics* physics;
 	void updateAveragePos();
 	//Returns index for the group within the radius with the most members
-	int groupInRange(Vector3 actorPos, int currentGroupSize);
-	void joinGroup(Actor* actor, int groupIndex);
+	int groupInRange(const Vector3& actorPos, int currentGroupSize);
+	void joinGroup(DynamicActor* actor, int groupIndex);
 	void leaveGroup(int groupIndex, int where);
-	void assignPathsToGroups(Vector3 targetPos);
+	void assignPathsToGroups(const Vector3& targetPos);
 	void updateGroups();
-	void initGroupForActor(Actor* actor);
-	void createGroup(Actor* actor);
-	std::vector<Actor*> actors;
+	void destroyActor(int index);
+	void initGroupForActor(DynamicActor* actor);
+	void createGroup(DynamicActor* actor);
+	Vector3 predictPlayerPos(const Vector3& targetPos);
+	std::vector<AIGroup> groups;
+	Vector2& generateRandom(const float& x, const float& z, Radius radius);
+	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
+	std::vector<DynamicActor*> actors;
 	TurretHandler turretHandler;
-	std::vector<Spitfire*> cars;
-	std::vector<Actor*> sendToPlayer;
+	std::vector<DynamicActor*> sendToPlayer;
 	AStar* aStar;
 };

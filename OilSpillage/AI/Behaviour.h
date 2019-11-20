@@ -8,7 +8,7 @@ using namespace std::placeholders;
 
 class Selector;
 class Sequence;
-enum Status
+enum class Status
 {
 	INVALID,
 	RUNNING,

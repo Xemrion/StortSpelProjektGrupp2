@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -153,21 +153,26 @@
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
+    <ClCompile Include="AI\Boss.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
-    <ClCompile Include="AI\Node.cpp" />
+    <ClCompile Include="AI\ChaseCar.cpp" />
+    <ClCompile Include="AI\DynamicActor.cpp" />
+    <ClCompile Include="AI\Melee.cpp" />
+    <ClCompile Include="AI\Ranged.cpp" />
+    <ClCompile Include="AI\Sniper.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Inventory\Container.cpp" />
     <ClCompile Include="Inventory\Item.cpp" />
     <ClCompile Include="Inventory\ItemWeapon.cpp" />
+    <ClCompile Include="fog.cpp" />
     <ClCompile Include="Objectives\Objective.cpp" />
     <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
     <ClCompile Include="PG\MapConfig.cpp" />
     <ClCompile Include="PG\Map.cpp" />
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
-    <ClCompile Include="PG\Modelizer.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="PowerUp.cpp" />
@@ -212,7 +217,6 @@
     <ClCompile Include="SoLoud\src\filter\soloud_waveshaperfilter.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
-    <ClCompile Include="PG\District.cpp" />
     <ClCompile Include="States\UpgradingGameState.cpp" />
     <ClCompile Include="UI\Elements\Button.cpp" />
     <ClCompile Include="UI\Elements\ButtonPromtBar.cpp" />
@@ -270,9 +274,16 @@
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
+    <ClInclude Include="AI\Boss.h" />
     <ClInclude Include="AI\Car_Spitfire.h" />
-    <ClInclude Include="AI\Node.h" />
+    <ClInclude Include="AI\ChaseCar.h" />
+    <ClInclude Include="AI\DynamicActor.h" />
+    <ClInclude Include="AI\Melee.h" />
+    <ClInclude Include="AI\Ranged.h" />
+    <ClInclude Include="AI\Sniper.h" />
     <ClInclude Include="AI\TurretHandler.h" />
+    <ClInclude Include="fog.h" />
+    <ClInclude Include="PG\Biome.hpp" />
     <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="Inventory\Container.h" />
     <ClInclude Include="Inventory\ItemWeapon.h" />
@@ -421,6 +432,30 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="FogDrawPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="FogDrawVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="FogPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Particle\ParticleCreateCS.hlsl">
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

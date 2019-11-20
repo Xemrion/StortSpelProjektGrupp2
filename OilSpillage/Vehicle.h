@@ -111,7 +111,7 @@ private:
 	bool immortal;
 	float immortalTimer;
 	float respawnTimer;
-	float totRespawnTime;
+	float totalRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
 
 	VehicleSlots* vehicleSlots;
@@ -153,19 +153,19 @@ private:
 	float soundTimer;
 	bool flameBool;
 	bool dmg;
+	bool player = false;
 
-	
+
 	Vector2 curDir;
 	Vector2 currentDir;
 	float velocitySimple;
 	float velocitySpeed;
 	class Physics* physics;
-
 public:
 	Vehicle();
 	virtual ~Vehicle();
 
-	void init(Physics *physics);
+	void init(Physics* physics);
 	void updatePlayer(float deltaTime);
 	void update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput);
 	void updateWeapon(float deltaTime);
@@ -198,8 +198,10 @@ public:
 	void resetHealth();
 	void changeHealth(int amount);
 	bool isDead() const;
-	float getTotRespawnTime()const;
+	float getTotalRespawnTime()const;
 	float getRespawnTimer()const;
+	void makePlayer();
+	bool isPlayer() const;
 
 	float getPitch(DirectX::XMVECTOR Quaternion);
 	float getYaw(DirectX::XMVECTOR Quaternion);
@@ -207,9 +209,9 @@ public:
 	float getHeading(Quaternion qt);
 
 	Bullet* getBulletArray(size_t& count);
-	void powerUp(PowerUpType p);
-
-
+	void addPowerUp(PowerUpType p);
+	void updatePowerUpEffects(float deltaTime);
+	float getPowerUpTimer(PowerUpType p);
 };
 
 #endif // !VEHICLE_H

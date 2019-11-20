@@ -31,8 +31,8 @@ public:
 	Physics();
 	~Physics();
 	void update(float deltaTime);
-	btRigidBody* addSphere(float radius, btVector3 Origin, float mass);
-	btRigidBody* addBox(btVector3 Origin, btVector3 size, float mass);
+	btRigidBody* addSphere(float radius, btVector3 Origin, float mass, void* obj = nullptr);
+	btRigidBody* addBox(btVector3 Origin, btVector3 size, float mass, void* obj = nullptr);
 	btRigidBody* addCylinder(btVector3 Origin, btVector3 size, float mass);
 	btGeneric6DofSpring2Constraint* addSpring(btRigidBody*box1, btRigidBody* box2);
 	btPoint2PointConstraint* addPointJoint(btRigidBody* box1, btRigidBody* box2);
@@ -40,7 +40,9 @@ public:
 	/*btRigidBody* addPlayer(btVector3 Origin, btVector3 size, float mass,Player *player);*/
 
 	bool DeleteRigidBody(btRigidBody * rb);
-	//static bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2);
+	bool deletePointJoint(btPoint2PointConstraint* pointJoint);
+	static bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2,
+		int id2, int index2);
 	//void renderSphere(btRigidBody* sphere);
 	//void renderPlane(btRigidBody* plane);
 	//void renderBox(btRigidBody* box);

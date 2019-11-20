@@ -228,7 +228,7 @@ void ShadowMapping::setViewProjSpot(Vector3 pos,Vector3 dir, float fov)
 	CopyMemory(mappedResource.pData, &viewProj, sizeof(Matrix));
 	deviceContext->Unmap(perFrameCBSpot.Get(), 0);
 
-	DynamicCamera spotCamera(pos, dir, fovTemp, 1.0f, 60.0f);
+	DynamicCamera spotCamera(pos, dir, fovTemp, 0.05f, 20.0f);
 	spotFrustum = spotCamera.getFrustum();
 }
 

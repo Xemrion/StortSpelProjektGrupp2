@@ -39,11 +39,11 @@ void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::Flamethrower)
+	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower)
 	{
 		flamethrowerShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
-	else if (this->weapon.type == WeaponType::Laser)
+	else if (this->weapon.type == WeaponType::Laser or this->weapon.type == WeaponType::aiLaser)
 	{
 		laserShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
@@ -102,7 +102,7 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 		1,
 		weapon.bulletLifetime + 0.5f,
 		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition()+Vector3(0,1,0),
+	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
 		weapon.bulletLifetime + 0.5f,
@@ -145,13 +145,20 @@ void Bullet::update(float deltaTime)
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::aiMachineGun)
+	else if (this->weapon.type == WeaponType::aiMachineGun or
+		this->weapon.type == WeaponType::aiFlamethrower or
+		this->weapon.type == WeaponType::aiMelee or
+		this->weapon.type == WeaponType::aiMissileLauncher)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}
 	else if (this->weapon.type == WeaponType::Laser)
 	{
 		laserUpdate(deltaTime);
+	}
+	else if (this->weapon.type == WeaponType::aiLaser)
+	{
+		laserEnemyUpdate(deltaTime);
 	}
 	else
 	{
@@ -197,6 +204,30 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 	}
 }
 
+void Bullet::laserEnemyUpdate(float& deltaTime)
+{
+	GameObject* laserObject = this->getGameObject();
+	Vector3 rayDir = this->getDirection();
+	Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
+	if (static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getAABB().intersect(rayOrigin, rayDir, 1000))
+	{
+		if (soundTimer > 0.05f) 
+		{
+			Sound::play("data/sound/HitSound.wav");
+			soundTimer = 0;
+		}
+		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage());
+	}
+	this->obj->setScale(weapon.bulletScale * Vector3(timeLeft / weapon.bulletLifetime, timeLeft / weapon.bulletLifetime, 1.0));
+	if (timeLeft > 0.0f)
+	{
+		obj->move(dir * this->obj->getScale().z + dir);
+		float newRot = atan2(dir.x, dir.z);
+		this->obj->setRotation(Vector3(0, newRot, 0));
+		timeLeft = max(timeLeft - deltaTime, 0.0f);
+	}
+}
+
 void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
 {
 	if (vehicleWeapon.remainingCooldown > 0.0)
@@ -219,7 +250,7 @@ void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direc
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.02), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread*vehicleWeapon.maxSpread)));
+	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.02), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread * vehicleWeapon.maxSpread)));
 
 	Game::getGraphics().addToDraw(this->obj);
 	if (vehicleWeapon.currentSpreadIncrease > vehicleWeapon.maxSpread)
@@ -264,6 +295,11 @@ WeaponType Bullet::getWeaponType() const
 int Bullet::getDamage() const
 {
 	return weapon.damage;
+}
+
+bool Bullet::getMelee() const
+{
+	return weapon.melee;
 }
 
 GameObject* Bullet::getGameObject()

@@ -6,6 +6,7 @@ enum class PowerUpType
 	Time,
 	Health,
 	Speed,
+	Star,
 	Length
 };
 

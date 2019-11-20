@@ -4,4 +4,4 @@
 #include "defs.hpp"
 #include "Tile.hpp"
 
-String  createMinimapTexture( Map const & );
+String  createMinimapTexture( Map const &, Bool isDistrictColoured=true );

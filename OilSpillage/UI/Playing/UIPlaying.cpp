@@ -87,7 +87,7 @@ void UIPlaying::drawUI()
 	
 	if (player->getRespawnTimer() > 0 && time > 0)
 	{
-		std::string respawnTime = std::to_string(int(player->getTotRespawnTime() - player->getRespawnTimer()));
+		std::string respawnTime = std::to_string(int(player->getTotalRespawnTime() - player->getRespawnTimer()));
 		Vector2 textSize = UserInterface::getFontArial()->MeasureString(respawnTime.c_str());
 		if (this->respawnTimer >= 1.0f)
 		{

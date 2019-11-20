@@ -23,6 +23,7 @@
 #include"Shadows/ShadowMapping.h"
 #include"Particle/ParticleSystem.h"
 #include "Structs.h"
+#include "Fog.h"
 
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
@@ -61,6 +62,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Buffer> culledLightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexSpot;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> cameraBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> fogAnimationBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> culledLightBufferUAV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> culledLightBufferSRV;
@@ -83,6 +85,8 @@ class Graphics {
 	ParticleSystem particleSystem;
 	ParticleSystem particleSystem2;
 
+	std::unique_ptr<Fog> fog;
+	float time = 0.0;
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
@@ -100,9 +104,9 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> uiDSV;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> uiDSB;
 
-
-	void cullLights();
+	void cullLights(Matrix view);
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
+	void drawFog(DynamicCamera* camera, float deltaTime);
 public:
 	Graphics();
 	~Graphics();
@@ -118,7 +122,8 @@ public:
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path);
 	Material getMaterial(const char* modelPath);
-	void addToDraw(GameObject* o, bool isStatic = false);
+	void addToDraw(GameObject* o);
+	void addToDrawStatic(GameObject* o);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
 	void clearStaticObjects();
@@ -151,5 +156,5 @@ public:
 	Vector3 screenToWorldSpaceUI(Vector2 screenPos);
 
 	float farZTempShadow;
-	void setSpotLighShadow(SpotLight* spotLight);
+	void setSpotLightShadow(SpotLight* spotLight);
 };

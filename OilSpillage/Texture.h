@@ -30,10 +30,11 @@ private:
 	unsigned char* data;
 	int bpp;
 
+public:
 	Texture();
 	Texture(const Texture&) = delete;
 	~Texture();
-public:
+
 	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, const char* filename, int mipLevels, bool cpuOnly);
 	void Shutdown();
 
