@@ -1,0 +1,109 @@
+#include "ShootCar.h"
+
+void ShootCar::followPath()
+{
+	if (pathSize >= 0 && (position - targetPos).Length() > 40)
+	{
+		destination = *path;
+		if ((destination - position).Length() < 15)
+		{
+			path--;
+			pathSize--;
+		}
+	}
+	else
+	{
+		destination = targetPos;
+	}
+}
+
+ShootCar::ShootCar()
+{
+}
+
+ShootCar::ShootCar(float x, float z, int weaponType, Physics* physics)
+	: Spitfire(x, z, physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
+{
+	this->stats = VehicleStats::fastCar;
+	setHealth(this->stats.maxHealth);
+	attackRange = 15;
+}
+
+ShootCar::~ShootCar()
+{
+}
+
+void ShootCar::update(float dt, const Vector3& targetPos)
+{
+	Spitfire::update(dt, targetPos);
+	updateBullets(deltaTime);
+	if ((position - targetPos).Length() < attackRange)
+	{
+		shoot();
+	}
+}
+
+Status ShootCar::shoot()
+{
+	float offset;
+	Vector3 offsetPos;
+	if ((position - targetPos).Length() < 23)
+	{
+		if (this->timeSinceLastShot >= this->weapon.fireRate)
+		{
+			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+
+			for (int i = 0; i < Ranged::bulletCount; i++)
+			{
+				if (bullets[i].getTimeLeft() == 0.0)
+				{
+					if(weapon.type == WeaponType::aiFlamethrower)
+					{
+						Vector3 dir = Vector3(vehicleBody1->getRigidBody()->getLinearVelocity());
+						dir.Normalize();
+						Vector3 bulletOrigin = position + dir;
+
+						this->bullets[i].shoot(
+							weapon,
+							bulletOrigin,
+							dir,
+							Vector3(vehicleBody1->getRigidBody()->getLinearVelocity()) * 1.2,
+							deltaTime
+						);
+					}
+					else if(weapon.type == WeaponType::aiLaser)
+					{
+						Vector3 dir = (targetPos - position);
+						dir.Normalize();
+						Vector3 bulletOrigin = position + dir;
+
+						this->bullets[i].shoot(
+							weapon,
+							bulletOrigin,
+							dir,
+							Vector3(0.0f),
+							deltaTime
+						);
+					}
+					else
+					{
+						Vector3 dir = (targetPos - position);
+						dir.Normalize();
+						Vector3 bulletOrigin = position + dir;
+
+						this->bullets[i].shoot(
+							weapon,
+							bulletOrigin,
+							dir,
+							Vector3(vehicleBody1->getRigidBody()->getLinearVelocity()),
+							deltaTime
+						);
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	return Status::SUCCESS;
+}

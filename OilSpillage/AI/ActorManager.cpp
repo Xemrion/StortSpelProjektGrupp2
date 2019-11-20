@@ -4,6 +4,7 @@
 #include "Attacker.h"
 #include "Swarm.h"
 #include "ChaseCar.h"
+#include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
 
@@ -96,6 +97,12 @@ void ActorManager::createSpitFire(float x, float z)
 void ActorManager::createChaseCar(float x, float z)
 {
 	this->actors.push_back(new ChaseCar(x, z, physics));
+	initGroupForActor(actors.at(actors.size() - 1));
+}
+
+void ActorManager::createShootCar(float x, float z, int weaponType)
+{
+	this->actors.push_back(new ShootCar(x, z, weaponType, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
@@ -195,7 +202,7 @@ void ActorManager::spawnAttackers(const Vector3& originPos, int weaponType)
 	for (int i = 0; i < 2; i++)
 	{
 		createAttacker(originPos.x + i, originPos.z, weaponType);
-		createAttacker(originPos.x, originPos.z + 1, weaponType);
+		createAttacker(originPos.x, originPos.z + i, weaponType);
 		createAttacker(originPos.x - i, originPos.z, weaponType);
 	}
 }
@@ -205,8 +212,18 @@ void ActorManager::spawnChaseCars(const Vector3& originPos)
 	for (int i = 0; i < 2; i++)
 	{
 		createChaseCar(originPos.x + i, originPos.z);
-		createChaseCar(originPos.x, originPos.z + 1);
+		createChaseCar(originPos.x, originPos.z + i);
 		createChaseCar(originPos.x - i, originPos.z);
+	}
+}
+
+void ActorManager::spawnShootCars(const Vector3& originPos, int weaponType)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		createShootCar(originPos.x + i, originPos.z, weaponType);
+		createShootCar(originPos.x, originPos.z + i, weaponType);
+		createShootCar(originPos.x - i, originPos.z, weaponType);
 	}
 }
 
@@ -215,7 +232,7 @@ void ActorManager::spawnSwarm(const Vector3& originPos)
 	for (int i = 0; i < 2; i++)
 	{
 		createSwarm(originPos.x + i, originPos.z);
-		createSwarm(originPos.x, originPos.z + 1);
+		createSwarm(originPos.x, originPos.z + i);
 		createSwarm(originPos.x - i, originPos.z);
 	}
 }

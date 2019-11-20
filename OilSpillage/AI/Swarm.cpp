@@ -7,7 +7,7 @@ Swarm::Swarm()
 }
 
 Swarm::Swarm(float x, float z, Physics* physics)
-	: DynamicActor(x,z,physics),Melee(&position,&velocity,&deltaTime)
+	: DynamicActor(x, z, physics), Melee(&position, &velocity, &deltaTime)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
@@ -19,7 +19,7 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Drone");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Drone"));
 	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMelee);
-	this->boidOffset = 2.5;
+
 	this->aggroRange = 40;
 	createRigidbody(physics);
 }
@@ -27,7 +27,10 @@ Swarm::Swarm(float x, float z, Physics* physics)
 void Swarm::update(float dt, const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
-	meleeAttack();
+	if ((position - targetPos).Length() < 2)
+	{
+		meleeAttack();
+	}
 }
 
 void Swarm::createRigidbody(Physics* physics)

@@ -55,7 +55,6 @@ void Ranged::assignWeapon(int weaponType)
 }
 Status Ranged::shoot()
 {
-
 	float offset;
 	Vector3 offsetPos;
 	if (!predicting)

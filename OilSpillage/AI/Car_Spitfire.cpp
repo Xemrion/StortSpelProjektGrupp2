@@ -25,8 +25,6 @@ void Spitfire::setUpActor()
 Spitfire::Spitfire(float x, float z, Physics* physics)
 	: DynamicActor(x, z,physics)
 {
-	velocity = Vector2(0.0f, 0.0f);
-
 	targetRotation = 0.0f;
 	this->rotateAcceleration = 0.0f;
 	this->velocitySpeed = 0.0f;
@@ -43,6 +41,7 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	this->stats = VehicleStats::AICar;
 	setHealth(this->stats.maxHealth);
 	this->aggroRange = 500; //TODO: Find better aggro range
+	this->setPoints(150);
 }
 
 Spitfire::Spitfire()
@@ -104,6 +103,7 @@ void Spitfire::update(float dt,const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	updateVehicle();
+	vehicleBody1->setColor(this->getColor());
 }
 
 void Spitfire::followPath()

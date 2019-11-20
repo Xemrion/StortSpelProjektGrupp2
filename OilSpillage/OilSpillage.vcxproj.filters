@@ -85,6 +85,7 @@
     <ClCompile Include="AI\Boss.cpp" />
     <ClCompile Include="AI\ChaseCar.cpp" />
     <ClCompile Include="AI\Sniper.cpp" />
+    <ClCompile Include="AI\ShootCar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="fog.h" />
     <ClInclude Include="PG\Biome.hpp" />
     <ClInclude Include="PG\Modelizer.hpp" />
+    <ClInclude Include="AI\ShootCar.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

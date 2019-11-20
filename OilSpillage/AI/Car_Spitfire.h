@@ -10,9 +10,6 @@ private:
 	GameObject* wheel3;
 	GameObject* wheel4;
 
-
-	DirectX::XMFLOAT2 velocity;
-
 	float targetRotation;
 	float rotateAcceleration;
 	bool rotationDirection;
