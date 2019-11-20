@@ -9,14 +9,47 @@
 #include<d3d11.h>
 #include<SimpleMath.h>
 #include <algorithm>
+#include "BulletCollision/CollisionDispatch/btCollisionDispatcherMt.h"
+#include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolverMt.h"
+#include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
+#include "BulletDynamics/ConstraintSolver/btNNCGConstraintSolver.h"
+#include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
+#include "BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h"
+#include "BulletDynamics/MLCPSolvers/btDantzigSolver.h"
+#include "BulletDynamics/MLCPSolvers/btLemkeSolver.h"
+#include "LinearMath/btAlignedObjectArray.h"
+#include "LinearMath/btPoolAllocator.h"
+#include "btBulletCollisionCommon.h"
+#include "BulletCollision/CollisionDispatch/btCollisionDispatcherMt.h"
+#include "BulletDynamics/Dynamics/btSimulationIslandManagerMt.h"  // for setSplitIslands()
+#include "BulletDynamics/Dynamics/btDiscreteDynamicsWorldMt.h"
+#include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolverMt.h"
+#include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
+#include "BulletDynamics/ConstraintSolver/btNNCGConstraintSolver.h"
+#include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
+#include "BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h"
+#include "BulletDynamics/MLCPSolvers/btDantzigSolver.h"
+#include "BulletDynamics/MLCPSolvers/btLemkeSolver.h"
 using namespace DirectX::SimpleMath;
+enum SolverType
+{
+	SOLVER_TYPE_SEQUENTIAL_IMPULSE,
+	SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT,
+	SOLVER_TYPE_NNCG,
+	SOLVER_TYPE_MLCP_PGS,
+	SOLVER_TYPE_MLCP_DANTZIG,
+	SOLVER_TYPE_MLCP_LEMKE,
+
+	SOLVER_TYPE_COUNT
+};
 class Physics
 {
 private:
 	btClock realClock;
-
-	btDynamicsWorld* world;
-	btDispatcher* dispatcher;
+	btConstraintSolver* m_solver;
+	SolverType m_solverType;
+	btDiscreteDynamicsWorldMt* world;
+	btCollisionDispatcherMt* dispatcher;
 	btBroadphaseInterface* broadphase;
 	btConstraintSolver* solver;
 	btCollisionConfiguration* collisionConfig;

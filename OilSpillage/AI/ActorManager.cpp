@@ -33,6 +33,7 @@ ActorManager::~ActorManager()
 void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
+	seperation(targetPos);
 	updateActors(dt,targetPos);
 	Vector3 newPos;
 	float deltaX;
@@ -41,22 +42,22 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	for (int i = 0; i < groups.size(); i++)
 	{
 		groups[i].update(targetPos);
-		deltaX = groups[i].averagePos.x - targetPos.x;
-		deltaZ = groups[i].averagePos.z - targetPos.z;
-		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-					   //(TileSize * nrOfTiles)^2
-		if (distance > (20 * 10) * (20*10))
-		{
-			newPos = generateObjectivePos(targetPos,50,100);
-			for (int j = 0; j < groups[i].actors.size(); j++)
-			{
-				groups[i].actors[j]->setPosition(newPos);
-				if (j % 5 == 0)
-				{
-					newPos = generateObjectivePos(targetPos, 50, 100);
-				}
-			}
-		}
+		//deltaX = groups[i].averagePos.x - targetPos.x;
+		//deltaZ = groups[i].averagePos.z - targetPos.z;
+		//distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+		//			   //(TileSize * nrOfTiles)^2
+		//if (distance > (20 * 10) * (20*10))
+		//{
+		//	newPos = generateObjectivePos(targetPos,50,100);
+		//	for (int j = 0; j < groups[i].actors.size(); j++)
+		//	{
+		//		groups[i].actors[j]->setPosition(newPos);
+		//		if (j % 5 == 0)
+		//		{
+		//			newPos = generateObjectivePos(targetPos, 50, 100);
+		//		}
+		//	}
+		//}
 	}
 	updateGroups();
 	turretHandler.update(dt, targetPos);

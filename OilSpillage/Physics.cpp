@@ -1,17 +1,80 @@
 #include "Physics.h"
 #include "Vehicle.h"
 #include "AI/Actor.h"
-
-Physics::Physics() :broadphase(new btDbvtBroadphase()),
-collisionConfig(new btDefaultCollisionConfiguration()),
-solver(new btSequentialImpulseConstraintSolver)
+static SolverType gSolverType = SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT;
+static int gSolverMode = SOLVER_SIMD |
+SOLVER_USE_WARMSTARTING |
+// SOLVER_RANDMIZE_ORDER |
+// SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS |
+// SOLVER_USE_2_FRICTION_DIRECTIONS |
+0;
+btConstraintSolver* createSolverByType(SolverType t)
+{
+	btMLCPSolverInterface* mlcpSolver = NULL;
+	switch (t)
+	{
+	case SOLVER_TYPE_SEQUENTIAL_IMPULSE:
+		return new btSequentialImpulseConstraintSolver();
+	case SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT:
+		return new btSequentialImpulseConstraintSolverMt();
+	case SOLVER_TYPE_NNCG:
+		return new btNNCGConstraintSolver();
+	case SOLVER_TYPE_MLCP_PGS:
+		mlcpSolver = new btSolveProjectedGaussSeidel();
+		break;
+	case SOLVER_TYPE_MLCP_DANTZIG:
+		mlcpSolver = new btDantzigSolver();
+		break;
+	case SOLVER_TYPE_MLCP_LEMKE:
+		mlcpSolver = new btLemkeSolver();
+		break;
+	default:
+	{
+	}
+	}
+	if (mlcpSolver)
+	{
+		return new btMLCPSolver(mlcpSolver);
+	}
+	return NULL;
+}
+Physics::Physics() :broadphase(new btDbvtBroadphase())
 {
 
-	dispatcher = new btCollisionDispatcher(collisionConfig);
-	
-	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
+	btDefaultCollisionConstructionInfo cci;
+	cci.m_defaultMaxPersistentManifoldPoolSize = 80000;
+	cci.m_defaultMaxCollisionAlgorithmPoolSize = 80000;
+	collisionConfig = new btDefaultCollisionConfiguration(cci);
+	dispatcher = new btCollisionDispatcherMt(collisionConfig,40);
+
+	btConstraintSolverPoolMt* solverPool;
+	{
+		SolverType poolSolverType = m_solverType;
+		if (poolSolverType == SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT)
+		{
+			// pool solvers shouldn't be parallel solvers, we don't allow that kind of
+			// nested parallelism because of performance issues
+			poolSolverType = SOLVER_TYPE_SEQUENTIAL_IMPULSE;
+		}
+		btConstraintSolver* solvers[BT_MAX_THREAD_COUNT];
+		int maxThreadCount = BT_MAX_THREAD_COUNT;
+		for (int i = 0; i < maxThreadCount; ++i)
+		{
+			solvers[i] = createSolverByType(poolSolverType);
+		}
+		solverPool = new btConstraintSolverPoolMt(solvers, maxThreadCount);
+		m_solver = solverPool;
+	}
+	btSequentialImpulseConstraintSolverMt* solverMt = NULL;
+	if (m_solverType == SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT)
+	{
+		solverMt = new btSequentialImpulseConstraintSolverMt();
+	}
+
+	world = new btDiscreteDynamicsWorldMt(dispatcher, broadphase,solverPool, solverMt, collisionConfig);
 	world->setForceUpdateAllAabbs(false);
-	this->world->setGravity(btVector3(0, -10, 0));
+	world->setGravity(btVector3(0, -10, 0));
+	world->getSolverInfo().m_solverMode = gSolverMode;
 	//temp plane inf
 	btTransform t;
 	t.setIdentity();
