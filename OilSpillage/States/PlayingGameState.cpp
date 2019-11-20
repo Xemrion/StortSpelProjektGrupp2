@@ -603,15 +603,15 @@ void PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 
-		//if (spawnTimer % 200 == 0)
-		//{
-		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-		//	actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
-		//	nrOfEnemies += 12;
-		//	//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
-		//	spawnTimer = 0;
-		//}
-		//spawnTimer++;
+		if (spawnTimer % 200 == 0)
+		{
+			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
+			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
+			nrOfEnemies += 12;
+			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
+			spawnTimer = 0;
+		}
+		spawnTimer++;
 		//spawn Boss
 		//if (spawnTimer % 10 == 0)
 		//{

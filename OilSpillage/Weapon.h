@@ -148,6 +148,15 @@ public:
 				weapon.flameBool = false;
 			}
 		}
+		else if (weapon.type == WeaponType::Laser && weapon.flameBool == true)
+		{
+			int randomSound = rand() % 4 + 1;
+			std::string soundEffect = "./data/sound/Lazer" + std::to_string(randomSound) + ".mp3";
+			Sound::stopLooping(weapon.soundHandle);
+			weapon.soundHandle = Sound::playLooping(soundEffect);
+			Sound::play("./data/sound/LazerImpact.mp3");
+			weapon.flameBool = false;
+		}
 	};
 
 	static void weaponEndSound(Weapon& weapon)
@@ -157,6 +166,12 @@ public:
 			return;
 		}
 		else if (weapon.type == WeaponType::Flamethrower)
+		{
+			weapon.flameBool = true;
+			Sound::stopLooping(weapon.soundHandle);
+			weapon.soundHandle = 0;
+		}
+		else if (weapon.type == WeaponType::Laser) 
 		{
 			weapon.flameBool = true;
 			Sound::stopLooping(weapon.soundHandle);

@@ -155,8 +155,9 @@ private:
 	bool flameBool;
 	bool dmg;
 	bool player = false;
+	
 
-
+	Vector2 aimLerp;
 	Vector2 curDir;
 	Vector2 currentDir;
 	float velocitySimple;
