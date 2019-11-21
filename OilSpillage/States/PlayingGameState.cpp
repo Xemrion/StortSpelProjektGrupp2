@@ -1,4 +1,4 @@
-#include "PlayingGameState.h"
+﻿#include "PlayingGameState.h"
 #include "../Sound.h"
 #include "../Input.h"
 #include "../UI/UIPlaying.h"
@@ -56,10 +56,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 #endif // _DEBUG
 	this->current_item = NULL;
 
-	rng.seed(config.seed); // g�r i konstruktorn
+	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
 	camera = std::make_unique<DynamicCamera>();
-	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
+	testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
 
@@ -175,19 +175,22 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 				10.0f));
 	}
 
-	/*
+	
 	 //Road Network Turtlewalker
-	 testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-	 testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-	 testNetwork.get()->setAngle(45);
-	 for (int i = 0; i < 5; i++) {
+	//FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF
+	testNetwork.get()->generateInitialSegments("F+F-F-FF+F+F-F+F+F-F-FF+F+F-F-F+F-F-FF+F+F-F-F+F-F-FF+F+F-FF+F-F-FF+F+F-F+F+F-F-FF+F+F-F+F+F-F-FF+F+F-F-F+F-F-FF+F+F-F+F+F-F-FF+F+F-F+F+F-F-FF+F+F-F-F+F-F-FF+F+F-F-F+F-F-FF+F+F-FF+F-F-FF+F+F-F+F+F-F-FF+F+F-F+F+F-F-FF+F+F-F-F+F-F-FF+F+F-F+F+F-F-FF+F+F-F+F+F-F-FF+F+F-F-F+F-F-FF+F+F-F-F+F-F-FF+F+F-FF+F-F-FF+F+F-F+F+F-F-FF+F+F-F+F+F-F-FF+F+F-F-F+F-F-FF+F+F-F+F+F-F-FF+F+F-F+F+F-F-FF+F+F-F-F+F-F-FF+F+F-F-F+F-F-FF+F+F-FF+F-F-FF+F+F-F+F+F-F-FF+F+F-F+F+F-F-FF+F+F-F-F+F-F-FF+F+F-F");
+	//testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+	testNetwork.get()->setAngle(90);
+	for (int i = 0; i < 5; i++) 
+	{
 		 testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
 		 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	 }
-	 testNetwork.get()->cleanRoadNetwork();
+	}
+	/* testNetwork.get()->cleanRoadNetwork();
 	 testNetwork.get()->saveTestNetwork("test-network");
 	*/
 	//}
+
 	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 
 	graphics.setLightList(lightList.get());
@@ -258,6 +261,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	this->graphics.setTestParticleSystem(this->graphics.getParticleSystem("explosion"));
 	this->fillTestParticle();
+
 
 
 	//Bullet
@@ -683,12 +687,19 @@ void PlayingGameState::update(float deltaTime)
 		Bullet::updateSoundTimer(deltaTime);
 		bulletThread.get();
 		player->updateWeapon(deltaTime);
+#ifdef _DEBUG
 		timer += deltaTime;
 		if (timer > 0.001f)
 		{
 			timer = 0.0f;
-			this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition() + Vector3(0.0f, 1.0f, 0.0f)), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+			for (int i = 0; i < this->testNetwork->getSegments().size(); i++)
+			{
+				this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()) + Vector3(this->testNetwork->getSegments().at(i).firstPoint.x, this->testNetwork->getSegments().at(i).firstPoint.y, this->testNetwork->getSegments().at(i).firstPoint.z), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+			}
 		}
+#endif 
+
+		
 #ifndef _DEBUG
 		updateObjects();
 		paperCollision(deltaTime);

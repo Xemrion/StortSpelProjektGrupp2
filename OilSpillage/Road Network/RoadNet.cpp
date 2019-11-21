@@ -307,6 +307,11 @@ void RoadNetwork::drawRoadNetwork(Graphics* graph)
 	}
 }
 
+std::vector<Segment>& RoadNetwork::getSegments()
+{
+	return roadNetwork;
+}
+
 bool RoadNetwork::saveTestNetwork(std::string filename)
 {
 	std::ofstream testSave;
