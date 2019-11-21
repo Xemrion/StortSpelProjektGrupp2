@@ -144,7 +144,11 @@ void Physics::moveBody(btRigidBody* rigidbody, float x, float y, float z)
 {
 	btTransform transform = rigidbody->getCenterOfMassTransform();
 	transform.setOrigin(btVector3(x, y, z));
-	rigidbody->setCenterOfMassTransform(transform);
+	rigidbody->setWorldTransform(transform);
+	rigidbody->getMotionState()->setWorldTransform(transform);
+	rigidbody->setLinearVelocity(btVector3());
+	rigidbody->setAngularVelocity(btVector3());
+	rigidbody->clearForces();
 }
 
 void Physics::update(float deltaTime)

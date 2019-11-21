@@ -79,7 +79,6 @@ Vector3 Attacker::seek()
 {
 	Vector3 desiredDirection;
 	Vector3 offsetVec;
-	Vector3 eliminatingVec = Vector3(0.0f, -1.0f, 0.0f) - Vector3(0.0f, 1.0f, 0.0f);
 	//standard group movement
 	if (!vActive)
 	{
