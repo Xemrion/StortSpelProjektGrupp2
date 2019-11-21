@@ -14,6 +14,9 @@ private:
 	Vector3* positionPtr;
 	Vector3* targetPosPtr;
 	Vector3* velocityPtr;
+	Vector3 flameThrowerDir;
+	int flameXDir;
+	int flameZDir;
 	WaitTimer waitTimer;
 
 	float timeSinceLastShot;
@@ -27,6 +30,7 @@ private:
 protected:
 	int attackRange;
 	float dt;
+	Vector3 frontVecShoot;
 	Vector3 targetToSelf; //use in boll abilities
 
 	Status shoot();

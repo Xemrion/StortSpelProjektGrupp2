@@ -93,7 +93,7 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
 
-	//Game::getGraphics().addToDraw(this->obj); //draws hitbox
+	Game::getGraphics().addToDraw(this->obj); //draws hitbox
 	this->dir.y = 0.0f;
 
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),

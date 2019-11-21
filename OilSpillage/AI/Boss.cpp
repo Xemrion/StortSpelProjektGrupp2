@@ -87,7 +87,7 @@ void Boss::update(float dt, const Vector3& targetPos)
 	this->dt = dt;
 	Actor::update(dt, targetPos);
 	this->movementVariables(dt);
-	this->circulatePlayer(targetPos);
+	//this->circulatePlayer(targetPos);
 
 	this->updateBullets(dt);
 
@@ -223,6 +223,7 @@ void Boss::move()
 		vecForward -= (targetToSelf * deltaTime) / 0.02f;
 		vecForward.Normalize();
 		this->frontVector = vecForward;
+		this->frontVecShoot = vecForward;
 
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
 
