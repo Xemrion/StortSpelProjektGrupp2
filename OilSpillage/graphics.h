@@ -105,9 +105,6 @@ class Graphics {
 	Vector3 uiSunDir = Vector3(0.0, 1.0, 0.0);
 	std::vector<std::pair<GameObject*,Matrix*>> uiObjects;
 
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> uiDSV;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> uiDSB;
-
 	void cullLights(Matrix view);
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
 	void drawFog(DynamicCamera* camera, float deltaTime);
