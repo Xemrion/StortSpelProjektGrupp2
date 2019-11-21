@@ -15,6 +15,9 @@ private:
 	void scrapSkyScraper();
 	void generateSkyscraper();
 	bool saveSkyscraper(std::string name);
+	void unloadRoof(std::string name);
+	void unloadWall(std::string name);
+	void unloadWindow(std::string name);
 public:
 	Skyscraper(I32 input = -1);
 	~Skyscraper();
@@ -23,9 +26,7 @@ public:
 	void setRoofMesh(std::string name, GameObject* roof);
 	void setWallMesh(std::string name, GameObject* roof);
 	void setWindowMesh(std::string name, GameObject* roof);
-	void unloadRoof(std::string name);
-	void unloadWall(std::string name);
-	void unloadWindow(std::string name);
+	void unloadSkyscrapers(std::vector<std::string>& names);
 };
 
 /* Pseudocode

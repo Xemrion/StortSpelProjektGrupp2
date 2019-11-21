@@ -47,6 +47,16 @@ void Skyscraper::setWindowMesh(std::string name, GameObject* roof)
 	roof->mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
 }
 
+void Skyscraper::unloadSkyscrapers(std::vector<std::string>& names)
+{
+	for (int i = 0; i < names.size(); i++) {
+		unloadRoof(names[i]);
+		unloadWall(names[i]);
+		unloadWindow(names[i]);
+	}
+	names.clear();
+}
+
 void Skyscraper::unloadRoof(std::string name)
 {
 	std::string meshName = name + "-roof";
