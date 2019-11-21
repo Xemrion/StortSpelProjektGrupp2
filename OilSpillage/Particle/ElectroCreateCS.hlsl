@@ -31,10 +31,11 @@ void main(uint3 DispatchThreadID : SV_DispatchThreadID)
     float noiseValue = hash(32.03f).x*10.0f;
     float3 initDir = float3(0.0f, 0.5f, 1.0f) + randomVector.xyz;
     float3 noiseDir = float3(hash(2.123f).y, hash(23.22f).z, hash(72.323f).x);
-    p.position.xyz = emitterLocation.xyz + initDir.xyz * (1 + DispatchThreadID.x) + noiseDir * noiseValue;
+    p.position.xyz = emitterLocation.xyz;
+   // +initDir.xyz * (1 + DispatchThreadID.x) + noiseDir * noiseValue;
     p.position.w = 1.0f;
-    p.direction.xyz = initDir.xyz * DispatchThreadID.x + noiseDir * noiseValue;
-    p.direction.w = 2.0f + 1+hash(float3(randomVector.xyz)).x;
+    p.direction.xyz = initDir.xyz;// * DispatchThreadID.x + noiseDir * noiseValue;
+    p.direction.w = 2.0f;
     p.time.x = 0.0f;
     p.time.y = emitterLocation.w;
     NewSimulationState.Append(p);

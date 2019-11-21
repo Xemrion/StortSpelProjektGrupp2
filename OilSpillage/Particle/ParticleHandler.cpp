@@ -88,3 +88,19 @@ bool ParticleHandler::saveParticleSystems()
 	}
 	return result;
 }
+
+void ParticleHandler::renderParticleSystems(DynamicCamera* camera)
+{
+	for (auto i = this->particleSystems.begin(); i != this->particleSystems.end(); i++)
+	{
+		i->second->drawAll(camera);
+	}
+}
+
+void ParticleHandler::updateParticleSystems(float delta, Matrix viewProj)
+{
+	for (auto i = this->particleSystems.begin(); i != this->particleSystems.end(); i++)
+	{
+		i->second->updateParticles(delta, viewProj);
+	}
+}

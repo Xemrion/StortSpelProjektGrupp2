@@ -473,7 +473,17 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->Unmap(cameraBuffer.Get(), 0);
 
 	deviceContext->RSSetViewports(1, &this->vp);
-	this->particleSystem->updateParticles(deltaTime, viewProj);
+
+	this->particleHandler->updateParticleSystems(deltaTime, viewProj);
+
+	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
+
+	this->particleHandler->renderParticleSystems(camera);
+
+
+	/*this->particleSystem->updateParticles(deltaTime, viewProj);
 
 	this->particleSystem->drawAll(camera);
 
@@ -491,11 +501,9 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	this->particleTrail->updateParticles(deltaTime, viewProj);
 
-	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
-	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
-	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
+	
 
-	this->particleTrail->drawAll(camera);
+	this->particleTrail->drawAll(camera);*/
 	
 	//set up Shaders
 	

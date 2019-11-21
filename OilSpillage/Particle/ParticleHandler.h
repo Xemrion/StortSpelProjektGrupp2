@@ -18,6 +18,9 @@ public:
 	bool loadParticleSystems();//load particleSystems
 	bool saveParticleSystem(std::string name);
 	bool saveParticleSystems();//save particleSystems
+
+	void renderParticleSystems(DynamicCamera* camera);
+	void updateParticleSystems(float delta, Matrix viewProj);
 private:
 	std::unordered_map<std::string, ParticleSystem*> particleSystems;
 	std::vector<std::string> names;

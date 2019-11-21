@@ -93,7 +93,7 @@ bool RoadNetwork::generateInitialSegments(const char* seed)
 { //'F' to move forward a segment, '+' or '-' to turn but doesn't move 'H' to move half a length for a segment
 	bool success = false;
 	int counter = 0;
-	Vector4 currentForward = this->forward;
+	Vector4 currentForward = this->forward*0.2f;
 	float nextX, nextZ;
 	while (seed[counter]) {
 
@@ -163,7 +163,7 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment, bool
 { //'F' to move forward a segment, '+' or '-' to turn but doesn't move 'H' to move half a length for a segment
 	bool success = false;
 	int counter = 0;
-	Vector4 currentForward = this->forward;
+	Vector4 currentForward = this->forward*0.2f;
 	float nextX, nextZ;
 	auto  check = roadNetwork.size();
 
