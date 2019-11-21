@@ -1,12 +1,50 @@
 #include"GameObject.h"
 #include"game.h"
 
+GameObject::GameObject()
+{
+}
+
 GameObject::~GameObject()
 {
 	/*if (rigidBody != nullptr) {
 		physics->DeleteRigidBody(rigidBody);
 		this->rigidBody = nullptr;
 	}*/
+}
+
+GameObject::GameObject(const GameObject& obj)
+{
+	this->color = obj.color;
+	this->material = obj.material;
+	this->mesh = obj.mesh;
+	this->parent = obj.parent;
+	this->physics = obj.physics;
+	this->position = obj.position;
+	this->sunShadow = obj.sunShadow;
+	this->spotShadow = obj.spotShadow;
+	this->rigidBody = obj.rigidBody;
+	this->rotation = obj.rotation;
+	this->rotationQt = obj.rotationQt;
+	this->scale = obj.scale;
+}
+
+//GameObject::GameObject(const GameObject& obj)
+//{
+//
+//}
+//
+//void GameObject::operator=(const GameObject& obj)
+//{
+//	if (this != &obj)
+//	{
+//
+//	}
+//}
+
+bool GameObject::getShading() const
+{
+	return this->shading;
 }
 
 bool GameObject::getSpotShadow() const
@@ -82,6 +120,11 @@ Matrix GameObject::getTransform()
 
 	//	return transform;
 	//}
+}
+
+void GameObject::setShading(bool arg)
+{
+	this->shading = arg;
 }
 
 void GameObject::setSunShadow(bool arg)

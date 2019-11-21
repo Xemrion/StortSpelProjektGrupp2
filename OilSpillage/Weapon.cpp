@@ -34,6 +34,9 @@ Bullet::~Bullet()
 
 void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity, float deltaTime)
 {
+	this->initPos = position;
+	this->initDir = direction;
+
 	this->weapon = Weapon(weapon);
 	if (this->weapon.type == WeaponType::None)
 	{
@@ -68,6 +71,7 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& dir
 	this->dir += additionalVelocity;
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
+	this->obj->setColor(Vector4(1.2f, 1.2f, 0, 1));
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
@@ -140,6 +144,12 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 
 void Bullet::update(float deltaTime)
 {
+	if (this->weapon.type == WeaponType::Laser || this->weapon.melee)
+	{
+		this->obj->setPosition(initPos);
+		this->dir = initDir;
+	}
+
 	if (this->weapon.type == WeaponType::None)
 	{
 
@@ -190,9 +200,9 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 		{
 			if (soundTimer > 0.05f) {
 				int randomSound = rand() % 3 + 1;
-				std::wstring soundEffect = L"data/sound/CarGlass" + std::to_wstring(randomSound) + L".wav";
-				Sound::PlaySoundEffect(soundEffect);
-				Sound::PlaySoundEffect(L"data/sound/MetalImpact1.wav");
+				std::string soundEffect = "./data/sound/CarGlass" + std::to_string(randomSound) + ".wav";
+				Sound::play(soundEffect);
+				Sound::play("./data/sound/MetalImpact1.wav");
 				soundTimer = 0;
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);
@@ -212,10 +222,7 @@ void Bullet::laserEnemyUpdate(float& deltaTime)
 	{
 		if (soundTimer > 0.05f) 
 		{
-			/*int randomSound = rand() % 3 + 1;
-			std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
-			Sound::PlaySoundEffect(soundEffect);*/
-			Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+			Sound::play("data/sound/HitSound.wav");
 			soundTimer = 0;
 		}
 		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage());
@@ -239,22 +246,13 @@ void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direc
 	}
 	direction.Normalize();
 	this->dir = direction;
-	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
-	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
 	vehicleWeapon.currentSpreadIncrease += vehicleWeapon.spreadIncreasePerSecond * vehicleWeapon.maxSpread * deltaTime;
-
-	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
-	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
 
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setScale(weapon.bulletScale);
-	this->obj->setPosition(position + direction * this->obj->getScale().z);
-
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-	this->obj->setColor(Vector4::Lerp(Vector4(0.5, 1.0, 4.5, 0.2), Vector4(4.5, 0.5, 0.5, 0.02), (vehicleWeapon.currentSpreadIncrease * vehicleWeapon.currentSpreadIncrease) / (vehicleWeapon.maxSpread * vehicleWeapon.maxSpread)));
 
-	Game::getGraphics().addToDraw(this->obj);
 	if (vehicleWeapon.currentSpreadIncrease > vehicleWeapon.maxSpread)
 	{
 		vehicleWeapon.remainingCooldown = 4.0;

@@ -1,8 +1,8 @@
 #include "MenuGameState.h"
-#include "../UI/UIMainMenu.h"
-#include "../UI/UIOptions.h"
-#include "../UI/UICredits.h"
-#include "../UI/UIControls.h"
+#include "../UI/Menu/UIMainMenu.h"
+#include "../UI/Menu/UIOptions.h"
+#include "../UI/Menu/UICredits.h"
+#include "../UI/Menu/UIControls.h"
 #include <cassert>
 
 MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU_MAIN)
@@ -25,7 +25,7 @@ MenuGameState::~MenuGameState() {}
 
 void MenuGameState::update(float deltaTime)
 {
-	this->graphics.clearScreen();
+	this->graphics.clearScreen(Vector4(0,0,0,0));
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2());

@@ -71,9 +71,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\Users\Filip\Documents\GitHub\StortSpelProjektGrupp2\OilSpillage\glm;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\Filip\Documents\GitHub\StortSpelProjektGrupp2\OilSpillage\glm;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -97,12 +99,13 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <FloatingPointModel>Precise</FloatingPointModel>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>BulletSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>SoLoud\include;BulletSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>BulletSDK\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LinearMath_vs2010_x64_debug.lib;BulletDynamics_vs2010_x64_debug.lib;BulletCollision_vs2010_x64_debug.lib;Bullet3Dynamics_vs2010_x64_debug.lib;Bullet3Common_vs2010_x64_debug.lib;Bullet3Collision_vs2010_x64_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LinearMath_vs2010_x64_debug.lib;BulletDynamics_vs2010_x64_debug.lib;BulletCollision_vs2010_x64_debug.lib;Bullet3Dynamics_vs2010_x64_debug.lib;Bullet3Common_vs2010_x64_debug.lib;Bullet3Collision_vs2010_x64_debug.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,14 +135,15 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>BulletSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>SoLoud\include;BulletSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>BulletSDK\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LinearMath_vs2010_x64_release.lib;BulletDynamics_vs2010_x64_release.lib;BulletCollision_vs2010_x64_release.lib;Bullet3Dynamics_vs2010_x64_release.lib;Bullet3Common_vs2010_x64_release.lib;Bullet3Collision_vs2010_x64_release.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LinearMath_vs2010_x64_release.lib;BulletDynamics_vs2010_x64_release.lib;BulletCollision_vs2010_x64_release.lib;Bullet3Dynamics_vs2010_x64_release.lib;Bullet3Common_vs2010_x64_release.lib;Bullet3Collision_vs2010_x64_release.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -159,6 +163,9 @@
     <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
+    <ClCompile Include="Inventory\Container.cpp" />
+    <ClCompile Include="Inventory\Item.cpp" />
+    <ClCompile Include="Inventory\ItemWeapon.cpp" />
     <ClCompile Include="fog.cpp" />
     <ClCompile Include="Objectives\Objective.cpp" />
     <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
@@ -171,12 +178,53 @@
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\darray.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\klatt.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\resonator.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\soloud_speech.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\speech\tts.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\wav\dr_impl.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\wav\soloud_wav.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\wav\soloud_wavstream.cpp" />
+    <ClCompile Include="SoLoud\src\audiosource\wav\stb_vorbis.c" />
+    <ClCompile Include="SoLoud\src\backend\null\soloud_null.cpp" />
+    <ClCompile Include="SoLoud\src\backend\xaudio2\soloud_xaudio2.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_audiosource.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_bus.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_core_3d.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_core_basicops.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_core_faderops.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_core_filterops.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_core_getters.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_core_setters.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_core_voicegroup.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_core_voiceops.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_fader.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_fft.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_fft_lut.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_file.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_filter.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_queue.cpp" />
+    <ClCompile Include="SoLoud\src\core\soloud_thread.cpp" />
+    <ClCompile Include="SoLoud\src\filter\soloud_bassboostfilter.cpp" />
+    <ClCompile Include="SoLoud\src\filter\soloud_biquadresonantfilter.cpp" />
+    <ClCompile Include="SoLoud\src\filter\soloud_dcremovalfilter.cpp" />
+    <ClCompile Include="SoLoud\src\filter\soloud_echofilter.cpp" />
+    <ClCompile Include="SoLoud\src\filter\soloud_fftfilter.cpp" />
+    <ClCompile Include="SoLoud\src\filter\soloud_flangerfilter.cpp" />
+    <ClCompile Include="SoLoud\src\filter\soloud_lofifilter.cpp" />
+    <ClCompile Include="SoLoud\src\filter\soloud_robotizefilter.cpp" />
+    <ClCompile Include="SoLoud\src\filter\soloud_waveshaperfilter.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
+    <ClCompile Include="States\UpgradingGameState.cpp" />
+    <ClCompile Include="UI\Elements\Button.cpp" />
+    <ClCompile Include="UI\Elements\ButtonPromtBar.cpp" />
+    <ClCompile Include="UI\Elements\CarGadgetSelector.cpp" />
+    <ClCompile Include="UI\Elements\CheckBox.cpp" />
+    <ClCompile Include="UI\Elements\Element.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
-    <ClCompile Include="UI\Button.cpp" />
-    <ClCompile Include="UI\CheckBox.cpp" />
-    <ClCompile Include="UI\Element.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="graphics.cpp" />
@@ -198,15 +246,22 @@
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Road Network\RoadNet.cpp" />
     <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="UI\Minimap.cpp" />
-    <ClCompile Include="UI\ObjectiveBox.cpp" />
-    <ClCompile Include="UI\Slider.cpp" />
-    <ClCompile Include="UI\UIControls.cpp" />
-    <ClCompile Include="UI\UICredits.cpp" />
-    <ClCompile Include="UI\UIMainMenu.cpp" />
-    <ClCompile Include="UI\UIOptions.cpp" />
-    <ClCompile Include="UI\UIPaused.cpp" />
-    <ClCompile Include="UI\UIPlaying.cpp" />
+    <ClCompile Include="UI\Elements\ItemSelector.cpp" />
+    <ClCompile Include="UI\Elements\ItemSlot.cpp" />
+    <ClCompile Include="UI\Elements\Minimap.cpp" />
+    <ClCompile Include="UI\Elements\ObjectiveBox.cpp" />
+    <ClCompile Include="UI\Elements\Slider.cpp" />
+    <ClCompile Include="UI\Elements\TextBox.cpp" />
+    <ClCompile Include="UI\Elements\VehicleStatBox.cpp" />
+    <ClCompile Include="UI\Menu\UIControls.cpp" />
+    <ClCompile Include="UI\Menu\UICredits.cpp" />
+    <ClCompile Include="UI\Menu\UIMainMenu.cpp" />
+    <ClCompile Include="UI\Menu\UIOptions.cpp" />
+    <ClCompile Include="UI\Playing\UIBefore.cpp" />
+    <ClCompile Include="UI\Playing\UIPaused.cpp" />
+    <ClCompile Include="UI\Playing\UIPlaying.cpp" />
+    <ClCompile Include="UI\Upgrading\UIRandomItem.cpp" />
+    <ClCompile Include="UI\Upgrading\UIUpgrading.cpp" />
     <ClCompile Include="UI\UserInterface.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="Weapon.cpp" />
@@ -232,6 +287,8 @@
     <ClInclude Include="Particle\ParticleHandler.h" />
     <ClInclude Include="PG\Biome.hpp" />
     <ClInclude Include="PG\Modelizer.hpp" />
+    <ClInclude Include="Inventory\Container.h" />
+    <ClInclude Include="Inventory\ItemWeapon.h" />
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
@@ -243,18 +300,62 @@
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="PG\Profiler.hpp" />
+    <ClInclude Include="SoLoud\include\soloud.h" />
+    <ClInclude Include="SoLoud\include\soloud_audiosource.h" />
+    <ClInclude Include="SoLoud\include\soloud_bassboostfilter.h" />
+    <ClInclude Include="SoLoud\include\soloud_biquadresonantfilter.h" />
+    <ClInclude Include="SoLoud\include\soloud_bus.h" />
+    <ClInclude Include="SoLoud\include\soloud_c.h" />
+    <ClInclude Include="SoLoud\include\soloud_dcremovalfilter.h" />
+    <ClInclude Include="SoLoud\include\soloud_echofilter.h" />
+    <ClInclude Include="SoLoud\include\soloud_error.h" />
+    <ClInclude Include="SoLoud\include\soloud_fader.h" />
+    <ClInclude Include="SoLoud\include\soloud_fft.h" />
+    <ClInclude Include="SoLoud\include\soloud_fftfilter.h" />
+    <ClInclude Include="SoLoud\include\soloud_file.h" />
+    <ClInclude Include="SoLoud\include\soloud_file_hack_off.h" />
+    <ClInclude Include="SoLoud\include\soloud_file_hack_on.h" />
+    <ClInclude Include="SoLoud\include\soloud_filter.h" />
+    <ClInclude Include="SoLoud\include\soloud_flangerfilter.h" />
+    <ClInclude Include="SoLoud\include\soloud_internal.h" />
+    <ClInclude Include="SoLoud\include\soloud_lofifilter.h" />
+    <ClInclude Include="SoLoud\include\soloud_monotone.h" />
+    <ClInclude Include="SoLoud\include\soloud_openmpt.h" />
+    <ClInclude Include="SoLoud\include\soloud_queue.h" />
+    <ClInclude Include="SoLoud\include\soloud_robotizefilter.h" />
+    <ClInclude Include="SoLoud\include\soloud_sfxr.h" />
+    <ClInclude Include="SoLoud\include\soloud_speech.h" />
+    <ClInclude Include="SoLoud\include\soloud_tedsid.h" />
+    <ClInclude Include="SoLoud\include\soloud_thread.h" />
+    <ClInclude Include="SoLoud\include\soloud_vic.h" />
+    <ClInclude Include="SoLoud\include\soloud_vizsn.h" />
+    <ClInclude Include="SoLoud\include\soloud_wav.h" />
+    <ClInclude Include="SoLoud\include\soloud_waveshaperfilter.h" />
+    <ClInclude Include="SoLoud\include\soloud_wavstream.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\darray.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\klatt.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\resonator.h" />
+    <ClInclude Include="SoLoud\src\audiosource\speech\tts.h" />
+    <ClInclude Include="SoLoud\src\audiosource\wav\dr_flac.h" />
+    <ClInclude Include="SoLoud\src\audiosource\wav\dr_mp3.h" />
+    <ClInclude Include="SoLoud\src\audiosource\wav\dr_wav.h" />
+    <ClInclude Include="SoLoud\src\audiosource\wav\stb_vorbis.h" />
     <ClInclude Include="States\GameState.h" />
     <ClInclude Include="States\MenuGameState.h" />
     <ClInclude Include="States\PlayingGameState.h" />
     <ClInclude Include="PG\District.hpp" />
+    <ClInclude Include="States\UpgradingGameState.h" />
     <ClInclude Include="STB\stb_image.h" />
     <ClInclude Include="STB\stb_image_write.h" />
     <ClInclude Include="AI\Swarm.h" />
-    <ClInclude Include="UI\Button.h" />
+    <ClInclude Include="UI\Elements\AnimatedText.h" />
+    <ClInclude Include="UI\Elements\Button.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DynamicCamera.h" />
-    <ClInclude Include="UI\CheckBox.h" />
-    <ClInclude Include="UI\Element.h" />
+    <ClInclude Include="UI\Elements\ButtonPromtBar.h" />
+    <ClInclude Include="UI\Elements\CarGadgetSelector.h" />
+    <ClInclude Include="UI\Elements\CheckBox.h" />
+    <ClInclude Include="UI\Elements\Element.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="graphics.h" />
@@ -287,15 +388,23 @@
     <ClInclude Include="Road Network\RoadNet.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="Texture.h" />
-    <ClInclude Include="UI\Minimap.h" />
-    <ClInclude Include="UI\ObjectiveBox.h" />
-    <ClInclude Include="UI\Slider.h" />
-    <ClInclude Include="UI\UIControls.h" />
-    <ClInclude Include="UI\UICredits.h" />
-    <ClInclude Include="UI\UIMainMenu.h" />
-    <ClInclude Include="UI\UIOptions.h" />
-    <ClInclude Include="UI\UIPaused.h" />
-    <ClInclude Include="UI\UIPlaying.h" />
+    <ClInclude Include="Inventory\Item.h" />
+    <ClInclude Include="UI\Elements\ItemSelector.h" />
+    <ClInclude Include="UI\Elements\ItemSlot.h" />
+    <ClInclude Include="UI\Elements\Minimap.h" />
+    <ClInclude Include="UI\Elements\ObjectiveBox.h" />
+    <ClInclude Include="UI\Elements\Slider.h" />
+    <ClInclude Include="UI\Elements\TextBox.h" />
+    <ClInclude Include="UI\Elements\VehicleStatBox.h" />
+    <ClInclude Include="UI\Menu\UIControls.h" />
+    <ClInclude Include="UI\Menu\UICredits.h" />
+    <ClInclude Include="UI\Menu\UIMainMenu.h" />
+    <ClInclude Include="UI\Menu\UIOptions.h" />
+    <ClInclude Include="UI\Playing\UIBefore.h" />
+    <ClInclude Include="UI\Playing\UIPaused.h" />
+    <ClInclude Include="UI\Playing\UIPlaying.h" />
+    <ClInclude Include="UI\Upgrading\UIRandomItem.h" />
+    <ClInclude Include="UI\Upgrading\UIUpgrading.h" />
     <ClInclude Include="UI\UserInterface.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleStats.h" />
@@ -419,6 +528,13 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="PixelUI.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Shadows\SimpleVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
@@ -435,10 +551,23 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="VertexUI.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="ShaderDefines.hlsli" />
+    <None Include="SoLoud\src\audiosource\speech\Elements.def">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="SoLoud\src\audiosource\speech\legal_readme.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

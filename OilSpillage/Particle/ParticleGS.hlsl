@@ -55,6 +55,7 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	float time = input[0].time.x;
 	float totalLifeTime = input[0].time.y;
 	float size;
+
 	/*
 	Config.x is nrOfColors. Max 4
 	Config.y is the startsize and config.z is the end size.

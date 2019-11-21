@@ -1,18 +1,49 @@
 #include "Input.h"
+#include <Xinput.h>
 std::unique_ptr<Input> Input::instance;
 
-Input::Input() : wWidth(0), wHeight(0)//, playerKeyboard(-1)
+Input::Input() : wWidth(0), wHeight(0), controller(Controllers::NONE), checkController(false), resetTimer(0.0f)//, playerKeyboard(-1)
 {
+	this->updateController();
 }
 
 Input::~Input()
 {
 }
 
+void Input::updateController()
+{
+	if (!this->gamePad.GetState(0).IsConnected())
+	{
+		this->controller = Controllers::NONE;
+		return;
+	}
+
+	JOYINFOEX info = {};
+	JOYCAPS caps = {};
+
+	if (joyGetPosEx(JOYSTICKID1, &info) != JOYERR_NOERROR)
+	{
+		joyGetDevCaps(JOYSTICKID1, &caps, sizeof(caps));
+	}
+
+	switch (caps.wMid)
+	{
+	/*case 0x0000:
+		this->controller = Controllers::NONE;
+		break;*/
+	case 0x054C:
+		this->controller = Controllers::PLAYSTATION;
+		break;
+	default:
+		this->controller = Controllers::XBOX;
+		break;
+	}
+}
+
 bool Input::checkButtonKeyboard(Keys key, States state)
 {
 	Keyboard::State keyboardState = instance->keyboard.GetState();
-
 	if (state == States::UP)
 	{
 		switch (key)
@@ -48,7 +79,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CONFIRM:
 			return !keyboardState.Enter;
 		case Keys::CANCEL:
-			return !keyboardState.Q;
+			return !keyboardState.Back;
 		case Keys::ACTION_1:
 			return !keyboardState.Space;
 		case Keys::ACTION_2:
@@ -92,7 +123,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CONFIRM:
 			return keyboardState.Enter;
 		case Keys::CANCEL:
-			return keyboardState.Q;
+			return keyboardState.Back;
 		case Keys::ACTION_1:
 			return keyboardState.Space;
 		case Keys::ACTION_2:
@@ -136,7 +167,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CONFIRM:
 			return instance->keyboardTracker.pressed.Enter;
 		case Keys::CANCEL:
-			return instance->keyboardTracker.pressed.Q;
+			return instance->keyboardTracker.pressed.Back;
 		case Keys::ACTION_1:
 			return instance->keyboardTracker.pressed.Space;
 		case Keys::ACTION_2:
@@ -180,7 +211,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CONFIRM:
 			return instance->keyboardTracker.released.Enter;
 		case Keys::CANCEL:
-			return instance->keyboardTracker.released.Q;
+			return instance->keyboardTracker.released.Back;
 		case Keys::ACTION_1:
 			return instance->keyboardTracker.released.Space;
 		case Keys::ACTION_2:
@@ -254,8 +285,20 @@ void Input::init(Window* window)
 
 }
 
-void Input::update()
+void Input::update(float deltaTime)
 {
+	if (instance->checkController)
+	{
+		instance->resetTimer += deltaTime;
+
+		if (instance->resetTimer >= 2.0f)
+		{
+			instance->updateController();
+			instance->checkController = false;
+			instance->resetTimer = 0.0f;
+		}
+	}
+
 	Keyboard::State keyboardState = instance->keyboard.GetState();
 	Mouse::State mouseState = instance->mouse.GetState();
 
@@ -300,6 +343,8 @@ void Input::reset()
 	//{
 		instance->gamePadTrackers/*[i]*/.Reset();
 	//}
+
+	instance->checkController = true;
 }
 
 void Input::setRumble(/*int player,*/ float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
@@ -457,6 +502,46 @@ Vector2 Input::getDirectionR(/*int player*/)
 	return dir;
 }
 
+Vector2 Input::getDirectionRnoMouse(/*int player*/)
+{
+	Vector2 dir;
+
+	//if (player >= Input::PLAYER_COUNT || player < 0) return dir;
+
+	/*if (player == instance->playerKeyboard)
+	{
+		float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
+		float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
+
+		dir = Vector2(mX, -mY);
+	}
+	else
+	{
+		if (instance->playerKeyboard != -1 && player > instance->playerKeyboard)
+		{
+			player--;
+		}*/
+
+	GamePad::State gamepadState = instance->gamePad.GetState(/*player*/0);
+
+	if (gamepadState.IsConnected())
+	{
+		dir = Vector2(gamepadState.thumbSticks.rightX, gamepadState.thumbSticks.rightY);
+	}
+	//}
+
+	if (dir == Vector2())
+	{
+		if (checkButtonKeyboard(Keys::R_LEFT, States::HELD)) dir.x -= 1.0f;
+		if (checkButtonKeyboard(Keys::R_RIGHT, States::HELD)) dir.x += 1.0f;
+		if (checkButtonKeyboard(Keys::R_UP, States::HELD)) dir.y += 1.0f;
+		if (checkButtonKeyboard(Keys::R_DOWN, States::HELD)) dir.y -= 1.0f;
+	}
+
+	dir.Normalize();
+	return dir;
+}
+
 float Input::getStrengthR(/*int player*/)
 {
 	float strength = 0.0f;
@@ -505,6 +590,16 @@ float Input::getStrengthRnoMouse()
 	{
 		strength = min(Vector2(gamepadState.thumbSticks.rightX, gamepadState.thumbSticks.rightY).Length(), 1.0f);
 	}
+
+	if (strength == 0.0f)
+	{
+		if (checkButtonKeyboard(Keys::R_LEFT, States::HELD) || checkButtonKeyboard(Keys::R_RIGHT, States::HELD) ||
+			checkButtonKeyboard(Keys::R_UP, States::HELD) || checkButtonKeyboard(Keys::R_DOWN, States::HELD))
+		{
+			strength = 1.0f;
+		}
+	}
+
 	return strength;
 }
 
@@ -541,6 +636,11 @@ bool Input::checkButtonMouse(MouseKeys key, States state)
 Vector2 Input::getMousePosition()
 {
 	return Vector2(instance->mouse.GetState().x, instance->mouse.GetState().y);
+}
+
+Controllers Input::getControllerID()
+{
+	return instance->controller;
 }
 
 /*void Input::setKeyboardPlayerID(int player)
