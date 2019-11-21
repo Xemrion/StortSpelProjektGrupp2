@@ -111,8 +111,7 @@ private:
 	SimulationParams sP;
 	ParticleShaders particleShaders;
 	ParticleSData systemData;
-	//Particle* particles;
-	//ID3D11Buffer* particleBuffer;
+
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;

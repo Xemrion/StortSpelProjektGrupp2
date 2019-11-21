@@ -48,6 +48,5 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float bias)
 
 float4 main(PSInput input) : SV_Target
 {
-   // return input.color;
     return (1 - shadowVisible(input.shadowPos, ShadowMap, 0.00015f)) * input.color;
 }

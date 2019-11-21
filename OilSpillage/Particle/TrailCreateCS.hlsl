@@ -20,7 +20,7 @@ void main(uint3 DispatchThreadID : SV_DispatchThreadID)
 {
 	Particle p;
 	float frameID = initialDirection.w;
-	p.position.xyz = emitterLocation.xyz + initialDirection.xyz * DispatchThreadID.x * 0.1f /*+ float3(0,(((DispatchThreadID.x%4)*60) + frameID)*0.02f, 0)*/;/*Use this for more randomness sin(DispatchThreadID.x*10)+cos(DispatchThreadID.x*6)+ direction[DispatchThreadID.x];*/
+    p.position.xyz = emitterLocation.xyz + initialDirection.xyz * DispatchThreadID.x * 0.1f;
 	p.position.w = 1.0f;
 	p.direction = initialDirection;
 	p.time.x = 0.0f;

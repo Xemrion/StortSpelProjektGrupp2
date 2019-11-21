@@ -11,6 +11,5 @@ SamplerState Sampler : register(s0);
 
 float4 main(PSInput input) : SV_Target
 {
-   // return input.color;
     return input.color;
 }

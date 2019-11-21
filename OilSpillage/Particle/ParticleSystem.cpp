@@ -222,7 +222,6 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	CopyMemory(mappedResource.pData, &pParams, sizeof(ParticleParams));
 	deviceContext->Unmap(particleParamCB.Get(), 0);
 	ID3D11UnorderedAccessView* n = nullptr;
-	//run create particle compute shader here
 	
 	ID3D11Buffer* nB = nullptr;
 

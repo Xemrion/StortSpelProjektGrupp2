@@ -44,7 +44,6 @@ Graphics::Graphics()
 		Vector4(1.0f,0.0f,1.0f,1.0f)
 	};
 	this->particleHandler->addParticleSystem("explosion","ParticleUpdateCS.cso", "ExplosionCreateCS.cso");
-	//this->particleHandler->getParticleSystem("electro")->saveSystem();
 
 
 	this->particleHandler->loadParticleSystems();
@@ -428,11 +427,11 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
 
 
-	this->particleSystem->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleSystem2->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleTrail->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleHandler->getParticleSystem("electro")->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleHandler->getParticleSystem("explosion")->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem2->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleTrail->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("electro")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("explosion")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 
 	
 	FogMaterial fogMaterial;

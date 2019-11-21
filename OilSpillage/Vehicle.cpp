@@ -187,8 +187,8 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 		updatePowerUpEffects(deltaTime);
 	}
-	
-	
+
+
 	tempTargetRotation = targetRotation;
 
 	//Quaternion Rotation to Euler
@@ -483,8 +483,6 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	rightDir.Normalize();
 	Vector3 initialDir = -Vector3(this->vehicle->getRigidBody()->getLinearVelocity());
 	initialDir.Normalize();
-	//Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - this->vehicleBody1->getPosition() + rightDir*0.5f, -frontTempDir, 1, 20.0f);
-	//Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - this->vehicleBody1->getPosition() - rightDir * 0.5f, -frontTempDir, 1, 20.0f);
 	if (this->trailTimer > 0.01f && abs(this->driftForce) > 5.0f)
 	{
 		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 60.0f);
@@ -494,6 +492,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 60.0f);
 		this->trailTimer = 0;
 	}
+}
 
 void Vehicle::updateWeapon(float deltaTime)
 {

@@ -90,13 +90,12 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
         testColor = colors[0];
     }
 	
-    float3 testUp = trailDirection; //float3(0, 0, 1);
-    float3 testRight = right; //float3(1, 0, 0);
-	//Change every frame between up-pointy triangle and down-pointy triangle
-    vert[0] = input[0].pos.xyz - testRight * size /** input[0].direction.w*/ + testUp * size * input[0].direction.w; // Top middle
-    vert[1] = input[0].pos.xyz + testRight * size /** input[0].direction.w*/ + testUp * size * input[0].direction.w; // Top right
-    vert[3] = input[0].pos.xyz + testRight * size /** input[0].direction.w*/ - testUp * size * input[0].direction.w; // Bottom right
-    vert[2] = input[0].pos.xyz - testRight * size /** input[0].direction.w*/ - testUp * size * input[0].direction.w; // Top right 
+    float3 testUp = trailDirection;
+    float3 testRight = right; 
+    vert[0] = input[0].pos.xyz - testRight * size + testUp * size * input[0].direction.w; // Top middle
+    vert[1] = input[0].pos.xyz + testRight * size + testUp * size * input[0].direction.w; // Top right
+    vert[3] = input[0].pos.xyz + testRight * size - testUp * size * input[0].direction.w; // Bottom right
+    vert[2] = input[0].pos.xyz - testRight * size - testUp * size * input[0].direction.w; // Top right 
 
     float2 texCoord[4];
     texCoord[2] = float2(0, 1); //2

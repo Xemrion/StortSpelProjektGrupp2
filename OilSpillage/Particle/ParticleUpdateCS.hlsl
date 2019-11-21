@@ -73,7 +73,6 @@ void main( uint3 DTid : SV_DispatchThreadID)
         float ySin = sin((sin(-7.8f * moveSine + 1) + p.position.y) * (1 / fieldSize) - (moveSine * 0.7f));
         float zSin = sin((sin(-4.8f * moveSine - 2) + p.position.z) * (1 / fieldSize) - (moveSine * 7.7f));
 		acceleration += ((2.85f * fieldPower * normalize(float3(xSin, ySin, zSin)))) * TimeFactors.x;
-		//acceleration += 0.0005f*float3(noise(p.position.x), noise(p.position.y), noise(p.position.z));
 		if (p.position.y > depth)
 		{
 			p.velocity.xyz = p.velocity.xyz + acceleration;
