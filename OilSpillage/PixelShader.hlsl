@@ -12,6 +12,12 @@ struct VS_OUT
 	float4 BitangentWS : BINORMAL;
 };
 
+struct PS_OUT
+{
+	float4 color;
+	float4 depth;
+};
+
 struct Light
 {
 	float4 pos;
@@ -97,7 +103,8 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float bias)
 
 	return visibility;
 };
-float4 main(VS_OUT input) : SV_Target
+
+PS_OUT main(VS_OUT input) : SV_Target
 {
 	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
 	/*if (shadeTrue.x == 0)
@@ -195,5 +202,9 @@ float4 main(VS_OUT input) : SV_Target
 	float4 outColor = (texColor + color) * (diffuseLight + ambient);
 	outColor += (specularColor + color) * specularLight;
 
-	return outColor;
+	PS_OUT output;
+	output.color = outColor;
+	output.depth = float4(input.Pos.z, 0.0, 0.0, 1.0);
+	
+	return output;
 }
