@@ -575,11 +575,11 @@ void Vehicle::updateWeapon(float deltaTime)
 
 		if (this->health > 0)
 		{
-			// recoil goes from 100% to 0% in half a second
 			if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
 			{
 				float newRot = atan2(curDir.x, curDir.y);
 				this->gunRotation = newRot;
+
 				if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
 				{
 					if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
@@ -591,8 +591,7 @@ void Vehicle::updateWeapon(float deltaTime)
 						{
 							if (temp->getWeapon().updateFireRate())
 							{
-								//this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
-
+						
 								for (int i = 0; i < Vehicle::bulletCount; ++i)
 								{
 									if (bullets[i].getWeaponType() == WeaponType::None)
@@ -790,6 +789,26 @@ void Vehicle::updateWeapon(float deltaTime)
 				{
 					this->spotLight->setPos(this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->getPosition() - Vector3(curDir.x, -1, curDir.y));
 					this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
+				}
+			}
+		}
+
+		for (int i = 0; i < Slots::SIZEOF; ++i)
+		{
+			ItemWeapon* itemWeapon = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot((Slots)i));
+			if (itemWeapon != nullptr)
+			{
+				GameObject* weaponObject = itemWeapon->getObject();
+				Weapon& weapon = itemWeapon->getWeapon();
+				
+				if (weapon.remainingCooldown == 0.0)
+				{
+					weaponObject->setColor(itemWeapon->getBaseColor() + (Vector4(1.0, 0.4, 0.1, 0.0) * (weapon.currentSpreadIncrease / weapon.maxSpread) * 2.0));
+				}
+				else
+				{
+					float time = dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime();
+					weaponObject->setColor(itemWeapon->getBaseColor() + (Vector4(0.0 + sin(time*3.0) * 0.5, 0.0 + sin(time*3.0) * 0.5, 0.0 + sin(time*3.0) * 0.5, 0.0)));
 				}
 			}
 		}
