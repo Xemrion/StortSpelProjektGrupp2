@@ -138,6 +138,7 @@
     <ClCompile Include="SoLoud\src\backend\xaudio2\soloud_xaudio2.cpp" />
     <ClCompile Include="UI\Playing\UIBefore.cpp" />
     <ClCompile Include="SoLoud\src\backend\null\soloud_null.cpp" />
+    <ClCompile Include="UI\Elements\AnimatedText.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="physics.h" />
