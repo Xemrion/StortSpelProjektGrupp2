@@ -38,12 +38,13 @@ Graphics::Graphics()
 	Vector4 colors[4] = {
 		Vector4(0.0f,0.0f,1.0f,1.0f)
 	};
-	this->particleHandler->addParticleSystem("electro", colors, 1, 0.1f, 0.1f, 0.0f, 0.0f);
+	this->particleHandler->addParticleSystem("electro", colors, 1, 0.1f, 0.1f, 0.0f, 0.0f,"TrailUpdateCS.cso","ElectroCreateCS.cso","TrailGS.cso");
+	this->particleHandler->getParticleSystem("electro")->setParticleShaders("TrailUpdateCS.cso", "ElectroCreateCS.cso", "ElectroGS.cso", "ElectroPS.cso");
 	Vector4 fireX[4] = {
 		Vector4(1.0f,0.0f,1.0f,1.0f)
 	};
 	this->particleHandler->addParticleSystem("explosion","ParticleUpdateCS.cso", "ExplosionCreateCS.cso");
-
+	this->particleHandler->getParticleSystem("electro")->saveSystem();
 
 
 	this->particleHandler->loadParticleSystems();

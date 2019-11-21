@@ -20,6 +20,9 @@
     <FxCompile Include="Particle\TrailPS.hlsl" />
     <FxCompile Include="Particle\TrailVS.hlsl" />
     <FxCompile Include="Particle\ExplosionCreateCS.hlsl" />
+    <FxCompile Include="Particle\ElectroCreateCS.hlsl" />
+    <FxCompile Include="Particle\ElectroPS.hlsl" />
+    <FxCompile Include="Particle\ElectroGS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="physics.cpp" />
