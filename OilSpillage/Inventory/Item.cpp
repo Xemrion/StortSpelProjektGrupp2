@@ -1,6 +1,7 @@
 #include "Item.h"
 #include "ItemWeapon.h"
 #include "../game.h"
+#include "../PG/defs.hpp"
 
 std::vector<std::shared_ptr<Item>> Item::premadeItems;
 
@@ -90,9 +91,11 @@ Item* Item::clone() const
 
 void Item::randomize()
 {
+	F32_Dist genValue{ .0f, .27f };
+	RNG rng { RD()() };
 	if (this->object)
 	{
-		this->object->setColor(Vector4((rand() % 64) / 63.0f, (rand() % 64) / 63.0f, (rand() % 64) / 63.0f, 1));
+		this->object->setColor(Vector4( genValue(rng), genValue(rng), genValue(rng), 1));
 	}
 }
 

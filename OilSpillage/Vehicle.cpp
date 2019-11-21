@@ -565,7 +565,7 @@ void Vehicle::updateWeapon(float deltaTime)
 				dir.Normalize();
 				curDir = Vector2(0.5f + curDir.x * 0.5f, 0.5f + curDir.y * 0.5f);
 			}
-			curDir = Vector2::Lerp(curDir, dir, deltaTime * 20);
+			curDir = Vector2::Lerp(curDir, dir, deltaTime * 50);
 			curDir.Normalize();
 		}
 		else
@@ -976,9 +976,11 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 	}
 	vehicleDistance = min(vehicleDistance, 20.0f);
 
+	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionR().x * Input::getStrengthR() * 3, Input::getDirectionR().y * Input::getStrengthR() * 3), deltaTime*10.0f);
+
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime * 1.2f + cameraDistance;
-	cameraDistanceX = ((this->vehicle->getRigidBody()->getLinearVelocity().getX() * 0.3f + Input::getDirectionR().x * Input::getStrengthR() * 3) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
-	cameraDistanceZ = ((this->vehicle->getRigidBody()->getLinearVelocity().getZ() * 0.25f + Input::getDirectionR().y * Input::getStrengthR() * 3) - cameraDistanceZ) * deltaTime * 12.2f + cameraDistanceZ;
+	cameraDistanceX = ((this->vehicle->getRigidBody()->getLinearVelocity().getX() * 0.3f + aimLerp.x) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
+	cameraDistanceZ = ((this->vehicle->getRigidBody()->getLinearVelocity().getZ() * 0.25f + aimLerp.y) - cameraDistanceZ) * deltaTime * 12.2f + cameraDistanceZ;
 
 	return Vector3(cameraDistanceX, cameraDistance, cameraDistanceZ);
 }
