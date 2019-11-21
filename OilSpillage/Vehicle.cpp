@@ -827,6 +827,9 @@ void Vehicle::updateWeapon(float deltaTime)
 				{
 					float time = dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime();
 					weaponObject->setColor(itemWeapon->getBaseColor() + (Vector4(0.0 + sin(time*3.0) * 0.5, 0.0 + sin(time*3.0) * 0.5, 0.0 + sin(time*3.0) * 0.5, 0.0)));
+					Vector3 rotation = weaponObject->getRotation();
+					Vector3 positionOffset = Vector3(sin(rotation.y), 1.0, cos(rotation.y));
+					Game::getGraphics().getParticleSystem("smoke")->addParticle(2, 3, weaponObject->getPosition() + positionOffset, Vector3(0.0, 1.0, 0.0));
 				}
 			}
 		}
