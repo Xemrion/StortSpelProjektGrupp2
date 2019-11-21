@@ -4,6 +4,8 @@
 class ShootCar : public Spitfire, public Ranged
 {
 private:
+	void createRigidbody(Physics* physics);
+
 protected:
 	virtual void followPath();
 public:

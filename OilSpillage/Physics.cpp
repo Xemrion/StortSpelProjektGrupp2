@@ -40,12 +40,19 @@ btConstraintSolver* createSolverByType(SolverType t)
 }
 Physics::Physics() :broadphase(new btDbvtBroadphase())
 {
-
+#ifdef _DEBUG
+	collisionConfig = new btDefaultCollisionConfiguration();
+	solver = new btSequentialImpulseConstraintSolver();
+	dispatcher = new btCollisionDispatcher(collisionConfig);
+	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
+	world->setForceUpdateAllAabbs(false);
+	world->setGravity(btVector3(0, -10, 0));
+#else
 	btDefaultCollisionConstructionInfo cci;
 	cci.m_defaultMaxPersistentManifoldPoolSize = 80000;
 	cci.m_defaultMaxCollisionAlgorithmPoolSize = 80000;
 	collisionConfig = new btDefaultCollisionConfiguration(cci);
-	dispatcher = new btCollisionDispatcherMt(collisionConfig,40);
+	dispatcherMt = new btCollisionDispatcherMt(collisionConfig, 40);
 
 	btConstraintSolverPoolMt* solverPool;
 	{
@@ -71,10 +78,12 @@ Physics::Physics() :broadphase(new btDbvtBroadphase())
 		solverMt = new btSequentialImpulseConstraintSolverMt();
 	}
 
-	world = new btDiscreteDynamicsWorldMt(dispatcher, broadphase,solverPool, solverMt, collisionConfig);
-	world->setForceUpdateAllAabbs(false);
-	world->setGravity(btVector3(0, -10, 0));
-	world->getSolverInfo().m_solverMode = gSolverMode;
+	worldMt = new btDiscreteDynamicsWorldMt(dispatcherMt, broadphase, solverPool, solverMt, collisionConfig);
+	worldMt->getSolverInfo().m_solverMode = gSolverMode;
+	worldMt->setForceUpdateAllAabbs(false);
+	worldMt->setGravity(btVector3(0, -10, 0));
+#endif // !DEBUG
+
 	//temp plane inf
 	btTransform t;
 	t.setIdentity();
@@ -91,8 +100,11 @@ Physics::Physics() :broadphase(new btDbvtBroadphase())
 
 	btRigidBody* body = new btRigidBody(info);
 	body->setFriction(1);
-
+#ifdef _DEBUG
 	world->addRigidBody(body);
+#else
+	worldMt->addRigidBody(body);
+#endif
 	bodies.push_back(body);
 
 	gContactAddedCallback = callbackFunc;
@@ -108,7 +120,11 @@ Physics::~Physics()
 		btCollisionShape* shape = bodies[i]->getCollisionShape();
 		delete shape;
 		delete motionState;
+#ifdef _DEBUG
 		this->world->removeRigidBody(bodies[i]);
+#else
+		this->worldMt->removeRigidBody(bodies[i]);
+#endif
 		delete bodies[i];
 	}
 	for (int i = 0; i < pointJoints.size(); i++)
@@ -119,15 +135,19 @@ Physics::~Physics()
 	delete collisionConfig;
 	delete solver;
 	delete broadphase;
+#ifdef _DEBUG
 	delete world;
+#else
+	delete worldMt;
+#endif
 	bodies.clear();
 
 }
 
-void Physics::moveBody(btRigidBody* rigidbody, float x,float y,float z)
+void Physics::moveBody(btRigidBody* rigidbody, float x, float y, float z)
 {
 	btTransform transform = rigidbody->getCenterOfMassTransform();
-	transform.setOrigin(btVector3(x,y,z));
+	transform.setOrigin(btVector3(x, y, z));
 	rigidbody->setCenterOfMassTransform(transform);
 }
 
@@ -135,7 +155,11 @@ void Physics::update(float deltaTime)
 {
 
 	//this->world->stepSimulation(deltaTime);
+#ifdef _DEBUG
 	this->world->stepSimulation(deltaTime, 2, 1. / 120.);
+#else
+	this->worldMt->stepSimulation(deltaTime, 2, 1. / 120.);
+#endif
 	//this->world->stepSimulation(deltaTime, 0);
 	//this->world->stepSimulation(btScalar(deltaTime));
 }
@@ -157,9 +181,16 @@ btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, void
 
 	btRigidBody* body = new btRigidBody(info);
 
-	this->world->addRigidBody(body);
 	bodies.push_back(body);
 	body->setUserPointer(obj);
+	
+#ifdef _DEBUG
+	this->world->addRigidBody(body);
+#else
+	this->worldMt->addRigidBody(body);
+#endif
+
+
 	return body;
 }
 
@@ -180,9 +211,14 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass, void*
 	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, box, inertia);
 	btRigidBody* body = new btRigidBody(info);
 	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	this->world->addRigidBody(body);
 	bodies.push_back(body);
 	body->setUserPointer(objects);
+#ifdef _DEBUG
+	this->world->addRigidBody(body);
+#else
+	this->worldMt->addRigidBody(body);
+#endif
+	
 	return body;
 }
 
@@ -203,8 +239,12 @@ btRigidBody* Physics::addCylinder(btVector3 Origin, btVector3 size, float mass)
 
 	btRigidBody* body = new btRigidBody(info);
 
-	this->world->addRigidBody(body);
 	bodies.push_back(body);
+#ifdef _DEBUG
+	this->world->addRigidBody(body);
+#else
+	this->worldMt->addRigidBody(body);
+#endif
 	return body;
 }
 
@@ -214,9 +254,12 @@ btGeneric6DofSpring2Constraint* Physics::addSpring(btRigidBody* box1, btRigidBod
 		*box1, *box2,
 		btTransform(btQuaternion::getIdentity(), { 0.0f, -1.5f, 0.0f }),
 		btTransform(btQuaternion::getIdentity(), { 0.0f,  0.0f, 0.0f }));
-	this->world->addConstraint(spring);
 	springs.push_back(spring);
-
+#ifdef _DEBUG
+	this->world->addConstraint(spring);
+#else
+	this->worldMt->addConstraint(spring);
+#endif
 	return spring;
 }
 
@@ -227,16 +270,23 @@ btPoint2PointConstraint* Physics::addPointJoint(btRigidBody* box1, btRigidBody* 
 	/*btJointFeedback* hej = new btJointFeedback;
 	hej->m_appliedForceBodyA = btVector3(1, 0, 1);
 	pointJoint->setJointFeedback(hej);*/
-	this->world->addConstraint(pointJoint);
 	pointJoints.push_back(pointJoint);
-
+#ifdef _DEBUG
+	this->world->addConstraint(pointJoint);
+#else
+	this->worldMt->addConstraint(pointJoint);
+#endif
 	return pointJoint;
 }
 
 btRaycastVehicle* Physics::addVehicle(btRaycastVehicle* vehicle)
 {
-	this->world->addVehicle(vehicle);
 	vehicles.push_back(vehicle);
+#ifdef _DEBUG
+	this->world->addVehicle(vehicle);
+#else
+	this->worldMt->addVehicle(vehicle);
+#endif
 	return vehicle;
 }
 
@@ -247,7 +297,11 @@ bool Physics::DeleteRigidBody(btRigidBody* rb)
 	{
 		if (bodies[i] == rb)
 		{
+#ifdef _DEBUG
 			this->world->removeRigidBody(bodies[i]);
+#else
+			this->worldMt->removeRigidBody(bodies[i]);
+#endif
 			return true;
 		}
 	}
@@ -259,7 +313,11 @@ bool Physics::deletePointJoint(btPoint2PointConstraint* pointJoint)
 	{
 		if (pointJoints[i] == pointJoint)
 		{
+#ifdef _DEBUG
 			this->world->removeConstraint(pointJoint);
+#else
+			this->worldMt->removeConstraint(pointJoint);
+#endif
 			return true;
 		}
 	}
