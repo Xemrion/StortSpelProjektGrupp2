@@ -26,24 +26,43 @@ void Skyscraper::generateASkyscraper(std::string name)
 			generateSkyscraper();
 		}
 	} while (!success);
+	scrapSkyScraper();
 }
 
-void Skyscraper::setRoofMesh(std::string name, GameObject& roof)
+void Skyscraper::setRoofMesh(std::string name, GameObject* roof)
 {
 	std::string meshName = name + "-roof";
-	roof.mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
+	roof->mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
 }
 
-void Skyscraper::setWallMesh(std::string name, GameObject& roof)
+void Skyscraper::setWallMesh(std::string name, GameObject* roof)
 {
 	std::string meshName = name + "-wall";
-	roof.mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
+	roof->mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
 }
 
-void Skyscraper::setWindowMesh(std::string name, GameObject& roof)
+void Skyscraper::setWindowMesh(std::string name, GameObject* roof)
 {
 	std::string meshName = name + "-wind";
-	roof.mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
+	roof->mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
+}
+
+void Skyscraper::unloadRoof(std::string name)
+{
+	std::string meshName = name + "-roof";
+	Game::getGraphics().unloadMesh(meshName);
+}
+
+void Skyscraper::unloadWall(std::string name)
+{
+	std::string meshName = name + "-wall";
+	Game::getGraphics().unloadMesh(meshName);
+}
+
+void Skyscraper::unloadWindow(std::string name)
+{
+	std::string meshName = name + "-wind";
+	Game::getGraphics().unloadMesh(meshName);
 }
 
 void Skyscraper::generateSkyscraper()

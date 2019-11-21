@@ -79,6 +79,10 @@ private:
 	std::vector<PowerUp>		    powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
+	std::vector<std::string> skyscrapers;
+	GameObject* skyscraperTest0;
+	GameObject* skyscraperTest1;
+	GameObject* skyscraperTest2;
 	GameObject* objTestPickUp;
 	GameObject* objTestPickUp2;
 	GameObject* objTestPickUp3;

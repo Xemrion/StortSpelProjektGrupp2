@@ -153,7 +153,22 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	}
 
 	testSkyscraper = std::make_unique<Skyscraper>();
-	//testSkyscraper.get()->generateASkyscraper("test");
+	for (int i = 0; i < 25; i++) {
+		testSkyscraper.get()->generateASkyscraper("test-" + std::to_string(i));
+		skyscrapers.push_back("test-" + std::to_string(i));
+	}
+	skyscraperTest0 = new GameObject();
+	skyscraperTest1 = new GameObject();
+	skyscraperTest2 = new GameObject();
+	testSkyscraper.get()->setWindowMesh("test-0", skyscraperTest0);
+	testSkyscraper.get()->setWindowMesh("test-11", skyscraperTest1);
+	testSkyscraper.get()->setWindowMesh("test-22", skyscraperTest2);
+	Game::getGraphics().addToDraw(skyscraperTest0);
+	Game::getGraphics().addToDraw(skyscraperTest1);
+	Game::getGraphics().addToDraw(skyscraperTest2);
+	skyscraperTest0->setPosition(Vector3(0.0f, -1.0f, 0.0f));
+	skyscraperTest1->setPosition(Vector3(10.0f, -1.0f, 0.0f));
+	skyscraperTest2->setPosition(Vector3(20.0f, -1.0f, 0.0f));
 
 	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 
@@ -256,6 +271,9 @@ PlayingGameState::~PlayingGameState()
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
 	delete this->objTestPickUp3;
+	delete this->skyscraperTest0;
+	delete this->skyscraperTest1;
+	delete this->skyscraperTest2;
 
 	delete[] this->objArray;
 }

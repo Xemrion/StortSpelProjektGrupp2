@@ -962,6 +962,13 @@ void Graphics::loadMesh(std::string name, std::vector<Vertex3D>& vertices, Vecto
 
 }
 
+void Graphics::unloadMesh(std::string name)
+{
+	if (meshes.find(name) != meshes.end()) {
+		meshes.erase(meshes.find(name));
+	}
+}
+
 
 void Graphics::loadModel(std::string path, Vector3 rotation)
 {

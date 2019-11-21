@@ -102,6 +102,7 @@ public:
 	Window* getWindow();
 	void loadMesh(std::string path, Vector3 rotation = Vector3(0, 0, 0));
 	void loadMesh(std::string name, std::vector<Vertex3D>& vertices, Vector3 rotation = Vector3(0, 0, 0)); //Construct mesh from vector of Vertex3D.
+	void unloadMesh(std::string name);
 	void loadModel(std::string path, Vector3 rotation = Vector3(0,0,0));
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
 	bool loadTexture(std::string fileName, bool overridePath = false, bool cpuOnly = false);

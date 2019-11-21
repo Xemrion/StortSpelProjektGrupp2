@@ -20,9 +20,12 @@ public:
 	~Skyscraper();
 
 	void generateASkyscraper(std::string name);
-	void setRoofMesh(std::string name, GameObject& roof);
-	void setWallMesh(std::string name, GameObject& roof);
-	void setWindowMesh(std::string name, GameObject& roof);
+	void setRoofMesh(std::string name, GameObject* roof);
+	void setWallMesh(std::string name, GameObject* roof);
+	void setWindowMesh(std::string name, GameObject* roof);
+	void unloadRoof(std::string name);
+	void unloadWall(std::string name);
+	void unloadWindow(std::string name);
 };
 
 /* Pseudocode

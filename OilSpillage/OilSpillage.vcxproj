@@ -174,7 +174,6 @@
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
-    <ClCompile Include="PG\District.cpp" />
     <ClCompile Include="PG\SkyscraperFloor.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="UI\Button.cpp" />
