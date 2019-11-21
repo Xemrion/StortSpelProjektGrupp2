@@ -716,10 +716,12 @@ void PlayingGameState::update(float deltaTime)
 		if (timer > 0.001f)
 		{
 			timer = 0.0f;
-			for (int i = 0; i < this->testNetwork->getSegments().size(); i++)
+			/*for (int i = 0; i < this->testNetwork->getSegments().size(); i++)
 			{
 				this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()) +Vector3(0,0,5.0f)+ Vector3(this->testNetwork->getSegments().at(i).firstPoint.x, this->testNetwork->getSegments().at(i).firstPoint.y, this->testNetwork->getSegments().at(i).firstPoint.z), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
-			}
+			}*/
+			this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+
 		}
 #endif 
 
