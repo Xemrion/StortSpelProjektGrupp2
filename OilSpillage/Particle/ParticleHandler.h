@@ -6,21 +6,24 @@ class ParticleHandler
 public:
 	ParticleHandler();
 	~ParticleHandler();
-
-	
-
-	void addParticleSystem(ParticleSystem* system);
-	void addParticleSystem(const wchar_t* csUpdate, const wchar_t* csCreate = nullptr, const wchar_t* gs = nullptr);
-	void addParticleSystem(Vector4 colors[4], int nrOfColors, float startSize, float endSize, float vectorFieldPower = 0.0f, float vectorFieldSize = 0.0f,
-		const wchar_t* csUpdate = nullptr, const wchar_t* csCreate = nullptr, const wchar_t* gs = nullptr);
+	//if no name is given the particlesystems name will be used. If given a name the name of the particlesystem will be replaced
+	void addParticleSystem(ParticleSystem* system, std::string name = "NONE");
+	void addParticleSystem(std::string name, std::string csUpdate = "ParticleUpdateCS.cso", std::string csCreate = "ParticleCreateCS.cso", std::string gs = "ParticleGS.cso");
+	void addParticleSystem(std::string name, Vector4 colors[4], int nrOfColors, float startSize, float endSize, float vectorFieldPower = 0.0f, float vectorFieldSize = 0.0f,
+		std::string csUpdate = "ParticleUpdateCS.cso", std::string csCreate = "ParticleCreateCS.cso", std::string gs = "ParticleGS.cso");
 
 	ParticleSystem* getParticleSystem(std::string name)const;
+	const std::vector<std::string>& getNames()const;
+	bool loadParticleSystem(std::string name);
+	bool loadParticleSystems();//load particleSystems
+	bool saveParticleSystem(std::string name);
+	bool saveParticleSystems();//save particleSystems
 
-	bool loadParticleSystems(std::string filePath);//load particleSystems from file
-
+	void renderParticleSystems(DynamicCamera* camera);
+	void updateParticleSystems(float delta, Matrix viewProj);
 private:
 	std::unordered_map<std::string, ParticleSystem*> particleSystems;
-	
+	std::vector<std::string> names;
 
 };
 

@@ -18,10 +18,7 @@ cbuffer ParticleCount : register(b1)
 {
 	uint4 NumParticles;
 };
-cbuffer CameraMatrix : register(b2)
-{
-	float4x4 viewProj;
-};
+
 
 [numthreads(512, 1, 1)]
 

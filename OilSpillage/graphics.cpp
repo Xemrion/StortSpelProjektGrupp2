@@ -21,6 +21,34 @@ Graphics::Graphics()
 
 	lightBufferContents = new LightBufferContents;
 
+	this->particleHandler = new ParticleHandler;
+	this->particleSystem = new ParticleSystem;
+	this->particleSystem2 = new ParticleSystem;
+	this->particleTrail = new ParticleSystem;
+
+
+
+	this->particleSystem->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
+	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
+	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso", "TrailPS.cso");
+
+	this->particleHandler->addParticleSystem(this->particleSystem, "fire");
+	this->particleHandler->addParticleSystem(this->particleSystem2, "smoke");
+	this->particleHandler->addParticleSystem(this->particleTrail, "trail");
+	Vector4 colors[4] = {
+		Vector4(0.0f,0.0f,1.0f,1.0f)
+	};
+	this->particleHandler->addParticleSystem("electro", colors, 1, 0.1f, 0.1f, 0.0f, 0.0f,"TrailUpdateCS.cso","ElectroCreateCS.cso","TrailGS.cso");
+	this->particleHandler->getParticleSystem("electro")->setParticleShaders("TrailUpdateCS.cso", "ElectroCreateCS.cso", "ElectroGS.cso", "ElectroPS.cso");
+	Vector4 fireX[4] = {
+		Vector4(1.0f,0.0f,1.0f,1.0f)
+	};
+	this->particleHandler->addParticleSystem("explosion","ParticleUpdateCS.cso", "ExplosionCreateCS.cso");
+	//this->particleHandler->getParticleSystem("electro")->saveSystem();
+
+
+	this->particleHandler->loadParticleSystems();
+
 	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
 }
 
@@ -36,7 +64,7 @@ Graphics::~Graphics()
 		i->second->Shutdown();
 		delete i->second;
 	}
-
+	delete this->particleHandler;
 	delete this->lightBufferContents;
 	swapChain->SetFullscreenState(false, NULL);
 }
@@ -368,29 +396,43 @@ bool Graphics::init(Window* window)
 	ImGui_ImplDX11_Init(this->device.Get(), this->deviceContext.Get());
 	ImGui::StyleColorsDark();
 
-	this->particleSystem.setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
-	this->particleSystem2.setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
-	this->particleTrail.setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso");
-
-	this->particleSystem.setNameofSystem("fire");
-	this->particleSystem2.setNameofSystem("smoke");
-	this->particleTrail.setNameofSystem("trail");
 
 	Vector4 colors[4];
-	colors[0] = Vector4(0.0f, 0.0f, 0.0f, 1.0f);
-	this->particleTrail.changeColornSize(colors, 1, 0.1f, 0.1f);
+	/*OIL = 0.3f, 0.2f, 0.0f, 1.0f*/
+	colors[0] = Vector4(0.1f, 0.1f, 0.1f, 1.0f);
+	Vector4 colorFire[4] = {
+		Vector4(1.0f,1.0f,0.0f,1.0f),
+		Vector4(1.0f,0.4f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f)
+	};
+	Vector4 colorsE[4] = {
+		Vector4(0.0f,0.0f,1.0f,1.0f)
+	};
+	Vector4 fireX[4] = {
+		Vector4(1.0f,1.0f,0.0f,1.0f),
+		Vector4(1.0f,0.3f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f)
+	};
+	this->particleTrail->changeColornSize(colors, 1, 0.1f, 0.1f);
+	this->particleSystem->changeColornSize(colorFire, 4, 0.05f, 0.1f);
+	//this->particleHandler->getParticleSystem("electro")->changeColornSize(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
+	
 
-	this->particleSystem.loadSystem();
-	this->particleSystem2.loadSystem();
+
+	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleSystem2->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleTrail->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
 
 
-	this->particleSystem.initiateParticles(device.Get(), deviceContext.Get());
-	this->particleSystem2.initiateParticles(device.Get(), deviceContext.Get());
-	this->particleTrail.initiateParticles(device.Get(), deviceContext.Get());
-
-	this->particleSystem.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleSystem2.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleTrail.addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleSystem2->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleTrail->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("electro")->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("explosion")->addParticle(1, 2, Vector3(0, 0, 3), Vector3(1, 0, 0));
 
 	
 	FogMaterial fogMaterial;
@@ -469,15 +511,37 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->Unmap(cameraBuffer.Get(), 0);
 
 	deviceContext->RSSetViewports(1, &this->vp);
-	this->particleSystem.updateParticles(deltaTime, viewProj);
 
-	this->particleSystem.drawAll(camera);
+	this->particleHandler->updateParticleSystems(deltaTime, viewProj);
 
-	this->particleSystem2.updateParticles(deltaTime, viewProj);
+	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
 
-	this->particleSystem2.drawAll(camera);
+	this->particleHandler->renderParticleSystems(camera);
 
 
+	/*this->particleSystem->updateParticles(deltaTime, viewProj);
+
+	this->particleSystem->drawAll(camera);
+
+	this->particleSystem2->updateParticles(deltaTime, viewProj);
+
+	this->particleSystem2->drawAll(camera);
+
+	this->particleHandler->getParticleSystem("electro")->updateParticles(deltaTime, viewProj);
+
+	this->particleHandler->getParticleSystem("electro")->drawAll(camera);
+
+	this->particleHandler->getParticleSystem("explosion")->updateParticles(deltaTime, viewProj);
+
+	this->particleHandler->getParticleSystem("explosion")->drawAll(camera);
+
+	this->particleTrail->updateParticles(deltaTime, viewProj);
+
+	
+
+	this->particleTrail->drawAll(camera);*/
 	
 	//set up Shaders
 
@@ -564,9 +628,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	}
 	
 	drawStaticGameObjects(camera, frustum, 10.0);
-	this->particleTrail.updateParticles(deltaTime, viewProj);
-
-	this->particleTrail.drawAll(camera);
+	
 	drawFog(camera, deltaTime);
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
@@ -760,7 +822,7 @@ void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfPartic
 	randomPos += pos;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleSystem.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+	this->particleHandler->getParticleSystem("fire")->addParticle(nrOfParticles, lifeTime, randomPos,initialDirection);
 }
 
 void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime, float randomPower)
@@ -771,14 +833,14 @@ void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParti
 	randomPos += pos;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleSystem2.addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+	this->particleSystem2->addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
 }
 
 void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
 {
 	if (nrOfColors < 5)
 	{
-		//this->particleSystem.changeColornSize(colors, nrOfColors, startSize, endSize);
+		this->particleHandler->getParticleSystem("explosion")->changeColornSize(colors, nrOfColors, startSize, endSize);
 	}
 }
 
@@ -792,7 +854,7 @@ void Graphics::setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float s
 
 void Graphics::setVectorField(float vectorFieldSize, float vectorFieldPower)
 {
-	//this->particleSystem.changeVectorField(vectorFieldPower, vectorFieldSize);
+	this->particleHandler->getParticleSystem("explosion")->changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
 void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
@@ -800,9 +862,75 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 	//this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
-void Graphics::addTrail(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime)
+void Graphics::addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime)
 {
-	this->particleTrail.addParticle(nrOfParticles, lifeTime, pos, initialDirection);
+	this->particleTrail->addParticle(nrOfParticles, lifeTime, pos, initialDirection);
+}
+
+void Graphics::changeTrailColor(Vector3 color)
+{
+	Vector4 colors[4];
+	/*OIL = 0.3f, 0.2f, 0.0f, 1.0f*/
+	colors[0] = Vector4(color.x,color.y,color.z, 1.0f);
+	this->particleTrail->changeColornSize(colors, 1, 0.1f, 0.1f);
+}
+
+ParticleSystem* Graphics::getParticleSystem(std::string name)
+{
+	return this->particleHandler->getParticleSystem(name);
+}
+
+ParticleHandler* Graphics::getParticleHandler() const
+{
+	return this->particleHandler;
+}
+
+void Graphics::addTestParticle(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime, float randomPower)
+{
+	if (this->testParticle != nullptr)
+	{
+		Vector3 randomPos = randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+		Vector3 randomPos2 = -1.0f * randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
+		randomPos += pos;
+		randomPos += randomPos2;
+		float grey = float(rand()) / RAND_MAX;
+		this->testParticle->addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+	}
+}
+
+void Graphics::setTestParticleSystem(ParticleSystem* test)
+{
+	this->testParticle = test;
+}
+
+ParticleSystem* Graphics::getTestParticleSystem() const
+{
+	return this->testParticle;
+}
+
+void Graphics::saveTestParticleSystem()
+{
+	if (this->testParticle != nullptr)
+	{
+		this->testParticle->saveSystem();
+	}
+}
+
+void Graphics::setTestVectorField(float vectorFieldSize, float vectorFieldPower)
+{
+	if (this->testParticle != nullptr)
+	{
+		this->testParticle->changeVectorField(vectorFieldPower, vectorFieldSize);
+	}
+}
+
+void Graphics::setTestColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
+{
+	if (this->testParticle != nullptr)
+	{
+		this->testParticle->changeColornSize(colors, nrOfColors, startSize, endSize);
+	}
 }
 
 Vector3 Graphics::screenToWorldSpaceUI(Vector2 screenPos)

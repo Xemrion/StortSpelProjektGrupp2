@@ -19,6 +19,12 @@
     <FxCompile Include="Particle\TrailGS.hlsl" />
     <FxCompile Include="PixelUI.hlsl" />
     <FxCompile Include="VertexUI.hlsl" />
+    <FxCompile Include="Particle\TrailPS.hlsl" />
+    <FxCompile Include="Particle\TrailVS.hlsl" />
+    <FxCompile Include="Particle\ExplosionCreateCS.hlsl" />
+    <FxCompile Include="Particle\ElectroCreateCS.hlsl" />
+    <FxCompile Include="Particle\ElectroPS.hlsl" />
+    <FxCompile Include="Particle\ElectroGS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="physics.cpp" />
@@ -131,6 +137,7 @@
     <ClCompile Include="AI\Boss.cpp" />
     <ClCompile Include="AI\ChaseCar.cpp" />
     <ClCompile Include="AI\Sniper.cpp" />
+    <ClCompile Include="Particle\ParticleHandler.cpp" />
     <ClCompile Include="Inventory\Container.cpp" />
     <ClCompile Include="UI\Elements\ButtonPromtBar.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\speech\soloud_speech.cpp" />

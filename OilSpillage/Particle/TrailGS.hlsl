@@ -5,6 +5,10 @@ cbuffer CB_PER_FRAME : register(b0)
 	float4 upp;//.w is 0 or 1
 }
 
+cbuffer CB_PER_FRAME : register(b2)
+{
+	float4x4 viewProjShadow;
+}
 cbuffer ParticleRenderParams : register(b1)
 {
 	float4 colors[4];
@@ -20,16 +24,17 @@ static const float4 position[4] =
 };
 struct GSInput
 {
-	float4 pos : POSITION;
-	float4 direction : DIRECTION;
-	float2 time : TIME;
-	uint ind : VAR;
+    float4 pos : POSITION;
+    float4 direction : DIRECTION;
+    float2 time : TIME;
+    uint ind : VAR;
 };
 struct GSOutput
 {
-	float4 pos : SV_POSITION;
-	float4 color : COLOR;
-	float2 uv : UV;
+    float4 pos : SV_POSITION;
+    float4 shadowPos : SHADOWPOS;
+    float4 color : COLOR;
+    float2 uv : UV;
 };
 float4 fadeOverTime(float4 startColor, float4 endColor, float time, float totTime)
 {
@@ -88,10 +93,10 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	float3 testUp = trailDirection;//float3(0, 0, 1);
 	float3 testRight = right;//float3(1, 0, 0);
 	//Change every frame between up-pointy triangle and down-pointy triangle
-	vert[0] = input[0].pos - testRight *size*2 + testUp * size; // Top middle
-	vert[1] = input[0].pos + testRight *size*2 + testUp * size; // Top right
-	vert[3] = input[0].pos + testRight *size*2 - testUp * size; // Bottom right
-	vert[2] = input[0].pos - testRight *size*2 - testUp * size; // Top right 
+	vert[0] = input[0].pos.xyz - testRight * size /** input[0].direction.w*/ + testUp * size * input[0].direction.w; // Top middle
+	vert[1] = input[0].pos.xyz + testRight * size /** input[0].direction.w*/ + testUp * size * input[0].direction.w; // Top right
+	vert[3] = input[0].pos.xyz + testRight * size /** input[0].direction.w*/ - testUp * size * input[0].direction.w; // Bottom right
+	vert[2] = input[0].pos.xyz - testRight * size /** input[0].direction.w*/ - testUp * size * input[0].direction.w; // Top right 
 
 	float2 texCoord[4];
 	texCoord[2] = float2(0, 1);//2
@@ -102,6 +107,7 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	for (int i = 0; i < 4; i++)
 	{
 		output.pos = mul(float4(vert[i], 1.0f), viewProj);
+        output.shadowPos = mul(float4(vert[i], 1.0f), viewProjShadow);
 		output.uv = texCoord[i];
 		output.color = testColor;
 		theOutput.Append(output);
