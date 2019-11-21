@@ -48,7 +48,6 @@ private:
 	btClock realClock;
 	btConstraintSolver* m_solver;
 	SolverType m_solverType;
-	btDiscreteDynamicsWorldMt* worldMt;
 	btCollisionDispatcherMt* dispatcherMt;
 	btDiscreteDynamicsWorld* world;
 	btCollisionDispatcher* dispatcher;
