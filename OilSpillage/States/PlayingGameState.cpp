@@ -59,7 +59,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
 	camera = std::make_unique<DynamicCamera>();
-	testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 90); //Int seed, max pos, min pos, angle in degrees
+	testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f, -16.0f), 90); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
 
@@ -175,18 +175,18 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 				10.0f));
 	}
 
-	
-	 //Road Network Turtlewalker
-	//FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF
+
+	//Road Network Turtlewalker
+   //FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF
 	testNetwork.get()->generateInitialSegments("F+F-F-FHF--F+FFFF+FFF+FF-FFF+FFFF+FFH+FFF-FF");
 	//testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
 	testNetwork.get()->setAngle(45);
-	for (int i = 0; i < 5; i++) 
+	for (int i = 0; i < 5; i++)
 	{
-		 testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
-		 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+		testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
+		testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
 	}
-	testNetwork.get()->setAngle(90+45);
+	testNetwork.get()->setAngle(90 + 45);
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -389,7 +389,7 @@ void PlayingGameState::ImGui_AI()
 void PlayingGameState::ImGui_Particles()
 {
 	ImGui::Begin("Particle");
-	
+
 
 	if (ImGui::BeginCombo("##ParticleSystems", current_item)) // The second parameter is the label previewed before opening the combo.
 	{
@@ -402,12 +402,12 @@ void PlayingGameState::ImGui_Particles()
 				this->graphics.setTestParticleSystem(this->graphics.getParticleSystem(current_item));
 				this->fillTestParticle();
 			}
-				
+
 			if (is_selected)
 			{
 				ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
 			}
-					
+
 		}
 		ImGui::EndCombo();
 	}
@@ -422,7 +422,7 @@ void PlayingGameState::ImGui_Particles()
 	ImGui::SliderFloat("Vectorfield size", &vectorFieldSize, 0.0f, 10.0f);
 	ImGui::SliderFloat("Vectorfield power", &vectorFieldPower, 0.0f, 10.0f);
 	ImGui::SliderFloat("Random power", &randomPosPower, 0.0f, 10.0f);
-	
+
 	colorsP[0] = Vector4(colors);
 	colorsP[1] = Vector4(colors2);
 	colorsP[2] = Vector4(colors3);
@@ -712,7 +712,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 #endif 
 
-		
+
 #ifndef _DEBUG
 		updateObjects();
 		paperCollision(deltaTime);
