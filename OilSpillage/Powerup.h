@@ -17,6 +17,8 @@ class PowerUp : public GameObject
 	float respawnTime;
 	float currentRespawnTimer;
 	float time;
+	void loadModel();
+	void clone(const PowerUp& p);
 public:
 	PowerUp();
 	PowerUp(Vector3 position, PowerUpType type = PowerUpType::Time, float respawnTime = 10000000.0);
