@@ -387,10 +387,10 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 	}
 	if (hasDied)
 	{
-		float normalizedRandom = float(rand()) / RAND_MAX;
 
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
+			float normalizedRandom = float(rand()) / RAND_MAX;
 			if (normalizedRandom >= 0.95)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
