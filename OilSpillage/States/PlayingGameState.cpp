@@ -21,7 +21,7 @@ void PlayingGameState::initAI()
 			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
 			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
 			//actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
-			actorManager->createShootCar(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 4);
+			//actorManager->createShootCar(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 4);
 		}
 	}
 }
@@ -567,36 +567,9 @@ void PlayingGameState::update(float deltaTime)
 		}
 #endif // !_DEBUG
 
-		//Bullet
-		//player->getVehicle()->getRigidBody()->(btVector3(Input::GetDirectionL(0).x * deltaTime * 1000, 0, Input::GetDirectionL(0).y * deltaTime * 1000), btVector3(0, 0, 0));
 
-		//player->getVehicle()->setPosition(Vector3(player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getX(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getY(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getZ()));
-		//player->getVehicle()->updateRigidBody();
 
 		auto playerVehicle{ player->getVehicle() };
-		size_t playerBulletCount;
-		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
-
-		if (spawnTimer % 200 == 0 && nrOfEnemies < 100)
-		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-			//actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
-			nrOfEnemies += 12;
-			actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
-			spawnTimer = 0;
-		}
-		spawnTimer++;
-		//spawn Boss
-		//if (spawnTimer % 10 == 0)
-		//{
-		//	actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
-		//		player->getVehicle()->getPosition().y,
-		//		player->getVehicle()->getPosition().z + 5), 1);
-		//	spawnTimer = 0;
-		//}
-		//spawnTimer = 1;
-
 		powerUps.erase(
 			std::remove_if(
 				powerUps.begin(),
@@ -627,6 +600,8 @@ void PlayingGameState::update(float deltaTime)
 
 		physics->update(deltaTime);
 
+		size_t playerBulletCount;
+		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 		actorManager->update(deltaTime, playerVehicle->getPosition());
 		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);

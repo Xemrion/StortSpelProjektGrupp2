@@ -65,6 +65,7 @@ private:
 public:
 	Physics();
 	~Physics();
+	void teleportRigidbody(Vector3 newPos, btRigidBody* body);
 	void moveBody(btRigidBody* rigidbody,float x, float y, float z);
 	void update(float deltaTime);
 	btRigidBody* addSphere(float radius, btVector3 Origin, float mass, void* obj = nullptr);

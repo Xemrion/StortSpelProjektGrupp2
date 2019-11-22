@@ -34,8 +34,16 @@ ActorManager::~ActorManager()
 void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
-	seperation(targetPos);
-	updateActors(dt,targetPos);
+	spawnTimer -= dt;
+	//seperation(targetPos);
+	updateActors(dt, targetPos);
+
+	if (spawnTimer <= 0)
+	{
+		spawnEnemies(targetPos);
+		spawnTimer = spawnCooldown;
+	}
+
 	Vector3 newPos;
 	float deltaX;
 	float deltaZ;
@@ -46,14 +54,14 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		deltaX = groups[i].averagePos.x - targetPos.x;
 		deltaZ = groups[i].averagePos.z - targetPos.z;
 		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-					   //(TileSize * nrOfTiles)^2
-		if (distance > (20 * 10) * (20*10))
+		//(TileSize * nrOfTiles)^2
+		if (distance > (20 * 5) * (20 * 5))
 		{
-			newPos = generateObjectivePos(targetPos,50,100);
+			newPos = generateObjectivePos(targetPos, 50, 75);
 			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
-				groups[i].actors[j]->setPosition(newPos);
-				physics->moveBody(groups[i].actors[j]->getRigidBody(), newPos.x, newPos.y, newPos.z);
+				groups[i].actors[j]->setPosition(Vector3(newPos.x, groups[i].actors[j]->getPosition().y, newPos.z));
+				physics->teleportRigidbody(Vector3(newPos.x, groups[i].actors[j]->getPosition().y, newPos.z), groups[i].actors[j]->getRigidBody());
 				if (j % 5 == 0)
 				{
 					newPos = generateObjectivePos(targetPos, 50, 100);
@@ -197,16 +205,24 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 
 }
 
-void ActorManager::spawnAttackers(const Vector3& originPos, int weaponType)
+void ActorManager::spawnAttackers(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createAttacker(originPos.x + i, originPos.z, weaponType);
-		createAttacker(originPos.x, originPos.z + i, weaponType);
-		createAttacker(originPos.x - i, originPos.z, weaponType);
+		createAttacker(originPos.x + i, originPos.z, (rand() % 4) + 1);
+		createAttacker(originPos.x, originPos.z + i, (rand() % 4) + 1);
+		createAttacker(originPos.x - i, originPos.z, (rand() % 4) + 1);
 	}
 }
-
+void ActorManager::spawnSnipers(const Vector3& originPos)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		createSniper(originPos.x + i, originPos.z, (rand() % 4) + 1);
+		createSniper(originPos.x, originPos.z + i, (rand() % 4) + 1);
+		createSniper(originPos.x - i, originPos.z, (rand() % 4) + 1);
+	}
+}
 void ActorManager::spawnChaseCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
@@ -217,13 +233,13 @@ void ActorManager::spawnChaseCars(const Vector3& originPos)
 	}
 }
 
-void ActorManager::spawnShootCars(const Vector3& originPos, int weaponType)
+void ActorManager::spawnShootCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createShootCar(originPos.x + i, originPos.z, weaponType);
-		createShootCar(originPos.x, originPos.z + i, weaponType);
-		createShootCar(originPos.x - i, originPos.z, weaponType);
+		createShootCar(originPos.x + i, originPos.z, (rand() % 4) + 1);
+		createShootCar(originPos.x, originPos.z + i, (rand() % 4) + 1);
+		createShootCar(originPos.x - i, originPos.z, (rand() % 4) + 1);
 	}
 }
 
@@ -237,17 +253,17 @@ void ActorManager::spawnSwarm(const Vector3& originPos)
 	}
 }
 
-void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float angle, int weaponType)
+void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float angle)
 {
 	if (angle != 0)
 	{
 		Vector2& newPosition = generateAroundaPoint(position.x, position.z, angle);
-		createTurret(newPosition.x, newPosition.y, weaponType);
+		createTurret(newPosition.x, newPosition.y, 1);
 	}
 	else
 	{
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
-		createTurret(newPosition.x, newPosition.y, weaponType);
+		createTurret(newPosition.x, newPosition.y, 1);
 	}
 }
 
@@ -414,6 +430,31 @@ void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 	groups[groupIndex].updateDuty();
 }
 
+void ActorManager::spawnEnemies(const Vector3& targetPos)
+{
+	if (actors.size() < maxNrOfEnemies)
+	{
+		int enemyType = rand() % 4;
+		Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
+		if (enemyType == 0)
+		{
+			spawnAttackers(newPos);
+		}
+		else if (enemyType == 1)
+		{
+			spawnChaseCars(newPos);
+		}
+		else if (enemyType == 2)
+		{
+			spawnShootCars(newPos);
+		}
+		else if (enemyType == 3)
+		{
+			spawnSwarm(newPos);
+		}
+	}
+}
+
 void ActorManager::leaveGroup(int groupIndex, int where)
 {
 	groups[groupIndex].actors.erase(groups[groupIndex].actors.begin() + where);
@@ -546,7 +587,7 @@ Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
 }
-Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos,float minDistance, float maxDistance) noexcept
+Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
 	for (;;) {

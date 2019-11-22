@@ -5,7 +5,7 @@
 #include "Physics.h"
 #include <math.h>
 
-using namespace DirectX::SimpleMath; 
+using namespace DirectX::SimpleMath;
 
 class GameObject
 {
@@ -15,8 +15,8 @@ private:
 	bool spotShadow = true;
 	bool sunShadow = true;
 protected:
-   Vector3  position { 1.0f, 1.0f, 1.0f };
-	Vector3  scale    { 1.0f, 1.0f, 1.0f };
+	Vector3  position{ 1.0f, 1.0f, 1.0f };
+	Vector3  scale{ 1.0f, 1.0f, 1.0f };
 	Vector3  rotation;
 	Quaternion rotationQt;
 	Vector4  color;
@@ -25,9 +25,9 @@ protected:
 public:
 	~GameObject();
 
-	const Mesh *mesh   = nullptr;
-	GameObject *parent = nullptr;
-	
+	const Mesh* mesh = nullptr;
+	GameObject* parent = nullptr;
+
 
 	bool getSpotShadow()const;
 	bool getSunShadow()const;
@@ -39,8 +39,8 @@ public:
 	void     addRotation(Vector3);
 	void     setRotation(Vector3);
 	void     setScale(Vector3);
-	Texture *getTexture();
-	void     setTexture(Texture *);
+	Texture* getTexture();
+	void     setTexture(Texture*);
 	Texture* getNormalMap();
 	void     setNormalMap(Texture*);
 	Texture* getSpecularMap();
@@ -52,7 +52,7 @@ public:
 	void     setColor(Vector4 aColor);
 	Vector4  getColor()    const;
 	Vector3  getPosition();
-	const Vector3 &getPositionRef();
+	const Vector3& getPositionRef();
 	Vector3  getRotation();
 	Quaternion getRotationQuaternion() const;
 	Vector3  getScale()    const;

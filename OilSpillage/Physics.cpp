@@ -140,6 +140,23 @@ Physics::~Physics()
 
 }
 
+void Physics::teleportRigidbody(Vector3 newPos,btRigidBody* body)
+{
+	btTransform transform = body->getCenterOfMassTransform();
+	//Delete
+	DeleteRigidBody(body);
+
+	//Move
+	transform.setOrigin(btVector3(newPos.x, newPos.y, newPos.z));
+	body->setWorldTransform(transform);
+	body->getMotionState()->setWorldTransform(transform);
+	//Add
+	world->addRigidBody(body);
+	body->setLinearVelocity(btVector3());
+	body->setAngularVelocity(btVector3());
+	body->clearForces();
+}
+
 void Physics::moveBody(btRigidBody* rigidbody, float x, float y, float z)
 {
 	btTransform transform = rigidbody->getCenterOfMassTransform();
