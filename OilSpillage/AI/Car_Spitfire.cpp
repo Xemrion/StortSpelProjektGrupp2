@@ -20,13 +20,12 @@ void Spitfire::setUpActor()
 
 	sequence.addChildren(inRange);
 	sequence.addChildren(chase);
+
 }
 
 Spitfire::Spitfire(float x, float z, Physics* physics)
 	: DynamicActor(x, z,physics)
 {
-	velocity = Vector2(0.0f, 0.0f);
-
 	targetRotation = 0.0f;
 	this->rotateAcceleration = 0.0f;
 	this->velocitySpeed = 0.0f;
@@ -43,6 +42,9 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	this->stats = VehicleStats::AICar;
 	setHealth(this->stats.maxHealth);
 	this->aggroRange = 500; //TODO: Find better aggro range
+	this->trailTimer = 0.0f;
+
+	this->setPoints(150);
 }
 
 Spitfire::Spitfire()
@@ -74,7 +76,10 @@ void Spitfire::updateVehicle()
 	setWheelRotation();
 	this->setPosition(getPosition());
 
+	
+
 }
+
 
 void Spitfire::move()
 {
@@ -103,26 +108,23 @@ void Spitfire::update(float dt,const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	updateVehicle();
+	vehicleBody1->setColor(this->getColor());
 }
 
 void Spitfire::followPath()
 {
-	if (path != nullptr)
+	if (pathSize >= 0)
 	{
-
-		if (path->size() > 0)
+		destination = *path;
+		if ((destination - position).Length() < 15)
 		{
-			destination = path->at(path->size() - 1);
-			if ((destination - this->position).Length() < 15)
-			{
-
-				path->pop_back();
-			}
+			path--;
+			pathSize--;
 		}
-		else
-		{
-			destination = targetPos;
-		}
+	}
+	else
+	{
+		destination = targetPos;
 	}
 }
 
@@ -170,27 +172,7 @@ void Spitfire::init(Physics* physics)
 	wheel4->setTexture(vehicleTexture);
 
 
-	btRigidBody* tempo = physics->addBox(
-		btVector3(getPosition().x, getPosition().y, getPosition().z),
-		btVector3(getScale().x, getScale().y, getScale().z),
-		10.0f,
-		this);
-	setRigidBody(tempo, physics);
-	getRigidBody()->activate();
-	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	getRigidBody()->setFriction(0);
-	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
-	AABB vehicleBodyAABB = vehicleBody1->getAABB();
-	btVector3 origin = btVector3(getPosition().x, getPosition().y + 0.65f, getPosition().z);
-	btVector3 size = btVector3(vehicleBodyAABB.maxPos.x - vehicleBodyAABB.minPos.x,
-		(vehicleBodyAABB.maxPos.y - vehicleBodyAABB.minPos.y) * 0.2f,
-		vehicleBodyAABB.maxPos.z - vehicleBodyAABB.minPos.z) * 0.5f;
-	tempo = physics->addBox(origin, size, 1.0f,this);
-	vehicleBody1->setRigidBody(tempo, physics);
-	vehicleBody1->getRigidBody()->activate();
-	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	vehicleBody1->getRigidBody()->setFriction(1);
-	pointJoint = physics->addPointJoint(getRigidBody(), this->vehicleBody1->getRigidBody());
+
 }
 
 void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)
@@ -357,6 +339,25 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 	}
 	else {
 		soundTimer += 100.0f;
+	}
+
+	this->trailTimer += deltaTime;
+
+	Vector3 frontTempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+	Vector3 rightDir = frontTempDir.Cross(Vector3(0.0f, 1.0f, 0.0f));
+	rightDir.Normalize();
+	Vector3 initialDir = -Vector3(getRigidBody()->getLinearVelocity());
+	initialDir.Normalize();
+	//Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - this->vehicleBody1->getPosition() + rightDir*0.5f, -frontTempDir, 1, 20.0f);
+	//Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - this->vehicleBody1->getPosition() - rightDir * 0.5f, -frontTempDir, 1, 20.0f);
+	if (this->trailTimer > 0.01f && abs(driftForce) > 5.0f)
+	{
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
+
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
+		this->trailTimer = 0;
 	}
 
 }

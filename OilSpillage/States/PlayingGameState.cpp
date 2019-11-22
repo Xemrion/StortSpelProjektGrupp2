@@ -1,4 +1,4 @@
-#include "PlayingGameState.h"
+﻿#include "PlayingGameState.h"
 #include "../Sound.h"
 #include "../Input.h"
 #include "../UI/Playing/UIPlaying.h"
@@ -8,10 +8,33 @@
 #include "../PG/Profiler.hpp"
 #include <future>
 
+void PlayingGameState::fillTestParticle()
+{
+	this->colors[0] = this->graphics.getTestParticleSystem()->getColor(0).x;
+	this->colors2[0] = this->graphics.getTestParticleSystem()->getColor(1).x;
+	this->colors3[0] = this->graphics.getTestParticleSystem()->getColor(2).x;
+	this->colors4[0] = this->graphics.getTestParticleSystem()->getColor(3).x;
+
+	this->colors[1] = this->graphics.getTestParticleSystem()->getColor(0).y;
+	this->colors2[1] = this->graphics.getTestParticleSystem()->getColor(1).y;
+	this->colors3[1] = this->graphics.getTestParticleSystem()->getColor(2).y;
+	this->colors4[1] = this->graphics.getTestParticleSystem()->getColor(3).y;
+
+	this->colors[2] = this->graphics.getTestParticleSystem()->getColor(0).z;
+	this->colors2[2] = this->graphics.getTestParticleSystem()->getColor(1).z;
+	this->colors3[2] = this->graphics.getTestParticleSystem()->getColor(2).z;
+	this->colors4[2] = this->graphics.getTestParticleSystem()->getColor(3).z;
+
+	this->size1 = this->graphics.getTestParticleSystem()->getStartSize();
+	this->size2 = this->graphics.getTestParticleSystem()->getEndSize();
+	this->vectorFieldPower = this->graphics.getTestParticleSystem()->getVectorFieldPower();
+	this->vectorFieldSize = this->graphics.getTestParticleSystem()->getVectorFieldSize();
+}
+
 void PlayingGameState::initAI()
 {
 	aStar = new AStar(map->getTileMap());
-	actorManager = new ActorManager(aStar, physics.get());
+	actorManager = new ActorManager(aStar, physics.get(), map.get(), &rng);
 	aStar->generateTileData(map->getTileMap());
 	for (int i = 0; i < 30; i++)
 	{
@@ -31,12 +54,12 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	pausedTime = false;
 #endif // _DEBUG
+	this->current_item = NULL;
 
-
-	rng.seed(config.seed); // g�r i konstruktorn
+	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
 	camera = std::make_unique<DynamicCamera>();
-	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
+	testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 90); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
 
@@ -152,23 +175,33 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 				10.0f));
 	}
 
-	/*
+	
 	 //Road Network Turtlewalker
-	 testNetwork.get()->generateInitialSegments("FFFFFFFFFFFFFFF-FF-FF-FFH+F+F+FF+FF+FF+FFFFFFFFF+FF-F-FF-FFF-FFF");
-	 testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-	 testNetwork.get()->setAngle(45);
-	 for (int i = 0; i < 5; i++) {
+	//FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF
+	testNetwork.get()->generateInitialSegments("F+F-F-FHF--F+FFFF+FFF+FF-FFF+FFFF+FFH+FFF-FF");
+	//testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+	testNetwork.get()->setAngle(45);
+	for (int i = 0; i < 5; i++) 
+	{
 		 testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
 		 testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	 }
-	 testNetwork.get()->cleanRoadNetwork();
+	}
+	testNetwork.get()->setAngle(90+45);
+
+	for (int i = 0; i < 5; i++)
+	{
+		testNetwork.get()->generateAdditionalSegments("FFFF-FF+F+F+F", ((i * 3) + 1) + 2, false);
+		testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+	}
+	/* testNetwork.get()->cleanRoadNetwork();
 	 testNetwork.get()->saveTestNetwork("test-network");
 	*/
 	//}
+
 	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 
 	graphics.setLightList(lightList.get());
-	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.4f);
+	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.0f);
 	this->player->setSpotLight(lightList->addLight(tempLight));
 
 	LaserLight tempLaserLight(Vector3(0.0, 0.0, 0.0), Vector3(0.9, 0.1, 0.9), 10.0, Vector3(1.0, 0.0, 0.0), 10.0);
@@ -186,6 +219,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 	// Needs to be loaded before the menues
 	minimap = createMinimapTexture(*map);
+	generateMapPowerUps();
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
@@ -221,10 +255,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 		Vector4(0.9f, 0.9f, 0.05f, 1)
 	};
 
-	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
-	graphics.setVectorField(4.5f, 3.0f);
 
 	addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 30.0));
 
@@ -241,7 +273,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
-	
+
+
+	this->graphics.setTestParticleSystem(this->graphics.getParticleSystem("explosion"));
+	this->fillTestParticle();
+
+
+
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	graphics.loadModel("Vehicles/Player");
@@ -352,6 +390,28 @@ void PlayingGameState::ImGui_AI()
 void PlayingGameState::ImGui_Particles()
 {
 	ImGui::Begin("Particle");
+	
+
+	if (ImGui::BeginCombo("##ParticleSystems", current_item)) // The second parameter is the label previewed before opening the combo.
+	{
+		for (int i = 0; i < this->graphics.getParticleHandler()->getNames().size(); i++)
+		{
+			bool is_selected = (current_item == this->graphics.getParticleHandler()->getNames().at(i).c_str()); // You can store your selection however you want, outside or inside your objects
+			if (ImGui::Selectable(this->graphics.getParticleHandler()->getNames().at(i).c_str(), is_selected))
+			{
+				current_item = this->graphics.getParticleHandler()->getNames().at(i).c_str();
+				this->graphics.setTestParticleSystem(this->graphics.getParticleSystem(current_item));
+				this->fillTestParticle();
+			}
+				
+			if (is_selected)
+			{
+				ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+			}
+					
+		}
+		ImGui::EndCombo();
+	}
 	ImGui::ColorPicker4("Color Slider", colors);
 	ImGui::ColorPicker4("Color 1 Slider", colors2);
 	ImGui::ColorPicker4("Color 2 Slider", colors3);
@@ -363,6 +423,7 @@ void PlayingGameState::ImGui_Particles()
 	ImGui::SliderFloat("Vectorfield size", &vectorFieldSize, 0.0f, 10.0f);
 	ImGui::SliderFloat("Vectorfield power", &vectorFieldPower, 0.0f, 10.0f);
 	ImGui::SliderFloat("Random power", &randomPosPower, 0.0f, 10.0f);
+	
 	colorsP[0] = Vector4(colors);
 	colorsP[1] = Vector4(colors2);
 	colorsP[2] = Vector4(colors3);
@@ -371,10 +432,9 @@ void PlayingGameState::ImGui_Particles()
 	colorsP[1].w = 1.0f;
 	colorsP[2].w = 1.0f;
 	colorsP[3].w = 1.0f;
-	graphics.setVectorField(vectorFieldSize, vectorFieldPower);
-	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-	graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
-
+	graphics.setTestVectorField(vectorFieldSize, vectorFieldPower);
+	graphics.setTestColorNSize(colorsP, 4, size1, size2);
+	graphics.saveTestParticleSystem();
 	ImGui::End();
 }
 
@@ -498,6 +558,9 @@ void PlayingGameState::ImGui_ProcGen()
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
 		player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
+
+		clearPowerUps();
+		generateMapPowerUps();
 	}
 	ImGui::End();
 }
@@ -599,28 +662,11 @@ void PlayingGameState::update(float deltaTime)
 
 		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
 		Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
-		
+
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 
-		//if (spawnTimer % 200 == 0)
-		//{
-		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-		//	actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
-		//	nrOfEnemies += 12;
-		//	//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
-		//	spawnTimer = 0;
-		//}
-		//spawnTimer++;
-		//spawn Boss
-		//if (spawnTimer % 10 == 0)
-		//{
-		//	actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
-		//		player->getVehicle()->getPosition().y,
-		//		player->getVehicle()->getPosition().z + 5), 1);
-		//	spawnTimer = 0;
-		//}
-		//spawnTimer = 1;
+
 
 		for (std::unique_ptr<PowerUp>& p : powerUps)
 		{
@@ -652,13 +698,27 @@ void PlayingGameState::update(float deltaTime)
 		Bullet::updateSoundTimer(deltaTime);
 		bulletThread.get();
 		player->updateWeapon(deltaTime);
+#ifdef _DEBUG
+		timer += deltaTime;
+		if (timer > 0.001f)
+		{
+			timer = 0.0f;
+			/*for (int i = 0; i < this->testNetwork->getSegments().size(); i++)
+			{
+				this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()) +Vector3(0,0,5.0f)+ Vector3(this->testNetwork->getSegments().at(i).firstPoint.x, this->testNetwork->getSegments().at(i).firstPoint.y, this->testNetwork->getSegments().at(i).firstPoint.z), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+			}*/
+			this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
 
+		}
+#endif 
+
+		
 #ifndef _DEBUG
 		updateObjects();
 		paperCollision(deltaTime);
 #endif
 
-		
+
 
 		btVector3 spotlightDir{ 0,
 								 0,
@@ -713,12 +773,12 @@ void PlayingGameState::update(float deltaTime)
 	graphics.render(camera.get(), deltaTime);
 
 	// render UI
-	menues[MENU_PLAYING]->update( deltaTime );
-	if ( currentMenu != MENU_PLAYING )
-		menues[currentMenu]->update( deltaTime );
-	else if ( Input::checkButton(Keys::MENU, States::PRESSED) )
-		setCurrentMenu( PlayingGameState::MENU_PAUSED );
-	
+	menues[MENU_PLAYING]->update(deltaTime);
+	if (currentMenu != MENU_PLAYING)
+		menues[currentMenu]->update(deltaTime);
+	else if (Input::checkButton(Keys::MENU, States::PRESSED))
+		setCurrentMenu(PlayingGameState::MENU_PAUSED);
+
 
 	//Render all objects
 
@@ -731,7 +791,7 @@ void PlayingGameState::update(float deltaTime)
 	ImGui_Driving();
 	//ImGui_ProcGen();
 	//ImGui_AI();
-	//ImGui_Particles();
+	ImGui_Particles();
 	ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -1080,4 +1140,37 @@ void PlayingGameState::addPowerUp(PowerUp p)
 void PlayingGameState::clearPowerUps()
 {
 	powerUps.clear();
+}
+
+void PlayingGameState::generateMapPowerUps()
+{
+	UINT index = rng() % 10;
+	while (index < map->config.dimensions.x * map->config.dimensions.y)
+	{
+		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
+		Vector3 indexWorldSpace = Vector3(
+			(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+			0.0,
+			-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+		);
+
+		for (int i = 0; i < 100; ++i)
+		{
+			if (Vector3::Distance(position, indexWorldSpace) > 30.0)
+			{
+				position = map->generateRoadPositionInWorldSpace(rng);
+				indexWorldSpace = Vector3(
+					(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+					0.0,
+					-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+				);
+				break;
+			}
+		}
+		PowerUp p(position, (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
+
+		addPowerUp(p);
+
+		index += rng() % 142 + 124;
+	}
 }

@@ -58,7 +58,7 @@ void main( uint3 DTid : SV_DispatchThreadID)
 	{
 		Particle p = CurrentSimulationState.Consume();
 		
-		float depth = 0.5f;
+        float depth = -1.0f;
 		float friction = 0.05f;
 		float3 wind = float3(1.0f, 0.0f, 0.5f);
 		float3 random = hash(float3(43.5, 12.322, 21.5));
@@ -69,11 +69,10 @@ void main( uint3 DTid : SV_DispatchThreadID)
 		float moveSine = VectorField.x;//increases every frame to move the sine
 		float fieldSize = VectorField.z;//for the vectorField
 		float fieldPower = VectorField.y;//for the vectorField
-		float xSin = sin((sin(-5.8f * moveSine - 1) + p.position.x) * fieldSize - (moveSine * 8.2f));
-		float ySin = sin((sin(-7.8f * moveSine + 1) + p.position.y) * fieldSize - (moveSine * 0.7f));
-		float zSin = sin((sin(-4.8f * moveSine - 2) + p.position.z) * fieldSize - (moveSine * 7.7f));
-		acceleration += ((2.85f * fieldPower * normalize(float3(xSin, ySin, zSin)))/m1) * TimeFactors.x;
-		//acceleration += 0.0005f*float3(noise(p.position.x), noise(p.position.y), noise(p.position.z));
+        float xSin = sin((sin(-5.8f * moveSine - 1) + p.position.x) * (1 / fieldSize) - (moveSine * 8.2f));
+        float ySin = sin((sin(-7.8f * moveSine + 1) + p.position.y) * (1 / fieldSize) - (moveSine * 0.7f));
+        float zSin = sin((sin(-4.8f * moveSine - 2) + p.position.z) * (1 / fieldSize) - (moveSine * 7.7f));
+		acceleration += ((2.85f * fieldPower * normalize(float3(xSin, ySin, zSin)))) * TimeFactors.x;
 		if (p.position.y > depth)
 		{
 			p.velocity.xyz = p.velocity.xyz + acceleration;
@@ -81,9 +80,11 @@ void main( uint3 DTid : SV_DispatchThreadID)
 		else
 		{
 			//On zero or lower apply friction and set velocity.y to 0 for no movement in y 
-			p.velocity.xyz = (p.velocity.xyz + TimeFactors.x * float3(0, -1, 0))/(1 + (friction* TimeFactors.x));
-			p.velocity.y = 0;
-		}
+			//p.velocity.xyz = (p.velocity.xyz + TimeFactors.x * float3(0, -1, 0))/(1 + (friction* TimeFactors.x));
+            p.velocity.xyz = 1.1f*reflect(p.velocity.xyz, float3(0.0f, 1.0f, 0.0f))+acceleration;
+            //+reflect(p.velocity.xyz + acceleration, float3(0.0f, 1.0f, 0.0f)); 
+        }
+
 		p.position.xyz = p.position.xyz + p.velocity.xyz * TimeFactors.x;
 		p.time.x = p.time.x + TimeFactors.x;
 		if (p.time.x < p.time.y)

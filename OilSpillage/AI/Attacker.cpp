@@ -17,6 +17,8 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 	this->attackRange = 10;
+	createRigidbody(physics);
+	this->setPoints(100);
 }
 
 void Attacker::update(float dt, const Vector3& targetPos)
@@ -24,7 +26,15 @@ void Attacker::update(float dt, const Vector3& targetPos)
 	DynamicActor::update(dt, targetPos);
 	this->updateBullets(dt);
 }
-
+void Attacker::createRigidbody(Physics* physics)
+{
+	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(position.x, position.y, position.z), 0.5f, this);
+	setRigidBody(tempo, physics);
+	getRigidBody()->activate();
+	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	getRigidBody()->setFriction(0);
+	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+}
 Attacker::~Attacker()
 {
 	Game::getGraphics().removeFromDraw(this);
@@ -69,7 +79,6 @@ Vector3 Attacker::seek()
 {
 	Vector3 desiredDirection;
 	Vector3 offsetVec;
-	Vector3 eliminatingVec = Vector3(0.0f, -1.0f, 0.0f) - Vector3(0.0f, 1.0f, 0.0f);
 	//standard group movement
 	if (!vActive)
 	{

@@ -116,6 +116,9 @@ private:
 
 	VehicleSlots* vehicleSlots;
 
+	float trailTimer = 0.0f;
+	float driftForce = 0.0f;
+
 	float timeSinceLastShot;
 	float timeSinceLastShot2;
 	Weapon weapon;

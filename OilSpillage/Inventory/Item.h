@@ -22,6 +22,7 @@ protected:
 	std::string name;
 	std::string description;
 	ItemType type;
+	Vector4 baseColor;
 	GameObject* object;
 public:
 	static void init();
@@ -39,6 +40,7 @@ public:
 	std::string getDescription() const;
 	ItemType getType() const;
 	GameObject* getObject() const;
+	Vector4 getBaseColor() const;
 };
 
 #endif // !ITEM_H

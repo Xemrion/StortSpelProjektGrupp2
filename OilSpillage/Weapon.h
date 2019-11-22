@@ -30,10 +30,9 @@ struct Weapon
 	DirectX::SimpleMath::Vector3 bulletScale = DirectX::SimpleMath::Vector3(1.0);
 	float spreadRadians = 0.0;
 	float maxSpread = 1.0;
-	float spreadIncreasePerSecond = 1.0;
+	float spreadIncreasePerSecond = 1.0; // Spread increase per shot in percentage of max spread
 	float currentSpreadIncrease = 0.0;
-	//float recoilDissipationTime = 1.0; // time (in seconds) for recoil to go from 100% to 0%
-	float spreadDecreasePerSecond = 1.0;
+	float spreadDecreasePerSecond = 1.0; // Spread increase per shot in percentage of max spread
 	float remainingCooldown = 0.0;
 	WeaponType type = WeaponType::Default;
 	bool melee = false;
@@ -50,7 +49,7 @@ struct Weapon
 			soundTimer += 100.0f;
 		}
 		timeSinceLastShot += deltaTime;
-		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * maxSpread * 2.0, 0.0);
+		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * spreadDecreasePerSecond * maxSpread, 0.0);
 		remainingCooldown = max(remainingCooldown - deltaTime, 0.0);
 	};
 
@@ -109,10 +108,10 @@ public:
 		{    300,       1.5f,         0.0f,         0.15f,		Vector3(0.17f, 0.17f, 30.0f),	 0.0f,  0.0f,  0.11f,  0.0f,  2.0f,  0.0,  WeaponType::Railgun },
 		{      4,      0.01f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Flamethrower },
 		{      5,      0.01f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Spikes ,false },
-		{	   2,       0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::aiMachineGun },
-		{	   2,       0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::aiMelee },
+		{	   0,       0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::aiMachineGun },
+		{	  0,       0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::aiMelee },
 		{    200,       1.5f,         4.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiMissileLauncher },
-		{     10,       1.0f,         0.0f,          0.15f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f,  5.0f,  1.75f,  0.0f,  2.0f,  0.0f, WeaponType::aiLaser },
+		{     3,       1.0f,         0.0f,          0.15f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f,  5.0f,  1.5f,  0.0f,  2.0f,  0.0f, WeaponType::aiLaser },
 		{      1,      0.05f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiFlamethrower },
 		{0, 0, 0, 0, Vector3(0,0,0), 0, 0, 0, 0, 0, 0, WeaponType::None}
 
@@ -185,8 +184,10 @@ public:
 class Bullet
 {
 	void defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
+	void meleeShoot(Vector3& position, Vector3& direction);
 	void defaultUpdate(float& deltaTime);
 	void defaultEnemyUpdate(float& deltaTime);
+	void enemyMeleeUpdate(float& deltaTime);
 	void laserEnemyUpdate(float& deltaTime);
 	void flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
 	void laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);

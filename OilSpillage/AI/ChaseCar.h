@@ -3,6 +3,8 @@
 class ChaseCar : public Spitfire
 {
 private:
+	void createRigidbody(Physics* physics);
+
 protected:
 	virtual void followPath();
 public:
