@@ -3,8 +3,7 @@
 #include <d3d11.h>
 #include "SimpleMath.h"
 #include "GameObject.h"
-
-
+#include "Sound.h"
 enum class WeaponType
 {
 	Default,
@@ -38,7 +37,66 @@ struct Weapon
 	float remainingCooldown = 0.0;
 	WeaponType type = WeaponType::Default;
 	bool melee = false;
+	float soundTimer = 0.0f;
+	float timeSinceLastShot = 0.0f;
+	bool flameBool = false;
+	int soundHandle = 0;
+	void updateWeapon(float deltaTime)
+	{
+		if (deltaTime > 0.01f) {
+			soundTimer += 100.0f * deltaTime;
+		}
+		else {
+			soundTimer += 100.0f;
+		}
+		timeSinceLastShot += deltaTime;
+		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * maxSpread * 2.0, 0.0);
+		remainingCooldown = max(remainingCooldown - deltaTime, 0.0);
+	};
+
+	bool updateFireRate()
+	{
+		if (timeSinceLastShot >= fireRate)
+		{
+			timeSinceLastShot = fmod(timeSinceLastShot, fireRate);
+			return true;
+		}
+		return false;
+	};
 };
+
+/*
+Grattis! Här får ni en uppgift!
+
+laserLight->setLuminance(0.0);
+	for (int i = 0; i < Vehicle::bulletCount; i++)
+	{
+		if (bullets[i].getWeaponType() == WeaponType::Laser)
+		{
+			bullets[i].getGameObject()->setPosition(this->vehicleBody1->getPosition());
+			bullets[i].setDirection(Vector3(curDir.x, 0, curDir.y));
+
+			laserLight->setPos(this->mountedWeapon->getPosition() + Vector3(curDir.x, 0.0, curDir.y) * 2.0);
+
+			laserLight->setDirection(Vector3(curDir.x, 0.0, curDir.y));
+			if (this->weapon.remainingCooldown == 0.0)
+			{
+				laserLight->setLuminance(10.0);
+			}
+			laserLight->setLength(bullets[i].getWeapon().bulletScale.z);
+			laserLight->setColor(Vector3::Lerp(Vector3(1.0, 0.25, 0.05), Vector3(0.2, 0.01, 0.01), (this->weapon.currentSpreadIncrease * this->weapon.currentSpreadIncrease + 0.0) / (this->weapon.maxSpread * this->weapon.maxSpread)));
+		}
+		else if (bullets->getMelee() == true)
+		{
+			bullets[i].getGameObject()->setPosition(this->vehicleBody1->getPosition());
+			bullets[i].setDirection(Vector3(curDir.x, 0, curDir.y));
+		}
+		bullets[i].update(deltaTime);
+	}
+
+	this->spotLight->setPos(this->mountedWeapon->getPosition() - Vector3(curDir.x, -1, curDir.y));
+	this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
+*/
 
 class WeaponHandler
 {
@@ -63,6 +121,65 @@ public:
 	static Weapon getWeapon(WeaponType type) {
 		return weapons[(int)type];
 	};
+
+	static void weaponStartSound(Weapon& weapon)
+	{
+		if (weapon.type == WeaponType::MachineGun)
+		{
+			if (weapon.soundTimer > 4.0f) {
+				int randomSound = rand() % 6 + 1;
+				int rand2 = rand() % 2;
+				std::string soundEffect = "./data/sound/MachineGunSound" + std::to_string(randomSound) + ".wav";
+				if (rand2 < 1) {
+					soundEffect = "./data/sound/MachineGunSound1.wav";
+				}
+				Sound::play(soundEffect);
+				weapon.soundTimer = 0;
+			}
+		}
+		else if (weapon.type == WeaponType::Flamethrower)
+		{
+			if (weapon.flameBool == true) {
+				int randomSound = rand() % 2 + 1;
+				std::string soundEffect = "./data/sound/FlameLoop" + std::to_string(randomSound) + ".wav";
+				Sound::stopLooping(weapon.soundHandle);
+				weapon.soundHandle = Sound::playLooping(soundEffect);
+				Sound::play("./data/sound/FlameStart.wav");
+				weapon.flameBool = false;
+			}
+		}
+		else if (weapon.type == WeaponType::Laser && weapon.flameBool == true)
+		{
+			int randomSound = rand() % 4 + 1;
+			std::string soundEffect = "./data/sound/Lazer" + std::to_string(randomSound) + ".mp3";
+			Sound::stopLooping(weapon.soundHandle);
+			weapon.soundHandle = Sound::playLooping(soundEffect);
+			Sound::play("./data/sound/LazerImpact.mp3");
+			weapon.flameBool = false;
+		}
+	};
+
+	static void weaponEndSound(Weapon& weapon)
+	{
+		if (weapon.type == WeaponType::MachineGun)
+		{
+			return;
+		}
+		else if (weapon.type == WeaponType::Flamethrower)
+		{
+			weapon.flameBool = true;
+			Sound::stopLooping(weapon.soundHandle);
+			weapon.soundHandle = 0;
+		}
+		else if (weapon.type == WeaponType::Laser) 
+		{
+			weapon.flameBool = true;
+			Sound::stopLooping(weapon.soundHandle);
+			weapon.soundHandle = 0;
+		}
+	};
+
+
 };
 
 class Bullet
@@ -78,6 +195,8 @@ class Bullet
 	void laserUpdate(float& deltaTime);
 	GameObject* obj = nullptr;
 	Vector3 dir;
+	Vector3 initDir;
+	Vector3 initPos;
 	float timeLeft = 0.0f;
 	Weapon weapon;
 	static float soundTimer;

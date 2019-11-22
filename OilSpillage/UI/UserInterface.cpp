@@ -28,13 +28,14 @@ void UserInterface::initStaticVariables()
 	UserInterface::fontArial = std::make_unique<SpriteFont>(Game::getGraphics().getDevice(), L"data/bebas.spritefont");
 }
 
-Element* UserInterface::changeSelected(Element* selected) const
+Element* UserInterface::changeSelected(Element* selected)
 {
 	if (Input::checkButton(Keys::L_DOWN, States::PRESSED))
 	{
 		if (selected->getDown() != nullptr)
 		{
 			selected = selected->getDown();
+			Sound::play("./data/sound/MenuMove.wav");
 		}
 	}
 
@@ -43,6 +44,7 @@ Element* UserInterface::changeSelected(Element* selected) const
 		if (selected->getUp() != nullptr)
 		{
 			selected = selected->getUp();
+			Sound::play("./data/sound/MenuMove.wav");
 		}
 	}
 
@@ -51,6 +53,7 @@ Element* UserInterface::changeSelected(Element* selected) const
 		if (selected->getLeft() != nullptr)
 		{
 			selected = selected->getLeft();
+			Sound::play("./data/sound/MenuMove.wav");
 		}
 	}
 
@@ -59,6 +62,7 @@ Element* UserInterface::changeSelected(Element* selected) const
 		if (selected->getRight() != nullptr)
 		{
 			selected = selected->getRight();
+			Sound::play("./data/sound/MenuMove.wav");
 		}
 	}
 

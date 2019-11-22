@@ -89,7 +89,7 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 				if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->turrets[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
 					this->turrets[i]->changeHealth(-bulletArray[j].getDamage());

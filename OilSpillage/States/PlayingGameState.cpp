@@ -1,9 +1,9 @@
 #include "PlayingGameState.h"
 #include "../Sound.h"
 #include "../Input.h"
-#include "../UI/UIPlaying.h"
-#include "../UI/UIPaused.h"
-#include "../UI/UIOptions.h"
+#include "../UI/Playing/UIPlaying.h"
+#include "../UI/Playing/UIPaused.h"
+#include "../UI/Menu/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
 #include <future>
@@ -171,6 +171,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.setLightList(lightList.get());
 	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.4f);
 	this->player->setSpotLight(lightList->addLight(tempLight));
+
+	LaserLight tempLaserLight(Vector3(0.0, 0.0, 0.0), Vector3(0.9, 0.1, 0.9), 10.0, Vector3(1.0, 0.0, 0.0), 10.0);
+	this->player->setLaserLight(lightList->addLight(tempLaserLight));
+
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
 
@@ -197,6 +201,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	initAI();
 
+
+
+	Game::getGraphics().setUISun(Vector3(1.0f, -1.0f, 0.1f), Vector4(0.84, 0.83, 0, 1));
+
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
@@ -218,8 +226,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	graphics.setVectorField(4.5f, 3.0f);
 
-	powerUps.push_back(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star));
-	Game::getGraphics().addToDraw(&*powerUps.begin());
+	addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 30.0));
 
 	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
@@ -234,7 +241,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
-
+	
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	graphics.loadModel("Vehicles/Player");
@@ -252,14 +259,14 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	count = 0;
 	prevAccelForce = Vector3(0, 0, 0);
 	accelForce = Vector3(0, 0, 0);
-	soundAggro = 0;
 }
 
 PlayingGameState::~PlayingGameState()
 {
 	delete aStar;
 	delete actorManager;
-	delete testObjective;
+
+
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
 	delete this->objTestPickUp3;
@@ -525,6 +532,18 @@ Vector3 PlayingGameState::getRespawnPosition() const noexcept
 	else return map->getStartPositionInWorldSpace() + Vector3(0, -1.2f, 0);
 }
 
+std::unique_ptr<Vehicle>& PlayingGameState::getPlayer()
+{
+	return this->player;
+}
+
+void PlayingGameState::setPlayer(Vehicle* theVehicle)
+{
+	SpotLight* temp = this->player->getSpotLight();
+	this->player.reset(theVehicle);// = std::make_unique<Vehicle>(theVehicle);
+	this->player->setSpotLight(temp);
+}
+
 void PlayingGameState::update(float deltaTime)
 {
 	/*-------------------------UPDATING-------------------------*/
@@ -533,7 +552,7 @@ void PlayingGameState::update(float deltaTime)
 		if (Input::isKeyDown_DEBUG(Keyboard::E)) {
 			deltaTime /= 4;
 		}
-		if (Input::checkButton(Keys::CANCEL, States::PRESSED)) {
+		if (Input::isKeyDown_DEBUG(Keyboard::Q)) {
 			if (player->getDrivingMode() == 0) {
 				player->setDrivingMode(1);
 			}
@@ -543,7 +562,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
-		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
+		if (Input::isKeyDown_DEBUG(Keyboard::LeftAlt))
 		{
 			pausedTime = !pausedTime;
 		}
@@ -568,37 +587,39 @@ void PlayingGameState::update(float deltaTime)
 #endif // !_DEBUG
 
 
+		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
+		btVector3 positionCam{ playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
+		camera->setPosition(Vector3(positionCam.getX(),
+			positionCam.getY() / 3,
+			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z));
+		camera->update(deltaTime);
 
-		auto playerVehicle{ player->getVehicle() };
-		powerUps.erase(
-			std::remove_if(
-				powerUps.begin(),
-				powerUps.end(),
-				[&](PowerUp& p) {
-					p.update(time);
-					if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
-					{
-						player->addPowerUp(p.getPowerUpType());
-						return true;
-					}
-					else
-					{
-						return false;
-					}
+		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
+		Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
+		
+		size_t playerBulletCount;
+		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
+
+
+
+		for (std::unique_ptr<PowerUp>& p : powerUps)
+		{
+			p->update(deltaTime);
+			if (p->isActive())
+			{
+				if (p->getAABB().intersectXZ(player->getVehicle()->getAABB()))
+				{
+					player->addPowerUp(p->getPowerUpType());
+					p->deactivate();
 				}
-			),
-			powerUps.end()
-		);
+			}
+		}
 
 		if (time == 0)
 		{
 			deltaTime /= 4;
 			this->player->setHealth(0);
 		}
-		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
-		player->updatePlayer(deltaTime);
-
-		physics->update(deltaTime);
 
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
@@ -607,6 +628,7 @@ void PlayingGameState::update(float deltaTime)
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation();
+		//actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		Bullet::updateSoundTimer(deltaTime);
@@ -617,12 +639,8 @@ void PlayingGameState::update(float deltaTime)
 		updateObjects();
 		paperCollision(deltaTime);
 #endif
-		btVector3 positionCam{ playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
-		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
-		camera->setPosition(Vector3(positionCam.getX(),
-			positionCam.getY() / 3,
-			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z));
+		
 
 		btVector3 spotlightDir{ 0,
 								 0,
@@ -641,13 +659,22 @@ void PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos(spotlightPos);
 
-		if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
+		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 25.0f || this->time <= 20.0f)
+		{
+			Sound::fadeSoundtrack(true, 1.0f);
+		}
+		else
+		{
+			Sound::fadeSoundtrack(false, 3.0f);
+		}
+
+		/*if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
 			soundAggro += 0.2f * deltaTime;
 		}
 		else if (soundAggro > 0.0f) {
 			soundAggro -= 0.1f * deltaTime;
 		}
-		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);
+		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);*/
 
 		/*timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
@@ -662,15 +689,18 @@ void PlayingGameState::update(float deltaTime)
 
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
+
+	graphics.clearScreen(Vector4(0, 0, 0, 1));
 	graphics.setSpotLightShadow(playerLight);
 	graphics.render(camera.get(), deltaTime);
 
 	// render UI
-	menues[MENU_PLAYING]->update(deltaTime);
-	if (currentMenu != MENU_PLAYING)
-		menues[currentMenu]->update(deltaTime);
-	else if (Input::checkButton(Keys::MENU, States::PRESSED))
-		setCurrentMenu(PlayingGameState::MENU_PAUSED);
+	menues[MENU_PLAYING]->update( deltaTime );
+	if ( currentMenu != MENU_PLAYING )
+		menues[currentMenu]->update( deltaTime );
+	else if ( Input::checkButton(Keys::MENU, States::PRESSED) )
+		setCurrentMenu( PlayingGameState::MENU_PAUSED );
+	
 
 	//Render all objects
 
@@ -952,14 +982,34 @@ Vector3 PlayingGameState::generateObjectivePos(Vector3 origin, float minDistance
 
 }
 
-PointLight* PlayingGameState::addPointLight(PointLight& light)
+PointLight* PlayingGameState::addLight(PointLight& light)
 {
 	return this->lightList->addLight(light);
 }
 
-void PlayingGameState::removeLight(PointLight* theLight)
+void PlayingGameState::removeLight(PointLight* light)
 {
-	this->lightList->removeLight(theLight);
+	this->lightList->removeLight(light);
+}
+
+SpotLight* PlayingGameState::addLight(SpotLight& light)
+{
+	return this->lightList->addLight(light);
+}
+
+void PlayingGameState::removeLight(SpotLight* light)
+{
+	this->lightList->removeLight(light);
+}
+
+LaserLight* PlayingGameState::addLight(LaserLight& light)
+{
+	return this->lightList->addLight(light);
+}
+
+void PlayingGameState::removeLight(LaserLight* light)
+{
+	this->lightList->removeLight(light);
 }
 
 ObjectiveHandler& PlayingGameState::getObjHandler()
@@ -1001,4 +1051,15 @@ void PlayingGameState::paperCollision(float deltaTime)
 			obj->updateObject(deltaTime);
 		}
 	}
+}
+
+void PlayingGameState::addPowerUp(PowerUp p)
+{
+	powerUps.push_back(std::make_unique<PowerUp>(p));
+	powerUps[powerUps.size() - 1]->activate();
+}
+
+void PlayingGameState::clearPowerUps()
+{
+	powerUps.clear();
 }

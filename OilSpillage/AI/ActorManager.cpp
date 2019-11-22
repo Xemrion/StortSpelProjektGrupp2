@@ -137,7 +137,7 @@ float ActorManager::distanceToPlayer(const Vector3& position)
 		}
 	}
 	float turretMinDist = turretHandler.distanceToPlayer(position);
-	if (turretMinDist < minDistance)
+	if (turretMinDist < minDistance && turretMinDist != -1)
 	{
 		return turretMinDist;
 	}
@@ -168,10 +168,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z * 2))
 					{
 						if (soundTimer > 0.05f) {
-							/*int randomSound = rand() % 3 + 1;
-							std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
-							Sound::PlaySoundEffect(soundEffect);*/
-							Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
@@ -180,10 +177,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						/*int randomSound = rand() % 3 + 1;
-						std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
-						Sound::PlaySoundEffect(soundEffect);*/
-						Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
@@ -192,7 +186,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 				if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+						Sound::play("data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
@@ -393,6 +387,15 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 	}
 	if (hasDied)
 	{
+		float normalizedRandom = float(rand()) / RAND_MAX;
+
+		if (normalizedRandom >= 0.95)
+		{
+			static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
+				PowerUp(groups[i].actors[j]->getPosition(),
+					PowerUpType::Health)
+			);
+		}
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
 			if (actors[i]->isDead())

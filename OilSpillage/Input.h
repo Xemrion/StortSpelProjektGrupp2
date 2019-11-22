@@ -11,6 +11,12 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+enum class Controllers {
+	NONE,
+	XBOX,
+	PLAYSTATION
+};
+
 enum class Keys {
 	L_UP, //Left stick up. Keyboard: W
 	L_DOWN, //Left stick down. Keyboard: S
@@ -29,7 +35,7 @@ enum class Keys {
 	R_PRESS, //Right stick pressed. Keyboard: ?
 
 	CONFIRM, //A (PS: X) button. Keyboard: Enter
-	CANCEL, //B (PS: O) button. Keyboard: Q
+	CANCEL, //B (PS: O) button. Keyboard: Return
 	ACTION_1, //X (PS: Square) button. Keyboard: Space
 	ACTION_2, //Y (PS: Triangle) button. Keyboard: Left shift
 
@@ -67,6 +73,11 @@ private:
 	float wHeight;
 	float wWidth;
 
+	float resetTimer;
+	bool checkController;
+	Controllers controller;
+
+	void updateController();
 	static bool checkButtonKeyboard(Keys key, States state);
 	static bool checkButtonGamePad(Keys key, GamePad::ButtonStateTracker::ButtonState state/*, int playerId*/);
 public:
@@ -76,7 +87,7 @@ public:
 	static bool isKeyDown_DEBUG(Keyboard::Keys key);
 
 	static void init(Window* window);
-	static void update();
+	static void update(float deltaTime);
 	static void reset();
 
 	static void setRumble(/*int player, */float leftMotor, float rightMotor, float leftTrigger = 0.f, float rightTrigger = 0.f);
@@ -85,12 +96,14 @@ public:
 	static Vector2 getDirectionL(/*int player*/);
 	static float getStrengthL(/*int player*/);
 	static Vector2 getDirectionR(/*int player*/);
+	static Vector2 getDirectionRnoMouse(/*int player*/);
 	static float getStrengthR(/*int player*/);
 	static float getStrengthRnoMouse(/*int player*/);
 
 	static void setWindowSize(int width, int height);
 	static bool checkButtonMouse(MouseKeys key, States state);
 	static Vector2 getMousePosition();
+	static Controllers getControllerID();
 
 	//static void setKeyboardPlayerID(int player);
 };
