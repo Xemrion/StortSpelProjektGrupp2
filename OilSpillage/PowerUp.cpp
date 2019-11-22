@@ -49,6 +49,7 @@ void PowerUp::clone(const PowerUp& p)
 {
 	this->type = p.type;
 	this->mesh = p.mesh;
+	this->material = p.material;
 	this->setPosition(p.position);
 	this->currentRespawnTimer = p.currentRespawnTimer;
 	this->respawnTime = p.respawnTime;
@@ -72,6 +73,7 @@ void PowerUp::loadModel()
 	else if (type == PowerUpType::Star)
 	{
 		mesh = Game::getGraphics().getMeshPointer("Entities/Star");
+		setMaterial(Game::getGraphics().getMaterial("Entities/Star"));
 	}
 }
 
