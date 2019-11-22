@@ -176,6 +176,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
+	player->startEngineSound();
 
 	map = std::make_unique<Map>(graphics, config, physics.get());
 	map->setDistrictColorCoding(isDebugging);
@@ -584,7 +585,6 @@ void PlayingGameState::update(float deltaTime)
 			Game::setState(Game::STATE_MENU);
 		}
 #endif // !_DEBUG
-
 		auto playerVehicle{ player->getVehicle() };
 		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
 		player->updatePlayer(deltaTime);
@@ -603,15 +603,15 @@ void PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 
-		if (spawnTimer % 200 == 0)
-		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
-			nrOfEnemies += 12;
-			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
-			spawnTimer = 0;
-		}
-		spawnTimer++;
+		//if (spawnTimer % 200 == 0)
+		//{
+		//	actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
+		//	actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
+		//	nrOfEnemies += 12;
+		//	//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
+		//	spawnTimer = 0;
+		//}
+		//spawnTimer++;
 		//spawn Boss
 		//if (spawnTimer % 10 == 0)
 		//{
@@ -645,7 +645,7 @@ void PlayingGameState::update(float deltaTime)
 		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
-		player->setWheelRotation();
+		player->setWheelRotation(deltaTime);
 		//actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());

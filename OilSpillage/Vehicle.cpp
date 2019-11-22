@@ -96,33 +96,33 @@ void Vehicle::init(Physics* physics)
 	vehicleBody1->setScale(Vector3(0.35f, 0.35f, 0.35f));	
 	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
 	//vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
-
 	vehicleBody1->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Chassi1"));
 
+	Game::getGraphics().loadModel("Entities/Player_Car_Parts/Wheel1");
 	this->wheel1 = new GameObject;
 	this->wheel2 = new GameObject;
 	this->wheel3 = new GameObject;
 	this->wheel4 = new GameObject;
-	wheel1->mesh = Game::getGraphics().getMeshPointer("Entities/Player");
-	wheel2->mesh = Game::getGraphics().getMeshPointer("Entities/Player2");
-	wheel3->mesh = Game::getGraphics().getMeshPointer("Entities/Player3");
-	wheel4->mesh = Game::getGraphics().getMeshPointer("Entities/Player4");
+	wheel1->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
+	wheel2->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
+	wheel3->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
+	wheel4->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
 	Game::getGraphics().addToDraw(wheel1);
 	Game::getGraphics().addToDraw(wheel2);
 	Game::getGraphics().addToDraw(wheel3);
 	Game::getGraphics().addToDraw(wheel4);
-	wheel1->setPosition(Vector3(0.0f, 1.0f, 0.0f));
-	wheel2->setPosition(Vector3(0.0f, 1.0f, 0.0f));
-	wheel3->setPosition(Vector3(0.0f, 1.0f, 0.0f));
-	wheel4->setPosition(Vector3(0.0f, 1.0f, 0.0f));
-	wheel1->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	wheel2->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	wheel3->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	wheel4->setScale(Vector3(0.005f, 0.005f, 0.005f));
-	wheel1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
-	wheel2->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
-	wheel3->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
-	wheel4->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
+	wheel1->setPosition(Vector3(1.0f, 1.0f, 0.0f));
+	wheel2->setPosition(Vector3(-1.0f, 1.0f, 0.0f));
+	wheel3->setPosition(Vector3(0.0f, 1.0f, 1.0f));
+	wheel4->setPosition(Vector3(0.0f, 1.0f, -1.0f));
+	wheel1->setScale(Vector3(0.38f, 0.38f, 0.38f));
+	wheel2->setScale(Vector3(0.38f, 0.38f, 0.38f));
+	wheel3->setScale(Vector3(0.38f, 0.38f, 0.38f));
+	wheel4->setScale(Vector3(0.38f, 0.38f, 0.38f));
+	wheel1->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
+	wheel2->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
+	wheel3->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
+	wheel4->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
 
 
 	btRigidBody* tempo = physics->addBox(btVector3(vehicle->getPosition().x, vehicle->getPosition().y, vehicle->getPosition().z), btVector3(vehicle->getScale().x, vehicle->getScale().y, vehicle->getScale().z), 10.0f);
@@ -455,11 +455,45 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 	add += 0.4f * deltaTime;
 
-	if (dmg == true) {
+	/*if (dmg == true) {
 		vehicleBody1->setColor(Vector4(vehicleBody1->getColor().x / (1 + 15.0f * deltaTime), vehicleBody1->getColor().y, vehicleBody1->getColor().z, 1));
 		if (vehicleBody1->getColor().x <= 0.01f) {
 			dmg = false;
 		}
+	}*/
+	vehicleBody1->setColor(Vector4(vehicleBody1->getColor().x / (1 + 5.0f * deltaTime), vehicleBody1->getColor().y / (1 + 5.0f * deltaTime), vehicleBody1->getColor().z / (1 + 5.0f * deltaTime), 1));
+
+	//Engine sound
+	engineGears += (deltaTime * 0.15f + randomGears*0.5f *deltaTime * 0.05f)*Input::getStrengthL();
+	if (engineGears > 1) {
+		randomGears = rand() % 10 + 1;
+		engineGears = ((rand() % 11)-5)*0.1f;
+		if (abs(driftForce) < 15.0f) {
+			int randomSound = rand() % 4 + 1;
+			std::string soundEffect = "./data/sound/CarExhaust" + std::to_string(randomSound) + ".mp3";
+			Sound::play(soundEffect,0.6f);
+		}
+	}
+	enginePitch = enginePitch + deltaTime*2 * ((Input::getStrengthL()) - enginePitch);
+	time += deltaTime;
+	if (abs(driftForce) < 15.0f) {
+		Sound::changeLoopingPitch(soundHandle, 1.0f + enginePitch + (engineGears * Input::getStrengthL() * min(abs(velocitySpeed * 0.045f), 1)));
+		Sound::changeLoopingVolume(soundHandle, 0.7f);
+		driftVolume -= 1 * deltaTime;
+		Sound::changeLoopingVolume(driftHandle,driftVolume);
+		driftBool = false;
+	}
+	else {
+		driftVolume = 0.2f;
+		int randomSound = rand() % 2 + 1;
+		std::string soundEffect = "./data/sound/Drift" + std::to_string(randomSound) + ".mp3";
+		if (driftBool == false) {
+			Sound::stopLooping(driftHandle);
+			driftHandle = Sound::playLooping(soundEffect, 0.2f);
+			driftBool = true;
+		}
+		Sound::changeLoopingPitch(soundHandle, 3);
+		Sound::changeLoopingVolume(soundHandle, min(20 * sin((time - 1) / 0.0095f) + 0, 0.7f));
 	}
 
 	if (this->immortal)
@@ -844,6 +878,11 @@ float Vehicle::getAcceleratorX()
 	return accelerator.x;
 }
 
+void Vehicle::startEngineSound()
+{
+	soundHandle = Sound::playLooping("./data/sound/CarEngine4.mp3",0.5f);
+}
+
 Stats Vehicle::getStats() const
 {
 	return this->updatedStats;
@@ -926,7 +965,7 @@ void Vehicle::changeHealth(int amount)
 		if (amount < 0) {
 			dmg = true;
 		}
-		vehicleBody1->setColor(Vector4(max(vehicleBody1->getColor().x + -amount * 0.1f, 0), vehicleBody1->getColor().y, vehicleBody1->getColor().z, 1));
+		vehicleBody1->setColor(Vector4(max(vehicleBody1->getColor().x + -amount * 0.6f, 0), vehicleBody1->getColor().y, vehicleBody1->getColor().z, 1));
 		this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
 		Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 		if (this->deadImpulse == false && this->health <= 0)
@@ -976,7 +1015,7 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 	}
 	vehicleDistance = min(vehicleDistance, 20.0f);
 
-	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionR().x * Input::getStrengthR() * 3, Input::getDirectionR().y * Input::getStrengthR() * 3), deltaTime*10.0f);
+	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionRnoMouse().x * Input::getStrengthRnoMouse() * 3, Input::getDirectionRnoMouse().y * Input::getStrengthRnoMouse() * 3), deltaTime*10.0f);
 
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime * 1.2f + cameraDistance;
 	cameraDistanceX = ((this->vehicle->getRigidBody()->getLinearVelocity().getX() * 0.3f + aimLerp.x) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
@@ -1016,15 +1055,50 @@ void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 	}*/
 }
 
-void Vehicle::setWheelRotation()
+void Vehicle::setWheelRotation(float deltaTime)
 {
-	wheel1->setPosition(vehicle->getPosition() + Vector3(0, 0.25f, 0));
-	wheel2->setPosition(vehicle->getPosition() + Vector3(0, 0.25f, 0));
-	wheel3->setPosition(vehicle->getPosition() + Vector3(0, 0.25f, 0));
-	wheel4->setPosition(vehicle->getPosition() + Vector3(0, 0.25f, 0));
+	Quaternion qt = Vector4(this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getX(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getY(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getZ(), this->vehicleBody1->getRigidBody()->getWorldTransform().getRotation().getW());
+	float bodyHeading = getHeading(qt);
+	//bodyHeading = fmod((bodyHeading * 180 / DirectX::XM_PI), 360.0f);
 
-	wheel1->setRotation(Vector3(0, vehicleBody1->getRotation().y, 0));
-	wheel2->setRotation(Vector3(0, vehicleBody1->getRotation().y, 0));
+
+	Vector2 wheel1Pos = Vector2(vehicleBody1->getPosition().x + (cos(-bodyHeading) * 0.41f) + (-sin(-bodyHeading) * 0.73f),
+								vehicleBody1->getPosition().z + (sin(-bodyHeading) * 0.41f) + (cos(-bodyHeading) * 0.73f));
+	Vector2 wheel2Pos = Vector2(vehicleBody1->getPosition().x + (cos(bodyHeading) * -0.41f) + (-sin(bodyHeading) * -0.73f),
+								vehicleBody1->getPosition().z + (sin(bodyHeading) * 0.41f) + (cos(bodyHeading) * 0.73f));
+	Vector2 wheel3Pos = Vector2(vehicleBody1->getPosition().x + (cos(-bodyHeading) * -0.41f) + (-sin(-bodyHeading) * -0.68f),
+								vehicleBody1->getPosition().z + (sin(-bodyHeading) * -0.41f) + (cos(-bodyHeading) * -0.68f));
+	Vector2 wheel4Pos = Vector2(vehicleBody1->getPosition().x + (cos(bodyHeading) * 0.41f) + (-sin(bodyHeading) * 0.68f),
+								vehicleBody1->getPosition().z + (sin(bodyHeading) * -0.41f) + (cos(bodyHeading) * -0.68f));
+
+	wheel1->setPosition(Vector3(wheel1Pos.x, vehicleBody1->getPosition().y -0.25f, wheel1Pos.y));
+	wheel2->setPosition(Vector3(wheel2Pos.x, vehicleBody1->getPosition().y - 0.25f, wheel2Pos.y));
+	wheel3->setPosition(Vector3(wheel3Pos.x, vehicleBody1->getPosition().y - 0.25f, wheel3Pos.y));
+	wheel4->setPosition(Vector3(wheel4Pos.x, vehicleBody1->getPosition().y - 0.25f, wheel4Pos.y));
+
+	Quaternion rotationNow = XMQuaternionRotationRollPitchYaw(wheel1->getRotation().x, wheel1->getRotation().y, wheel1->getRotation().z);
+	Quaternion rotationDest = Quaternion::Lerp(rotationNow, Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), std::atan2f(Input::getDirectionL().x, Input::getDirectionL().y)), deltaTime *20);
+	rotationNow.Normalize();
+	rotationDest.Normalize();
+
+	float dotProduct = rotationNow.x * rotationDest.x + rotationNow.y * rotationDest.y + rotationNow.z * rotationDest.z + rotationNow.w * rotationDest.w;
+
+	if (Input::getStrengthL() < 0.01f) {
+		rotationDest = Quaternion::Lerp(rotationNow, Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), bodyHeading), deltaTime * 20);
+	}
+	else {
+		float angle1 = bodyHeading;
+		float angle2 = getHeading(rotationNow);
+		float a = abs(angle1 - angle2);
+		fmod((a * 180 / DirectX::XM_PI), 360.0f);
+		if (abs(a) > 45 * (DirectX::XM_PI / 180)) {
+			rotationDest = Quaternion::Lerp(rotationNow, Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), bodyHeading), deltaTime * 20);
+		}
+	}
+	float wheelHeading = getHeading(rotationDest);
+
+	wheel1->setRotation(Vector3(0, wheelHeading, 0));
+	wheel2->setRotation(Vector3(0, wheelHeading, 0));
 	wheel3->setRotation(Vector3(0, vehicleBody1->getRotation().y, 0));
 	wheel4->setRotation(Vector3(0, vehicleBody1->getRotation().y, 0));
 }
@@ -1138,7 +1212,7 @@ void Vehicle::updatePowerUpEffects(float deltaTime)
 	{
 		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate;
 		this->updatedStats.handlingRate = this->defaultStats.handlingRate;
-		this->vehicleBody1->setColor(Vector4(0.0, 0.0, 0.0, 1.0));
+		//this->vehicleBody1->setColor(Vector4(0.0, 0.0, 0.0, 1.0));
 	}
 
 	for (int i = 0; i < (int)PowerUpType::Length; ++i)

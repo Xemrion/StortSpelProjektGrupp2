@@ -48,6 +48,27 @@ void Game::start(Window* window)
 	Sound::load("./data/sound/MetalImpactPitched2.wav");
 	Sound::load("./data/sound/MetalImpactPitched3.wav");
 	
+	Sound::load("./data/sound/Drift2.mp3");
+	Sound::load("./data/sound/Drift1.mp3");
+	Sound::load("./data/sound/CarEngine1.mp3");
+	Sound::load("./data/sound/CarEngine2.mp3");
+	Sound::load("./data/sound/CarExhaust1.mp3");
+	Sound::load("./data/sound/CarExhaust2.mp3");
+	Sound::load("./data/sound/CarExhaust3.mp3");
+	Sound::load("./data/sound/CarExhaust4.mp3");
+	Sound::load("./data/sound/RobotBullet1.mp3");
+	Sound::load("./data/sound/RobotBullet2.mp3");
+	Sound::load("./data/sound/RobotBullet3.mp3");
+	Sound::load("./data/sound/RobotBullet4.mp3");
+	Sound::load("./data/sound/RobotBullet5.mp3");
+	Sound::load("./data/sound/RobotBullet6.mp3");
+	Sound::load("./data/sound/Lazer1.mp3");
+	Sound::load("./data/sound/Lazer2.mp3");
+	Sound::load("./data/sound/Lazer3.mp3");
+	Sound::load("./data/sound/Lazer4.mp3");
+	Sound::load("./data/sound/LazerImpact.mp3");
+
+
 	Sound::playSoundtrack("./data/sound/OilSpillageSoundtrack1_Calm.mp3", "./data/sound/OilSpillageSoundtrack1_Aggressive.mp3");
 
 	//Input::setKeyboardPlayerID(0);
