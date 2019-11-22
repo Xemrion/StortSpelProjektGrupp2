@@ -234,7 +234,7 @@ void Sound::fadeSoundtrack(bool toAgressive, float fadeTime)
 {
 	//Get the aggressive factor (the time of the fade that is left) so this function can be called every frame if needed.
 	float aggressiveFactor = (instance->soloud.getFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY) - 10.0f) / 10000.0f;
-	if (toAgressive) aggressiveFactor = 1 - aggressiveFactor; 
+	if (toAgressive) aggressiveFactor = 1 - aggressiveFactor;
 
 	instance->soloud.fadeFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY, toAgressive ? 10000.0f : 10.0f, fadeTime * aggressiveFactor);
 }

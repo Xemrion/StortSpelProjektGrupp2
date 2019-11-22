@@ -1354,7 +1354,7 @@ Texture* Graphics::getTexturePointer(const char* path)
 	texturePath += ".tga";
 
 	if (textures.find(texturePath) == textures.end()) {
-		assert(false && "Failed to load texture!");
+		//assert(false && "Failed to load texture!");
 		return nullptr;
 	}
 	return textures[texturePath];

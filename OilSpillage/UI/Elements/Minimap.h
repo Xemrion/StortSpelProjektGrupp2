@@ -27,7 +27,7 @@ private:
 public:
 	static Vector2 size;
 
-	Minimap(float zoom, float fogClearRadius = 10.0f, Vector2 position = Vector2());
+	Minimap(Vector2 position = Vector2());
 	virtual ~Minimap();
 
 	void init();

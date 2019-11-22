@@ -26,8 +26,6 @@ void Spitfire::setUpActor()
 Spitfire::Spitfire(float x, float z, Physics* physics)
 	: DynamicActor(x, z,physics)
 {
-	velocity = Vector2(0.0f, 0.0f);
-
 	targetRotation = 0.0f;
 	this->rotateAcceleration = 0.0f;
 	this->velocitySpeed = 0.0f;
@@ -46,6 +44,7 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	this->aggroRange = 500; //TODO: Find better aggro range
 	this->trailTimer = 0.0f;
 
+	this->setPoints(150);
 }
 
 Spitfire::Spitfire()
@@ -81,6 +80,7 @@ void Spitfire::updateVehicle()
 
 }
 
+
 void Spitfire::move()
 {
 	direction = destination - this->position;
@@ -108,26 +108,23 @@ void Spitfire::update(float dt,const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	updateVehicle();
+	vehicleBody1->setColor(this->getColor());
 }
 
 void Spitfire::followPath()
 {
-	if (path != nullptr)
+	if (pathSize >= 0)
 	{
-
-		if (path->size() > 0)
+		destination = *path;
+		if ((destination - position).Length() < 15)
 		{
-			destination = path->at(path->size() - 1);
-			if ((destination - this->position).Length() < 15)
-			{
-
-				path->pop_back();
-			}
+			path--;
+			pathSize--;
 		}
-		else
-		{
-			destination = targetPos;
-		}
+	}
+	else
+	{
+		destination = targetPos;
 	}
 }
 
@@ -175,27 +172,7 @@ void Spitfire::init(Physics* physics)
 	wheel4->setTexture(vehicleTexture);
 
 
-	btRigidBody* tempo = physics->addBox(
-		btVector3(getPosition().x, getPosition().y, getPosition().z),
-		btVector3(getScale().x, getScale().y, getScale().z),
-		10.0f,
-		this);
-	setRigidBody(tempo, physics);
-	getRigidBody()->activate();
-	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	getRigidBody()->setFriction(0);
-	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
-	AABB vehicleBodyAABB = vehicleBody1->getAABB();
-	btVector3 origin = btVector3(getPosition().x, getPosition().y + 0.65f, getPosition().z);
-	btVector3 size = btVector3(vehicleBodyAABB.maxPos.x - vehicleBodyAABB.minPos.x,
-		(vehicleBodyAABB.maxPos.y - vehicleBodyAABB.minPos.y) * 0.2f,
-		vehicleBodyAABB.maxPos.z - vehicleBodyAABB.minPos.z) * 0.5f;
-	tempo = physics->addBox(origin, size, 1.0f,this);
-	vehicleBody1->setRigidBody(tempo, physics);
-	vehicleBody1->getRigidBody()->activate();
-	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	vehicleBody1->getRigidBody()->setFriction(1);
-	pointJoint = physics->addPointJoint(getRigidBody(), this->vehicleBody1->getRigidBody());
+
 }
 
 void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)

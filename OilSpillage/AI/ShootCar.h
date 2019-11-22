@@ -1,6 +1,7 @@
 #pragma once
 #include "Car_Spitfire.h"
-class ChaseCar : public Spitfire
+#include "Ranged.h"
+class ShootCar : public Spitfire, public Ranged
 {
 private:
 	void createRigidbody(Physics* physics);
@@ -8,9 +9,9 @@ private:
 protected:
 	virtual void followPath();
 public:
-	ChaseCar();
-	ChaseCar(float x, float z,Physics* physics);
-	~ChaseCar();
+	ShootCar();
+	ShootCar(float x, float z, int weaponType, Physics* physics);
+	~ShootCar();
 	void update(float dt, const Vector3& targetPos);
-
+	Status shoot();
 };

@@ -9,15 +9,15 @@ private:
 	Vector3* targetPosPtr;
 	Vector3* velocityPtr;
 	float* deltaTimePtr;
-	float timeSinceLastShot;
-	bool predicting = false;
-	Weapon weapon;
 
-	static const int bulletCount = 32;
-	Bullet bullets[bulletCount];
 
 	void assignWeapon(int weaponType);
 protected:
+	static const int bulletCount = 32;
+	Bullet bullets[bulletCount];
+	float timeSinceLastShot;
+	bool predicting = false;
+	Weapon weapon;
 	int attackRange;
 	void updateBullets(float deltaTime);
 	virtual Status shoot();

@@ -34,7 +34,7 @@ void PlayingGameState::fillTestParticle()
 void PlayingGameState::initAI()
 {
 	aStar = new AStar(map->getTileMap());
-	actorManager = new ActorManager(aStar, physics.get());
+	actorManager = new ActorManager(aStar, physics.get(), map.get(), &rng);
 	aStar->generateTileData(map->getTileMap());
 	for (int i = 0; i < 30; i++)
 	{
@@ -662,28 +662,11 @@ void PlayingGameState::update(float deltaTime)
 
 		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
 		Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
-		
+
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 
-		if (spawnTimer % 200 == 0)
-		{
-			//actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-			//actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
-			nrOfEnemies += 12;
-			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
-			spawnTimer = 0;
-		}
-		spawnTimer++;
-		//spawn Boss
-		//if (spawnTimer % 10 == 0)
-		//{
-		//	actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
-		//		player->getVehicle()->getPosition().y,
-		//		player->getVehicle()->getPosition().z + 5), 1);
-		//	spawnTimer = 0;
-		//}
-		//spawnTimer = 1;
+
 
 		for (std::unique_ptr<PowerUp>& p : powerUps)
 		{
@@ -720,10 +703,12 @@ void PlayingGameState::update(float deltaTime)
 		if (timer > 0.001f)
 		{
 			timer = 0.0f;
-			for (int i = 0; i < this->testNetwork->getSegments().size(); i++)
+			/*for (int i = 0; i < this->testNetwork->getSegments().size(); i++)
 			{
 				this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()) +Vector3(0,0,5.0f)+ Vector3(this->testNetwork->getSegments().at(i).firstPoint.x, this->testNetwork->getSegments().at(i).firstPoint.y, this->testNetwork->getSegments().at(i).firstPoint.z), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
-			}
+			}*/
+			this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+
 		}
 #endif 
 
@@ -733,7 +718,7 @@ void PlayingGameState::update(float deltaTime)
 		paperCollision(deltaTime);
 #endif
 
-		
+
 
 		btVector3 spotlightDir{ 0,
 								 0,
@@ -788,12 +773,12 @@ void PlayingGameState::update(float deltaTime)
 	graphics.render(camera.get(), deltaTime);
 
 	// render UI
-	menues[MENU_PLAYING]->update( deltaTime );
-	if ( currentMenu != MENU_PLAYING )
-		menues[currentMenu]->update( deltaTime );
-	else if ( Input::checkButton(Keys::MENU, States::PRESSED) )
-		setCurrentMenu( PlayingGameState::MENU_PAUSED );
-	
+	menues[MENU_PLAYING]->update(deltaTime);
+	if (currentMenu != MENU_PLAYING)
+		menues[currentMenu]->update(deltaTime);
+	else if (Input::checkButton(Keys::MENU, States::PRESSED))
+		setCurrentMenu(PlayingGameState::MENU_PAUSED);
+
 
 	//Render all objects
 

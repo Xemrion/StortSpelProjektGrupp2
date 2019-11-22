@@ -20,10 +20,14 @@ public:
 	void setHealth(int health);
 	void changeHealth(int amount);
 	bool isDead() const;
+	int getPoints();
+	void setPoints(int amount);
 
 private:
 	int health;
+	int points;
 protected:
+	bool isHit = false;
 	float deltaTime;
 	Vector3 targetPos;
 

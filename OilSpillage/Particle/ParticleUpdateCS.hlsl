@@ -58,7 +58,7 @@ void main( uint3 DTid : SV_DispatchThreadID)
 	{
 		Particle p = CurrentSimulationState.Consume();
 		
-		float depth = -1.5f;
+        float depth = -1.0f;
 		float friction = 0.05f;
 		float3 wind = float3(1.0f, 0.0f, 0.5f);
 		float3 random = hash(float3(43.5, 12.322, 21.5));
@@ -80,10 +80,11 @@ void main( uint3 DTid : SV_DispatchThreadID)
 		else
 		{
 			//On zero or lower apply friction and set velocity.y to 0 for no movement in y 
-			p.velocity.xyz = (p.velocity.xyz + TimeFactors.x * float3(0, -1, 0))/(1 + (friction* TimeFactors.x));
-			p.velocity.y = 0;
-		}
-        p.velocity.xyz = p.velocity.xyz + acceleration;
+			//p.velocity.xyz = (p.velocity.xyz + TimeFactors.x * float3(0, -1, 0))/(1 + (friction* TimeFactors.x));
+            p.velocity.xyz = 1.1f*reflect(p.velocity.xyz, float3(0.0f, 1.0f, 0.0f))+acceleration;
+            //+reflect(p.velocity.xyz + acceleration, float3(0.0f, 1.0f, 0.0f)); 
+        }
+
 		p.position.xyz = p.position.xyz + p.velocity.xyz * TimeFactors.x;
 		p.time.x = p.time.x + TimeFactors.x;
 		if (p.time.x < p.time.y)
