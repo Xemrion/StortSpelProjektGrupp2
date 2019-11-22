@@ -55,12 +55,12 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		deltaZ = groups[i].averagePos.z - targetPos.z;
 		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		//(TileSize * nrOfTiles)^2
-		if (distance > (20 * 5) * (20 * 5))
+		if (distance > (20 * 10) * (20 * 10))
 		{
-			newPos = generateObjectivePos(targetPos, 50, 75);
+			newPos = generateObjectivePos(targetPos, 50, 100);
 			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
-				groups[i].actors[j]->setPosition(Vector3(newPos.x, groups[i].actors[j]->getPosition().y, newPos.z));
+				groups[i].actors[j]->setGameObjectPos(Vector3(newPos.x, groups[i].actors[j]->getPosition().y, newPos.z));
 				physics->teleportRigidbody(Vector3(newPos.x, groups[i].actors[j]->getPosition().y, newPos.z), groups[i].actors[j]->getRigidBody());
 				if (j % 5 == 0)
 				{
@@ -389,15 +389,15 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 	{
 		float normalizedRandom = float(rand()) / RAND_MAX;
 
-		if (normalizedRandom >= 0.95)
-		{
-			static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-				PowerUp(groups[i].actors[j]->getPosition(),
-					PowerUpType::Health)
-			);
-		}
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
+			if (normalizedRandom >= 0.95)
+			{
+				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
+					PowerUp(actors[i]->getPosition(),
+						PowerUpType::Health)
+				);
+			}
 			if (actors[i]->isDead())
 			{
 				destroyActor(i);

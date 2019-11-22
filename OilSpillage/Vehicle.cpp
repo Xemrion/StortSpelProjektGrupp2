@@ -131,6 +131,7 @@ void Vehicle::init(Physics* physics)
 	this->getVehicle()->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	this->getVehicle()->getRigidBody()->setFriction(0);
 	this->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+	this->getVehicle()->getRigidBody()->setLinearVelocity(btVector3(5, 0, 1));
 
 	tempo = physics->addBox(
 		btVector3(vehicle->getPosition().x, vehicle->getPosition().y + 0.65f, vehicle->getPosition().z),

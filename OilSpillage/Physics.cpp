@@ -140,7 +140,7 @@ Physics::~Physics()
 
 }
 
-void Physics::teleportRigidbody(Vector3 newPos,btRigidBody* body)
+void Physics::teleportRigidbody(Vector3 newPos, btRigidBody* body)
 {
 	btTransform transform = body->getCenterOfMassTransform();
 	//Delete
@@ -159,13 +159,13 @@ void Physics::teleportRigidbody(Vector3 newPos,btRigidBody* body)
 
 void Physics::moveBody(btRigidBody* rigidbody, float x, float y, float z)
 {
-	btTransform transform = rigidbody->getCenterOfMassTransform();
-	transform.setOrigin(btVector3(x, y, z));
-	rigidbody->setWorldTransform(transform);
-	rigidbody->getMotionState()->setWorldTransform(transform);
-	rigidbody->setLinearVelocity(btVector3());
-	rigidbody->setAngularVelocity(btVector3());
-	rigidbody->clearForces();
+	//btTransform transform = rigidbody->getCenterOfMassTransform();
+	//transform.setOrigin(btVector3(x, y, z));
+	//rigidbody->setWorldTransform(transform);
+	//rigidbody->getMotionState()->setWorldTransform(transform);
+	//rigidbody->setLinearVelocity(btVector3());
+	//rigidbody->setAngularVelocity(btVector3());
+	//rigidbody->clearForces();
 }
 
 void Physics::update(float deltaTime)
@@ -198,7 +198,7 @@ btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, void
 
 	bodies.push_back(body);
 	body->setUserPointer(obj);
-	
+
 	this->world->addRigidBody(body);
 
 
@@ -222,13 +222,13 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass, void*
 	btMotionState* motion = new btDefaultMotionState(t);
 	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, box, inertia);
 	btRigidBody* body = new btRigidBody(info);
-	//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	bodies.push_back(body);
 	body->setUserPointer(objects);
- 
+
 	this->world->addRigidBody(body);
 
-	
+
 	return body;
 }
 

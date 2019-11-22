@@ -42,6 +42,7 @@ public:
 	void setSunShadow(bool arg);
 	void setSpotShadow(bool arg);
 	void     setPosition(Vector3);
+	void     setGameObjectPos(Vector3);
 	void     move(Vector3 offset);
 	void     addRotation(Vector3);
 	void     setRotation(Vector3);

@@ -232,9 +232,9 @@ void Bullet::enemyMeleeUpdate(float& deltaTime)
 	{
 		if (soundTimer > 0.05f) {
 			int randomSound = rand() % 3 + 1;
-			std::wstring soundEffect = L"data/sound/CarGlass" + std::to_wstring(randomSound) + L".wav";
-			Sound::PlaySoundEffect(soundEffect);
-			Sound::PlaySoundEffect(L"data/sound/MetalImpact1.wav");
+			std::string soundEffect = "./data/sound/CarGlass" + std::to_string(randomSound) + ".wav";
+			Sound::play(soundEffect);
+			Sound::play("./data/sound/MetalImpact1.wav");
 			soundTimer = 0;
 		}
 		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);
