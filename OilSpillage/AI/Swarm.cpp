@@ -22,6 +22,7 @@ Swarm::Swarm(float x, float z, Physics* physics)
 
 	this->aggroRange = 40;
 	createRigidbody(physics);
+	this->setPoints(50);
 }
 
 void Swarm::update(float dt, const Vector3& targetPos)

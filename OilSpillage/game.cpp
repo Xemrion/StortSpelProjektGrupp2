@@ -91,6 +91,12 @@ float Game::getDeltaTime()
 	return instance->deltaTime;
 }
 
+GameInfo& Game::getGameInfo() noexcept
+{
+	return instance->gameInfo;
+	// TODO: insert return statement here
+}
+
 
 
 void Game::createCurrentState()

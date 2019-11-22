@@ -7,6 +7,26 @@
 #include"Vehicle.h"
 //#define RELEASE_DEBUG
 
+struct GameInfo
+{
+	int nrOfClearedStages = 0;
+	int highScore = 0;
+
+
+	int getScore() 
+	{
+		return highScore;
+	};
+	void addToScore(int amount) 
+	{
+		highScore += amount;
+	};
+	int getNrOfClearedStages() 
+	{
+		return nrOfClearedStages;
+	};
+};
+
 class Game
 {
 private:
@@ -25,11 +45,13 @@ public:
 	static Graphics					   &getGraphics() noexcept;
 	static float						lerp(float v0, float v1, float t);
 	static float						getDeltaTime();
+	static GameInfo                    &getGameInfo() noexcept;
 private:
 	void								createCurrentState();
 	void								run();
 	bool								running;
 	Graphics							graphics;
+	GameInfo							gameInfo;
 	std::unique_ptr<GameState>			state;
 	int									currentState;
 	int									oldState;                         
