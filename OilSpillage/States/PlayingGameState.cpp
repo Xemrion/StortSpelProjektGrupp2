@@ -189,6 +189,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 	// Needs to be loaded before the menues
 	minimap = createMinimapTexture(*map);
+	createFogOfWarTexture(*map);
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
@@ -482,6 +483,7 @@ void PlayingGameState::ImGui_ProcGen()
 		player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
 		player->getVehicleBody1()->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
 		minimap = createMinimapTexture(*map);
+		createFogOfWarTexture(*map);
 		aStar->generateTileData(map->getTileMap());
 		// minimap stuff
 		auto tilemap = map->getTileMap();
@@ -785,7 +787,6 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 20; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		graphics.loadModel("Cube");
 		objPtr->mesh = graphics.getMeshPointer("Cube");
 		graphics.loadTexture("brownPaperCardboard");
 		objPtr->setTexture(graphics.getTexturePointer("brownPaperCardboard"));

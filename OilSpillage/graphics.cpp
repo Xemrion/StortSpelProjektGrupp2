@@ -785,7 +785,7 @@ ID3D11Device* Graphics::getDevice()
 
 void Graphics::loadMesh( std::string const &fileName, Vector3 rotation )
 {
-	if ( fileName == "Cube" ) return;
+	if ( fileName == "Cube" or fileName == "Quad" ) return;
 
 	Mesh newMesh;
 

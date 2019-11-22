@@ -373,6 +373,7 @@ void  Map::generateBuildings( )
 			}
 
 			// place single-tile houses:
+/*
 			while ( (computeCurrentDistrictCoverage() < targetDistrictCoverage) and (++currentTries < maxTries) ) {
 				auto maybeLot = findFixedLot( cellId, 1, 1, {true} );
 				if ( maybeLot ) {
@@ -400,6 +401,7 @@ void  Map::generateBuildings( )
 					++currentArea;
 				}
 			}
+*/
 		}
 	}
 
@@ -1129,19 +1131,19 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 			U32  idx        = index(x,y);
 			if ( layout.floors[idx] != 0 ) {
 				// compute mask:
-				if ( (y-1 < layout.length) and (layout.floors[index(x,y-1)]   < floorCount ) )
+				if ( (y-1 < layout.length) and (layout.floors[index(x,y-1)] < floorCount ) )
 					masks[idx] += 1 << 0; // N
 				if ( (y-1 < layout.length) and (x+1 < layout.width) and (layout.floors[index(x+1,y-1)] < floorCount ) )
 					masks[idx] += 1 << 1; // NE
-				if ( (x+1 < layout.width) and (layout.floors[index(x+1,y)]   < floorCount ) )
+				if ( (x+1 < layout.width) and (layout.floors[index(x+1,y)]  < floorCount ) )
 					masks[idx] += 1 << 2; // E
 				if ( (y+1 < layout.length) and (x+1 < layout.width) and (layout.floors[index(x+1,y+1)] < floorCount ) )
 					masks[idx] += 1 << 3; // SE
-				if ( (y+1 < layout.length) and (layout.floors[index(x,y+1)]   < floorCount ) )
+				if ( (y+1 < layout.length) and (layout.floors[index(x,y+1)] < floorCount ) )
 					masks[idx] += 1 << 4; // S
 				if ( (y+1 < layout.length) and (x-1 < layout.width) and (layout.floors[index(x-1,y+1)] < floorCount ) )
 					masks[idx] += 1 << 5; // SW
-				if ( (x-1 < layout.width) and (layout.floors[index(x-1,y)]   < floorCount ) )
+				if ( (x-1 < layout.width) and (layout.floors[index(x-1,y)]  < floorCount ) )
 					masks[idx] += 1 << 6; // W
 				if ( (y-1 < layout.length) and (x-1 < layout.width) and (layout.floors[index(x-1,y-1)] < floorCount ) )
 					masks[idx] += 1 << 7; // NW
@@ -1175,7 +1177,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 		model.setMaterial( graphics.getMaterial(     name.c_str() ) );
 		if ( deg > 1.0f )
 			model.setRotation({ .0f, util::degToRad(deg), .0f });
-		model.setPosition( pos + Vector3{.0f, yOffset, .0f} );
+		model.setPosition( pos + Vector3{.0f, yOffset+(config.tileScaleFactor.y*0.50f*floorHeightFactor), .0f} );
 		model.setColor({ .0f, .0f, .0f, .0f });
 		model.setScale({ config.tileScaleFactor.x*0.50f,
 		                 config.tileScaleFactor.y*0.50f*floorHeightFactor,
@@ -1220,6 +1222,9 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 			}
 		}
 	}
+	for ( auto &part : house.parts )
+		part.addRotation({ 0.5f*3.1415926535f, .0f, .0f  });
+
 	return std::move( house );
 }
 

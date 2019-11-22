@@ -6,7 +6,7 @@
 struct MapConfig {
    I32   seed                           {  69469 };
    I32   distanceMapSearchRadius        {      3 };
-   V2i   dimensions                     { 96, 96 };
+   V2i   dimensions                     { 48, 48 };
    I32   districtCellSide               {     16 };
    Bool  isUsingManhattanDistance       {   true };
    I32   roadStepSize                   {      1 };

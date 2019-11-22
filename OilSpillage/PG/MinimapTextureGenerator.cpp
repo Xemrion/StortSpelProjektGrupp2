@@ -213,9 +213,9 @@ String createFogOfWarTexture( Map const &map )
    auto generateFogColor {
 		[&generateSelection,&rng]() {
 			RGBA color;
-			if      ( generateSelection(rng) <= .05f ) color = 0xFF'222222;
+			if      ( generateSelection(rng) <= .05f ) color = 0xFF'333333;
 			else if ( generateSelection(rng) <= .95f ) color = 0xFF'000000;
-			else                                       color = 0xFF'111111;
+			else                                       color = 0xFF'212121;
 			return color;
    }};
 
