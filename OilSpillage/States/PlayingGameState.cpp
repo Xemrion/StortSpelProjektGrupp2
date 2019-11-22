@@ -218,6 +218,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 	// Needs to be loaded before the menues
 	minimap = createMinimapTexture(*map);
+	generateMapPowerUps();
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
@@ -556,6 +557,9 @@ void PlayingGameState::ImGui_ProcGen()
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
 		player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
+
+		clearPowerUps();
+		generateMapPowerUps();
 	}
 	ImGui::End();
 }
@@ -1151,4 +1155,37 @@ void PlayingGameState::addPowerUp(PowerUp p)
 void PlayingGameState::clearPowerUps()
 {
 	powerUps.clear();
+}
+
+void PlayingGameState::generateMapPowerUps()
+{
+	UINT index = rng() % 10;
+	while (index < map->config.dimensions.x * map->config.dimensions.y)
+	{
+		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
+		Vector3 indexWorldSpace = Vector3(
+			(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+			0.0,
+			-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+		);
+
+		for (int i = 0; i < 100; ++i)
+		{
+			if (Vector3::Distance(position, indexWorldSpace) > 30.0)
+			{
+				position = map->generateRoadPositionInWorldSpace(rng);
+				indexWorldSpace = Vector3(
+					(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+					0.0,
+					-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+				);
+				break;
+			}
+		}
+		PowerUp p(position, (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
+
+		addPowerUp(p);
+
+		index += rng() % 142 + 124;
+	}
 }

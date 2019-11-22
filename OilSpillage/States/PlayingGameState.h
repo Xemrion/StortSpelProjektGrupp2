@@ -51,6 +51,7 @@ public:
 	void		 paperCollision(float deltaTime);
 	Vector3   getRespawnPosition() const noexcept;
 	void addPowerUp(PowerUp p);
+	void generateMapPowerUps();
 	void clearPowerUps();
 
 	std::unique_ptr<Vehicle>& getPlayer();
