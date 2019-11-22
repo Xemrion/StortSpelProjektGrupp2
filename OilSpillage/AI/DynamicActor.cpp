@@ -14,12 +14,13 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 	this->path = nullptr;
 	this->state = State::Idle;
 	this->aggroRange = 80;
-	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(x, position.y, z),0.5f);
+	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(x, position.y, z), 0.5f, this);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);
 	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+
 
 }
 
@@ -42,7 +43,7 @@ void DynamicActor::move()
 	}
 
 	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed;
-	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed * 100);
+	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * (stats.maxSpeed * 100)*0.9);
 	Vector3 targetToSelf = (temp - position);
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)
@@ -174,14 +175,14 @@ void DynamicActor::followPath()
 		{
 			destination = targetPos;
 		}
-		else if (path->size() > 0)
-		{
-			destination = path->at(path->size() - 1);
-			if (position.Distance(path->at(path->size() - 1), position) < 2)
+			else if (path->size() > 0)
 			{
-				path->pop_back();
+				destination = path->at(path->size() - 1);
+				if((path->at(path->size() -1) - position).Length() < 2)
+				{
+					path->pop_back();
+				}
 			}
-		}
 	}
 }
 

@@ -56,6 +56,8 @@ Spitfire::~Spitfire()
 	Game::getGraphics().removeFromDraw(wheel2);
 	Game::getGraphics().removeFromDraw(wheel3);
 	Game::getGraphics().removeFromDraw(wheel4);
+	physics->DeleteRigidBody(vehicleBody1->getRigidBody());
+	physics->deletePointJoint(pointJoint);
 	delete vehicleBody1;
 	delete wheel1;
 	delete wheel2;
@@ -113,6 +115,7 @@ void Spitfire::followPath()
 			destination = path->at(path->size() - 1);
 			if ((destination - this->position).Length() < 15)
 			{
+
 				path->pop_back();
 			}
 		}
@@ -167,7 +170,11 @@ void Spitfire::init(Physics* physics)
 	wheel4->setTexture(vehicleTexture);
 
 
-	btRigidBody* tempo = physics->addBox(btVector3(getPosition().x, getPosition().y, getPosition().z), btVector3(getScale().x, getScale().y, getScale().z), 10.0f);
+	btRigidBody* tempo = physics->addBox(
+		btVector3(getPosition().x, getPosition().y, getPosition().z),
+		btVector3(getScale().x, getScale().y, getScale().z),
+		10.0f,
+		this);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
@@ -183,7 +190,7 @@ void Spitfire::init(Physics* physics)
 	vehicleBody1->getRigidBody()->activate();
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicleBody1->getRigidBody()->setFriction(1);
-	physics->addPointJoint(getRigidBody(), this->vehicleBody1->getRigidBody());
+	pointJoint = physics->addPointJoint(getRigidBody(), this->vehicleBody1->getRigidBody());
 }
 
 void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)
@@ -360,24 +367,24 @@ void Spitfire::setAccelForce(Vector3 accelForce, float deltaTime)
 	//AccelForce
 	if ((max(abs(accelForce.x), abs(accelForce.z)) > 5.0f)) {
 		int randomSound = rand() % 3 + 1;
-		std::wstring soundEffect = L"data/sound/CarImpact" + std::to_wstring(randomSound) + L".wav";
+		std::string soundEffect = "data/sound/CarImpact" + std::to_string(randomSound) + ".wav";
 		int randomSound2 = rand() % 3 + 1;
-		std::wstring soundEffect2 = L"data/sound/MetalImpactPitched" + std::to_wstring(randomSound) + L".wav";
+		std::string soundEffect2 = "data/sound/MetalImpactPitched" + std::to_string(randomSound) + ".wav";
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
 			Game::getGraphics().addParticle2(getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-20.0f);
-			Sound::PlaySoundEffect(L"data/sound/CarCrash.wav");
-			Sound::PlaySoundEffect(soundEffect2);
+			Sound::play("data/sound/CarCrash.wav");
+			Sound::play(soundEffect2);
 		}
 		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
 			Game::getGraphics().addParticle2(getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-10.0f);
-			Sound::PlaySoundEffect(soundEffect);
-			Sound::PlaySoundEffect(soundEffect2);
+			Sound::play(soundEffect);
+			Sound::play(soundEffect2);
 		}
 		else {
-			Sound::PlaySoundEffect(L"data/sound/CarImpactSoft.wav");
-			Sound::PlaySoundEffect(soundEffect2);
+			Sound::play("data/sound/CarImpactSoft.wav");
+			Sound::play(soundEffect2);
 		}
 	}
 	/*else {

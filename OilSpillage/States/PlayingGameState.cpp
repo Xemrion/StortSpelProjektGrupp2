@@ -1,9 +1,9 @@
 #include "PlayingGameState.h"
 #include "../Sound.h"
 #include "../Input.h"
-#include "../UI/UIPlaying.h"
-#include "../UI/UIPaused.h"
-#include "../UI/UIOptions.h"
+#include "../UI/Playing/UIPlaying.h"
+#include "../UI/Playing/UIPaused.h"
+#include "../UI/Menu/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
 #include <future>
@@ -13,22 +13,16 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar, physics.get());
 	aStar->generateTileData(map->getTileMap());
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 30; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-		//actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j,physics.get());
-			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
+			//	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
+				//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
+			//	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
+			//actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
 		}
 	}
-			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x, map->getStartPositionInWorldSpace().z);
-	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x+5, map->getStartPositionInWorldSpace().z+5);
-
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
@@ -76,13 +70,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadTexture("Tiles/asphalt_nor");
 	graphics.loadTexture("Tiles/grass");
 	graphics.loadTexture("Tiles/grass_nor");
-// graphics.loadTexture("Tiles/grass_spec");
+	// graphics.loadTexture("Tiles/grass_spec");
 	graphics.loadTexture("Tiles/snow");
 	graphics.loadTexture("Tiles/snow_nor");
-// graphics.loadTexture("Tiles/snow_spec");
+	// graphics.loadTexture("Tiles/snow_spec");
 	graphics.loadTexture("Tiles/desert");
 	graphics.loadTexture("Tiles/desert_nor");
-// graphics.loadTexture("Tiles/desert_spec");
+	// graphics.loadTexture("Tiles/desert_spec");
 	graphics.loadTexture("Tiles/road_trans_2file2metro");
 	graphics.loadTexture("Tiles/road_trans_2file2metro_nor");
 	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne");
@@ -141,7 +135,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 
 	player = std::make_unique<Vehicle>();
-
+	player->makePlayer();
 	//if constexpr ( isDebugging ) {
 		// light tests
 	lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
@@ -181,6 +175,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.setLightList(lightList.get());
 	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.4f);
 	this->player->setSpotLight(lightList->addLight(tempLight));
+
+	LaserLight tempLaserLight(Vector3(0.0, 0.0, 0.0), Vector3(0.9, 0.1, 0.9), 10.0, Vector3(1.0, 0.0, 0.0), 10.0);
+	this->player->setLaserLight(lightList->addLight(tempLaserLight));
+
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
 
@@ -206,6 +204,10 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	initAI();
 
+
+
+	Game::getGraphics().setUISun(Vector3(1.0f, -1.0f, 0.1f), Vector4(0.84, 0.83, 0, 1));
+
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
@@ -227,8 +229,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	graphics.setVectorField(4.5f, 3.0f);
 
-	powerUps.push_back(PowerUp(Vector3(100, 0.0, -100), PowerUpType::Speed));
-	graphics.addToDraw(&*powerUps.begin());
+	addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 30.0));
 
 	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
@@ -243,7 +244,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
-
+	
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
 	graphics.loadModel("Vehicles/Player");
@@ -261,14 +262,14 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	count = 0;
 	prevAccelForce = Vector3(0, 0, 0);
 	accelForce = Vector3(0, 0, 0);
-	soundAggro = 0;
 }
 
 PlayingGameState::~PlayingGameState()
 {
 	delete aStar;
 	delete actorManager;
-	delete testObjective;
+
+
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
 	delete this->objTestPickUp3;
@@ -307,6 +308,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text(("R Dir: " + std::to_string(rDir.x) + " " + std::to_string(rDir.y)).c_str());
 	ImGui::Text(("R Str: " + std::to_string(rStr)).c_str());
 	ImGui::Text(("Accelerator: " + std::to_string(player->getAcceleratorX())).c_str());
+	ImGui::Text(("nr of enemies: " + std::to_string(nrOfEnemies)).c_str());
 	ImGui::End();
 }
 
@@ -472,13 +474,13 @@ void PlayingGameState::ImGui_ProcGen()
 	ImGui::NewLine();
 	if (ImGui::Button("Re-generate")) {
 		// (TODO: refactor) hacky, but:
-		player->getVehicle()->getRigidBody()->setLinearFactor( btVector3(.0,.0f,.0f) );
+		player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
 
 		map = nullptr; // clear, then regenerate:
-		map = std::make_unique<Map>( graphics, config, physics.get() );
+		map = std::make_unique<Map>(graphics, config, physics.get());
 
-		player->getVehicle()->setPosition( map->getStartPositionInWorldSpace() );
-		player->getVehicleBody1()->setPosition( map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f) );
+		player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
+		player->getVehicleBody1()->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
 		minimap = createMinimapTexture(*map);
 		aStar->generateTileData(map->getTileMap());
 		// minimap stuff
@@ -488,7 +490,7 @@ void PlayingGameState::ImGui_ProcGen()
 
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
-		player->getVehicle()->getRigidBody()->setLinearFactor( btVector3(1.0f, .0f, 1.0f) );
+		player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
 	}
 	ImGui::End();
 }
@@ -523,6 +525,18 @@ Vector3 PlayingGameState::getRespawnPosition() const noexcept
 	else return map->getStartPositionInWorldSpace() + Vector3(0, -1.2f, 0);
 }
 
+std::unique_ptr<Vehicle>& PlayingGameState::getPlayer()
+{
+	return this->player;
+}
+
+void PlayingGameState::setPlayer(Vehicle* theVehicle)
+{
+	SpotLight* temp = this->player->getSpotLight();
+	this->player.reset(theVehicle);// = std::make_unique<Vehicle>(theVehicle);
+	this->player->setSpotLight(temp);
+}
+
 void PlayingGameState::update(float deltaTime)
 {
 	/*-------------------------UPDATING-------------------------*/
@@ -531,7 +545,7 @@ void PlayingGameState::update(float deltaTime)
 		if (Input::isKeyDown_DEBUG(Keyboard::E)) {
 			deltaTime /= 4;
 		}
-		if (Input::checkButton(Keys::CANCEL, States::PRESSED)) {
+		if (Input::isKeyDown_DEBUG(Keyboard::Q)) {
 			if (player->getDrivingMode() == 0) {
 				player->setDrivingMode(1);
 			}
@@ -541,7 +555,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
-		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
+		if (Input::isKeyDown_DEBUG(Keyboard::LeftAlt))
 		{
 			pausedTime = !pausedTime;
 		}
@@ -565,22 +579,33 @@ void PlayingGameState::update(float deltaTime)
 		}
 #endif // !_DEBUG
 
-		//Bullet
-		//player->getVehicle()->getRigidBody()->(btVector3(Input::GetDirectionL(0).x * deltaTime * 1000, 0, Input::GetDirectionL(0).y * deltaTime * 1000), btVector3(0, 0, 0));
-
-		//player->getVehicle()->setPosition(Vector3(player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getX(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getY(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getZ()));
-		//player->getVehicle()->updateRigidBody();
-
 		auto playerVehicle{ player->getVehicle() };
+		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
+		player->updatePlayer(deltaTime);
+		physics->update(deltaTime);
+
+		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
+		btVector3 positionCam{ playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
+		camera->setPosition(Vector3(positionCam.getX(),
+			positionCam.getY() / 3,
+			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z));
+		camera->update(deltaTime);
+
+		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
+		Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
+		
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
-		
-	/*	if(spawnTimer % 200 == 0)
+
+		if (spawnTimer % 200 == 0)
 		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f));
+			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
+			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
+			nrOfEnemies += 12;
+			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
 			spawnTimer = 0;
 		}
-		spawnTimer++;*/
+		spawnTimer++;
 		//spawn Boss
 		//if (spawnTimer % 10 == 0)
 		//{
@@ -591,41 +616,31 @@ void PlayingGameState::update(float deltaTime)
 		//}
 		//spawnTimer = 1;
 
-		powerUps.erase(
-			std::remove_if(
-				powerUps.begin(),
-				powerUps.end(),
-				[&](PowerUp& p) {
-			p.update(time);
-			if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
+		for (std::unique_ptr<PowerUp>& p : powerUps)
+		{
+			p->update(deltaTime);
+			if (p->isActive())
 			{
-				player->powerUp(p.getPowerUpType());
-				return true;
-			}
-			else
-			{
-				return false;
+				if (p->getAABB().intersectXZ(player->getVehicle()->getAABB()))
+				{
+					player->addPowerUp(p->getPowerUpType());
+					p->deactivate();
+				}
 			}
 		}
-			),
-			powerUps.end()
-			);
 
 		if (time == 0)
 		{
 			deltaTime /= 4;
 			this->player->setHealth(0);
 		}
-		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
-		player->updatePlayer(deltaTime);
-
-		physics->update(deltaTime);
 
 		actorManager->update(deltaTime, playerVehicle->getPosition());
 		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation();
+		//actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		Bullet::updateSoundTimer(deltaTime);
@@ -636,12 +651,8 @@ void PlayingGameState::update(float deltaTime)
 		updateObjects();
 		paperCollision(deltaTime);
 #endif
-		btVector3 positionCam{ playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
-		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
-		camera->setPosition(Vector3(positionCam.getX(),
-			positionCam.getY() / 3,
-			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z));
+		
 
 		btVector3 spotlightDir{ 0,
 								 0,
@@ -660,13 +671,22 @@ void PlayingGameState::update(float deltaTime)
 
 		playerLight->setPos(spotlightPos);
 
-		if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
+		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f || this->time <= 20.0f)
+		{
+			Sound::fadeSoundtrack(true, 1.0f);
+		}
+		else
+		{
+			Sound::fadeSoundtrack(false, 3.0f);
+		}
+
+		/*if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
 			soundAggro += 0.2f * deltaTime;
 		}
 		else if (soundAggro > 0.0f) {
 			soundAggro -= 0.1f * deltaTime;
 		}
-		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);
+		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);*/
 
 		/*timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
@@ -681,32 +701,35 @@ void PlayingGameState::update(float deltaTime)
 
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
-	graphics.setSpotLighShadow(playerLight);
+
+	graphics.clearScreen(Vector4(0, 0, 0, 1));
+	graphics.setSpotLightShadow(playerLight);
 	graphics.render(camera.get(), deltaTime);
 
 	// render UI
-	menues[MENU_PLAYING]->update(deltaTime);
-	if (currentMenu != MENU_PLAYING)
-		menues[currentMenu]->update(deltaTime);
-	else if (Input::checkButton(Keys::MENU, States::PRESSED))
-		setCurrentMenu(PlayingGameState::MENU_PAUSED);
+	menues[MENU_PLAYING]->update( deltaTime );
+	if ( currentMenu != MENU_PLAYING )
+		menues[currentMenu]->update( deltaTime );
+	else if ( Input::checkButton(Keys::MENU, States::PRESSED) )
+		setCurrentMenu( PlayingGameState::MENU_PAUSED );
+	
 
 	//Render all objects
 
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 //#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	   ImGui_ImplDX11_NewFrame();
-	   ImGui_ImplWin32_NewFrame();
-	   ImGui::NewFrame();
-	   //ImGui_Driving();
-	   ImGui_ProcGen();
-	   ImGui_AI();
-	   //ImGui_Particles();
-	   ImGui_Camera();
-	   ImGui::Render();
-	   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-//#endif // !_DEBUG
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	ImGui_Driving();
+	//ImGui_ProcGen();
+	//ImGui_AI();
+	//ImGui_Particles();
+	ImGui_Camera();
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	//#endif // !_DEBUG
 
 	graphics.presentScene();
 }
@@ -971,14 +994,34 @@ Vector3 PlayingGameState::generateObjectivePos(Vector3 origin, float minDistance
 
 }
 
-PointLight* PlayingGameState::addPointLight(PointLight& light)
+PointLight* PlayingGameState::addLight(PointLight& light)
 {
 	return this->lightList->addLight(light);
 }
 
-void PlayingGameState::removeLight(PointLight* theLight)
+void PlayingGameState::removeLight(PointLight* light)
 {
-	this->lightList->removeLight(theLight);
+	this->lightList->removeLight(light);
+}
+
+SpotLight* PlayingGameState::addLight(SpotLight& light)
+{
+	return this->lightList->addLight(light);
+}
+
+void PlayingGameState::removeLight(SpotLight* light)
+{
+	this->lightList->removeLight(light);
+}
+
+LaserLight* PlayingGameState::addLight(LaserLight& light)
+{
+	return this->lightList->addLight(light);
+}
+
+void PlayingGameState::removeLight(LaserLight* light)
+{
+	this->lightList->removeLight(light);
 }
 
 ObjectiveHandler& PlayingGameState::getObjHandler()
@@ -1020,4 +1063,15 @@ void PlayingGameState::paperCollision(float deltaTime)
 			obj->updateObject(deltaTime);
 		}
 	}
+}
+
+void PlayingGameState::addPowerUp(PowerUp p)
+{
+	powerUps.push_back(std::make_unique<PowerUp>(p));
+	powerUps[powerUps.size() - 1]->activate();
+}
+
+void PlayingGameState::clearPowerUps()
+{
+	powerUps.clear();
 }

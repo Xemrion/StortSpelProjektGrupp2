@@ -231,11 +231,6 @@ Frustum DynamicCamera::getFrustum()
 	Vector3 nearCenter = position + viewDir * nearDist;
 	Vector3 farCenter = position + viewDir * farDist;
 
-	Vector3 nearTopLeft = nearCenter + Vector3(viewUp) * nearHeight - Vector3(viewRight) * nearWidth;
-	Vector3 nearTopRight = nearCenter + Vector3(viewUp) * nearHeight + Vector3(viewRight) * nearWidth;
-	Vector3 nearBottomLeft = nearCenter - Vector3(viewUp) * nearHeight - Vector3(viewRight) * nearWidth;
-	Vector3 nearBottomRight = nearCenter - Vector3(viewUp) * nearHeight + Vector3(viewRight) * nearWidth;
-
 	Vector3 farTopLeft = farCenter + Vector3(viewUp) * farHeight - Vector3(viewRight) * farWidth;
 	Vector3 farTopRight = farCenter + Vector3(viewUp) * farHeight + Vector3(viewRight) * farWidth;
 	Vector3 farBottomLeft = farCenter - Vector3(viewUp) * farHeight - Vector3(viewRight) * farWidth;

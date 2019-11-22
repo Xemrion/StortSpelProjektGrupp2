@@ -7,7 +7,7 @@
 #include "RoadGenerator.hpp"
 #include "Voronoi.hpp"
 #include "District.hpp"
-#include "../UI/UIPlaying.h"
+#include "../UI/Playing/UIPlaying.h"
 #include "Biome.hpp"
 
 struct HouseTileset {

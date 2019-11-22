@@ -6,7 +6,7 @@ Swarm::Swarm()
 
 }
 
-Swarm::Swarm(float x, float z, int weaponType, Physics* physics)
+Swarm::Swarm(float x, float z, Physics* physics)
 	: DynamicActor(x,z,physics),Melee()
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
