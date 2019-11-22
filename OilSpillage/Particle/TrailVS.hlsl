@@ -23,7 +23,7 @@ struct VS_OUT
 VS_OUT main(in VS_INPUT input)
 {
 	VS_OUT output = (VS_OUT)0;
-	
+
 	output.pos.xyz = SimulationState[input.vertexId].position.xyz;
 	output.pos.w = SimulationState[input.vertexId].direction.w;
 	output.ind = input.vertexId;

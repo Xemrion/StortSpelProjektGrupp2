@@ -17,6 +17,7 @@ private:
 	float reverseTimer2;
 	float soundTimer;
 
+	float trailTimer;
 
 	float velocitySpeed;
 	class Physics* physics;

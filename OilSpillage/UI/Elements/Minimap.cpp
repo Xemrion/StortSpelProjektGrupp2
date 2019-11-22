@@ -6,29 +6,59 @@
 
 Vector2 Minimap::size = Vector2(96 * 2, 96 * 2);
 
-Minimap::Minimap(float zoom, float fogClearRadius, Vector2 position)
-	: Element(position, 0.0f), fogClearRadius(max(fogClearRadius, 10.0f)), zoom(std::clamp(zoom, 0.0f, 1.0f)),
-							   textureMap(nullptr), textureFog(nullptr), resourceFog(nullptr), compassRot(0.0f)
+Minimap::Minimap(Vector2 position)
+	: Element(position, 0.0f), fogClearRadius(25.0f), zoom(0.25f), textureMap(nullptr), textureFog(nullptr), textureFogTemp(nullptr), resourceFog(nullptr), pixels(nullptr), compassRot(0.0f)
 {
 	Game::getGraphics().loadTexture("UI/mapOutline");
 	Game::getGraphics().loadTexture("UI/mapPlayerMarker");
 	Game::getGraphics().loadTexture("UI/mapObjective");
 	Game::getGraphics().loadTexture("UI/mapEnemy");
 	Game::getGraphics().loadTexture("UI/mapCompass");
-	Game::getGraphics().loadTexture("UI/mapFog", false, true);
 
 	this->textureOutline = Game::getGraphics().getTexturePointer("UI/mapOutline");
 	this->texturePlayerMarker = Game::getGraphics().getTexturePointer("UI/mapPlayerMarker");
 	this->textureObjectiveMarker = Game::getGraphics().getTexturePointer("UI/mapObjective");
 	this->textureEnemyMarker = Game::getGraphics().getTexturePointer("UI/mapEnemy");
 	this->textureCompass = Game::getGraphics().getTexturePointer("UI/mapCompass");
-	this->textureFogTemp = Game::getGraphics().getTexturePointer("UI/mapFog");
 
 	assert(textureOutline && "Texture failed to load!");
 	assert(texturePlayerMarker && "Texture failed to load!");
-	assert(textureFogTemp && "Texture failed to load!");
+	assert(textureObjectiveMarker && "Texture failed to load!");
 	assert(textureEnemyMarker && "Texture failed to load!");
 	assert(textureCompass && "Texture failed to load!");
+}
+
+Minimap::~Minimap()
+{
+	delete this->pixels;
+	this->textureFog->Release();
+	this->resourceFog->Release();
+}
+
+void Minimap::init()
+{
+	if (!Game::getGraphics().getTexturePointer("map/fog"))
+	{
+		Game::getGraphics().loadTexture("map/fog", false, true);
+	}
+	else
+	{
+		Game::getGraphics().reloadTexture("map/fog");
+	}
+
+	if (!Game::getGraphics().getTexturePointer("map/map"))
+	{
+		Game::getGraphics().loadTexture("map/map");
+	}
+	else
+	{
+		Game::getGraphics().reloadTexture("map/map");
+	}
+
+	this->textureMap = Game::getGraphics().getTexturePointer("map/map");
+	this->textureFogTemp = Game::getGraphics().getTexturePointer("map/fog");
+	assert(textureMap && "Texture failed to load!");
+	assert(textureFogTemp && "Texture failed to load!");
 
 	ID3D11Device* device = Game::getGraphics().getDevice();
 	ID3D11DeviceContext* deviceContext = Game::getGraphics().getDeviceContext();
@@ -42,9 +72,9 @@ Minimap::Minimap(float zoom, float fogClearRadius, Vector2 position)
 	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.SampleDesc.Quality = 0;
-	textureDesc.Usage = D3D11_USAGE_DYNAMIC;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = 0;
 
 	// Create an empty texture.
@@ -53,7 +83,16 @@ Minimap::Minimap(float zoom, float fogClearRadius, Vector2 position)
 	{
 		assert(this->textureFog && "Texture failed to create!");
 	}
-	
+
+	//Copy the texture so we can change the alpha later
+	this->pixels = new unsigned char[this->textureFogTemp->getDataSize()];
+	CopyMemory(this->pixels, this->textureFogTemp->getData(), this->textureFogTemp->getDataSize());
+
+	// Set the row pitch of the targa image data.
+	unsigned int rowPitch = (this->textureFogTemp->getWidth() * 4) * sizeof(unsigned char);
+	// Copy the targa image data into the texture.
+	deviceContext->UpdateSubresource(this->textureFog, 0, NULL, this->pixels, rowPitch, 0);
+
 	// Setup the shader resource view description.
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = textureDesc.Format;
@@ -67,27 +106,11 @@ Minimap::Minimap(float zoom, float fogClearRadius, Vector2 position)
 		assert(this->textureFog && "Texture failed to create!");
 	}
 
-	//Copy the texture so we can change the alpha later
-	this->pixels = new unsigned char[this->textureFogTemp->getDataSize()];
-	CopyMemory(this->pixels, this->textureFogTemp->getData(), this->textureFogTemp->getDataSize());
-}
+	unsigned short minDimension = min(this->textureMap->getWidth(), this->textureMap->getHeight());
+	this->zoom = min(72.0f / minDimension, 1.0f);
+	this->fogClearRadius = min(25.0f * (minDimension / 72.0f), 25.0f);
 
-Minimap::~Minimap()
-{
-	delete this->pixels;
-	this->textureFog->Release();
-	this->resourceFog->Release();
-}
-
-void Minimap::init()
-{
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
-	std::string minimap = state->getMinimap();
-
-	Game::getGraphics().loadTexture(minimap);
-	this->textureMap = Game::getGraphics().getTexturePointer(minimap.c_str());
-	assert(textureMap && "Texture failed to load!");
-
 	Vector3 mapSize((state->getBottomRight() - state->getTopLeft() + Vector3(0, 1, 0)) * Vector3(1, 1, -1));
 	Vector3 mapScale(Vector3(this->textureMap->getWidth(), 1, this->textureMap->getHeight()) / mapSize);
 
@@ -149,7 +172,7 @@ void Minimap::draw(bool selected)
 	for (int i = 0; i < static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->getGroups().size(); i++)
 	{
 		targetPos = static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->getGroups()[i].getAveragePos();
-		if ((targetPos - playerPos).Length() < 150.0f)
+		if ((targetPos - playerPos).Length() < 75.0f)
 		{
 			targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
 			targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
@@ -174,7 +197,7 @@ void Minimap::draw(bool selected)
 				if (state->getObjHandler().getObjective(0)->getTarget(i) != nullptr)
 				{
 					targetPos = state->getObjHandler().getObjective(0)->getTarget(i)->getPosition();
-					if ((targetPos - playerPos).Length() < 300.0f)
+					if ((targetPos - playerPos).Length() < 150.0f)
 					{
 						targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
 						targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
@@ -229,15 +252,15 @@ void Minimap::update(float deltaTime)
 			{
 				shade = 150;
 			}
-			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius - 5.0f)
+			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.8f)
 			{
 				shade = 100;
 			}
-			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius - 10.0f)
+			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.6f)
 			{
 				shade = 50;
 			}
-			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius-15.0f)
+			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.4f)
 			{
 				shade = 0;
 			}
@@ -248,16 +271,8 @@ void Minimap::update(float deltaTime)
 	}
 
 	ID3D11DeviceContext* deviceContext = Game::getGraphics().getDeviceContext();
-	D3D11_MAPPED_SUBRESOURCE mappedResource = {};
-
-	HRESULT hResult = deviceContext->Map(this->textureFog, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(hResult))
-	{
-		assert("Failed to map texture!");
-	}
-
-	CopyMemory(mappedResource.pData, this->pixels, this->textureFogTemp->getDataSize());
-	deviceContext->Unmap(this->textureFog, 0);
+	unsigned int rowPitch = (this->textureFogTemp->getWidth() * 4) * sizeof(unsigned char);
+	deviceContext->UpdateSubresource(this->textureFog, 0, NULL, this->pixels, rowPitch, 0);
 
 	Vector3 closestPos = state->getObjHandler().getObjective(0)->getClosestToPlayer();
 	this->compassRot = XMVector3AngleBetweenVectors(closestPos - playerPos, Vector3::UnitX).m128_f32[0] + XM_PIDIV2;
