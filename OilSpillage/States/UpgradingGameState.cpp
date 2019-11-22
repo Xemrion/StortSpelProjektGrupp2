@@ -68,7 +68,7 @@ void UpgradingGameState::update(float deltaTime)
 		this->theVehicle->getVehicle()->getRigidBody()->setAngularVelocity(btVector3(0, deltaTime * 150, 0));
 	}
 	
-	this->theVehicle->setWheelRotation();
+	this->theVehicle->setWheelRotation(deltaTime);
 	this->physics->update(deltaTime);
 
 	this->graphics.clearScreen(Vector4(Colors::Red));
