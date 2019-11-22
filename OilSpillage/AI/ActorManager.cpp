@@ -392,7 +392,7 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
 			float normalizedRandom = float(rand()) / RAND_MAX;
-			if (normalizedRandom >= 0.95)
+			if (normalizedRandom >= 0.995)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
 					PowerUp(actors[i]->getPosition(),

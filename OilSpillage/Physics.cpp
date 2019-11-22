@@ -293,26 +293,26 @@ bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* 
 	Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
 	Actor* enemyPtr = static_cast<Actor*>(obj2->getCollisionObject()->getUserPointer());
 
-	//if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
-	//{
-	//	playerPtr = static_cast<Vehicle*>(obj2->getCollisionObject()->getUserPointer());
-	//	enemyPtr = static_cast<Actor*>(obj1->getCollisionObject()->getUserPointer());
+	if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
+	{
+		playerPtr = static_cast<Vehicle*>(obj2->getCollisionObject()->getUserPointer());
+		enemyPtr = static_cast<Actor*>(obj1->getCollisionObject()->getUserPointer());
 
-	//	if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
-	//	{
-	//		return false;
-	//	}
-	//}
+		if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
+		{
+			return false;
+		}
+	}
 
-	//if (enemyPtr != nullptr)
-	//{
-	//	if (playerPtr->getPowerUpTimer(PowerUpType::Star) > 0.0)
-	//	{
-	//		enemyPtr->setHealth(0);
-	//	}
+	if (enemyPtr != nullptr)
+	{
+		if (playerPtr->getPowerUpTimer(PowerUpType::Star) > 0.0)
+		{
+			enemyPtr->changeHealth(-200);
+		}
 
-	//	return true;
-	//}
+		return true;
+	}
 	return false;
 }
 
