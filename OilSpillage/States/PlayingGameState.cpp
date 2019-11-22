@@ -603,6 +603,7 @@ void PlayingGameState::update(float deltaTime)
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 
+#if !defined(_DEBUG)
 		if (spawnTimer % 200 == 0)
 		{
 			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
@@ -612,6 +613,7 @@ void PlayingGameState::update(float deltaTime)
 			spawnTimer = 0;
 		}
 		spawnTimer++;
+#endif
 		//spawn Boss
 		//if (spawnTimer % 10 == 0)
 		//{
