@@ -416,8 +416,9 @@ bool Graphics::init(Window* window)
 	};
 	this->particleTrail->changeColornSize(colors, 1, 0.1f, 0.1f);
 	this->particleSystem->changeColornSize(colorFire, 4, 0.05f, 0.1f);
-	//this->particleHandler->getParticleSystem("electro")->changeColornSize(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
-	
+	//this->particleHandler->getParticleSystem("electro")->setParticleShaders(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("electro")->setGeometryShader("ParticleGS.cso");
+	this->particleHandler->getParticleSystem("electro")->setPixelShader("ParticlePS.cso");
 
 
 	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());

@@ -22,6 +22,7 @@ private:
 	Texture* textureObjectiveMarker;
 	Texture* textureEnemyMarker;
 	Texture* textureCompass;
+	Texture* textureArrow;
 	float compassRot;
 
 public:

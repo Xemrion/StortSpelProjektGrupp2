@@ -109,7 +109,7 @@ private:
 	const char* items;
 	float timer = 0.0f;
 	int                             addNrOfParticles  {     2 };
-	int                             lifeTime          {     1 };
+	float                             lifeTime          {     1 };
 	float                           timerForParticle  {   .0f };
 	float                           vectorFieldPower  {  4.0f };
 	float                           vectorFieldSize   {  2.2f };
@@ -124,7 +124,10 @@ private:
 	                                                    Vector4( 0.99f,  0.13f, .0f, 1.0f ),
 	                                                    Vector4( 0.0f,  0.0f, .0f, 1.0f ),
 	                                                    Vector4( 0.0f,  0.0f, .0f, 1.0f )  };
-  
+	int electricNew = 0.0f;
+	float timerElectric = 0.0f;
+	float timerEMP = 0.0f;
+	void createElectric(int randNr, float deltaTime);
     void initAI();
 	void ImGui_ProcGen();
 	void ImGui_Driving();

@@ -16,6 +16,7 @@ Minimap::Minimap(float zoom, float fogClearRadius, Vector2 position)
 	Game::getGraphics().loadTexture("UI/mapEnemy");
 	Game::getGraphics().loadTexture("UI/mapCompass");
 	Game::getGraphics().loadTexture("UI/mapFog", false, true);
+	Game::getGraphics().loadTexture("UI/arrowObjective");
 
 	this->textureOutline = Game::getGraphics().getTexturePointer("UI/mapOutline");
 	this->texturePlayerMarker = Game::getGraphics().getTexturePointer("UI/mapPlayerMarker");
@@ -23,6 +24,7 @@ Minimap::Minimap(float zoom, float fogClearRadius, Vector2 position)
 	this->textureEnemyMarker = Game::getGraphics().getTexturePointer("UI/mapEnemy");
 	this->textureCompass = Game::getGraphics().getTexturePointer("UI/mapCompass");
 	this->textureFogTemp = Game::getGraphics().getTexturePointer("UI/mapFog");
+	this->textureArrow = Game::getGraphics().getTexturePointer("UI/arrowObjective");
 
 	assert(textureOutline && "Texture failed to load!");
 	assert(texturePlayerMarker && "Texture failed to load!");
@@ -192,10 +194,13 @@ void Minimap::draw(bool selected)
 			}
 		}
 	}
-	
+	RECT arrow;
+	Vector3 arrowPos = playerPos - state->getObjHandler().getObjective(0)->getClosestToPlayer();
+	arrowPos.Normalize();
 	sb->Draw(this->textureOutline->getShaderResView(), this->position - Vector2(5, 5));
 	sb->Draw(this->resourceFog, mapRect, &zoomedRect);
 	sb->Draw(this->texturePlayerMarker->getShaderResView(), markerRect, nullptr, Colors::White, playerRot, this->texturePlayerMarker->getCenter());
+	sb->Draw(this->textureArrow->getShaderResView(), Vector2(1080/2+arrowPos.x, 720/2+ arrowPos.z), NULL, Colors::White, compassRot, textureArrow->getCenter(), Vector2(0.1f));
 
 	if (state->getObjHandler().getObjective(0) != nullptr && state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree)
 	{

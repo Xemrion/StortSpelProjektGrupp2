@@ -58,11 +58,11 @@ void main( uint3 DTid : SV_DispatchThreadID)
 	{
 		Particle p = CurrentSimulationState.Consume();
 		
-        float depth = -1.0f;
+        float depth = -1.4f;
 		float friction = 0.05f;
 		float3 wind = float3(1.0f, 0.0f, 0.5f);
 		float3 random = hash(float3(43.5, 12.322, 21.5));
-		float windPower = 1.0f;
+		float windPower = 0.0f;
 		wind = wind * windPower + random * 0.0f;
 		float3 acceleration = 1.0f*G * m1 * float3(0, -1, 0) * TimeFactors.x;
 		acceleration += (wind / m1) * TimeFactors.x;
