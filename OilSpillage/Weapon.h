@@ -30,10 +30,9 @@ struct Weapon
 	DirectX::SimpleMath::Vector3 bulletScale = DirectX::SimpleMath::Vector3(1.0);
 	float spreadRadians = 0.0;
 	float maxSpread = 1.0;
-	float spreadIncreasePerSecond = 1.0;
+	float spreadIncreasePerSecond = 1.0; // Spread increase per shot in percentage of max spread
 	float currentSpreadIncrease = 0.0;
-	//float recoilDissipationTime = 1.0; // time (in seconds) for recoil to go from 100% to 0%
-	float spreadDecreasePerSecond = 1.0;
+	float spreadDecreasePerSecond = 1.0; // Spread increase per shot in percentage of max spread
 	float remainingCooldown = 0.0;
 	WeaponType type = WeaponType::Default;
 	bool melee = false;
@@ -50,7 +49,7 @@ struct Weapon
 			soundTimer += 100.0f;
 		}
 		timeSinceLastShot += deltaTime;
-		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * maxSpread * 2.0, 0.0);
+		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * spreadDecreasePerSecond * maxSpread, 0.0);
 		remainingCooldown = max(remainingCooldown - deltaTime, 0.0);
 	};
 
@@ -148,6 +147,15 @@ public:
 				weapon.flameBool = false;
 			}
 		}
+		else if (weapon.type == WeaponType::Laser && weapon.flameBool == true)
+		{
+			int randomSound = rand() % 4 + 1;
+			std::string soundEffect = "./data/sound/Lazer" + std::to_string(randomSound) + ".mp3";
+			Sound::stopLooping(weapon.soundHandle);
+			weapon.soundHandle = Sound::playLooping(soundEffect);
+			Sound::play("./data/sound/LazerImpact.mp3");
+			weapon.flameBool = false;
+		}
 	};
 
 	static void weaponEndSound(Weapon& weapon)
@@ -157,6 +165,12 @@ public:
 			return;
 		}
 		else if (weapon.type == WeaponType::Flamethrower)
+		{
+			weapon.flameBool = true;
+			Sound::stopLooping(weapon.soundHandle);
+			weapon.soundHandle = 0;
+		}
+		else if (weapon.type == WeaponType::Laser) 
 		{
 			weapon.flameBool = true;
 			Sound::stopLooping(weapon.soundHandle);

@@ -22,9 +22,9 @@
 #include <array>
 #include"Shadows/ShadowMapping.h"
 #include"Particle/ParticleSystem.h"
+#include"Particle/ParticleHandler.h"
 #include "Structs.h"
 #include "Fog.h"
-
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
 
@@ -45,10 +45,14 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;
 	D3D11_VIEWPORT vp;
 
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> renderTarget;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> depthCopyRTV;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthBufferCopy;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> depthSRV;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterState;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterStateShadow;
 
@@ -81,10 +85,12 @@ class Graphics {
 	};
 	LightBufferContents* lightBufferContents = nullptr;
 	std::unique_ptr<QuadTree> quadTree;
-	
-	ParticleSystem particleSystem;
-	ParticleSystem particleSystem2;
 
+	ParticleHandler* particleHandler;
+	ParticleSystem* particleSystem;
+	ParticleSystem* particleSystem2;
+	ParticleSystem* particleTrail;
+	ParticleSystem* testParticle;
 	std::unique_ptr<Fog> fog;
 	float time = 0.0;
 	ShaderClass shaderDefault;
@@ -100,9 +106,6 @@ class Graphics {
 	Sun uiSun;
 	Vector3 uiSunDir = Vector3(0.0, 1.0, 0.0);
 	std::vector<std::pair<GameObject*,Matrix*>> uiObjects;
-
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> uiDSV;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> uiDSB;
 
 	void cullLights(Matrix view);
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
@@ -156,6 +159,17 @@ public:
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
 	Vector3 screenToWorldSpaceUI(Vector2 screenPos);
 
+	void addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f);
+	void changeTrailColor(Vector3 color);
+	ParticleSystem* getParticleSystem(std::string name);
+	ParticleSystem* getParticleSystem(int index);
+	ParticleHandler* getParticleHandler()const;
+	void addTestParticle(Vector3 pos, Vector4 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
+	void setTestParticleSystem(ParticleSystem* test);
+	ParticleSystem* getTestParticleSystem()const;
+	void saveTestParticleSystem();
+	void setTestVectorField(float vectorFieldSize, float vectorFieldPower);
+	void setTestColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	float farZTempShadow;
 	void setSpotLightShadow(SpotLight* spotLight);
 };

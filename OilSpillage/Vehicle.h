@@ -116,6 +116,9 @@ private:
 
 	VehicleSlots* vehicleSlots;
 
+	float trailTimer = 0.0f;
+	float driftForce = 0.0f;
+
 	float timeSinceLastShot;
 	float timeSinceLastShot2;
 	Weapon weapon;
@@ -155,8 +158,9 @@ private:
 	bool flameBool;
 	bool dmg;
 	bool player = false;
+	
 
-
+	Vector2 aimLerp;
 	Vector2 curDir;
 	Vector2 currentDir;
 	float velocitySimple;

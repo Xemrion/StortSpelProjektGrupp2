@@ -12,7 +12,7 @@
 struct FogMaterial
 {
 	Vector3 color = Vector3(0.6, 0.6, 0.62);
-	float densityThreshold = 0.15f; // lower = more fog
+	float densityThreshold = 0.15f; // remove all fog density below threshold
 	float density = 0.25f; // density of fog patches
 	float ambientDensity = 0.1f; // constant fog value
 	float scale = 50.f; // noise scale
@@ -29,7 +29,6 @@ private:
 	std::vector<Texture*> fogTextures;
 	std::vector<Texture*> normalTextures;
 	float spacing;
-
 
 	ShaderClass generateTextureShader;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> textureRTV;

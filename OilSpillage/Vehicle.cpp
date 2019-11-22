@@ -187,8 +187,8 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 		updatePowerUpEffects(deltaTime);
 	}
-	
-	
+
+
 	tempTargetRotation = targetRotation;
 
 	//Quaternion Rotation to Euler
@@ -403,7 +403,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 	//Drifting
 	float hypoC = sqrt(pow(dx, 2) + (pow(dy, 2)));
-	float driftForce = this->vehicle->getRigidBody()->getLinearVelocity().getX() * (dy / hypoC) + -this->vehicle->getRigidBody()->getLinearVelocity().getZ() * -(dx / hypoC);
+	this->driftForce = this->vehicle->getRigidBody()->getLinearVelocity().getX() * (dy / hypoC) + -this->vehicle->getRigidBody()->getLinearVelocity().getZ() * -(dx / hypoC);
 	Vector2 driftResistance = Vector2(-((dy / hypoC) * 4000 * deltaTime) * updatedStats.handlingRate, -(-((dx / hypoC) * 4000 * deltaTime)) * updatedStats.handlingRate);
 	if (abs(driftForce) < 250) {
 		driftResistance = driftResistance * (abs(driftForce) * 0.005f);
@@ -473,6 +473,24 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 			this->immortalTimer = 0.0f;
 			this->immortal = false;
 		}
+	}
+
+	/*Trail / Sladdspår*/
+	this->trailTimer += deltaTime;
+
+	Vector3 frontTempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+	Vector3 rightDir = frontTempDir.Cross(Vector3(0.0f, 1.0f, 0.0f));
+	rightDir.Normalize();
+	Vector3 initialDir = -Vector3(this->vehicle->getRigidBody()->getLinearVelocity());
+	initialDir.Normalize();
+	if (this->trailTimer > 0.01f && abs(this->driftForce) > 5.0f)
+	{
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 60.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 60.0f);
+
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 60.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 60.0f);
+		this->trailTimer = 0;
 	}
 }
 
@@ -565,7 +583,7 @@ void Vehicle::updateWeapon(float deltaTime)
 				dir.Normalize();
 				curDir = Vector2(0.5f + curDir.x * 0.5f, 0.5f + curDir.y * 0.5f);
 			}
-			curDir = Vector2::Lerp(curDir, dir, deltaTime * 20);
+			curDir = Vector2::Lerp(curDir, dir, deltaTime * 50);
 			curDir.Normalize();
 		}
 		else
@@ -575,11 +593,11 @@ void Vehicle::updateWeapon(float deltaTime)
 
 		if (this->health > 0)
 		{
-			// recoil goes from 100% to 0% in half a second
 			if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
 			{
 				float newRot = atan2(curDir.x, curDir.y);
 				this->gunRotation = newRot;
+
 				if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
 				{
 					if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
@@ -591,8 +609,7 @@ void Vehicle::updateWeapon(float deltaTime)
 						{
 							if (temp->getWeapon().updateFireRate())
 							{
-								//this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
-
+						
 								for (int i = 0; i < Vehicle::bulletCount; ++i)
 								{
 									if (bullets[i].getWeaponType() == WeaponType::None)
@@ -793,6 +810,26 @@ void Vehicle::updateWeapon(float deltaTime)
 				}
 			}
 		}
+
+		for (int i = 0; i < Slots::SIZEOF; ++i)
+		{
+			ItemWeapon* itemWeapon = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot((Slots)i));
+			if (itemWeapon != nullptr)
+			{
+				GameObject* weaponObject = itemWeapon->getObject();
+				Weapon& weapon = itemWeapon->getWeapon();
+				
+				if (weapon.remainingCooldown == 0.0)
+				{
+					weaponObject->setColor(itemWeapon->getBaseColor() + (Vector4(1.0, 0.4, 0.1, 0.0) * (weapon.currentSpreadIncrease / weapon.maxSpread) * 2.0));
+				}
+				else
+				{
+					float time = dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime();
+					weaponObject->setColor(itemWeapon->getBaseColor() + (Vector4(0.0 + sin(time*3.0) * 0.5, 0.0 + sin(time*3.0) * 0.5, 0.0 + sin(time*3.0) * 0.5, 0.0)));
+				}
+			}
+		}
 	}
 }
 
@@ -976,9 +1013,11 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 	}
 	vehicleDistance = min(vehicleDistance, 20.0f);
 
+	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionR().x * Input::getStrengthR() * 3, Input::getDirectionR().y * Input::getStrengthR() * 3), deltaTime*10.0f);
+
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime * 1.2f + cameraDistance;
-	cameraDistanceX = ((this->vehicle->getRigidBody()->getLinearVelocity().getX() * 0.3f + Input::getDirectionR().x * Input::getStrengthR() * 3) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
-	cameraDistanceZ = ((this->vehicle->getRigidBody()->getLinearVelocity().getZ() * 0.25f + Input::getDirectionR().y * Input::getStrengthR() * 3) - cameraDistanceZ) * deltaTime * 12.2f + cameraDistanceZ;
+	cameraDistanceX = ((this->vehicle->getRigidBody()->getLinearVelocity().getX() * 0.3f + aimLerp.x) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
+	cameraDistanceZ = ((this->vehicle->getRigidBody()->getLinearVelocity().getZ() * 0.25f + aimLerp.y) - cameraDistanceZ) * deltaTime * 12.2f + cameraDistanceZ;
 
 	return Vector3(cameraDistanceX, cameraDistance, cameraDistanceZ);
 }

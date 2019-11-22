@@ -1,6 +1,7 @@
 #include "Item.h"
 #include "ItemWeapon.h"
 #include "../game.h"
+#include "../PG/defs.hpp"
 
 std::vector<std::shared_ptr<Item>> Item::premadeItems;
 
@@ -38,6 +39,7 @@ void Item::init()
 		std::make_shared<ItemWeapon>("Flamethrower", WeaponHandler::getWeapon(WeaponType::Flamethrower), flameThrower),
 		std::make_shared<ItemWeapon>("Lazer", WeaponHandler::getWeapon(WeaponType::Laser), lazer)
 	};
+
 }
 
 Item* Item::getRandom()
@@ -60,6 +62,11 @@ Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 sc
 Item::Item(std::string name, std::string description, ItemType type, GameObject* object)
 	: name(name), description(description), type(type), object(object)
 {
+	this->baseColor = Vector4(0.0, 0.0, 0.0, 0.0);
+	if (this->object != nullptr)
+	{
+		this->object->setColor(baseColor);
+	}
 }
 
 Item::~Item()
@@ -72,10 +79,12 @@ Item::Item(const Item& obj)
 	this->name = obj.name;
 	this->description = obj.description;
 	this->type = obj.type;
+	this->baseColor = obj.baseColor;
 	
 	if (obj.object != nullptr)
 	{
 		this->object = new GameObject(*obj.object);
+		this->object->setColor(baseColor);
 	}
 	else
 	{
@@ -90,9 +99,12 @@ Item* Item::clone() const
 
 void Item::randomize()
 {
+	F32_Dist genValue{ .0f, .27f };
+	RNG rng { RD()() };
+	this->baseColor = Vector4(genValue(rng), genValue(rng), genValue(rng), 1);
 	if (this->object)
 	{
-		this->object->setColor(Vector4((rand() % 64) / 63.0f, (rand() % 64) / 63.0f, (rand() % 64) / 63.0f, 1));
+		this->object->setColor(baseColor);
 	}
 }
 
@@ -114,4 +126,9 @@ ItemType Item::getType() const
 GameObject* Item::getObject() const
 {
 	return this->object;
+}
+
+Vector4 Item::getBaseColor() const
+{
+	return this->baseColor;
 }
