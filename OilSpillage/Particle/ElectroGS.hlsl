@@ -5,10 +5,7 @@ cbuffer CB_PER_FRAME : register(b0)
     float4 upp; //.w is 0 or 1
 }
 
-cbuffer CB_PER_FRAME : register(b2)
-{
-    float4x4 viewProjShadow;
-}
+
 cbuffer ParticleRenderParams : register(b1)
 {
     float4 colors[4];
@@ -32,7 +29,6 @@ struct GSInput
 struct GSOutput
 {
     float4 pos : SV_POSITION;
-    float4 shadowPos : SHADOWPOS;
     float4 color : COLOR;
     float2 uv : UV;
 };
@@ -92,10 +88,10 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	
     float3 testUp = trailDirection;
     float3 testRight = right; 
-    vert[0] = input[0].pos.xyz - testRight * size + testUp * size * input[0].direction.w; // Top middle
-    vert[1] = input[0].pos.xyz + testRight * size + testUp * size * input[0].direction.w; // Top right
-    vert[3] = input[0].pos.xyz + testRight * size - testUp * size * input[0].direction.w; // Bottom right
-    vert[2] = input[0].pos.xyz - testRight * size - testUp * size * input[0].direction.w; // Top right 
+    vert[0] = input[0].pos.xyz - testRight * size * 0.3f + testUp * size * input[0].direction.w; // Top middle
+    vert[1] = input[0].pos.xyz + testRight * size * 0.3f + testUp * size * input[0].direction.w; // Top right
+    vert[3] = input[0].pos.xyz + testRight * size * 0.3f - testUp * size * input[0].direction.w; // Bottom right
+    vert[2] = input[0].pos.xyz - testRight * size * 0.3f - testUp * size * input[0].direction.w; // Top right 
 
     float2 texCoord[4];
     texCoord[2] = float2(0, 1); //2
@@ -106,7 +102,6 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
     for (int i = 0; i < 4; i++)
     {
         output.pos = mul(float4(vert[i], 1.0f), viewProj);
-        output.shadowPos = mul(float4(vert[i], 1.0f), viewProjShadow);
         output.uv = texCoord[i];
         output.color = testColor;
         theOutput.Append(output);

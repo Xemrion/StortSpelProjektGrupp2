@@ -42,7 +42,7 @@ ObjectiveHandler::~ObjectiveHandler()
 
 }
 
-void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfTargets, std::string info, TypeOfTarget targetType, GameObject** target, Actor** enemies)
+void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfTargets, std::string info, TypeOfTarget targetType,Vector3 getToPos, GameObject** target, Actor* boss)
 {
 	PlayingGameState* ptrState = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Objective *temp = new Objective;
@@ -91,10 +91,16 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 		this->pickUpArrs.push_back(targets);
 		temp->setTarget(this->pickUpArrs.at(this->pickUpArrs.size()-1), nrOfTargets);
 	}
+	else if (type == TypeOfMission::GetToPoint)
+	{
+		temp->setInfo(info);
+		temp->setGeneralPosition(getToPos);
+	}
 	else
 	{
 		temp->setInfo(info);
-		temp->setEnemies(enemies, nrOfTargets);
+		temp->setEnemies(nrOfTargets);
+		temp->setBoss(boss);
 	}
 	this->objectiveVec.push_back(temp);
 }

@@ -53,6 +53,8 @@ public:
 	void addPowerUp(PowerUp p);
 	void clearPowerUps();
 
+	Vector3 getCameraPos();
+
 	std::unique_ptr<Vehicle>& getPlayer();
 	void setPlayer(Vehicle* theVehicle);
 	ActorManager* actorManager;
@@ -108,12 +110,12 @@ private:
 	void fillTestParticle();
 	const char* items;
 	float timer = 0.0f;
-	int                             addNrOfParticles  {     2 };
+	int                             addNrOfParticles  {     1 };
 	float                             lifeTime          {     1 };
 	float                           timerForParticle  {   .0f };
 	float                           vectorFieldPower  {  4.0f };
 	float                           vectorFieldSize   {  2.2f };
-	float                           randomPosPower    {  0.5f };
+	float                           randomPosPower    {  0.0f };
 	float                           size1             { .039f };
 	float                           size2             { .063f };
 	float                           colors  [4]       {};

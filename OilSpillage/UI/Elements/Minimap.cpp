@@ -195,15 +195,20 @@ void Minimap::draw(bool selected)
 		}
 	}
 	RECT arrow;
-	Vector3 arrowPos = playerPos - state->getObjHandler().getObjective(0)->getClosestToPlayer();
+	Vector3 camToPlayer = playerPos -(state->getCameraPos() * Vector3(1.0f, 0.0f, 1.0f));
+	Vector3 arrowPos = (state->getObjHandler().getObjective(0)->getClosestToPlayer() * Vector3(1.0f, 0.0f, 1.0f)) - playerPos;
 	arrowPos.Normalize();
+	arrowPos *= 100.0f;
+	Vector2 arrowPosition(1080 / 2, 720 / 2);
+	arrowPosition += Vector2(camToPlayer.x,camToPlayer.z);
+	arrowPosition += Vector2(arrowPos.x, arrowPos.z);
 	sb->Draw(this->textureOutline->getShaderResView(), this->position - Vector2(5, 5));
 	sb->Draw(this->resourceFog, mapRect, &zoomedRect);
 	sb->Draw(this->texturePlayerMarker->getShaderResView(), markerRect, nullptr, Colors::White, playerRot, this->texturePlayerMarker->getCenter());
-	sb->Draw(this->textureArrow->getShaderResView(), Vector2(1080/2+arrowPos.x, 720/2+ arrowPos.z), NULL, Colors::White, compassRot, textureArrow->getCenter(), Vector2(0.1f));
 
 	if (state->getObjHandler().getObjective(0) != nullptr && state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree)
 	{
+		sb->Draw(this->textureArrow->getShaderResView(), arrowPosition, NULL, Colors::White, compassRot, textureArrow->getCenter(), Vector2(0.2f));
 		sb->Draw(this->textureCompass->getShaderResView(), compassRect, nullptr, Colors::White, this->compassRot, Vector2(this->textureCompass->getWidth() * 0.5f, this->textureCompass->getHeight() * 0.75f));
 	}
 }
