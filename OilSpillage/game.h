@@ -25,6 +25,8 @@ public:
 	static Graphics					   &getGraphics() noexcept;
 	static float						lerp(float v0, float v1, float t);
 	static float						getDeltaTime();
+	static float						getLocalScale();
+	static int							getNrOfStagesDone();
 private:
 	void								createCurrentState();
 	void								run();

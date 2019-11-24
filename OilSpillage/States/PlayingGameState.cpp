@@ -297,7 +297,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 30.0));
 
-	//objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
+	/*objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
 	objectives.addObjective(TypeOfMission::GetToPoint, 0, 5, "Go to the exit now!!!", TypeOfTarget::Crate);
 
@@ -309,9 +309,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");*/
 
-	
+	this->generateObjectives();
 	this->graphics.setTestParticleSystem(this->graphics.getParticleSystem("explosion"));
 	this->fillTestParticle();
 
@@ -1256,6 +1256,42 @@ void PlayingGameState::addPowerUp(PowerUp p)
 void PlayingGameState::clearPowerUps()
 {
 	powerUps.clear();
+}
+
+void PlayingGameState::generateObjectives()
+{
+	if (Game::getNrOfStagesDone() % 3 == 0)
+	{
+		//this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->spawnBoss());
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
+	}
+	else
+	{
+
+		float prob[2] = { 0.5f, 0.5f };
+		for (int i = 0; i < 3; i++)
+		{
+			int dice = rand() % 10 + 1;
+			if (dice <= prob[0] * 10)
+			{
+				objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5*Game::getLocalScale(), "Pick up the important", TypeOfTarget::Crate);
+				prob[0] -= 0.1f;
+				prob[1] += 0.1f;
+			}
+			else if (dice > (1 - prob[1]) * 10)
+			{
+				objectives.addObjective(TypeOfMission::KillingSpree, 120, 20*Game::getLocalScale(), "Kill the enemies");
+				prob[0] += 0.1f;
+				prob[1] -= 0.1f;
+				
+			}
+			prob[0] = std::fmaxf(prob[0], 0.0f);
+			prob[1] = std::fmaxf(prob[1], 0.0f);
+			prob[0] = std::fminf(prob[0], 1.0f);
+			prob[1] = std::fminf(prob[1], 1.0f);
+		}
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
+	}
 }
 
 Vector3 PlayingGameState::getCameraPos()

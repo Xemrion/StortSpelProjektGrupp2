@@ -91,6 +91,16 @@ float Game::getDeltaTime()
 	return instance->deltaTime;
 }
 
+float Game::getLocalScale()
+{
+	return instance->localScale;
+}
+
+int Game::getNrOfStagesDone()
+{
+	return instance->nrOfStagesDone;
+}
+
 
 
 void Game::createCurrentState()
@@ -105,6 +115,11 @@ void Game::createCurrentState()
 		{
 			transfer = static_cast<UpgradingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
+			nrOfStagesDone++;
+			if (nrOfStagesDone % 3 == 0)
+			{
+				localScale += 0.05f;
+			}
 		}
 		state = std::make_unique<PlayingGameState>();
 

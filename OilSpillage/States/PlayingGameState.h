@@ -52,6 +52,7 @@ public:
 	Vector3   getRespawnPosition() const noexcept;
 	void addPowerUp(PowerUp p);
 	void clearPowerUps();
+	void generateObjectives();
 
 	Vector3 getCameraPos();
 
