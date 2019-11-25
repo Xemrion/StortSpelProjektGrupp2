@@ -43,7 +43,11 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	barrels.get()->setTexture(graphics.getMaterial("Entities/Barrel").diffuse);
 	barrels.get()->setPosition(Vector3(0, -0.5, 0));
 	barrels.get()->setScale(Vector3(0.4f,0.4f,0.4f));
+	
+
+
 	graphics.addToDraw(barrels.get());
+
 }
 
 MenuGameState::~MenuGameState() {}
@@ -55,7 +59,10 @@ void MenuGameState::update(float deltaTime)
 	this->theVehicle->setWheelRotation(deltaTime);
 	this->physics->update(deltaTime);
 
-	graphics.getParticleSystem("fire")->addParticle(1, 1.0f, Vector3(0, 0, 0), Vector4(0, 2, 0, 0));
+	graphics.getParticleSystem("fire")->addParticle(1, 0.5f, Vector3(0, 0, 0), Vector4(0, 0.5f, 0, 0));
+	graphics.getParticleSystem("fire")->addParticle(1, 0.5f, Vector3(0.1f, 0, 0), Vector4(0, 0.5f, 0, 0));
+	graphics.getParticleSystem("fire")->addParticle(1, 0.5f, Vector3(0, 0, 0.1f), Vector4(0, 2, 0, 0));
+	graphics.getParticleSystem("smoke")->addParticle(1, 2.0f, Vector3(0, 0, 0.1f), Vector4(0, 1, 0, 0));
 
 	this->graphics.clearScreen(Vector4(0,0,0,0));
 	this->graphics.render(this->camera.get(), deltaTime);

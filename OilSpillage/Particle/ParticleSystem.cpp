@@ -274,6 +274,7 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	//run create particle compute shader here
 
 	ID3D11Buffer* nB = nullptr;
+	UINT null = 0;
 
 	this->deviceContext->CSSetConstantBuffers(2, 1, &nB);
 	this->deviceContext->CSSetConstantBuffers(1, 1, &nB);
@@ -296,7 +297,7 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	{
 		deviceContext->Dispatch(nrOf, 1, 1);
 	}
-	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
+	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &null);
 
 	return true;
 }
@@ -371,8 +372,24 @@ void ParticleSystem::changeColornSize(Vector4 colors[4], int nrOfColors, float s
 	this->systemData.renderParams.config.z = endSize;
 	
 }
+
+void ParticleSystem::setSize(float startSize, float endSize)
+{
+	
+	colorNSize.config.y = startSize;
+	colorNSize.config.z = endSize;
+
+	this->systemData.renderParams.config.y = startSize;
+	this->systemData.renderParams.config.z = endSize;
+
+}
+
 void ParticleSystem::changeVectorField(float vectorFieldPower, float vectorFieldSize)
 {
+	if (vectorFieldSize <= 0.0f)
+	{
+		vectorFieldSize = 1.0f;
+	}
 	this->systemData.vectorFieldSize = vectorFieldSize;
 	this->systemData.vectorFieldPower = vectorFieldPower;
 	this->sP.vectorField.y = this->systemData.vectorFieldPower;
@@ -393,6 +410,31 @@ void ParticleSystem::setParticleShaders(std::string csUpdate, std::string csCrea
 	strcpy(this->systemData.shaders.pixelShader, pixelShader.c_str());
 	strcpy(this->systemData.shaders.vertexShader, vertexShader.c_str());
 
+}
+void ParticleSystem::setVertexShader(std::string vertexShader)
+{
+	strcpy(this->particleShaders.vertexShader, vertexShader.c_str());
+	strcpy(this->systemData.shaders.vertexShader, vertexShader.c_str());
+}
+void ParticleSystem::setUpdateShader(std::string csUpdate)
+{
+	strcpy(this->particleShaders.csUpdate, csUpdate.c_str());
+	strcpy(this->systemData.shaders.csUpdate, csUpdate.c_str());
+}
+void ParticleSystem::setCreateShader(std::string csCreate)
+{
+	strcpy(this->particleShaders.csCreate, csCreate.c_str());
+	strcpy(this->systemData.shaders.csCreate, csCreate.c_str());
+}
+void ParticleSystem::setGeometryShader(std::string gsPrimitive)
+{
+	strcpy(this->particleShaders.gsPrimitive, gsPrimitive.c_str());
+	strcpy(this->systemData.shaders.gsPrimitive, gsPrimitive.c_str());
+}
+void ParticleSystem::setPixelShader(std::string pixelShader)
+{
+	strcpy(this->particleShaders.pixelShader, pixelShader.c_str());
+	strcpy(this->systemData.shaders.pixelShader, pixelShader.c_str());
 }
 void ParticleSystem::drawAll(DynamicCamera* camera)
 {

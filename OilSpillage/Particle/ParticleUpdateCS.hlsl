@@ -58,7 +58,7 @@ void main( uint3 DTid : SV_DispatchThreadID)
 	{
 		Particle p = CurrentSimulationState.Consume();
 		
-        float depth = -1.0f;
+        float depth = -1.4f;
 		float friction = 0.05f;
 		float3 wind = float3(1.0f, 0.0f, 0.5f);
 		float3 random = hash(float3(43.5, 12.322, 21.5));

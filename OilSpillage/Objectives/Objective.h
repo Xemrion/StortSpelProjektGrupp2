@@ -13,7 +13,10 @@ enum class TypeOfMission
 {
 	SearchAndDestroy,
 	KillingSpree,
-	FindAndCollect
+	FindAndCollect,
+	GetToPoint,
+	BossEvent,
+	SizeOf
 };
 enum class Reward
 {
@@ -22,8 +25,9 @@ enum class Reward
 };
 struct Mission
 {
-	Actor* *enemies;
+	Actor* boss;
 	GameObject* *target;//target or targets
+	Vector3 generalPosition;
 	TypeOfMission typeMission;
 	TypeOfTarget typeOfTarget;
 	int rewardTime;
@@ -36,8 +40,10 @@ public:
 	Objective();
 	~Objective();
 	void setTarget(GameObject* *target, int nrOfTargets);
-	void setEnemies(Actor* *enemies, int nrOfEnemies);
+	void setEnemies(int nrOfEnemies);
+	void setBoss(Actor* boss);
 	void setType(TypeOfMission type);
+	void setGeneralPosition(Vector3 pos);
 	void setTargetType(TypeOfTarget targetType);
 	void setReward(int time);
 	void setScore(int score);
@@ -52,6 +58,7 @@ public:
 	std::string getInfo()const;
 	Vector3 getAveragePosition()const;
 	Vector3 getClosestToPlayer()const;
+	Vector3 getGeneralPosition()const;
 	bool isDone();
 	void update(Vector3 playerPosition);
 	int getNrOfMax()const;

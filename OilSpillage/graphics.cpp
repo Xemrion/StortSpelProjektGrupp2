@@ -436,6 +436,9 @@ bool Graphics::init(Window* window)
 
 	//this->particleHandler->getParticleSystem("debris")->saveSystem();
 
+	//this->particleHandler->getParticleSystem("electro")->setParticleShaders(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("electro")->setGeometryShader("ParticleGS.cso");
+	this->particleHandler->getParticleSystem("electro")->setPixelShader("ParticlePS.cso");
 
 
 	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());

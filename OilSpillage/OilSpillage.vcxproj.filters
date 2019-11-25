@@ -28,6 +28,7 @@
     <FxCompile Include="VertexUI.hlsl" />
     <FxCompile Include="Particle\DebrisUpdateCS.hlsl" />
     <FxCompile Include="Particle\DebrisCreateCS.hlsl" />
+    <FxCompile Include="Particle\ElectroUpdateCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI\AIGroup.cpp" />
