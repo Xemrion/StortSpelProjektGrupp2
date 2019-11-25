@@ -118,8 +118,12 @@ void Game::createCurrentState()
 {
 	VehicleSlots* transfer = nullptr;
 	VehicleSlots* newSlots = nullptr;
+
 	if (currentState == STATE_MENU)
+	{
+		Container::playerInventory = std::make_unique<Container>();
 		state = std::make_unique<MenuGameState>();
+	}
 	else if (currentState == STATE_PLAYING)
 	{
 		if (oldState == STATE_UPGRADING)
