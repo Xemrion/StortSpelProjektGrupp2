@@ -163,6 +163,7 @@
     <ClCompile Include="AI\Sniper.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
+    <ClCompile Include="BulletSDK\include\LinearMath\btThreads.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Inventory\Container.cpp" />
     <ClCompile Include="Inventory\Item.cpp" />

@@ -24,7 +24,8 @@
 #include "BulletDynamics/Dynamics/btSimulationIslandManagerMt.h"  // for setSplitIslands()
 #include "BulletDynamics/Dynamics/btDiscreteDynamicsWorldMt.h"
 #include "BulletDynamics/MLCPSolvers/btLemkeSolver.h"
-#define BT_THREAD_SAFE 1
+#define BT_THREADSAFE 1
+#define BT_USE_PPL 1
 using namespace DirectX::SimpleMath;
 enum SolverType
 {
