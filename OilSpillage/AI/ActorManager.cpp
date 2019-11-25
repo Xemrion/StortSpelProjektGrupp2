@@ -403,6 +403,7 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 			}
 			if (actors[i]->isDead())
 			{
+				Game::getGameInfo().highScore += actors[i]->getPoints();
 				destroyActor(i);
 			}
 		}
