@@ -30,7 +30,6 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 	Game::getGraphics().loadShape(SHAPE_QUAD);
 	Game::getGraphics().loadTexture("perlin_s4_e8");
 	noiseTexture = Game::getGraphics().getTexturePointer("perlin_s4_e8");
-	
 	//Game::getGraphics().loadTexture("brickwall");
 	//noiseTexture = Game::getGraphics().getTexturePointer("brickwall");
 
@@ -220,8 +219,12 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 	}
 }
 
-
 std::vector<GameObject*>& Fog::getQuads()
 {
 	return quads;
+}
+
+const Vector2& Fog::getWindSpeed() const
+{
+	return wind;
 }

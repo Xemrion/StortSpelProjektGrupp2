@@ -171,4 +171,7 @@ public:
 	void setTestColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	float farZTempShadow;
 	void setSpotLightShadow(SpotLight* spotLight);
+
+	void setFog(FogMaterial material, int layers, float spacing);
+	void setFogWindSpeed(Vector2 speed);
 };
