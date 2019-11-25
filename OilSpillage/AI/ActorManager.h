@@ -35,7 +35,7 @@ public:
 	void seperation(const Vector3& targetPos);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
 private:
-	const int maxNrOfEnemies = 100;
+	const int maxNrOfEnemies = 70;
 	const int spawnCooldown = 2;
 	float spawnTimer = 0;
 	float soundTimer = 0;

@@ -125,7 +125,7 @@ PS_OUT main(VS_OUT input) : SV_Target
 
 	uint2 lightTileIndex = uint2(input.Pos.x * 0.0625f, input.Pos.y * 0.0625f);
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
-	float sunShadow = (1 - shadowVisible(input.shadowPos, ShadowMap, 0.00015f));
+	float sunShadow = (1 - shadowVisible(input.shadowPos, ShadowMap, 0.0015f));
 	float4 ambient = max(-dot(sunDir, normal) * sunShadow, float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
 
 	float shadowSpotVisible = 1.0f;

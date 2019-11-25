@@ -60,8 +60,9 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 			newPos = generateObjectivePos(targetPos, 50, 100);
 			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
-				groups[i].actors[j]->setGameObjectPos(Vector3(newPos.x, groups[i].actors[j]->getPosition().y, newPos.z));
-				physics->teleportRigidbody(Vector3(newPos.x, groups[i].actors[j]->getPosition().y, newPos.z), groups[i].actors[j]->getRigidBody());
+				Actor* current = groups[i].actors[j];
+				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
 				if (j % 5 == 0)
 				{
 					newPos = generateObjectivePos(targetPos, 50, 100);
@@ -221,9 +222,9 @@ void ActorManager::spawnChaseCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createChaseCar(originPos.x + i, originPos.z);
-		createChaseCar(originPos.x, originPos.z + i);
-		createChaseCar(originPos.x - i, originPos.z);
+	//	createChaseCar(originPos.x + i, originPos.z);
+		//createChaseCar(originPos.x, originPos.z + i);
+	//	createChaseCar(originPos.x - i, originPos.z);
 	}
 }
 
@@ -231,9 +232,9 @@ void ActorManager::spawnShootCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createShootCar(originPos.x + i, originPos.z, (rand() % 4) + 1);
-		createShootCar(originPos.x, originPos.z + i, (rand() % 4) + 1);
-		createShootCar(originPos.x - i, originPos.z, (rand() % 4) + 1);
+	//	createShootCar(originPos.x + i, originPos.z, (rand() % 4) + 1);
+	//	createShootCar(originPos.x, originPos.z + i, (rand() % 4) + 1);
+	//	createShootCar(originPos.x - i, originPos.z, (rand() % 4) + 1);
 	}
 }
 
@@ -391,7 +392,7 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
 			float normalizedRandom = float(rand()) / RAND_MAX;
-			if (normalizedRandom >= 0.95)
+			if (normalizedRandom >= 0.995)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
 					PowerUp(actors[i]->getPosition(),
