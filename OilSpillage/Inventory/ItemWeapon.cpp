@@ -51,6 +51,11 @@ void ItemWeapon::randomize()
 	this->weapon.spreadDecreasePerSecond =	this->weapon.spreadDecreasePerSecond	* (rand() % 1001 / 500.0f) + 0.1f;
 
 	this->description = generateDescription(this->weapon);
+	if (this->weapon.type == WeaponType::Laser)
+	{
+		this->weapon.lightColor = Vector3(rand(), rand(), rand());
+		this->weapon.lightColor /= max(max(this->weapon.lightColor.x, this->weapon.lightColor.y), this->weapon.lightColor.z);
+	}
 	Item::randomize();
 }
 

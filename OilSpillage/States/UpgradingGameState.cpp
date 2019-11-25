@@ -11,11 +11,6 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 	this->menues[MENU_RANDOMITEM] = std::make_unique<UIRandomItem>();
 	this->menues[MENU_RANDOMITEM]->init();
 
-	for (int i = 0; i < 20; i++)
-	{
-		Container::playerInventory->addItem(Item::getRandom());
-	}
-
 	this->lightList = std::make_unique<LightList>();
 	this->lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 	this->lightList->addLight(PointLight(Vector3(0, 5, 0), Vector3(0.5, 0, 0), 10));

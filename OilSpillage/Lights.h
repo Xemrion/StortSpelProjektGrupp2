@@ -29,6 +29,7 @@ public:
 	Vector3 getColor() const { return Vector3(color); }
 	void setLuminance(float luminance) { this->luminance = luminance; };
 	float getLuminance() const { return this->luminance; }
+	float getLightType() const { return this->lightType; }
 };
 
 class PointLight : public Light

@@ -45,7 +45,7 @@ void ObjectiveBox::update(float deltaTime)
 	else
 	{
 		infoUI = objHandlerPtr->getObjective(0)->getInfo();
-		rewardInfo = "Reward: " + std::to_string(objHandlerPtr->getObjective(0)->getRewardTime()) + " extra seconds ";
+		rewardInfo = "Reward: +" + std::to_string(objHandlerPtr->getObjective(0)->getRewardTime()) + " sec";
 		color = Colors::White;
 	}
 

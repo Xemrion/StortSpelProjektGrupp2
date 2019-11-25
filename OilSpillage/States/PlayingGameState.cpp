@@ -36,19 +36,18 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar, physics.get(), map.get(), &rng);
 	aStar->generateTileData(map->getTileMap());
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			//	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
-				//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-			//	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
+			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
+			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
 			//actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
 		}
 	}
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(70.0f), currentMenu(MENU_PLAYING)
 {
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -262,19 +261,19 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 30.0));
 
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill enemies");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up ", TypeOfTarget::Crate);
 
 
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::KillingSpree, 240, 75, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 50, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 6, "Pick up the important");
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 25, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up ");
+	objectives.addObjective(TypeOfMission::KillingSpree, 240, 75, "Kill enemies");
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 50, "Kill enemies");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 6, "Pick up ");
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 25, "Kill enemies");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up ");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up ");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up ");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up ");
 
 
 	this->graphics.setTestParticleSystem(this->graphics.getParticleSystem("explosion"));
@@ -374,11 +373,14 @@ void PlayingGameState::ImGui_AI()
 
 	float pathSize = actorManager->groups.at(0).actors.at(0)->path->size();
 	ImGui::Text((("Path size: " + std::to_string(pathSize)).c_str()));*/
-	ImGui::Text(("VelocityX: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getX())).c_str());
-	ImGui::Text(("VelocityY: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getY())).c_str());
-	ImGui::Text(("VelocityZ: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getZ())).c_str());
+	//ImGui::Text(("VelocityX: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getX())).c_str());
+	//ImGui::Text(("VelocityY: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getY())).c_str());
+	//ImGui::Text(("VelocityZ: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getZ())).c_str());
 	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
 							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
+	
+	ImGui::Text(("Score: " + std::to_string(Game::getGameInfo().highScore)).c_str());
+	
 	ImGui::End();
 }
 
@@ -780,16 +782,16 @@ void PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 //#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	ImGui_Driving();
-	//ImGui_ProcGen();
-	//ImGui_AI();
-	ImGui_Particles();
-	ImGui_Camera();
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	//ImGui_ImplDX11_NewFrame();
+	//ImGui_ImplWin32_NewFrame();
+	//ImGui::NewFrame();
+	//ImGui_Driving();
+	////ImGui_ProcGen();
+	////ImGui_AI();
+	//ImGui_Particles();
+	//ImGui_Camera();
+	//ImGui::Render();
+	//ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	//#endif // !_DEBUG
 
 	graphics.presentScene();

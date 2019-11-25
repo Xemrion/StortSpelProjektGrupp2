@@ -86,7 +86,6 @@ Status Ranged::shoot()
 						dir.Normalize();
 						Vector3 bulletOrigin = *this->positionPtr + dir;
 
-
 						this->bullets[i].shoot(
 							weapon,
 							bulletOrigin,

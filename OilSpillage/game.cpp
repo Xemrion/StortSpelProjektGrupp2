@@ -112,14 +112,30 @@ float Game::getDeltaTime()
 	return instance->deltaTime;
 }
 
+GameInfo& Game::getGameInfo() noexcept
+{
+	return instance->gameInfo;
+	// TODO: insert return statement here
+}
+
 
 
 void Game::createCurrentState()
 {
 	VehicleSlots* transfer = nullptr;
 	VehicleSlots* newSlots = nullptr;
+
 	if (currentState == STATE_MENU)
+	{
+		Container::playerInventory = std::make_unique<Container>();
+
+		for (int i = 0; i < 20; i++)
+		{
+			Container::playerInventory->addItem(Item::getRandom());
+		}
+
 		state = std::make_unique<MenuGameState>();
+	}
 	else if (currentState == STATE_PLAYING)
 	{
 		if (oldState == STATE_UPGRADING)
@@ -195,7 +211,7 @@ void Game::run()
 	Sound::deinit();
 }
 
-Game::Game() : currentState(STATE_UPGRADING), oldState(-1), running(false) {}
+Game::Game() : currentState(STATE_MENU), oldState(-1), running(false) {}
 
 Game::~Game()
 {

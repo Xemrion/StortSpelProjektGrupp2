@@ -153,6 +153,8 @@
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="physics.cpp" />
+    <ClCompile Include="UI\Menu\UIHighscore.cpp" />
+    <ClCompile Include="MyClient.cpp" />
     <ClCompile Include="BulletSDK\include\LinearMath\btThreads.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -300,11 +302,8 @@
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="physics.h" />
-    <ClInclude Include="UI\Upgrading\UIUpgrading.h" />
-    <ClInclude Include="UI\UserInterface.h" />
-    <ClInclude Include="Vehicle.h" />
-    <ClInclude Include="VehicleStats.h" />
-    <ClInclude Include="VertexBuffer.h" />
+    <ClInclude Include="UI\Menu\UIHighscore.h" />
+    <ClInclude Include="MyClient.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

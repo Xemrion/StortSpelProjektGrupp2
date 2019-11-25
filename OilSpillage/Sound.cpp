@@ -26,6 +26,8 @@ void Sound::init()
 
 void Sound::deinit()
 {
+	instance->soloud.stopAll();
+	instance->loopingSounds.clear();
 	instance->soloud.deinit();
 }
 

@@ -1,12 +1,14 @@
 #include "AnimatedText.h"
 #include "../UserInterface.h"
+#include <string>
 
-AnimatedText::AnimatedText(const std::string& text, const Color& color, float scale, Animation animation, Vector2 position) : Element(position), animationActive(false)
+void AnimatedText::createAnimation(const std::string& text, const Color& color, float scale, Animation animation)
 {
-	this->size = UserInterface::getFontArial()->MeasureString(text.c_str()) * scale;
-
 	switch (animation)
 	{
+	case Animation::FADE_IN:
+		this->animation = std::make_unique<FadeAnimation>(text, color, scale);
+		break;
 	case Animation::SHAKING:
 		this->animation = std::make_unique<ShakingAnimation>(text, color, scale);
 		break;
@@ -29,9 +31,23 @@ AnimatedText::AnimatedText(const std::string& text, const Color& color, float sc
 		this->animation = std::make_unique<SpinningFadeAnimation>(text, color, scale, true);
 		break;
 	default:
-		this->animation = std::make_unique<FadeAnimation>(text, color, scale);
+		this->animation = std::make_unique<NoAnimation>(text, color, scale);
 		break;
 	}
+}
+
+AnimatedText::AnimatedText(const std::string& text, const Color& color, float scale, Animation animation, Vector2 position) : Element(position), animationActive(false)
+{
+	this->size = UserInterface::getFontArial()->MeasureString(text.c_str()) * scale;
+
+	int tries = 0;
+	while (this->size.x < 30.0f && tries < 10)
+	{
+		this->size = UserInterface::getFontArial()->MeasureString(text.c_str()) * scale;
+		tries++;
+	}
+
+	this->createAnimation(text, color, scale, animation);
 }
 
 AnimatedText::~AnimatedText()
@@ -63,9 +79,34 @@ void AnimatedText::endAnimation()
 	this->animation->end();
 }
 
+void AnimatedText::setAnimation(Animation animation)
+{
+	if (this->animation->getType() != animation)
+	{
+		this->createAnimation(this->animation->getText(), this->animation->getColor(), this->animation->getScale(), animation);
+	}
+}
+
+void AnimatedText::setAnimation(Animation animation, const std::string& text, const Color& color, float scale)
+{
+	if (this->animation->getType() != animation)
+	{
+		this->createAnimation(text, color, scale, animation);
+	}
+	else
+	{
+		this->setVariables(text, color, scale);
+	}
+}
+
 void AnimatedText::setVariables(std::optional<std::string> text, std::optional<Color> color, std::optional<float> scale)
 {
 	this->animation->setVariables(text, color, scale);
+
+	if (text.has_value())
+	{
+		this->size = UserInterface::getFontArial()->MeasureString(this->animation->getText().c_str()) * this->animation->getScale();
+	}
 }
 
 void AnimatedText::setPosition(const Vector2& position)
@@ -78,8 +119,14 @@ Vector2 AnimatedText::getSize() const
 	return this->size;
 }
 
-AnimatedText::TextAnimation::TextAnimation(const std::string& text, const Color& color, float scale) : text(text), color(color), scale(scale)
+AnimatedText::TextAnimation::TextAnimation(const std::string& text, const Color& color, float scale, bool skipOffsets) : text(text), color(color), scale(scale)
 {
+	if (skipOffsets)
+	{
+		this->offsets = nullptr;
+		return;
+	}
+
 	SpriteFont* font = UserInterface::getFontArial();
 	const SpriteFont::Glyph* glyph = nullptr;
 	this->offsets = new Vector2[text.length()];
@@ -118,12 +165,16 @@ void AnimatedText::TextAnimation::setVariables(std::optional<std::string> text, 
 
 	if (text.has_value())
 	{
-		delete[] this->offsets;
+		if (text->length() != this->text.length())
+		{
+			delete[] this->offsets;
+			this->offsets = new Vector2[text->length()];
+		}
+		
 		this->text = text.value();
 
 		SpriteFont* font = UserInterface::getFontArial();
 		const SpriteFont::Glyph* glyph = nullptr;
-		this->offsets = new Vector2[text->length()];
 		this->offsets[0] = Vector2::Zero;
 
 		for (int i = 1; i < this->text.length(); i++)
@@ -139,6 +190,21 @@ void AnimatedText::TextAnimation::setVariables(std::optional<std::string> text, 
 			}
 		}
 	}
+}
+
+std::string AnimatedText::TextAnimation::getText() const
+{
+	return this->text;
+}
+
+Color AnimatedText::TextAnimation::getColor() const
+{
+	return this->color;
+}
+
+float AnimatedText::TextAnimation::getScale() const
+{
+	return this->scale;
 }
 
 AnimatedText::ShakingAnimation::ShakingAnimation(const std::string& text, const Color& color, float scale)
@@ -170,13 +236,13 @@ void AnimatedText::ShakingAnimation::draw(const Vector2& position)
 
 void AnimatedText::ShakingAnimation::setVariables(std::optional<std::string> text, std::optional<Color> color, std::optional<float> scale)
 {
-	TextAnimation::setVariables(text, color, scale);
-
-	if (text.has_value())
+	if (text.has_value() && text->length() != this->text.length())
 	{
 		delete[] this->randomOffsets;
 		this->randomOffsets = new Vector2[text->length()];
 	}
+
+	TextAnimation::setVariables(text, color, scale);
 }
 
 AnimatedText::FadeAnimation::FadeAnimation(const std::string& text, const Color& color, float scale)
@@ -386,10 +452,13 @@ void AnimatedText::SpinningAnimation::end()
 
 void AnimatedText::SpinningAnimation::setVariables(std::optional<std::string> text, std::optional<Color> color, std::optional<float> scale)
 {
-	TextAnimation::setVariables(text, color, scale);
+	if (text.has_value() && text->length() != this->text.length())
+	{
+		delete[] this->spinOffsets;
+		this->spinOffsets = new Vector2[text->length()];
+	}
 
-	delete[] this->spinOffsets;
-	this->spinOffsets = new Vector2[this->text.length()];
+	TextAnimation::setVariables(text, color, scale);
 }
 
 AnimatedText::SpinningFadeAnimation::SpinningFadeAnimation(const std::string& text, const Color& color, float scale, bool upDownOnly)
@@ -453,5 +522,37 @@ void AnimatedText::SpinningFadeAnimation::setVariables(std::optional<std::string
 	if (text.has_value())
 	{
 		this->animationTime = FADE_SPEED * text->length();
+	}
+}
+
+AnimatedText::NoAnimation::NoAnimation(const std::string& text, const Color& color, float scale)
+	: TextAnimation(text, color, scale, true)
+{
+}
+
+AnimatedText::NoAnimation::~NoAnimation()
+{
+}
+
+void AnimatedText::NoAnimation::draw(const Vector2& position)
+{
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), this->text.c_str(), position, this->color, 0.0f, Vector2::Zero, this->scale);
+}
+
+void AnimatedText::NoAnimation::setVariables(std::optional<std::string> text, std::optional<Color> color, std::optional<float> scale)
+{
+	if (color.has_value())
+	{
+		this->color = color.value();
+	}
+
+	if (scale.has_value())
+	{
+		this->scale = scale.value();
+	}
+
+	if (text.has_value())
+	{
+		this->text = text.value();
 	}
 }

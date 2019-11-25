@@ -163,9 +163,9 @@ void Bullet::update(float deltaTime)
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::aiMachineGun or
-		this->weapon.type == WeaponType::aiFlamethrower or
-		this->weapon.type == WeaponType::aiMissileLauncher)
+	else if (this->weapon.type == WeaponType::aiMachineGun		or
+			 this->weapon.type == WeaponType::aiFlamethrower	or
+			 this->weapon.type == WeaponType::aiMissileLauncher)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}
