@@ -191,7 +191,7 @@ void Game::run()
 		//deltaTime reset
 		prevTime = curTime;
 	}
-
+	Sound::stopAll();
 	Sound::deinit();
 }
 
