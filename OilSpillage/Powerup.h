@@ -17,6 +17,7 @@ class PowerUp : public GameObject
 	float respawnTime;
 	float currentRespawnTimer;
 	float time;
+	int soundHandle;
 public:
 	PowerUp();
 	PowerUp(Vector3 position, PowerUpType type = PowerUpType::Time, float respawnTime = 10000000.0);
