@@ -3,9 +3,9 @@
 #include "AI/Actor.h"
 static SolverType gSolverType = SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT;
 static int gSolverMode = SOLVER_SIMD |
-SOLVER_USE_WARMSTARTING |
-// SOLVER_RANDMIZE_ORDER |
-// SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS |
+//SOLVER_USE_WARMSTARTING |
+SOLVER_RANDMIZE_ORDER |
+SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS |
 // SOLVER_USE_2_FRICTION_DIRECTIONS |
 0;
 btConstraintSolver* createSolverByType(SolverType t)
@@ -45,49 +45,28 @@ Physics::Physics() :broadphase(new btDbvtBroadphase())
 	solver = new btSequentialImpulseConstraintSolver();
 	dispatcher = new btCollisionDispatcher(collisionConfig);
 	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
-	world->setForceUpdateAllAabbs(false);
-	world->setGravity(btVector3(0, -10, 0));
+
 #else
-	btDefaultCollisionConstructionInfo cci;
-	cci.m_defaultMaxPersistentManifoldPoolSize = 80000;
-	cci.m_defaultMaxCollisionAlgorithmPoolSize = 80000;
-	collisionConfig = new btDefaultCollisionConfiguration(cci);
+
+	collisionConfig = new btDefaultCollisionConfiguration();
 	dispatcherMt = new btCollisionDispatcherMt(collisionConfig, 40);
 
-	btConstraintSolverPoolMt* solverPool;
-	{
-		SolverType poolSolverType = m_solverType;
-		if (poolSolverType == SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT)
-		{
-			// pool solvers shouldn't be parallel solvers, we don't allow that kind of
-			// nested parallelism because of performance issues
-			poolSolverType = SOLVER_TYPE_SEQUENTIAL_IMPULSE;
-		}
-		btConstraintSolver* solvers[BT_MAX_THREAD_COUNT];
-		int maxThreadCount = BT_MAX_THREAD_COUNT;
-		for (int i = 0; i < maxThreadCount; ++i)
-		{
-			solvers[i] = createSolverByType(poolSolverType);
-		}
-		solverPool = new btConstraintSolverPoolMt(solvers, maxThreadCount);
-		m_solver = solverPool;
-	}
+	SolverType poolSolverType = SOLVER_TYPE_SEQUENTIAL_IMPULSE;
+
+	btConstraintSolver* solvers[BT_MAX_THREAD_COUNT];
+	int maxThreadCount = BT_MAX_THREAD_COUNT;
+	btConstraintSolverPoolMt* solverPool = new btConstraintSolverPoolMt(maxThreadCount);
+	m_solver = solverPool;
+	btSetTaskScheduler(btCreateDefaultTaskScheduler());
 	btSequentialImpulseConstraintSolverMt* solverMt = new btSequentialImpulseConstraintSolverMt();
 	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver();
 
-	if (m_solverType == SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT)
-	{
-		solverMt = new btSequentialImpulseConstraintSolverMt();
-	}
-
 	world = new btDiscreteDynamicsWorldMt(dispatcherMt, broadphase, solverPool, solver, collisionConfig);
-	//worldMt->getSolverInfo().m_solverMode = gSolverMode;
+
+	//world->getSolverInfo().m_solverMode = gSolverMode;
+#endif // !DEBUG
 	world->setForceUpdateAllAabbs(false);
 	world->setGravity(btVector3(0, -10, 0));
-	world->getSolverInfo().m_solverMode = gSolverMode;
-	world->getSolverInfo().m_numIterations = 10;
-#endif // !DEBUG
-
 	//temp plane inf
 	btTransform t;
 	t.setIdentity();
@@ -155,17 +134,6 @@ void Physics::teleportRigidbody(Vector3 newPos, btRigidBody* body)
 	body->setLinearVelocity(btVector3());
 	body->setAngularVelocity(btVector3());
 	body->clearForces();
-}
-
-void Physics::moveBody(btRigidBody* rigidbody, float x, float y, float z)
-{
-	//btTransform transform = rigidbody->getCenterOfMassTransform();
-	//transform.setOrigin(btVector3(x, y, z));
-	//rigidbody->setWorldTransform(transform);
-	//rigidbody->getMotionState()->setWorldTransform(transform);
-	//rigidbody->setLinearVelocity(btVector3());
-	//rigidbody->setAngularVelocity(btVector3());
-	//rigidbody->clearForces();
 }
 
 void Physics::update(float deltaTime)
@@ -349,26 +317,26 @@ bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* 
 	Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
 	Actor* enemyPtr = static_cast<Actor*>(obj2->getCollisionObject()->getUserPointer());
 
-	//if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
-	//{
-	//	playerPtr = static_cast<Vehicle*>(obj2->getCollisionObject()->getUserPointer());
-	//	enemyPtr = static_cast<Actor*>(obj1->getCollisionObject()->getUserPointer());
+	if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
+	{
+		playerPtr = static_cast<Vehicle*>(obj2->getCollisionObject()->getUserPointer());
+		enemyPtr = static_cast<Actor*>(obj1->getCollisionObject()->getUserPointer());
 
-	//	if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
-	//	{
-	//		return false;
-	//	}
-	//}
+		if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
+		{
+			return false;
+		}
+	}
 
-	//if (enemyPtr != nullptr)
-	//{
-	//	if (playerPtr->getPowerUpTimer(PowerUpType::Star) > 0.0)
-	//	{
-	//		enemyPtr->setHealth(0);
-	//	}
+	if (enemyPtr != nullptr)
+	{
+		if (playerPtr->getPowerUpTimer(PowerUpType::Star) > 0.0)
+		{
+			enemyPtr->changeHealth(-200);
+		}
 
-	//	return true;
-	//}
+		return true;
+	}
 	return false;
 }
 
