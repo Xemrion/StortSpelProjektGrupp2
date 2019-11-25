@@ -597,10 +597,10 @@ Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
-	for (;;) {
+	for (float i = 0;; i += 1.0) {
 		Vector3 position = map->generateRoadPositionInWorldSpace(*rng);
 		float distance = (position - targetPos).Length();
-		if ((distance <= maxDistance) && (distance >= minDistance))
+		if ((distance <= maxDistance + i) && (distance >= minDistance))
 		{
 			return position;
 		}
