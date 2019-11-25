@@ -25,6 +25,10 @@ struct GameInfo
 	{
 		return nrOfClearedStages;
 	};
+	void incrementLevelCount() 
+	{
+		nrOfClearedStages++;
+	};
 };
 
 class Game
