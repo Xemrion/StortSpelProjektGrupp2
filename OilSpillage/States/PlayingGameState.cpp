@@ -1307,7 +1307,7 @@ void PlayingGameState::generateObjectives()
 	else
 	{
 		float prob[2] = { 0.5f, 0.5f };
-		for (int i = 0; i < 1; i++)
+		for (int i = 0; i < 0; i++)
 		{
 			int dice = rand() % 10 + 1;
 			if (dice <= prob[0] * 10)

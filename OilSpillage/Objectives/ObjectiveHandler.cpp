@@ -116,6 +116,10 @@ bool ObjectiveHandler::isAllDone()
 			break;//om den hittar minst en så är alla inte klara
 		}
 	}
+	if (this->objectiveVec.size() == 0)
+	{
+		return true;
+	}
 	return allDone;
 }
 
