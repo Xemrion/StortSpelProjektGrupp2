@@ -874,6 +874,11 @@ void Vehicle::updateWeapon(float deltaTime)
 						if (weapon.remainingCooldown > 0.0)
 						{
 							laser->setLuminance(0.0);
+
+							if (weapon.remainingCooldown > 3.5)
+							{
+								laser->setLuminance((sin(weapon.remainingCooldown * 200.0) * sin(weapon.remainingCooldown * 111) + 1.0) * 0.05);
+							}
 						}
 						else
 						{
