@@ -16,20 +16,16 @@
 #include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
 #include "BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h"
 #include "BulletDynamics/MLCPSolvers/btDantzigSolver.h"
-#include "BulletDynamics/MLCPSolvers/btLemkeSolver.h"
 #include "LinearMath/btAlignedObjectArray.h"
 #include "LinearMath/btPoolAllocator.h"
+#include "LinearMath/TaskScheduler/btThreadSupportInterface.h"
 #include "btBulletCollisionCommon.h"
 #include "BulletCollision/CollisionDispatch/btCollisionDispatcherMt.h"
 #include "BulletDynamics/Dynamics/btSimulationIslandManagerMt.h"  // for setSplitIslands()
 #include "BulletDynamics/Dynamics/btDiscreteDynamicsWorldMt.h"
-#include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolverMt.h"
-#include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
-#include "BulletDynamics/ConstraintSolver/btNNCGConstraintSolver.h"
-#include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
-#include "BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h"
-#include "BulletDynamics/MLCPSolvers/btDantzigSolver.h"
 #include "BulletDynamics/MLCPSolvers/btLemkeSolver.h"
+#define BT_THREADSAFE 1
+#define BT_USE_PPL 1
 using namespace DirectX::SimpleMath;
 enum SolverType
 {
@@ -45,7 +41,6 @@ enum SolverType
 class Physics
 {
 private:
-	btClock realClock;
 	btConstraintSolver* m_solver;
 	SolverType m_solverType;
 	btCollisionDispatcherMt* dispatcherMt;
@@ -66,11 +61,11 @@ public:
 	Physics();
 	~Physics();
 	void teleportRigidbody(Vector3 newPos, btRigidBody* body);
-	void moveBody(btRigidBody* rigidbody,float x, float y, float z);
 	void update(float deltaTime);
 	btRigidBody* addSphere(float radius, btVector3 Origin, float mass, void* obj = nullptr);
 	btRigidBody* addBox(btVector3 Origin, btVector3 size, float mass, void* obj = nullptr);
 	btRigidBody* addCylinder(btVector3 Origin, btVector3 size, float mass);
+	btRigidBody* addCapsule(btScalar radius, btVector3 Origin, btScalar height, float mass);
 	btGeneric6DofSpring2Constraint* addSpring(btRigidBody* box1, btRigidBody* box2);
 	btPoint2PointConstraint* addPointJoint(btRigidBody* box1, btRigidBody* box2);
 	btRaycastVehicle* addVehicle(btRaycastVehicle* vehicle);
@@ -86,4 +81,4 @@ public:
 	btStaticPlaneShape* getPlaneRigidBody();
 };
 
-#endif // !PHYSICS_H
+#endif 

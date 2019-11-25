@@ -40,7 +40,7 @@ void main( uint3 DispatchThreadID : SV_DispatchThreadID )
 {
 	Particle p;
 
-	p.position.xyz = emitterLocation.xyz; /*Use this for more randomness sin(DispatchThreadID.x*10)+cos(DispatchThreadID.x*6)+ direction[DispatchThreadID.x];*/
+	p.position.xyz = emitterLocation.xyz;
 	p.position.w = randomVector.w;            
 	p.direction = float4(reflect(direction[DispatchThreadID.x], hash(randomVector.xyz * 5.1 + float3(DispatchThreadID.x * 2.3f, DispatchThreadID.x * 1.4, DispatchThreadID.x * 4.3))) * 1.f, randomVector.w);
 	p.direction += float4(initialDirection.xyz, 0.0f);

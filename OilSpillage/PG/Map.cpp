@@ -276,6 +276,7 @@ void  Map::generateBuildings( )
 																							  15.5f * houseTile.getScale().z ),
 																				.0f );
 								houseTile.setRigidBody( tmp, physics );
+								houseTile.getRigidBody()->setFriction(0);
 								houseTile.getRigidBody()->forceActivationState(DISABLE_SIMULATION);
 							#endif
 						}

@@ -23,17 +23,16 @@ enum class WeaponType
 
 struct Weapon
 {
-	int damage = 40;
+	float damage = 40;
 	float fireRate = 3.0f;
 	float bulletSpeed = 24.0f;
 	float bulletLifetime = 2.0f;
 	DirectX::SimpleMath::Vector3 bulletScale = DirectX::SimpleMath::Vector3(1.0);
 	float spreadRadians = 0.0;
 	float maxSpread = 1.0;
-	float spreadIncreasePerSecond = 1.0;
+	float spreadIncreasePerSecond = 1.0; // Spread increase per shot in percentage of max spread
 	float currentSpreadIncrease = 0.0;
-	//float recoilDissipationTime = 1.0; // time (in seconds) for recoil to go from 100% to 0%
-	float spreadDecreasePerSecond = 1.0;
+	float spreadDecreasePerSecond = 1.0; // Spread increase per shot in percentage of max spread
 	float remainingCooldown = 0.0;
 	WeaponType type = WeaponType::Default;
 	bool melee = false;
@@ -50,7 +49,7 @@ struct Weapon
 			soundTimer += 100.0f;
 		}
 		timeSinceLastShot += deltaTime;
-		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * maxSpread * 2.0, 0.0);
+		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * spreadDecreasePerSecond * maxSpread, 0.0);
 		remainingCooldown = max(remainingCooldown - deltaTime, 0.0);
 	};
 
@@ -104,7 +103,7 @@ public:
 	static constexpr Weapon weapons[] = {
 		Weapon(), //default gun
 		{      6,      0.05f,        55.0f,          1.4f,		Vector3(0.07f, 0.07f, 0.3f),	 0.1f,  0.3f,  0.11f,  0.0f,  0.7f,  0.0,  WeaponType::MachineGun },
-		{    200,       1.5f,        13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::MissileLauncher },
+		{     10,       1.5f,        13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::MissileLauncher },
 		{      2,     0.015f,         0.0f,         0.15f,		Vector3(0.37f, 0.37f, 30.0f),	 0.0f,  5.0f,  1.75f,  0.0f,  1.5f,  0.0,  WeaponType::Laser },
 		{    300,       1.5f,         0.0f,         0.15f,		Vector3(0.17f, 0.17f, 30.0f),	 0.0f,  0.0f,  0.11f,  0.0f,  2.0f,  0.0,  WeaponType::Railgun },
 		{      4,      0.01f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Flamethrower },
@@ -133,7 +132,7 @@ public:
 				if (rand2 < 1) {
 					soundEffect = "./data/sound/MachineGunSound1.wav";
 				}
-				Sound::play(soundEffect);
+				Sound::play(soundEffect,0.5f);
 				weapon.soundTimer = 0;
 			}
 		}
@@ -153,8 +152,8 @@ public:
 			int randomSound = rand() % 4 + 1;
 			std::string soundEffect = "./data/sound/Lazer" + std::to_string(randomSound) + ".mp3";
 			Sound::stopLooping(weapon.soundHandle);
-			weapon.soundHandle = Sound::playLooping(soundEffect);
-			Sound::play("./data/sound/LazerImpact.mp3");
+			weapon.soundHandle = Sound::playLooping(soundEffect, 0.5f);
+			Sound::play("./data/sound/LazerImpact.mp3", 0.75f);
 			weapon.flameBool = false;
 		}
 	};

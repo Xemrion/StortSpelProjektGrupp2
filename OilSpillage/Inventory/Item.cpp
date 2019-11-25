@@ -9,15 +9,15 @@ void Item::init()
 {
 	Graphics& graphics = Game::getGraphics();
 
-	graphics.loadModel("Entities/MiniGun");
+	graphics.loadModel("Entities/Minigun");
 	graphics.loadModel("Entities/FlameThrower");
 	graphics.loadModel("Entities/Lazer");
 
 	GameObject* machineGun = new GameObject();
-	machineGun->mesh = graphics.getMeshPointer("Entities/MiniGun");
-	machineGun->setMaterial(graphics.getMaterial("Entities/MiniGun"));
-	machineGun->setScale(Vector3(0.05f));
-	machineGun->setPosition(machineGun->mesh->getAABB().scale(machineGun->getScale()).maxPos * Vector3(0, 1, 0));
+	machineGun->mesh = graphics.getMeshPointer("Entities/Minigun");
+	machineGun->setMaterial(graphics.getMaterial("Entities/Minigun"));
+	machineGun->setScale(Vector3(0.04f));
+	machineGun->setPosition(machineGun->mesh->getAABB().scale(machineGun->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.08f, 0));
 
 	GameObject* flameThrower = new GameObject();
 	flameThrower->mesh = graphics.getMeshPointer("Entities/FlameThrower");
@@ -39,6 +39,7 @@ void Item::init()
 		std::make_shared<ItemWeapon>("Flamethrower", WeaponHandler::getWeapon(WeaponType::Flamethrower), flameThrower),
 		std::make_shared<ItemWeapon>("Lazer", WeaponHandler::getWeapon(WeaponType::Laser), lazer)
 	};
+
 }
 
 Item* Item::getRandom()
@@ -61,6 +62,11 @@ Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 sc
 Item::Item(std::string name, std::string description, ItemType type, GameObject* object)
 	: name(name), description(description), type(type), object(object)
 {
+	this->baseColor = Vector4(0.0, 0.0, 0.0, 0.0);
+	if (this->object != nullptr)
+	{
+		this->object->setColor(baseColor);
+	}
 }
 
 Item::~Item()
@@ -73,10 +79,12 @@ Item::Item(const Item& obj)
 	this->name = obj.name;
 	this->description = obj.description;
 	this->type = obj.type;
+	this->baseColor = obj.baseColor;
 	
 	if (obj.object != nullptr)
 	{
 		this->object = new GameObject(*obj.object);
+		this->object->setColor(baseColor);
 	}
 	else
 	{
@@ -91,11 +99,12 @@ Item* Item::clone() const
 
 void Item::randomize()
 {
-	F32_Dist genValue{ .0f, .27f };
+	F32_Dist genValue{ -.20f, .20f };
 	RNG rng { RD()() };
+	this->baseColor = Vector4(genValue(rng), genValue(rng), genValue(rng), 1);
 	if (this->object)
 	{
-		this->object->setColor(Vector4( genValue(rng), genValue(rng), genValue(rng), 1));
+		this->object->setColor(baseColor);
 	}
 }
 
@@ -117,4 +126,9 @@ ItemType Item::getType() const
 GameObject* Item::getObject() const
 {
 	return this->object;
+}
+
+Vector4 Item::getBaseColor() const
+{
+	return this->baseColor;
 }
