@@ -59,6 +59,11 @@ void Objective::setReward(int time)
 	this->mission->rewardTime = time;
 }
 
+void Objective::setScore(int score)
+{
+	this->mission->points = score;
+}
+
 void Objective::setInfo(std::string info)
 {
 	this->mission->info = info;
@@ -87,6 +92,11 @@ TypeOfTarget Objective::getTargetType() const
 int Objective::getRewardTime() const
 {
 	return this->mission->rewardTime;
+}
+
+int Objective::getScore() const
+{
+	return this->mission->points;
 }
 
 std::string Objective::getInfo() const

@@ -4,6 +4,7 @@
 #include "Attacker.h"
 #include "Swarm.h"
 #include "ChaseCar.h"
+#include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
 
@@ -12,11 +13,13 @@ ActorManager::ActorManager()
 	this->aStar = nullptr;
 }
 
-ActorManager::ActorManager(AStar* aStar, Physics* physics)
+ActorManager::ActorManager(AStar* aStar, Physics* physics, Map* map, std::mt19937* RNG)
 	:turretHandler(physics)
 {
 	this->aStar = aStar;
 	this->physics = physics;
+	this->map = map;
+	this->rng = RNG;
 }
 
 ActorManager::~ActorManager()
@@ -31,54 +34,43 @@ ActorManager::~ActorManager()
 void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
-	bool hasDied = false;
+	spawnTimer -= dt;
 	//seperation(targetPos);
-	for (int i = 0; i < this->groups.size(); i++)
+	updateActors(dt, targetPos);
+
+	if (spawnTimer <= 0)
 	{
-		for (int j = 0; j < groups[i].actors.size(); j++)
-		{
-			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
-			{
-				groups[i].actors[j]->update(dt, targetPos);
-			}
-			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
-			{
-				Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
-				if (ptr != nullptr)
-				{
-					if (ptr->getType() == TypeOfMission::KillingSpree)
-					{
-						ptr->killEnemy();
-					}
-				}
-
-				hasDied = true;
-
-				float normalizedRandom = float(rand()) / RAND_MAX;
-
-				if (normalizedRandom >= 0.95)
-				{
-					static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-						PowerUp(groups[i].actors[j]->getPosition(),
-							    PowerUpType::Health)
-					);
-				}
-			}
-		}
+#ifndef _DEBUG
+		spawnEnemies(targetPos);
+#endif
+		spawnTimer = spawnCooldown;
 	}
-	if (hasDied)
-	{
-		for (int i = this->actors.size() - 1; i >= 0; i--)
-		{
-			if (actors[i]->isDead())
-			{
-				destroyActor(i);
-			}
-		}
-	}
+
+	Vector3 newPos;
+	float deltaX;
+	float deltaZ;
+	float distance;
 	for (int i = 0; i < groups.size(); i++)
 	{
 		groups[i].update(targetPos);
+		deltaX = groups[i].averagePos.x - targetPos.x;
+		deltaZ = groups[i].averagePos.z - targetPos.z;
+		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+		//(TileSize * nrOfTiles)^2
+		if (distance > (20 * 10) * (20 * 10))
+		{
+			//newPos = generateObjectivePos(targetPos, 50, 100);
+			for (int j = 0; j < groups[i].actors.size(); j++)
+			{
+				Actor* current = groups[i].actors[j];
+				//current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+				if (j % 5 == 0)
+				{
+					//newPos = generateObjectivePos(targetPos, 50, 100);
+				}
+			}
+		}
 	}
 	updateGroups();
 	turretHandler.update(dt, targetPos);
@@ -119,6 +111,12 @@ void ActorManager::createChaseCar(float x, float z)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
+void ActorManager::createShootCar(float x, float z, int weaponType)
+{
+	this->actors.push_back(new ShootCar(x, z, weaponType, physics));
+	initGroupForActor(actors.at(actors.size() - 1));
+}
+
 void ActorManager::createSwarm(float x, float z)
 {
 	this->actors.push_back(new Swarm(x, z, physics));
@@ -156,7 +154,7 @@ const std::vector<AIGroup>& ActorManager::getGroups() const
 {
 	return this->groups;
 }
-
+//Player vs AI
 void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 {
 	for (int i = 0; i < this->actors.size(); i++)
@@ -188,7 +186,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					bulletArray[j].destroy();
 				}
-				if (bulletArray[j].getMelee() == true && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
+				if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
 						Sound::play("data/sound/HitSound.wav");
@@ -204,23 +202,41 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 
 }
 
-void ActorManager::spawnAttackers(const Vector3& originPos, int weaponType)
+void ActorManager::spawnAttackers(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-			createAttacker(originPos.x + i, originPos.z, weaponType);
-			createAttacker(originPos.x, originPos.z + 1, weaponType);
-			createAttacker(originPos.x - i, originPos.z, weaponType);
+		createAttacker(originPos.x + i, originPos.z, (rand() % 4) + 1);
+		createAttacker(originPos.x, originPos.z + i, (rand() % 4) + 1);
+		createAttacker(originPos.x - i, originPos.z, (rand() % 4) + 1);
 	}
 }
-
+void ActorManager::spawnSnipers(const Vector3& originPos)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		createSniper(originPos.x + i, originPos.z, (rand() % 4) + 1);
+		createSniper(originPos.x, originPos.z + i, (rand() % 4) + 1);
+		createSniper(originPos.x - i, originPos.z, (rand() % 4) + 1);
+	}
+}
 void ActorManager::spawnChaseCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createChaseCar(originPos.x + i, originPos.z);
-		createChaseCar(originPos.x, originPos.z + 1);
-		createChaseCar(originPos.x - i, originPos.z);
+	//	createChaseCar(originPos.x + i, originPos.z);
+		//createChaseCar(originPos.x, originPos.z + i);
+	//	createChaseCar(originPos.x - i, originPos.z);
+	}
+}
+
+void ActorManager::spawnShootCars(const Vector3& originPos)
+{
+	for (int i = 0; i < 2; i++)
+	{
+	//	createShootCar(originPos.x + i, originPos.z, (rand() % 4) + 1);
+	//	createShootCar(originPos.x, originPos.z + i, (rand() % 4) + 1);
+	//	createShootCar(originPos.x - i, originPos.z, (rand() % 4) + 1);
 	}
 }
 
@@ -229,22 +245,22 @@ void ActorManager::spawnSwarm(const Vector3& originPos)
 	for (int i = 0; i < 2; i++)
 	{
 		createSwarm(originPos.x + i, originPos.z);
-		createSwarm(originPos.x, originPos.z + 1);
+		createSwarm(originPos.x, originPos.z + i);
 		createSwarm(originPos.x - i, originPos.z);
 	}
 }
 
-void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float angle, int weaponType)
+void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float angle)
 {
 	if (angle != 0)
 	{
 		Vector2& newPosition = generateAroundaPoint(position.x, position.z, angle);
-		createTurret(newPosition.x, newPosition.y, weaponType);
+		createTurret(newPosition.x, newPosition.y, 1);
 	}
 	else
 	{
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
-		createTurret(newPosition.x, newPosition.y, weaponType);
+		createTurret(newPosition.x, newPosition.y, 1);
 	}
 }
 
@@ -347,6 +363,53 @@ void ActorManager::updateAveragePos()
 	}
 }
 
+void ActorManager::updateActors(float dt, Vector3 targetPos)
+{
+	bool hasDied = false;
+	for (int i = 0; i < this->groups.size(); i++)
+	{
+		for (int j = 0; j < groups[i].actors.size(); j++)
+		{
+			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
+			{
+				groups[i].actors[j]->update(dt, targetPos);
+			}
+			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
+			{
+				Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+				if (ptr != nullptr)
+				{
+					if (ptr->getType() == TypeOfMission::KillingSpree)
+					{
+						ptr->killEnemy();
+					}
+				}
+				hasDied = true;
+			}
+		}
+	}
+	if (hasDied)
+	{
+
+		for (int i = this->actors.size() - 1; i >= 0; i--)
+		{
+			float normalizedRandom = float(rand()) / RAND_MAX;
+			if (normalizedRandom >= 0.995)
+			{
+				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
+					PowerUp(actors[i]->getPosition(),
+						PowerUpType::Health)
+				);
+			}
+			if (actors[i]->isDead())
+			{
+				Game::getGameInfo().highScore += actors[i]->getPoints();
+				destroyActor(i);
+			}
+		}
+	}
+}
+
 int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 {
 	int biggestGroupSize = currentGroupSize;
@@ -374,6 +437,31 @@ void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 	groups[groupIndex].updateDuty();
 }
 
+void ActorManager::spawnEnemies(const Vector3& targetPos)
+{
+	if (actors.size() < maxNrOfEnemies)
+	{
+		int enemyType = rand() % 4;
+		Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
+		if (enemyType == 0)
+		{
+			spawnAttackers(newPos);
+		}
+		else if (enemyType == 1)
+		{
+			spawnChaseCars(newPos);
+		}
+		else if (enemyType == 2)
+		{
+			spawnShootCars(newPos);
+		}
+		else if (enemyType == 3)
+		{
+			spawnSwarm(newPos);
+		}
+	}
+}
+
 void ActorManager::leaveGroup(int groupIndex, int where)
 {
 	groups[groupIndex].actors.erase(groups[groupIndex].actors.begin() + where);
@@ -386,8 +474,8 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 	std::vector<Vector3>* pathToUse;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		aStar->algorithm(groups[i].getAveragePos(), targetPos, groups[i].path);
-		/*aStar->algorithm(groups[i].getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
+		aStar->algorithm(groups[i].getAveragePos(), targetPos, pathToPlayer);
+		aStar->algorithm(groups[i].getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
 
 		if (pathToPlayer.size() < pathToPredicted.size())
 		{
@@ -397,10 +485,11 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 		{
 			pathToUse = &pathToPredicted;
 		}
-		groups[i].setPath(*pathToUse);*/
+		groups[i].setPath(*pathToUse);
 		for (int j = 0; j < groups[i].actors.size(); j++)
 		{
-			groups[i].actors[j]->setPath(&groups[i].path);
+			groups[i].actors[j]->setPath(groups[i].path.data() + groups[i].path.size() - 1);
+			groups[i].actors[j]->pathSize = groups[i].path.size() - 1;
 		}
 	}
 }
@@ -504,4 +593,19 @@ Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 	targetVelocity.Normalize();
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
+}
+Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
+{
+
+	for (;;) {
+		Vector3 position = map->generateRoadPositionInWorldSpace(*rng);
+		float distance = (position - targetPos).Length();
+		if ((distance <= maxDistance) && (distance >= minDistance))
+		{
+			return position;
+		}
+	}
+	assert(false and "BUG: Shouldn't be possible!");
+	return { -1.0f, -1.0f, -1.0f }; //  silences a warning
+
 }

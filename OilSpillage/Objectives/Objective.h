@@ -27,6 +27,7 @@ struct Mission
 	TypeOfMission typeMission;
 	TypeOfTarget typeOfTarget;
 	int rewardTime;
+	int points;
 	std::string info;
 };
 class Objective
@@ -39,6 +40,7 @@ public:
 	void setType(TypeOfMission type);
 	void setTargetType(TypeOfTarget targetType);
 	void setReward(int time);
+	void setScore(int score);
 	void setInfo(std::string info);
 	void killEnemy();
 	GameObject* getTarget(int id)const;
@@ -46,6 +48,7 @@ public:
 	TypeOfTarget getTargetType()const;
 
 	int getRewardTime()const;
+	int getScore()const;
 	std::string getInfo()const;
 	Vector3 getAveragePosition()const;
 	Vector3 getClosestToPlayer()const;

@@ -9,15 +9,15 @@ void Item::init()
 {
 	Graphics& graphics = Game::getGraphics();
 
-	graphics.loadModel("Entities/MiniGun");
+	graphics.loadModel("Entities/Minigun");
 	graphics.loadModel("Entities/FlameThrower");
 	graphics.loadModel("Entities/Lazer");
 
 	GameObject* machineGun = new GameObject();
-	machineGun->mesh = graphics.getMeshPointer("Entities/MiniGun");
-	machineGun->setMaterial(graphics.getMaterial("Entities/MiniGun"));
-	machineGun->setScale(Vector3(0.05f));
-	machineGun->setPosition(machineGun->mesh->getAABB().scale(machineGun->getScale()).maxPos * Vector3(0, 1, 0));
+	machineGun->mesh = graphics.getMeshPointer("Entities/Minigun");
+	machineGun->setMaterial(graphics.getMaterial("Entities/Minigun"));
+	machineGun->setScale(Vector3(0.04f));
+	machineGun->setPosition(machineGun->mesh->getAABB().scale(machineGun->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.08f, 0));
 
 	GameObject* flameThrower = new GameObject();
 	flameThrower->mesh = graphics.getMeshPointer("Entities/FlameThrower");
@@ -99,7 +99,7 @@ Item* Item::clone() const
 
 void Item::randomize()
 {
-	F32_Dist genValue{ .0f, .27f };
+	F32_Dist genValue{ -.20f, .20f };
 	RNG rng { RD()() };
 	this->baseColor = Vector4(genValue(rng), genValue(rng), genValue(rng), 1);
 	if (this->object)

@@ -80,8 +80,9 @@ void main( uint3 DTid : SV_DispatchThreadID)
 		else
 		{
 			//On zero or lower apply friction and set velocity.y to 0 for no movement in y 
-			//p.velocity.xyz = (p.velocity.xyz + TimeFactors.x * float3(0, -1, 0))/(1 + (friction* TimeFactors.x));
-            p.velocity.xyz = 1.1f*reflect(p.velocity.xyz, float3(0.0f, 1.0f, 0.0f))+acceleration;
+			p.velocity.xyz = (p.velocity.xyz + TimeFactors.x * float3(0, -1, 0))/(1 + (friction* TimeFactors.x));
+			p.velocity.y = 0;
+           // p.velocity.xyz = 1.1f*reflect(p.velocity.xyz, float3(0.0f, 1.0f, 0.0f))+acceleration;
             //+reflect(p.velocity.xyz + acceleration, float3(0.0f, 1.0f, 0.0f)); 
         }
 
