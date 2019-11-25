@@ -134,12 +134,11 @@ void Game::createCurrentState()
 {
 	VehicleSlots* transfer = nullptr;
 	VehicleSlots* newSlots = nullptr;
-
+	Vehicle*temp = nullptr;
 	if (currentState == STATE_MENU)
 	{
 		Container::playerInventory = std::make_unique<Container>();
 
-		
 		nrOfStagesDone = 0.0f;
 		localScale = 1.0f;
 		state = std::make_unique<MenuGameState>();
@@ -150,6 +149,8 @@ void Game::createCurrentState()
 		{
 			transfer = static_cast<UpgradingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
+			temp = static_cast<UpgradingGameState*>(state.get())->getPlayer().get();
+			temp->stopEngineSound();
 			nrOfStagesDone++;
 			if (nrOfStagesDone % 3 == 0)
 			{
@@ -171,6 +172,8 @@ void Game::createCurrentState()
 		{
 			transfer = static_cast<PlayingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
+			temp = static_cast<UpgradingGameState*>(state.get())->getPlayer().get();
+			temp->stopEngineSound();
 		}
 
 		state = std::make_unique<UpgradingGameState>();

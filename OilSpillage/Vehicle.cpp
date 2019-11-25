@@ -644,7 +644,7 @@ void Vehicle::updateWeapon(float deltaTime)
 						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::MOUNTED));
 						this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, newRot, 0));
 
-						if (/*Input::checkButton(Keys::R_SHOULDER, States::HELD) ||*/ Input::getStrengthRnoMouse() > 0.01f || Input::checkButtonMouse(MouseKeys::LEFT,States::HELD))
+						if (/*Input::checkButton(Keys::R_SHOULDER, States::HELD) ||*/ Input::getStrengthRnoMouse() > 0.01f || Input::checkButtonMouse(MouseKeys::LEFT,States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 						{
 							if (temp->getWeapon().updateFireRate())
 							{
@@ -666,6 +666,23 @@ void Vehicle::updateWeapon(float deltaTime)
 							}
 
 						}
+						else if(temp->getWeapon().type == WeaponType::Spikes){
+							if (temp->getWeapon().updateFireRate())
+							{
+								for (int i = 0; i < Vehicle::bulletCount; ++i)
+								{
+									if (bullets[i].getWeaponType() == WeaponType::None)
+									{
+										auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+										this->bullets[i].shoot(temp->getWeapon(),
+											this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
+											Vector3(curDir.x, 0.0, curDir.y),
+											Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 1.0f, deltaTime);
+										break;
+									}
+								}
+							}
+						}
 						else
 						{
 							WeaponHandler::weaponEndSound(temp->getWeapon());
@@ -679,10 +696,29 @@ void Vehicle::updateWeapon(float deltaTime)
 						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::FRONT));
 						if (this->vehicleSlots->getSlot(Slots::FRONT)->getType() == ItemType::WEAPON && temp!=nullptr)
 						{
-							if (Input::checkButton(Keys::R_SHOULDER, States::HELD))
+							if (Input::checkButton(Keys::R_SHOULDER, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 							{
 								//weapon.startSound();
 								WeaponHandler::weaponStartSound(temp->getWeapon());
+								if (temp->getWeapon().updateFireRate())
+								{
+									for (int i = 0; i < Vehicle::bulletCount; ++i)
+									{
+										if (bullets[i].getWeaponType() == WeaponType::None)
+										{
+											auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+											this->bullets[i].shoot(temp->getWeapon(),
+												this->vehicleBody1->getPosition() + Vector3(tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
+												tempDir,
+												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
+											break;
+										}
+									}
+								}
+							}
+							else if (temp->getWeapon().type == WeaponType::Spikes) {
 								if (temp->getWeapon().updateFireRate())
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
@@ -715,10 +751,29 @@ void Vehicle::updateWeapon(float deltaTime)
 						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::BACK));
 						if (this->vehicleSlots->getSlot(Slots::BACK)->getType() == ItemType::WEAPON && temp != nullptr)
 						{
-							if (Input::checkButton(Keys::CONFIRM, States::HELD))
+							if (Input::checkButton(Keys::CONFIRM, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 							{
 								//weapon.startSound();
 								WeaponHandler::weaponStartSound(temp->getWeapon());
+								if (temp->getWeapon().updateFireRate())
+								{
+									for (int i = 0; i < Vehicle::bulletCount; ++i)
+									{
+										if (bullets[i].getWeaponType() == WeaponType::None)
+										{
+											auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+											this->bullets[i].shoot(temp->getWeapon(),
+												this->vehicleBody1->getPosition() + Vector3(-tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
+												-tempDir,
+												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
+											break;
+										}
+									}
+								}
+							}
+							else if (temp->getWeapon().type == WeaponType::Spikes) {
 								if (temp->getWeapon().updateFireRate())
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
@@ -751,10 +806,29 @@ void Vehicle::updateWeapon(float deltaTime)
 						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::RIGHT));
 						if (this->vehicleSlots->getSlot(Slots::RIGHT)->getType() == ItemType::WEAPON && temp != nullptr)
 						{
-							if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
+							if (Input::checkButton(Keys::L_SHOULDER, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 							{
 								//weapon.startSound();
 								WeaponHandler::weaponStartSound(temp->getWeapon());
+								if (temp->getWeapon().updateFireRate())
+								{
+									for (int i = 0; i < Vehicle::bulletCount; ++i)
+									{
+										if (bullets[i].getWeaponType() == WeaponType::None)
+										{
+											auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+											this->bullets[i].shoot(temp->getWeapon(),
+												this->vehicleBody1->getPosition() + Vector3(right * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
+												right,
+												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
+											break;
+										}
+									}
+								}
+							}
+							else if (temp->getWeapon().type == WeaponType::Spikes) {
 								if (temp->getWeapon().updateFireRate())
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
@@ -801,6 +875,25 @@ void Vehicle::updateWeapon(float deltaTime)
 
 											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
 											this->bullets[i].shoot(temp->getWeapon(), 
+												this->vehicleBody1->getPosition() + Vector3(-right * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
+												-right,
+												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
+											break;
+										}
+									}
+								}
+							}
+							else if (temp->getWeapon().type == WeaponType::Spikes) {
+								if (temp->getWeapon().updateFireRate())
+								{
+									for (int i = 0; i < Vehicle::bulletCount; ++i)
+									{
+										if (bullets[i].getWeaponType() == WeaponType::None)
+										{
+											auto playerVelocity = this->vehicle->getRigidBody()->getLinearVelocity();
+
+											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+											this->bullets[i].shoot(temp->getWeapon(),
 												this->vehicleBody1->getPosition() + Vector3(-right * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 												-right,
 												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
@@ -966,7 +1059,14 @@ float Vehicle::getAcceleratorX()
 
 void Vehicle::startEngineSound()
 {
+	Sound::stopLooping(soundHandle);
 	soundHandle = Sound::playLooping("./data/sound/CarEngine4.mp3",0.5f);
+}
+
+void Vehicle::stopEngineSound()
+{
+	Sound::stopLooping(soundHandle);
+	soundHandle = 0;
 }
 
 Stats Vehicle::getStats() const
@@ -1029,12 +1129,12 @@ int Vehicle::getMaxHealth() const
 	return this->updatedStats.maxHealth;
 }
 
-void Vehicle::setHealth(int health)
+void Vehicle::setHealth(float health)
 {
-	this->health = std::clamp(health, 0, this->updatedStats.maxHealth);
+	this->health = std::clamp(health, 0.0f, this->updatedStats.maxHealth);
 }
 
-void Vehicle::setMaxHealth(int maxHealth)
+void Vehicle::setMaxHealth(float maxHealth)
 {
 	this->updatedStats.maxHealth = max(maxHealth, 1);
 }
@@ -1044,7 +1144,7 @@ void Vehicle::resetHealth()
 	this->health = this->updatedStats.maxHealth;
 }
 
-void Vehicle::changeHealth(int amount)
+void Vehicle::changeHealth(float amount)
 {
 	if (!this->immortal && powerUpTimers[(int)PowerUpType::Star] <= 0.0)
 	{
@@ -1052,7 +1152,7 @@ void Vehicle::changeHealth(int amount)
 			dmg = true;
 		}
 		vehicleBody1->setColor(Vector4(max(vehicleBody1->getColor().x + -amount * 0.6f, 0), vehicleBody1->getColor().y, vehicleBody1->getColor().z, 1));
-		this->health = std::clamp(this->health + amount, 0, this->updatedStats.maxHealth);
+		this->health = std::clamp(this->health + amount, 0.0f, this->updatedStats.maxHealth);
 		Game::getGraphics().addParticle2(this->vehicle->getPosition(), Vector3(0, 0, 0), 2, 1);
 		if (this->deadImpulse == false && this->health <= 0)
 		{

@@ -51,18 +51,18 @@ void Actor::update(float dt, const Vector3& targetPos)
 //	}
 //}
 
-void Actor::setHealth(int health)
+void Actor::setHealth(float health)
 {
-	this->health = std::clamp(health, 0, this->stats.maxHealth);
+	this->health = std::clamp(health, 0.0f, this->stats.maxHealth);
 }
 
-void Actor::changeHealth(int amount)
+void Actor::changeHealth(float amount)
 {
 	if (amount < 0) {
 		isHit = true;
 	}
 	setColor(Vector4(max(getColor().x + -amount * 0.1f, 0), getColor().y, getColor().z, 1));
-	this->health = std::clamp(this->health + amount, 0, this->stats.maxHealth);
+	this->health = std::clamp(this->health + amount, 0.0f, this->stats.maxHealth);
 	Game::getGraphics().addParticle2(this->getPosition(), Vector3(0, 0, 0), 2, 1);
 }
 
