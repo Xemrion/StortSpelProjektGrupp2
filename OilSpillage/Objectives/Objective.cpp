@@ -59,6 +59,11 @@ void Objective::setReward(int time)
 	this->mission->rewardTime = time;
 }
 
+void Objective::setScore(int score)
+{
+	this->mission->points = score;
+}
+
 void Objective::setInfo(std::string info)
 {
 	this->mission->info = info;
