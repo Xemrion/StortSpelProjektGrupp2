@@ -31,12 +31,12 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->graphics.setLightList(lightList.get());
 
 	this->theVehicle->init(physics.get());
-	this->theVehicle->getVehicle()->setPosition(Vector3(-2, 2, 0));
+	this->theVehicle->getVehicle()->setPosition(Vector3(0, 0, 0));
 	this->theVehicle->getVehicleBody1()->setPosition(Vector3(0, 0.55, 0));
 	
 	this->theVehicle->getVehicle()->setRotation(Vector3(0, 90, 0));
 
-	this->camera = std::make_unique<DynamicCamera>(Vector3(0, 0.5f, -2.0f), Vector3(0, 0, 0));
+	this->camera = std::make_unique<DynamicCamera>(Vector3(2.0f, 0.5f, -2.0f), Vector3(0, 0, 0));
 }
 
 MenuGameState::~MenuGameState() {}
