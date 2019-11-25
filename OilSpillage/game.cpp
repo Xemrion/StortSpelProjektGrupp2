@@ -195,7 +195,7 @@ void Game::run()
 	Sound::deinit();
 }
 
-Game::Game() : currentState(STATE_UPGRADING), oldState(-1), running(false) {}
+Game::Game() : currentState(STATE_MENU), oldState(-1), running(false) {}
 
 Game::~Game()
 {
