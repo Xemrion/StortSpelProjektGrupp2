@@ -1267,7 +1267,6 @@ void PlayingGameState::generateObjectives()
 	}
 	else
 	{
-
 		float prob[2] = { 0.5f, 0.5f };
 		for (int i = 0; i < 3; i++)
 		{
@@ -1280,10 +1279,9 @@ void PlayingGameState::generateObjectives()
 			}
 			else if (dice > (1 - prob[1]) * 10)
 			{
-				objectives.addObjective(TypeOfMission::KillingSpree, 120, 20*Game::getLocalScale(), "Kill the enemies");
+				objectives.addObjective(TypeOfMission::KillingSpree, 120, 100*Game::getLocalScale(), "Kill the enemies");
 				prob[0] += 0.1f;
 				prob[1] -= 0.1f;
-				
 			}
 			prob[0] = std::fmaxf(prob[0], 0.0f);
 			prob[1] = std::fmaxf(prob[1], 0.0f);

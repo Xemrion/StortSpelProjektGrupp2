@@ -47,18 +47,20 @@ void main(uint3 DispatchThreadID : SV_DispatchThreadID)
     p.time.x = 0.0f;
     p.time.y = emitterLocation.w;
     NewSimulationState.Append(p);
-    for(int i = 1; i < 9; i++)
+    float scale = 25.0f;
+    float spacing = 0.2f;
+    for (int i = 1; i < scale; i++)
     {
         float3 randomVec = 2.0f*direction[DispatchThreadID.x] + hash(i * 2.0f + DispatchThreadID.x * randomVector.xyz) + hash(randomVector.xyz);
         normalize(randomVec);
-        earlyPoint += 0.05f*randomVec;
+        earlyPoint += spacing * randomVec;
         p.position.xyz = earlyPoint.xyz;
         p.position.y = emitterLocation.y;
         p.direction.xyz = randomVec.xyz;
         NewSimulationState.Append(p);
         if (hash(randomVector.xyz*DispatchThreadID.x).x > 0.1f)
         {
-            earlyPoint += 0.05f * randomVec;
+            earlyPoint += spacing * randomVec;
             p.position.xyz = earlyPoint.xyz;
             p.position.y = emitterLocation.y;
             p.direction.xyz = randomVec.xyz;
