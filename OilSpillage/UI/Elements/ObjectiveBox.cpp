@@ -46,6 +46,10 @@ void ObjectiveBox::update(float deltaTime)
 	{
 		infoUI = objHandlerPtr->getObjective(0)->getInfo();
 		rewardInfo = "Reward: " + std::to_string(objHandlerPtr->getObjective(0)->getRewardTime()) + " extra seconds ";
+		if (objHandlerPtr->getObjective(0)->getType() == TypeOfMission::GetToPoint)
+		{
+			rewardInfo = "Reward: Three new Items";
+		}
 		color = Colors::White;
 	}
 

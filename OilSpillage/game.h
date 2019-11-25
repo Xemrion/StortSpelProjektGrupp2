@@ -36,6 +36,8 @@ public:
 	static Graphics					   &getGraphics() noexcept;
 	static float						lerp(float v0, float v1, float t);
 	static float						getDeltaTime();
+	static float						getLocalScale();
+	static int							getNrOfStagesDone();
 	static GameInfo                    &getGameInfo() noexcept;
 private:
 	void								createCurrentState();
@@ -48,6 +50,8 @@ private:
 	int									oldState;                         
 	Window                             *window       = nullptr;
 
+	float								localScale = 1.0f;
+	int									nrOfStagesDone = 0;
 	float								deltaTime    = 0.0f;
 	long long							curTime      = 0;
 	long long							prevTime     = 0;

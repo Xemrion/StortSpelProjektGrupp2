@@ -24,6 +24,9 @@ private:
 	Texture* textureCompass;
 	Texture* textureArrow;
 	float compassRot;
+	float timerForCompass;
+	float compassSpeed;
+	float compassMoveSize;
 
 public:
 	static Vector2 size;

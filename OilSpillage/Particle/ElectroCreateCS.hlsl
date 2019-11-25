@@ -34,20 +34,37 @@ float3 hash(float3 p)
     return 1.0 - 2.0 * frac(cos(p) * 9528.764565);
 }
 
-[numthreads(8, 1, 1)]
+[numthreads(16, 1, 1)]
 void main(uint3 DispatchThreadID : SV_DispatchThreadID)
 {
     Particle p;
-    float frameID = initialDirection.w;
-    float noiseValue = hash(32.03f).x*10.0f;
-    float3 initDir = randomVector.xyz;
-    normalize(initDir);
-    float3 noiseDir = float3(hash(2.123f).y, hash(23.22f).z, hash(72.323f).x);
+    float3 earlyPoint = emitterLocation.xyz;
     p.position.xyz = emitterLocation.xyz; //+ 0.1f*normalize(DispatchThreadID.x * direction[DispatchThreadID.x]);
     p.position.w = 1.0f;
+    float3 initDir = randomVector.xyz;
     p.direction.xyz = initDir.xyz;
-    p.direction.w = 2.0f;
+    p.direction.w = 4.0f;
     p.time.x = 0.0f;
     p.time.y = emitterLocation.w;
     NewSimulationState.Append(p);
+    float scale = 25.0f;
+    float spacing = 0.2f;
+    for (int i = 1; i < scale; i++)
+    {
+        float3 randomVec = 2.0f*direction[DispatchThreadID.x] + hash(i * 2.0f + DispatchThreadID.x * randomVector.xyz) + hash(randomVector.xyz);
+        normalize(randomVec);
+        earlyPoint += spacing * randomVec;
+        p.position.xyz = earlyPoint.xyz;
+        p.position.y = emitterLocation.y;
+        p.direction.xyz = randomVec.xyz;
+        NewSimulationState.Append(p);
+        if (hash(randomVector.xyz*DispatchThreadID.x).x > 0.1f)
+        {
+            earlyPoint += spacing * randomVec;
+            p.position.xyz = earlyPoint.xyz;
+            p.position.y = emitterLocation.y;
+            p.direction.xyz = randomVec.xyz;
+            NewSimulationState.Append(p);
+        }
+    }
 }

@@ -112,10 +112,20 @@ float Game::getDeltaTime()
 	return instance->deltaTime;
 }
 
+float Game::getLocalScale()
+{
+	return instance->localScale;
+}
 GameInfo& Game::getGameInfo() noexcept
 {
 	return instance->gameInfo;
 	// TODO: insert return statement here
+}
+
+
+int Game::getNrOfStagesDone()
+{
+	return instance->nrOfStagesDone;
 }
 
 
@@ -133,7 +143,8 @@ void Game::createCurrentState()
 		{
 			Container::playerInventory->addItem(Item::getRandom());
 		}
-
+		nrOfStagesDone = 0.0f;
+		localScale = 1.0f;
 		state = std::make_unique<MenuGameState>();
 	}
 	else if (currentState == STATE_PLAYING)
@@ -142,6 +153,11 @@ void Game::createCurrentState()
 		{
 			transfer = static_cast<UpgradingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
+			nrOfStagesDone++;
+			if (nrOfStagesDone % 3 == 0)
+			{
+				localScale += 0.05f;
+			}
 		}
 		state = std::make_unique<PlayingGameState>();
 

@@ -300,9 +300,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 30.0));
 
-	//objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
+	/*objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
-
+	objectives.addObjective(TypeOfMission::GetToPoint, 0, 5, "Go to the exit now!!!", TypeOfTarget::Crate);
 
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::KillingSpree, 240, 75, "Kill the enemies");
@@ -312,9 +312,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");*/
 
-
+	this->generateObjectives();
 	this->graphics.setTestParticleSystem(this->graphics.getParticleSystem("explosion"));
 	this->fillTestParticle();
 
@@ -762,25 +762,27 @@ void PlayingGameState::update(float deltaTime)
 		{
 			timerEMP -= deltaTime;
 		}
-		if (timer > 0.01f&&timerEMP>0.0f)
+		if (timer > 0.1f&&timerEMP>0.0f)
 		{
-			testNetwork->clearSegments();
+
+			
+			/*testNetwork->clearSegments();
 			testNetwork.get()->setAngle(rand() % 360 + 1);
 
 			testNetwork.get()->generateInitialSegments("+F");
 
 			testNetwork.get()->setAngle(rand()%30+1);
 
-			//testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+			testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
 			int scale = 10;
 			std::string temp = "F--FFFF++FFFF-FFF--FF";
 			std::string addedTemp = temp;
 			for (int i = 1; i < scale; i++)
 			{
-				/*if (i % 2)
+				if (i % 2)
 				{
 					addedTemp.replace("-", "+");
-				}*/
+				}
 				temp += addedTemp;
 			}
 			if (rand() % 2)
@@ -794,8 +796,8 @@ void PlayingGameState::update(float deltaTime)
 			}
 			testNetwork.get()->generateAdditionalSegments(temp.c_str(), 1, rand() % 2);
 			testNetwork.get()->generateAdditionalSegments(branch.c_str(), scale*2, rand() % 2);
-			/*testNetwork.get()->generateAdditionalSegments(branch.c_str(), 12, rand() % 2);
-			testNetwork.get()->generateAdditionalSegments(branch.c_str(), 22, rand() % 2);*/
+			testNetwork.get()->generateAdditionalSegments(branch.c_str(), 12, rand() % 2);
+			testNetwork.get()->generateAdditionalSegments(branch.c_str(), 22, rand() % 2);
 
 			timer = 0.0f;
 			int iteration = rand() % this->testNetwork->getSegments().size() + 10;
@@ -804,8 +806,10 @@ void PlayingGameState::update(float deltaTime)
 			{
 				this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()) +Vector3(0,0,5.0f)+ Vector3(this->testNetwork->getSegments().at(i).firstPoint.x, this->testNetwork->getSegments().at(i).firstPoint.y, this->testNetwork->getSegments().at(i).firstPoint.z), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
 			}
-			//this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+			*/
 
+			this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()+Vector3(0.0f,0.0f,5.0f)), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+			timer = 0.0f;
 		}
 
 
@@ -1270,4 +1274,43 @@ void PlayingGameState::generateMapPowerUps()
 
 		index += rng() % 142 + 124;
 	}
+}
+
+void PlayingGameState::generateObjectives()
+{
+	if (Game::getNrOfStagesDone() % 3 == 0)
+	{
+		//this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->spawnBoss());
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
+	}
+	else
+	{
+		float prob[2] = { 0.5f, 0.5f };
+		for (int i = 0; i < 3; i++)
+		{
+			int dice = rand() % 10 + 1;
+			if (dice <= prob[0] * 10)
+			{
+				objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5*Game::getLocalScale(), "Pick up the important", TypeOfTarget::Crate);
+				prob[0] -= 0.1f;
+				prob[1] += 0.1f;
+			}
+			else if (dice > (1 - prob[1]) * 10)
+			{
+				objectives.addObjective(TypeOfMission::KillingSpree, 120, 100*Game::getLocalScale(), "Kill the enemies");
+				prob[0] += 0.1f;
+				prob[1] -= 0.1f;
+			}
+			prob[0] = std::fmaxf(prob[0], 0.0f);
+			prob[1] = std::fmaxf(prob[1], 0.0f);
+			prob[0] = std::fminf(prob[0], 1.0f);
+			prob[1] = std::fminf(prob[1], 1.0f);
+		}
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
+	}
+}
+
+Vector3 PlayingGameState::getCameraPos()
+{
+	return this->camera->getPosition();
 }
