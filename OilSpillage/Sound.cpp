@@ -245,6 +245,11 @@ void Sound::stopSoundtrack(float fadeOutTime)
 	instance->soloud.scheduleStop(instance->soundtrack.handleGroup, fadeOutTime);
 }
 
+void Sound::changeSoundtrackVolume(float volume)
+{
+	instance->soloud.setVolume(instance->soundtrack.handleGroup,volume);
+}
+
 void Sound::updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity)
 {
 	instance->soloud.set3dListenerParameters(position.x, position.y, position.z, lookAt.x, lookAt.y, lookAt.z, up.x, up.y, up.z, velocity.x, velocity.y, velocity.z);

@@ -224,6 +224,30 @@ btRigidBody* Physics::addCylinder(btVector3 Origin, btVector3 size, float mass)
 	return body;
 }
 
+btRigidBody* Physics::addCapsule(btScalar radius, btVector3 Origin, btScalar height, float mass)
+{
+	btTransform t; //
+	t.setIdentity();
+	t.setOrigin(btVector3(Origin));
+	btCapsuleShapeZ* capsule = new btCapsuleShapeZ(radius,height); //raduius
+
+	btVector3 inertia(0, 0, 0);
+	if (mass != 0.0f) {
+		capsule->calculateLocalInertia(mass, inertia);
+	}
+
+	btMotionState* motion = new btDefaultMotionState(t);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, capsule, inertia);
+
+	btRigidBody* body = new btRigidBody(info);
+
+	bodies.push_back(body);
+
+	this->world->addRigidBody(body);
+
+	return body;
+}
+
 btGeneric6DofSpring2Constraint* Physics::addSpring(btRigidBody* box1, btRigidBody* box2)
 {
 	btGeneric6DofSpring2Constraint* spring = new btGeneric6DofSpring2Constraint(

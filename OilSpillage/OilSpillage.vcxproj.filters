@@ -26,6 +26,8 @@
     <FxCompile Include="Shadows\SimpleVS.hlsl" />
     <FxCompile Include="VertexShader.hlsl" />
     <FxCompile Include="VertexUI.hlsl" />
+    <FxCompile Include="Particle\DebrisUpdateCS.hlsl" />
+    <FxCompile Include="Particle\DebrisCreateCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI\AIGroup.cpp" />
@@ -353,6 +355,11 @@
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="physics.h" />
+    <ClInclude Include="UI\Upgrading\UIUpgrading.h" />
+    <ClInclude Include="UI\UserInterface.h" />
+    <ClInclude Include="Vehicle.h" />
+    <ClInclude Include="VehicleStats.h" />
+    <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
