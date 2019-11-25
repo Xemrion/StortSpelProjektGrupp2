@@ -10,25 +10,12 @@
 struct GameInfo
 {
 	int nrOfClearedStages = 0;
+	int nrOfObjectives = 0;
+	int nrOfSwarm = 0;
+	int nrOfAttackers = 0;
+	int nrOfCars = 0;
+	int nrOfBosses = 0;
 	int highScore = 0;
-
-
-	int getScore() 
-	{
-		return highScore;
-	};
-	void addToScore(int amount) 
-	{
-		highScore += amount;
-	};
-	int getNrOfClearedStages() 
-	{
-		return nrOfClearedStages;
-	};
-	void incrementLevelCount() 
-	{
-		nrOfClearedStages++;
-	};
 };
 
 class Game

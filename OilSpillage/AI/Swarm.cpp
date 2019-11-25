@@ -22,8 +22,8 @@ Swarm::Swarm(float x, float z, Physics* physics)
 
 	this->aggroRange = 40;
 	createRigidbody(physics);
-	this->setPoints(50 * (1 + (0.1 * Game::getGameInfo().getNrOfClearedStages())));
-	this->weapon.damage = this->weapon.damage * (1 + (0.1 * Game::getGameInfo().getNrOfClearedStages()));
+	this->setPoints(50 * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages)));
+	this->weapon.damage = this->weapon.damage * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages));
 }
 
 void Swarm::update(float dt, const Vector3& targetPos)
@@ -48,6 +48,7 @@ void Swarm::createRigidbody(Physics* physics)
 Swarm::~Swarm()
 {
 	Game::getGraphics().removeFromDraw(this);
+	Game::getGameInfo().nrOfSwarm++;
 }
 
 void Swarm::setUpActor()
