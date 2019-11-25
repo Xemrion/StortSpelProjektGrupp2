@@ -101,7 +101,7 @@ int Objective::getScore() const
 
 std::string Objective::getInfo() const
 {
-	return this->mission->info + " " + std::to_string(this->nrOfMax - this->nrOfTargets) + " / " + std::to_string(this->nrOfMax) + " ";
+	return this->mission->info + ": " + std::to_string(this->nrOfMax - this->nrOfTargets) + " / " + std::to_string(this->nrOfMax) + " ";
 }
 
 Vector3 Objective::getAveragePosition() const

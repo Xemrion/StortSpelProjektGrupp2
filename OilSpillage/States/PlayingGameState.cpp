@@ -47,7 +47,7 @@ void PlayingGameState::initAI()
 	}
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(70.0f), currentMenu(MENU_PLAYING)
 {
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -261,19 +261,19 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 
 	addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 30.0));
 
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill enemies");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up ", TypeOfTarget::Crate);
 
 
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::KillingSpree, 240, 75, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 50, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 6, "Pick up the important");
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 25, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up ");
+	objectives.addObjective(TypeOfMission::KillingSpree, 240, 75, "Kill enemies");
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 50, "Kill enemies");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 6, "Pick up ");
+	objectives.addObjective(TypeOfMission::KillingSpree, 120, 25, "Kill enemies");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up ");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up ");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up ");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up ");
 
 
 	this->graphics.setTestParticleSystem(this->graphics.getParticleSystem("explosion"));
@@ -782,16 +782,16 @@ void PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 //#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	ImGui_Driving();
-	//ImGui_ProcGen();
-	//ImGui_AI();
-	ImGui_Particles();
-	ImGui_Camera();
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	//ImGui_ImplDX11_NewFrame();
+	//ImGui_ImplWin32_NewFrame();
+	//ImGui::NewFrame();
+	//ImGui_Driving();
+	////ImGui_ProcGen();
+	////ImGui_AI();
+	//ImGui_Particles();
+	//ImGui_Camera();
+	//ImGui::Render();
+	//ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	//#endif // !_DEBUG
 
 	graphics.presentScene();
