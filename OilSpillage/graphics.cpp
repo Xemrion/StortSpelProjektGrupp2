@@ -421,8 +421,7 @@ bool Graphics::init(Window* window)
 		Vector4(0.0f,0.0f,0.0f,1.0f),
 		Vector4(0.0f,0.0f,0.0f,1.0f)
 	};
-	this->particleTrail->changeColornSize(colors, 1, 0.1f, 0.1f);
-	this->particleSystem->changeColornSize(colorFire, 4, 0.05f, 0.1f);
+	
 	//this->particleHandler->getParticleSystem("electro")->changeColornSize(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
 	Vector4 debrisColor[4] = {
@@ -846,6 +845,17 @@ void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfPartic
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
 	this->particleHandler->getParticleSystem("fire")->addParticle(nrOfParticles, lifeTime, randomPos,initialDirection);
+}
+
+void Graphics::addParticle(std::string particleSystem, int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection, float randomPower)
+{
+	Vector3 randomPos = randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos2 = -1.0f * randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
+	randomPos += position;
+	randomPos += randomPos2;
+	float grey = float(rand()) / RAND_MAX;
+	this->particleHandler->getParticleSystem(particleSystem)->addParticle(nrOf, lifeTime, randomPos, initialDirection);
 }
 
 void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime, float randomPower)
