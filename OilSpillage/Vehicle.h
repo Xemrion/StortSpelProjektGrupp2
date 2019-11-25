@@ -106,7 +106,7 @@ private:
 	btVehicleRaycaster* m_vehicleRayCaster;
 	btCollisionShape* m_wheelShape;
 	SpotLight* spotLight;
-	int health;
+	float health;
 	bool deadImpulse;
 	bool immortal;
 	float immortalTimer;
@@ -190,6 +190,7 @@ public:
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
 	void startEngineSound();
+	void stopEngineSound();
 
 	Stats getStats()const; 
 
@@ -209,10 +210,10 @@ public:
 	const int& getHealthRef() const;
 	int getHealth() const;
 	int getMaxHealth() const;
-	void setHealth(int health);
-	void setMaxHealth(int maxHealth);
+	void setHealth(float health);
+	void setMaxHealth(float maxHealth);
 	void resetHealth();
-	void changeHealth(int amount);
+	void changeHealth(float amount);
 	bool isDead() const;
 	float getTotalRespawnTime()const;
 	float getRespawnTimer()const;

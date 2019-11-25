@@ -83,7 +83,8 @@ private:
 	std::vector<std::unique_ptr<PowerUp>> powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
-	GameObject* testObjective2; //Test
+	GameObject*		testObjective2; //Test
+	GameObject* cameraObject;
 
 	GameObject* objTestPickUp;
 	GameObject* objTestPickUp2;

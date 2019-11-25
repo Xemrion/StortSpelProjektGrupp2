@@ -272,7 +272,7 @@ void  Map::generateBuildings( )
 																							  houseTile.getPosition().y,
 																							  houseTile.getPosition().z ),
 																				btVector3( 15.5f * houseTile.getScale().x,
-																							  15.5f * houseTile.getScale().y,
+																							  /*15.5f * houseTile.getScale().y*/400,
 																							  15.5f * houseTile.getScale().z ),
 																				.0f );
 								houseTile.setRigidBody( tmp, physics );

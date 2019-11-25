@@ -17,14 +17,14 @@ public:
 	virtual void update(float dt, const Vector3& targetPos);
 	virtual void setUpActor() = 0 {};
 
-	void setHealth(int health);
-	void changeHealth(int amount);
+	void setHealth(float health);
+	void changeHealth(float amount);
 	bool isDead() const;
 	int getPoints();
 	void setPoints(int amount);
 
 private:
-	int health;
+	float health;
 	int points;
 protected:
 	bool isHit = false;

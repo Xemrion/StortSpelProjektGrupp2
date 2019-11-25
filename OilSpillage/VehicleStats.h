@@ -3,7 +3,7 @@
 
 struct Stats
 {
-	int maxHealth = 100;
+	float maxHealth = 100;
 	float durability = 1.0F;
 	float armour = 1.0F;
 	float accelerationRate = 1.0F;

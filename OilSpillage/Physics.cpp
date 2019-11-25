@@ -332,6 +332,7 @@ bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* 
 	{
 		if (playerPtr->getPowerUpTimer(PowerUpType::Star) > 0.0)
 		{
+			Sound::play("./data/sound/StarPowerupHit.mp3",0.75f);
 			enemyPtr->changeHealth(-200);
 		}
 

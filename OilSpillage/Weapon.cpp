@@ -79,8 +79,8 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& dir
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-
-	Game::getGraphics().addToDraw(this->obj);
+	if(!vehicleWeapon.melee)
+		Game::getGraphics().addToDraw(this->obj);
 }
 
 void Bullet::meleeShoot(Vector3& position,Vector3& direction)
@@ -153,7 +153,7 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 
 void Bullet::update(float deltaTime)
 {
-	if (this->weapon.type == WeaponType::Laser || this->weapon.melee)
+	if (this->weapon.type == WeaponType::Spikes || this->weapon.melee)
 	{
 		this->obj->setPosition(initPos);
 		this->dir = initDir;

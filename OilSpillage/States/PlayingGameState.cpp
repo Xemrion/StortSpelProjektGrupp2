@@ -293,6 +293,21 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
 	buildingTest->setRigidBody(tempo2, physics.get());*/
 
+	this->cameraObject = new GameObject;
+	Game::getGraphics().loadShape(Shapes::SHAPE_CUBE);
+	cameraObject->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//Game::getGraphics().addToDraw(vehicle);
+	cameraObject->setPosition(Vector3(0.0f, 10.0f, 0.0f));
+	cameraObject->setScale(Vector3(0.5f, 0.14f, 0.9f));
+	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x,btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 10.0f);
+	cameraObject->setRigidBody(tempo, physics.get());
+	cameraObject->getRigidBody()->activate();
+	cameraObject->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	cameraObject->getRigidBody()->setFriction(0);
+	cameraObject->getRigidBody()->setGravity(btVector3(0,0,0));
+	//cameraObject->getRigidBody()->setDamping(10,0);
+
+
 #ifndef _DEBUG
 	spawnObjects();
 #endif
@@ -305,7 +320,6 @@ PlayingGameState::~PlayingGameState()
 {
 	delete aStar;
 	delete actorManager;
-
 
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
@@ -657,9 +671,13 @@ void PlayingGameState::update(float deltaTime)
 
 		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
 		btVector3 positionCam{ playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
-		camera->setPosition(Vector3(positionCam.getX(),
+		Vector3 destinationCamPos = Vector3(positionCam.getX(),
 			positionCam.getY() / 3,
-			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z));
+			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z);
+		Vector3 currentCamPos = Vector3(cameraObject->getRigidBody()->getWorldTransform().getOrigin().getX(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getY(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getZ());
+		Vector3 directionCam =  destinationCamPos- currentCamPos;
+		cameraObject->getRigidBody()->setLinearVelocity(btVector3(directionCam.x, directionCam.y, directionCam.z)*10);
+		camera->setPosition(Vector3(currentCamPos.x, currentCamPos.y, currentCamPos.z));
 		camera->update(deltaTime);
 
 		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
