@@ -320,14 +320,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
 	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
-	ImGui::Text("Driving Mode:");
-	static int radioButtonValue = 0;
-	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
-	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
-	if (radioButtonValue == 0)
-		player->setDrivingMode(1);
-	else if (radioButtonValue == 1)
-		player->setDrivingMode(0);
+	
 
 
 	Vector3 camPos = camera->getPosition();
