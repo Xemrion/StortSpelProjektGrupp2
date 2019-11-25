@@ -101,6 +101,7 @@
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="States\UpgradingGameState.cpp" />
+    <ClCompile Include="UI\Elements\AnimatedText.cpp" />
     <ClCompile Include="UI\Elements\Button.cpp" />
     <ClCompile Include="UI\Elements\ButtonPromtBar.cpp" />
     <ClCompile Include="UI\Elements\CarGadgetSelector.cpp" />
@@ -149,8 +150,8 @@
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="physics.cpp" />
-    <ClCompile Include="SoLoud\src\backend\null\soloud_null.cpp" />
-    <ClCompile Include="UI\Elements\AnimatedText.cpp" />
+    <ClCompile Include="UI\Menu\UIHighscore.cpp" />
+    <ClCompile Include="MyClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -296,6 +297,8 @@
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="physics.h" />
+    <ClInclude Include="UI\Menu\UIHighscore.h" />
+    <ClInclude Include="MyClient.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

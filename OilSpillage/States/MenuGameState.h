@@ -15,6 +15,7 @@ public:
 		MENU_OPTIONS,
 		MENU_CREDITS,
 		MENU_CONTROLS,
+		MENU_HIGHSCORE,
 		MENUCOUNT
 	};
 private:
