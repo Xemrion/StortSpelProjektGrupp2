@@ -64,7 +64,7 @@ UIHighscore::UIHighscore() : timer(0.0f)
 
 UIHighscore::~UIHighscore()
 {
-	this->sendHighscore.join();
+	if (this->sendHighscore.joinable()) this->sendHighscore.join();
 }
 
 void UIHighscore::init()
