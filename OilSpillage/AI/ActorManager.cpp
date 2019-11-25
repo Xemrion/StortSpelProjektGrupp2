@@ -224,9 +224,9 @@ void ActorManager::spawnChaseCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-	//	createChaseCar(originPos.x + i, originPos.z);
-		//createChaseCar(originPos.x, originPos.z + i);
-	//	createChaseCar(originPos.x - i, originPos.z);
+		createChaseCar(originPos.x + i, originPos.z);
+		createChaseCar(originPos.x, originPos.z + i);
+		createChaseCar(originPos.x - i, originPos.z);
 	}
 }
 
@@ -234,9 +234,9 @@ void ActorManager::spawnShootCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-	//	createShootCar(originPos.x + i, originPos.z, (rand() % 4) + 1);
-	//	createShootCar(originPos.x, originPos.z + i, (rand() % 4) + 1);
-	//	createShootCar(originPos.x - i, originPos.z, (rand() % 4) + 1);
+		createShootCar(originPos.x + i, originPos.z, (rand() % 4) + 1);
+		createShootCar(originPos.x, originPos.z + i, (rand() % 4) + 1);
+		createShootCar(originPos.x - i, originPos.z, (rand() % 4) + 1);
 	}
 }
 
