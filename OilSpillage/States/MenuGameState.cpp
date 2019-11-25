@@ -4,6 +4,7 @@
 #include "../UI/Menu/UICredits.h"
 #include "../UI/Menu/UIControls.h"
 #include <cassert>
+#include "../UI/Menu/UIHighscore.h"
 
 MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU_MAIN)
 {
@@ -15,6 +16,7 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->menues[MENU_CREDITS]->init();
 	this->menues[MENU_CONTROLS] = std::make_unique<UIControls>();
 	this->menues[MENU_CONTROLS]->init();
+	this->menues[MENU_HIGHSCORE] = std::make_unique<UIHighscore>();
 
 	Game::getGraphics().loadTexture("UI/image");
 	this->textureBG = Game::getGraphics().getTexturePointer("UI/image");
@@ -59,4 +61,9 @@ void MenuGameState::update(float deltaTime)
 void MenuGameState::setCurrentMenu(Menu menu)
 {
 	this->currentMenu = static_cast<int>(menu);
+
+	if (menu == MENU_HIGHSCORE)
+	{
+		this->menues[MENU_HIGHSCORE]->init();
+	}
 }

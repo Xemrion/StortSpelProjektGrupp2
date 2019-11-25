@@ -36,13 +36,12 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar, physics.get(), map.get(), &rng);
 	aStar->generateTileData(map->getTileMap());
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			//	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
-				//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-			//	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
+			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
+			//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
 			//actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
 		}
 	}
@@ -320,14 +319,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
 	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
-	ImGui::Text("Driving Mode:");
-	static int radioButtonValue = 0;
-	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
-	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
-	if (radioButtonValue == 0)
-		player->setDrivingMode(1);
-	else if (radioButtonValue == 1)
-		player->setDrivingMode(0);
+	
 
 
 	Vector3 camPos = camera->getPosition();
@@ -381,11 +373,14 @@ void PlayingGameState::ImGui_AI()
 
 	float pathSize = actorManager->groups.at(0).actors.at(0)->path->size();
 	ImGui::Text((("Path size: " + std::to_string(pathSize)).c_str()));*/
-	ImGui::Text(("VelocityX: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getX())).c_str());
-	ImGui::Text(("VelocityY: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getY())).c_str());
-	ImGui::Text(("VelocityZ: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getZ())).c_str());
+	//ImGui::Text(("VelocityX: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getX())).c_str());
+	//ImGui::Text(("VelocityY: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getY())).c_str());
+	//ImGui::Text(("VelocityZ: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getZ())).c_str());
 	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
 							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
+	
+	ImGui::Text(("Score: " + std::to_string(Game::getGameInfo().highScore)).c_str());
+	
 	ImGui::End();
 }
 
@@ -673,7 +668,7 @@ void PlayingGameState::update(float deltaTime)
 		for (std::unique_ptr<PowerUp>& p : powerUps)
 		{
 			p->update(deltaTime);
-			if (p->isActive())
+			if (p->isActive() && !player->isDead())
 			{
 				if (p->getAABB().intersectXZ(player->getVehicle()->getAABB()))
 				{

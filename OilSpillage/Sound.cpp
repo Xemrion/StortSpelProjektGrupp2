@@ -26,6 +26,8 @@ void Sound::init()
 
 void Sound::deinit()
 {
+	instance->soloud.stopAll();
+	instance->loopingSounds.clear();
 	instance->soloud.deinit();
 }
 
@@ -243,6 +245,11 @@ void Sound::stopSoundtrack(float fadeOutTime)
 {
 	instance->soloud.fadeVolume(instance->soundtrack.handleGroup, 0, fadeOutTime);
 	instance->soloud.scheduleStop(instance->soundtrack.handleGroup, fadeOutTime);
+}
+
+void Sound::changeSoundtrackVolume(float volume)
+{
+	instance->soloud.setVolume(instance->soundtrack.handleGroup,volume);
 }
 
 void Sound::updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity)

@@ -17,6 +17,7 @@ class PowerUp : public GameObject
 	float respawnTime;
 	float currentRespawnTimer;
 	float time;
+	int soundHandle;
 	void loadModel();
 	void clone(const PowerUp& p);
 public:

@@ -24,7 +24,8 @@
 #include "BulletDynamics/Dynamics/btSimulationIslandManagerMt.h"  // for setSplitIslands()
 #include "BulletDynamics/Dynamics/btDiscreteDynamicsWorldMt.h"
 #include "BulletDynamics/MLCPSolvers/btLemkeSolver.h"
-#define BT_THREAD_SAFE 1
+#define BT_THREADSAFE 1
+#define BT_USE_PPL 1
 using namespace DirectX::SimpleMath;
 enum SolverType
 {
@@ -64,6 +65,7 @@ public:
 	btRigidBody* addSphere(float radius, btVector3 Origin, float mass, void* obj = nullptr);
 	btRigidBody* addBox(btVector3 Origin, btVector3 size, float mass, void* obj = nullptr);
 	btRigidBody* addCylinder(btVector3 Origin, btVector3 size, float mass);
+	btRigidBody* addCapsule(btScalar radius, btVector3 Origin, btScalar height, float mass);
 	btGeneric6DofSpring2Constraint* addSpring(btRigidBody* box1, btRigidBody* box2);
 	btPoint2PointConstraint* addPointJoint(btRigidBody* box1, btRigidBody* box2);
 	btRaycastVehicle* addVehicle(btRaycastVehicle* vehicle);

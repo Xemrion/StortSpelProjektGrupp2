@@ -62,7 +62,7 @@ void main( uint3 DTid : SV_DispatchThreadID)
 		float friction = 0.05f;
 		float3 wind = float3(1.0f, 0.0f, 0.5f);
 		float3 random = hash(float3(43.5, 12.322, 21.5));
-		float windPower = 1.0f;
+		float windPower = 0.0f;
 		wind = wind * windPower + random * 0.0f;
 		float3 acceleration = 1.0f*G * m1 * float3(0, -1, 0) * TimeFactors.x;
 		acceleration += (wind / m1) * TimeFactors.x;
@@ -80,8 +80,9 @@ void main( uint3 DTid : SV_DispatchThreadID)
 		else
 		{
 			//On zero or lower apply friction and set velocity.y to 0 for no movement in y 
-			//p.velocity.xyz = (p.velocity.xyz + TimeFactors.x * float3(0, -1, 0))/(1 + (friction* TimeFactors.x));
-            p.velocity.xyz = 1.1f*reflect(p.velocity.xyz, float3(0.0f, 1.0f, 0.0f))+acceleration;
+			p.velocity.xyz = (p.velocity.xyz + TimeFactors.x * float3(0, -1, 0))/(1 + (friction* TimeFactors.x));
+			p.velocity.y = 0;
+           // p.velocity.xyz = 1.1f*reflect(p.velocity.xyz, float3(0.0f, 1.0f, 0.0f))+acceleration;
             //+reflect(p.velocity.xyz + acceleration, float3(0.0f, 1.0f, 0.0f)); 
         }
 

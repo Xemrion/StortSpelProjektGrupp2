@@ -43,11 +43,18 @@ Graphics::Graphics()
 	Vector4 fireX[4] = {
 		Vector4(1.0f,0.0f,1.0f,1.0f)
 	};
-	this->particleHandler->addParticleSystem("explosion","ParticleUpdateCS.cso", "ExplosionCreateCS.cso");
 
+	Vector4 debrisColor[4] = {
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f)
+	};
+	this->particleHandler->addParticleSystem("explosion","ParticleUpdateCS.cso", "ExplosionCreateCS.cso");
+	this->particleHandler->addParticleSystem("debris", debrisColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 
 	this->particleHandler->loadParticleSystems();
-
+	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
 }
 
@@ -418,6 +425,17 @@ bool Graphics::init(Window* window)
 	this->particleSystem->changeColornSize(colorFire, 4, 0.05f, 0.1f);
 	//this->particleHandler->getParticleSystem("electro")->changeColornSize(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
+	Vector4 debrisColor[4] = {
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f)
+	};
+	//this->particleHandler->getParticleSystem("debris")->changeColornSize(debrisColor, 4, 0.1f, 0.1f);
+	//this->particleHandler->getParticleSystem("debris")->changeVectorField(0.0f, 1.0f);
+
+	//this->particleHandler->getParticleSystem("debris")->saveSystem();
+
 
 
 	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());
@@ -425,6 +443,7 @@ bool Graphics::init(Window* window)
 	this->particleTrail->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleHandler->getParticleSystem("debris")->initiateParticles(device.Get(), deviceContext.Get());
 
 
 	this->particleSystem->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
@@ -432,6 +451,7 @@ bool Graphics::init(Window* window)
 	this->particleTrail->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("electro")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("explosion")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("debris")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 
 	
 	FogMaterial fogMaterial;

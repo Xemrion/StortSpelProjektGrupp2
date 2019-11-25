@@ -55,7 +55,7 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 	std::string typeInfo = this->types.getType(TypeOfTarget(typeInt));
 	
 	temp->setReward(rewardTime);
-	
+	temp->setScore(500 * (1 + (0.1*Game::getGameInfo().nrOfClearedStages)));
 	if (type == TypeOfMission::FindAndCollect)
 	{
 		temp->setInfo(info + typeInfo);
@@ -129,6 +129,8 @@ void ObjectiveHandler::update(Vector3 playerPos)
 				}
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->addTime(this->objectiveVec.at(0)->getRewardTime());
+			Game::getGameInfo().highScore += objectiveVec[0]->getScore();
+			Game::getGameInfo().nrOfObjectives++;
 			delete this->objectiveVec.at(0);
 			this->objectiveVec.erase(this->objectiveVec.begin());
 			this->eventNewObj = true;
