@@ -236,7 +236,7 @@ void Sound::fadeSoundtrack(bool toAgressive, float fadeTime)
 {
 	//Get the aggressive factor (the time of the fade that is left) so this function can be called every frame if needed.
 	float aggressiveFactor = (instance->soloud.getFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY) - 10.0f) / 10000.0f;
-	if (toAgressive) aggressiveFactor = 1 - aggressiveFactor; 
+	if (toAgressive) aggressiveFactor = 1 - aggressiveFactor;
 
 	instance->soloud.fadeFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY, toAgressive ? 10000.0f : 10.0f, fadeTime * aggressiveFactor);
 }
@@ -245,6 +245,11 @@ void Sound::stopSoundtrack(float fadeOutTime)
 {
 	instance->soloud.fadeVolume(instance->soundtrack.handleGroup, 0, fadeOutTime);
 	instance->soloud.scheduleStop(instance->soundtrack.handleGroup, fadeOutTime);
+}
+
+void Sound::changeSoundtrackVolume(float volume)
+{
+	instance->soloud.setVolume(instance->soundtrack.handleGroup,volume);
 }
 
 void Sound::updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity)

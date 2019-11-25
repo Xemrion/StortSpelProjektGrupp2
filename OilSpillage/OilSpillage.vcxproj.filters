@@ -26,6 +26,8 @@
     <FxCompile Include="Shadows\SimpleVS.hlsl" />
     <FxCompile Include="VertexShader.hlsl" />
     <FxCompile Include="VertexUI.hlsl" />
+    <FxCompile Include="Particle\DebrisUpdateCS.hlsl" />
+    <FxCompile Include="Particle\DebrisCreateCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI\AIGroup.cpp" />
@@ -40,6 +42,7 @@
     <ClCompile Include="AI\DynamicActor.cpp" />
     <ClCompile Include="AI\Melee.cpp" />
     <ClCompile Include="AI\Ranged.cpp" />
+    <ClCompile Include="AI\ShootCar.cpp" />
     <ClCompile Include="AI\Sniper.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
@@ -152,6 +155,7 @@
     <ClCompile Include="physics.cpp" />
     <ClCompile Include="UI\Menu\UIHighscore.cpp" />
     <ClCompile Include="MyClient.cpp" />
+    <ClCompile Include="BulletSDK\include\LinearMath\btThreads.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -166,6 +170,7 @@
     <ClInclude Include="AI\DynamicActor.h" />
     <ClInclude Include="AI\Melee.h" />
     <ClInclude Include="AI\Ranged.h" />
+    <ClInclude Include="AI\ShootCar.h" />
     <ClInclude Include="AI\Sniper.h" />
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="fog.h" />

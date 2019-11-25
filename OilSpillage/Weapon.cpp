@@ -50,6 +50,10 @@ void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 
 	{
 		laserShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
+	else if (weapon.type == WeaponType::aiMelee)
+	{
+		meleeShoot(position,direction);
+	}
 	else
 	{
 		defaultShoot(weapon, position, direction, additionalVelocity, deltaTime);
@@ -77,6 +81,11 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& dir
 	this->obj->setRotation(Vector3(0, newRot, 0));
 
 	Game::getGraphics().addToDraw(this->obj);
+}
+
+void Bullet::meleeShoot(Vector3& position,Vector3& direction)
+{
+	this->obj->setPosition(position + direction);
 }
 
 void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
@@ -156,7 +165,6 @@ void Bullet::update(float deltaTime)
 	}
 	else if (this->weapon.type == WeaponType::aiMachineGun or
 		this->weapon.type == WeaponType::aiFlamethrower or
-		this->weapon.type == WeaponType::aiMelee or
 		this->weapon.type == WeaponType::aiMissileLauncher)
 	{
 		defaultEnemyUpdate(deltaTime);
@@ -168,6 +176,10 @@ void Bullet::update(float deltaTime)
 	else if (this->weapon.type == WeaponType::aiLaser)
 	{
 		laserEnemyUpdate(deltaTime);
+	}
+	else if (weapon.type == WeaponType::aiMelee)
+	{
+		enemyMeleeUpdate(deltaTime);
 	}
 	else
 	{
@@ -213,6 +225,23 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 	}
 }
 
+void Bullet::enemyMeleeUpdate(float& deltaTime)
+{
+
+	if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition()).Length() < 1.5f)
+	{
+		if (soundTimer > 0.05f) {
+			int randomSound = rand() % 3 + 1;
+			std::string soundEffect = "./data/sound/CarGlass" + std::to_string(randomSound) + ".wav";
+			Sound::play(soundEffect);
+			Sound::play("./data/sound/MetalImpact1.wav");
+			soundTimer = 0;
+		}
+		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);
+		this->timeLeft = 0.f;
+	}
+}
+
 void Bullet::laserEnemyUpdate(float& deltaTime)
 {
 	GameObject* laserObject = this->getGameObject();
@@ -220,9 +249,11 @@ void Bullet::laserEnemyUpdate(float& deltaTime)
 	Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
 	if (static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getAABB().intersect(rayOrigin, rayDir, 1000))
 	{
-		if (soundTimer > 0.05f) 
+		if (soundTimer > 0.05f)
 		{
-			Sound::play("data/sound/HitSound.wav");
+			int randomSound = rand() % 6 + 1;
+			std::string soundEffect = "./data/sound/RobotBullet" + std::to_string(randomSound) + ".mp3";
+			Sound::play(soundEffect);
 			soundTimer = 0;
 		}
 		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage());
@@ -277,7 +308,7 @@ float Bullet::getTimeLeft() const
 	return timeLeft;
 }
 
-void Bullet::setWeapon(Weapon weapon) 
+void Bullet::setWeapon(Weapon weapon)
 {
 	this->weapon = weapon;
 }
@@ -309,7 +340,7 @@ GameObject* Bullet::getGameObject()
 
 void Bullet::updateSoundTimer(float deltaTime)
 {
-	soundTimer +=  deltaTime;
+	soundTimer += deltaTime;
 }
 
 void Bullet::destroy()

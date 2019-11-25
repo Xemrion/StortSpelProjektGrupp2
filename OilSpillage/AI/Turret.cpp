@@ -4,7 +4,7 @@ Turret::Turret()
 {}
 
 Turret::Turret(float x, float z, int weaponType, Physics* physics)
-	: Actor(x, z, physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
+	: Actor(x, z,physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 23;
@@ -19,15 +19,10 @@ Turret::Turret(float x, float z, int weaponType, Physics* physics)
 	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
 	Game::getGraphics().addToDraw(&this->body);
 	Game::getGraphics().addToDraw(this);
-	btRigidBody* tempo = physics->addSphere(0.5f, btVector3(position.x, position.y, position.z), 0, this);
-	setRigidBody(tempo, physics);
-	getRigidBody()->activate();
-	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	getRigidBody()->setFriction(0);
-	getRigidBody()->setLinearFactor(btVector3(0, 0, 0));
 	this->stats = VehicleStats::AITurret;
 	setHealth(this->stats.maxHealth);
 	this->velocity = Vector3();
+	createRigidbody(physics);
 }
 
 Turret::~Turret()
@@ -40,6 +35,16 @@ void Turret::update(float dt, const Vector3& targetPos)
 {
 	Actor::update(dt, targetPos);
 	updateBullets(dt);
+}
+
+void Turret::createRigidbody(Physics* physics)
+{
+	btRigidBody* tempo = physics->addSphere(0.5f, btVector3(position.x, position.y, position.z), 0, this);
+	setRigidBody(tempo, physics);
+	getRigidBody()->activate();
+	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	getRigidBody()->setFriction(0);
+	getRigidBody()->setLinearFactor(btVector3(0, 0, 0));
 }
 
 void Turret::setForwardVector(Vector3 forward)

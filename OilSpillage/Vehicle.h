@@ -159,7 +159,16 @@ private:
 	bool dmg;
 	bool player = false;
 	
-
+	int soundHandle = 0;
+	int driftHandle = 0;
+	int starPowerHandle = 0;
+	bool driftBool;
+	float driftVolume;
+	float enginePitch;
+	float engineGears;
+	int randomGears;
+	float time;
+	float wheelRotation;
 	Vector2 aimLerp;
 	Vector2 curDir;
 	Vector2 currentDir;
@@ -180,6 +189,7 @@ public:
 	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
+	void startEngineSound();
 
 	Stats getStats()const; 
 
@@ -193,7 +203,7 @@ public:
 	float getRotator();
 	Vector3 getCameraDistance(float deltaTime);
 	void setAccelForce(Vector3 accelForce, float deltaTime);
-	void setWheelRotation();
+	void setWheelRotation(float deltaTime);
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;
