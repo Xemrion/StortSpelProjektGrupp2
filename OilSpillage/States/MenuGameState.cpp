@@ -18,19 +18,49 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->menues[MENU_CONTROLS]->init();
 	this->menues[MENU_HIGHSCORE] = std::make_unique<UIHighscore>();
 
-	Game::getGraphics().loadTexture("UI/menuBG");
-	this->textureBG = Game::getGraphics().getTexturePointer("UI/menuBG");
+	Game::getGraphics().loadTexture("UI/image");
+	this->textureBG = Game::getGraphics().getTexturePointer("UI/image");
 	assert(textureBG && "Could not load texture!");
+	this->theVehicle = std::make_unique<Vehicle>();
+	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
+	this->physics = std::make_unique<Physics>();
+	this->lightList = std::make_unique<LightList>();
+	this->lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
+	this->lightList->addLight(PointLight(Vector3(0,-0.25, -0.25), Vector3(0.4, 0.1, 0), 10));
+
+	this->graphics.setLightList(lightList.get());
+
+	this->theVehicle->init(physics.get());
+	this->theVehicle->getVehicle()->setPosition(Vector3(0, -0.25, -0.25));
+	this->theVehicle->getVehicleBody1()->setPosition(Vector3(0, 0.55, 0));
+	
+	this->theVehicle->getVehicle()->setRotation(Vector3(0, 90, 0));
+
+	this->camera = std::make_unique<DynamicCamera>(Vector3(2.0f, 0.5f, -2.0f), Vector3(0, 0, 0));
+	barrels = std::make_unique<GameObject>();
+	graphics.loadModel("Entities/Barrel");
+	barrels.get()->mesh = graphics.getMeshPointer("Entities/Barrel");;
+	barrels.get()->setTexture(graphics.getMaterial("Entities/Barrel").diffuse);
+	barrels.get()->setPosition(Vector3(0, -0.5, 0));
+	barrels.get()->setScale(Vector3(0.4f,0.4f,0.4f));
+	graphics.addToDraw(barrels.get());
 }
 
 MenuGameState::~MenuGameState() {}
 
 void MenuGameState::update(float deltaTime)
 {
-	this->graphics.clearScreen(Vector4(0,0,0,0));
 
+	this->theVehicle->update(deltaTime, 0, 0, 0, Vector2(0, 0));
+	this->theVehicle->setWheelRotation(deltaTime);
+	this->physics->update(deltaTime);
+
+	graphics.getParticleSystem("fire")->addParticle(1, 1.0f, Vector3(0, 0, 0), Vector4(0, 2, 0, 0));
+
+	this->graphics.clearScreen(Vector4(0,0,0,0));
+	this->graphics.render(this->camera.get(), deltaTime);
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2());
+	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2(SCREEN_WIDTH / 2 - textureBG->getWidth() / 2,textureBG->getHeight()));
 	UserInterface::getSpriteBatch()->End();
 
 	this->menues[this->currentMenu]->update(deltaTime);

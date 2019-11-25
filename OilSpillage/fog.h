@@ -29,6 +29,7 @@ private:
 	std::vector<Texture*> fogTextures;
 	std::vector<Texture*> normalTextures;
 	float spacing;
+	Vector2 wind;
 
 	ShaderClass generateTextureShader;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> textureRTV;
@@ -40,5 +41,7 @@ public:
 	~Fog();
 	void initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, UINT slices, float spacing, FogMaterial material);
 	std::vector<GameObject*>& getQuads();
+	void setWindSpeed(Vector2&& speed);
+	const Vector2& getWindSpeed() const;
 	ShaderClass drawShader;
 };

@@ -119,17 +119,11 @@ private:
 	float trailTimer = 0.0f;
 	float driftForce = 0.0f;
 
-	float timeSinceLastShot;
-	float timeSinceLastShot2;
-	Weapon weapon;
-	Weapon weapon2;
-	Weapon mountedWeaponData;
 	Stats defaultStats;
 	Stats updatedStats;
 
 	static const int bulletCount = 512;
 	Bullet bullets[bulletCount];
-	LaserLight* laserLight;
 
 	float gunRotation;
 	DirectX::XMFLOAT2 velocity;

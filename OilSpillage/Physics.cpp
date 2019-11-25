@@ -145,7 +145,7 @@ void Physics::update(float deltaTime)
 
 	//this->world->stepSimulation(deltaTime, 0);
 	//this->world->stepSimulation(btScalar(deltaTime));
-}
+ }
 
 btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, void* obj)
 {	//add object set transform
