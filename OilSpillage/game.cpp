@@ -122,6 +122,12 @@ void Game::createCurrentState()
 	if (currentState == STATE_MENU)
 	{
 		Container::playerInventory = std::make_unique<Container>();
+
+		for (int i = 0; i < 20; i++)
+		{
+			Container::playerInventory->addItem(Item::getRandom());
+		}
+
 		state = std::make_unique<MenuGameState>();
 	}
 	else if (currentState == STATE_PLAYING)
