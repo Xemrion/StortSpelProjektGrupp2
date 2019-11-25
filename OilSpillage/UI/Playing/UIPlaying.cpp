@@ -35,10 +35,38 @@ void UIPlaying::updateUI(float deltaTime)
 		this->shouldInit = false;
 	}
 
-	
 	this->respawnTimer += deltaTime;
 	this->minimap->update(deltaTime);
 	this->objectiveBox->update(deltaTime);
+
+	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
+	Color color(Colors::Yellow);
+
+	int secondsFromMinute = static_cast<int>(std::roundf(time)) % 60;
+	if (secondsFromMinute <= 1 || secondsFromMinute >= 59 || time <= 10.0f)
+	{
+		timerScale = Game::lerp(timerScale, 1.0f, deltaTime * 2);
+		color = Color(Colors::GreenYellow);
+	}
+	else
+	{
+		timerScale = Game::lerp(timerScale, 0.5f, deltaTime * 2);
+		color = Color(Colors::Yellow);
+	}
+
+	if (time <= 20.0f)
+	{
+		color = Color::Lerp(Color(Colors::Red), Color(Colors::Yellow), time / 20.0f);
+	}
+
+	if (time <= 10.0f)
+	{
+		this->timer->setAnimation(Animation::SHAKING);
+	}
+
+	this->timer->setVariables(this->getFormattedTime(), color, timerScale);
+	this->timer->setPosition(Vector2(SCREEN_WIDTH / 2 - this->timer->getSize().x / 2, 20 + Slider::size.y + 10));
+	this->timer->update(deltaTime);
 }
 
 void UIPlaying::drawUI()
@@ -80,10 +108,6 @@ void UIPlaying::drawUI()
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position+Vector2(0,textSize.y), colorOverTime, 0, Vector2(textSize.x / 2, textSize.y / 2), timeScale);
 
 	}
-	else
-	{
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), timeStr.c_str(), position+Vector2(0.0f,70.0f), colorOverTime, 0, Vector2(textSize.x / 2, (textSize.y / 2)+60), timeScale);
-	}
 	
 	if (player->getRespawnTimer() > 0 && time > 0)
 	{
@@ -110,10 +134,12 @@ void UIPlaying::drawUI()
 	this->healthBar->draw(false);
 	this->objectiveBox->draw(false);
 	this->minimap->draw(false);
+	this->timer->draw(false);
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), std::to_string(Game::getGameInfo().highScore).c_str(), Vector2(0, 0), Colors::Red, 0, Vector2::Zero, 1.0f);
 	UserInterface::getSpriteBatch()->End();
 }
 
-UIPlaying::UIPlaying() : shouldInit(true), respawnTimer(0)
+UIPlaying::UIPlaying() : shouldInit(true), respawnTimer(0), timerScale(0.5f)
 {
 }
 
@@ -126,6 +152,9 @@ void UIPlaying::init()
 	this->healthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 20));
 	this->minimap = std::make_unique<Minimap>(Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
 	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(-10, 15));
+	this->timer = std::make_unique<AnimatedText>("00:00", Color(Colors::Yellow), timerScale, Animation::NONE);
+	this->timer->setPosition(Vector2(SCREEN_WIDTH / 2 - this->timer->getSize().x / 2, 20 + Slider::size.y + 10));
+	this->timer->beginAnimation();
 }
 
 void UIPlaying::resetMinimapFog()

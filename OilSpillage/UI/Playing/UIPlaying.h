@@ -5,6 +5,7 @@
 #include "../Elements/Slider.h"
 #include "../Elements/Minimap.h"
 #include "../Elements/ObjectiveBox.h"
+#include "../Elements/AnimatedText.h"
 
 class UIPlaying : public UserInterface
 {
@@ -15,7 +16,9 @@ private:
 
 	bool shouldInit;
 	float respawnTimer;
+	float timerScale;
 
+	std::unique_ptr<AnimatedText> timer;
 	std::unique_ptr<Slider> healthBar;
 	std::unique_ptr<Minimap> minimap;
 	std::unique_ptr<ObjectiveBox> objectiveBox;
