@@ -55,7 +55,7 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 	std::string typeInfo = this->types.getType(TypeOfTarget(typeInt));
 	
 	temp->setReward(rewardTime);
-	temp->setScore(500 * (1 + (0.1*Game::getGameInfo().getNrOfClearedStages())));
+	temp->setScore(500 * (1 + (0.1*Game::getGameInfo().nrOfClearedStages)));
 	if (type == TypeOfMission::FindAndCollect)
 	{
 		temp->setInfo(info + typeInfo);

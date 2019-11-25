@@ -12,7 +12,7 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	Game::getGraphics().addToDraw(this);
 
 	this->stats = VehicleStats::AIAttacker;
-	setHealth(this->stats.maxHealth);
+	setHealth(this->stats.maxHealth * (1 + (0.3 * Game::getGameInfo().nrOfClearedStages)));
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));

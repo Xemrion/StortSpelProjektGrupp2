@@ -38,11 +38,11 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	//seperation(targetPos);
 	updateActors(dt, targetPos);
 
-	if (spawnTimer <= 0)
-	{
-		spawnEnemies(targetPos);
-		spawnTimer = spawnCooldown;
-	}
+	//if (spawnTimer <= 0)
+	//{
+	//	spawnEnemies(targetPos);
+	//	spawnTimer = spawnCooldown;
+	//}
 
 	Vector3 newPos;
 	float deltaX;
