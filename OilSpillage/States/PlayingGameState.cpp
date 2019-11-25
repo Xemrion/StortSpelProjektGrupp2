@@ -68,7 +68,7 @@ void PlayingGameState::initAI()
 	}
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(70.0f), currentMenu(MENU_PLAYING)
 {
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -885,16 +885,16 @@ void PlayingGameState::update(float deltaTime)
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
 //#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	ImGui_Driving();
-	//ImGui_ProcGen();
-	//ImGui_AI();
-	ImGui_Particles();
-	ImGui_Camera();
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	//ImGui_ImplDX11_NewFrame();
+	//ImGui_ImplWin32_NewFrame();
+	//ImGui::NewFrame();
+	//ImGui_Driving();
+	////ImGui_ProcGen();
+	////ImGui_AI();
+	//ImGui_Particles();
+	//ImGui_Camera();
+	//ImGui::Render();
+	//ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	//#endif // !_DEBUG
 
 	graphics.presentScene();
