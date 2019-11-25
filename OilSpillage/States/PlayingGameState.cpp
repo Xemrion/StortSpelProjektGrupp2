@@ -90,6 +90,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	//graphics.loadModel("Roads/Metro/1110");
 	//graphics.loadModel("Roads/Metro/1111");
 
+	graphics.loadModel("Entities/Star");
+	
 	graphics.loadModel("Tiles/Quad_SS"); // single-sided
 	graphics.loadTexture("Tiles/asphalt");
 	graphics.loadTexture("Tiles/asphalt_nor");
@@ -671,7 +673,7 @@ void PlayingGameState::update(float deltaTime)
 		for (std::unique_ptr<PowerUp>& p : powerUps)
 		{
 			p->update(deltaTime);
-			if (p->isActive())
+			if (p->isActive() && !player->isDead())
 			{
 				if (p->getAABB().intersectXZ(player->getVehicle()->getAABB()))
 				{
@@ -1167,6 +1169,7 @@ void PlayingGameState::generateMapPowerUps()
 				break;
 			}
 		}
+		position.y += 2.0;
 		PowerUp p(position, (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
 
 		addPowerUp(p);

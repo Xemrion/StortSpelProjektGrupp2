@@ -161,6 +161,7 @@ private:
 	
 	int soundHandle = 0;
 	int driftHandle = 0;
+	int starPowerHandle = 0;
 	bool driftBool;
 	float driftVolume;
 	float enginePitch;

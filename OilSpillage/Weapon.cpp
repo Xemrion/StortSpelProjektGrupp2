@@ -251,7 +251,9 @@ void Bullet::laserEnemyUpdate(float& deltaTime)
 	{
 		if (soundTimer > 0.05f)
 		{
-			Sound::play("data/sound/HitSound.wav");
+			int randomSound = rand() % 6 + 1;
+			std::string soundEffect = "./data/sound/RobotBullet" + std::to_string(randomSound) + ".mp3";
+			Sound::play(soundEffect);
 			soundTimer = 0;
 		}
 		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage());

@@ -224,6 +224,30 @@ btRigidBody* Physics::addCylinder(btVector3 Origin, btVector3 size, float mass)
 	return body;
 }
 
+btRigidBody* Physics::addCapsule(btScalar radius, btVector3 Origin, btScalar height, float mass)
+{
+	btTransform t; //
+	t.setIdentity();
+	t.setOrigin(btVector3(Origin));
+	btCapsuleShapeZ* capsule = new btCapsuleShapeZ(radius,height); //raduius
+
+	btVector3 inertia(0, 0, 0);
+	if (mass != 0.0f) {
+		capsule->calculateLocalInertia(mass, inertia);
+	}
+
+	btMotionState* motion = new btDefaultMotionState(t);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, capsule, inertia);
+
+	btRigidBody* body = new btRigidBody(info);
+
+	bodies.push_back(body);
+
+	this->world->addRigidBody(body);
+
+	return body;
+}
+
 btGeneric6DofSpring2Constraint* Physics::addSpring(btRigidBody* box1, btRigidBody* box2)
 {
 	btGeneric6DofSpring2Constraint* spring = new btGeneric6DofSpring2Constraint(
@@ -293,26 +317,26 @@ bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* 
 	Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
 	Actor* enemyPtr = static_cast<Actor*>(obj2->getCollisionObject()->getUserPointer());
 
-	//if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
-	//{
-	//	playerPtr = static_cast<Vehicle*>(obj2->getCollisionObject()->getUserPointer());
-	//	enemyPtr = static_cast<Actor*>(obj1->getCollisionObject()->getUserPointer());
+	if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
+	{
+		playerPtr = static_cast<Vehicle*>(obj2->getCollisionObject()->getUserPointer());
+		enemyPtr = static_cast<Actor*>(obj1->getCollisionObject()->getUserPointer());
 
-	//	if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
-	//	{
-	//		return false;
-	//	}
-	//}
+		if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
+		{
+			return false;
+		}
+	}
 
-	//if (enemyPtr != nullptr)
-	//{
-	//	if (playerPtr->getPowerUpTimer(PowerUpType::Star) > 0.0)
-	//	{
-	//		enemyPtr->setHealth(0);
-	//	}
+	if (enemyPtr != nullptr)
+	{
+		if (playerPtr->getPowerUpTimer(PowerUpType::Star) > 0.0)
+		{
+			enemyPtr->changeHealth(-200);
+		}
 
-	//	return true;
-	//}
+		return true;
+	}
 	return false;
 }
 
