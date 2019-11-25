@@ -134,15 +134,10 @@ void Game::createCurrentState()
 {
 	VehicleSlots* transfer = nullptr;
 	VehicleSlots* newSlots = nullptr;
-
 	if (currentState == STATE_MENU)
 	{
 		Container::playerInventory = std::make_unique<Container>();
 
-		for (int i = 0; i < 20; i++)
-		{
-			Container::playerInventory->addItem(Item::getRandom());
-		}
 		nrOfStagesDone = 0.0f;
 		localScale = 1.0f;
 		state = std::make_unique<MenuGameState>();
@@ -169,6 +164,7 @@ void Game::createCurrentState()
 	}
 	else if (currentState == STATE_UPGRADING)
 	{
+		graphics.removeAllUIDraw();
 		if (oldState == STATE_PLAYING)
 		{
 			transfer = static_cast<PlayingGameState*>(state.get())->getPlayer()->getSlots();
