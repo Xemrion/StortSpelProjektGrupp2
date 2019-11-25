@@ -39,9 +39,6 @@ void Item::init()
 	spike->setPosition(lazer->mesh->getAABB().scale(lazer->getScale()).maxPos * Vector3(0, 1, 0));
 
 	Item::premadeItems = {
-		std::make_shared<Item>("Test Item", "A very useless thing!", ItemType::GADGET, nullptr),
-		std::make_shared<Item>("Test Item 2", "A very useless thing 2!", ItemType::GADGET, nullptr),
-		std::make_shared<Item>("Test Item 3", "A very useless thing 3!", ItemType::GADGET, nullptr),
 		std::make_shared<ItemWeapon>("Machinegun", WeaponHandler::getWeapon(WeaponType::MachineGun), machineGun),
 		std::make_shared<ItemWeapon>("Flamethrower", WeaponHandler::getWeapon(WeaponType::Flamethrower), flameThrower),
 		std::make_shared<ItemWeapon>("Lazer", WeaponHandler::getWeapon(WeaponType::Laser), lazer),
