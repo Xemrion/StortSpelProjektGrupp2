@@ -25,13 +25,13 @@ struct ParticleParams
 struct ParticleRenderParams
 {
 	Vector4 colors[4];
-	Vector4 config;
+	Vector4 config;//x = nrOfColors, y = startSize, z = endSize
 };
 struct SimulationParams
 {
 	Vector4 timeFactors;
 	Vector4 vectorField;
-	Vector4 consumerLocation;
+	Vector4 physicsConfig; //.x = mass, .y = gravity69
 };
 struct IndirDraw
 {
@@ -40,18 +40,72 @@ struct IndirDraw
 	UINT vertexStartLoc;
 	UINT instanceStartLoc;
 };
+struct ParticleShaders
+{
+	char csUpdate[128];
+	char csCreate[128];
+	char gsPrimitive[128];
+	char pixelShader[128];
+	char vertexShader[128];
+};
+struct ParticleSData
+{
+	char name[128];
+	ParticleShaders shaders;
+	ParticleRenderParams renderParams;
+	float vectorFieldPower;
+	float vectorFieldSize;
+};
 class ParticleSystem
 {
 public:
 	ParticleSystem();
 	~ParticleSystem();
-	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext, const wchar_t* csUpdate, const wchar_t* csCreate, const wchar_t* gs);
+	void setNameofSystem(std::string name);
+	std::string getName();
+	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 	bool addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection);
+	bool addParticle(int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection);
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
+	void setSize(float startSize, float endSize);
+	void setMass(float mass);
+	//gravity = -1 means -1 * 9.82
+	void setGravity(float gravity);
 	void changeVectorField(float vectorFieldPower, float vectorFieldSize);
+	void setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader = "ParticlePS.cso", std::string vertexShader = "ParticleVS.cso");
+	void setVertexShader(std::string vertexShader);
+	void setUpdateShader(std::string csUpdate);
+	void setCreateShader(std::string csCreate);
+	void setGeometryShader(std::string gsPrimitive);
+	void setPixelShader(std::string pixelShader);
+
 	void drawAll(DynamicCamera* camera);
+	bool loadSystem();
+	bool saveSystem();
+
+	float getStartSize()const;
+	float getEndSize()const;
+	float getVectorFieldPower()const;
+	float getVectorFieldSize()const;
+	Vector4 getColor(int index)const;
 private:
+
+	std::wstring StringToWString(const std::string& s)
+	{
+		std::wstring temp(s.length(), L' ');
+		std::copy(s.begin(), s.end(), temp.begin());
+		return temp;
+	};
+
+
+	std::string WStringToString(const std::wstring& s)
+	{
+		std::string temp(s.length(), ' ');
+		std::copy(s.begin(), s.end(), temp.begin());
+		return temp;
+	};
+	int frameID = 0.0f;
 	const int capParticle = 51200 * 2;//100*512
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
@@ -65,9 +119,9 @@ private:
 	ParticleRenderParams colorNSize;
 	ParticleParams pParams;
 	SimulationParams sP;
+	ParticleShaders particleShaders;
+	ParticleSData systemData;
 
-	//Particle* particles;
-	//ID3D11Buffer* particleBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;

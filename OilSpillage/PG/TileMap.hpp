@@ -102,23 +102,13 @@ public:
 
 	inline V2u  convertWorldPositionToTilePosition( Vector3 const &worldPosition ) const
 	{
-		V2u result { static_cast<U32>( std::floor(worldPosition.x /  config.tileScaleFactor.x) ),
-		             static_cast<U32>( std::floor(worldPosition.z / -config.tileScaleFactor.y) ) };
+		
+		V2u result { static_cast<U32>( std::round(worldPosition.x /  config.tileScaleFactor.x) ),
+		             static_cast<U32>( std::round(worldPosition.z / -config.tileScaleFactor.y) ) };
 		//assert( result.x <  width );
 		//assert( result.y < height );
 		return result;
 	}
-
-	//  uses the inputs x and z values
-	inline V2u  convertWorldPositionToTilePositionXZ( Vector3 const &worldPosition ) const
-	{
-		V2u result { static_cast<U32>( std::floor(worldPosition.x /  config.tileScaleFactor.x) ),
-		             static_cast<U32>( std::floor(worldPosition.z / -config.tileScaleFactor.y) ) };
-		//assert( result.x <  width );
-		//assert( result.y < height );
-		return result;
-	}
-
 	inline Tile const &tileAt( U16 x, U16 y ) const noexcept
 	{
 		return data[ index(x, y) ];
@@ -128,7 +118,6 @@ public:
 	{
 		return data[ index(tilePosition.x, tilePosition.y) ];
 	}
-
 	inline Tile& tileAt( U16 x, U16 y ) noexcept
 	{
 		return data[ index(x, y) ];
@@ -139,7 +128,14 @@ public:
 		return data[ index(tilePosition.x, tilePosition.y) ];
 	}
 
+	Opt<Vector3> getRandomTilePositionInRadius( Vector3 origin, F32 radius, Tile target, U16 tries=100 ) const noexcept;
+
+	Vector<Vector3> getAllTilePositionsInRadius( Vector3 origin, F32 radius, Tile target ) const noexcept;
+
 	friend std::ostream &operator<< ( std::ostream &, TileMap const & );
+
+private:
+	Bounds calculateBounds( Vector3 const &origin, F32 radius ) const noexcept;
 };
 
 // road generator stream outputter implementation

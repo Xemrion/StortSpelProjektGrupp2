@@ -21,6 +21,7 @@ static const float4 position[4] =
 struct GSInput
 {
 	float4 pos : POSITION;
+	float4 direction : DIRECTION;
 	float2 time : TIME;
 	uint ind : VAR;
 };
@@ -54,6 +55,7 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	float time = input[0].time.x;
 	float totalLifeTime = input[0].time.y;
 	float size;
+
 	/*
 	Config.x is nrOfColors. Max 4
 	Config.y is the startsize and config.z is the end size.
@@ -79,12 +81,9 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 		testColor = fadeOverTime(colors[2], colors[3], time % halfTime, halfTime);
 	}
 	
-	//vert[0] = input[0].pos - right *size + up * size; // Top middle
-	//vert[1] = input[0].pos + right *size + up * size; // Top right
-	//vert[3] = input[0].pos + right *size - up * size; // Bottom right
-	//vert[2] = input[0].pos - right *size - up * size; // Top right 
-	float3 testUp = up;//float3(0, 0, 1);
-	float3 testRight = right;//float3(1, 0, 0);
+
+	float3 testUp = up;
+	float3 testRight = right;
 	//Change every frame between up-pointy triangle and down-pointy triangle
 	if (upp.w>0.9f)
 	{

@@ -1,16 +1,16 @@
-
 #pragma once
+#include "Ranged.h"
 #include "Actor.h"
-
-class Turret : public Actor
+class Turret : public Actor,public Ranged
 {
 public:
 	Turret();
-	Turret(float x, float z);
-	~Turret();
-	void update(float dt, Vector3 targetPos);
+	Turret(float x, float z, int weaponType,Physics* physics);
+	virtual ~Turret();
+	void update(float dt, const Vector3& targetPos);
+protected:
+	virtual void createRigidbody(Physics* physics);
 private:
-	int deltaTime;
 	void setForwardVector(Vector3 forward);
 	void setSightRange(int range);
 	void setUpActor();
@@ -24,5 +24,5 @@ private:
 	Vector3 idleTarget;
 	float turretAngle;
 
-	void calculateTarget(float& angle);
+	void calculateTarget(float angle);
 };

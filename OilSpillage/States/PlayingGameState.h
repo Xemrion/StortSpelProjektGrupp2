@@ -40,13 +40,25 @@ public:
 	void spawnObjects();
 	Vector3 generateObjectivePos(float minDistance, float maxDistance) noexcept;
 	Vector3 generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept;
-	PointLight* addPointLight(PointLight& light);
-	void removeLight(PointLight* theLight);
+	PointLight* addLight(PointLight& light);
+	void removeLight(PointLight* light);
+	SpotLight* addLight(SpotLight& light);
+	void removeLight(SpotLight* light);
+	LaserLight* addLight(LaserLight& light);
+	void removeLight(LaserLight* light);
 	void		 moveObjects();
 	void		 updateObjects();
+	void		 paperCollision(float deltaTime);
 	Vector3   getRespawnPosition() const noexcept;
+	void addPowerUp(PowerUp p);
+	void generateMapPowerUps();
+	void clearPowerUps();
+	void generateObjectives();
 
+	Vector3 getCameraPos();
 
+	std::unique_ptr<Vehicle>& getPlayer();
+	void setPlayer(Vehicle* theVehicle);
 	ActorManager* actorManager;
 
 private:
@@ -71,16 +83,21 @@ private:
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::vector<CinematicPos>       points;
-	std::vector<PowerUp>		    powerUps;
+	std::vector<std::unique_ptr<PowerUp>> powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
+	GameObject*		testObjective2; //Test
+	GameObject* cameraObject;
+
 	GameObject* objTestPickUp;
 	GameObject* objTestPickUp2;
 	GameObject* objTestPickUp3;
 	GameObject** objArray = new GameObject * [3];
 	ObjectiveHandler objectives;
 	RNG rng{ RD()() };        // gör privat klassmedlem istället
-	
+	int frameCount = 0;
+	int nrOfEnemies = 0;
+
 	//Bullet
 	std::unique_ptr<Physics>		physics;
 	std::unique_ptr<GameObject>		buildingTest;
@@ -92,13 +109,16 @@ private:
 
 	int								spawnTimer = 0;
 	float							soundAggro;
-
-	int                             addNrOfParticles  {     2 };
-	int                             lifeTime          {     1 };
+	const char* current_item;
+	void fillTestParticle();
+	const char* items;
+	float timer = 0.0f;
+	int                             addNrOfParticles  {     1 };
+	float                             lifeTime          {     1 };
 	float                           timerForParticle  {   .0f };
 	float                           vectorFieldPower  {  4.0f };
 	float                           vectorFieldSize   {  2.2f };
-	float                           randomPosPower    {  0.5f };
+	float                           randomPosPower    {  0.0f };
 	float                           size1             { .039f };
 	float                           size2             { .063f };
 	float                           colors  [4]       {};
@@ -109,7 +129,10 @@ private:
 	                                                    Vector4( 0.99f,  0.13f, .0f, 1.0f ),
 	                                                    Vector4( 0.0f,  0.0f, .0f, 1.0f ),
 	                                                    Vector4( 0.0f,  0.0f, .0f, 1.0f )  };
-  
+	int electricNew = 0.0f;
+	float timerElectric = 0.0f;
+	float timerEMP = 0.0f;
+	void createElectric(int randNr, float deltaTime);
     void initAI();
 	void ImGui_ProcGen();
 	void ImGui_Driving();

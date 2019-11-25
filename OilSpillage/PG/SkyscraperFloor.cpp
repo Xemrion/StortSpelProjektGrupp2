@@ -2,7 +2,7 @@
 
 SkyscraperFloor::SkyscraperFloor(int edges)
 {
-	this->center = Vector3(0.0f, 10.0f, 0.0f);
+	this->center = Vector3(0.0f, 0.0f, 0.0f);
 	this->verticies.clear();
 	this->nrOfEdges = 0;
 	this->generateShape(edges);
@@ -14,6 +14,8 @@ SkyscraperFloor::SkyscraperFloor(const SkyscraperFloor& other)
 	this->verticies.clear();
 	this->verticies = other.verticies;
 	this->nrOfEdges = other.nrOfEdges;
+	this->indices.clear();
+	this->indices = other.indices;
 }
 
 SkyscraperFloor::~SkyscraperFloor()
@@ -43,16 +45,11 @@ void SkyscraperFloor::rotateRad(float radians)
 	}
 }
 
-/*
-nextX = (currentForward.x * float((cos(rotationAngle)))) + (currentForward.z * float(sin(rotationAngle)));
-nextZ = (currentForward.z * float(cos(rotationAngle))) - (currentForward.x * float(sin(rotationAngle)));
-*/
-
 void SkyscraperFloor::generateShape(int edges)
 {
 	if (edges >= 3) {
 		this->nrOfEdges = edges;
-		Vector3 temp = this->center + Vector3(0.0f, 0.0f, 5.0f);
+		Vector3 temp = this->center + Vector3(0.0f, 0.0f, 3.0f);
 		float angle = ((pi * 2) / float(edges));
 		this->verticies.push_back(temp);
 		for (int i = 1; i < edges; i++) {
@@ -64,8 +61,8 @@ void SkyscraperFloor::generateShape(int edges)
 	}
 }
 
-Vector3 SkyscraperFloor::intersectingLines(Vector3& pointA1, Vector3& pointA2, Vector3& pointB1, Vector3& pointB2)
-{ //Incorrect: Fix it
+Vector3 SkyscraperFloor::intersectingLines(Vector3& pointA1, Vector3& pointA2, Vector3& pointB1, Vector3& pointB2) const
+{
 	float divider, t1, t2;
 	Vector3 result(0.0f, -1.0f, 0.0f);
 
@@ -82,21 +79,19 @@ Vector3 SkyscraperFloor::intersectingLines(Vector3& pointA1, Vector3& pointA2, V
 			((pointA2.x - pointA1.x) * (pointA1.z - pointB1.z)))
 			/ divider;
 
-		if (t1 > 0 && t2 > 0 && t1 < 1 && t2 < 1) {
-			Vector3 aResult = Vector3(pointA1.x + (pointA2.x - pointA1.x) * t1, pointA1.y, pointA1.z + (pointA2.z - pointA1.z) * t1);
-			Vector3 bResult = Vector3(pointB1.x + (pointB2.x - pointB1.x) * t2, pointB1.y, pointB1.z + (pointB2.z - pointB1.z) * t2);
-			result = aResult;
+		if (t1 > 0 && t2 > 0 && t1 <= 1 && t2 <= 1) {
+			result = Vector3(pointA1.x + (pointA2.x - pointA1.x) * t1, pointA1.y, pointA1.z + (pointA2.z - pointA1.z) * t1);
 		}
 	}
 	return result;
 }
 
-bool SkyscraperFloor::evenOddCheck( Vector3 pointB1,Vector3 pointB2, Vector3 pointA)
+bool SkyscraperFloor::evenOddCheck( Vector3 pointB1,Vector3 pointB2, Vector3 pointA) const
 {
 	bool intersect = false;
 	
 	float divider, t1, t2;
-	Vector3 direction(0.0f, 0.0f, 1.0f);
+	Vector3 direction(1.0f, 0.0f, 1.0f);
 
 	divider = (((pointB2.x - pointB1.x) * (pointA.z - direction.z))
 		- ((pointA.x - direction.x) * (pointB2.z - pointB1.z)));
@@ -111,7 +106,7 @@ bool SkyscraperFloor::evenOddCheck( Vector3 pointB1,Vector3 pointB2, Vector3 poi
 			((direction.x - pointA.x) * (pointA.z - pointB1.z)))
 			/ divider;
 
-		if (t1 > 0 && t2 > 0 && t2 < 1) {
+		if (t1 > 0 && t2 > 0 && t2 <= 1) {
 			intersect = true;
 		}
 	}
@@ -122,34 +117,35 @@ bool SkyscraperFloor::evenOddCheck( Vector3 pointB1,Vector3 pointB2, Vector3 poi
 
 void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 {
+	/* Union
+	This Shape A
+	Other Shape B
+	Go through lines in A and see if they intersect with lines from B
+	If they intersect, add a point between the lines in A & B.
+	After all lines are done, compare points in A to Shape B
+	If inside, remove from Copy A
+	Repeat for B
+	Add points of B between the intersecting points added to A
+	You have a union.
+	*/
+
 	//Phase 1: Intersections.
 	toUnion.translate(newCenter);
 	std::vector<Vector3> intersections;
 	Vector3 intersectionA(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < toUnion.nrOfEdges; i++) {
 		for (int j = 0; j < this->nrOfEdges; j++) {
-			if (i == toUnion.nrOfEdges - 1) {
-				if (j == this->nrOfEdges - 1) {
-					intersectionA = intersectingLines(toUnion.verticies[i], toUnion.verticies[0], this->verticies[j], this->verticies[0]);
-				}
-				else {
-					intersectionA = intersectingLines(toUnion.verticies[i], toUnion.verticies[0], this->verticies[j], this->verticies[size_t(j) + 1]);
-				}
-			}
-			else {
-				if (j == this->nrOfEdges - 1) {
-					intersectionA = intersectingLines(toUnion.verticies[i], toUnion.verticies[size_t(i) + 1], this->verticies[j], this->verticies[0]);
-				}
-				else {
-					intersectionA = intersectingLines(toUnion.verticies[i], toUnion.verticies[size_t(i) + 1], this->verticies[j], this->verticies[size_t(j) + 1]);
-				}
-			}
+			intersectionA = intersectingLines(toUnion.verticies[i], toUnion.verticies[(size_t(i) + 1) % toUnion.nrOfEdges], this->verticies[j], this->verticies[(size_t(j) + 1) % this->nrOfEdges]);
 			if (intersectionA.y != -1.0f) {
 				intersections.push_back(intersectionA);
-				this->verticies.insert(this->verticies.begin() + j + 1, intersectionA);
-				this->nrOfEdges++;
-				toUnion.verticies.insert(toUnion.verticies.begin() + i + 1, intersectionA);
-				toUnion.nrOfEdges++;
+				if (this->verticies[(size_t(j) + 1) % this->nrOfEdges] != intersectionA) {
+					this->verticies.insert(this->verticies.begin() + j + 1, intersectionA);
+					this->nrOfEdges++;
+				}
+				if (toUnion.verticies[(size_t(i) + 1) % toUnion.nrOfEdges] != intersectionA) {
+					toUnion.verticies.insert(toUnion.verticies.begin() + i + 1, intersectionA);
+					toUnion.nrOfEdges++;
+				}
 			}
 		}
 	}
@@ -158,6 +154,8 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 		int evenOddCount;
 		bool found;
 		//Remove points with an odd number of intersections with the other shape. (Odd = inside, Even = outside)
+		SkyscraperFloor temp1(toUnion);
+		SkyscraperFloor temp2(*this);
 		for (int i = 0; i < this->nrOfEdges; i++) { //Check points in this
 			found = false;
 			evenOddCount = 0;
@@ -167,16 +165,9 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 				}
 			}
 			if (!found) {
-				for (int j = 0; j < toUnion.nrOfEdges; j++) {
-					if (j == toUnion.nrOfEdges - 1) {
-						if (evenOddCheck(toUnion.verticies[j], toUnion.verticies[0], this->verticies[i])) {
-							evenOddCount++;
-						}
-					}
-					else {
-						if (evenOddCheck(toUnion.verticies[j], toUnion.verticies[size_t(j) + 1], this->verticies[i])) {
-							evenOddCount++;
-						}
+				for (int j = 0; j < temp1.nrOfEdges; j++) {
+					if (evenOddCheck(temp1.verticies[j], temp1.verticies[(size_t(j) + 1) % toUnion.nrOfEdges], this->verticies[i])) {
+						evenOddCount++;
 					}
 				}
 				if (evenOddCount % 2 == 1) {
@@ -189,22 +180,15 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 		for (int i = 0; i < toUnion.nrOfEdges; i++) { //Check points in toUnion
 			found = false;
 			evenOddCount = 0;
-			for (int k = 0; k < intersections.size(); k++) {
+			for (int k = 0; k < intersections.size() && !found; k++) {
 				if (toUnion.verticies[i] == intersections[k]) {
 					found = true;
 				}
 			}
 			if (!found) {
-				for (int j = 0; j < this->nrOfEdges; j++) {
-					if (j == this->nrOfEdges - 1) {
-						if (evenOddCheck(this->verticies[j], this->verticies[0], toUnion.verticies[i])) {
-							evenOddCount++;
-						}
-					}
-					else {
-						if (evenOddCheck(this->verticies[j], this->verticies[size_t(j) + 1], toUnion.verticies[i])) {
-							evenOddCount++;
-						}
+				for (int j = 0; j < temp2.nrOfEdges; j++) {
+					if (evenOddCheck(temp2.verticies[j], temp2.verticies[(size_t(j) + 1) % temp2.nrOfEdges], toUnion.verticies[i])) {
+						evenOddCount++;
 					}
 				}
 				if (evenOddCount % 2 == 1) {
@@ -258,7 +242,7 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 				}
 			}
 		}
-		this->nrOfEdges += toUnion.nrOfEdges - int(intersections.size());
+		this->nrOfEdges = int(this->verticies.size());
 
 	}
 	else {
@@ -282,42 +266,260 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 		}
 	}
 }
-void SkyscraperFloor::testDrawLines(Graphics* graphics)
+void SkyscraperFloor::testDrawLines() const
 {
-	for (int i = 0; i < this->nrOfEdges; i++) {
-		if (i == nrOfEdges - 1) {
-			graphics->getdebugger()->DrawLine(XMFLOAT3(this->verticies[i].x, this->center.y, this->verticies[i].z),
-				XMFLOAT3(this->verticies[0].x, this->center.y, this->verticies[0].z),
-				XMFLOAT3(0.0f, 1.0f, 1.0f));
-		}
-		else {
-			graphics->getdebugger()->DrawLine(XMFLOAT3(this->verticies[i].x, this->center.y, this->verticies[i].z),
-				XMFLOAT3(this->verticies[size_t(i) + 1].x, this->center.y, this->verticies[size_t(i) + 1].z),
-				XMFLOAT3(0.0f, 1.0f, 1.0f));
-		}
+	
+	for (int i = 0; i < this->indices.size(); i += 3) {
+		Game::getGraphics().getdebugger()->DrawLine(XMFLOAT3(this->verticies[this->indices[i]].x, this->center.y, this->verticies[this->indices[i]].z),
+			XMFLOAT3(this->verticies[this->indices[(size_t(i) + 1)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 1)]].z),
+			XMFLOAT3(0.0f, 1.0f, 1.0f));
+		Game::getGraphics().getdebugger()->DrawLine(XMFLOAT3(this->verticies[this->indices[(size_t(i) + 1)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 1)]].z),
+			XMFLOAT3(this->verticies[this->indices[(size_t(i) + 2)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 2)]].z),
+			XMFLOAT3(0.0f, 1.0f, 1.0f));
+		Game::getGraphics().getdebugger()->DrawLine(XMFLOAT3(this->verticies[this->indices[(size_t(i) + 2)]].x, this->center.y, this->verticies[this->indices[(size_t(i) + 2)]].z),
+			XMFLOAT3(this->verticies[this->indices[i]].x, this->center.y, this->verticies[this->indices[i]].z),
+			XMFLOAT3(0.0f, 1.0f, 1.0f));
 	}
 }
-void SkyscraperFloor::testDrawTriangle()
-{
 
+void SkyscraperFloor::getTriangleIndices()
+{ //Bug: Infinite Loop
+	this->indices.clear();
+	std::vector<int> triangleIndices;
+	std::vector<bool> usedIndices;
+	size_t counter = 1, forwardsOffset = 1, backwardsOffset = 1;
+	size_t size = this->verticies.size();
+	bool counterUsed = false, forwardsUsed = false, backwardsUsed = false;
+	bool mainPointLeft = false;
+	int pointsOnMainPointSide = 0;
+	int pointsUsed = 0;
+	usedIndices.resize(size);
+
+	while (size - pointsUsed > 2) {
+		counterUsed = false;
+		if (usedIndices[counter]) {
+			counterUsed = true;
+		}
+		if (!counterUsed) {
+			Vector3 backToFront, backToOther, crossProduct;
+			bool towardsUsed = false;
+			//Check forward until an available is found, save offset from point
+			do {
+				forwardsUsed = false;
+				if (usedIndices[(size_t(counter) + size_t(forwardsOffset)) % size]) {
+					forwardsUsed = true;
+				}
+				if (forwardsUsed) {
+					forwardsOffset++;
+				}
+			} while (forwardsUsed);
+
+			//Check backward until an available is found, save offset from point
+			do {
+				backwardsUsed = false;
+				if (usedIndices[(counter - backwardsOffset + size) % size]) {
+					backwardsUsed = true;
+				}
+				if (backwardsUsed) {
+					backwardsOffset++;
+					if (backwardsOffset >= size) {
+						backwardsOffset -= size;
+					}
+				}
+			} while (backwardsUsed);
+
+			if (forwardsOffset !=  size && backwardsOffset != size) {
+				/**/
+				
+				//Make a line from backward to forward and backward to main point
+				backToFront = this->verticies[(counter + forwardsOffset) % size] - this->verticies[(counter - backwardsOffset + size) % size];
+				backToOther = this->verticies[counter] - this->verticies[(counter - backwardsOffset + size) % size];
+				backToFront.Normalize();
+				backToOther.Normalize();
+				//Cross product the start point line first
+				crossProduct = backToFront.Cross(backToOther);
+				if (crossProduct.y > 0) {
+					mainPointLeft = false;
+					pointsOnMainPointSide++;
+				}
+				else if (crossProduct.y < 0) {
+					mainPointLeft = true;
+					pointsOnMainPointSide++;
+				}
+				//Cross product the start point line first, then others, if any are on the same side as the point line, there cannot be a triangle
+				for (size_t i = 1 + counter + forwardsOffset; i < size + ((counter - backwardsOffset + size) % size) && pointsOnMainPointSide < 2; i++) {
+					towardsUsed = false;
+					if (usedIndices[i % size]) {
+						towardsUsed = true;
+					}
+					if (!towardsUsed) {
+						backToOther = this->verticies[i % size] - this->verticies[(counter - backwardsOffset + size) % size];
+						backToOther.Normalize();
+						crossProduct = backToFront.Cross(backToOther);
+						if (!mainPointLeft) {
+							if (crossProduct.y > 0) {
+								pointsOnMainPointSide++;
+							}
+						}
+						else {
+							if (crossProduct.y < 0) {
+								pointsOnMainPointSide++;
+							}
+						}
+					}
+				}
+				if (pointsOnMainPointSide < 2) {
+					triangleIndices.push_back(int(counter - backwardsOffset + int(size)) % int(size));
+					triangleIndices.push_back(int(counter));
+					triangleIndices.push_back(int(counter + forwardsOffset) % int(size));
+					usedIndices[counter] = true;
+					pointsUsed++;
+				}
+
+				pointsOnMainPointSide = 0;
+			}
+
+		}
+		counter++;
+		counter = counter % size;
+
+		backwardsOffset = 1;
+		forwardsOffset = 1;
+	}
+	this->indices.clear();
+	this->indices = triangleIndices;
 }
-Vector3 SkyscraperFloor::getAVertex(int vertex)
+
+std::vector<Vertex3D> SkyscraperFloor::getWallVertices(Vector3 otherCenter)
+{	//Strange triangles
+	std::vector<Vertex3D> meshData;
+	Vertex3D temp;
+	Vector2 topLeft(0, 0), topRight(1, 0), botLeft(0, 1), botRight(1, 1);
+	int counter = 0;
+	float counterPow = 0.0f, distSquared = 0.0f;
+	Vector3 lowerFirst(0.0f), lowerSecond(0.0f);
+	Vector3 normal(0.0f), line1(0.0f), line2(0.0f);
+	for (size_t i = 0; i < this->verticies.size(); i++) {
+		lowerFirst = Vector3(this->verticies[i].x, otherCenter.y, this->verticies[i].z);
+		lowerSecond = Vector3(this->verticies[(i + 1) % this->nrOfEdges].x, otherCenter.y, this->verticies[(i + 1) % this->nrOfEdges].z);
+	
+		line1 = this->verticies[(i + 1) % this->nrOfEdges] - this->verticies[i];
+		line2 = lowerSecond - this->verticies[i];
+		normal = line2.Cross(line1);
+
+		temp.position = this->verticies[i];
+		temp.normal = normal;
+		temp.uv = topRight;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = lowerFirst;
+		temp.normal = normal;
+		temp.uv = botRight;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = lowerSecond;
+		temp.normal = normal;
+		temp.uv = botLeft;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = this->verticies[(i + 1) % this->nrOfEdges];
+		temp.normal = normal;
+		temp.uv = topLeft;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = this->verticies[i];
+		temp.normal = normal;
+		temp.uv = topRight;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = lowerSecond;
+		temp.normal = normal;
+		temp.uv = botLeft;
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+	}
+	return meshData;
+}
+
+std::vector<Vertex3D> SkyscraperFloor::getRoofVertices()
+{
+	std::vector<Vertex3D> meshData;
+	Vertex3D temp;
+	//float minUV = 1.0f / 24.0f * 3.0f, maxUV = 1.0f / 24.0f * 6.0f;
+	Vector3 normal(0.0f), line1(0.0f), line2(0.0f);
+	if (this->indices.size() == 0) {
+		this->getTriangleIndices();
+	}
+	for (size_t i = 0; i < this->indices.size(); i += 3) {
+		line1 = this->verticies[this->indices[i + 1]] - this->verticies[this->indices[i]];
+		line2 = this->verticies[this->indices[i + 2]] - this->verticies[this->indices[i]];
+		normal = line1.Cross(line2);
+
+		temp.position = this->verticies[this->indices[i]];
+		temp.normal = normal;
+		temp.uv = Vector2(temp.position.x, 0.2);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = this->verticies[this->indices[size_t(i) + 1]];
+		temp.normal = normal;
+		temp.uv = Vector2(temp.position.x, 0);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+
+		temp.position = this->verticies[this->indices[size_t(i) + 2]];
+		temp.normal = normal;
+		temp.uv = Vector2(temp.position.x,0.2);
+		temp.tangent = temp.normal;
+		temp.bitangent = temp.normal;
+		meshData.push_back(temp);
+	}
+	return meshData;
+}
+
+void SkyscraperFloor::testDrawTriangles(std::string name, Vector4 colour)
+{
+	std::vector<Vertex3D> meshData;
+	meshData = this->getRoofVertices();
+	this->roof = new GameObject;
+	Game::getGraphics().loadMesh(name.c_str(), meshData);
+	this->roof->mesh = Game::getGraphics().getPGMeshPointer(name.c_str());
+	Game::getGraphics().addToDraw(this->roof);
+	this->roof->setPosition(this->center);
+	this->roof->setScale(Vector3(2.50f, 1.0f, 2.50f));
+	this->roof->setColor(colour);
+}
+
+Vector3 SkyscraperFloor::getAVertex(int vertex) const //Returns the vertex in the index - 1
 {
 	Vector3 returnVertex;
 	returnVertex = this->verticies[(size_t(vertex) - 1) % this->nrOfEdges];
 	return returnVertex;
 }
-/* Union
-	This Shape A
-	Other Shape B
-	Go through lines in A and see if they intersect with lines from B
-	If they intersect, add a point between the lines in A & B.
-	After all lines are done, compare points in A to Shape B
-	If inside, remove from Copy A
-	Repeat for B
-	Add points of B between the intersecting points added to A
-	You have a union.
-*/
+
+Vector3 SkyscraperFloor::getCenter() const
+{
+	return this->center;
+}
+
+int SkyscraperFloor::getNrOfEdges() const
+{
+	return this->nrOfEdges;
+}
 
 void SkyscraperFloor::translate(Vector3 newCenter)
 {
@@ -329,10 +531,30 @@ void SkyscraperFloor::translate(Vector3 newCenter)
 	
 }
 
+void SkyscraperFloor::translateBy(Vector3 moveBy)
+{
+	Vector3 translation = moveBy;
+	this->center = this->center + translation;
+	for (int i = 0; i < this->nrOfEdges; i++) {
+		this->verticies[i] = this->verticies[i] + translation;
+	}
+
+}
+
+void SkyscraperFloor::scale(Vector3 scaleBy)
+{
+	Vector3 newPoint(0.0f);
+	for (int i = 0; i < this->nrOfEdges; i++) {
+		newPoint = this->verticies[i] - this->center;
+		newPoint *= scaleBy;
+		this->verticies[i] = newPoint;
+	}
+}
+
 void SkyscraperFloor::regenerateShape(int edges)
 {
 	this->verticies.clear();
-	this->center = Vector3(0.0f, 10.0f, 0.0f);
+	this->center = Vector3(0.0f, 0.0f, 0.0f);
 	this->nrOfEdges = 0;
 	generateShape(edges);
 }

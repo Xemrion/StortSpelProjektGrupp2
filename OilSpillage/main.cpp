@@ -1,6 +1,8 @@
-#include "game.h"
+#pragma comment(lib, "Ws2_32.lib")
+
 #include <Windows.h>
 #include <ctime>
+#include "game.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd) {
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)

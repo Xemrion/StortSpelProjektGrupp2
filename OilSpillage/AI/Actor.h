@@ -1,73 +1,39 @@
 #pragma once
 #include "Behaviour.h"
-#include "Boid.h"
-#include "AStar.h"
-#include "../Weapon.h"
+#include<vector>
 #include "../VehicleStats.h"
+#include "../GameObject.h"
+#include<SimpleMath.h>
+#include<DirectXMath.h>
+#include"..//game.h"
 
+using namespace DirectX::SimpleMath;
 class Actor : public GameObject
 {
 public:
 	Actor();
-	Actor(float x, float z, AStar* aStar);
+	Actor(float x, float z,Physics* physics);
 	virtual ~Actor();
-	virtual void update(float dt, Vector3 targetPos);
+	virtual void update(float dt, const Vector3& targetPos);
 	virtual void setUpActor() = 0 {};
 
-	void applyForce(Vector3 force);
-	// one Laws that boids follow
-	Vector3 separation(vector<Actor*>& boids, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
-	// Other function for moving and interacting
-	Vector3 seek();
-	void run(vector<Actor*>& boids, float deltaTime, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
-	virtual void updateBoid(float deltaTime);
-	void setPath(std::vector<Vector3> path);
-	virtual bool hasGroup();
-	void joinGroup();
-
-	const int& getHealthRef() const;
-	int getHealth() const;
-	int getMaxHealth() const;
-	void setHealth(int health);
-	void setMaxHealth(int maxHealth);
-	void resetHealth();
-	void changeHealth(int amount);
+	void setHealth(float health);
+	void changeHealth(float amount);
 	bool isDead() const;
-	void death();
+	int getPoints();
+	void setPoints(int amount);
 
 private:
-	Vector3 acceleration;
-	float maxSpeed;
-	float maxForce;
-	bool isInGroup = false;
+	float health;
+	int points;
 protected:
-	Vector3 velocity;
-	int health;
-	Stats defaultStats;
-	Stats updatedStats;
-
-	Vector3 vecForward;
-	Vector3 destination;
-	Selector* root;
-	std::vector<Vector3> path;
-	AStar* aStar;
-	Vector3 targetNode;
-	enum State { Roaming, Chasing, Returning };
-	State state;
-	BT bt;
+	bool isHit = false;
+	float deltaTime;
 	Vector3 targetPos;
 
-	virtual Status shoot();
-	virtual Status inAttackRange();	
-	virtual Status enemyNear();
-	virtual Status setChaseState();
-	virtual Status setRoamState();
-	virtual void  followPath();
-	virtual void  updateWeapon(float deltaTime);
+	Stats stats;
 
-
-	Weapon weapon;
-	static const int bulletCount = 32;
-	float timeSinceLastShot;
-	Bullet bullets[bulletCount];
+	Vector3 vecForward;
+	Selector* root;
+	BT bt;
 };

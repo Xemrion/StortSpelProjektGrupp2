@@ -1,58 +1,50 @@
-#include "../States/PlayingGameState.h"
 #include "Turret.h"
 
 Turret::Turret()
-{
-	this->sightRange = 10;
-	this->setPosition(Vector3(-15.0f, 0.0f, 0.0f));
-	setUpActor();
-	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
-	turretAngle = 90;
-	this->calculateTarget(turretAngle);
+{}
 
-	this->defaultStats = VehicleStats::AITurret;
-	this->updatedStats = this->defaultStats;
-
-	this->health = this->updatedStats.maxHealth;
-}
-
-Turret::Turret(float x, float z)
-	: Actor(x, z, nullptr)
+Turret::Turret(float x, float z, int weaponType, Physics* physics)
+	: Actor(x, z,physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
-	this->sightRange = 10;
+	this->sightRange = 23;
 	turretAngle = 90;
 	this->calculateTarget(turretAngle);
 	setUpActor();
-	vecForward.Normalize();
 	this->body.setPosition(this->position);
 	this->body.setScale(this->scale);
-	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret");
-	this->mesh = Game::getGraphics().getMeshPointer("Entities/Dummy_Turret1");
-	this->setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
-	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Dummy_Turret"));
+	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Turret");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Turret1");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
+	this->body.setMaterial(Game::getGraphics().getMaterial("Entities/Turret"));
 	Game::getGraphics().addToDraw(&this->body);
-
-	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
-
-	this->defaultStats = VehicleStats::AITurret;
-	this->updatedStats = this->defaultStats;
-
-	this->health = this->updatedStats.maxHealth;
+	Game::getGraphics().addToDraw(this);
+	this->stats = VehicleStats::AITurret;
+	setHealth(this->stats.maxHealth);
+	this->velocity = Vector3();
+	createRigidbody(physics);
 }
 
 Turret::~Turret()
 {
 	Game::getGraphics().removeFromDraw(&this->body);
+	Game::getGraphics().removeFromDraw(this);
 }
 
-void Turret::update(float dt, Vector3 targetPos)
+void Turret::update(float dt, const Vector3& targetPos)
 {
-	this->deltaTime = dt;
-	this->targetPos = targetPos;
-	this->root->func();
+	Actor::update(dt, targetPos);
+	updateBullets(dt);
+}
 
-	updateWeapon(dt);
+void Turret::createRigidbody(Physics* physics)
+{
+	btRigidBody* tempo = physics->addSphere(0.5f, btVector3(position.x, position.y, position.z), 0, this);
+	setRigidBody(tempo, physics);
+	getRigidBody()->activate();
+	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	getRigidBody()->setFriction(0);
+	getRigidBody()->setLinearFactor(btVector3(0, 0, 0));
 }
 
 void Turret::setForwardVector(Vector3 forward)
@@ -136,28 +128,32 @@ Status Turret::lineOfSight()
 	return status;
 
 }
-void Turret::calculateTarget(float& angle)
+
+void Turret::calculateTarget(float angle)
 {
 	float radians = angle * (3.14f / 180.f);
 	float x = cos(radians) * vecForward.x + sin(radians) * vecForward.z;
 	float y = cos(radians) * vecForward.x - sin(radians) * vecForward.z;
 	this->idleTarget = Vector3(x, 0.0f, y);
+	this->idleTarget.Normalize();
 }
+
 Status Turret::idle()
 {
 	/*calculate new target position if are getting close to the point*/
-	if (idleTarget.Dot(vecForward) <= 0.0f)
+	if (idleTarget.Dot(vecForward) <= 0.1f)
 	{
 		turretAngle += 90;
 		this->calculateTarget(turretAngle);
 	}
 	else
 	{
-		vecForward -= (idleTarget * deltaTime) / 1.01f;
+		vecForward -= (idleTarget * deltaTime);
 		vecForward.Normalize();
 
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
-		this->setRotation(Vector3(0, newRot - (XM_PIDIV2), 0));
+		Vector3 tempRot = Vector3(0, newRot - (XM_PIDIV2), 0);
+		this->setRotation(tempRot);
 	}
 	return Status::SUCCESS;
 }

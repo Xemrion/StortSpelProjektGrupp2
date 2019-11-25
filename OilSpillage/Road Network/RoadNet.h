@@ -40,7 +40,7 @@ public:
 	bool generateAdditionalSegments(const char* seed, int segment, bool right);
 	void cleanRoadNetwork();
 	void drawRoadNetwork(Graphics* graph);
-	
+	std::vector<Segment>& getSegments();
 	bool saveTestNetwork(std::string filename);
 	bool loadTestNetwork(std::string filename);
 private:

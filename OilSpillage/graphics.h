@@ -22,8 +22,9 @@
 #include <array>
 #include"Shadows/ShadowMapping.h"
 #include"Particle/ParticleSystem.h"
+#include"Particle/ParticleHandler.h"
 #include "Structs.h"
-
+#include "Fog.h"
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
 
@@ -32,7 +33,11 @@ enum Shapes
 	SHAPE_CUBE,
 	SHAPE_QUAD
 };
-
+struct MaterialColor
+{
+	Vector4 color;
+	Vector4 shading;
+};
 class Graphics {
 	Window* window;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
@@ -40,10 +45,14 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;
 	D3D11_VIEWPORT vp;
 
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> renderTarget;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> depthCopyRTV;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthBufferCopy;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> depthSRV;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterState;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterStateShadow;
 
@@ -57,6 +66,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11Buffer> culledLightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexSpot;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> cameraBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> fogAnimationBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> culledLightBufferUAV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> culledLightBufferSRV;
@@ -76,9 +86,13 @@ class Graphics {
 	LightBufferContents* lightBufferContents = nullptr;
 	std::unique_ptr<QuadTree> quadTree;
 
-	ParticleSystem particleSystem;
-	ParticleSystem particleSystem2;
-
+	ParticleHandler* particleHandler;
+	ParticleSystem* particleSystem;
+	ParticleSystem* particleSystem2;
+	ParticleSystem* particleTrail;
+	ParticleSystem* testParticle;
+	std::unique_ptr<Fog> fog;
+	float time = 0.0;
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
 	ComputeShader lightCullingShader;
@@ -86,8 +100,16 @@ class Graphics {
 	ShadowMapping shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11Debug> debug;
 
-	void cullLights();
+	DynamicCamera uiCamera;
+	PixelShader uiPixelShader;
+	VertexShader uiVertexShader;
+	Sun uiSun;
+	Vector3 uiSunDir = Vector3(0.0, 1.0, 0.0);
+	std::vector<std::pair<GameObject*,Matrix*>> uiObjects;
+
+	void cullLights(Matrix view);
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
+	void drawFog(DynamicCamera* camera, float deltaTime);
 public:
 	Graphics();
 	~Graphics();
@@ -103,17 +125,25 @@ public:
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path);
 	Material getMaterial(const char* modelPath);
-	void addToDraw(GameObject* o, bool isStatic = false);
+	void addToDraw(GameObject* o);
+	void addToDrawStatic(GameObject* o);
 	void removeFromDraw(GameObject* o);
 	void clearDraw();
 	void clearStaticObjects();
+
+	void addToUIDraw(GameObject* obj, Matrix* world);
+	void removeFromUIDraw(GameObject* obj, Matrix* world);
+	void removeAllUIDraw();
+	void setUISun(Vector3 direction, Vector4 color);
+	void renderUI(float deltaTime);
+
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera, float deltaTime);
 	void renderShadowmap(DynamicCamera* camera);
 	bool createShaders();
 	void fillLightBuffers();
-	void clearScreen();
+	void clearScreen(Vector4 color);
 	ID3D11DeviceContext* getDeviceContext();
 	ID3D11Device* getDevice();
 	//culling by distance from camera
@@ -121,13 +151,28 @@ public:
 	float getCullingDistance();
 	//Randompower means hom large the random position area is. 
 	void addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
+	void addParticle(std::string particleSystem, int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection, float randomPower);
 	void addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
 	void setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setVectorField(float vectorFieldSize,float vectorFieldPower);
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
+	Vector3 screenToWorldSpaceUI(Vector2 screenPos);
 
-
+	void addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f);
+	void changeTrailColor(Vector3 color);
+	ParticleSystem* getParticleSystem(std::string name);
+	ParticleSystem* getParticleSystem(int index);
+	ParticleHandler* getParticleHandler()const;
+	void addTestParticle(Vector3 pos, Vector4 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
+	void setTestParticleSystem(ParticleSystem* test);
+	ParticleSystem* getTestParticleSystem()const;
+	void saveTestParticleSystem();
+	void setTestVectorField(float vectorFieldSize, float vectorFieldPower);
+	void setTestColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	float farZTempShadow;
-	void setSpotLighShadow(SpotLight* spotLight);
+	void setSpotLightShadow(SpotLight* spotLight);
+
+	void setFog(FogMaterial material, int layers, float spacing);
+	void setFogWindSpeed(Vector2 speed);
 };
