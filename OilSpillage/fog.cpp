@@ -228,3 +228,8 @@ const Vector2& Fog::getWindSpeed() const
 {
 	return wind;
 }
+
+void Fog::setWindSpeed(Vector2&& speed)
+{
+	this->wind = speed;
+}
