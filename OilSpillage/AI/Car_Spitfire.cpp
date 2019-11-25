@@ -40,11 +40,10 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	setPosition(Vector3(x,- 1.2f, z));
 	vehicleBody1->setPosition(Vector3(x, 0 - 1.2f + 0.65f, z));
 	this->stats = VehicleStats::AICar;
-	setHealth(this->stats.maxHealth);
+	setHealth(this->stats.maxHealth * (1 + (0.3 * Game::getGameInfo().nrOfClearedStages)));
 	this->aggroRange = 500; //TODO: Find better aggro range
+	this->setPoints(150 * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages)));
 	this->trailTimer = 0.0f;
-
-	this->setPoints(150);
 }
 
 Spitfire::Spitfire()
@@ -65,6 +64,7 @@ Spitfire::~Spitfire()
 	delete wheel2;
 	delete wheel3;
 	delete wheel4;
+	Game::getGameInfo().nrOfCars++;
 }
 
 void Spitfire::updateVehicle()

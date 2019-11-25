@@ -1,5 +1,5 @@
 #include "Input.h"
-#include <Xinput.h>
+#include <joystickapi.h>
 std::unique_ptr<Input> Input::instance;
 
 Input::Input() : wWidth(0), wHeight(0), controller(Controllers::NONE), checkController(false), resetTimer(0.0f)//, playerKeyboard(-1)

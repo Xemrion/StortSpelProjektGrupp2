@@ -39,6 +39,10 @@ private:
 		virtual void end() {}
 
 		virtual void setVariables(std::optional<std::string> text, std::optional<Color> color, std::optional<float> scale);
+
+		std::string getText() const;
+		Color getColor() const;
+		float getScale() const;
 	};
 
 	class ShakingAnimation : public TextAnimation
