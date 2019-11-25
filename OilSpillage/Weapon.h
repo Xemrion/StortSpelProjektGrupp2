@@ -19,7 +19,10 @@ enum class WeaponType
 	aiLaser,
 	aiFlamethrower,
 	aiBossFlamethrower,
+	aiBossFlamethrowerPhase2,
 	aiBossMachineGun,
+	aiBossMachineGunPhase2,
+	aiBossMissileLauncher,
 	None
 };
 
@@ -45,6 +48,7 @@ class WeaponHandler
 public:
 	static constexpr Weapon weapons[] = {
 		Weapon(), //default gun
+		    //DMG    Firerate     bulletSpeed   bulletLifetime       bulletScale          spreadRad maxSprd SprdInc CurSprdInc SprdDec RemainCoolDown
 		{      6,      0.05f,        55.0f,          1.4f,		Vector3(0.07f, 0.07f, 0.3f),	 0.1f,  0.3f,  0.11f,  0.0f,  0.7f,  0.0,  WeaponType::MachineGun },
 		{    200,       1.5f,        13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::MissileLauncher },
 		{      1,     0.015f,         0.0f,         0.15f,		Vector3(0.37f, 0.37f, 30.0f),	 0.0f,  5.0f,  1.75f,  0.0f,  1.5f,  0.0,  WeaponType::Laser },
@@ -55,8 +59,11 @@ public:
 		{    200,       1.5f,         4.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiMissileLauncher },
 		{     60,       1.0f,         0.0f,          0.5f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f,  5.0f,  1.75f,  0.0f,  2.0f,  0.0f, WeaponType::aiLaser },
 		{      1,      0.05f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiFlamethrower },
-		{      1,     0.025f,        25.0f,          0.4f,		Vector3(1.0f, 1.0f, 1.0f),		 0.0f,  360.0f,  360.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossFlamethrower },
-		{      3,      0.05f,        55.0f,          1.4f,		Vector3(1.0f, 1.0f, 1.0f),		 0.1f,  6.0f,   0.5f,  0.0f,  0.7f,  0.0,  WeaponType::aiBossMachineGun },
+		{      2,     0.015f,        20.0f,          1.0f,		Vector3(1.0f, 1.0f, 1.0f),		 0.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossFlamethrower },
+		{      6,     0.015f,        25.0f,          2.0f,		Vector3(1.0f, 1.0f, 1.0f),		 0.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossFlamethrowerPhase2 },
+		{      1,     0.025f,        30.0f,          4.0f,		Vector3(1.0f, 1.0f, 1.0f),	  	 0.2f, 60.0f,  20.0f,  0.0f,  0.7f,  0.0,  WeaponType::aiBossMachineGun },
+		{      3,     0.022f,        45.0f,          3.5f,		Vector3(1.0f, 1.0f, 1.0f),	  	 0.1f, 10.0f,  10.0f,  0.0f,  0.7f,  0.0,  WeaponType::aiBossMachineGunPhase2 },
+		{    200,       0.5f,        50.0f,         15.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossMissileLauncher },
 		{0, 0, 0, 0, Vector3(0,0,0), 0, 0, 0, 0, 0, 0, WeaponType::None}
 	};
 
@@ -70,6 +77,7 @@ class Bullet
 	void defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
 	void defaultUpdate(float& deltaTime);
 	void defaultEnemyUpdate(float& deltaTime);
+	void missileUpdate(float& deltaTime);
 	void flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
 	void laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
 	void laserUpdate(float& deltaTime);

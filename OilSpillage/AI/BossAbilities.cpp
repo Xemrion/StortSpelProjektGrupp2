@@ -1,19 +1,21 @@
 #include "BossAbilities.h"
 #include"../States/PlayingGameState.h"
 
-
 BossAbilities::BossAbilities()
 {
 	Vector3 *vec = { 0 };
 	this->positionPtr = vec;
 	this->targetPosPtr = vec;
 	this->velocityPtr = vec;
-	this->flameThrowerDir = { 0, 0, 0 };
-	this->flameXDir = 0;
-	this->flameZDir = 0;
+	this->flameXDirDegree = 0;
+	this->flameZDirDegree = 0;
+	this->turnToShoot = 0;
+	this->turnToShoot2 = 0;
 	WaitTimer waitTimer;
 
 	this->timeSinceLastShot = 0;
+	this->weaponSwitchTimer = 0;
+
 	this->predicting = 0;
 	this->weaponNr = 0;
 	this->weapon = Weapon();
@@ -21,8 +23,6 @@ BossAbilities::BossAbilities()
 	this->waitTimer.wait_time = 2;
 	this->waitTimer.time_left = 2;
 	this->waitTimer.repeatable = true;
-
-	this->attackRange = 0;
 	this->dt = 0;
 	this->frontVecShoot = { 0, 0, 0 };
 }
@@ -32,19 +32,21 @@ BossAbilities::BossAbilities(Vector3* pos, Vector3* targetPos, Vector3* velocity
 	this->positionPtr = pos;
 	this->targetPosPtr = targetPos;
 	this->velocityPtr = velocity;
-	this->flameThrowerDir = { 0, 0, 0 };
-	this->flameXDir = 0;
-	this->flameZDir = 0;
+	this->flameXDirDegree = 0;
+	this->flameZDirDegree = 0;
+	this->turnToShoot = 0;
+	this->turnToShoot2 = 0;
+
+	this->timeSinceLastShot = 0;
+	this->weaponSwitchTimer = 0;
+
 	this->frontVecShoot = { 0, 0, 0 };
-	this->attackRange = 8;
 	this->weaponNr = weaponType;
 	assignWeapon(weaponType);
 
 	this->waitTimer.wait_time = 2;
 	this->waitTimer.time_left = 2;
 	this->waitTimer.repeatable = 1;
-
-	this->attackRange = 0;
 	this->dt = 0;
 	this->frontVecShoot = { 0, 0, 0 };
 }
@@ -61,11 +63,13 @@ BossAbilities& BossAbilities::operator=(const BossAbilities& other)
 		this->positionPtr = other.positionPtr;
 		this->targetPosPtr = other.positionPtr;
 		this->velocityPtr = other.velocityPtr;
-		this->flameThrowerDir = other.flameThrowerDir;
-		this->flameXDir = other.flameXDir;
-		this->flameZDir = other.flameZDir;
+		this->flameXDirDegree = other.flameXDirDegree;
+		this->flameZDirDegree = other.flameZDirDegree;
+		this->turnToShoot = other.turnToShoot;
+		this->turnToShoot2 = other.turnToShoot2;
 		this->frontVecShoot = other.frontVecShoot;
 		this->timeSinceLastShot = other.timeSinceLastShot;
+		this->weaponSwitchTimer = other.weaponSwitchTimer;
 		this->predicting = other.predicting;
 		this->weaponNr = other.weaponNr;
 		this->weapon = other.weapon;
@@ -73,7 +77,6 @@ BossAbilities& BossAbilities::operator=(const BossAbilities& other)
 		{
 			this->bullets[i] = other.bullets[i];
 		}
-		this->attackRange = other.attackRange;
 		this->dt = other.dt;
 		this->frontVecShoot = other.frontVecShoot;
 	}
@@ -87,6 +90,8 @@ void BossAbilities::updateBullets(float deltaTime)
 	{
 		bullets[i].update(deltaTime);
 	}
+
+	this->weaponSwitchTimer += deltaTime;
 }
 
 Status BossAbilities::inAttackRange()
@@ -111,146 +116,383 @@ void BossAbilities::assignWeapon(int weaponType)
 		this->weapon = WeaponHandler::getWeapon(WeaponType::aiBossMachineGun);
 		//this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	}
-	else if (weaponType == 2)// MissileLauncher
-	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMissileLauncher);
-		//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
-		this->predicting = true;
-	}
-	else if (weaponType == 3)// Laser
-	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::aiLaser);
-		//this->setColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f));
-	}
-	else if (weaponType == 4)// Flamethrower
+	else if (weaponType == 2)// Flamethrower
 	{
 		this->weapon = WeaponHandler::getWeapon(WeaponType::aiBossFlamethrower);
 		//	this->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
 	}
+	else if (weaponType == 3)// MissileLauncher
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiBossMissileLauncher);
+		//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+		this->predicting = true;
+	}
+	else if (weaponType == 4)
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiBossFlamethrowerPhase2);
+		this->predicting = true;
+	}
+	else if (weaponType == 5)
+	{
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiBossMachineGunPhase2);
+		//this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+		this->predicting = true;
+	}
+	
 }
 
 Status BossAbilities::shoot()
 {
-	if (this->weaponNr == 1) //machinegun
+	if (phaseShoot == 1)
 	{
-		float offset;
-		Vector3 offsetPos;
-		if (!predicting)
+		if (this->weaponNr == 1) //machinegun
 		{
-			offset = (rand() % 4) - 2;
-			offset *= 0.9f;
-			offsetPos = Vector3(targetPosPtr->x - offset, 0.0f, targetPosPtr->z - offset);
-		}
-		else
-		{
-			Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
-
-			float predictionFactor = 0.4f;
-			offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
-		}
-		if ((*positionPtr - *targetPosPtr).Length() < 23)
-		{
-			if (this->timeSinceLastShot >= this->weapon.fireRate)
+			float offset;
+			Vector3 offsetPos;
+			if (!predicting)
 			{
-				this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+				offset = (rand() % 4) - 2;
+				offset *= 0.9f;
+				offsetPos = Vector3(targetPosPtr->x - offset, 0.0f, targetPosPtr->z - offset);
+			}
+			else
+			{
+				Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
 
-				for (int i = 0; i < BossAbilities::bulletCount; i++)
+				float predictionFactor = 0.4f;
+				offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
+			}
+			if ((*positionPtr - *targetPosPtr).Length() < 9999) // range, depends on change weapon func
+			{
+				if (this->timeSinceLastShot >= this->weapon.fireRate)
 				{
-					if (bullets[i].getTimeLeft() == 0.0)
-					{
-						Vector3 dir = (*targetPosPtr - *this->positionPtr);
-						dir.Normalize();
-						Vector3 bulletOrigin = *this->positionPtr + dir;
-						dir = (offsetPos - bulletOrigin);
-						dir.Normalize();
+					this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
 
-						this->bullets[i].shoot(
-							weapon,
-							bulletOrigin,
-							dir,
-							*velocityPtr,
-							dt
-						);
-						break;
+					for (int i = 0; i < BossAbilities::bulletCount; i++)
+					{
+						if (bullets[i].getTimeLeft() == 0.0)
+						{
+							Vector3 dir = (*targetPosPtr - *this->positionPtr);
+							Vector3 dir2 = (*targetPosPtr - *this->positionPtr);
+							dir.Normalize();
+							dir2.Normalize();
+							Vector3 bulletOrigin = *this->positionPtr + (this->rightVecShoot * 4);
+							Vector3 bulletOriginLeft = *this->positionPtr + (this->rightVecShoot * 4 * -1);
+							bulletOrigin.y = 0.1;
+							bulletOriginLeft.y = 0.1;
+							dir = (offsetPos - bulletOrigin);
+							dir2 = (offsetPos - bulletOriginLeft);
+							dir.Normalize();
+							dir2.Normalize();
+
+							if (this->turnToShoot2 % 2 == 0)
+							{
+								this->bullets[i].shoot(
+									weapon,
+									bulletOrigin,
+									dir,
+									*velocityPtr,
+									dt);
+							}
+							if (this->turnToShoot2 % 2 == 1)
+							{
+								this->bullets[i].shoot(
+									weapon,
+									bulletOriginLeft,
+									dir2,
+									*velocityPtr,
+									dt);
+							}
+							break;
+						}
+						this->turnToShoot2++;
 					}
+					this->turnToShoot2 = 0;
 				}
 			}
 		}
-	}
-	else if (this->weaponNr == 4) //flamethrower
-	{
-		//here make direction for shoot
-		float offset;
-		Vector3 offsetPos;
-		if (!predicting)
+		else if (this->weaponNr == 2) //flamethrower
 		{
-			offset = (rand() % 4) - 2;
-			offset *= 0.9f;
-			offsetPos = Vector3(targetPosPtr->x - offset, 0.0f, targetPosPtr->z - offset);
-		}
-		else
-		{
-			Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
-
-			float predictionFactor = 0.4f;
-			offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
-		}
-		if ((*positionPtr - *targetPosPtr).Length() < 23)
-		{
-			if (this->timeSinceLastShot >= this->weapon.fireRate)
+			//here make direction for shoot
+			float offset;
+			Vector3 offsetPos;
+			if (!predicting)
 			{
-				this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+				offset = (rand() % 4) - 2;
+				offset *= 0.9f;
+				offsetPos = Vector3(targetPosPtr->x - offset, 0.0f, targetPosPtr->z - offset);
+			}
+			else
+			{
+				Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
 
-				for (int i = 0; i < BossAbilities::bulletCount; i++)
+				float predictionFactor = 0.4f;
+				offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
+			}
+			if ((*positionPtr - *targetPosPtr).Length() < 9999)
+			{
+				if (this->timeSinceLastShot >= this->weapon.fireRate)
 				{
-					if (bullets[i].getTimeLeft() == 0.0)
+					this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+
+					for (int i = 0; i < BossAbilities::bulletCount; i++)
 					{
-						float flameXDirRad = ((this->flameXDir * M_PI) / 180); //degree to radians
-						float flameZDirRad = ((this->flameZDir * M_PI) / 180);
+						if (bullets[i].getTimeLeft() == 0.0)
+						{
+							float flameXDirRad = ((this->flameXDirDegree * M_PI) / 180); //degree to radians
+							float flameZDirRad = ((this->flameZDirDegree * M_PI) / 180);
 
-						float xCos = cos(flameXDirRad);
-						float zSin = sin(flameZDirRad);
+							float xCos = cos(flameXDirRad);
+							float zSin = sin(flameZDirRad);
 
-						std::cout << xCos;
-						CONTINUE HERER WITH FLAME THREOWER 360 DEGREEs
+							Vector3 flameThrowerDir;
 
-						this->flameThrowerDir.x += xCos;
-						this->flameThrowerDir.z += zSin;
+							flameThrowerDir.x = xCos;
+							flameThrowerDir.z = zSin;
 
-						this->flameXDir += 1;
-						this->flameZDir += 1;
-
-						if (this->flameXDir == 360)
-							int stop = 1;
+							this->flameXDirDegree += this->dt * 250;
+							this->flameZDirDegree += this->dt * 250;
 
 
-						Vector3 dir = (this->flameThrowerDir); //from boss to dir
-						dir.Normalize();
+							Vector3 dir = (flameThrowerDir); //from boss to dir
+							dir.Normalize();
 
-						dir.Normalize();
-						Vector3 bulletOrigin = *this->positionPtr + (dir * 3);
-						/*dir = (offsetPos - bulletOrigin);
-						dir.Normalize();*/
+							Vector3 bulletOrigin = *this->positionPtr + (dir * 3);
+							Vector3 bulletOriginNeg = *this->positionPtr + (-dir * 3);
 
-						this->bullets[i].shoot(
-							weapon,
-							bulletOrigin,
-							dir,
-							*velocityPtr,
-							dt
-						);
-						break;
+							/*dir = (offsetPos - bulletOrigin);
+							dir.Normalize();*/
+
+							if (i % 2 == 0)
+							{
+								this->bullets[i].shoot(
+									weapon,
+									bulletOrigin,
+									dir,
+									*velocityPtr,
+									dt);
+							}
+							else if (i % 2 == 1)
+							{
+								this->bullets[i].shoot(
+									weapon,
+									bulletOriginNeg,
+									-dir,
+									*velocityPtr,
+									dt);
+							}
+							break;
+						}
+						this->turnToShoot++;
 					}
+					this->turnToShoot = 0;
 				}
 			}
 		}
-	}
+		else if (this->weaponNr == 3) //Missile
+		{
+			float offset;
+			Vector3 offsetPos;
+			if (!predicting)
+			{
+				offset = (rand() % 4) - 2;
+				offset *= 0.9f;
+				offsetPos = Vector3(targetPosPtr->x - offset, 0.0f, targetPosPtr->z - offset);
+			}
+			else
+			{
+				Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
 
+				float predictionFactor = 0.4f;
+				offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
+			}
+			if ((*positionPtr - *targetPosPtr).Length() < 9999) // range, depends on change weapon func
+			{
+				if (this->timeSinceLastShot >= this->weapon.fireRate)
+				{
+					this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+
+					for (int i = 0; i < BossAbilities::bulletCount; i++)
+					{
+						if (bullets[i].getTimeLeft() == 0.0)
+						{
+							Vector3 dir = (*targetPosPtr - *this->positionPtr);
+							dir.Normalize();
+							Vector3 bulletOrigin = *this->positionPtr + dir;
+							bulletOrigin.y = 0.1;
+							dir = (offsetPos - bulletOrigin);
+							dir.Normalize();
+
+							this->bullets[i].shoot(
+								weapon,
+								bulletOrigin,
+								dir,
+								*velocityPtr,
+								dt);
+						}
+						break;
+					}
+					this->turnToShoot2++;
+				}
+				this->turnToShoot2 = 0;
+			}
+		}
+	}
+	else if (this->phaseShoot == 2)
+	{
+		if (this->weaponNr == 4)	//flamethrower phase2
+		{
+			//here make direction for shoot
+			float offset;
+			Vector3 offsetPos;
+			if (!predicting)
+			{
+				offset = (rand() % 4) - 2;
+				offset *= 0.9f;
+				offsetPos = Vector3(targetPosPtr->x - offset, 0.0f, targetPosPtr->z - offset);
+			}
+			else
+			{
+				Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
+	
+				float predictionFactor = 0.4f;
+				offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
+			}
+			if ((*positionPtr - *targetPosPtr).Length() < 9999)
+			{
+				if (this->timeSinceLastShot >= this->weapon.fireRate)
+				{
+					this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+	
+					for (int i = 0; i < BossAbilities::bulletCount; i++)
+					{
+						if (bullets[i].getTimeLeft() == 0.0)
+						{
+							float flameXDirRad = ((this->flameXDirDegree * M_PI) / 180); //degree to radians
+							float flameZDirRad = ((this->flameZDirDegree * M_PI) / 180);
+								
+							float xCos = cos(flameXDirRad);
+							float zSin = sin(flameZDirRad);
+	
+							Vector3 flameThrowerDir;
+								
+							flameThrowerDir.x = xCos;
+							flameThrowerDir.z = zSin;
+								
+							this->flameXDirDegree += this->dt * 325;
+							this->flameZDirDegree += this->dt * 325;
+	
+	
+							Vector3 dir = (flameThrowerDir); //from boss to dir
+							dir.Normalize();
+								
+							Vector3 bulletOrigin = *this->positionPtr + (dir * 3);
+							Vector3 bulletOriginNeg = *this->positionPtr + (-dir * 3);
+	
+							/*dir = (offsetPos - bulletOrigin);
+							dir.Normalize();*/
+								
+							if (i % 2 == 0)
+							{
+								this->bullets[i].shoot(
+									weapon,
+									bulletOrigin,
+									dir,
+									*velocityPtr,
+									dt);
+							}
+							else if (i % 2 == 1)
+							{
+								this->bullets[i].shoot(
+									weapon,
+									bulletOriginNeg,
+									-dir,
+									*velocityPtr,
+									dt);
+							}
+							break;
+						}
+						this->turnToShoot++;
+					}
+					this->turnToShoot = 0;
+				}
+			}
+			this->weaponNr = 5;
+		}
+		if (this->weaponNr == 5)
+		{
+			float offset;
+			Vector3 offsetPos;
+			if (!predicting)
+			{
+				offset = (rand() % 4) - 2;
+				offset *= 0.9f;
+				offsetPos = Vector3(targetPosPtr->x - offset, 0.0f, targetPosPtr->z - offset);
+			}
+			else
+			{
+				Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
+
+				float predictionFactor = 0.4f;
+				offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
+			}
+			if ((*positionPtr - *targetPosPtr).Length() < 9999) // range, depends on change weapon func
+			{
+				if (this->timeSinceLastShot >= this->weapon.fireRate)
+				{
+					this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+
+					for (int i = 0; i < BossAbilities::bulletCount; i++)
+					{
+						if (bullets[i].getTimeLeft() == 0.0)
+						{
+							Vector3 dir = (*targetPosPtr - *this->positionPtr);
+							Vector3 dir2 = (*targetPosPtr - *this->positionPtr);
+							dir.Normalize();
+							dir2.Normalize();
+							Vector3 bulletOrigin = *this->positionPtr + (this->rightVecShoot * 4);
+							Vector3 bulletOriginLeft = *this->positionPtr + (this->rightVecShoot * 4 * -1);
+							bulletOrigin.y = 0.1;
+							bulletOriginLeft.y = 0.1;
+							dir = (offsetPos - bulletOrigin);
+							dir2 = (offsetPos - bulletOriginLeft);
+							dir.Normalize();
+							dir2.Normalize();
+
+							if (this->turnToShoot2 % 2 == 0)
+							{
+								this->bullets[i].shoot(
+									weapon,
+									bulletOrigin,
+									dir,
+									*velocityPtr,
+									dt);
+							}
+							if (this->turnToShoot2 % 2 == 1)
+							{
+								this->bullets[i].shoot(
+									weapon,
+									bulletOriginLeft,
+									dir2,
+									*velocityPtr,
+									dt);
+							}
+							break;
+						}
+						this->turnToShoot2++;
+					}
+					this->turnToShoot2 = 0;
+				}
+			}
+			this->weaponNr = 4;
+		}
+	}
 	return Status::SUCCESS;
 }
 
 Status BossAbilities::ability1() //not done
 {
+
 	return Status::SUCCESS;
 }
 
@@ -259,23 +501,37 @@ Status BossAbilities::switchWeapon()
 	//Fix the length of player to boss
 	float length = sqrt(pow(this->targetToSelf.x, 2) + pow(this->targetToSelf.y, 2) + pow(this->targetToSelf.z, 2));
 
-	if (length <= 15.0f)
+	if (this->phaseShoot == 1)
 	{
-		this->weaponNr = 4;
-		assignWeapon(this->weaponNr);
+		if (length <= 20.0f) //flame
+		{
+			this->weaponNr = 2;
+			assignWeapon(this->weaponNr);
+		}
+		else if (length > 20 && length <= 35) //machine
+		{
+			this->weaponNr = 1;
+			assignWeapon(this->weaponNr);
+		}
+		else  //rocket
+		{
+			this->weaponNr = 3;
+			assignWeapon(this->weaponNr);
+		}
 	}
-	else
+	if (this->phaseShoot == 2)
 	{
-		this->weaponNr = 1;
-		assignWeapon(this->weaponNr);
+		if (length <= 22.5f)
+		{
+			this->weaponNr = 4;
+			assignWeapon(this->weaponNr);
+		}
+		else
+		{
+			this->weaponNr = 5;
+			assignWeapon(this->weaponNr);
+		}
 	}
-
-
-	//assignWeapon(this->weaponNr);
-	//this->weaponNr++;
-
-	//if (this->weaponNr == 5)
-	//	this->weaponNr = 1;
 
 	return Status::SUCCESS;
 }

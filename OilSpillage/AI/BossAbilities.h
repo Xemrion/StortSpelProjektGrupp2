@@ -14,17 +14,21 @@ private:
 	Vector3* positionPtr;
 	Vector3* targetPosPtr;
 	Vector3* velocityPtr;
-	Vector3 flameThrowerDir;
-	int flameXDir;
-	int flameZDir;
+	int flameXDirDegree;
+	int flameZDirDegree;
+	int turnToShoot;
+	int turnToShoot2;
 	WaitTimer waitTimer;
 
 	float timeSinceLastShot;
+	float weaponSwitchTimer;
+
 	bool predicting = false;
 	int weaponNr;
 	Weapon weapon;
-	static const int bulletCount = 32;
+	static const int bulletCount = 128;
 	Bullet bullets[bulletCount];
+	//Bullet bullets2[bulletCount];
 
 	void assignWeapon(int weaponType);
 protected:
@@ -32,6 +36,8 @@ protected:
 	float dt;
 	Vector3 frontVecShoot;
 	Vector3 targetToSelf; //use in boll abilities
+	Vector3 rightVecShoot;
+	int phaseShoot;
 
 	Status shoot();
 	Status ability1();

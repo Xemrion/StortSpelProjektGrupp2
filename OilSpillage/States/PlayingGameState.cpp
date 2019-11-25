@@ -109,6 +109,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	graphics.loadModel("Houses/houseMaterial2");
 	graphics.loadModel("Houses/houseMaterial3");
 
+	graphics.loadModel("Missile");
+
 
 	player = std::make_unique<Vehicle>();
 

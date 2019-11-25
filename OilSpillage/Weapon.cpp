@@ -39,7 +39,7 @@ void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrower)
+	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrowerPhase2)
 	{
 		flamethrowerShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
@@ -93,7 +93,7 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
 
-	Game::getGraphics().addToDraw(this->obj); //draws hitbox
+	//Game::getGraphics().addToDraw(this->obj); //draws hitbox
 	this->dir.y = 0.0f;
 
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
@@ -149,13 +149,20 @@ void Bullet::update(float deltaTime)
 		this->weapon.type == WeaponType::aiMelee or
 		this->weapon.type == WeaponType::aiMissileLauncher or
 		this->weapon.type == WeaponType::aiBossFlamethrower or
-		this->weapon.type == WeaponType::aiBossMachineGun)
+		this->weapon.type == WeaponType::aiBossFlamethrowerPhase2 or
+		this->weapon.type == WeaponType::aiBossMachineGun or
+		this->weapon.type == WeaponType::aiBossMachineGunPhase2 or
+		this->weapon.type == WeaponType::aiBossMissileLauncher)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}
 	else if (this->weapon.type == WeaponType::Laser or this->weapon.type == WeaponType::aiLaser)
 	{
 		laserUpdate(deltaTime);
+	}
+	else if (this->weapon.type == WeaponType::aiBossMissileLauncher)
+	{
+		missileUpdate(deltaTime);
 	}
 	else
 	{
@@ -182,6 +189,43 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 {
 	if (timeLeft > 0.0f)
 	{
+		obj->move(dir * min(deltaTime, timeLeft));
+
+		Vector3 playerPos = static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition(); //playerpos
+		Vector2 playerPosXZ = { playerPos.x, playerPos.z };
+		Vector3 bulletPos = this->obj->getPosition();
+		Vector2 bulletPosXZ = { bulletPos.x, bulletPos.z };
+
+
+
+		if ((bulletPosXZ - playerPosXZ).Length() < 1.5f)
+		{
+			if (soundTimer > 0.05f) {
+				int randomSound = rand() % 3 + 1;
+				std::wstring soundEffect = L"data/sound/CarGlass" + std::to_wstring(randomSound) + L".wav";
+				Sound::PlaySoundEffect(soundEffect);
+				Sound::PlaySoundEffect(L"data/sound/MetalImpact1.wav");
+				soundTimer = 0;
+			}
+			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);
+			this->timeLeft = 0.f;
+		}
+
+		timeLeft = max(timeLeft - deltaTime, 0.0f);
+	}
+}
+
+void Bullet::missileUpdate(float& deltaTime)
+{
+	if (timeLeft > 0.0f)
+	{
+		//add mesh to object?
+		/*GameObject missileObj;
+		missileObj.mesh = graphics.getMeshPointer("Missile");
+		missileObj.setPosition(this->rigidBody->getWorldTransform().getOrigin());
+		graphics.addToDraw(missileObj, true);*/
+
+
 		obj->move(dir * min(deltaTime, timeLeft));
 
 		Vector3 playerPos = static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition(); //playerpos

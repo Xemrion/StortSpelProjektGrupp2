@@ -8,8 +8,10 @@ Boss::Boss()
 	this->timeRotateDelay = 0;
 	this->rotationVar = 0;
 	this->phase = 1;
+	this->phaseShoot = this->phase;
 	this->currentPointNr = 0;
 	this->dt = 0;
+	this->attackRange = 75;
 
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
@@ -36,6 +38,7 @@ Boss::Boss(Boss&& boss)
 	this->timeTilRotationChange = boss.timeTilRotationChange;
 	this->rotationVar = boss.rotationVar;
 	this->phase = boss.rotationVar;
+	this->phaseShoot = this->phase;
 	this->currentPointNr = boss.currentPointNr;
 	this->currentPoint = boss.currentPoint;
 	this->playerPos = boss.playerPos;
@@ -60,12 +63,13 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 
-	this->attackRange = 150;
+	this->attackRange = 75;
 
 	this->timeTilNextPoint = 0.0f;
 	this->timeTilRotationChange = 0.0f;
 	this->rotationVar = 0;
 	this->phase = 1;
+	this->phaseShoot = this->phase;
 	this->currentPointNr = 0;
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
@@ -87,7 +91,7 @@ void Boss::update(float dt, const Vector3& targetPos)
 	this->dt = dt;
 	Actor::update(dt, targetPos);
 	this->movementVariables(dt);
-	//this->circulatePlayer(targetPos);
+	this->circulatePlayer(targetPos);
 
 	this->updateBullets(dt);
 
@@ -183,16 +187,33 @@ void Boss::movementVariables(float dt)
 	}
 
 	// Decides when boss moves to next point
-	if (this->timeTilNextPoint >= 1.0f)
+	if (this->phase == 1)
 	{
-		this->currentPointNr += this->rotationVar;
+		if (this->timeTilNextPoint >= 1.0f)
+		{
+			this->currentPointNr += this->rotationVar;
 
-		if (this->currentPointNr == 8)
-			this->currentPointNr = 0; //start over
-		else if (this->currentPointNr == -1)
-			this->currentPointNr = 7;
+			if (this->currentPointNr == 8)
+				this->currentPointNr = 0; //start over
+			else if (this->currentPointNr == -1)
+				this->currentPointNr = 7;
 
-		this->timeTilNextPoint = 0.0f;
+			this->timeTilNextPoint = 0.0f;
+		}
+	}
+	else if (this->phase == 2)
+	{
+		if (this->timeTilNextPoint >= 0.65f)
+		{
+			this->currentPointNr += this->rotationVar;
+
+			if (this->currentPointNr == 8)
+				this->currentPointNr = 0; //start over
+			else if (this->currentPointNr == -1)
+				this->currentPointNr = 7;
+
+			this->timeTilNextPoint = 0.0f;
+		}
 	}
 }
 
@@ -209,7 +230,10 @@ void Boss::move()
 		velocity /= velocity.Length();
 	}
 
-	velocity *= 4.5;
+	if (this->phase == 1)
+		velocity *= 4.5;
+	else if (this->phase == 2)
+		velocity *= 7;
 
 	//move rigid body
 	//Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed;
@@ -275,6 +299,8 @@ void Boss::circulatePlayer(Vector3 targetPos)
 
 void Boss::enterPhase2()
 {
+	this->phaseShoot = this->phase;
+	this->switchWeapon();
 	this->stats = VehicleStats::AIBossWeak;
 }
 
@@ -305,6 +331,7 @@ void Boss::updateWeakPoints()
 		//Vectors for position
 		Vector3 upVector = { 0, 1, 0 };
 		Vector3 rightVector = XMVector3Cross(this->frontVector, upVector);
+		this->rightVecShoot = rightVector;
 
 		//make the offsets
 		float sideVar = 2.5;
