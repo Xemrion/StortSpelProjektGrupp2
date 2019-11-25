@@ -115,7 +115,6 @@ void Minimap::init()
 
 	this->compassMoveSize = 6.0f;
 	this->compassSpeed = 6.0f;
-}
 
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Vector3 mapSize((state->getBottomRight() - state->getTopLeft() + Vector3(0, 1, 0)) * Vector3(1, 1, -1));
@@ -124,6 +123,9 @@ void Minimap::init()
 	this->mapMatrix = Matrix::CreateTranslation(-Vector3(state->getTopLeft().x, 0, state->getBottomRight().z));
 	this->mapMatrix *= Matrix::CreateScale(mapScale);
 }
+
+	
+
 
 void Minimap::draw(bool selected)
 {
