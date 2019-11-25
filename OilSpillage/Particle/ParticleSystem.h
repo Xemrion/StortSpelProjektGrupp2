@@ -68,8 +68,15 @@ public:
 	bool addParticle(int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection);
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
+	void setSize(float startSize, float endSize);
 	void changeVectorField(float vectorFieldPower, float vectorFieldSize);
 	void setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader = "ParticlePS.cso", std::string vertexShader = "ParticleVS.cso");
+	void setVertexShader(std::string vertexShader);
+	void setUpdateShader(std::string csUpdate);
+	void setCreateShader(std::string csCreate);
+	void setGeometryShader(std::string gsPrimitive);
+	void setPixelShader(std::string pixelShader);
+
 	void drawAll(DynamicCamera* camera);
 	bool loadSystem();
 	bool saveSystem();

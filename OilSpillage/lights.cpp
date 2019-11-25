@@ -63,7 +63,7 @@ UINT LightList::findNextEmptySpace(UINT start)
 	UINT nextEmptySpace = start;
 	for (; nextEmptySpace < maxSize; ++nextEmptySpace)
 	{
-		if (lights[nextEmptySpace].getLuminance() == 0.0)
+		if (lights[nextEmptySpace].getLightType() == -1.0)
 		{
 			break;
 		}

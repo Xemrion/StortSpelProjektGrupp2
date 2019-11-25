@@ -53,6 +53,9 @@ public:
 	void addPowerUp(PowerUp p);
 	void generateMapPowerUps();
 	void clearPowerUps();
+	void generateObjectives();
+
+	Vector3 getCameraPos();
 
 	std::unique_ptr<Vehicle>& getPlayer();
 	void setPlayer(Vehicle* theVehicle);
@@ -110,12 +113,12 @@ private:
 	void fillTestParticle();
 	const char* items;
 	float timer = 0.0f;
-	int                             addNrOfParticles  {     2 };
-	int                             lifeTime          {     1 };
+	int                             addNrOfParticles  {     1 };
+	float                             lifeTime          {     1 };
 	float                           timerForParticle  {   .0f };
 	float                           vectorFieldPower  {  4.0f };
 	float                           vectorFieldSize   {  2.2f };
-	float                           randomPosPower    {  0.5f };
+	float                           randomPosPower    {  0.0f };
 	float                           size1             { .039f };
 	float                           size2             { .063f };
 	float                           colors  [4]       {};
@@ -126,7 +129,10 @@ private:
 	                                                    Vector4( 0.99f,  0.13f, .0f, 1.0f ),
 	                                                    Vector4( 0.0f,  0.0f, .0f, 1.0f ),
 	                                                    Vector4( 0.0f,  0.0f, .0f, 1.0f )  };
-  
+	int electricNew = 0.0f;
+	float timerElectric = 0.0f;
+	float timerEMP = 0.0f;
+	void createElectric(int randNr, float deltaTime);
     void initAI();
 	void ImGui_ProcGen();
 	void ImGui_Driving();

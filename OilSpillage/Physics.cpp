@@ -57,11 +57,11 @@ Physics::Physics() :broadphase(new btDbvtBroadphase())
 	int maxThreadCount = BT_MAX_THREAD_COUNT;
 	btConstraintSolverPoolMt* solverPool = new btConstraintSolverPoolMt(maxThreadCount);
 	m_solver = solverPool;
-	btSetTaskScheduler(btCreateDefaultTaskScheduler());
+	btSetTaskScheduler(btGetOpenMPTaskScheduler());
 	btSequentialImpulseConstraintSolverMt* solverMt = new btSequentialImpulseConstraintSolverMt();
 	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver();
 
-	world = new btDiscreteDynamicsWorldMt(dispatcherMt, broadphase, solverPool, solver, collisionConfig);
+	world = new btDiscreteDynamicsWorldMt(dispatcherMt, broadphase, solverPool, solverMt, collisionConfig);
 
 	//world->getSolverInfo().m_solverMode = gSolverMode;
 #endif // !DEBUG
@@ -141,11 +141,11 @@ void Physics::update(float deltaTime)
 
 	//this->world->stepSimulation(deltaTime);
 
-	this->world->stepSimulation(deltaTime, 2, 1. / 120.);
+	this->world->stepSimulation(deltaTime, 6, 1. / 120.);
 
 	//this->world->stepSimulation(deltaTime, 0);
 	//this->world->stepSimulation(btScalar(deltaTime));
-}
+ }
 
 btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, void* obj)
 {	//add object set transform
@@ -190,7 +190,7 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass, void*
 	btMotionState* motion = new btDefaultMotionState(t);
 	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, box, inertia);
 	btRigidBody* body = new btRigidBody(info);
-	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	bodies.push_back(body);
 	body->setUserPointer(objects);
 

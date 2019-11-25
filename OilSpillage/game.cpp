@@ -112,6 +112,22 @@ float Game::getDeltaTime()
 	return instance->deltaTime;
 }
 
+float Game::getLocalScale()
+{
+	return instance->localScale;
+}
+GameInfo& Game::getGameInfo() noexcept
+{
+	return instance->gameInfo;
+	// TODO: insert return statement here
+}
+
+
+int Game::getNrOfStagesDone()
+{
+	return instance->nrOfStagesDone;
+}
+
 
 
 void Game::createCurrentState()
@@ -120,7 +136,17 @@ void Game::createCurrentState()
 	VehicleSlots* newSlots = nullptr;
 	Vehicle*temp = nullptr;
 	if (currentState == STATE_MENU)
+	{
+		Container::playerInventory = std::make_unique<Container>();
+
+		for (int i = 0; i < 20; i++)
+		{
+			Container::playerInventory->addItem(Item::getRandom());
+		}
+		nrOfStagesDone = 0.0f;
+		localScale = 1.0f;
 		state = std::make_unique<MenuGameState>();
+	}
 	else if (currentState == STATE_PLAYING)
 	{
 		if (oldState == STATE_UPGRADING)
@@ -129,6 +155,11 @@ void Game::createCurrentState()
 			newSlots = new VehicleSlots(*transfer);
 			temp = static_cast<UpgradingGameState*>(state.get())->getPlayer().get();
 			temp->stopEngineSound();
+			nrOfStagesDone++;
+			if (nrOfStagesDone % 3 == 0)
+			{
+				localScale += 0.05f;
+			}
 		}
 		state = std::make_unique<PlayingGameState>();
 
@@ -196,11 +227,11 @@ void Game::run()
 		//deltaTime reset
 		prevTime = curTime;
 	}
-
+	Sound::stopAll();
 	Sound::deinit();
 }
 
-Game::Game() : currentState(STATE_UPGRADING), oldState(-1), running(false) {}
+Game::Game() : currentState(STATE_MENU), oldState(-1), running(false) {}
 
 Game::~Game()
 {

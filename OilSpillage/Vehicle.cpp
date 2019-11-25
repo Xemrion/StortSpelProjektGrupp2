@@ -35,11 +35,7 @@ Vehicle::Vehicle()
 	this->reverseTimer2 = 0;
 
 	this->curDir = Vector2(0.0f, 1.0f);//UP
-	this->timeSinceLastShot = 0.0f;
-	this->timeSinceLastShot2 = 0.0f;
 
-	this->weapon = WeaponHandler::getWeapon(WeaponType::Laser);
-	this->weapon2 = WeaponHandler::getWeapon(WeaponType::Flamethrower);
 	this->defaultStats = VehicleStats::fastCar;
 	this->updatedStats = this->defaultStats;
 	this->health = this->updatedStats.maxHealth;
@@ -918,24 +914,10 @@ void Vehicle::updateWeapon(float deltaTime)
 
 		if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
 		{
-			laserLight->setLuminance(0.0);
 
 			for (int i = 0; i < Vehicle::bulletCount; i++)
 			{
 				bullets[i].update(deltaTime);
-
-				if (bullets[i].getWeaponType() == WeaponType::Laser && dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(MOUNTED)))
-				{
-					laserLight->setPos(this->vehicleBody1->getPosition() + Vector3(curDir.x, 0.0, curDir.y) * 2.0);
-
-					laserLight->setDirection(Vector3(curDir.x, 0.0, curDir.y));
-					if (dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(MOUNTED)) && dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(MOUNTED))->getWeapon().remainingCooldown == 0.0)
-					{
-						laserLight->setLuminance(10.0);
-					}
-					laserLight->setLength(bullets[i].getWeapon().bulletScale.z);
-					laserLight->setColor(Vector3::Lerp(Vector3(1.0, 0.25, 0.05), Vector3(0.2, 0.01, 0.01), (dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(MOUNTED))->getWeapon().currentSpreadIncrease * dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(MOUNTED))->getWeapon().currentSpreadIncrease + 0.0) / (this->weapon.maxSpread * dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(MOUNTED))->getWeapon().maxSpread)));
-				}
 			}
 			if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
 			{
@@ -967,6 +949,45 @@ void Vehicle::updateWeapon(float deltaTime)
 					Vector3 positionOffset = Vector3(sin(rotation.y), 1.0, cos(rotation.y));
 					Game::getGraphics().getParticleSystem("smoke")->addParticle(2, 3, weaponObject->getPosition() + positionOffset, Vector3(0.0, 1.0, 0.0));
 				}
+
+				if (weapon.type == WeaponType::Laser)
+				{
+					LaserLight* laser = static_cast<LaserLight*>(weapon.light);
+
+					if (laser != nullptr)
+					{
+						Vector3 rotation = weaponObject->getRotation();
+						Vector3 dir = Vector3::TransformNormal(Vector3(0.0, 0.0, 1.0), Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z));
+						float heightOffset = (Slots)i == Slots::MOUNTED ? 0.0 : -0.5;
+
+						laser->setDirection(dir);
+						laser->setPos(this->vehicleBody1->getPosition() + dir * 1.5f + Vector3(0.0f, heightOffset, 0.0f));
+						laser->setColor(Vector3::Lerp(weapon.lightColor, weapon.lightColor * 0.1, (weapon.currentSpreadIncrease * weapon.currentSpreadIncrease) / (weapon.maxSpread * weapon.maxSpread)));
+
+						if (weapon.remainingCooldown > 0.0)
+						{
+							laser->setLuminance(0.0);
+
+							if (weapon.remainingCooldown > 3.5)
+							{
+								laser->setLuminance((sin(weapon.remainingCooldown * 200.0) * sin(weapon.remainingCooldown * 111) + 1.0) * 0.05);
+							}
+						}
+						else
+						{
+							if (weapon.timeSinceLastShot < 0.15)
+							{
+								laser->setLuminance(5.0);
+							}
+							else
+							{
+								//laser->setLuminance(0.0);
+								const float laserDropOffSpeed = 20.0;
+								laser->setLuminance(max(5. - (weapon.timeSinceLastShot * laserDropOffSpeed) + 0.15 * laserDropOffSpeed, 0.0));
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -983,12 +1004,28 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 	this->vehicleSlots = slots;
 	for (int i = 0; i < Slots::SIZEOF; i++)
 	{
-		if (this->vehicleSlots->getSlot(Slots(i)) != nullptr)
+		Item* item = this->vehicleSlots->getSlot(Slots(i));
+		if (item != nullptr)
 		{
-			GameObject* temp = this->vehicleSlots->getSlot(Slots(i))->getObject();
+			GameObject* temp = item->getObject();
 			if (temp != nullptr)
 			{
 				Game::getGraphics().addToDraw(temp);
+
+				ItemWeapon* itemWeapon = static_cast<ItemWeapon*>(item);
+				if (itemWeapon != nullptr)
+				{
+					if (itemWeapon->getWeapon().type == WeaponType::Laser)
+					{
+						LaserLight laser = LaserLight(
+							Vector3(0,0,0),
+							itemWeapon->getWeapon().lightColor,
+							0.0,
+							Vector3(0,0,0),
+							itemWeapon->getWeapon().bulletScale.z);
+						itemWeapon->getWeapon().light = (Light*)static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(laser);
+					}
+				}
 			}
 		}
 	}
@@ -1049,7 +1086,7 @@ SpotLight* Vehicle::getSpotLight()
 
 void Vehicle::setLaserLight(LaserLight* light)
 {
-	this->laserLight = light;
+	//this->laserLight = light;
 }
 
 void Vehicle::setDrivingMode(int i)
@@ -1349,16 +1386,6 @@ void Vehicle::updatePowerUpEffects(float deltaTime)
 			1,
 			10.5f,
 			11.f);
-		Game::getGraphics().addParticle(this->vehicleBody1->getPosition(),
-			Vector3(0.0, 0.0, 10.0) + velocity,
-			1,
-			10.5f,
-			10.f);
-		Game::getGraphics().addParticle(this->vehicleBody1->getPosition(),
-			Vector3(10.0, 0.0, 0.0) + velocity,
-			1,
-			10.5f,
-			10.f);
 	}
 	// speed power up
 	else if (powerUpTimers[(int)PowerUpType::Speed] > 0.0)

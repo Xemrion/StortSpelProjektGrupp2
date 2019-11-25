@@ -142,6 +142,7 @@ namespace SoLoud
 		if (0 == data->thread)
 		{
 			delete data;
+			aSoloud->mInsideAudioThreadMutex = false;
 			return;
 		}
         SetEvent(data->audioProcessingDoneEvent);

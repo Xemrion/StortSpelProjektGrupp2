@@ -436,6 +436,9 @@ bool Graphics::init(Window* window)
 
 	//this->particleHandler->getParticleSystem("debris")->saveSystem();
 
+	//this->particleHandler->getParticleSystem("electro")->setParticleShaders(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("electro")->setGeometryShader("ParticleGS.cso");
+	this->particleHandler->getParticleSystem("electro")->setPixelShader("ParticlePS.cso");
 
 
 	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());
@@ -465,6 +468,7 @@ bool Graphics::init(Window* window)
 	uiCamera.setPosition(Vector3(0, 0, -10));
 
 	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
+
 	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
 	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
 	deviceContext->RSSetViewports(1, &this->vp);
@@ -1817,7 +1821,6 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		SimpleMath::Matrix world = object->getTransform();
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 
-		mappedResource;
 		HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
 		deviceContext->Unmap(worldBuffer.Get(), 0);
@@ -1837,7 +1840,6 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 			normalSRV = material.normal->getShaderResView();
 		}
 
-
 		Vector4 modColor = object->getColor();
 		hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
@@ -1850,7 +1852,8 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
-		Vector4 t = Vector4(time, 0.0005 + (i % 3) * 0.00003, 0.0005 + (i % 2) * 0.000045, 0.0);
+		const Vector2 windSpeed = fog->getWindSpeed();
+		Vector4 t = Vector4(time, windSpeed.x + (i % 3) * 0.00003, windSpeed.y + (i % 2) * 0.000045, 0.0);
 		deviceContext->Map(fogAnimationBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &t, sizeof(Vector4));
 		deviceContext->Unmap(fogAnimationBuffer.Get(), 0);
@@ -1862,4 +1865,15 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 
 	ID3D11ShaderResourceView* nullSRV = NULL;
 	deviceContext->PSSetShaderResources(7, 1, &nullSRV);
+}
+
+void Graphics::setFog(FogMaterial material, int layers, float spacing)
+{
+	fog = std::make_unique<Fog>();
+	fog->initialize(device, deviceContext, layers, spacing, material);
+}
+
+void Graphics::setFogWindSpeed(Vector2 speed)
+{
+	fog->setWindSpeed(std::move(speed));
 }

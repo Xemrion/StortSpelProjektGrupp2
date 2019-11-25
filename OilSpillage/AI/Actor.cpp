@@ -20,9 +20,9 @@ Actor::Actor(float x, float z,Physics* physics)
 }
 Actor::~Actor()
 {
-	for(int i = 0; i < 30; i++)
+	for(int i = 0; i < 60; i++)
 	{
-		Game::getGraphics().addParticle(position, Vector3(0.0f), 20, 3);
+		Game::getGraphics().addParticle(position, Vector3(0.0f), 25, 3);
 	}
 }
 

@@ -37,16 +37,27 @@ void Objective::setTarget(GameObject* *target, int nrOfTargets)
 	this->nrOfTargets = nrOfTargets;
 }
 
-void Objective::setEnemies(Actor* *enemies, int nrOfEnemies)
+void Objective::setEnemies(int nrOfEnemies)
 {
 	started = true;
 	this->nrOfMax = nrOfEnemies;
 	this->nrOfTargets = nrOfEnemies;
 }
 
+void Objective::setBoss(Actor* boss)
+{
+	this->mission->boss = boss;
+}
+
 void Objective::setType(TypeOfMission type)
 {
 	this->mission->typeMission = type;
+}
+
+void Objective::setGeneralPosition(Vector3 pos)
+{
+	this->mission->generalPosition = pos;
+	this->closestToPlayer = pos;
 }
 
 void Objective::setTargetType(TypeOfTarget targetType)
@@ -57,6 +68,11 @@ void Objective::setTargetType(TypeOfTarget targetType)
 void Objective::setReward(int time)
 {
 	this->mission->rewardTime = time;
+}
+
+void Objective::setScore(int score)
+{
+	this->mission->points = score;
 }
 
 void Objective::setInfo(std::string info)
@@ -89,8 +105,17 @@ int Objective::getRewardTime() const
 	return this->mission->rewardTime;
 }
 
+int Objective::getScore() const
+{
+	return this->mission->points;
+}
+
 std::string Objective::getInfo() const
 {
+	if (this->mission->typeMission == TypeOfMission::GetToPoint)
+	{
+		return this->mission->info;
+	}
 	return this->mission->info + " " + std::to_string(this->nrOfMax - this->nrOfTargets) + " / " + std::to_string(this->nrOfMax) + " ";
 }
 
@@ -109,9 +134,14 @@ Vector3 Objective::getClosestToPlayer() const
 	return this->closestToPlayer;
 }
 
+Vector3 Objective::getGeneralPosition() const
+{
+	return this->mission->generalPosition;
+}
+
 bool Objective::isDone()
 {
-	if (this->mission->typeMission == TypeOfMission::FindAndCollect)
+	if (this->mission->typeMission == TypeOfMission::FindAndCollect || this->mission->typeMission == TypeOfMission::GetToPoint)
 	{
 		return done;
 	}
@@ -128,6 +158,13 @@ bool Objective::isDone()
 	else if (this->mission->typeMission == TypeOfMission::SearchAndDestroy)
 	{
 		if (this->mission->target[0] == nullptr)
+		{
+			return true;
+		}
+	}
+	else if (this->mission->typeMission == TypeOfMission::BossEvent)
+	{
+		if (this->mission->boss == nullptr)
 		{
 			return true;
 		}
@@ -207,9 +244,17 @@ void Objective::update(Vector3 playerPosition)
 
 				GOptr->setPosition(Vector3(randPos.x,yPos,randPos.z));
 				Game::getGraphics().addToDraw(GOptr);
-				//static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->spawnTurrets(GOptr->getPosition(), ActorManager::Radius::CLOSE, 0);
-				//static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->spawnTurrets(GOptr->getPosition(), ActorManager::Radius::CLOSE, 50);
+				static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->createTurret(GOptr->getPosition().x + 3, GOptr->getPosition().z, 1);
+				static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->createTurret(GOptr->getPosition().x, GOptr->getPosition().z + 3, 1);
+				static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->createTurret(GOptr->getPosition().x - 3, GOptr->getPosition().z, 1);
 			}
+		}
+	}
+	else if (this->mission->typeMission == TypeOfMission::GetToPoint)
+	{
+		if ((this->mission->generalPosition - playerPosition).Length() < 5.0f)
+		{
+			this->done = true;
 		}
 	}
 	this->closestToPlayer = findClosestPlayer;

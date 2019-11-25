@@ -40,7 +40,9 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 
 	if (spawnTimer <= 0)
 	{
+#ifndef _DEBUG
 		spawnEnemies(targetPos);
+#endif
 		spawnTimer = spawnCooldown;
 	}
 
@@ -57,15 +59,15 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		//(TileSize * nrOfTiles)^2
 		if (distance > (20 * 10) * (20 * 10))
 		{
-			newPos = generateObjectivePos(targetPos, 50, 100);
+			//newPos = generateObjectivePos(targetPos, 50, 100);
 			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
 				Actor* current = groups[i].actors[j];
-				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+				//current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
 				if (j % 5 == 0)
 				{
-					newPos = generateObjectivePos(targetPos, 50, 100);
+					//newPos = generateObjectivePos(targetPos, 50, 100);
 				}
 			}
 		}
@@ -222,9 +224,9 @@ void ActorManager::spawnChaseCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-	//	createChaseCar(originPos.x + i, originPos.z);
-		//createChaseCar(originPos.x, originPos.z + i);
-	//	createChaseCar(originPos.x - i, originPos.z);
+		createChaseCar(originPos.x + i, originPos.z);
+		createChaseCar(originPos.x, originPos.z + i);
+		createChaseCar(originPos.x - i, originPos.z);
 	}
 }
 
@@ -232,9 +234,9 @@ void ActorManager::spawnShootCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-	//	createShootCar(originPos.x + i, originPos.z, (rand() % 4) + 1);
-	//	createShootCar(originPos.x, originPos.z + i, (rand() % 4) + 1);
-	//	createShootCar(originPos.x - i, originPos.z, (rand() % 4) + 1);
+		createShootCar(originPos.x + i, originPos.z, (rand() % 4) + 1);
+		createShootCar(originPos.x, originPos.z + i, (rand() % 4) + 1);
+		createShootCar(originPos.x - i, originPos.z, (rand() % 4) + 1);
 	}
 }
 
@@ -401,6 +403,7 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 			}
 			if (actors[i]->isDead())
 			{
+				Game::getGameInfo().highScore += actors[i]->getPoints();
 				destroyActor(i);
 			}
 		}
@@ -594,10 +597,10 @@ Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
-	for (;;) {
+	for (float i = 0;; i += 1.0) {
 		Vector3 position = map->generateRoadPositionInWorldSpace(*rng);
 		float distance = (position - targetPos).Length();
-		if ((distance <= maxDistance) && (distance >= minDistance))
+		if ((distance <= maxDistance + i) && (distance >= minDistance))
 		{
 			return position;
 		}

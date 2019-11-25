@@ -6,6 +6,7 @@
 
 enum class Animation
 {
+	NONE,
 	SHAKING,
 	FADE_IN,
 	SHAKING_FADE_IN,
@@ -30,13 +31,31 @@ private:
 		Color color;
 		float scale;
 	public:
-		TextAnimation(const std::string& text, const Color& color, float scale);
+		TextAnimation(const std::string& text, const Color& color, float scale, bool skipOffsets = false);
 		virtual ~TextAnimation();
 
+		virtual Animation getType() const = 0;
 		virtual void update(float deltaTime) = 0;
 		virtual void draw(const Vector2& position) = 0;
 		virtual void begin() {}
 		virtual void end() {}
+
+		virtual void setVariables(std::optional<std::string> text, std::optional<Color> color, std::optional<float> scale);
+
+		std::string getText() const;
+		Color getColor() const;
+		float getScale() const;
+	};
+
+	class NoAnimation : public TextAnimation
+	{
+	public:
+		NoAnimation(const std::string& text, const Color& color, float scale);
+		virtual ~NoAnimation();
+
+		virtual Animation getType() const { return Animation::NONE; }
+		virtual void update(float deltaTime) {}
+		virtual void draw(const Vector2& position);
 
 		virtual void setVariables(std::optional<std::string> text, std::optional<Color> color, std::optional<float> scale);
 	};
@@ -49,6 +68,7 @@ private:
 		ShakingAnimation(const std::string& text, const Color& color, float scale);
 		virtual ~ShakingAnimation();
 
+		virtual Animation getType() const { return Animation::SHAKING; }
 		virtual void update(float deltaTime);
 		virtual void draw(const Vector2& position);
 
@@ -64,6 +84,7 @@ private:
 		FadeAnimation(const std::string& text, const Color& color, float scale);
 		virtual ~FadeAnimation();
 
+		virtual Animation getType() const { return Animation::FADE_IN; }
 		virtual void update(float deltaTime);
 		virtual void draw(const Vector2& position);
 		virtual void begin();
@@ -81,6 +102,7 @@ private:
 		ShakingFadeAnimation(const std::string& text, const Color& color, float scale);
 		virtual ~ShakingFadeAnimation();
 
+		virtual Animation getType() const { return Animation::SHAKING_FADE_IN; }
 		virtual void update(float deltaTime);
 		virtual void draw(const Vector2& position);
 
@@ -93,6 +115,7 @@ private:
 		ShakingFadeStopAnimation(const std::string& text, const Color& color, float scale);
 		virtual ~ShakingFadeStopAnimation();
 
+		virtual Animation getType() const { return Animation::SHAKING_FADE_IN_STOP; }
 		virtual void update(float deltaTime);
 		virtual void draw(const Vector2& position);
 		virtual void end();
@@ -108,6 +131,7 @@ private:
 		SpinningAnimation(const std::string& text, const Color& color, float scale, bool upDownOnly);
 		virtual ~SpinningAnimation();
 
+		virtual Animation getType() const { return this->upDownOnly ? Animation::UP_DOWN : Animation::SPINNING; }
 		virtual void update(float deltaTime);
 		virtual void draw(const Vector2& position);
 		virtual void begin();
@@ -125,6 +149,7 @@ private:
 		SpinningFadeAnimation(const std::string& text, const Color& color, float scale, bool upDownOnly);
 		virtual ~SpinningFadeAnimation();
 
+		virtual Animation getType() const { return this->upDownOnly ? Animation::UP_DOWN_FADE_IN : Animation::SPINNING_FADE_IN; }
 		virtual void update(float deltaTime);
 		virtual void draw(const Vector2& position);
 		virtual void begin();
@@ -137,6 +162,7 @@ private:
 	Vector2 size;
 	std::unique_ptr<TextAnimation> animation;
 	bool animationActive;
+	void createAnimation(const std::string& text, const Color& color, float scale, Animation animation);
 public:
 	AnimatedText(const std::string& text, const Color& color, float scale, Animation animation = Animation::FADE_IN, Vector2 position = Vector2());
 	virtual ~AnimatedText();
@@ -147,6 +173,8 @@ public:
 	void beginAnimation();
 	void endAnimation();
 
+	void setAnimation(Animation animation);
+	void setAnimation(Animation animation, const std::string& text, const Color& color, float scale);
 	void setVariables(std::optional<std::string> text, std::optional<Color> color, std::optional<float> scale);
 	void setPosition(const Vector2& position);
 	Vector2 getSize() const;
