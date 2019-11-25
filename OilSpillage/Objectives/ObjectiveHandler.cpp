@@ -129,6 +129,7 @@ void ObjectiveHandler::update(Vector3 playerPos)
 				}
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->addTime(this->objectiveVec.at(0)->getRewardTime());
+			Game::getGameInfo().addToScore(objectiveVec[0]->getScore());
 			delete this->objectiveVec.at(0);
 			this->objectiveVec.erase(this->objectiveVec.begin());
 			this->eventNewObj = true;

@@ -19,6 +19,7 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	this->attackRange = 10;
 	createRigidbody(physics);
 	this->setPoints(100 * (1 + (0.1 * Game::getGameInfo().getNrOfClearedStages())));
+	this->weapon.damage = this->weapon.damage * (1 + (0.1 * Game::getGameInfo().getNrOfClearedStages()));
 }
 
 void Attacker::update(float dt, const Vector3& targetPos)

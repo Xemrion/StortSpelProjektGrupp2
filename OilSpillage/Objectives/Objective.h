@@ -48,6 +48,7 @@ public:
 	TypeOfTarget getTargetType()const;
 
 	int getRewardTime()const;
+	int getScore()const;
 	std::string getInfo()const;
 	Vector3 getAveragePosition()const;
 	Vector3 getClosestToPlayer()const;

@@ -94,6 +94,11 @@ int Objective::getRewardTime() const
 	return this->mission->rewardTime;
 }
 
+int Objective::getScore() const
+{
+	return this->mission->points;
+}
+
 std::string Objective::getInfo() const
 {
 	return this->mission->info + " " + std::to_string(this->nrOfMax - this->nrOfTargets) + " / " + std::to_string(this->nrOfMax) + " ";
