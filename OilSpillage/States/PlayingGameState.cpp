@@ -188,7 +188,11 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 				10.0f));
 	}
 
-	
+	testSystem = std::make_unique<Lsystem>();
+	testSystem.get()->setupDragonCurveSystem();
+	testSystem.get()->updateLSystem();
+
+
 	 //Road Network Turtlewalker
 	//FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF
 
