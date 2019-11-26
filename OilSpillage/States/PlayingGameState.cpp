@@ -198,10 +198,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0
 	}
 
 	testSystem = std::make_unique<Lsystem>();
-	testSystem.get()->addVariable('A', "ABB");
-	testSystem.get()->addVariable('B', "BAA");
-	testSystem.get()->setAxiom("A");
-	testSystem.get()->setRecursions(1);
+	testSystem.get()->setupDragonCurveSystem();
 	testSystem.get()->updateLSystem();
 	 //Road Network Turtlewalker
 	//FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF

@@ -9,7 +9,11 @@ enum Rule {
 	TURN_LEFT,
 	TURN_RIGHT,
 	PUSH_POS,
-	POP_POS
+	POP_POS,
+	PUSH_AND_LEFT,
+	PUSH_AND_RIGHT,
+	POP_AND_LEFT,
+	POP_AND_RIGHT
 };
 struct LSegment {
 	Vector3 from, towards;
@@ -47,6 +51,14 @@ public:
 	void setForwardDistance(float distance);
 	void setAxiom(String axiom);
 	void updateLSystem();
+
+	void setupAlgaeSystem();
+	void setupFractalTreeSystem();
+	void setupKochCurveSystem();
+	void setupSierpinskiTriangleSystem();
+	void setupSierpinskiArrowheadSystem();
+	void setupDragonCurveSystem();
+	void setupFractalPlantSystem();
 private:
 	Vector<Constant> constants;
 	Vector<Variable> variables;
