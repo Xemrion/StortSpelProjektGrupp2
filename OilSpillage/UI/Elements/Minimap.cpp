@@ -131,8 +131,8 @@ void Minimap::draw(bool selected)
 {
 
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
-	float playerRot = state->getPlayer()->getVehicle()->getRotation().y;
-	Vector3 playerPos(state->getPlayer()->getVehicle()->getPosition() * Vector3(1, 0, 1));
+	float playerRot = state->getPlayer()->getRotation().y;
+	Vector3 playerPos(state->getPlayer()->getPosition() * Vector3(1, 0, 1));
 	Vector3 minimapSize(this->textureMap->getWidth(), 1, this->textureMap->getHeight());
 	Vector3 zoomedMinimapSize(minimapSize * zoom);
 	Vector3 zoomedMinimapScale(Vector3(Minimap::size.x, 0, Minimap::size.y) / zoomedMinimapSize);
@@ -259,7 +259,7 @@ void Minimap::update(float deltaTime)
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
 	if (state != nullptr)
 	{
-		Vector3 playerPos(state->getPlayer()->getVehicle()->getPosition() * Vector3(1, 0, 1));
+		Vector3 playerPos(state->getPlayer()->getPosition() * Vector3(1, 0, 1));
 		timerForCompass += deltaTime * compassSpeed;
 		timerForCompass = fmod(timerForCompass, 2 * XM_PI);
 
