@@ -48,6 +48,27 @@ void Game::start(Window* window)
 	Sound::load("./data/sound/MetalImpactPitched2.wav");
 	Sound::load("./data/sound/MetalImpactPitched3.wav");
 	
+	Sound::load("./data/sound/Drift2.mp3");
+	Sound::load("./data/sound/Drift1.mp3");
+	Sound::load("./data/sound/CarEngine1.mp3");
+	Sound::load("./data/sound/CarEngine2.mp3");
+	Sound::load("./data/sound/CarExhaust1.mp3");
+	Sound::load("./data/sound/CarExhaust2.mp3");
+	Sound::load("./data/sound/CarExhaust3.mp3");
+	Sound::load("./data/sound/CarExhaust4.mp3");
+	Sound::load("./data/sound/RobotBullet1.mp3");
+	Sound::load("./data/sound/RobotBullet2.mp3");
+	Sound::load("./data/sound/RobotBullet3.mp3");
+	Sound::load("./data/sound/RobotBullet4.mp3");
+	Sound::load("./data/sound/RobotBullet5.mp3");
+	Sound::load("./data/sound/RobotBullet6.mp3");
+	Sound::load("./data/sound/Lazer1.mp3");
+	Sound::load("./data/sound/Lazer2.mp3");
+	Sound::load("./data/sound/Lazer3.mp3");
+	Sound::load("./data/sound/Lazer4.mp3");
+	Sound::load("./data/sound/LazerImpact.mp3");
+
+
 	Sound::playSoundtrack("./data/sound/OilSpillageSoundtrack1_Calm.mp3", "./data/sound/OilSpillageSoundtrack1_Aggressive.mp3");
 
 	//Input::setKeyboardPlayerID(0);
@@ -91,20 +112,50 @@ float Game::getDeltaTime()
 	return instance->deltaTime;
 }
 
+float Game::getLocalScale()
+{
+	return instance->localScale;
+}
+GameInfo& Game::getGameInfo() noexcept
+{
+	return instance->gameInfo;
+	// TODO: insert return statement here
+}
+
+
+int Game::getNrOfStagesDone()
+{
+	return instance->nrOfStagesDone;
+}
+
 
 
 void Game::createCurrentState()
 {
 	VehicleSlots* transfer = nullptr;
 	VehicleSlots* newSlots = nullptr;
+	Vehicle*temp = nullptr;
 	if (currentState == STATE_MENU)
+	{
+		Container::playerInventory = std::make_unique<Container>();
+
+		nrOfStagesDone = 0.0f;
+		localScale = 1.0f;
 		state = std::make_unique<MenuGameState>();
+	}
 	else if (currentState == STATE_PLAYING)
 	{
 		if (oldState == STATE_UPGRADING)
 		{
 			transfer = static_cast<UpgradingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
+			temp = static_cast<UpgradingGameState*>(state.get())->getPlayer().get();
+			temp->stopEngineSound();
+			nrOfStagesDone++;
+			if (nrOfStagesDone % 3 == 0)
+			{
+				localScale += 0.05f;
+			}
 		}
 		state = std::make_unique<PlayingGameState>();
 
@@ -116,10 +167,13 @@ void Game::createCurrentState()
 	}
 	else if (currentState == STATE_UPGRADING)
 	{
+		graphics.removeAllUIDraw();
 		if (oldState == STATE_PLAYING)
 		{
 			transfer = static_cast<PlayingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
+			temp = static_cast<PlayingGameState*>(state.get())->getPlayer().get();
+			temp->stopEngineSound();
 		}
 
 		state = std::make_unique<UpgradingGameState>();
@@ -127,6 +181,7 @@ void Game::createCurrentState()
 		if (oldState == STATE_PLAYING)
 		{
 			static_cast<UpgradingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
+			
 		}
 	}
 }
@@ -170,11 +225,11 @@ void Game::run()
 		//deltaTime reset
 		prevTime = curTime;
 	}
-
+	Sound::stopAll();
 	Sound::deinit();
 }
 
-Game::Game() : currentState(STATE_UPGRADING), oldState(-1), running(false) {}
+Game::Game() : currentState(STATE_MENU), oldState(-1), running(false) {}
 
 Game::~Game()
 {

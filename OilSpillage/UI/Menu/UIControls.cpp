@@ -8,7 +8,7 @@ void UIControls::updateUI(float deltaTime)
 {
 	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
-		Game::setState(Game::STATE_PLAYING);
+		Game::setState(Game::STATE_UPGRADING); //Game::setState(Game::STATE_PLAYING);
 	}
 	else if (Input::checkButton(Keys::CANCEL, States::PRESSED))
 	{

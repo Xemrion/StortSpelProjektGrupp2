@@ -14,12 +14,16 @@ Minimap::Minimap(Vector2 position)
 	Game::getGraphics().loadTexture("UI/mapObjective");
 	Game::getGraphics().loadTexture("UI/mapEnemy");
 	Game::getGraphics().loadTexture("UI/mapCompass");
+	Game::getGraphics().loadTexture("UI/mapFog", false, true);
+	Game::getGraphics().loadTexture("UI/arrowObjective2");
 
 	this->textureOutline = Game::getGraphics().getTexturePointer("UI/mapOutline");
 	this->texturePlayerMarker = Game::getGraphics().getTexturePointer("UI/mapPlayerMarker");
 	this->textureObjectiveMarker = Game::getGraphics().getTexturePointer("UI/mapObjective");
 	this->textureEnemyMarker = Game::getGraphics().getTexturePointer("UI/mapEnemy");
 	this->textureCompass = Game::getGraphics().getTexturePointer("UI/mapCompass");
+	this->textureFogTemp = Game::getGraphics().getTexturePointer("UI/mapFog");
+	this->textureArrow = Game::getGraphics().getTexturePointer("UI/arrowObjective2");
 
 	assert(textureOutline && "Texture failed to load!");
 	assert(texturePlayerMarker && "Texture failed to load!");
@@ -106,9 +110,11 @@ void Minimap::init()
 		assert(this->textureFog && "Texture failed to create!");
 	}
 
-	unsigned short minDimension = min(this->textureMap->getWidth(), this->textureMap->getHeight());
-	this->zoom = min(72.0f / minDimension, 1.0f);
-	this->fogClearRadius = min(25.0f * (minDimension / 72.0f), 25.0f);
+	//Copy the texture so we can change the alpha later
+	
+
+	this->compassMoveSize = 6.0f;
+	this->compassSpeed = 6.0f;
 
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Vector3 mapSize((state->getBottomRight() - state->getTopLeft() + Vector3(0, 1, 0)) * Vector3(1, 1, -1));
@@ -117,6 +123,9 @@ void Minimap::init()
 	this->mapMatrix = Matrix::CreateTranslation(-Vector3(state->getTopLeft().x, 0, state->getBottomRight().z));
 	this->mapMatrix *= Matrix::CreateScale(mapScale);
 }
+
+	
+
 
 void Minimap::draw(bool selected)
 {
@@ -215,71 +224,101 @@ void Minimap::draw(bool selected)
 			}
 		}
 	}
+
 	
 	sb->Draw(this->textureOutline->getShaderResView(), this->position - Vector2(5, 5));
 	sb->Draw(this->resourceFog, mapRect, &zoomedRect);
 	sb->Draw(this->texturePlayerMarker->getShaderResView(), markerRect, nullptr, Colors::White, playerRot, this->texturePlayerMarker->getCenter());
-
-	if (state->getObjHandler().getObjective(0) != nullptr && state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree)
+	
+	if (state->getObjHandler().getObjective(0) != nullptr && state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree )
 	{
-		sb->Draw(this->textureCompass->getShaderResView(), compassRect, nullptr, Colors::White, this->compassRot, Vector2(this->textureCompass->getWidth() * 0.5f, this->textureCompass->getHeight() * 0.75f));
+		Vector3 playerToObj = (state->getObjHandler().getObjective(0)->getClosestToPlayer() * Vector3(1.0f, 0.0f, 1.0f)) - playerPos;
+		Vector3 camToObj = (state->getObjHandler().getObjective(0)->getClosestToPlayer() * Vector3(1.0f, 0.0f, 1.0f)) - (state->getCameraPos() * Vector3(1.0f, 0.0f, 1.0f));
+		camToObj.Normalize();
+		camToObj.x *= 250.0f + compassMoveSize * sin((timerForCompass - 0) / 1) + 1;
+		camToObj.z *= 250.0f + compassMoveSize * sin((timerForCompass - 0) / 1) + 1;
+		Vector2 arrowPositionUI(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f);
+		float alphaLength = 1.0f;
+		arrowPositionUI += Vector2(camToObj.x, -camToObj.z);
+		float startFade = 50.0f;
+		float endFade = 20.0f;
+		if (playerToObj.Length() <= startFade && playerToObj.Length() > 0.0f)
+		{
+			alphaLength = playerToObj.Length() / startFade;
+			alphaLength -= endFade / startFade;
+		}
+		if (playerToObj.Length() > endFade)
+		{
+			sb->Draw(this->textureArrow->getShaderResView(), arrowPositionUI, NULL, Vector4(1, 1, 1, alphaLength), compassRot, Vector2(textureArrow->getWidth() * 0.5f, textureArrow->getHeight() * 0.5f), Vector2(0.05f));
+		}
 	}
 }
 
 void Minimap::update(float deltaTime)
 {
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
-	Vector3 playerPos(state->getPlayer()->getVehicle()->getPosition() * Vector3(1, 0, 1));
-
-
-
-	Vector3 playerMapPos = Vector3::Transform(playerPos, this->mapMatrix);
-	//playerMapPos /= 3;
-	playerMapPos.Clamp(Vector3(), Vector3(this->textureFogTemp->getWidth(), 0, this->textureFogTemp->getHeight()));
-	playerMapPos.z = this->textureFogTemp->getHeight() - playerMapPos.z;
-
-	Vector2 topLeft = Vector2(max(playerMapPos.x - this->fogClearRadius, 0),
-							  max(playerMapPos.z - this->fogClearRadius, 0));
-	Vector2 bottomRight = Vector2(min(playerMapPos.x + this->fogClearRadius, this->textureFogTemp->getWidth()),
-							      min(playerMapPos.z + this->fogClearRadius, this->textureFogTemp->getHeight()));
-
-	for (int x = static_cast<int>(topLeft.x); x < static_cast<int>(std::roundf(bottomRight.x)); x++)
+	if (state != nullptr)
 	{
-		for (int y = static_cast<int>(topLeft.y); y < static_cast<int>(std::roundf(bottomRight.y)); y++)
+		Vector3 playerPos(state->getPlayer()->getVehicle()->getPosition() * Vector3(1, 0, 1));
+		timerForCompass += deltaTime * compassSpeed;
+		timerForCompass = fmod(timerForCompass, 2 * XM_PI);
+
+		Vector3 playerMapPos = Vector3::Transform(playerPos, this->mapMatrix);
+		//playerMapPos /= 3;
+		playerMapPos.Clamp(Vector3(), Vector3(this->textureFogTemp->getWidth(), 0, this->textureFogTemp->getHeight()));
+		playerMapPos.z = this->textureFogTemp->getHeight() - playerMapPos.z;
+
+		Vector2 topLeft = Vector2(max(playerMapPos.x - this->fogClearRadius, 0),
+			max(playerMapPos.z - this->fogClearRadius, 0));
+		Vector2 bottomRight = Vector2(min(playerMapPos.x + this->fogClearRadius, this->textureFogTemp->getWidth()),
+			min(playerMapPos.z + this->fogClearRadius, this->textureFogTemp->getHeight()));
+
+		for (int x = static_cast<int>(topLeft.x); x < static_cast<int>(std::roundf(bottomRight.x)); x++)
 		{
-			float shade = 255;
-			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius)
+			for (int y = static_cast<int>(topLeft.y); y < static_cast<int>(std::roundf(bottomRight.y)); y++)
 			{
-				shade = 150;
-			}
-			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.8f)
-			{
-				shade = 100;
-			}
-			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.6f)
-			{
-				shade = 50;
-			}
-			if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.4f)
-			{
-				shade = 0;
-			}
-			if (this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] > shade) {
-				this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] = shade;
+				float shade = 255;
+				if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius)
+				{
+					shade = 150;
+				}
+				if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.8f)
+				{
+					shade = 100;
+				}
+				if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.6f)
+				{
+					shade = 50;
+				}
+				if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.4f)
+				{
+					shade = 0;
+				}
+				if (this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] > shade) {
+					this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] = shade;
+				}
 			}
 		}
-	}
 
-	ID3D11DeviceContext* deviceContext = Game::getGraphics().getDeviceContext();
-	unsigned int rowPitch = (this->textureFogTemp->getWidth() * 4) * sizeof(unsigned char);
-	deviceContext->UpdateSubresource(this->textureFog, 0, NULL, this->pixels, rowPitch, 0);
+		ID3D11DeviceContext* deviceContext = Game::getGraphics().getDeviceContext();
+		unsigned int rowPitch = (this->textureFogTemp->getWidth() * 4) * sizeof(unsigned char);
+		deviceContext->UpdateSubresource(this->textureFog, 0, NULL, this->pixels, rowPitch, 0);
 
-	Vector3 closestPos = state->getObjHandler().getObjective(0)->getClosestToPlayer();
-	this->compassRot = XMVector3AngleBetweenVectors(closestPos - playerPos, Vector3::UnitX).m128_f32[0] + XM_PIDIV2;
+		Vector3 closestPos;
+		if (state->getObjHandler().getObjective(0) != nullptr)
+		{
+			state->getObjHandler().getObjective(0)->getClosestToPlayer();
+		}
+		else
+		{
+			closestPos = Vector3(0.0f);
+		}
+		this->compassRot = XMVector3AngleBetweenVectors(closestPos - playerPos, Vector3::UnitX).m128_f32[0] + XM_PIDIV2;
 
-	if (playerPos.z < closestPos.z)
-	{
-		this->compassRot = XM_PI - this->compassRot;
+		if (playerPos.z < closestPos.z)
+		{
+			this->compassRot = XM_PI - this->compassRot;
+		}
 	}
 }
 

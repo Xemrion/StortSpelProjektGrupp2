@@ -35,6 +35,8 @@ private:
 	std::vector<int> loopingSounds;
 	SoLoud::Speech speech;
 	Soundtrack soundtrack;
+
+	int handlePowerup;
 public:
 	Sound();
 	virtual ~Sound();
@@ -60,6 +62,7 @@ public:
 	static void playSoundtrack(std::string fileNameCalm, std::string fileNameAggressive, float volume = 1.0f);
 	static void fadeSoundtrack(bool toAgressive, float fadeTime);
 	static void stopSoundtrack(float fadeOutTime = 0.0f);
+	static void changeSoundtrackVolume(float volume);
 
 	static void updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity);
 };
