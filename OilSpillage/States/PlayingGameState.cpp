@@ -57,15 +57,6 @@ void PlayingGameState::initAI()
 	aStar = new AStar(map->getTileMap());
 	actorManager = new ActorManager(aStar, physics.get(), map.get(), &rng);
 	aStar->generateTileData(map->getTileMap());
-	for (int i = 0; i < 5; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-			actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
-			//actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
-		}
-	}
 }
 
 PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0f), currentMenu(MENU_PLAYING)
@@ -249,7 +240,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0
 
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
-	player->startEngineSound();
 
 	map = std::make_unique<Map>(graphics, config, physics.get());
 	map->setDistrictColorCoding(isDebugging);
@@ -346,6 +336,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0
 	cameraObject->getRigidBody()->setGravity(btVector3(0,0,0));
 	//cameraObject->getRigidBody()->setDamping(10,0);
 
+	graphics.getParticleSystem("fire")->setGravity(-0.1f);
+	graphics.getParticleSystem("fire")->setSize(0.055f, 0.065f);
+	graphics.getParticleSystem("fire")->changeVectorField(1.75f, 0.5f);
+	
+	graphics.getParticleSystem("smoke")->setGravity(-0.1f);
+	graphics.getParticleSystem("smoke")->setSize(0.055f, 0.065f);
+	graphics.getParticleSystem("smoke")->changeVectorField(1.75f, 0.09f);
 
 #ifndef _DEBUG
 	spawnObjects();
@@ -729,8 +726,9 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else {
 			cameraTimer += deltaTime;
-			if (cameraTimer > 100) {
+			if (cameraTimer > 250) {
 				cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+				cameraTimer = 0;
 			}
 		}
 		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
@@ -776,7 +774,6 @@ void PlayingGameState::update(float deltaTime)
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation(deltaTime);
-		//actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		Bullet::updateSoundTimer(deltaTime);

@@ -163,6 +163,7 @@ void Game::createCurrentState()
 		{	
 			static_cast<PlayingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
 			Sound::stopAllSoundsExceptSoundtrack();
+			static_cast<PlayingGameState*>(state.get())->getPlayer()->startEngineSound();
 			//static_cast<PlayingGameState*>(state.get())->initiatePlayer();
 		}
 	}

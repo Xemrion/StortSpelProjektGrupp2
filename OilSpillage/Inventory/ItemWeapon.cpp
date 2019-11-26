@@ -4,10 +4,30 @@
 std::string ItemWeapon::generateDescription(Weapon weapon)
 {
 	std::stringstream stream;
-	stream << "Damage: " << weapon.damage << "\n";
-	stream << "Fire Rate: " << weapon.fireRate << "\n";
-	stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
-	stream << "Max Spread: " << weapon.maxSpread << "\n";
+	if (weapon.type == WeaponType::MachineGun) {
+		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
+		stream << "Fire Rate: " << weapon.fireRate << "\n";
+		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
+		stream << "Max Spread: " << weapon.maxSpread << "\n";
+	}
+	else if(weapon.type == WeaponType::Laser){
+		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
+	}
+	else if(weapon.type == WeaponType::Flamethrower) {
+		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
+		stream << "Fire Rate: " << weapon.fireRate << "\n";
+		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
+		stream << "Max Spread: " << weapon.maxSpread << "\n";
+	}
+	else if(weapon.type == WeaponType::Spikes){
+		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
+	}
+	else {
+		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
+		stream << "Fire Rate: " << weapon.fireRate << "\n";
+		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
+		stream << "Max Spread: " << weapon.maxSpread << "\n";
+	}
 	
 	return stream.str();
 }
