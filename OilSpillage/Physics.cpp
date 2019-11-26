@@ -128,7 +128,7 @@ void Physics::teleportRigidbody(Vector3 newPos, btRigidBody* body)
 	body->getMotionState()->setWorldTransform(transform);
 	//Add
 	world->addRigidBody(body);
-	body->setLinearVelocity(btVector3());
+	body->setLinearVelocity(btVector3(0,0,0));
 	body->setAngularVelocity(btVector3());
 	body->clearForces();
 }

@@ -163,7 +163,9 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	graphics.loadModel("Houses/houseMaterial");
 	graphics.loadModel("Houses/houseMaterial2");
 	graphics.loadModel("Houses/houseMaterial3");
-
+	graphics.loadModel("Entities/PowerUps/HealthBoost");
+	graphics.loadModel("Entities/PowerUps/SpeedBoost");
+	graphics.loadModel("Entities/PowerUps/TimeBoost");
 
 	player = std::make_unique<Vehicle>();
 	player->makePlayer();
@@ -265,6 +267,21 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
 	player->getVehicleBody1()->setPosition(startPos + Vector3(.0f, 0.65f - 1.2f, .0f));
 
+	this->cameraObject = new GameObject;
+	Game::getGraphics().loadShape(Shapes::SHAPE_CUBE);
+	cameraObject->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//Game::getGraphics().addToDraw(vehicle);
+	cameraObject->setPosition(Vector3(player->getPosition().x, 10.0f, player->getPosition().z));
+	cameraObject->setScale(Vector3(0.5f, 0.14f, 0.9f));
+	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x, btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 10.0f);
+	cameraObject->setRigidBody(tempo, physics.get());
+	cameraObject->getRigidBody()->activate();
+	cameraObject->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	cameraObject->getRigidBody()->setFriction(0);
+	cameraObject->getRigidBody()->setGravity(btVector3(0, 0, 0));
+	//cameraObject->getRigidBody()->setDamping(10,0);
+	cameraTimer = 0;
+
 	initAI();
 
 
@@ -324,20 +341,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
 	buildingTest->setRigidBody(tempo2, physics.get());*/
 
-	this->cameraObject = new GameObject;
-	Game::getGraphics().loadShape(Shapes::SHAPE_CUBE);
-	cameraObject->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//Game::getGraphics().addToDraw(vehicle);
-	cameraObject->setPosition(Vector3(0.0f, 10.0f, 0.0f));
-	cameraObject->setScale(Vector3(0.5f, 0.14f, 0.9f));
-	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x,btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 10.0f);
-	cameraObject->setRigidBody(tempo, physics.get());
-	cameraObject->getRigidBody()->activate();
-	cameraObject->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	cameraObject->getRigidBody()->setFriction(0);
-	cameraObject->getRigidBody()->setGravity(btVector3(0,0,0));
-	//cameraObject->getRigidBody()->setDamping(10,0);
-
 	graphics.getParticleSystem("fire")->setGravity(-0.1f);
 	graphics.getParticleSystem("fire")->setSize(0.055f, 0.065f);
 	graphics.getParticleSystem("fire")->changeVectorField(1.75f, 0.5f);
@@ -346,6 +349,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	graphics.getParticleSystem("smoke")->setSize(0.055f, 0.065f);
 	graphics.getParticleSystem("smoke")->changeVectorField(1.75f, 0.09f);
 
+	
 
 #ifndef _DEBUG
 	spawnObjects();
@@ -751,12 +755,12 @@ void PlayingGameState::update(float deltaTime)
 		physics->update(deltaTime);
 
 		if (player->isDead()) {
-			cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 			cameraTimer = 0;
 		}
 		else {
 			cameraTimer += deltaTime;
-			if (cameraTimer > 250) {
+			if (cameraTimer > 0.5f) {
 				cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 				cameraTimer = 0;
 			}
@@ -1027,14 +1031,15 @@ void PlayingGameState::spawnObjects()
 		objPtr->setTexture(graphics.getTexturePointer("brownPaperCardboard"));
 		graphics.addToDraw(objPtr);
 		randomValue = (rand() % 3 + 8) * 0.125f;
-		tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue), 0.01f);
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
 		objPtr->setScale(Vector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue));
+
 		//objPtr->setColor(Vector4(0.8, 0.6, 0.38, 1));
+		/*tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue), 0.01f);
 		objPtr->setRigidBody(tempo2, physics.get());
 		objPtr->getRigidBody()->setFriction(0.7f);
 		objPtr->getRigidBody()->setActivationState(0);
-		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+		objPtr->getRigidBody()->setDeactivationTime(0.1f);*/
 	}
 	float size = 1.3f * 0.38f;
 	randomValue = 0;
@@ -1046,13 +1051,14 @@ void PlayingGameState::spawnObjects()
 		objPtr->mesh = graphics.getMeshPointer("Entities/Barrel");
 		objPtr->setTexture(graphics.getMaterial("Entities/Barrel").diffuse);
 		graphics.addToDraw(objPtr);
-		tempo2 = physics->addCylinder(btVector3(-200, 0.2f + i, -200), btVector3(size, size, size), 0.01f);
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
 		objPtr->setScale(Vector3(size, size, size));
 		randomValue = (rand() % 5) * 0.03f;
 		randomValue2 = (rand() % 5) * 0.03f;
 		randomValue3 = (rand() % 5) * 0.03f;
 		objPtr->setColor(Vector4(randomValue, randomValue2, 0, 1));
+
+		tempo2 = physics->addCylinder(btVector3(-200, 0.2f + i, -200), btVector3(size, size, size), 0.01f);
 		objPtr->setRigidBody(tempo2, physics.get());
 		objPtr->getRigidBody()->setFriction(0.7f);
 		objPtr->getRigidBody()->setActivationState(0);
@@ -1070,12 +1076,13 @@ void PlayingGameState::spawnObjects()
 		objPtr->setScale(Vector3(size, size, size));
 		tempo2 = physics->addSphere(size, btVector3(0, 0.0f, 0), 0.01f);
 		objPtr->setPosition(Vector3(0, 0, 0));
+
 		//objPtr->setColor(Vector4(0.8, 0.6, 0.38, 1));
-		objPtr->setRigidBody(tempo2, physics.get());
+		/*objPtr->setRigidBody(tempo2, physics.get());
 		objPtr->getRigidBody()->setDamping(0, 0.98f);
 		objPtr->getRigidBody()->setFriction(0.7f);
 		objPtr->getRigidBody()->setActivationState(0);
-		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+		objPtr->getRigidBody()->setDeactivationTime(0.1f);*/
 	}
 	for (int i = 0; i < 250; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());

@@ -135,8 +135,8 @@ void Vehicle::init(Physics* physics)
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicleBody1->getRigidBody()->setCollisionFlags(vehicleBody1->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	vehicleBody1->getRigidBody()->setFriction(1);
-	vehicleBody1->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
-	/*spring1 = physics->addSpring(this->getRigidBody(),this->wheel1->getRigidBody());
+	//vehicleBody1->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+	/*spring1 = physics->addSpring(this->vehicle->getRigidBody(),this->wheel1->getRigidBody());
 	spring1->setLinearLowerLimit(btVector3(0.0f, 0.0f, 0.0f));
 	spring1->setLinearUpperLimit(btVector3(0.0f, 0.56f, 0.0f));
 	spring1->enableSpring(1, true);
@@ -921,80 +921,81 @@ void Vehicle::updateWeapon(float deltaTime)
 					this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
 				}
 			}
-		}
 
-		for (int i = 0; i < Slots::SIZEOF; ++i)
-		{
-			ItemWeapon* itemWeapon = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot((Slots)i));
-			if (itemWeapon != nullptr)
+
+			for (int i = 0; i < Slots::SIZEOF; ++i)
 			{
-				GameObject* weaponObject = itemWeapon->getObject();
-				Weapon& weapon = itemWeapon->getWeapon();
-				
-				if (weapon.remainingCooldown == 0.0)
+				ItemWeapon* itemWeapon = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot((Slots)i));
+				if (itemWeapon != nullptr)
 				{
-					weaponObject->setColor(itemWeapon->getBaseColor() + (Vector4(1.0, 0.4, 0.1, 0.0) * (weapon.currentSpreadIncrease / weapon.maxSpread) * 2.0));
-				}
-				else
-				{
-					float time = dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime();
-					weaponObject->setColor(itemWeapon->getBaseColor() + (Vector4(0.0 + sin(time*3.0) * 0.5, 0.0 + sin(time*3.0) * 0.5, 0.0 + sin(time*3.0) * 0.5, 0.0)));
-					Vector3 rotation = weaponObject->getRotation();
-					Vector3 positionOffset = Vector3(sin(rotation.y), 1.0, cos(rotation.y));
-					Game::getGraphics().getParticleSystem("smoke")->addParticle(2, 3, weaponObject->getPosition() + positionOffset, Vector3(0.0, 1.0, 0.0));
-				}
+					GameObject* weaponObject = itemWeapon->getObject();
+					Weapon& weapon = itemWeapon->getWeapon();
 
-				if (weapon.type == WeaponType::Laser && Game::getCurrentStateIndex()==Game::State::STATE_PLAYING)
-				{
-					LaserLight* laser = static_cast<LaserLight*>(weapon.light);
-
-					if (laser != nullptr)
+					if (weapon.remainingCooldown == 0.0)
 					{
+						weaponObject->setColor(itemWeapon->getBaseColor() + (Vector4(1.0, 0.4, 0.1, 0.0) * (weapon.currentSpreadIncrease / weapon.maxSpread) * 2.0));
+					}
+					else
+					{
+						float time = dynamic_cast<PlayingGameState*>(Game::getCurrentState())->getTime();
+						weaponObject->setColor(itemWeapon->getBaseColor() + (Vector4(0.0 + sin(time * 3.0) * 0.5, 0.0 + sin(time * 3.0) * 0.5, 0.0 + sin(time * 3.0) * 0.5, 0.0)));
 						Vector3 rotation = weaponObject->getRotation();
-						Vector3 dir = Vector3::TransformNormal(Vector3(0.0, 0.0, 1.0), Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z));
-						float heightOffset = (Slots)i == Slots::MOUNTED ? 0.0 : -0.5;
+						Vector3 positionOffset = Vector3(sin(rotation.y), 1.0, cos(rotation.y));
+						Game::getGraphics().getParticleSystem("smoke")->addParticle(2, 3, weaponObject->getPosition() + positionOffset, Vector3(0.0, 1.0, 0.0));
+					}
 
-						laser->setDirection(dir);
-						laser->setPos(this->vehicleBody1->getPosition() + dir * 1.5f + Vector3(0.0f, heightOffset, 0.0f));
-						laser->setColor(Vector3::Lerp(weapon.lightColor, weapon.lightColor * 0.1, (weapon.currentSpreadIncrease * weapon.currentSpreadIncrease) / (weapon.maxSpread * weapon.maxSpread)));
+					if (weapon.type == WeaponType::Laser && Game::getCurrentStateIndex() == Game::State::STATE_PLAYING)
+					{
+						LaserLight* laser = static_cast<LaserLight*>(weapon.light);
 
-						if (weapon.remainingCooldown > 0.0)
+						if (laser != nullptr)
 						{
-							laser->setLuminance(0.0);
+							Vector3 rotation = weaponObject->getRotation();
+							Vector3 dir = Vector3::TransformNormal(Vector3(0.0, 0.0, 1.0), Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z));
+							float heightOffset = (Slots)i == Slots::MOUNTED ? 0.0 : -0.5;
 
-							if (weapon.remainingCooldown > 3.5)
+							laser->setDirection(dir);
+							laser->setPos(this->vehicleBody1->getPosition() + dir * 1.5f + Vector3(0.0f, heightOffset, 0.0f));
+							laser->setColor(Vector3::Lerp(weapon.lightColor, weapon.lightColor * 0.1, (weapon.currentSpreadIncrease * weapon.currentSpreadIncrease) / (weapon.maxSpread * weapon.maxSpread)));
+
+							if (weapon.remainingCooldown > 0.0)
 							{
-								laser->setLuminance((sin(weapon.remainingCooldown * 200.0) * sin(weapon.remainingCooldown * 111) + 1.0) * 0.05);
-							}
-						}
-						else
-						{
-							if (weapon.timeSinceLastShot < 0.15)
-							{
-								laser->setLuminance(5.0);
+								laser->setLuminance(0.0);
+
+								if (weapon.remainingCooldown > 3.5)
+								{
+									laser->setLuminance((sin(weapon.remainingCooldown * 200.0) * sin(weapon.remainingCooldown * 111) + 1.0) * 0.05);
+								}
 							}
 							else
 							{
-								//laser->setLuminance(0.0);
-								const float laserDropOffSpeed = 20.0;
-								laser->setLuminance(max(5. - (weapon.timeSinceLastShot * laserDropOffSpeed) + 0.15 * laserDropOffSpeed, 0.0));
+								if (weapon.timeSinceLastShot < 0.15)
+								{
+									laser->setLuminance(5.0);
+								}
+								else
+								{
+									//laser->setLuminance(0.0);
+									const float laserDropOffSpeed = 20.0;
+									laser->setLuminance(max(5. - (weapon.timeSinceLastShot * laserDropOffSpeed) + 0.15 * laserDropOffSpeed, 0.0));
+								}
 							}
 						}
 					}
-				}
-				else if (weapon.type == WeaponType::MachineGun)
-				{
-					SpotLight* flash = static_cast<SpotLight*>(weapon.light);
-
-					if (flash != nullptr)
+					else if (weapon.type == WeaponType::MachineGun)
 					{
-						Vector3 rotation = weaponObject->getRotation();
-						Vector3 dir = Vector3::TransformNormal(Vector3(0.0, 0.0, 1.0), Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z));
-						float heightOffset = (Slots)i == Slots::MOUNTED ? 0.0 : -0.5;
-						
-						flash->setDirection(dir);
-						flash->setPos(this->vehicleBody1->getPosition() + dir * 1.5f + Vector3(0.0f, heightOffset, 0.0f));
-						flash->setLuminance(max(0.5f - (weapon.timeSinceLastShot * 20.0), 0.0f));
+						SpotLight* flash = static_cast<SpotLight*>(weapon.light);
+
+						if (flash != nullptr)
+						{
+							Vector3 rotation = weaponObject->getRotation();
+							Vector3 dir = Vector3::TransformNormal(Vector3(0.0, 0.0, 1.0), Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z));
+							float heightOffset = (Slots)i == Slots::MOUNTED ? 0.0 : -0.5;
+
+							flash->setDirection(dir);
+							flash->setPos(this->vehicleBody1->getPosition() + dir * 1.5f + Vector3(0.0f, heightOffset, 0.0f));
+							flash->setLuminance(max(0.5f - (weapon.timeSinceLastShot * 20.0), 0.0f));
+						}
 					}
 				}
 			}
