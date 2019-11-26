@@ -307,7 +307,7 @@ void Minimap::update(float deltaTime)
 		Vector3 closestPos;
 		if (state->getObjHandler().getObjective(0) != nullptr)
 		{
-			state->getObjHandler().getObjective(0)->getClosestToPlayer();
+			closestPos = state->getObjHandler().getObjective(0)->getClosestToPlayer();
 		}
 		else
 		{
