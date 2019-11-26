@@ -15,6 +15,7 @@ Swarm::Swarm(float x, float z, Physics* physics)
 
 	this->stats = VehicleStats::AISwarm;
 	setHealth(this->stats.maxHealth * (1 + (0.3 * Game::getGameInfo().nrOfClearedStages)));
+	this->stats.maxSpeed = this->stats.maxSpeed * (1.1 + (0.2 * Game::getGameInfo().nrOfClearedStages));
 	Game::getGraphics().loadModel("Entities/Drone");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Drone");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Drone"));
