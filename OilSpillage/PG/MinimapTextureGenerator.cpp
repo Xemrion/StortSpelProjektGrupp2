@@ -10,7 +10,7 @@
 #pragma warning( disable : 4715 ) 
 String createMinimapTexture( Map const &map, Bool isDistrictColoured )
 {
-	static auto constexpr districtBlendFac { .2f };
+	static auto constexpr districtBlendFac { .05f };
 	auto numDistricts = District::Type::size();
 	Vector<RGBA> districtColors( numDistricts );
 					 districtColors[District::residential  .index] = 0xFF'00FFFF;

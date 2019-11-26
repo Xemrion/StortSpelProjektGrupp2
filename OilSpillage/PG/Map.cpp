@@ -40,73 +40,93 @@
 // for roof:
 //   0 = neighbourFloorNo != myFloorNo
 //   1 = neighbourFloorNo == myFloorNo
-// 
-// auto placeHouse = []( I32 x, I32 y ) { 
-//    placeMesh(); // house
-//    placeMesh(); // floor
-// };
-// 
-// 
-// auto startDirection;
-// 
-// for ( ++x = 0 < map.width ) {
-//    for ( ++n = 0 < borderWidth ) {
-//       if ( !(startDirection == Direction::north and startPos.x == x) and selection(rng) < .90f )
-//          placeHouse(x,-n);
-//       if ( !(startDirection == Direction::south and startPos.x == x) and selection(rng) < .90f )
-//          placeHouse(x,map.height+n);
-//    }
-// }
-// 
-// for ( ++y = 0 < map.height )
-//    for ( ++n = 0 < borderWidth ) {
-//       if ( !(startDirection == Direction::west and startPos.y == y) and selection(rng) < .90f )
-//          placeHouse(x,-n);
-//       if ( !(startDirection == Direction::south and startPos.y == y) and selection(rng) < .90f )
-//          placeHouse(x,map.height+n);
-//    }
-// }
-// 
-// if ( startDirection != Direction::north )
-//    placeFence(north);
-// else {
-//    westLength = map.width - startPos.x; // confirm?
-//    eastLength = startPos.x;
-//    // place at -1-1, rotate 90 deg, scale by west length
-//    // place at startPos.x+1,-1, rotate 90 deg, scale by east length
-// }
-// 
-// if ( startDirection != Direction::east )
-//    placeFence(east);
-// else {
-//    northLength = map.length - startPos.y; // confirm?
-//    southLength = startPos.y;
-//    // place at map.width+1.-1 rotate 180 deg, scale by north length
-//    // place at map.width+1,startPos.y+1 rotate 180 deg, scale by south length
-// }
-// 
-// if ( startDirection != Direction::south )
-//    placeFence(south);
-// else {
-//    westLength = map.width - startPos.x; // confirm?
-//    eastLength = startPos.x;
-//    // place at -1,map.length+1 rotate 90 deg, scale by west length
-//    // place at startPos.x+1,map.length+1, rotate 90 deg, scale by east length
-// }
-// 
-// if ( startDirection != Direction::west )
-//    placeFence(west);
-// else {
-//    northLength = map.length - startPos.y; // confirm?
-//    southLength = startPos.y;
-//    // place at map.width+1.-1 rotate 180 deg, scale by north length
-//    // place at map.width+1,startPos.y+1 rotate 180 deg, scale by south length
-// }
-// 
-// // floor x4
+/*
+void Map::generateBorder() {
+	auto constexpr borderThickness = 5;
 
-// fence
+	auto placeHouse = [=]( I32 x, I32 y ) { 
+	   ; // placeMesh(); // house
+	   ; // placeMesh(); // floor
+	};
 
+	auto placeFence = [=]( I32 x, I32 y, Direction dir ) {
+		border.meshes.emplace_back();
+		auto &fence      = border.meshes.back();
+		fence.mesh       = graphics.getMeshPointer("Quad");
+		fence.setMaterial( graphics.getMaterial("FenceMaterial") );
+		F32 rotationDegs = 0; // north as default
+		if      ( dir == Direction::east  )  rotationDegs =  90.0f;
+		else if ( dir == Direction::south )  rotationDegs = 180.0f;
+		else if ( dir == Direction::west  )  rotationDegs = 270.0f;
+		fence.setPosition( tilemap->convertTilePositionToWorldPosition(x,y) );
+		fence.setRotation({ .0f, util::degToRad(rotationDegs), .0f });
+	};
+	
+	auto startPosTs = getStartPositionInTileSpace();
+	
+	Direction startDir;
+	if      ( startPosTs.x == 0                 ) startDir = Direction::west;
+	else if ( startPosTs.x == tilemap->width-1  ) startDir = Direction::east;
+	else if ( startPosTs.y == 0                 ) startDir = Direction::north;
+	else if ( startPosTs.y == tilemap->height-1 ) startDir = Direction::south;
+
+	
+	for ( auto x = 0;  x < tilemap->width;  ++x ) {
+	   for ( auto n = 0;  n < borderThickness;  ++n ) {
+	      //if ( !(startDir == Direction::north and startPosTs.x == x) and selection(rng) < .90f )
+	      //   placeHouse(x,-n);
+	      //if ( !(startDir == Direction::south and startPosTs.x == x) and selection(rng) < .90f )
+	      //   placeHouse(x,map.height+n);
+	   }
+	}
+	
+	for ( auto y = 0;  y < tilemap->width;  ++y ) {
+	   for ( auto n = 0;  n < borderThickness;  ++n ) {
+	      //if ( !(startDir == Direction::west and startPosTs.y == y) and selection(rng) < .90f )
+	      //   placeHouse(x,-n);
+	      //if ( !(startDir == Direction::south and startPosTs.y == y) and selection(rng) < .90f )
+	      //   placeHouse(x, tilemap->height+n);
+	   }
+	}
+	
+	if ( startDir != Direction::north )
+	   for ;//placeFence(north);
+	else {
+	   //U32  westLength = tilemap->width - startPosTs.x; // confirm?
+	   //U32  eastLength = startPosTs.x;
+	   // place at -1-1, rotate 90 deg, scale by west length
+	   // place at startPos.x+1,-1, rotate 90 deg, scale by east length
+	}
+	
+	if ( startDir != Direction::east )
+	   ;//placeFence(east);
+	else {
+	   //U32  northLength = tilemap->height - startPosTs.y; // confirm?
+	   //U32  southLength = startPosTs.y;
+	   // place at map.width+1.-1 rotate 180 deg, scale by north length
+	   // place at map.width+1,startPos.y+1 rotate 180 deg, scale by south length
+	}
+	
+	if ( startDir != Direction::south )
+	   ;//placeFence(south);
+	else {
+	   //U32  westLength = tilemap->width - startPosTs.x; // confirm?
+	   //U32  eastLength = startPosTs.x;
+	   // place at -1,map.length+1 rotate 90 deg, scale by west length
+	   // place at startPos.x+1,map.length+1, rotate 90 deg, scale by east length
+	}
+	
+	if ( startDir != Direction::west )
+	   ;//U32  placeFence(west);
+	else {
+	   //U32  northLength = tilemap->height - startPosTs.y; // confirm?
+	   //U32  southLength = startPosTs.y;
+	   // place at map.width+1.-1 rotate 180 deg, scale by north length
+	   // place at map.width+1,startPos.y+1 rotate 180 deg, scale by south length
+ }
+ 
+ // floor x4
+}*/
 
 
 // TODO: 1. make road coverage affect district type
@@ -239,11 +259,7 @@ Map::~Map() noexcept
 		physics->DeleteRigidBody( e.object.getRigidBody() );
 	for ( auto &e : houses.multis )
 		for ( auto &p : e.parts)
-		physics->DeleteRigidBody( p.getRigidBody() );
-	//for ( auto &e : houseTiles )
-	//	graphics.removeFromDraw( &e );
-	//for ( auto &e : groundTiles )
-	//	graphics.removeFromDraw( e.get() );
+			physics->DeleteRigidBody( p.getRigidBody() );
    #ifdef _DEBUG_MAP
 		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?
 		assert(profilerLogs.is_open());
@@ -361,6 +377,25 @@ Vector3 Map::generateGroundPositionInWorldSpace(RNG& rng) const noexcept
 	return tilemap->convertTilePositionToWorldPosition(positionInTileSpace);
 }
 
+
+
+
+// TODO: make district specific like MultitileTilesets
+static std::vector singleTileModels {
+	"Houses/testHouse",
+	"Houses/testHouse2",
+	"Houses/testHouse3",
+	"Houses/testHouse4",
+	"Houses/testHouse5",
+	"Houses/testHouse6"
+};
+
+static std::vector singleTileMaterials {
+	"Houses/houseMaterial",
+	"Houses/houseMaterial2",
+	"Houses/houseMaterial3"
+};
+
 void  Map::generateBuildings( )
 {
 	DBG_PROBE(Map::generateBuildings);
@@ -370,26 +405,12 @@ void  Map::generateBuildings( )
 	F32 constexpr smallProbability     { .2f      };
 	F32_Dist      smallProbabilityDist {};
 
-	// TODO: make district specific like MultitileTilesets
-	std::vector singleTileModels {
-		"Houses/testHouse",
-		"Houses/testHouse2",
-		"Houses/testHouse3",
-		"Houses/testHouse4",
-		"Houses/testHouse5",
-		"Houses/testHouse6"
-	};
-	std::vector singleTileMaterials {
-		"Houses/houseMaterial",
-		"Houses/houseMaterial2",
-		"Houses/houseMaterial3"
-	};
 
 	U16_Dist  generateOffset(      0,  256 );
 	F32_Dist  generateSelection( .0f, 1.0f );
 
 	// for each cell:
-	for ( U16 cellId = 0;  cellId < districtMap->noise.size();  ++cellId) {
+	for ( U16 cellId = 0;  cellId < districtMap->noise.size();  ++cellId ) {
 		District::Enum district     { districtLookupTable[cellId] };
 		Size           currentArea  { 0 };
 		Size const     cellArea     { districtMap->computeCellRealEstateArea(cellId,*tilemap) };
@@ -1076,6 +1097,7 @@ static U8  constexpr predDeadend { 0b0000'0001 };
 //     x0x     010     000
 static U8  constexpr predBend { 0b0000'0101 };
 
+
 // "straight":
 //     map     mask    predicate
 //     x1x     010     010
@@ -1263,8 +1285,9 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 {
 	auto  index = [&layout]( U32 x, U32 y) { return y * layout.width + x; };
 	// generate masks and compute the final number of parts:
-	auto  masks    = Vector<NeighbourMask>( Size(layout.width) * layout.length );
-	U32   numParts = { 0 };
+	auto  masks       = Vector<NeighbourMask>( Size(layout.width) * layout.length );
+	U32   numParts    = { 0 };
+	U32   numHitboxes = { 0 };
 	for ( U32 x = 0;  x < layout.width;  ++x ) {
 		for ( U32 y = 0;  y < layout.length;  ++y ) {
 			U32  idx    = index(x,y);
@@ -1284,16 +1307,25 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 				// process mask for parts count:
 				for ( auto q=0; q<4; ++q ) { // quadrants
 					U8 quadmask = util::cycleRight( mask.bitmap, 2*q) & 0b00000'111;
-					if      ( (quadmask & 0b00000'101) == 0b00000'000 )  // 010 or 000 => outer corner
+					if      ( (quadmask & 0b00000'101) == 0b00000'000 ) { // 010 or 000 => outer corner
 						numParts += floorCount + 2;
-					else if ( (quadmask & 0b00000'111) == 0b00000'101 )  // 101 => inner corner
+						++numHitboxes;
+					}
+					else if ( (quadmask & 0b00000'111) == 0b00000'101 ) { // 101 => inner corner
 						numParts += floorCount + 2;
-					else if ( (quadmask & 0b00000'101) == 0b00000'100 )  // 100 or 110 => side A
+						numHitboxes += 2;
+					}
+					else if ( (quadmask & 0b00000'101) == 0b00000'100 ) { // 100 or 110 => side A
 						numParts += floorCount + 2;
-					else if ( (quadmask & 0b00000'101) == 0b00000'001 )  // 001 or 010 => side B
+						++numHitboxes;
+					}
+					else if ( (quadmask & 0b00000'101) == 0b00000'001 ) { // 001 or 010 => side B
 						numParts += floorCount + 2;
-					else if ( (quadmask & 0b00000'111) == 0b00000'111 )  // 111 => midpiece
+						++numHitboxes;
+					}
+					else if ( (quadmask & 0b00000'111) == 0b00000'111 ) { // 111 => midpiece
 						++numParts; // roof only
+					}
 				}
 			}
 		}
@@ -1302,6 +1334,8 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 	MultiTileHouse  house;
 	house.parts = {};
 	house.parts.reserve(numParts);
+	house.hitboxes = {};
+	house.hitboxes.reserve(numHitboxes);
 
 	auto instantiateTilePart = [&]( std::string const &partName, Vector3 const &pos, F32 deg, U8 floor, F32 floorHeightFactor=1.0f ) {
 		house.parts.emplace_back();
@@ -1597,7 +1631,7 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 						break;
 					}
 					if ( maskedMap == util::cycleLeft( predDeadend, d ) ) {
-						instantiatePart( "Tiles/road_marker_deadend_n", e.origin, 45.0f*d, markerOffsetY, false );
+						instantiatePart( "Tiles/road_marker_deadend_n", e.origin, 180.0f+45.0f*d, markerOffsetY, false );
 						break;
 					}
 				}
@@ -1622,7 +1656,7 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 						break;
 					}
 					if ( maskedMap == util::cycleLeft( predDeadend, d ) ) {
-						instantiatePart( "Tiles/road_2file_deadend_n", e.origin, 45.0f*d, markerOffsetY );
+						instantiatePart( "Tiles/road_2file_deadend_n", e.origin, 180.f+45.0f*d, markerOffsetY );
 						break;
 					}
 				}

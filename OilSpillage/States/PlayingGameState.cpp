@@ -169,6 +169,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	graphics.loadMaterial("Houses/houseMaterial2");
 	graphics.loadMaterial("Houses/houseMaterial3");
 
+	graphics.loadMaterial("FenceMaterial");
 
 	player = std::make_unique<Vehicle>();
 	player->makePlayer();
@@ -911,18 +912,18 @@ void PlayingGameState::update(float deltaTime)
 
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
-#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	ImGui_Driving();
+	//ImGui_Driving();
 	ImGui_ProcGen();
 	//ImGui_AI();
 	//ImGui_Particles();
 	ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	#endif // !_DEBUG
+	//#endif // !_DEBUG
 
 	graphics.presentScene();
 }
