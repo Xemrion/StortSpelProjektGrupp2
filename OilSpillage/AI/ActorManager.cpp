@@ -445,15 +445,15 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 		Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
 		if (enemyType == 0)
 		{
-			//spawnAttackers(newPos);
+			spawnAttackers(newPos);
 		}
 		else if (enemyType == 1)
 		{
-			//spawnChaseCars(newPos);
+			spawnChaseCars(newPos);
 		}
 		else if (enemyType == 2)
 		{
-			//spawnShootCars(newPos);
+			spawnShootCars(newPos);
 		}
 		else if (enemyType == 3)
 		{
