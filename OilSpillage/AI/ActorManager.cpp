@@ -52,25 +52,28 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	float distance;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		groups[i].update(targetPos);
 		deltaX = groups[i].averagePos.x - targetPos.x;
 		deltaZ = groups[i].averagePos.z - targetPos.z;
 		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		//(TileSize * nrOfTiles)^2
 		if (distance > (20 * 10) * (20 * 10))
 		{
-			//newPos = generateObjectivePos(targetPos, 50, 100);
+			newPos = generateObjectivePos(targetPos, 0, 50);
 			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
 				Actor* current = groups[i].actors[j];
-				//current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
 				if (j % 5 == 0)
 				{
-					//newPos = generateObjectivePos(targetPos, 50, 100);
+					newPos = generateObjectivePos(targetPos, 0, 50);
 				}
 			}
 		}
+	}
+	for (int i = 0; i < groups.size(); i++)
+	{
+		groups[i].update(targetPos);
 	}
 	updateGroups();
 	turretHandler.update(dt, targetPos);
@@ -603,6 +606,15 @@ Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos, float minDi
 		if ((distance <= maxDistance + i) && (distance >= minDistance))
 		{
 			return position;
+		}
+		else
+		{
+			position = map->generateGroundPositionInWorldSpace(*rng);
+			float distance = (position - targetPos).Length();
+			if ((distance <= maxDistance + i) && (distance >= minDistance))
+			{
+				return position;
+			}
 		}
 	}
 	assert(false and "BUG: Shouldn't be possible!");
