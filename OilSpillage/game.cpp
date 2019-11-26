@@ -86,6 +86,11 @@ GameState* Game::getCurrentState()
 	return instance->state.get();
 }
 
+int Game::getCurrentStateIndex()
+{
+	return instance->currentState;
+}
+
 void Game::setState(State state)
 {
 	int newState = static_cast<int>(state);
@@ -161,13 +166,18 @@ void Game::createCurrentState()
 			newSlots = new VehicleSlots(*transfer);
 			temp = static_cast<UpgradingGameState*>(state.get())->getPlayer().get();
 			temp->stopEngineSound();
-			nrOfStagesDone++;
+			
 			Sound::stopAllSoundsExceptSoundtrack();
 			 // increase everytime a new stage is created
 			
 		}
 		state = std::make_unique<PlayingGameState>();
-
+		if (nrOfStagesDone > 0)
+		{
+			static_cast<PlayingGameState*>(state.get())->nextStage();
+		}
+		nrOfStagesDone++;
+		static_cast<PlayingGameState*>(state.get())->generateObjectives();
 		if (oldState == STATE_UPGRADING)
 		{	
 			static_cast<PlayingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);

@@ -240,8 +240,8 @@ void Minimap::draw(bool selected)
 		Vector2 arrowPositionUI(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f);
 		float alphaLength = 1.0f;
 		arrowPositionUI += Vector2(camToObj.x, -camToObj.z);
-		float startFade = 50.0f;
-		float endFade = 20.0f;
+		float startFade = 50.0f+20.0f;
+		float endFade = 20.0f+20.0f;
 		if (playerToObj.Length() <= startFade && playerToObj.Length() > 0.0f)
 		{
 			alphaLength = playerToObj.Length() / startFade;

@@ -944,7 +944,7 @@ void Vehicle::updateWeapon(float deltaTime)
 					Game::getGraphics().getParticleSystem("smoke")->addParticle(2, 3, weaponObject->getPosition() + positionOffset, Vector3(0.0, 1.0, 0.0));
 				}
 
-				if (weapon.type == WeaponType::Laser)
+				if (weapon.type == WeaponType::Laser && Game::getCurrentStateIndex()==Game::State::STATE_PLAYING)
 				{
 					LaserLight* laser = static_cast<LaserLight*>(weapon.light);
 
@@ -1032,7 +1032,7 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 							0.0,
 							Vector3(0,0,0),
 							itemWeapon->getWeapon().bulletScale.z);
-						if (static_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
+						if (Game::getCurrentStateIndex()==Game::State::STATE_PLAYING)
 						{
 							itemWeapon->getWeapon().light = (Light*)static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(laser);
 						}

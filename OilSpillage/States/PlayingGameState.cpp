@@ -188,7 +188,11 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 				10.0f));
 	}
 
-	
+	testSystem = std::make_unique<Lsystem>();
+	testSystem.get()->setupDragonCurveSystem();
+	testSystem.get()->updateLSystem();
+
+
 	 //Road Network Turtlewalker
 	//FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF
 
@@ -303,7 +307,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");*/
 
-	this->generateObjectives();
+
 	this->graphics.setTestParticleSystem(this->graphics.getParticleSystem("explosion"));
 	this->fillTestParticle();
 
@@ -341,6 +345,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	graphics.getParticleSystem("smoke")->setGravity(-0.1f);
 	graphics.getParticleSystem("smoke")->setSize(0.055f, 0.065f);
 	graphics.getParticleSystem("smoke")->changeVectorField(1.75f, 0.09f);
+
 
 #ifndef _DEBUG
 	spawnObjects();
@@ -610,6 +615,42 @@ void PlayingGameState::ImGui_ProcGen()
 	}
 	ImGui::End();
 }
+
+void PlayingGameState::nextStage() noexcept {
+	// (TODO: refactor) hacky, but:
+	player->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
+	RNG rng{ RD()() };
+	rng.seed( config.seed );
+	I32_Dist generateSeed{};
+	config.seed = generateSeed(rng);
+
+	// TODO: use RNG to decide width/length of map
+
+	map = nullptr; // clear, then regenerate:
+	map = std::make_unique<Map>(graphics, config, physics.get());
+
+	player->setPosition(map->getStartPositionInWorldSpace());
+	player->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
+
+	minimap = createMinimapTexture(*map);
+	aStar->generateTileData(map->getTileMap());
+
+	// minimap stuff
+	auto tilemap = map->getTileMap();
+	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
+	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+
+	graphics.reloadTexture(minimap);
+	UIPlaying* menu = static_cast<UIPlaying*>(menues[MENU_PLAYING].get());
+	if(menu!=nullptr)
+		menu->resetMinimapFog();
+	player->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
+
+	clearPowerUps();
+	generateMapPowerUps();
+
+}
+
 
 void  PlayingGameState::ImGui_Camera() {
 	ImGui::Begin("Camera & Culling:");
@@ -916,7 +957,7 @@ void PlayingGameState::update(float deltaTime)
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	ImGui_Driving();
-	//ImGui_ProcGen();
+	ImGui_ProcGen();
 	//ImGui_AI();
 	ImGui_Particles();
 	ImGui_Camera();
