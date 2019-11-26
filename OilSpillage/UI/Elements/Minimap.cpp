@@ -201,7 +201,7 @@ void Minimap::draw(bool selected)
 	{
 		for (int i = 0; i < state->getObjHandler().getObjective(0)->getNrOfMax(); i++)
 		{
-			if (state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree)
+			if (state->getObjHandler().getObjective(0)->getType() == TypeOfMission::FindAndCollect)
 			{
 				if (state->getObjHandler().getObjective(0)->getTarget(i) != nullptr)
 				{
