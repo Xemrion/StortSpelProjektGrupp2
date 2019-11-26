@@ -403,7 +403,7 @@ void Boss::checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTime
 	}
 }
 
-//ADD WEAPONSWITCH, BOSSWEAPONS, MORE WEAPON SPOTS ON MESH
-//MORE BOSS SPOTS THAT TAKE DAMAGE AND SHOOT, BOSS DEAD IF ALL DEAD
+
 //HEALTHBAR
-//behaviour tree
+//blink when taking damage
+//behaviour tree?
