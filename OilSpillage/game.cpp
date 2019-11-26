@@ -163,7 +163,7 @@ void Game::createCurrentState()
 			temp->stopEngineSound();
 			nrOfStagesDone++;
 			Sound::stopAllSoundsExceptSoundtrack();
-			localScale += 0.05f; // increase everytime a new stage is created
+			 // increase everytime a new stage is created
 			
 		}
 		state = std::make_unique<PlayingGameState>();
@@ -181,6 +181,7 @@ void Game::createCurrentState()
 		graphics.removeAllUIDraw();
 		if (oldState == STATE_PLAYING)
 		{
+			localScale += 0.05f;
 			transfer = static_cast<PlayingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
 			temp = static_cast<PlayingGameState*>(state.get())->getPlayer().get();
