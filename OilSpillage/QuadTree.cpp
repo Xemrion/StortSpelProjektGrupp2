@@ -52,19 +52,19 @@ void QuadTree::Node::insert(GameObject* o)
 	if (depth > 0)
 	{
 		
-		if (nwChild->boundingBox.intersect(o->getAABB()))
+		if (nwChild->boundingBox.intersectXZ(o->getAABB()))
 		{
 			nwChild->insert(o);
 		}
-		else if (neChild->boundingBox.intersect(o->getAABB()))
+		else if (neChild->boundingBox.intersectXZ(o->getAABB()))
 		{
 			neChild->insert(o);
 		}
-		else if (swChild->boundingBox.intersect(o->getAABB()))
+		else if (swChild->boundingBox.intersectXZ(o->getAABB()))
 		{
 			swChild->insert(o);
 		}
-		else if (seChild->boundingBox.intersect(o->getAABB()))
+		else if (seChild->boundingBox.intersectXZ(o->getAABB()))
 		{
 			seChild->insert(o);
 		}
@@ -84,7 +84,7 @@ void QuadTree::getGameObjects(std::vector<GameObject*>& objects, Frustum viewFru
 
 void QuadTree::Node::getGameObjects(std::vector<GameObject*>& objects, Frustum& viewFrustum, float& frustumBias)
 {
-	if (viewFrustum.intersect(boundingBox, frustumBias))
+	if (viewFrustum.intersect(boundingBox, frustumBias, true))
 	{
 		if (depth > 0)
 		{
@@ -97,7 +97,7 @@ void QuadTree::Node::getGameObjects(std::vector<GameObject*>& objects, Frustum& 
 		{
 			for (GameObject* o : this->objects)
 			{
-				if (viewFrustum.intersect(o->getAABB(), 0.0))
+				if (viewFrustum.intersect(o->getAABB(), 10.0, true))
 				{
 					objects.push_back(o);
 				}

@@ -55,7 +55,7 @@ Graphics::Graphics()
 
 	this->particleHandler->loadParticleSystems();
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
-	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
+	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -48.f * 20.f), Vector2(48.f * 20.f, 0.0f), 4);
 }
 
 Graphics::~Graphics()
