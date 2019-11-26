@@ -45,32 +45,32 @@ struct AABB
 		return true;
 	}
 
-	bool intersect(DirectX::SimpleMath::Vector3 rayOrigin, DirectX::SimpleMath::Vector3 rayDir, float dist)
+	bool intersect(DirectX::SimpleMath::Vector3 rayOrigin, DirectX::SimpleMath::Vector3 rayDir, float dist, float bias = 0.0)
 	{
-		DirectX::SimpleMath::Vector3 tminPos = (minPos - rayOrigin) / rayDir;
-		DirectX::SimpleMath::Vector3 tmaxPos = (maxPos - rayOrigin) / rayDir;
+		DirectX::SimpleMath::Vector3 t0 = (minPos - rayOrigin) / rayDir;
+		DirectX::SimpleMath::Vector3 t1 = (maxPos - rayOrigin) / rayDir;
 
-		DirectX::SimpleMath::Vector3 tmin = DirectX::SimpleMath::Vector3::Min(tminPos, tmaxPos);
-		DirectX::SimpleMath::Vector3 tmax = DirectX::SimpleMath::Vector3::Max(tminPos, tmaxPos);
+		DirectX::SimpleMath::Vector3 minSlab = DirectX::SimpleMath::Vector3::Min(t0, t1);
+		DirectX::SimpleMath::Vector3 maxSlab = DirectX::SimpleMath::Vector3::Max(t0, t1);
 
-		float maxtmin = max(tmin.x, max(tmin.y, tmin.z));
-		float mintmax = min(tmax.x, min(tmax.y, tmax.z));
+		float tmin = max(min(min(minSlab.x, maxSlab.x), min(minSlab.z, maxSlab.z)), min(minSlab.y, maxSlab.y));
+		float tmax = max(max(max(minSlab.x, maxSlab.x), max(minSlab.z, maxSlab.z)), max(minSlab.y, maxSlab.y));;
 
-		return maxtmin <= mintmax && maxtmin <= dist;
+		return tmin <= tmax && tmin <= dist && tmax >= bias;
 	}
 
-	bool intersectXZ(DirectX::SimpleMath::Vector3 rayOrigin, DirectX::SimpleMath::Vector3 rayDir, float dist)
+	bool intersectXZ(DirectX::SimpleMath::Vector3 rayOrigin, DirectX::SimpleMath::Vector3 rayDir, float dist, float bias = 0.0)
 	{
-		DirectX::SimpleMath::Vector3 tminPos = (minPos - rayOrigin) / rayDir;
-		DirectX::SimpleMath::Vector3 tmaxPos = (maxPos - rayOrigin) / rayDir;
+		DirectX::SimpleMath::Vector3 t0 = (minPos - rayOrigin) / rayDir;
+		DirectX::SimpleMath::Vector3 t1 = (maxPos - rayOrigin) / rayDir;
 
-		DirectX::SimpleMath::Vector3 tmin = DirectX::SimpleMath::Vector3::Min(tminPos, tmaxPos);
-		DirectX::SimpleMath::Vector3 tmax = DirectX::SimpleMath::Vector3::Max(tminPos, tmaxPos);
+		DirectX::SimpleMath::Vector3 minSlab = DirectX::SimpleMath::Vector3::Min(t0, t1);
+		DirectX::SimpleMath::Vector3 maxSlab = DirectX::SimpleMath::Vector3::Max(t0, t1);
 
-		float maxtmin = max(tmin.x, tmin.z);
-		float mintmax = min(tmax.x, tmax.z);
+		float tmin = max(min(minSlab.x, maxSlab.x), min(minSlab.z, maxSlab.z));
+		float tmax = min(max(minSlab.x, maxSlab.x), max(minSlab.z, maxSlab.z));
 
-		return maxtmin <= mintmax && maxtmin <= dist;
+		return tmin <= tmax && tmin <= dist && tmax >= bias;
 	}
 };
 

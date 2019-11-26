@@ -30,7 +30,6 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 	Game::getGraphics().loadShape(SHAPE_QUAD);
 	Game::getGraphics().loadTexture("perlin_s4_e8");
 	noiseTexture = Game::getGraphics().getTexturePointer("perlin_s4_e8");
-	
 	//Game::getGraphics().loadTexture("brickwall");
 	//noiseTexture = Game::getGraphics().getTexturePointer("brickwall");
 
@@ -39,11 +38,8 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 		GameObject* q = new GameObject();
 		q->mesh = Game::getGraphics().getMeshPointer("Quad");
 		q->setPosition(Vector3(95*10, i * spacing - 1.5f, -95*10));
-		//spacing *= 0.95;
 		q->setScale(Vector3(96.0 * 10, 96.0 * 10, 1.0));
 		q->setColor(Vector4(0.0, 0.0, 0.0, (float(i) / slices)));
-		//Game::getGraphics().loadTexture("brickwallnormal");
-		//Game::getGraphics().loadTexture("brickwall");
 		Game::getGraphics().loadTexture("white1x1");
 		q->setGlossMap(Game::getGraphics().getTexturePointer("white1x1"));
 		q->setSpecularMap(Game::getGraphics().getTexturePointer("white1x1"));
@@ -219,12 +215,21 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 	for (int i = 0; i < quads.size(); ++i)
 	{
 		quads[i]->setTexture(fogTextures[i]);
-		quads[i]->setNormalMap(normalTextures[i]);
+		//quads[i]->setNormalMap(normalTextures[i]);
 	}
 }
-
 
 std::vector<GameObject*>& Fog::getQuads()
 {
 	return quads;
+}
+
+const Vector2& Fog::getWindSpeed() const
+{
+	return wind;
+}
+
+void Fog::setWindSpeed(Vector2&& speed)
+{
+	this->wind = speed;
 }

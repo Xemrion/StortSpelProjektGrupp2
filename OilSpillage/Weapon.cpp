@@ -34,18 +34,25 @@ Bullet::~Bullet()
 
 void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity, float deltaTime)
 {
+	this->initPos = position;
+	this->initDir = direction;
+
 	this->weapon = Weapon(weapon);
 	if (this->weapon.type == WeaponType::None)
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower)
+	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrowerPhase2)
 	{
 		flamethrowerShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
 	else if (this->weapon.type == WeaponType::Laser or this->weapon.type == WeaponType::aiLaser)
 	{
 		laserShoot(weapon, position, direction, additionalVelocity, deltaTime);
+	}
+	else if (weapon.type == WeaponType::aiMelee)
+	{
+		meleeShoot(position,direction);
 	}
 	else
 	{
@@ -68,11 +75,17 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& dir
 	this->dir += additionalVelocity;
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
+	this->obj->setColor(Vector4(1.2f, 1.2f, 0, 1));
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
+	if(!vehicleWeapon.melee)
+		Game::getGraphics().addToDraw(this->obj);
+}
 
-	Game::getGraphics().addToDraw(this->obj);
+void Bullet::meleeShoot(Vector3& position,Vector3& direction)
+{
+	this->obj->setPosition(position + direction);
 }
 
 void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
@@ -140,14 +153,24 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 
 void Bullet::update(float deltaTime)
 {
+	if (this->weapon.type == WeaponType::Laser || this->weapon.melee)
+	{
+		this->obj->setPosition(initPos);
+		this->dir = initDir;
+	}
+
 	if (this->weapon.type == WeaponType::None)
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::aiMachineGun or
-		this->weapon.type == WeaponType::aiFlamethrower or
-		this->weapon.type == WeaponType::aiMelee or
-		this->weapon.type == WeaponType::aiMissileLauncher)
+	else if (this->weapon.type == WeaponType::aiMachineGun		or
+			 this->weapon.type == WeaponType::aiFlamethrower	or
+			 this->weapon.type == WeaponType::aiMissileLauncher or
+			 this->weapon.type == WeaponType::aiBossFlamethrower or
+			 this->weapon.type == WeaponType::aiBossFlamethrowerPhase2 or
+		 	 this->weapon.type == WeaponType::aiBossMachineGun or
+			 this->weapon.type == WeaponType::aiBossMachineGunPhase2 or
+			 this->weapon.type == WeaponType::aiBossMissileLauncher)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}
@@ -158,6 +181,10 @@ void Bullet::update(float deltaTime)
 	else if (this->weapon.type == WeaponType::aiLaser)
 	{
 		laserEnemyUpdate(deltaTime);
+	}
+	else if (weapon.type == WeaponType::aiMelee)
+	{
+		enemyMeleeUpdate(deltaTime);
 	}
 	else
 	{
@@ -186,13 +213,13 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 	{
 		obj->move(dir * min(deltaTime, timeLeft));
 
-		if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition()).Length() < 1.5f)
+		if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getPosition()).Length() < 1.5f)
 		{
 			if (soundTimer > 0.05f) {
 				int randomSound = rand() % 3 + 1;
-				std::wstring soundEffect = L"data/sound/CarGlass" + std::to_wstring(randomSound) + L".wav";
-				Sound::PlaySoundEffect(soundEffect);
-				Sound::PlaySoundEffect(L"data/sound/MetalImpact1.wav");
+				std::string soundEffect = "./data/sound/CarGlass" + std::to_string(randomSound) + ".wav";
+				Sound::play(soundEffect);
+				Sound::play("./data/sound/MetalImpact1.wav");
 				soundTimer = 0;
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);
@@ -203,19 +230,35 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 	}
 }
 
+void Bullet::enemyMeleeUpdate(float& deltaTime)
+{
+
+	if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getPosition()).Length() < 1.5f)
+	{
+		if (soundTimer > 0.05f) {
+			int randomSound = rand() % 3 + 1;
+			std::string soundEffect = "./data/sound/CarGlass" + std::to_string(randomSound) + ".wav";
+			Sound::play(soundEffect);
+			Sound::play("./data/sound/MetalImpact1.wav");
+			soundTimer = 0;
+		}
+		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);
+		this->timeLeft = 0.f;
+	}
+}
+
 void Bullet::laserEnemyUpdate(float& deltaTime)
 {
 	GameObject* laserObject = this->getGameObject();
 	Vector3 rayDir = this->getDirection();
 	Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
-	if (static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getAABB().intersect(rayOrigin, rayDir, 1000))
+	if (static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getAABB().intersect(rayOrigin, rayDir, 1000))
 	{
-		if (soundTimer > 0.05f) 
+		if (soundTimer > 0.05f)
 		{
-			/*int randomSound = rand() % 3 + 1;
-			std::wstring soundEffect = L"data/sound/MetalImpactPitched" + to_wstring(randomSound) + L".wav";
-			Sound::PlaySoundEffect(soundEffect);*/
-			Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+			int randomSound = rand() % 6 + 1;
+			std::string soundEffect = "./data/sound/RobotBullet" + std::to_string(randomSound) + ".mp3";
+			Sound::play(soundEffect);
 			soundTimer = 0;
 		}
 		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage());
@@ -270,7 +313,7 @@ float Bullet::getTimeLeft() const
 	return timeLeft;
 }
 
-void Bullet::setWeapon(Weapon weapon) 
+void Bullet::setWeapon(Weapon weapon)
 {
 	this->weapon = weapon;
 }
@@ -285,7 +328,7 @@ WeaponType Bullet::getWeaponType() const
 	return this->weapon.type;
 }
 
-int Bullet::getDamage() const
+float Bullet::getDamage() const
 {
 	return weapon.damage;
 }
@@ -302,7 +345,7 @@ GameObject* Bullet::getGameObject()
 
 void Bullet::updateSoundTimer(float deltaTime)
 {
-	soundTimer +=  deltaTime;
+	soundTimer += deltaTime;
 }
 
 void Bullet::destroy()

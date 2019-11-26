@@ -12,6 +12,12 @@ struct VS_OUT
 	float4 BitangentWS : BINORMAL;
 };
 
+struct PS_OUT
+{
+	float4 color;
+	float4 depth;
+};
+
 struct Light
 {
 	float4 pos;
@@ -28,6 +34,7 @@ struct TileData
 cbuffer MaterialBuffer : register(b0)
 {
 	float4 color;
+	float4 shadeTrue;
 }
 
 cbuffer Lights : register(b1)
@@ -96,8 +103,11 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float bias)
 
 	return visibility;
 };
-float4 main(VS_OUT input) : SV_Target
+
+PS_OUT main(VS_OUT input) : SV_Target
 {
+	PS_OUT output;
+	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
 	float3 normal = input.NormalWS.xyz;
 	float3 tangent = input.TangentWS.xyz;
 	float3 bitangent = input.BitangentWS.xyz;
@@ -113,17 +123,15 @@ float4 main(VS_OUT input) : SV_Target
 		normal = normalize(mul(normalMap, TBN));
 	}
 
-	float4 texColor = Tex.Sample(SampSt, input.Tex).xyzw;
-
 	uint2 lightTileIndex = uint2(input.Pos.x * 0.0625f, input.Pos.y * 0.0625f);
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
+	float sunShadow = (1 - shadowVisible(input.shadowPos, ShadowMap, 0.0005f));
+	float4 ambient = max(-dot(sunDir, normal) * sunShadow, float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
 
-	float4 ambient = max(-dot(sunDir, normal) * (1 - shadowVisible(input.shadowPos, ShadowMap, 0.00015f) * texColor.a), float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
 	float shadowSpotVisible = 1.0f;
 
 	float4 diffuseLight = float4(0.0, 0.0, 0.0, 1.0);
 	float4 specularLight = float4(0.0, 0.0, 0.0, 0.0);
-
 	for (int i = 0; i < lightTileData.numLights; ++i)
 	{
 		Light l = lights[lightTileData.indices[i]];
@@ -191,5 +199,9 @@ float4 main(VS_OUT input) : SV_Target
 	float4 outColor = (texColor + color) * (diffuseLight + ambient);
 	outColor += (specularColor + color) * specularLight;
 
-	return outColor;
+
+	output.color = outColor;
+	output.depth = float4(input.Pos.z, 0.0, 0.0, 1.0);
+	
+	return output;
 }

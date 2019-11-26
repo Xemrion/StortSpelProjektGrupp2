@@ -86,10 +86,33 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 		{
 			if (!this->turrets[i]->isDead())
 			{
-				if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->turrets[i]->getAABB()))
+				if (bulletArray[j].getWeaponType() == WeaponType::Laser)
+				{
+					GameObject* laserObject = bulletArray[j].getGameObject();
+					Vector3 rayDir = bulletArray[j].getDirection();
+					Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
+					if (this->turrets[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
+					{
+						if (soundTimer > 0.05f) {
+							Sound::play("./data/sound/HitSound.wav");
+							soundTimer = 0;
+						}
+						this->turrets[i]->changeHealth(-bulletArray[j].getDamage());
+					}
+				}
+				else if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->turrets[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						Sound::PlaySoundEffect(L"data/sound/HitSound.wav");
+						Sound::play("data/sound/HitSound.wav");
+						soundTimer = 0;
+					}
+					this->turrets[i]->changeHealth(-bulletArray[j].getDamage());
+					// dont remove the melee weapon
+				}
+				else if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->turrets[i]->getAABB()))
+				{
+					if (soundTimer > 0.05f) {
+						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
 					this->turrets[i]->changeHealth(-bulletArray[j].getDamage());

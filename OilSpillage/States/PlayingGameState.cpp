@@ -1,42 +1,76 @@
-#include "PlayingGameState.h"
+﻿#include "PlayingGameState.h"
 #include "../Sound.h"
 #include "../Input.h"
-#include "../UI/UIPlaying.h"
-#include "../UI/UIPaused.h"
-#include "../UI/UIOptions.h"
+#include "../UI/Playing/UIPlaying.h"
+#include "../UI/Playing/UIPaused.h"
+#include "../UI/Menu/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
 #include <future>
 
+void PlayingGameState::fillTestParticle()
+{
+	this->colors[0] = this->graphics.getTestParticleSystem()->getColor(0).x;
+	this->colors2[0] = this->graphics.getTestParticleSystem()->getColor(1).x;
+	this->colors3[0] = this->graphics.getTestParticleSystem()->getColor(2).x;
+	this->colors4[0] = this->graphics.getTestParticleSystem()->getColor(3).x;
+
+	this->colors[1] = this->graphics.getTestParticleSystem()->getColor(0).y;
+	this->colors2[1] = this->graphics.getTestParticleSystem()->getColor(1).y;
+	this->colors3[1] = this->graphics.getTestParticleSystem()->getColor(2).y;
+	this->colors4[1] = this->graphics.getTestParticleSystem()->getColor(3).y;
+
+	this->colors[2] = this->graphics.getTestParticleSystem()->getColor(0).z;
+	this->colors2[2] = this->graphics.getTestParticleSystem()->getColor(1).z;
+	this->colors3[2] = this->graphics.getTestParticleSystem()->getColor(2).z;
+	this->colors4[2] = this->graphics.getTestParticleSystem()->getColor(3).z;
+
+	this->size1 = this->graphics.getTestParticleSystem()->getStartSize();
+	this->size2 = this->graphics.getTestParticleSystem()->getEndSize();
+	this->vectorFieldPower = this->graphics.getTestParticleSystem()->getVectorFieldPower();
+	this->vectorFieldSize = this->graphics.getTestParticleSystem()->getVectorFieldSize();
+}
+
+void PlayingGameState::createElectric(int randNr, float deltaTime)
+{
+
+
+	electricNew = randNr;
+	testNetwork->clearSegments();
+	testNetwork.get()->generateInitialSegments("F");
+	//testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+
+	if (true)
+		testNetwork.get()->setAngle(electricNew);
+
+
+	testNetwork.get()->generateAdditionalSegments("F-F", 1, false);
+	testNetwork.get()->setAngle(40);
+	
+	testNetwork.get()->generateAdditionalSegments("F-F+F-F", 2, false);
+	testNetwork.get()->generateAdditionalSegments("F-F-F+F", 3, true);
+	
+}
+
 void PlayingGameState::initAI()
 {
 	aStar = new AStar(map->getTileMap());
-	actorManager = new ActorManager(aStar, physics.get());
+	actorManager = new ActorManager(aStar, physics.get(), map.get(), &rng);
 	aStar->generateTileData(map->getTileMap());
-	for (int i = 0; i < 30; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			//	actorManager->createSpitFire(map->getStartPositionInWorldSpace().x + i, map->getStartPositionInWorldSpace().z + j);
-				//actorManager->createTurret(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 1);
-			//	actorManager->createAttacker(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50, 3);
-			//actorManager->createSwarm(map->getStartPositionInWorldSpace().x + i + 50, map->getStartPositionInWorldSpace().z + j + 50);
-		}
-	}
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0f), currentMenu(MENU_PLAYING)
 {
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	pausedTime = false;
 #endif // _DEBUG
+	this->current_item = NULL;
 
-
-	rng.seed(config.seed); // g�r i konstruktorn
+	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
 	camera = std::make_unique<DynamicCamera>();
-	//testNetwork = std::make_unique<RoadNetwork>(2430, Vector2(16.0f, 16.0f), Vector2(-16.0f,-16.0f), 25); //Int seed, max pos, min pos, angle in degrees
+	testNetwork = std::make_unique<RoadNetwork>(1351, Vector2(32.0f, 32.0f), Vector2(-32.0f,-32.0f), 0); //Int seed, max pos, min pos, angle in degrees
 	graphics.createFrustumBuffer(camera.get());
 
 
@@ -67,6 +101,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	//graphics.loadModel("Roads/Metro/1110");
 	//graphics.loadModel("Roads/Metro/1111");
 
+	graphics.loadModel("Entities/Star");
+	
 	graphics.loadModel("Tiles/Quad_SS"); // single-sided
 	graphics.loadTexture("Tiles/asphalt");
 	graphics.loadTexture("Tiles/asphalt_nor");
@@ -152,6 +188,51 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 				10.0f));
 	}
 
+	testSystem = std::make_unique<Lsystem>();
+	testSystem.get()->setupDragonCurveSystem();
+	testSystem.get()->updateLSystem();
+
+
+	 //Road Network Turtlewalker
+	//FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF
+
+
+	testNetwork.get()->generateInitialSegments("F");
+	//testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+
+	testNetwork.get()->setAngle(30);
+	testNetwork.get()->generateAdditionalSegments("F--FF++FF", 1, false);
+	/*testNetwork.get()->generateAdditionalSegments("F-F", 1, false);
+	for (int i = 2; i < 4; i++)
+	{
+		testNetwork.get()->generateAdditionalSegments("F-F-F-F", i, i%2);
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		testNetwork.get()->generateAdditionalSegments("F-FF-F+F-FF-F-F-F", i + 4, i % 2);
+		testNetwork.get()->generateAdditionalSegments("F-F-F-FF-F+F-F-F", i + 4*2, i % 2);
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		testNetwork.get()->generateAdditionalSegments("F-FF-F+F-FF-F-F-F", i + 4, i % 2);
+		testNetwork.get()->generateAdditionalSegments("F-F-F-FF-F+F-F-F", i + 4 * 2, i % 2);
+	}*/
+	//for (int i = 0; i < 5; i++) 
+	//{
+	//	// testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+	//}
+	//testNetwork.get()->setAngle(90+45);
+
+	//for (int i = 0; i < 5; i++)
+	//{
+	//	testNetwork.get()->generateAdditionalSegments("F-F+F+FF-F-F+F", i, false);
+	//	testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
+	//}
+	/* testNetwork.get()->cleanRoadNetwork();
+	 testNetwork.get()->saveTestNetwork("test-network");
+	*/
+	//}
+
 	testSkyscraper = std::make_unique<Skyscraper>();
 	for (int i = 0; i < 25; i++) {
 		testSkyscraper.get()->generateASkyscraper("test-" + std::to_string(i));
@@ -173,7 +254,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 
 	graphics.setLightList(lightList.get());
-	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.4f);
+	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.0f);
 	this->player->setSpotLight(lightList->addLight(tempLight));
 
 	LaserLight tempLaserLight(Vector3(0.0, 0.0, 0.0), Vector3(0.9, 0.1, 0.9), 10.0, Vector3(1.0, 0.0, 0.0), 10.0);
@@ -190,29 +271,33 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 	// Needs to be loaded before the menues
 	minimap = createMinimapTexture(*map);
+	generateMapPowerUps();
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
 	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
 	menues[MENU_PAUSED]->init();
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
-	menues[MENU_OPTIONS]->init();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
-	auto playerVehicle = player->getVehicle();
-	playerVehicle->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
+	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
 	player->getVehicleBody1()->setPosition(startPos + Vector3(.0f, 0.65f - 1.2f, .0f));
 
 	initAI();
 
-	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+
+
+
+	Game::getGraphics().setUISun(Vector3(1.0f, -1.0f, 0.1f), Vector4(0.84, 0.83, 0, 1));
+
+	playerLight = lightList->addLight(SpotLight(player->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
 		{
-		 Vector3(0.0f, 30.0f + cameraDistance, -10.0f) + playerVehicle->getPosition(),
+		 Vector3(0.0f, 30.0f + cameraDistance, -10.0f) + player->getPosition(),
 		 Vector3(0.0f, 0.0f, 0.0f), 0.0f },
 		{
-		 Vector3(0.0f, cameraDistance, 0.0f) + playerVehicle->getPosition(),
+		 Vector3(0.0f, cameraDistance, 0.0f) + player->getPosition(),
 		 Vector3(XM_PIDIV2, 0.0f, 0.0f), 3.0f }
 	};
 	camera->startCinematic(&points, true);
@@ -221,17 +306,14 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 		Vector4(0.9f, 0.9f, 0.05f, 1)
 	};
 
-	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
-	graphics.setVectorField(4.5f, 3.0f);
 
-	powerUps.push_back(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star));
-	Game::getGraphics().addToDraw(&*powerUps.begin());
+	//addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 90.0));
 
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
+	/*objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
-
+	objectives.addObjective(TypeOfMission::GetToPoint, 0, 5, "Go to the exit now!!!", TypeOfTarget::Crate);
 
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::KillingSpree, 240, 75, "Kill the enemies");
@@ -241,7 +323,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");
+	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");*/
+
+	this->generateObjectives();
+	this->graphics.setTestParticleSystem(this->graphics.getParticleSystem("explosion"));
+	this->fillTestParticle();
+
+
 
 	//Bullet
 	/*buildingTest = std::make_unique<GameObject>();
@@ -254,20 +342,41 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
 	buildingTest->setRigidBody(tempo2, physics.get());*/
 
+	this->cameraObject = new GameObject;
+	Game::getGraphics().loadShape(Shapes::SHAPE_CUBE);
+	cameraObject->mesh = Game::getGraphics().getMeshPointer("Cube");
+	//Game::getGraphics().addToDraw(vehicle);
+	cameraObject->setPosition(Vector3(0.0f, 10.0f, 0.0f));
+	cameraObject->setScale(Vector3(0.5f, 0.14f, 0.9f));
+	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x,btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 10.0f);
+	cameraObject->setRigidBody(tempo, physics.get());
+	cameraObject->getRigidBody()->activate();
+	cameraObject->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	cameraObject->getRigidBody()->setFriction(0);
+	cameraObject->getRigidBody()->setGravity(btVector3(0,0,0));
+	//cameraObject->getRigidBody()->setDamping(10,0);
+
+	graphics.getParticleSystem("fire")->setGravity(-0.1f);
+	graphics.getParticleSystem("fire")->setSize(0.055f, 0.065f);
+	graphics.getParticleSystem("fire")->changeVectorField(1.75f, 0.5f);
+	
+	graphics.getParticleSystem("smoke")->setGravity(-0.1f);
+	graphics.getParticleSystem("smoke")->setSize(0.055f, 0.065f);
+	graphics.getParticleSystem("smoke")->changeVectorField(1.75f, 0.09f);
+
 #ifndef _DEBUG
 	spawnObjects();
 #endif
 	count = 0;
 	prevAccelForce = Vector3(0, 0, 0);
 	accelForce = Vector3(0, 0, 0);
-	soundAggro = 0;
 }
 
 PlayingGameState::~PlayingGameState()
 {
 	delete aStar;
 	delete actorManager;
-	delete testObjective;
+	delete this->cameraObject;
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
 	delete this->objTestPickUp3;
@@ -284,14 +393,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
 	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
-	ImGui::Text("Driving Mode:");
-	static int radioButtonValue = 0;
-	ImGui::RadioButton("Directional Semi-Realistic", &radioButtonValue, 0);
-	ImGui::RadioButton("Realistic", &radioButtonValue, 1);
-	if (radioButtonValue == 0)
-		player->setDrivingMode(1);
-	else if (radioButtonValue == 1)
-		player->setDrivingMode(0);
+	
 
 
 	Vector3 camPos = camera->getPosition();
@@ -323,11 +425,11 @@ void PlayingGameState::ImGui_AI()
 	//{
 	//	ImGui::Text(("Group " + std::to_string(i) + ":" + std::to_string(actorManager->groups.at(i).size())).c_str());
 	//}
-	//ImGui::Text(("x: " + std::to_string(player->getVehicle()->getPosition().x)).c_str());
-	//ImGui::Text(("y: " + std::to_string(player->getVehicle()->getPosition().y)).c_str());
-	//ImGui::Text(("z: " + std::to_string(player->getVehicle()->getPosition().z)).c_str());
+	//ImGui::Text(("x: " + std::to_string(player->getPosition().x)).c_str());
+	//ImGui::Text(("y: " + std::to_string(player->getPosition().y)).c_str());
+	//ImGui::Text(("z: " + std::to_string(player->getPosition().z)).c_str());
 
-	//Vector3 xzPos = Vector3(player->getVehicle()->getPosition().x, 0, -player->getVehicle()->getPosition().z);
+	//Vector3 xzPos = Vector3(player->getPosition().x, 0, -player->getPosition().z);
 	/*float goalX = actorManager->groups.at(0).actors.at(0)->destination.x;
 	float goalZ = actorManager->groups.at(0).actors.at(0)->destination.z;
 	ImGui::Text((("GoalPosX: " + std::to_string(goalX)).c_str()));
@@ -345,17 +447,42 @@ void PlayingGameState::ImGui_AI()
 
 	float pathSize = actorManager->groups.at(0).actors.at(0)->path->size();
 	ImGui::Text((("Path size: " + std::to_string(pathSize)).c_str()));*/
-	ImGui::Text(("VelocityX: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getX())).c_str());
-	ImGui::Text(("VelocityY: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getY())).c_str());
-	ImGui::Text(("VelocityZ: " + std::to_string(this->player->getVehicle()->getRigidBody()->getLinearVelocity().getZ())).c_str());
-	/*	+ std::to_string(player->getVehicle()->getPosition().y).c_str()
-							+ std::to_string(player->getVehicle()->getPosition().z).c_str()));*/
+	//ImGui::Text(("VelocityX: " + std::to_string(this->player->getRigidBody()->getLinearVelocity().getX())).c_str());
+	//ImGui::Text(("VelocityY: " + std::to_string(this->player->getRigidBody()->getLinearVelocity().getY())).c_str());
+	//ImGui::Text(("VelocityZ: " + std::to_string(this->player->getRigidBody()->getLinearVelocity().getZ())).c_str());
+	/*	+ std::to_string(player->getPosition().y).c_str()
+							+ std::to_string(player->getPosition().z).c_str()));*/
+	
+	ImGui::Text(("Score: " + std::to_string(Game::getGameInfo().highScore)).c_str());
+	
 	ImGui::End();
 }
 
 void PlayingGameState::ImGui_Particles()
 {
 	ImGui::Begin("Particle");
+
+
+	if (ImGui::BeginCombo("##ParticleSystems", current_item)) // The second parameter is the label previewed before opening the combo.
+	{
+		for (int i = 0; i < this->graphics.getParticleHandler()->getNames().size(); i++)
+		{
+			bool is_selected = (current_item == this->graphics.getParticleHandler()->getNames().at(i).c_str()); // You can store your selection however you want, outside or inside your objects
+			if (ImGui::Selectable(this->graphics.getParticleHandler()->getNames().at(i).c_str(), is_selected))
+			{
+				current_item = this->graphics.getParticleHandler()->getNames().at(i).c_str();
+				this->graphics.setTestParticleSystem(this->graphics.getParticleSystem(current_item));
+				this->fillTestParticle();
+			}
+
+			if (is_selected)
+			{
+				ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+			}
+
+		}
+		ImGui::EndCombo();
+	}
 	ImGui::ColorPicker4("Color Slider", colors);
 	ImGui::ColorPicker4("Color 1 Slider", colors2);
 	ImGui::ColorPicker4("Color 2 Slider", colors3);
@@ -363,10 +490,11 @@ void PlayingGameState::ImGui_Particles()
 	ImGui::SliderFloat("First size", &size1, 0.0f, 1.0f);
 	ImGui::SliderFloat("Second size", &size2, 0.0f, 1.0f);
 	ImGui::SliderInt("Nr of particles times 8", &addNrOfParticles, 1, 10);
-	ImGui::SliderInt("LifeTime", &lifeTime, 1, 20);
+	ImGui::SliderFloat("LifeTime", &lifeTime, 0.0f, 20.0f);
 	ImGui::SliderFloat("Vectorfield size", &vectorFieldSize, 0.0f, 10.0f);
 	ImGui::SliderFloat("Vectorfield power", &vectorFieldPower, 0.0f, 10.0f);
 	ImGui::SliderFloat("Random power", &randomPosPower, 0.0f, 10.0f);
+
 	colorsP[0] = Vector4(colors);
 	colorsP[1] = Vector4(colors2);
 	colorsP[2] = Vector4(colors3);
@@ -375,10 +503,9 @@ void PlayingGameState::ImGui_Particles()
 	colorsP[1].w = 1.0f;
 	colorsP[2].w = 1.0f;
 	colorsP[3].w = 1.0f;
-	graphics.setVectorField(vectorFieldSize, vectorFieldPower);
-	graphics.setParticleColorNSize(colorsP, 4, size1, size2);
-	graphics.setParticle2ColorNSize(colorsP, 4, size1, size2);
-
+	graphics.setTestVectorField(vectorFieldSize, vectorFieldPower);
+	graphics.setTestColorNSize(colorsP, 4, size1, size2);
+	graphics.saveTestParticleSystem();
 	ImGui::End();
 }
 
@@ -484,12 +611,12 @@ void PlayingGameState::ImGui_ProcGen()
 	ImGui::NewLine();
 	if (ImGui::Button("Re-generate")) {
 		// (TODO: refactor) hacky, but:
-		player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
+		player->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
 
 		map = nullptr; // clear, then regenerate:
 		map = std::make_unique<Map>(graphics, config, physics.get());
 
-		player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
+		player->setPosition(map->getStartPositionInWorldSpace());
 		player->getVehicleBody1()->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
 		map->setDistrictColorCoding(shouldColorCodeDistricts);
 		minimap = createMinimapTexture(*map);
@@ -501,7 +628,10 @@ void PlayingGameState::ImGui_ProcGen()
 
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
-		player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
+		player->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
+
+		clearPowerUps();
+		generateMapPowerUps();
 	}
 	ImGui::End();
 }
@@ -528,7 +658,7 @@ void  PlayingGameState::ImGui_Camera() {
 Vector3 PlayingGameState::getRespawnPosition() const noexcept
 {
 	auto ui = static_cast<UIPlaying const*>(menues[Menu::MENU_PLAYING].get());
-	auto maybeHospitalTilePos = map->getNearestFoundHospitalTilePos(player->getVehicle()->getPosition(), *ui);
+	auto maybeHospitalTilePos = map->getNearestFoundHospitalTilePos(player->getPosition(), *ui);
 	if (maybeHospitalTilePos) {
 		return map->getHospitalFrontPosition(maybeHospitalTilePos.value()) + Vector3(0, -1.2f, 0);
 		// TODO: rotate player
@@ -536,25 +666,48 @@ Vector3 PlayingGameState::getRespawnPosition() const noexcept
 	else return map->getStartPositionInWorldSpace() + Vector3(0, -1.2f, 0);
 }
 
+std::unique_ptr<Vehicle>& PlayingGameState::getPlayer()
+{
+	return this->player;
+}
+
+void PlayingGameState::setPlayer(Vehicle* theVehicle)
+{
+	SpotLight* temp = this->player->getSpotLight();
+	this->player.reset(theVehicle);// = std::make_unique<Vehicle>(theVehicle);
+	this->player->setSpotLight(temp);
+}
+
 void PlayingGameState::update(float deltaTime)
 {
+	
+	/*testNetwork->clearSegments();
+	testNetwork.get()->generateInitialSegments("F");
+	testNetwork->setAngle(40.0f);
+	for (int i = 2; i < 4; i++)
+	{
+		testNetwork.get()->generateAdditionalSegments("F-F-F-F", i, i % 2);
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		testNetwork.get()->generateAdditionalSegments("F-FF-F+F-FF-F-F-F", i + 4, i % 2);
+		testNetwork.get()->generateAdditionalSegments("F-F-F-FF-F+F-F-F", i + 4 * 2, i % 2);
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		testNetwork.get()->generateAdditionalSegments("F-FF-F+F-FF-F-F-F", i + 4, i % 2);
+		testNetwork.get()->generateAdditionalSegments("F-F-F-FF-F+F-F-F", i + 4 * 2, i % 2);
+	}*/
+	//this->createElectric(rand() % 360, deltaTime);
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{
 		if (Input::isKeyDown_DEBUG(Keyboard::E)) {
 			deltaTime /= 4;
 		}
-		if (Input::checkButton(Keys::CANCEL, States::PRESSED)) {
-			if (player->getDrivingMode() == 0) {
-				player->setDrivingMode(1);
-			}
-			else if (player->getDrivingMode() == 1) {
-				player->setDrivingMode(0);
-			}
-		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
-		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
+		if (Input::isKeyDown_DEBUG(Keyboard::LeftAlt))
 		{
 			pausedTime = !pausedTime;
 		}
@@ -577,152 +730,224 @@ void PlayingGameState::update(float deltaTime)
 			Game::setState(Game::STATE_MENU);
 		}
 #endif // !_DEBUG
+		prevAccelForce = Vector3(player->getRigidBody()->getLinearVelocity());
+		player->updatePlayer(deltaTime);
+		physics->update(deltaTime);
 
-		//Bullet
-		//player->getVehicle()->getRigidBody()->(btVector3(Input::GetDirectionL(0).x * deltaTime * 1000, 0, Input::GetDirectionL(0).y * deltaTime * 1000), btVector3(0, 0, 0));
+		if (player->isDead()) {
+			cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			cameraTimer = 0;
+		}
+		else {
+			cameraTimer += deltaTime;
+			if (cameraTimer > 250) {
+				cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+				cameraTimer = 0;
+			}
+		}
+		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
+		btVector3 positionCam{ player->getRigidBody()->getWorldTransform().getOrigin() };
+		Vector3 destinationCamPos = Vector3(positionCam.getX(),
+			positionCam.getY() / 3,
+			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z);
+		Vector3 currentCamPos = Vector3(cameraObject->getRigidBody()->getWorldTransform().getOrigin().getX(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getY(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getZ());
+		Vector3 directionCam =  destinationCamPos- currentCamPos;
+		cameraObject->getRigidBody()->setLinearVelocity(btVector3(directionCam.x, directionCam.y, directionCam.z)*10);
+		camera->setPosition(Vector3(currentCamPos.x, currentCamPos.y, currentCamPos.z));
+		camera->update(deltaTime);
 
-		//player->getVehicle()->setPosition(Vector3(player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getX(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getY(), player->getVehicle()->getRigidBody()->getWorldTransform().getOrigin().getZ()));
-		//player->getVehicle()->updateRigidBody();
+		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
+		Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
 
-		auto playerVehicle{ player->getVehicle() };
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
 
-		if (spawnTimer % 200 == 0)
-		{
-			actorManager->spawnAttackers(generateObjectivePos(50.0f, 100.0f),1);
-			actorManager->spawnSwarm(generateObjectivePos(50.0f, 100.0f));
-			nrOfEnemies += 12;
-			//actorManager->spawnChaseCars(generateObjectivePos(50.0f, 100.0f));
-			spawnTimer = 0;
-		}
-		spawnTimer++;
-		//spawn Boss
-		//if (spawnTimer % 10 == 0)
-		//{
-		//	actorManager->spawnBoss(Vector3(player->getVehicle()->getPosition().x + 5,
-		//		player->getVehicle()->getPosition().y,
-		//		player->getVehicle()->getPosition().z + 5), 1);
-		//	spawnTimer = 0;
-		//}
-		//spawnTimer = 1;
 
-		powerUps.erase(
-			std::remove_if(
-				powerUps.begin(),
-				powerUps.end(),
-				[&](PowerUp& p) {
-					p.update(time);
-					if (p.getAABB().intersectXZ(player->getVehicle()->getAABB()))
-					{
-						player->addPowerUp(p.getPowerUpType());
-						return true;
-					}
-					else
-					{
-						return false;
-					}
+
+		for (std::unique_ptr<PowerUp>& p : powerUps)
+		{
+			p->update(deltaTime);
+			if (p->isActive() && !player->isDead())
+			{
+				if (p->getAABB().intersectXZ(player->getAABB()))
+				{
+					player->addPowerUp(p->getPowerUpType());
+					p->deactivate();
 				}
-			),
-			powerUps.end()
-		);
+			}
+		}
 
 		if (time == 0)
 		{
 			deltaTime /= 4;
 			this->player->setHealth(0);
 		}
-		prevAccelForce = Vector3(playerVehicle->getRigidBody()->getLinearVelocity());
-		player->updatePlayer(deltaTime);
 
-		physics->update(deltaTime);
-
-		actorManager->update(deltaTime, playerVehicle->getPosition());
-		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
-		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
+		actorManager->update(deltaTime, player->getPosition());
+		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
+		accelForce = Vector3(player->getRigidBody()->getLinearVelocity().getX(), player->getRigidBody()->getLinearVelocity().getY(), player->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
-		player->setWheelRotation();
+		player->setWheelRotation(deltaTime);
 		camera->update(deltaTime);
-		objectives.update(player->getVehicle()->getPosition());
+		objectives.update(player->getPosition());
 		Bullet::updateSoundTimer(deltaTime);
-		bulletThread.get();
 		player->updateWeapon(deltaTime);
+		timer += deltaTime;
+		if (Input::checkButton(Keys::R_LEFT, States::PRESSED))
+		{
+			timerEMP = 4.0f;
+		}
+		if (timerEMP > 0.0f)
+		{
+			timerEMP -= deltaTime;
+		}
+		if (timer > 0.1f&&timerEMP>0.0f)
+		{
+
+			
+			/*testNetwork->clearSegments();
+			testNetwork.get()->setAngle(rand() % 360 + 1);
+
+			testNetwork.get()->generateInitialSegments("+F");
+
+			testNetwork.get()->setAngle(rand()%30+1);
+
+			testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
+			int scale = 10;
+			std::string temp = "F--FFFF++FFFF-FFF--FF";
+			std::string addedTemp = temp;
+			for (int i = 1; i < scale; i++)
+			{
+				if (i % 2)
+				{
+					addedTemp.replace("-", "+");
+				}
+				temp += addedTemp;
+			}
+			if (rand() % 2)
+			{
+				temp += "FF-F+F+FF";
+			}
+			std::string branch = "FF-FF+F";
+			if (rand() % 2)
+			{
+				branch += "F+FF-FF";
+			}
+			testNetwork.get()->generateAdditionalSegments(temp.c_str(), 1, rand() % 2);
+			testNetwork.get()->generateAdditionalSegments(branch.c_str(), scale*2, rand() % 2);
+			testNetwork.get()->generateAdditionalSegments(branch.c_str(), 12, rand() % 2);
+			testNetwork.get()->generateAdditionalSegments(branch.c_str(), 22, rand() % 2);
+
+			timer = 0.0f;
+			int iteration = rand() % this->testNetwork->getSegments().size() + 10;
+			iteration = this->testNetwork->getSegments().size();
+			for (int i = 1; i < iteration; i++)
+			{
+				this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()) +Vector3(0,0,5.0f)+ Vector3(this->testNetwork->getSegments().at(i).firstPoint.x, this->testNetwork->getSegments().at(i).firstPoint.y, this->testNetwork->getSegments().at(i).firstPoint.z), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+			}
+			*/
+
+			this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()+Vector3(0.0f,0.0f,5.0f)), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+			timer = 0.0f;
+		}
+
 
 #ifndef _DEBUG
 		updateObjects();
 		paperCollision(deltaTime);
 #endif
-		btVector3 positionCam{ playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 
-		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
-		camera->setPosition(Vector3(positionCam.getX(),
-			positionCam.getY() / 3,
-			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z));
+
 
 		btVector3 spotlightDir{ 0,
 								 0,
 								 1 };
-		playerVehicle->getRotationQuaternion();
+		player->getRotationQuaternion();
 		btQuaternion bt5 = btQuaternion(this->player->getVehicleBody1()->getRigidBody()->getWorldTransform().getRotation());
 		btTransform transform(bt5, btVector3(0, 0, 0));
 		spotlightDir = transform * spotlightDir;
 		playerLight->setDirection(Vector3(spotlightDir.getX(), spotlightDir.getY(), spotlightDir.getZ()));
 
-		Vector3 spotlightPos{ playerVehicle->getPosition().x,
-							   playerVehicle->getPosition().y + 1,
-							   playerVehicle->getPosition().z };
+		Vector3 spotlightPos{ player->getPosition().x,
+							   player->getPosition().y + 1,
+							   player->getPosition().z };
 
 		spotlightPos += Vector3(spotlightDir.getX(), spotlightDir.getY(), spotlightDir.getZ()) * 1;
 
 		playerLight->setPos(spotlightPos);
 
-		if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
+		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 25.0f || this->time <= 20.0f)
+		{
+			Sound::fadeSoundtrack(true, 1.0f);
+		}
+		else
+		{
+			Sound::fadeSoundtrack(false, 3.0f);
+		}
+
+		/*if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
 			soundAggro += 0.2f * deltaTime;
 		}
 		else if (soundAggro > 0.0f) {
 			soundAggro -= 0.1f * deltaTime;
 		}
-		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);
+		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);*/
 
 		/*timerForParticle += deltaTime;
 		if ( timerForParticle > .01f )
 		{
-			graphics.addParticle( player->getVehicle()->getPosition() + Vector3(0, 5, 0),
+			graphics.addParticle( player->getPosition() + Vector3(0, 5, 0),
 								  5 * Vector3(0,0,0),
 								  addNrOfParticles, lifeTime, randomPosPower);
 			timerForParticle = 0;
 		}*/
 
 	}
-
+	if (this->objectives.isAllDone())
+	{
+		Game::setState(Game::State::STATE_UPGRADING);
+	}
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
+
+	graphics.clearScreen(Vector4(0, 0, 0, 1));
 	graphics.setSpotLightShadow(playerLight);
 	graphics.render(camera.get(), deltaTime);
 
 	// render UI
-	menues[MENU_PLAYING]->update(deltaTime);
 	if (currentMenu != MENU_PLAYING)
+	{
+		menues[MENU_PLAYING]->update(0);
 		menues[currentMenu]->update(deltaTime);
-	else if (Input::checkButton(Keys::MENU, States::PRESSED))
-		setCurrentMenu(PlayingGameState::MENU_PAUSED);
+	}
+	else
+	{
+		menues[MENU_PLAYING]->update(deltaTime);
+
+		if (Input::checkButton(Keys::MENU, States::PRESSED))
+		{
+			setCurrentMenu(PlayingGameState::MENU_PAUSED);
+		}
+	}
+	
+
 
 	//Render all objects
 
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
-//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	ImGui_Driving();
 	//ImGui_ProcGen();
 	//ImGui_AI();
-	//ImGui_Particles();
+	ImGui_Particles();
 	ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	//#endif // !_DEBUG
+	#endif // !_DEBUG
 
 	graphics.presentScene();
 }
@@ -741,10 +966,12 @@ void PlayingGameState::setTime(float time) noexcept {
 
 void PlayingGameState::changeTime(float timeDiff) noexcept {
 	time = std::max(time + timeDiff, .0f);
+	static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->addTimeChangeText(timeDiff);
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
 	currentMenu = static_cast<int>(menu);
+	if (menu == Menu::MENU_OPTIONS) menues[MENU_OPTIONS]->init();
 }
 
 Vehicle* PlayingGameState::getPlayer() const {
@@ -901,36 +1128,36 @@ void PlayingGameState::moveObjects()
 {
 	GameObject* object = physicsObjects.at(physicsObjID).get();
 	auto tilemap = map->getTileMap();
-	if (object->getPosition().x > (player->getVehicle()->getPosition().x + 50) ||
-		object->getPosition().x < (player->getVehicle()->getPosition().x - 50) ||
-		object->getPosition().z >(player->getVehicle()->getPosition().z + 35) ||
-		object->getPosition().z < (player->getVehicle()->getPosition().z - 35)) {
+	if (object->getPosition().x > (player->getPosition().x + 50) ||
+		object->getPosition().x < (player->getPosition().x - 50) ||
+		object->getPosition().z >(player->getPosition().z + 35) ||
+		object->getPosition().z < (player->getPosition().z - 35)) {
 		if (object->getRigidBody() != nullptr) {
 			object->getRigidBody()->setActivationState(0);
 		}
 		int randomValue = rand() % 2 + 1;
 		if (randomValue == 1) {
-			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getZ() > 0) {
+			if (player->getRigidBody()->getLinearVelocity().getZ() > 0) {
 				//Top
 				randomValue = rand() % 100 + 1 - 50;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -1.5f, player->getVehicle()->getPosition().z + 35));
+				object->setPosition(Vector3(player->getPosition().x + randomValue, -1.5f, player->getPosition().z + 35));
 			}
 			else {
 				//Bottom
 				randomValue = rand() % 100 + 1 - 50;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x + randomValue, -1.5f, player->getVehicle()->getPosition().z - 35));
+				object->setPosition(Vector3(player->getPosition().x + randomValue, -1.5f, player->getPosition().z - 35));
 			}
 		}
 		else if (randomValue == 2) {
-			if (player->getVehicle()->getRigidBody()->getLinearVelocity().getX() < 0) {
+			if (player->getRigidBody()->getLinearVelocity().getX() < 0) {
 				//Left
 				randomValue = rand() % 50 + 1 - 25;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x - 50, -1.5f, player->getVehicle()->getPosition().z + randomValue));
+				object->setPosition(Vector3(player->getPosition().x - 50, -1.5f, player->getPosition().z + randomValue));
 			}
 			else {
 				//Right
 				randomValue = rand() % 50 + 1 - 25;
-				object->setPosition(Vector3(player->getVehicle()->getPosition().x + 50, -1.5f, player->getVehicle()->getPosition().z + randomValue));
+				object->setPosition(Vector3(player->getPosition().x + 50, -1.5f, player->getPosition().z + randomValue));
 			}
 		}
 		randomValue = rand() % 360 + 1;
@@ -960,7 +1187,7 @@ Vector3 PlayingGameState::generateObjectivePos(float minDistance, float maxDista
 
 	for (;;) {
 		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
-		float distance = (position - player->getVehicle()->getPosition()).Length();
+		float distance = (position - player->getPosition()).Length();
 		if ((distance <= maxDistance) and (distance >= minDistance))
 		{
 			return position;
@@ -1022,11 +1249,6 @@ ObjectiveHandler& PlayingGameState::getObjHandler()
 	return this->objectives;
 }
 
-void PlayingGameState::addTime(float time)
-{
-	this->time += time;
-}
-
 void PlayingGameState::updateObjects()
 {
 	if (abs(player->getVelocitySpeed()) > 1.0f) {
@@ -1047,13 +1269,97 @@ void PlayingGameState::paperCollision(float deltaTime)
 	for (auto& obj : physicsObjects) {
 		if (obj->getRigidBody() == nullptr) {
 			randomValue = rand() % 2;
-			if (((player->getVehicle()->getPosition() - obj->getPosition()).Length()) < 1.5f && abs(player->getVelocitySpeed()) > 8.0f && randomValue == 1) {
+			if (((player->getPosition() - obj->getPosition()).Length()) < 1.5f && abs(player->getVelocitySpeed()) > 8.0f && randomValue == 1) {
 				randomValue = rand() % 20;
 				randomValue = std::max(randomValue - 5.0f, 0.0f);
-				obj->setVelocity(Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), randomValue * 0.5f, player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()));
+				obj->setVelocity(Vector3(player->getRigidBody()->getLinearVelocity().getX(), randomValue * 0.5f, player->getRigidBody()->getLinearVelocity().getZ()));
 				obj->setPosition(obj->getPosition() + Vector3(0, 0.1f, 0));
 			}
 			obj->updateObject(deltaTime);
 		}
 	}
+}
+
+void PlayingGameState::addPowerUp(PowerUp p)
+{
+	powerUps.push_back(std::make_unique<PowerUp>(p));
+	powerUps[powerUps.size() - 1]->activate();
+}
+
+void PlayingGameState::clearPowerUps()
+{
+	powerUps.clear();
+}
+
+void PlayingGameState::generateMapPowerUps()
+{
+	UINT index = rng() % 10;
+	while (index < map->config.dimensions.x * map->config.dimensions.y)
+	{
+		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
+		Vector3 indexWorldSpace = Vector3(
+			(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+			0.0,
+			-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+		);
+
+		for (int i = 0; i < 100; ++i)
+		{
+			if (Vector3::Distance(position, indexWorldSpace) > 30.0)
+			{
+				position = map->generateRoadPositionInWorldSpace(rng);
+				indexWorldSpace = Vector3(
+					(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+					0.0,
+					-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+				);
+				break;
+			}
+		}
+		position.y += 2.0;
+		PowerUp p(position, (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
+
+		addPowerUp(p);
+
+		index += rng() % 142 + 124;
+	}
+}
+
+void PlayingGameState::generateObjectives()
+{
+	if (Game::getNrOfStagesDone() % 3 == 1)
+	{
+		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1)); //fix pos
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
+	}
+	else
+	{
+		float prob[2] = { 0.5f, 0.5f };
+		for (int i = 0; i < 1; i++)
+		{
+			int dice = rand() % 10 + 1;
+			if (dice <= prob[0] * 10)
+			{
+				objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5*Game::getLocalScale(), "Pick up ", TypeOfTarget::Crate);
+				prob[0] -= 0.1f;
+				prob[1] += 0.1f;
+			}
+			else if (dice > (1 - prob[1]) * 10)
+			{
+				objectives.addObjective(TypeOfMission::KillingSpree, 120, 100*Game::getLocalScale(), "Kill enemies");
+				prob[0] += 0.1f;
+				prob[1] -= 0.1f;
+			}
+			prob[0] = std::fmaxf(prob[0], 0.0f);
+			prob[1] = std::fmaxf(prob[1], 0.0f);
+			prob[0] = std::fminf(prob[0], 1.0f);
+			prob[1] = std::fminf(prob[1], 1.0f);
+		}
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, player->getPosition());// ->getStartPositionInWorldSpace());
+	}
+}
+
+Vector3 PlayingGameState::getCameraPos()
+{
+	return this->camera->getPosition();
 }

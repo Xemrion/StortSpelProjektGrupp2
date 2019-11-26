@@ -49,7 +49,7 @@ RoadNetwork::RoadNetwork(int randNr, Vector2 max, Vector2 min, float rotation)
 			this->forward.z = -1 * forwardDistance;
 		}
 	}
-	this->startPoint = Vector4(possibleStart.x, 0.0f, possibleStart.y, 0.0f);
+	this->startPoint = Vector4(0.0f, 0.0f,0.0f, 0.0f);
 	Segment startSegment;
 	startSegment.firstPoint = this->startPoint - forward;
 	startSegment.secondPoint = this->startPoint;
@@ -93,7 +93,7 @@ bool RoadNetwork::generateInitialSegments(const char* seed)
 { //'F' to move forward a segment, '+' or '-' to turn but doesn't move 'H' to move half a length for a segment
 	bool success = false;
 	int counter = 0;
-	Vector4 currentForward = this->forward;
+	Vector4 currentForward = this->forward*0.06f;
 	float nextX, nextZ;
 	while (seed[counter]) {
 
@@ -163,7 +163,7 @@ bool RoadNetwork::generateAdditionalSegments(const char* seed, int segment, bool
 { //'F' to move forward a segment, '+' or '-' to turn but doesn't move 'H' to move half a length for a segment
 	bool success = false;
 	int counter = 0;
-	Vector4 currentForward = this->forward;
+	Vector4 currentForward = this->forward*0.06f;
 	float nextX, nextZ;
 	auto  check = roadNetwork.size();
 
@@ -305,6 +305,11 @@ void RoadNetwork::drawRoadNetwork(Graphics* graph)
 			XMFLOAT3(this->roadNetwork[i].secondPoint.x, 2.0f, this->roadNetwork[i].secondPoint.z),
 			XMFLOAT3(1.0f, 0.0f, 1.0f));
 	}
+}
+
+std::vector<Segment>& RoadNetwork::getSegments()
+{
+	return roadNetwork;
 }
 
 bool RoadNetwork::saveTestNetwork(std::string filename)

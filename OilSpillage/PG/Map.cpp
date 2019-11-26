@@ -160,6 +160,29 @@ Vector3  Map::generateRoadPositionInWorldSpace(RNG& rng) const noexcept {
 	return tilemap->convertTilePositionToWorldPosition( positionInTileSpace );
 }
 
+V2u Map::generateGroundPositionInTileSpace(RNG& rng) const noexcept
+{
+	//DBG_PROBE(Map::generateRoadPositionInTileSpace);
+	DBG_PROBE(Map::generateRoadPositionInTileSpace);
+	static constexpr U16  MAX_TRIES{ 1024 };
+	static U16_Dist       generateX(0, config.dimensions.x - 1);
+	static U16_Dist       generateY(0, config.dimensions.y - 1);
+	U16                   x, y, counter{ 0 };
+	do {
+		x = generateX(rng);
+		y = generateY(rng);
+		if (++counter > MAX_TRIES)
+			assert(false and "No road tile found!");
+	} while (tilemap->tileAt(x, y) != Tile::ground);
+	return { x, y };
+}
+
+Vector3 Map::generateGroundPositionInWorldSpace(RNG& rng) const noexcept
+{
+	auto  positionInTileSpace{ generateGroundPositionInTileSpace(rng) };
+	return tilemap->convertTilePositionToWorldPosition(positionInTileSpace);
+}
+
 void  Map::generateBuildings( )
 {
 	DBG_PROBE(Map::generateBuildings);
@@ -272,10 +295,12 @@ void  Map::generateBuildings( )
 																							  houseTile.getPosition().y,
 																							  houseTile.getPosition().z ),
 																				btVector3( 15.5f * houseTile.getScale().x,
-																							  15.5f * houseTile.getScale().y,
+																							  /*15.5f * houseTile.getScale().y*/400,
 																							  15.5f * houseTile.getScale().z ),
 																				.0f );
 								houseTile.setRigidBody( tmp, physics );
+								houseTile.getRigidBody()->setFriction(0);
+								houseTile.getRigidBody()->forceActivationState(DISABLE_SIMULATION);
 							#endif
 						}
 						else { // is hospital

@@ -9,6 +9,7 @@
 #include "../Road Network/RoadNet.h"
 #include "../DynamicCamera.h"
 #include "../PG/Map.hpp"
+#include "../PG/Generic L-System.h"
 #include "../PG/Skyscraper.h"
 #include "../UI/UserInterface.h"
 #include "../Powerup.h"
@@ -37,7 +38,6 @@ public:
 	Vector3      getTopLeft() const;
 	Vector3      getBottomRight() const;
 	ObjectiveHandler& getObjHandler();
-	void addTime(float time);
 	void spawnObjects();
 	Vector3 generateObjectivePos(float minDistance, float maxDistance) noexcept;
 	Vector3 generateObjectivePos(Vector3 origin, float minDistance, float maxDistance) noexcept;
@@ -51,9 +51,16 @@ public:
 	void		 updateObjects();
 	void		 paperCollision(float deltaTime);
 	Vector3   getRespawnPosition() const noexcept;
+	void addPowerUp(PowerUp p);
+	void generateMapPowerUps();
+	void clearPowerUps();
+	void generateObjectives();
 
+	Vector3 getCameraPos();
+
+	std::unique_ptr<Vehicle>& getPlayer();
+	void setPlayer(Vehicle* theVehicle);
 	ActorManager* actorManager;
-	std::unique_ptr<Map>            map;
 
 private:
 	friend class Game;
@@ -70,19 +77,26 @@ private:
 	MapConfig                       config;
 	Graphics                       &graphics;
 	AStar                          *aStar;
+	std::unique_ptr<Map>            map;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;
 	std::unique_ptr<DynamicCamera>  camera;
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
+	std::unique_ptr<RoadNetwork>    testNetwork;
+	std::unique_ptr<Lsystem>		testSystem;
 	std::unique_ptr<Skyscraper>		testSkyscraper;
 	std::vector<CinematicPos>       points;
-	std::vector<PowerUp>		    powerUps;
+	std::vector<std::unique_ptr<PowerUp>> powerUps;
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
 	std::vector<std::string> skyscrapers;
 	GameObject* skyscraperTest0;
 	GameObject* skyscraperTest1;
 	GameObject* skyscraperTest2;
+	GameObject*		testObjective2; //Test
+	GameObject*		cameraObject;
+	float			cameraTimer;
+
 	GameObject* objTestPickUp;
 	GameObject* objTestPickUp2;
 	GameObject* objTestPickUp3;
@@ -103,13 +117,16 @@ private:
 
 	int								spawnTimer = 0;
 	float							soundAggro;
-
-	int                             addNrOfParticles  {     2 };
-	int                             lifeTime          {     1 };
+	const char* current_item;
+	void fillTestParticle();
+	const char* items;
+	float timer = 0.0f;
+	int                             addNrOfParticles  {     1 };
+	float                             lifeTime          {     1 };
 	float                           timerForParticle  {   .0f };
 	float                           vectorFieldPower  {  4.0f };
 	float                           vectorFieldSize   {  2.2f };
-	float                           randomPosPower    {  0.5f };
+	float                           randomPosPower    {  0.0f };
 	float                           size1             { .039f };
 	float                           size2             { .063f };
 	float                           colors  [4]       {};
@@ -120,7 +137,10 @@ private:
 	                                                    Vector4( 0.99f,  0.13f, .0f, 1.0f ),
 	                                                    Vector4( 0.0f,  0.0f, .0f, 1.0f ),
 	                                                    Vector4( 0.0f,  0.0f, .0f, 1.0f )  };
-  
+	int electricNew = 0.0f;
+	float timerElectric = 0.0f;
+	float timerEMP = 0.0f;
+	void createElectric(int randNr, float deltaTime);
     void initAI();
 	void ImGui_ProcGen();
 	void ImGui_Driving();

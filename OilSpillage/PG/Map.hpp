@@ -7,7 +7,7 @@
 #include "RoadGenerator.hpp"
 #include "Voronoi.hpp"
 #include "District.hpp"
-#include "../UI/UIPlaying.h"
+#include "../UI/Playing/UIPlaying.h"
 #include "Biome.hpp"
 
 class Map {
@@ -24,6 +24,8 @@ public:
 
 	V2u                        generateRoadPositionInTileSpace(  RNG & ) const noexcept;
 	Vector3                    generateRoadPositionInWorldSpace( RNG & ) const noexcept;
+	V2u                        generateGroundPositionInTileSpace(  RNG & ) const noexcept;
+	Vector3                    generateGroundPositionInWorldSpace( RNG & ) const noexcept;
 	void                       setDistrictColorCoding ( Bool useColorCoding ) noexcept;
 	V2u                        getStartPositionInTileSpace()  const noexcept;
 	Vector3                    getStartPositionInWorldSpace() const noexcept;

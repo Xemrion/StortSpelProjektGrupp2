@@ -7,31 +7,49 @@ Swarm::Swarm()
 }
 
 Swarm::Swarm(float x, float z, Physics* physics)
-	: DynamicActor(x,z,physics),Melee()
+	: DynamicActor(x, z, physics), Melee(&position, &velocity, &deltaTime)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
 	Game::getGraphics().addToDraw(this);
 
 	this->stats = VehicleStats::AISwarm;
-	setHealth(this->stats.maxHealth);
+	setHealth(this->stats.maxHealth * (1 + (0.3 * Game::getGameInfo().nrOfClearedStages)));
+	this->stats.maxSpeed = this->stats.maxSpeed * (1.1 + (0.2 * Game::getGameInfo().nrOfClearedStages));
 	Game::getGraphics().loadModel("Entities/Drone");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Drone");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Drone"));
 	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMelee);
 
-	this->boidOffset = 2.5;
 	this->aggroRange = 40;
+	createRigidbody(physics);
+	this->setPoints(50 * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages)));
+	this->weapon.damage = this->weapon.damage * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages));
 }
 
 void Swarm::update(float dt, const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
+	if ((position - targetPos).Length() < 2)
+	{
+		meleeAttack();
+	}
+}
+
+void Swarm::createRigidbody(Physics* physics)
+{
+	btRigidBody* tempo = physics->addSphere(0.7f, btVector3(position.x, position.y, position.z), 0.5f, this);
+	setRigidBody(tempo, physics);
+	getRigidBody()->activate();
+	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	getRigidBody()->setFriction(0);
+	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
 }
 
 Swarm::~Swarm()
 {
 	Game::getGraphics().removeFromDraw(this);
+	Game::getGameInfo().nrOfSwarm++;
 }
 
 void Swarm::setUpActor()

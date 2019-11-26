@@ -181,9 +181,18 @@ void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float 
 	Vector3 camToLeftGround = camera->getPosition().y * dirFarTopLeft;
 	Vector3 camToRightGround = camera->getPosition().y * dirFarTopRight;
 
+	
 	float width = (camToLeftGround - camToRightGround).Length();
+	if (width <= 0.0f)
+	{
+		width = 90.0f;
+	}
 	width *= 2.0f;
 	float height = (camToLeftBotGround - camToLeftGround).Length();
+	if (height <= 0.0f)
+	{
+		height = 90.0f;
+	}
 	height *= 2.0f;
 
 	viewMatrix = DirectX::XMMatrixLookAtLH(eye, target, Vector3(0, 1, 0));

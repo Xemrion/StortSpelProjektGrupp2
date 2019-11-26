@@ -5,7 +5,8 @@
 #include "../game.h"
 #include "../UI/UserInterface.h"
 #include "../Texture.h"
-
+#include "../Vehicle.h"
+#include <vector>
 class MenuGameState : public GameState
 {
 public:
@@ -15,6 +16,7 @@ public:
 		MENU_OPTIONS,
 		MENU_CREDITS,
 		MENU_CONTROLS,
+		MENU_HIGHSCORE,
 		MENUCOUNT
 	};
 private:
@@ -22,6 +24,13 @@ private:
 	std::unique_ptr<UserInterface> menues[MENUCOUNT];
 	int currentMenu;
 	Texture* textureBG;
+
+	std::unique_ptr<Physics> physics; //for vehicle
+	std::unique_ptr<Vehicle> theVehicle;
+	std::unique_ptr<LightList> lightList;
+	std::unique_ptr<DynamicCamera> camera;
+
+	std::unique_ptr<GameObject> barrels;
 public:
 	MenuGameState();
 	virtual ~MenuGameState();
