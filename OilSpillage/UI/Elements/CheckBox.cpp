@@ -5,7 +5,7 @@
 
 Vector2 CheckBox::size = Vector2(64, 64);
 
-CheckBox::CheckBox(Vector2 position) : Element(position, 0.0f), activated(false)
+CheckBox::CheckBox(std::string text, Vector2 position) : Element(position, 0.0f), text(text), activated(false)
 {
 	Game::getGraphics().loadTexture("UI/boxChecked");
 	Game::getGraphics().loadTexture("UI/boxUnchecked");
@@ -23,6 +23,7 @@ void CheckBox::draw(bool selected)
 {
 	ID3D11ShaderResourceView* texture = this->activated ? this->textureChecked->getShaderResView() : this->textureUnchecked->getShaderResView();
 	UserInterface::getSpriteBatch()->Draw(texture, this->position, nullptr, selected ? Colors::Gray : Colors::White);
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), this->text.c_str(), this->position + Vector2(CheckBox::size.x + 5, 5), Colors::White, 0.0f, Vector2::Zero, 0.4f);
 }
 
 void CheckBox::setActivated(bool activated)

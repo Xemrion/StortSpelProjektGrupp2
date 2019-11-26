@@ -38,35 +38,67 @@ Status Ranged::inAttackRange()
 
 void Ranged::assignWeapon(int weaponType)
 {
-	if (weaponType == 1) // MachineGun
+	if(Game::getGameInfo().nrOfClearedStages < 3)
 	{
 		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
-		//this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	}
-	else if (weaponType == 2)// MissileLauncher
+	else
 	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMissileLauncher);
-		//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
-		this->predicting = true;
+		if (weaponType == 1) // MachineGun
+		{
+			this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+			//this->setColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+		}
+		else if (weaponType == 2)// MissileLauncher
+		{
+			this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+			//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+			this->predicting = true;
+		}
+		else if (weaponType == 3)// MissileLauncher
+		{
+			this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+			//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+			this->predicting = true;
+		}
+		else if (weaponType == 4)// MissileLauncher
+		{
+			this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+			//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+			this->predicting = true;
+		}
+		else if (weaponType == 5)// MissileLauncher
+		{
+			this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+			//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+			this->predicting = true;
+		}
+		else if (weaponType == 6)// MissileLauncher
+		{
+			this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+			//this->setColor(Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+			this->predicting = true;
+		}
+		else if (weaponType == 7)// Laser
+		{
+			this->weapon = WeaponHandler::getWeapon(WeaponType::aiLaser);
+			LaserLight tempLaser = LaserLight(
+				Vector3(0, 0, 0),
+				Vector3(1.0, 0.1, 0.1),
+				0.0,
+				Vector3(0, 0, 0),
+				weapon.bulletScale.z);
+			PlayingGameState* gameState = static_cast<PlayingGameState*>(Game::getCurrentState());
+			laser = gameState->addLight(tempLaser);
+			//this->setColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f));
+		}
+		else if (weaponType == 8)// Flamethrower
+		{
+			this->weapon = WeaponHandler::getWeapon(WeaponType::aiFlamethrower);
+			//	this->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
+		}
 	}
-	else if (weaponType == 3)// Laser
-	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::aiLaser);
-		//this->setColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f));
-		LaserLight tempLaser = LaserLight(
-			Vector3(0, 0, 0),
-			Vector3(1.0, 0.1, 0.1),
-			0.0,
-			Vector3(0, 0, 0),
-			weapon.bulletScale.z);
-		PlayingGameState* gameState = static_cast<PlayingGameState*>(Game::getCurrentState());
-		laser = gameState->addLight(tempLaser);
-	}
-	else if (weaponType == 4)// Flamethrower
-	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::aiFlamethrower);
-	//	this->setColor(Vector4(0.0f, 1.0f, 1.0f, 1.0f));
-	}
+
 }
 Status Ranged::shoot()
 {

@@ -59,7 +59,7 @@ void PlayingGameState::initAI()
 	aStar->generateTileData(map->getTileMap());
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0f), currentMenu(MENU_PLAYING)
 {
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -240,7 +240,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0
 
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
-	player->startEngineSound();
 
 	map = std::make_unique<Map>(graphics, config, physics.get());
 	map->setDistrictColorCoding(isDebugging);
@@ -257,13 +256,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0
 	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
 	menues[MENU_PAUSED]->init();
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
-	menues[MENU_OPTIONS]->init();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
 	player->getVehicleBody1()->setPosition(startPos + Vector3(.0f, 0.65f - 1.2f, .0f));
 
 	initAI();
+
 
 
 
@@ -288,7 +287,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
 
-	addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 30.0));
+	//addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 90.0));
 
 	/*objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
 	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
@@ -335,6 +334,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0
 	cameraObject->getRigidBody()->setGravity(btVector3(0,0,0));
 	//cameraObject->getRigidBody()->setDamping(10,0);
 
+	graphics.getParticleSystem("fire")->setGravity(-0.1f);
+	graphics.getParticleSystem("fire")->setSize(0.055f, 0.065f);
+	graphics.getParticleSystem("fire")->changeVectorField(1.75f, 0.5f);
+	
+	graphics.getParticleSystem("smoke")->setGravity(-0.1f);
+	graphics.getParticleSystem("smoke")->setSize(0.055f, 0.065f);
+	graphics.getParticleSystem("smoke")->changeVectorField(1.75f, 0.09f);
 
 #ifndef _DEBUG
 	spawnObjects();
@@ -674,14 +680,6 @@ void PlayingGameState::update(float deltaTime)
 		if (Input::isKeyDown_DEBUG(Keyboard::E)) {
 			deltaTime /= 4;
 		}
-		if (Input::isKeyDown_DEBUG(Keyboard::Q)) {
-			if (player->getDrivingMode() == 0) {
-				player->setDrivingMode(1);
-			}
-			else if (player->getDrivingMode() == 1) {
-				player->setDrivingMode(0);
-			}
-		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 		if (Input::isKeyDown_DEBUG(Keyboard::LeftAlt))
@@ -717,8 +715,9 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else {
 			cameraTimer += deltaTime;
-			if (cameraTimer > 100) {
+			if (cameraTimer > 250) {
 				cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+				cameraTimer = 0;
 			}
 		}
 		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
@@ -760,14 +759,13 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 		actorManager->update(deltaTime, player->getPosition());
-		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
+		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
 		accelForce = Vector3(player->getRigidBody()->getLinearVelocity().getX(), player->getRigidBody()->getLinearVelocity().getY(), player->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation(deltaTime);
 		camera->update(deltaTime);
 		objectives.update(player->getPosition());
 		Bullet::updateSoundTimer(deltaTime);
-		bulletThread.get();
 		player->updateWeapon(deltaTime);
 		timer += deltaTime;
 		if (Input::checkButton(Keys::R_LEFT, States::PRESSED))
@@ -892,11 +890,21 @@ void PlayingGameState::update(float deltaTime)
 	graphics.render(camera.get(), deltaTime);
 
 	// render UI
-	menues[MENU_PLAYING]->update(deltaTime);
 	if (currentMenu != MENU_PLAYING)
+	{
+		menues[MENU_PLAYING]->update(0);
 		menues[currentMenu]->update(deltaTime);
-	else if (Input::checkButton(Keys::MENU, States::PRESSED))
-		setCurrentMenu(PlayingGameState::MENU_PAUSED);
+	}
+	else
+	{
+		menues[MENU_PLAYING]->update(deltaTime);
+
+		if (Input::checkButton(Keys::MENU, States::PRESSED))
+		{
+			setCurrentMenu(PlayingGameState::MENU_PAUSED);
+		}
+	}
+	
 
 
 	//Render all objects
@@ -933,10 +941,12 @@ void PlayingGameState::setTime(float time) noexcept {
 
 void PlayingGameState::changeTime(float timeDiff) noexcept {
 	time = std::max(time + timeDiff, .0f);
+	static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->addTimeChangeText(timeDiff);
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
 	currentMenu = static_cast<int>(menu);
+	if (menu == Menu::MENU_OPTIONS) menues[MENU_OPTIONS]->init();
 }
 
 Vehicle* PlayingGameState::getPlayer() const {
@@ -1214,11 +1224,6 @@ ObjectiveHandler& PlayingGameState::getObjHandler()
 	return this->objectives;
 }
 
-void PlayingGameState::addTime(float time)
-{
-	this->time += time;
-}
-
 void PlayingGameState::updateObjects()
 {
 	if (abs(player->getVelocitySpeed()) > 1.0f) {
@@ -1310,13 +1315,13 @@ void PlayingGameState::generateObjectives()
 			int dice = rand() % 10 + 1;
 			if (dice <= prob[0] * 10)
 			{
-				objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5*Game::getLocalScale(), "Pick up the important", TypeOfTarget::Crate);
+				objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5*Game::getLocalScale(), "Pick up ", TypeOfTarget::Crate);
 				prob[0] -= 0.1f;
 				prob[1] += 0.1f;
 			}
 			else if (dice > (1 - prob[1]) * 10)
 			{
-				objectives.addObjective(TypeOfMission::KillingSpree, 120, 100*Game::getLocalScale(), "Kill the enemies");
+				objectives.addObjective(TypeOfMission::KillingSpree, 120, 100*Game::getLocalScale(), "Kill enemies");
 				prob[0] += 0.1f;
 				prob[1] -= 0.1f;
 			}
@@ -1325,7 +1330,7 @@ void PlayingGameState::generateObjectives()
 			prob[0] = std::fminf(prob[0], 1.0f);
 			prob[1] = std::fminf(prob[1], 1.0f);
 		}
-		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, player->getPosition());// ->getStartPositionInWorldSpace());
 	}
 }
 

@@ -4,8 +4,8 @@
 static SolverType gSolverType = SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT;
 static int gSolverMode = SOLVER_SIMD |
 SOLVER_USE_WARMSTARTING |
-// SOLVER_RANDMIZE_ORDER |
-// SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS |
+ SOLVER_RANDMIZE_ORDER |
+ SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS |
 // SOLVER_USE_2_FRICTION_DIRECTIONS |
 0;
 btConstraintSolver* createSolverByType(SolverType t)
@@ -64,6 +64,26 @@ Physics::Physics() :broadphase(new btDbvtBroadphase())
 	world->setForceUpdateAllAabbs(false);
 	world->setGravity(btVector3(0, -10, 0));
 
+	//temp plane inf
+	btTransform t;
+	t.setIdentity();
+	t.setOrigin(btVector3(0, 0, 0));
+
+
+	////set shape for object
+	plane = new btStaticPlaneShape(btVector3(0, 1, 0), -1.5f);
+
+	//set motionshape aka set postion
+	btMotionState* motion = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0)));
+	////body definition check doc
+	btRigidBody::btRigidBodyConstructionInfo info(0.0, motion, plane);
+
+	btRigidBody* body = new btRigidBody(info);
+	body->setFriction(1);
+
+	world->addRigidBody(body);
+
+	bodies.push_back(body);
 
 	gContactAddedCallback = callbackFunc;
 }
