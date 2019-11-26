@@ -257,7 +257,14 @@ void Objective::update(Vector3 playerPosition)
 			this->done = true;
 		}
 	}
-	this->closestToPlayer = findClosestPlayer;
+	if (this->mission->typeMission == TypeOfMission::GetToPoint)
+	{
+		this->closestToPlayer = this->mission->generalPosition;
+	}
+	else
+	{
+		this->closestToPlayer = findClosestPlayer;
+	}
 }
 
 int Objective::getNrOfMax() const

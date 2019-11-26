@@ -1023,7 +1023,10 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 							0.0,
 							Vector3(0,0,0),
 							itemWeapon->getWeapon().bulletScale.z);
-						itemWeapon->getWeapon().light = (Light*)static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(laser);
+						if (static_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
+						{
+							itemWeapon->getWeapon().light = (Light*)static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(laser);
+						}
 					}
 				}
 			}

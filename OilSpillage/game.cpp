@@ -154,10 +154,8 @@ void Game::createCurrentState()
 			temp->stopEngineSound();
 			nrOfStagesDone++;
 			Sound::stopAllSoundsExceptSoundtrack();
-			if (nrOfStagesDone % 3 == 0)
-			{
-				localScale += 0.05f;
-			}
+			localScale += 0.05f; // increase everytime a new stage is created
+			
 		}
 		state = std::make_unique<PlayingGameState>();
 

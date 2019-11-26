@@ -277,6 +277,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0
 
 
 
+
 	Game::getGraphics().setUISun(Vector3(1.0f, -1.0f, 0.1f), Vector4(0.84, 0.83, 0, 1));
 
 	playerLight = lightList->addLight(SpotLight(playerVehicle->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
@@ -1337,7 +1338,7 @@ void PlayingGameState::generateObjectives()
 			prob[0] = std::fminf(prob[0], 1.0f);
 			prob[1] = std::fminf(prob[1], 1.0f);
 		}
-		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, player->getVehicle()->getPosition());// ->getStartPositionInWorldSpace());
 	}
 }
 
