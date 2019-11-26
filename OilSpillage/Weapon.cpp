@@ -42,7 +42,7 @@ void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower)
+	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrowerPhase2)
 	{
 		flamethrowerShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
@@ -165,7 +165,12 @@ void Bullet::update(float deltaTime)
 	}
 	else if (this->weapon.type == WeaponType::aiMachineGun		or
 			 this->weapon.type == WeaponType::aiFlamethrower	or
-			 this->weapon.type == WeaponType::aiMissileLauncher)
+			 this->weapon.type == WeaponType::aiMissileLauncher or
+			 this->weapon.type == WeaponType::aiBossFlamethrower or
+			 this->weapon.type == WeaponType::aiBossFlamethrowerPhase2 or
+		 	 this->weapon.type == WeaponType::aiBossMachineGun or
+			 this->weapon.type == WeaponType::aiBossMachineGunPhase2 or
+			 this->weapon.type == WeaponType::aiBossMissileLauncher)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}

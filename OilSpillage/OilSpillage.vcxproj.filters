@@ -37,7 +37,6 @@
     <ClCompile Include="AI\AStar.cpp" />
     <ClCompile Include="AI\Attacker.cpp" />
     <ClCompile Include="AI\Behaviour.cpp" />
-    <ClCompile Include="AI\Boss.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
     <ClCompile Include="AI\ChaseCar.cpp" />
     <ClCompile Include="AI\DynamicActor.cpp" />
@@ -157,6 +156,9 @@
     <ClCompile Include="UI\Menu\UIHighscore.cpp" />
     <ClCompile Include="MyClient.cpp" />
     <ClCompile Include="BulletSDK\include\LinearMath\btThreads.cpp" />
+    <ClCompile Include="AI\Boss.cpp" />
+    <ClCompile Include="AI\BossAbilities.cpp" />
+    <ClCompile Include="AI\Weakspot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -165,7 +167,6 @@
     <ClInclude Include="AI\AStar.h" />
     <ClInclude Include="AI\Attacker.h" />
     <ClInclude Include="AI\Behaviour.h" />
-    <ClInclude Include="AI\Boss.h" />
     <ClInclude Include="AI\Car_Spitfire.h" />
     <ClInclude Include="AI\ChaseCar.h" />
     <ClInclude Include="AI\DynamicActor.h" />
@@ -305,6 +306,9 @@
     <ClInclude Include="physics.h" />
     <ClInclude Include="UI\Menu\UIHighscore.h" />
     <ClInclude Include="MyClient.h" />
+    <ClInclude Include="AI\Boss.h" />
+    <ClInclude Include="AI\BossAbilities.h" />
+    <ClInclude Include="AI\Weakspot.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

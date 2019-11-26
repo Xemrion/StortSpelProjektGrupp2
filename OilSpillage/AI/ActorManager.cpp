@@ -126,10 +126,13 @@ void ActorManager::createSwarm(float x, float z)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createBoss(float x, float z, int weaponType)
+Boss* ActorManager::createBoss(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Boss(x, z, weaponType, physics));
+	Boss* boss = new Boss(x, z, weaponType, physics);
+	this->actors.push_back(boss);
 	initGroupForActor(actors.at(actors.size() - 1));
+
+	return boss;
 }
 
 float ActorManager::distanceToPlayer(const Vector3& position)
@@ -265,11 +268,6 @@ void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float an
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
 		createTurret(newPosition.x, newPosition.y, 1);
 	}
-}
-
-void ActorManager::spawnBoss(const Vector3& originPos, int weaponType)
-{
-	//createBoss(originPos.x, originPos.z, weaponType);
 }
 
 Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)
