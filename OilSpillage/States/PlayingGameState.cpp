@@ -175,7 +175,12 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 				10.0f));
 	}
 
-	
+	testSystem = std::make_unique<Lsystem>();
+	testSystem.get()->addVariable('A', "ABB");
+	testSystem.get()->addVariable('B', "BAA");
+	testSystem.get()->setAxiom("A");
+	testSystem.get()->setRecursions(1);
+	testSystem.get()->updateLSystem();
 	 //Road Network Turtlewalker
 	//FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF
 	testNetwork.get()->generateInitialSegments("F+F-F-FHF--F+FFFF+FFF+FF-FFF+FFFF+FFH+FFF-FF");

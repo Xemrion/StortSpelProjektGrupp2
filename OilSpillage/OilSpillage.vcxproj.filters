@@ -152,6 +152,7 @@
     <ClCompile Include="SoLoud\src\backend\null\soloud_null.cpp" />
     <ClCompile Include="AI\ShootCar.cpp" />
     <ClCompile Include="UI\Elements\AnimatedText.cpp" />
+    <ClCompile Include="PG\Generic L-System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -353,6 +354,12 @@
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="physics.h" />
+    <ClInclude Include="UI\Upgrading\UIUpgrading.h" />
+    <ClInclude Include="UI\UserInterface.h" />
+    <ClInclude Include="Vehicle.h" />
+    <ClInclude Include="VehicleStats.h" />
+    <ClInclude Include="VertexBuffer.h" />
+    <ClInclude Include="PG\Generic L-System.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
