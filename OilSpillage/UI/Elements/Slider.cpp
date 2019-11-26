@@ -5,8 +5,9 @@
 
 Vector2 Slider::size = Vector2(256, 32);
 
-Slider::Slider(Vector2 position) : Element(position, 0.0f), amount(0.0f)
+Slider::Slider(Vector2 position, DirectX::XMVECTORF32 color) : Element(position, 0.0f), amount(0.0f)
 {
+	this->color = color;
 	Game::getGraphics().loadTexture("UI/sliderBG");
 	Game::getGraphics().loadTexture("UI/sliderFG");
 	this->textureBG = Game::getGraphics().getTexturePointer("UI/sliderBG");
@@ -23,9 +24,9 @@ void Slider::draw(bool selected)
 {
 	RECT bgDest = SimpleMath::Rectangle(static_cast<long>(this->position.x + 8), static_cast<long>(this->position.y + 8), static_cast<long>(this->textureFG->getWidth() - 16), static_cast<long>(this->textureBG->getHeight()));
 	RECT amountDest = SimpleMath::Rectangle(static_cast<long>(this->position.x + 8), static_cast<long>(this->position.y + 8), static_cast<long>((this->textureFG->getWidth() - 16) * this->amount), static_cast<long>(this->textureBG->getHeight()));
-
+	
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), bgDest,     selected ? Colors::Gray : Colors::White);
-	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), amountDest, selected ? Colors::DarkGreen : Colors::Green);
+	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), amountDest, selected ? Colors::DarkGreen : color);
 	UserInterface::getSpriteBatch()->Draw(this->textureFG->getShaderResView(), this->position);
 }
 

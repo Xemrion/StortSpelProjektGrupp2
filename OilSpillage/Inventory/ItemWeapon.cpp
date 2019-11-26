@@ -12,6 +12,8 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 	}
 	else if(weapon.type == WeaponType::Laser){
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
+		stream << "Overheat : " << weapon.maxSpread << "\n";
+
 	}
 	else if(weapon.type == WeaponType::Flamethrower) {
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
@@ -61,14 +63,57 @@ void ItemWeapon::randomize()
 	//maxSpread
 	//spreadIncreasePerSecond
 	//spreadDecreasePerSecond
-
-	this->weapon.damage =  static_cast<int>(this->weapon.damage						* (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale())));
-	this->weapon.bulletSpeed =				this->weapon.bulletSpeed				* (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
-	this->weapon.bulletLifetime =			this->weapon.bulletLifetime				* (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
-	this->weapon.spreadRadians =			this->weapon.spreadRadians				* (((rand() % 1000 + 1) / 100) + (1));
-	this->weapon.maxSpread =				this->weapon.maxSpread					* (((rand() % 1000 + 1) / 100) + (1));
-	this->weapon.spreadIncreasePerSecond =	this->weapon.spreadIncreasePerSecond	* (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
-	this->weapon.spreadDecreasePerSecond =	this->weapon.spreadDecreasePerSecond	* (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+	if (weapon.type == WeaponType::MachineGun) 
+	{
+		this->weapon.damage = static_cast<int>(this->weapon.damage * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale())));
+		this->weapon.bulletSpeed = this->weapon.bulletSpeed * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.bulletLifetime = this->weapon.bulletLifetime * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.spreadRadians = this->weapon.spreadRadians + ((rand() % 101) *0.01f)*0.52f;//30 degree = 0.52 radians
+		this->weapon.maxSpread = this->weapon.maxSpread * (((rand() % 1000 + 1) / 100) + (1));
+		this->weapon.spreadIncreasePerSecond = this->weapon.spreadIncreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.spreadDecreasePerSecond = this->weapon.spreadDecreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+	}
+	else if (weapon.type == WeaponType::Laser) 
+	{
+		this->weapon.damage = static_cast<int>(this->weapon.damage * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale())));
+		this->weapon.bulletSpeed = this->weapon.bulletSpeed * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.bulletLifetime = this->weapon.bulletLifetime * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.spreadRadians = this->weapon.spreadRadians * (((rand() % 1000 + 1) / 100) + (1));
+		this->weapon.maxSpread = this->weapon.maxSpread * (((rand() % 1000 + 1) / 100) + (1));
+		this->weapon.spreadIncreasePerSecond = this->weapon.spreadIncreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.spreadDecreasePerSecond = this->weapon.spreadDecreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+	}
+	else if (weapon.type == WeaponType::Flamethrower) 
+	{
+		this->weapon.damage = static_cast<int>(this->weapon.damage * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale())));
+		this->weapon.bulletSpeed = this->weapon.bulletSpeed * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.bulletLifetime = this->weapon.bulletLifetime * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.spreadRadians = this->weapon.spreadRadians * (((rand() % 1000 + 1) / 100) + (1));
+		this->weapon.maxSpread = this->weapon.maxSpread * (((rand() % 1000 + 1) / 100) + (1));
+		this->weapon.spreadIncreasePerSecond = this->weapon.spreadIncreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.spreadDecreasePerSecond = this->weapon.spreadDecreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+	}
+	else if (weapon.type == WeaponType::Spikes) 
+	{
+		this->weapon.damage = static_cast<int>(this->weapon.damage * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale())));
+		this->weapon.bulletSpeed = this->weapon.bulletSpeed * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.bulletLifetime = this->weapon.bulletLifetime * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.spreadRadians = this->weapon.spreadRadians * (((rand() % 1000 + 1) / 100) + (1));
+		this->weapon.maxSpread = this->weapon.maxSpread * (((rand() % 1000 + 1) / 100) + (1));
+		this->weapon.spreadIncreasePerSecond = this->weapon.spreadIncreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.spreadDecreasePerSecond = this->weapon.spreadDecreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+	}
+	else 
+	{
+		this->weapon.damage = static_cast<int>(this->weapon.damage * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale())));
+		this->weapon.bulletSpeed = this->weapon.bulletSpeed * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.bulletLifetime = this->weapon.bulletLifetime * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.spreadRadians = this->weapon.spreadRadians * (((rand() % 1000 + 1) / 100) + (1));
+		this->weapon.maxSpread = this->weapon.maxSpread * (((rand() % 1000 + 1) / 100) + (1));
+		this->weapon.spreadIncreasePerSecond = this->weapon.spreadIncreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		this->weapon.spreadDecreasePerSecond = this->weapon.spreadDecreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+	}
+	
 
 	this->description = generateDescription(this->weapon);
 	if (this->weapon.type == WeaponType::Laser)
