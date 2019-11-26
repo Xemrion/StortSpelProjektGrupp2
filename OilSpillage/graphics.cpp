@@ -459,15 +459,15 @@ bool Graphics::init(Window* window)
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
 	fogMaterial.scale = 50.0;
-	fogMaterial.density = 0.3;
-	fogMaterial.ambientDensity = 0.025;
-	fogMaterial.densityThreshold = 0.0;
+	fogMaterial.density = 0.1;
+	fogMaterial.ambientDensity = 0.08;
+	fogMaterial.densityThreshold = 0.15;
 
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
 
 	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
-
+	fog->setWindSpeed(Vector2(4.0f / 1024.f, 4.0f / 1024.f));
 	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
 	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
 	deviceContext->RSSetViewports(1, &this->vp);
@@ -1863,7 +1863,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
 		const Vector2 windSpeed = fog->getWindSpeed();
-		Vector4 t = Vector4(time, windSpeed.x + (i % 3) * 0.00003, windSpeed.y + (i % 2) * 0.000045, 0.0);
+		Vector4 t = Vector4(time, windSpeed.x + (i % 3) * 0.00001, windSpeed.y + (i % 3) * 0.000015, 0.0);
 		deviceContext->Map(fogAnimationBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &t, sizeof(Vector4));
 		deviceContext->Unmap(fogAnimationBuffer.Get(), 0);

@@ -20,10 +20,6 @@ cbuffer MaterialBuffer : register(b0)
 	float scale;
 }
 
-Texture2D noiseTex : register(t0);
-SamplerState samplerState : register(s0);
-
-
 float2 hash(float2 p)
 {
 	p = fmod(p, scale);
