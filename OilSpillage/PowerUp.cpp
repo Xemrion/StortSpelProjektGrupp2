@@ -60,15 +60,15 @@ void PowerUp::loadModel()
 {
 	if (type == PowerUpType::Health)
 	{
-		mesh = Game::getGraphics().getMeshPointer("Cube");
+		mesh = Game::getGraphics().getMeshPointer("Entities/PowerUps/HealthBoost");
 	}
 	else if (type == PowerUpType::Speed)
 	{
-		mesh = Game::getGraphics().getMeshPointer("Cube");
+		mesh = Game::getGraphics().getMeshPointer("Entities/PowerUps/SpeedBoost");
 	}
 	else if (type == PowerUpType::Time)
 	{
-		mesh = Game::getGraphics().getMeshPointer("Cube");
+		mesh = Game::getGraphics().getMeshPointer("Entities/PowerUps/TimeBoost");
 	}
 	else if (type == PowerUpType::Star)
 	{
@@ -98,7 +98,13 @@ void PowerUp::update(float deltaTime)
 	{
 		this->rotation = Vector3(sin(time), cos(time * 0.1 + 1.0), cos(time));
 		this->setColor(Vector4(fmod(0.2 + time, 1.0), fmod(0.63 + time * 1.33, 1.0), fmod(time * 0.81, 1.0), 1.0));
-		this->setScale(Vector3(sin(time * 3.0) * 0.05 + 0.4, sin(time * 3.0) * 0.05 + 0.4, sin(time * 3.0) * 0.05 + 0.4));
+		if (type == PowerUpType::Star)
+		{
+			this->setScale(Vector3(sin(time * 3.0) * 0.05 + 0.4, sin(time * 3.0) * 0.05 + 0.4, sin(time * 3.0) * 0.05 + 0.4));
+		}
+		else {
+			this->setScale(Vector3(sin(time * 3.0) * 0.05 + 0.8, sin(time * 3.0) * 0.05 + 0.8, sin(time * 3.0) * 0.05 + 0.8));
+		}
 	}
 }
 

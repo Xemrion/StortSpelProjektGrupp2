@@ -139,7 +139,7 @@ void Vehicle::init(Physics* physics)
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicleBody1->getRigidBody()->setCollisionFlags(vehicleBody1->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	vehicleBody1->getRigidBody()->setFriction(1);
-	vehicleBody1->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+	//vehicleBody1->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
 	/*spring1 = physics->addSpring(this->vehicle->getRigidBody(),this->wheel1->getRigidBody());
 	spring1->setLinearLowerLimit(btVector3(0.0f, 0.0f, 0.0f));
 	spring1->setLinearUpperLimit(btVector3(0.0f, 0.56f, 0.0f));
