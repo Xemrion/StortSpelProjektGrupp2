@@ -18,7 +18,6 @@ Vehicle::Vehicle()
 	this->immortal = false;
 
 	targetRotation = 0.0f;
-	drivingMode = 1;
 	topSpeed = 4700;
 	this->add = 0.0f;
 	this->counter = 0.0f;
@@ -250,7 +249,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		vehicle->getRigidBody()->getAngularVelocity().getZ());
 
 	//Driving mode: Throttle and turning, realistic
-	if (drivingMode == 0) {
+	if (Game::getDrivingMode()) {
 		if ((throttleInputTrigger) && this->health > 0) {
 			if (velocitySpeed < (40 * updatedStats.maxSpeed)) {
 				this->vehicle->getRigidBody()->applyImpulse(btVector3(dx * deltaTime * 160.0f * updatedStats.accelerationRate, 0, -(dy * deltaTime * 160.0f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
@@ -327,7 +326,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		}
 	}
 	//Driving Mode: Turn towards direction, semi-realistic
-	else if (drivingMode == 1) {
+	else {
 
 		Vector3 steering3 = Vector3(vehicle->getRigidBody()->getAngularVelocity().getX(),
 			/*deltaTime*/0.035f * updatedStats.handlingRate * 80 * min(velocitySpeed * 0.15f, 1),
@@ -413,26 +412,24 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	if (Input::isKeyDown_DEBUG(DirectX::Keyboard::LeftShift)) {
 		driftResistance /= 2;
 	}
-	if (drivingMode != 2) {
-		if (Input::getStrengthL() > 0) {
-			if (driftForce < -0) {
-				this->vehicle->getRigidBody()->applyImpulse(btVector3(-driftResistance.x, 0, 0), btVector3(0, 0, 0));
-				this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, driftResistance.y), btVector3(0, 0, 0));
-			}
-			else if (driftForce > 0) {
-				this->vehicle->getRigidBody()->applyImpulse(btVector3(driftResistance.x, 0, 0), btVector3(0, 0, 0));
-				this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, -driftResistance.y), btVector3(0, 0, 0));
-			}
+	if (Input::getStrengthL() > 0) {
+		if (driftForce < -0) {
+			this->vehicle->getRigidBody()->applyImpulse(btVector3(-driftResistance.x, 0, 0), btVector3(0, 0, 0));
+			this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, driftResistance.y), btVector3(0, 0, 0));
 		}
-		else {
-			if (driftForce < -0) {
-				this->vehicle->getRigidBody()->applyImpulse(btVector3(-driftResistance.x, 0, 0), btVector3(0, 0, 0));
-				this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, driftResistance.y), btVector3(0, 0, 0));
-			}
-			else if (driftForce > 0) {
-				this->vehicle->getRigidBody()->applyImpulse(btVector3(driftResistance.x, 0, 0), btVector3(0, 0, 0));
-				this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, -driftResistance.y), btVector3(0, 0, 0));
-			}
+		else if (driftForce > 0) {
+			this->vehicle->getRigidBody()->applyImpulse(btVector3(driftResistance.x, 0, 0), btVector3(0, 0, 0));
+			this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, -driftResistance.y), btVector3(0, 0, 0));
+		}
+	}
+	else {
+		if (driftForce < -0) {
+			this->vehicle->getRigidBody()->applyImpulse(btVector3(-driftResistance.x, 0, 0), btVector3(0, 0, 0));
+			this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, driftResistance.y), btVector3(0, 0, 0));
+		}
+		else if (driftForce > 0) {
+			this->vehicle->getRigidBody()->applyImpulse(btVector3(driftResistance.x, 0, 0), btVector3(0, 0, 0));
+			this->vehicle->getRigidBody()->applyImpulse(btVector3(0, 0, -driftResistance.y), btVector3(0, 0, 0));
 		}
 	}
 	//this->vehicle->getRigidBody()->setLinearVelocity(btVector3((velocity.x * deltaTime*2 * 0.002f) * 100.0f, this->vehicle->getRigidBody()->getLinearVelocity().getY(), -(velocity.y * deltaTime*2 * 0.002f) * 100.0f));
@@ -1087,16 +1084,6 @@ SpotLight* Vehicle::getSpotLight()
 void Vehicle::setLaserLight(LaserLight* light)
 {
 	//this->laserLight = light;
-}
-
-void Vehicle::setDrivingMode(int i)
-{
-	this->drivingMode = i;
-}
-
-bool Vehicle::getDrivingMode()
-{
-	return this->drivingMode;
 }
 
 Vector3 Vehicle::getVelocity()

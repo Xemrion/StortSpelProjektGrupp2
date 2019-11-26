@@ -119,7 +119,16 @@ float Game::getLocalScale()
 GameInfo& Game::getGameInfo() noexcept
 {
 	return instance->gameInfo;
-	// TODO: insert return statement here
+}
+
+bool Game::getDrivingMode()
+{
+	return instance->drivingMode;
+}
+
+void Game::setDrivingMode(bool realistic)
+{
+	instance->drivingMode = realistic;
 }
 
 

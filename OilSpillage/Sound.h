@@ -35,8 +35,6 @@ private:
 	std::vector<int> loopingSounds;
 	SoLoud::Speech speech;
 	Soundtrack soundtrack;
-
-	int handlePowerup;
 public:
 	Sound();
 	virtual ~Sound();
@@ -46,6 +44,8 @@ public:
 	static void update(float deltaTime);
 	static void stopAll();
 	static void load(const std::string& fileName);
+	static float getMasterVolume();
+	static void setMasterVolume(float volume);
 
 	static void sayText(const std::string& text);
 

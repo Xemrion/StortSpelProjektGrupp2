@@ -28,10 +28,15 @@ std::string UIPlaying::getFormattedTime()
 
 void UIPlaying::updateUI(float deltaTime)
 {
+	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
+	Color color(Colors::Yellow);
+	Vector2 position = this->timer->getPosition();
+
 	if (this->shouldInit)
 	{
 		this->minimap->init();
 		this->objectiveBox->init();
+		this->lastMinute = static_cast<int>((time - 1.0f) / 60);
 		this->shouldInit = false;
 	}
 
@@ -39,18 +44,26 @@ void UIPlaying::updateUI(float deltaTime)
 	this->minimap->update(deltaTime);
 	this->objectiveBox->update(deltaTime);
 
-	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
-	Color color(Colors::Yellow);
-
-	int secondsFromMinute = static_cast<int>(std::roundf(time)) % 60;
-	if (secondsFromMinute <= 1 || secondsFromMinute >= 59 || time <= 10.0f)
+	int thisMinute = static_cast<int>((time - 1.0f) / 60);
+	if (thisMinute != this->lastMinute)
 	{
+		this->scaleUp = true;
+		this->scaleTimer = 0.0f;
+		this->lastMinute = thisMinute;
+	}
+
+	if ((this->scaleUp && this->scaleTimer < 3.0f) || time <= 10.0f)
+	{
+		this->scaleTimer += deltaTime;
+
 		timerScale = Game::lerp(timerScale, 1.0f, deltaTime * 2);
+		position = Vector2::Lerp(position, Vector2(SCREEN_WIDTH / 2 - 100, 20 + Slider::size.y + 10), deltaTime * 2);
 		color = Color(Colors::GreenYellow);
 	}
 	else
 	{
 		timerScale = Game::lerp(timerScale, 0.5f, deltaTime * 2);
+		position = Vector2::Lerp(position, Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2 - 115, 10), deltaTime * 2);
 		color = Color(Colors::Yellow);
 	}
 
@@ -65,8 +78,10 @@ void UIPlaying::updateUI(float deltaTime)
 	}
 
 	this->timer->setVariables(this->getFormattedTime(), color, timerScale);
-	this->timer->setPosition(Vector2(SCREEN_WIDTH / 2 - this->timer->getSize().x / 2, 20 + Slider::size.y + 10));
+	this->timer->setPosition(position);
 	this->timer->update(deltaTime);
+
+	this->score->setVariables("Score: " + std::to_string(Game::getGameInfo().highScore), {}, {});
 }
 
 void UIPlaying::drawUI()
@@ -124,22 +139,23 @@ void UIPlaying::drawUI()
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "You died", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)+Vector2(0,70.0f), Colors::Red, 0, Vector2(textSize2.x / 2, textSize2.y / 2), 1.0f);
 
 	}
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Press Q to change driving mode", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(400, -340.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
-	if (player->getDrivingMode() == 1) {
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Arcade", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(400, -300.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
-	}else if (player->getDrivingMode() == 0) {
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Realistic", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(400, -300.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Driving mode:", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(600, -340.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
+	if (!Game::getDrivingMode()) {
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Arcade", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(600, -320.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
+	}else {
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Realistic", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(600, -320.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
 	}
 	
 	this->healthBar->draw(false);
 	this->objectiveBox->draw(false);
 	this->minimap->draw(false);
+	this->timerText->draw(false);
 	this->timer->draw(false);
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), std::to_string(Game::getGameInfo().highScore).c_str(), Vector2(0, 0), Colors::Red, 0, Vector2::Zero, 1.0f);
+	this->score->draw(false);
 	UserInterface::getSpriteBatch()->End();
 }
 
-UIPlaying::UIPlaying() : shouldInit(true), respawnTimer(0), timerScale(0.5f)
+UIPlaying::UIPlaying() : shouldInit(true), respawnTimer(0), timerScale(0.5f), lastMinute(0), scaleUp(false), scaleTimer(0.0f)
 {
 }
 
@@ -151,10 +167,14 @@ void UIPlaying::init()
 {
 	this->healthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 20));
 	this->minimap = std::make_unique<Minimap>(Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
-	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(-10, 15));
-	this->timer = std::make_unique<AnimatedText>("00:00", Color(Colors::Yellow), timerScale, Animation::NONE);
-	this->timer->setPosition(Vector2(SCREEN_WIDTH / 2 - this->timer->getSize().x / 2, 20 + Slider::size.y + 10));
+	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(10, 10));
+
+	this->timerText = std::make_unique<AnimatedText>("Time: ", Color(Colors::Yellow), 0.5f, Animation::NONE, Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2 - 115 - 100, 10));
+	this->timerText->beginAnimation();
+	this->timer = std::make_unique<AnimatedText>("00:00", Color(Colors::Yellow), timerScale, Animation::NONE, Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2 - 115, 10));
 	this->timer->beginAnimation();
+	this->score = std::make_unique<AnimatedText>("Score: 0", Color(Colors::Yellow), 0.5f, Animation::NONE, Vector2(SCREEN_WIDTH / 2 + Slider::size.x / 2 + 10, 10));
+	this->score->beginAnimation();
 }
 
 void UIPlaying::resetMinimapFog()
@@ -165,4 +185,8 @@ void UIPlaying::resetMinimapFog()
 bool UIPlaying::hasExploredOnMinimap(Vector3 worldPosition) const
 {
 	return this->minimap->hasExplored(worldPosition);
+}
+
+void UIPlaying::addTimeChangeText(float amount)
+{
 }

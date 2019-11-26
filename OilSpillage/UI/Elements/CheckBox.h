@@ -9,11 +9,12 @@ class CheckBox : public Element
 private:
 	Texture* textureUnchecked;
 	Texture* textureChecked;
+	std::string text;
 	bool activated;
 public:
 	static Vector2 size;
 
-	CheckBox(Vector2 position = Vector2());
+	CheckBox(std::string text, Vector2 position = Vector2());
 	virtual ~CheckBox();
 
 	virtual void draw(bool selected);

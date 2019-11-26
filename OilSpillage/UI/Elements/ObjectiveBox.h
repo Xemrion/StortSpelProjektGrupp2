@@ -2,6 +2,7 @@
 #define OBJECTIVE_BOX_H
 
 #include "Element.h"
+#include "AnimatedText.h"
 #include"../../Objectives/ObjectiveHandler.h"
 
 class ObjectiveBox : public Element
@@ -9,9 +10,10 @@ class ObjectiveBox : public Element
 private:
 	ObjectiveHandler* objHandlerPtr;
 	Texture* textureQuest;
-	std::vector<std::string> vecToShow;
-	std::string rewardInfo;
-	Color color;
+	
+	std::unique_ptr<AnimatedText> objectiveText;
+	std::unique_ptr<AnimatedText> info;
+	std::unique_ptr<AnimatedText> rewardInfo;
 public:
 	static Vector2 size;
 

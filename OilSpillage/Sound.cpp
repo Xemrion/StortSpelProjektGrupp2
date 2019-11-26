@@ -51,6 +51,16 @@ void Sound::load(const std::string& fileName)
 	}
 }
 
+float Sound::getMasterVolume()
+{
+	return instance->soloud.getGlobalVolume();
+}
+
+void Sound::setMasterVolume(float volume)
+{
+	instance->soloud.setGlobalVolume(std::clamp(volume, 0.0f, 1.0f));
+}
+
 void Sound::sayText(const std::string& text)
 {
 	instance->speech.setText(text.c_str());
