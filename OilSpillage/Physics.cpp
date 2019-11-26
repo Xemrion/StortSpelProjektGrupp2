@@ -124,7 +124,7 @@ void Physics::update(float deltaTime)
 	//this->world->stepSimulation(btScalar(deltaTime));
 }
 
-btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, void* obj)
+btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, GameObject* obj)
 {	//add object set transform
 	btTransform t; //
 	t.setIdentity();
@@ -151,7 +151,7 @@ btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, void
 	return body;
 }
 
-btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass, void* objects)
+btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass, GameObject* objects)
 {
 	//add object set transform
 	btTransform t; //
@@ -291,30 +291,28 @@ bool Physics::deletePointJoint(btPoint2PointConstraint* pointJoint)
 bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1,
 	int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
-	Vehicle* playerPtr = static_cast<Vehicle*>(obj1->getCollisionObject()->getUserPointer());
-	Actor* enemyPtr = static_cast<Actor*>(obj2->getCollisionObject()->getUserPointer());
+	GameObject* playerPtr = obj1->getCollisionObject()->getUserPointer();
+	GameObject* enemyPtr = obj2->getCollisionObject()->getUserPointer();
+	if (playerPtr == nullptr || enemyPtr == nullptr) return false;
 
-	//if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
-	//{
-	//	playerPtr = static_cast<Vehicle*>(obj2->getCollisionObject()->getUserPointer());
-	//	enemyPtr = static_cast<Actor*>(obj1->getCollisionObject()->getUserPointer());
+	if (!playerPtr->isPlayer())
+	{
+		std::swap(playerPtr, enemyPtr);
 
-	//	if (playerPtr == nullptr || enemyPtr == nullptr ? true : !playerPtr->isPlayer())
-	//	{
-	//		return false;
-	//	}
-	//}
+		if (!playerPtr->isPlayer())
+		{
+			return false;
+		}
+	}
 
-	//if (enemyPtr != nullptr)
-	//{
-	//	if (playerPtr->getPowerUpTimer(PowerUpType::Star) > 0.0)
-	//	{
-	//		Sound::play("./data/sound/StarPowerupHit.mp3",0.75f);
-	//		enemyPtr->changeHealth(-200);
-	//	}
+	if (((Vehicle*)playerPtr)->getPowerUpTimer(PowerUpType::Star) > 0.0)
+	{
+		Sound::play("./data/sound/StarPowerupHit.mp3", 0.75f);
+		((Actor*)enemyPtr)->changeHealth(-200);
 
-	//	return true;
-	//}
+		return true;
+	}
+
 	return false;
 }
 

@@ -86,10 +86,9 @@ struct VehicleSlots
 	}
 
 };
-class Vehicle
+class Vehicle : public GameObject
 {
 private:
-	GameObject* vehicle;
 	btScalar mRotation;
 	GameObject* wheel1;
 	GameObject* wheel2;
@@ -151,7 +150,6 @@ private:
 	float soundTimer;
 	bool flameBool;
 	bool dmg;
-	bool player = false;
 	
 	int soundHandle = 0;
 	int driftHandle = 0;
@@ -180,7 +178,6 @@ public:
 	void setVehicleSlots(VehicleSlots* slots);
 	void setSpecSlot(Slots slot, Item* item);
 	VehicleSlots* getSlots();
-	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
 	void startEngineSound();
@@ -211,8 +208,6 @@ public:
 	bool isDead() const;
 	float getTotalRespawnTime()const;
 	float getRespawnTimer()const;
-	void makePlayer();
-	bool isPlayer() const;
 
 	float getPitch(DirectX::XMVECTOR Quaternion);
 	float getYaw(DirectX::XMVECTOR Quaternion);

@@ -208,7 +208,7 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 	{
 		obj->move(dir * min(deltaTime, timeLeft));
 
-		if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition()).Length() < 1.5f)
+		if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getPosition()).Length() < 1.5f)
 		{
 			if (soundTimer > 0.05f) {
 				int randomSound = rand() % 3 + 1;
@@ -228,7 +228,7 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 void Bullet::enemyMeleeUpdate(float& deltaTime)
 {
 
-	if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition()).Length() < 1.5f)
+	if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getPosition()).Length() < 1.5f)
 	{
 		if (soundTimer > 0.05f) {
 			int randomSound = rand() % 3 + 1;
@@ -247,7 +247,7 @@ void Bullet::laserEnemyUpdate(float& deltaTime)
 	GameObject* laserObject = this->getGameObject();
 	Vector3 rayDir = this->getDirection();
 	Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
-	if (static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getAABB().intersect(rayOrigin, rayDir, 1000))
+	if (static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getAABB().intersect(rayOrigin, rayDir, 1000))
 	{
 		if (soundTimer > 0.05f)
 		{
