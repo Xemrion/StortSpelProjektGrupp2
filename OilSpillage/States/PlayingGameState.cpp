@@ -1304,7 +1304,7 @@ void PlayingGameState::generateObjectives()
 {
 	if (Game::getNrOfStagesDone() % 3 == 1)
 	{
-		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getVehicle()->getPosition().x, this->player->getVehicle()->getPosition().z, 1)); //fix pos
+		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1)); //fix pos
 		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
 	}
 	else
