@@ -897,7 +897,7 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 
 void Graphics::addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime)
 {
-	this->particleTrail->addParticle(nrOfParticles, lifeTime, pos, initialDirection);
+	this->particleTrail->addParticle(1, lifeTime, pos, initialDirection);
 }
 
 void Graphics::changeTrailColor(Vector3 color)

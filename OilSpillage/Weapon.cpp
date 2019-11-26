@@ -153,7 +153,7 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 
 void Bullet::update(float deltaTime)
 {
-	if (this->weapon.type == WeaponType::Spikes || this->weapon.melee)
+	if (this->weapon.type == WeaponType::Laser || this->weapon.melee)
 	{
 		this->obj->setPosition(initPos);
 		this->dir = initDir;
@@ -323,7 +323,7 @@ WeaponType Bullet::getWeaponType() const
 	return this->weapon.type;
 }
 
-int Bullet::getDamage() const
+float Bullet::getDamage() const
 {
 	return weapon.damage;
 }

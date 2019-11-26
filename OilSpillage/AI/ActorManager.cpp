@@ -40,9 +40,9 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 
 	if (spawnTimer <= 0)
 	{
-#ifndef _DEBUG
+
 		spawnEnemies(targetPos);
-#endif
+
 		spawnTimer = spawnCooldown;
 	}
 
@@ -168,7 +168,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 					GameObject* laserObject = bulletArray[j].getGameObject();
 					Vector3 rayDir = bulletArray[j].getDirection();
 					Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
-					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z * 2))
+					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 					{
 						if (soundTimer > 0.05f) {
 							Sound::play("./data/sound/HitSound.wav");
@@ -206,18 +206,18 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createAttacker(originPos.x + i, originPos.z, (rand() % 4) + 1);
-		createAttacker(originPos.x, originPos.z + i, (rand() % 4) + 1);
-		createAttacker(originPos.x - i, originPos.z, (rand() % 4) + 1);
+		createAttacker(originPos.x + i, originPos.z, 7);
+		createAttacker(originPos.x, originPos.z + i, 7);
+		createAttacker(originPos.x - i, originPos.z, 7);
 	}
 }
 void ActorManager::spawnSnipers(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createSniper(originPos.x + i, originPos.z, (rand() % 4) + 1);
-		createSniper(originPos.x, originPos.z + i, (rand() % 4) + 1);
-		createSniper(originPos.x - i, originPos.z, (rand() % 4) + 1);
+		createSniper(originPos.x + i, originPos.z, (rand() % 8) + 1);
+		createSniper(originPos.x, originPos.z + i, (rand() % 8) + 1);
+		createSniper(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
 void ActorManager::spawnChaseCars(const Vector3& originPos)
@@ -234,9 +234,9 @@ void ActorManager::spawnShootCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createShootCar(originPos.x + i, originPos.z, (rand() % 4) + 1);
-		createShootCar(originPos.x, originPos.z + i, (rand() % 4) + 1);
-		createShootCar(originPos.x - i, originPos.z, (rand() % 4) + 1);
+		createShootCar(originPos.x + i, originPos.z, (rand() % 8) + 1);
+		createShootCar(originPos.x, originPos.z + i, (rand() % 8) + 1);
+		createShootCar(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
 
@@ -449,11 +449,13 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 		}
 		else if (enemyType == 1)
 		{
-			spawnChaseCars(newPos);
+			//spawnChaseCars(newPos);
+			spawnAttackers(newPos);
 		}
 		else if (enemyType == 2)
 		{
-			spawnShootCars(newPos);
+			//spawnShootCars(newPos);
+			spawnSwarm(newPos);
 		}
 		else if (enemyType == 3)
 		{
