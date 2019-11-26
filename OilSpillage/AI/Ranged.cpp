@@ -1,5 +1,7 @@
 #include "Ranged.h"
 #include"../States/PlayingGameState.h"
+#include "../Lights.h"
+
 void Ranged::updateBullets(float deltaTime)
 {
 	this->timeSinceLastShot += deltaTime;
@@ -10,6 +12,11 @@ void Ranged::updateBullets(float deltaTime)
 			bullets[i].getGameObject()->setPosition(*positionPtr);
 			//Vector3 selfToTarget = (*positionPtr - *targetPosPtr);
 			//bullets[i].setDirection(selfToTarget);
+			const float laserDropOffSpeed = 1.0;
+			laser->setDirection(bullets[i].getDirection());
+			laser->setPos(bullets[i].getGameObject()->getPosition());
+			float dropOffFactor = weapon.bulletLifetime - bullets[i].getTimeLeft();
+			laser->setLuminance(max(0.2 - (dropOffFactor * laserDropOffSpeed) * laserDropOffSpeed, 0.0));
 		}
 		bullets[i].update(deltaTime);
 	}
@@ -151,6 +158,7 @@ Status Ranged::shoot()
 }
 Ranged::Ranged()
 {
+
 }
 
 Ranged::Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity,float* deltaTimePtr, int weaponType)
@@ -165,4 +173,12 @@ Ranged::Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity,float* deltaT
 
 Ranged::~Ranged()
 {
+	if (laser != nullptr)
+	{
+		PlayingGameState* gameState = dynamic_cast<PlayingGameState*>(Game::getCurrentState());
+		if (gameState != nullptr)
+		{
+			gameState->removeLight(laser);
+		}
+	}
 }

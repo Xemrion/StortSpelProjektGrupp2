@@ -9,7 +9,7 @@ private:
 	Vector3* targetPosPtr;
 	Vector3* velocityPtr;
 	float* deltaTimePtr;
-
+	LaserLight* laser;
 
 	void assignWeapon(int weaponType);
 protected:

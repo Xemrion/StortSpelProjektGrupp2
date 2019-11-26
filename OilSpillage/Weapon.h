@@ -69,39 +69,6 @@ struct Weapon
 	};
 };
 
-/*
-Grattis! Här får ni en uppgift!
-
-laserLight->setLuminance(0.0);
-	for (int i = 0; i < Vehicle::bulletCount; i++)
-	{
-		if (bullets[i].getWeaponType() == WeaponType::Laser)
-		{
-			bullets[i].getGameObject()->setPosition(this->vehicleBody1->getPosition());
-			bullets[i].setDirection(Vector3(curDir.x, 0, curDir.y));
-
-			laserLight->setPos(this->mountedWeapon->getPosition() + Vector3(curDir.x, 0.0, curDir.y) * 2.0);
-
-			laserLight->setDirection(Vector3(curDir.x, 0.0, curDir.y));
-			if (this->weapon.remainingCooldown == 0.0)
-			{
-				laserLight->setLuminance(10.0);
-			}
-			laserLight->setLength(bullets[i].getWeapon().bulletScale.z);
-			laserLight->setColor(Vector3::Lerp(Vector3(1.0, 0.25, 0.05), Vector3(0.2, 0.01, 0.01), (this->weapon.currentSpreadIncrease * this->weapon.currentSpreadIncrease + 0.0) / (this->weapon.maxSpread * this->weapon.maxSpread)));
-		}
-		else if (bullets->getMelee() == true)
-		{
-			bullets[i].getGameObject()->setPosition(this->vehicleBody1->getPosition());
-			bullets[i].setDirection(Vector3(curDir.x, 0, curDir.y));
-		}
-		bullets[i].update(deltaTime);
-	}
-
-	this->spotLight->setPos(this->mountedWeapon->getPosition() - Vector3(curDir.x, -1, curDir.y));
-	this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
-*/
-
 class WeaponHandler
 {
 public:
