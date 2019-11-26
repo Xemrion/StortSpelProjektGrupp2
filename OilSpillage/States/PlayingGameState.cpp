@@ -266,13 +266,12 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
 	player->getVehicleBody1()->setPosition(startPos + Vector3(.0f, 0.65f - 1.2f, .0f));
-	
 
 	this->cameraObject = new GameObject;
 	Game::getGraphics().loadShape(Shapes::SHAPE_CUBE);
 	cameraObject->mesh = Game::getGraphics().getMeshPointer("Cube");
 	//Game::getGraphics().addToDraw(vehicle);
-	cameraObject->setPosition(Vector3(playerVehicle->getPosition().x, 10.0f, playerVehicle->getPosition().z));
+	cameraObject->setPosition(Vector3(player->getPosition().x, 10.0f, player->getPosition().z));
 	cameraObject->setScale(Vector3(0.5f, 0.14f, 0.9f));
 	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x, btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 10.0f);
 	cameraObject->setRigidBody(tempo, physics.get());
