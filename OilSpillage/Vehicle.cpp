@@ -1389,10 +1389,10 @@ void Vehicle::updatePowerUpEffects(float deltaTime)
 		btVector3 btVelocity = getRigidBody()->getLinearVelocity();
 		Vector3 velocity = Vector3(btVelocity.getX(), btVelocity.getY(), btVelocity.getZ());
 		Game::getGraphics().addParticle(this->vehicleBody1->getPosition(),
-			Vector3(0.0, 10.0, 0.0) + velocity,
+			Vector3(0.0, 0.0, 0.0) + velocity * 0.9,
 			1,
 			10.5f,
-			11.f);
+			1.f);
 	}
 	// speed power up
 	else if (powerUpTimers[(int)PowerUpType::Speed] > 0.0)
