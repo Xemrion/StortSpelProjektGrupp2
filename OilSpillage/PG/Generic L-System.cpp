@@ -21,8 +21,9 @@ Lsystem::~Lsystem()
 	storedPositions.clear();
 }
 
+//Add a constant, requires a char, a Rule type or forward. (Higher priority)
 void Lsystem::addConstant(char character, Rule action, bool forward)
-{ //Add a constant, requires a char, a Rule type or forward. (Higher priority)
+{ 
 	Constant newConstant;
 	newConstant.character = character;
 	newConstant.action = action;
@@ -42,8 +43,9 @@ void Lsystem::addConstant(char character, Rule action, bool forward)
 	valuesModified = true;
 }
 
+//Removes a constant based on a char
 void Lsystem::removeConstant(char character)
-{ //Removes a constant based on a char
+{ 
 	bool removed = false;
 	for (int i = 0; i < this->constants.size() && !removed; i++) {
 		if (this->constants[i].character == character) {
@@ -55,8 +57,9 @@ void Lsystem::removeConstant(char character)
 	valuesModified = true;
 }
 
+//Add a variable, it needs a char, a string to replace the char, and a bool if it should draw forward or not
 void Lsystem::addVariable(char character, String replacementString, bool forward)
-{ //Add a variable, it needs a char, a string to replace the char, and a bool if it should draw forward or not
+{ 
 	Variable newVariable;
 	newVariable.character = character;
 	newVariable.replacement = replacementString;
@@ -76,8 +79,9 @@ void Lsystem::addVariable(char character, String replacementString, bool forward
 	valuesModified = true;
 }
 
+//Removes a variable based on a char
 void Lsystem::removeVariable(char character)
-{ //Removes a variable based on a char
+{ 
 	bool removed = false;
 	for (int i = 0; i < this->variables.size() && !removed; i++) {
 		if (this->variables[i].character == character) {
@@ -89,52 +93,60 @@ void Lsystem::removeVariable(char character)
 	valuesModified = true;
 }
 
+//Set angle using degrees
 void Lsystem::setAngleDegrees(float degree)
-{//Set angle using degrees
+{
 	this->angle = degree * ((3.1415926535f) / 180.0f);
 	valuesModified = true;
 }
 
+//Set angle using radians
 void Lsystem::setAngleRadians(float radians)
-{ //Set angle using radians
+{ 
 	this->angle = radians;
 	valuesModified = true;
 }
 
+//Number of times the replacement function will run
 void Lsystem::setRecursions(int recursions)
-{ //Number of times the replacement function will run
+{ 
 	this->recursions = recursions;
 	rulesModified = true;
 	valuesModified = true;
 }
 
+//Set start position
 void Lsystem::setStartPosition(Vector3 startPos)
-{ //Set start position
+{ 
 	Vector3 difference = startPos - this->startPosition;
 	this->startPosition += difference;
 	moveLSystem(difference);
 }
 
+//Set direction of the start forward
 void Lsystem::setForwardDirection(Vector3 direction)
-{ //Set direction of the start forward
+{ 
 	this->forwardDirection = direction;
 	this->forwardDirection.Normalize();
 	valuesModified = true;
 }
 
+//Set lenght of segments
 void Lsystem::setForwardDistance(float distance)
-{ //Set lenght
+{ 
 	this->forWardDistance = distance;
 	valuesModified = true;
 }
 
+//Set the starting string
 void Lsystem::setAxiom(String axiom)
-{ //Set the starting string
+{ 
 	this->axiom = axiom;
 	rulesModified = true;
 	valuesModified = true;
 }
 
+//Generate the L-system with the specified values
 void Lsystem::updateLSystem()
 {
 	if (rulesModified) {
@@ -147,8 +159,9 @@ void Lsystem::updateLSystem()
 	}
 }
 
+//Setup the parameters of the original Lindenmayer system
 void Lsystem::setupAlgaeSystem()
-{ //Setup the parameters of the original Lindenmayer system
+{ 
 	this->constants.clear();
 	this->variables.clear();
 	addVariable('A', "AB");
@@ -157,8 +170,9 @@ void Lsystem::setupAlgaeSystem()
 	setRecursions(7);
 }
 
-void Lsystem::setupFractalTreeSystem()
-{ //Setup the parameters of a fractal (binary) tree
+//Setup the parameters of a fractal (binary) tree
+void Lsystem::setupFractalTreeSystem() 
+{ 
 	this->constants.clear();
 	this->variables.clear();
 	addVariable('0', "1[0]0", true);
@@ -169,8 +183,9 @@ void Lsystem::setupFractalTreeSystem()
 	setAxiom("0");
 }
 
+//Setup the parameters for a koch curve using right angles
 void Lsystem::setupKochCurveSystem()
-{ //Setup the parameters for a koch curve using right angles
+{ 
 	this->constants.clear();
 	this->variables.clear();
 	addVariable('F', "F+F-F-F+F", true);
@@ -181,8 +196,9 @@ void Lsystem::setupKochCurveSystem()
 	setRecursions(3);
 }
 
-void Lsystem::setupSierpinskiTriangleSystem()
-{ //Setup the parameters for a Sierpinski triangle
+//Setup the parameters for a Sierpinski triangle
+void Lsystem::setupSierpinskiTriangleSystem() 
+{ 
 	this->constants.clear();
 	this->variables.clear();
 	addVariable('F', "F-G+F+G-F", true);
@@ -192,10 +208,11 @@ void Lsystem::setupSierpinskiTriangleSystem()
 	setAngleDegrees(120);
 	setAxiom("F-G-G");
 	setRecursions(6);
-}
+} 
 
+//Setup the parameters for a Sierpinski arrowhead
 void Lsystem::setupSierpinskiArrowheadSystem()
-{ //Setup the parameters for a Sierpinski arrowhead
+{ 
 	this->constants.clear();
 	this->variables.clear();
 	addVariable('A', "B-A-B", true);
@@ -207,8 +224,9 @@ void Lsystem::setupSierpinskiArrowheadSystem()
 	setRecursions(8);
 }
 
+//Setup the parameters for a Dragon Curve
 void Lsystem::setupDragonCurveSystem()
-{ //Setup the parameters for a Dragon Curve
+{ 
 	this->constants.clear();
 	this->variables.clear();
 	addVariable('X', "X+YF+");
@@ -221,8 +239,9 @@ void Lsystem::setupDragonCurveSystem()
 	setRecursions(10);
 }
 
+//Setup the parameters for a Fractal plant or 'Barnsley Fern'
 void Lsystem::setupFractalPlantSystem()
-{ //Setup the parameters for a Fractal plant or 'Barnsley Fern'
+{ 
 	this->constants.clear();
 	this->variables.clear();
 	addVariable('X', "F+[[x]-X]-F[-FX]+X");
