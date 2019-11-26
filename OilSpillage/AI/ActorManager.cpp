@@ -206,9 +206,9 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createAttacker(originPos.x + i, originPos.z, (rand() % 8) + 1);
-		createAttacker(originPos.x, originPos.z + i, (rand() % 8) + 1);
-		createAttacker(originPos.x - i, originPos.z, (rand() % 8) + 1);
+		createAttacker(originPos.x + i, originPos.z, 7);
+		createAttacker(originPos.x, originPos.z + i, 7);
+		createAttacker(originPos.x - i, originPos.z, 7);
 	}
 }
 void ActorManager::spawnSnipers(const Vector3& originPos)
@@ -449,11 +449,13 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 		}
 		else if (enemyType == 1)
 		{
-			spawnChaseCars(newPos);
+			//spawnChaseCars(newPos);
+			spawnAttackers(newPos);
 		}
 		else if (enemyType == 2)
 		{
-			spawnShootCars(newPos);
+			//spawnShootCars(newPos);
+			spawnSwarm(newPos);
 		}
 		else if (enemyType == 3)
 		{

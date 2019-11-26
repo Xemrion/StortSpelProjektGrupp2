@@ -84,7 +84,7 @@ public:
 		{	   2,       0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::aiMachineGun },
 		{	   5,       0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::aiMelee },
 		{     50,       1.5f,         4.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiMissileLauncher },
-		{   0.33,       1.0f,         0.0f,          0.15f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f,  5.0f,  1.5f,  0.0f,  2.0f,  0.0f, WeaponType::aiLaser },
+		{   0.33,       1.0f,         0.0f,          0.5f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f,  5.0f,  1.5f,  0.0f,  2.0f,  0.0f, WeaponType::aiLaser },
 		{      1,      0.05f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiFlamethrower },
 		{0, 0, 0, 0, Vector3(0,0,0), 0, 0, 0, 0, 0, 0, WeaponType::None}
 
@@ -179,7 +179,7 @@ public:
 	void setWeapon(Weapon weapon);
 	Weapon getWeapon() const;
 	WeaponType getWeaponType() const;
-	int getDamage() const;
+	float getDamage() const;
 	bool getMelee() const;
 	void shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity, float deltaTime);
 	void update(float deltaTime);

@@ -38,7 +38,7 @@ Status Ranged::inAttackRange()
 
 void Ranged::assignWeapon(int weaponType)
 {
-	if(Game::getGameInfo().nrOfClearedStages < 3)
+	if(Game::getGameInfo().nrOfClearedStages < -1)
 	{
 		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 	}
@@ -82,6 +82,14 @@ void Ranged::assignWeapon(int weaponType)
 		else if (weaponType == 7)// Laser
 		{
 			this->weapon = WeaponHandler::getWeapon(WeaponType::aiLaser);
+			LaserLight tempLaser = LaserLight(
+				Vector3(0, 0, 0),
+				Vector3(1.0, 0.1, 0.1),
+				0.0,
+				Vector3(0, 0, 0),
+				weapon.bulletScale.z);
+			PlayingGameState* gameState = static_cast<PlayingGameState*>(Game::getCurrentState());
+			laser = gameState->addLight(tempLaser);
 			//this->setColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f));
 		}
 		else if (weaponType == 8)// Flamethrower

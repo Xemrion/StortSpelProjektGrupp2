@@ -323,7 +323,7 @@ WeaponType Bullet::getWeaponType() const
 	return this->weapon.type;
 }
 
-int Bullet::getDamage() const
+float Bullet::getDamage() const
 {
 	return weapon.damage;
 }
