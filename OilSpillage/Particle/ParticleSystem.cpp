@@ -206,6 +206,11 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 
 bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection)
 {
+	
+	if (!isfinite(position.x) || !isfinite(position.y) || !isfinite(position.z))
+	{
+		return false;
+	}
 	UINT initialCount;
 	if (firstAdd == 0)
 	{
@@ -216,6 +221,7 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	{
 		initialCount = -1;
 	}
+	mtx.lock();
 	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, initialDirection.w);
 	pParams.emitterLocation = Vector4(position.x,position.y,position.z, lifeTime);
 	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX,1.0f);
@@ -249,12 +255,16 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 		deviceContext->Dispatch(nrOf, 1, 1);
 	}
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
-
+	mtx.unlock();
 	return true;
 }
 
 bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection)
 {
+	if (!isfinite(position.x) || !isfinite(position.y) || !isfinite(position.z))
+	{
+		return false;
+	}
 	nrOf = 1;
 	UINT initialCount;
 	if (firstAdd == 0)
@@ -266,6 +276,7 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	{
 		initialCount = -1;
 	}
+	mtx.lock();
 	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f);
 	pParams.emitterLocation = Vector4(position.x, position.y, position.z, lifeTime);
 	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, 1.0f);
@@ -301,7 +312,7 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 		deviceContext->Dispatch(nrOf, 1, 1);
 	}
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &null);
-
+	mtx.unlock();
 	return true;
 }
 
