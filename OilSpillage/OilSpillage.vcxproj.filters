@@ -26,6 +26,9 @@
     <FxCompile Include="Shadows\SimpleVS.hlsl" />
     <FxCompile Include="VertexShader.hlsl" />
     <FxCompile Include="VertexUI.hlsl" />
+    <FxCompile Include="Particle\DebrisUpdateCS.hlsl" />
+    <FxCompile Include="Particle\DebrisCreateCS.hlsl" />
+    <FxCompile Include="Particle\ElectroUpdateCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI\AIGroup.cpp" />
@@ -40,6 +43,7 @@
     <ClCompile Include="AI\DynamicActor.cpp" />
     <ClCompile Include="AI\Melee.cpp" />
     <ClCompile Include="AI\Ranged.cpp" />
+    <ClCompile Include="AI\ShootCar.cpp" />
     <ClCompile Include="AI\Sniper.cpp" />
     <ClCompile Include="AI\Turret.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
@@ -101,6 +105,7 @@
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />
     <ClCompile Include="States\UpgradingGameState.cpp" />
+    <ClCompile Include="UI\Elements\AnimatedText.cpp" />
     <ClCompile Include="UI\Elements\Button.cpp" />
     <ClCompile Include="UI\Elements\ButtonPromtBar.cpp" />
     <ClCompile Include="UI\Elements\CarGadgetSelector.cpp" />
@@ -153,6 +158,9 @@
     <ClCompile Include="AI\ShootCar.cpp" />
     <ClCompile Include="UI\Elements\AnimatedText.cpp" />
     <ClCompile Include="PG\Generic L-System.cpp" />
+    <ClCompile Include="UI\Menu\UIHighscore.cpp" />
+    <ClCompile Include="MyClient.cpp" />
+    <ClCompile Include="BulletSDK\include\LinearMath\btThreads.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -167,6 +175,7 @@
     <ClInclude Include="AI\DynamicActor.h" />
     <ClInclude Include="AI\Melee.h" />
     <ClInclude Include="AI\Ranged.h" />
+    <ClInclude Include="AI\ShootCar.h" />
     <ClInclude Include="AI\Sniper.h" />
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="fog.h" />
@@ -360,6 +369,8 @@
     <ClInclude Include="VehicleStats.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="PG\Generic L-System.h" />
+    <ClInclude Include="UI\Menu\UIHighscore.h" />
+    <ClInclude Include="MyClient.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
