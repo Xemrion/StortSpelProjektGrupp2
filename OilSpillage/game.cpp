@@ -167,7 +167,8 @@ void Game::createCurrentState()
 			
 		}
 		state = std::make_unique<PlayingGameState>();
-
+		static_cast<PlayingGameState*>(state.get())->nextStage();
+		static_cast<PlayingGameState*>(state.get())->generateObjectives();
 		if (oldState == STATE_UPGRADING)
 		{	
 			static_cast<PlayingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
