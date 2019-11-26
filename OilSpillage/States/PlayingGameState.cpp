@@ -770,14 +770,15 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 		actorManager->update(deltaTime, playerVehicle->getPosition());
-		auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
+		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount);
+		//auto bulletThread = std::async(std::launch::async, &ActorManager::intersectPlayerBullets, actorManager, playerBullets, playerBulletCount);
 		accelForce = Vector3(player->getVehicle()->getRigidBody()->getLinearVelocity().getX(), player->getVehicle()->getRigidBody()->getLinearVelocity().getY(), player->getVehicle()->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation(deltaTime);
 		camera->update(deltaTime);
 		objectives.update(player->getVehicle()->getPosition());
 		Bullet::updateSoundTimer(deltaTime);
-		bulletThread.get();
+		//bulletThread.get();
 		player->updateWeapon(deltaTime);
 		timer += deltaTime;
 		if (Input::checkButton(Keys::R_LEFT, States::PRESSED))

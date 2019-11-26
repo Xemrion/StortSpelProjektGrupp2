@@ -123,7 +123,6 @@ private:
 	ParticleShaders particleShaders;
 	ParticleSData systemData;
 
-	std::mutex mtx;
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw
