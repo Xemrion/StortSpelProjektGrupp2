@@ -249,7 +249,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0
 
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
-	player->startEngineSound();
 
 	map = std::make_unique<Map>(graphics, config, physics.get());
 	map->setDistrictColorCoding(isDebugging);
