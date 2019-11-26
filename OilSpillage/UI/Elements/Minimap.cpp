@@ -119,7 +119,7 @@ void Minimap::init()
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Vector3 mapSize((state->getBottomRight() - state->getTopLeft() + Vector3(0, 1, 0)) * Vector3(1, 1, -1));
 	Vector3 mapScale(Vector3(this->textureMap->getWidth(), 1, this->textureMap->getHeight()) / mapSize);
-
+	
 	this->mapMatrix = Matrix::CreateTranslation(-Vector3(state->getTopLeft().x, 0, state->getBottomRight().z));
 	this->mapMatrix *= Matrix::CreateScale(mapScale);
 }
@@ -201,7 +201,7 @@ void Minimap::draw(bool selected)
 	{
 		for (int i = 0; i < state->getObjHandler().getObjective(0)->getNrOfMax(); i++)
 		{
-			if (state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree)
+			if (state->getObjHandler().getObjective(0)->getType() == TypeOfMission::FindAndCollect)
 			{
 				if (state->getObjHandler().getObjective(0)->getTarget(i) != nullptr)
 				{

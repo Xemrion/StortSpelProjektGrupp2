@@ -50,27 +50,30 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	float deltaX;
 	float deltaZ;
 	float distance;
+	//for (int i = 0; i < groups.size(); i++)
+	//{
+	//	deltaX = groups[i].averagePos.x - targetPos.x;
+	//	deltaZ = groups[i].averagePos.z - targetPos.z;
+	//	distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+	//	//(TileSize * nrOfTiles)^2
+	//	if (distance > (20 * 10) * (20 * 10))
+	//	{
+	//		newPos = generateObjectivePos(targetPos, 0, 50);
+	//		for (int j = 0; j < groups[i].actors.size(); j++)
+	//		{
+	//			Actor* current = groups[i].actors[j];
+	//			current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+	//			physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+	//			if (j % 5 == 0)
+	//			{
+	//				newPos = generateObjectivePos(targetPos, 0, 50);
+	//			}
+	//		}
+	//	}
+	//}
 	for (int i = 0; i < groups.size(); i++)
 	{
 		groups[i].update(targetPos);
-		deltaX = groups[i].averagePos.x - targetPos.x;
-		deltaZ = groups[i].averagePos.z - targetPos.z;
-		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-		//(TileSize * nrOfTiles)^2
-		if (distance > (20 * 10) * (20 * 10))
-		{
-			//newPos = generateObjectivePos(targetPos, 50, 100);
-			for (int j = 0; j < groups[i].actors.size(); j++)
-			{
-				Actor* current = groups[i].actors[j];
-				//current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-				if (j % 5 == 0)
-				{
-					//newPos = generateObjectivePos(targetPos, 50, 100);
-				}
-			}
-		}
 	}
 	updateGroups();
 	turretHandler.update(dt, targetPos);
@@ -123,10 +126,13 @@ void ActorManager::createSwarm(float x, float z)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createBoss(float x, float z, int weaponType)
+Boss* ActorManager::createBoss(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Boss(x, z, weaponType, physics));
+	Boss* boss = new Boss(x, z, weaponType, physics);
+	this->actors.push_back(boss);
 	initGroupForActor(actors.at(actors.size() - 1));
+
+	return boss;
 }
 
 float ActorManager::distanceToPlayer(const Vector3& position)
@@ -206,9 +212,9 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createAttacker(originPos.x + i, originPos.z, 7);
-		createAttacker(originPos.x, originPos.z + i, 7);
-		createAttacker(originPos.x - i, originPos.z, 7);
+		createAttacker(originPos.x + i, originPos.z, (rand() % 8) + 1);
+		createAttacker(originPos.x, originPos.z + i, (rand() % 8) + 1);
+		createAttacker(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
 void ActorManager::spawnSnipers(const Vector3& originPos)
@@ -262,11 +268,6 @@ void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float an
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
 		createTurret(newPosition.x, newPosition.y, 1);
 	}
-}
-
-void ActorManager::spawnBoss(const Vector3& originPos, int weaponType)
-{
-	//createBoss(originPos.x, originPos.z, weaponType);
 }
 
 Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)
@@ -449,13 +450,13 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 		}
 		else if (enemyType == 1)
 		{
-			//spawnChaseCars(newPos);
-			spawnAttackers(newPos);
+			spawnChaseCars(newPos);
+			//spawnAttackers(newPos);
 		}
 		else if (enemyType == 2)
 		{
-			//spawnShootCars(newPos);
-			spawnSwarm(newPos);
+			spawnShootCars(newPos);
+			//spawnSwarm(newPos);
 		}
 		else if (enemyType == 3)
 		{
@@ -605,6 +606,15 @@ Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos, float minDi
 		if ((distance <= maxDistance + i) && (distance >= minDistance))
 		{
 			return position;
+		}
+		else
+		{
+			position = map->generateGroundPositionInWorldSpace(*rng);
+			float distance = (position - targetPos).Length();
+			if ((distance <= maxDistance + i) && (distance >= minDistance))
+			{
+				return position;
+			}
 		}
 	}
 	assert(false and "BUG: Shouldn't be possible!");

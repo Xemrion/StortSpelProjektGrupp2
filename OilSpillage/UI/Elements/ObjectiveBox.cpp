@@ -2,11 +2,23 @@
 #include "../../game.h"
 #include "../../States/PlayingGameState.h"
 
+Vector2 ObjectiveBox::size = Vector2(218, 160);
+
 ObjectiveBox::ObjectiveBox(Vector2 position) : Element(position), objHandlerPtr(nullptr)
 {
 	Game::getGraphics().loadTexture("UI/quest");
 	this->textureQuest = Game::getGraphics().getTexturePointer("UI/quest");
 	assert(textureQuest && "Texture failed to load!");
+
+	this->objectiveText = std::make_unique<AnimatedText>("Objectives", Color(Colors::White), 0.25f, Animation::NONE);
+	this->objectiveText->setPosition(this->position + Vector2(ObjectiveBox::size.x / 2 - this->objectiveText->getSize().x / 2, 16));
+	this->objectiveText->beginAnimation();
+
+	this->info = std::make_unique<AnimatedText>("Info", Color(Colors::White), 0.2f, Animation::NONE, this->position + Vector2(16, 64));
+	this->info->beginAnimation();
+
+	this->rewardInfo = std::make_unique<AnimatedText>("Reward", Color(Colors::White), 0.2f, Animation::NONE, this->position + Vector2(16, 96));
+	this->rewardInfo->beginAnimation();
 }
 
 ObjectiveBox::~ObjectiveBox()
@@ -20,74 +32,33 @@ void ObjectiveBox::init()
 
 void ObjectiveBox::draw(bool selected)
 {
-	UserInterface::getSpriteBatch()->Draw(this->textureQuest->getShaderResView(), this->position, nullptr, Colors::White, 0.0f, Vector2(0, 0), Vector2(0.44f,0.44f));
+	UserInterface::getSpriteBatch()->Draw(this->textureQuest->getShaderResView(), this->position);
+	this->objectiveText->draw(false);
+	this->info->draw(false);
 
-	for (int i = 0; i < vecToShow.size(); i++)
+	if (objHandlerPtr->getObjective(0))
 	{
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), vecToShow[i].c_str(), this->position + Vector2(65.0f, 60.0f + i * 18.0f), color, 0, Vector2(), 0.20f);
+		this->rewardInfo->draw(false);
 	}
-
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), rewardInfo.c_str(), this->position + Vector2(65.0f, 120.0f), color, 0, Vector2(), 0.20f);
 }
 
 void ObjectiveBox::update(float deltaTime)
 {
-	vecToShow.clear();
-
-	std::string infoUI;
-	if (objHandlerPtr->getObjective(0) == nullptr)
+	if (!this->objHandlerPtr->getObjective(0))
 	{
-		infoUI = "You did it. Get out now!!! ";
-		color = Colors::Yellow;
-		rewardInfo = "";
-
+		this->info->setVariables("You did it.\nGet out now!!!", Color(Colors::Yellow), {});
 	}
 	else
 	{
-		infoUI = objHandlerPtr->getObjective(0)->getInfo();
-		rewardInfo = "Reward: " + std::to_string(objHandlerPtr->getObjective(0)->getRewardTime()) + " extra seconds ";
-		if (objHandlerPtr->getObjective(0)->getType() == TypeOfMission::GetToPoint)
-		{
-			rewardInfo = "Reward: Three new Items";
-		}
-		color = Colors::White;
-	}
+		this->info->setVariables(this->objHandlerPtr->getObjective(0)->getInfo(), Color(Colors::White), {});
 
-	int foundSpace = -1;
-	int wordIndex = 0;
-	std::vector<std::string> spacedString;
-	for (int i = 0; i < infoUI.size(); i++)
-	{
-		if (infoUI[i] == ' ')
+		if (this->objHandlerPtr->getObjective(0)->getType() == TypeOfMission::GetToPoint)
 		{
-			foundSpace = i;
-			std::string word;
-			for (int j = wordIndex; j < foundSpace + 1; j++)
-			{
-				word += infoUI[j];
-			}
-			if (wordIndex == foundSpace + 1)
-			{
-				word += infoUI[wordIndex];
-			}
-			word += " ";
-			wordIndex = foundSpace + 1;
-			spacedString.push_back(word);
+			this->rewardInfo->setVariables("Reward: 3 Items", Color(Colors::White), {});
+		}
+		else
+		{
+			this->rewardInfo->setVariables("Reward: +" + std::to_string(this->objHandlerPtr->getObjective(0)->getRewardTime()) + " sec", Color(Colors::White), {});
 		}
 	}
-
-	int sizeOfStrings = 0;
-	std::string temp = "";
-	for (int i = 0; i < spacedString.size(); i++)
-	{
-		sizeOfStrings += spacedString.at(i).size();
-		temp += spacedString.at(i);
-		if (sizeOfStrings >= 27)
-		{
-			sizeOfStrings = 0;
-			vecToShow.push_back(temp);
-			temp = "";
-		}
-	}
-	vecToShow.push_back(temp);
 }

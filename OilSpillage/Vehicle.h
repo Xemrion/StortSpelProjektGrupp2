@@ -135,7 +135,6 @@ private:
 	float acceleratorTempZ;
 
 	float targetRotation;
-	int drivingMode;
 	float topSpeed;
 	float counter = 0.0f;
 	float rotateAcceleration = 0.0f;
@@ -191,8 +190,6 @@ public:
 	void setSpotLight(SpotLight* theLight);
 	SpotLight* getSpotLight();
 	void setLaserLight(LaserLight* light);
-	void setDrivingMode(int i);
-	bool getDrivingMode();
 	Vector3 getVelocity();
 	float getVelocitySpeed();
 	float getRotator();

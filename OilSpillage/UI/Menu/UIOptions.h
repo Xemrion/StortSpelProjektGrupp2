@@ -14,7 +14,7 @@ private:
 	void drawUI();
 
 	std::unique_ptr<Button> buttonBack;
-	std::unique_ptr<CheckBox> checkBoxTest;
+	std::unique_ptr<CheckBox> checkBoxDrivingMode;
 	std::unique_ptr<Slider> sliderTest;
 	std::unique_ptr<ButtonPromptBar> promptBar;
 	Element* selected;
