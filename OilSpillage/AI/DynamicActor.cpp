@@ -34,7 +34,7 @@ void DynamicActor::move()
 		velocity /= velocity.Length();
 	}
 	Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed;
-	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x, 0.0f, velocity.z) * (stats.maxSpeed * 100) * 0.9 * deltaTime);
+	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x, 0.0f, velocity.z) * (stats.maxSpeed * 80) * 0.9 * deltaTime);
 	Vector3 targetToSelf = (temp - position);
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)
