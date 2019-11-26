@@ -38,7 +38,7 @@ Status Ranged::inAttackRange()
 
 void Ranged::assignWeapon(int weaponType)
 {
-	if(Game::getGameInfo().nrOfClearedStages < -1)
+	if(Game::getGameInfo().nrOfClearedStages < 3)
 	{
 		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
 	}
