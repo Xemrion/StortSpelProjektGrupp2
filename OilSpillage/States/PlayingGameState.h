@@ -89,7 +89,8 @@ private:
 	SpotLight                      *playerLight;
 	GameObject*						testObjective; //Test
 	GameObject*		testObjective2; //Test
-	GameObject* cameraObject;
+	GameObject*		cameraObject;
+	float			cameraTimer;
 
 	GameObject* objTestPickUp;
 	GameObject* objTestPickUp2;

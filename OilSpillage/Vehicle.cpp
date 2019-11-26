@@ -128,7 +128,7 @@ void Vehicle::init(Physics* physics)
 	this->getVehicle()->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	this->getVehicle()->getRigidBody()->setFriction(0);
 	this->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
-	this->getVehicle()->getRigidBody()->setLinearVelocity(btVector3(5, 0, 1));
+
 
 	tempo = physics->addBox(
 		btVector3(vehicle->getPosition().x, vehicle->getPosition().y + 0.65f, vehicle->getPosition().z),
@@ -140,7 +140,7 @@ void Vehicle::init(Physics* physics)
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicleBody1->getRigidBody()->setCollisionFlags(vehicleBody1->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	vehicleBody1->getRigidBody()->setFriction(1);
-
+	vehicleBody1->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
 	/*spring1 = physics->addSpring(this->vehicle->getRigidBody(),this->wheel1->getRigidBody());
 	spring1->setLinearLowerLimit(btVector3(0.0f, 0.0f, 0.0f));
 	spring1->setLinearUpperLimit(btVector3(0.0f, 0.56f, 0.0f));
@@ -164,6 +164,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 	if (playing != nullptr)
 	{
+
 		if (this->deadImpulse == true && this->health <= 0)
 		{
 			this->respawnTimer += deltaTime;
@@ -523,11 +524,11 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	initialDir.Normalize();
 	if (this->trailTimer > 0.01f && abs(this->driftForce) > 5.0f)
 	{
-		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 60.0f);
-		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 60.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 10.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 10.0f);
 
-		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 60.0f);
-		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 60.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 10.0f);
+		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(this->driftForce)), 1, 10.0f);
 		this->trailTimer = 0;
 	}
 }
