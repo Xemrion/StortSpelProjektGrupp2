@@ -39,6 +39,8 @@ public:
 	static float						getLocalScale();
 	static int							getNrOfStagesDone();
 	static GameInfo                    &getGameInfo() noexcept;
+	static bool						    getDrivingMode();
+	static void						    setDrivingMode(bool realistic);
 private:
 	void								createCurrentState();
 	void								run();
@@ -58,6 +60,7 @@ private:
 	long long							countsPerSec = 0;
 	float								secPerCount  = 0.0f;
 	Vehicle*							thePlayer = nullptr;
+	bool								drivingMode = false;
 public:
 	Game();
 	~Game();
