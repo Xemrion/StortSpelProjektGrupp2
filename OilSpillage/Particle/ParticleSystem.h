@@ -31,7 +31,7 @@ struct SimulationParams
 {
 	Vector4 timeFactors;
 	Vector4 vectorField;
-	Vector4 consumerLocation;
+	Vector4 physicsConfig; //.x = mass, .y = gravity69
 };
 struct IndirDraw
 {
@@ -69,6 +69,9 @@ public:
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setSize(float startSize, float endSize);
+	void setMass(float mass);
+	//gravity = -1 means -1 * 9.82
+	void setGravity(float gravity);
 	void changeVectorField(float vectorFieldPower, float vectorFieldSize);
 	void setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader = "ParticlePS.cso", std::string vertexShader = "ParticleVS.cso");
 	void setVertexShader(std::string vertexShader);

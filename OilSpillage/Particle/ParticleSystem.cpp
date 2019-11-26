@@ -199,6 +199,8 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	samplerDesc.MipLODBias = 0;
 	samplerDesc.MaxAnisotropy = 0;
 	hr = device->CreateSamplerState(&samplerDesc, this->sampler.GetAddressOf());
+	sP.physicsConfig.x = 0.5f;
+	sP.physicsConfig.y = 1.0f;
 
 }
 
@@ -253,6 +255,7 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 
 bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection)
 {
+	nrOf = 1;
 	UINT initialCount;
 	if (firstAdd == 0)
 	{
@@ -318,7 +321,6 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 	}
 	
 	sP.vectorField.x = sinMovement;// = Vector4(sinMovement, 0.0f, 0.0f, 0.0f);
-	sP.consumerLocation = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 	sP.timeFactors = Vector4(delta, 0.0f, 0.0f, 0.0f);
 
 	//run update computeshader here
@@ -382,6 +384,16 @@ void ParticleSystem::setSize(float startSize, float endSize)
 	this->systemData.renderParams.config.y = startSize;
 	this->systemData.renderParams.config.z = endSize;
 
+}
+
+void ParticleSystem::setMass(float mass)
+{
+	sP.physicsConfig.x = mass;
+}
+
+void ParticleSystem::setGravity(float gravity)
+{
+	sP.physicsConfig.y = gravity;
 }
 
 void ParticleSystem::changeVectorField(float vectorFieldPower, float vectorFieldSize)

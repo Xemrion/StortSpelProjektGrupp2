@@ -175,7 +175,7 @@ void Game::createCurrentState()
 		{
 			transfer = static_cast<PlayingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
-			temp = static_cast<UpgradingGameState*>(state.get())->getPlayer().get();
+			temp = static_cast<PlayingGameState*>(state.get())->getPlayer().get();
 			temp->stopEngineSound();
 			Sound::stopAllSoundsExceptSoundtrack();
 		}
@@ -186,6 +186,7 @@ void Game::createCurrentState()
 		{
 			Sound::stopAllSoundsExceptSoundtrack();
 			static_cast<UpgradingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
+			
 		}
 	}
 }

@@ -41,9 +41,13 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	graphics.loadModel("Entities/Barrel");
 	barrels.get()->mesh = graphics.getMeshPointer("Entities/Barrel");;
 	barrels.get()->setTexture(graphics.getMaterial("Entities/Barrel").diffuse);
-	barrels.get()->setPosition(Vector3(0, -0.5, 0));
+	barrels.get()->setPosition(Vector3(0, -0.65f, 0));
 	barrels.get()->setScale(Vector3(0.4f,0.4f,0.4f));
 	
+	graphics.getParticleSystem("fire")->setGravity(-0.1f);
+	
+	graphics.getParticleSystem("fire")->setSize(0.02f,0.01f);
+	graphics.getParticleSystem("fire")->changeVectorField(1.75f,0.09f);
 
 
 	graphics.addToDraw(barrels.get());
@@ -59,10 +63,11 @@ void MenuGameState::update(float deltaTime)
 	this->theVehicle->setWheelRotation(deltaTime);
 	this->physics->update(deltaTime);
 
-	graphics.getParticleSystem("fire")->addParticle(1, 0.5f, Vector3(0, 0, 0), Vector4(0, 0.5f, 0, 0));
-	graphics.getParticleSystem("fire")->addParticle(1, 0.5f, Vector3(0.1f, 0, 0), Vector4(0, 0.5f, 0, 0));
-	graphics.getParticleSystem("fire")->addParticle(1, 0.5f, Vector3(0, 0, 0.1f), Vector4(0, 2, 0, 0));
-	graphics.getParticleSystem("smoke")->addParticle(1, 2.0f, Vector3(0, 0, 0.1f), Vector4(0, 1, 0, 0));
+	graphics.addParticle("fire", 1, 1.0f, Vector3(0, 0, 0), Vector4(0, 1, 0, 0.5f), 0.25f);
+	graphics.addParticle("fire", 1, 1.0f, Vector3(0.1f, 0, 0), Vector4(0, 1, 0, 0.5f), 0.25f);
+	graphics.addParticle("fire", 1, 1.5f, Vector3(0, 0, 0.1f), Vector4(0, 1, 0, 0.5f), 0.25f);
+	
+
 
 	this->graphics.clearScreen(Vector4(0,0,0,0));
 	this->graphics.render(this->camera.get(), deltaTime);

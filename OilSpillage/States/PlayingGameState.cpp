@@ -46,7 +46,7 @@ void PlayingGameState::createElectric(int randNr, float deltaTime)
 
 	testNetwork.get()->generateAdditionalSegments("F-F", 1, false);
 	testNetwork.get()->setAngle(40);
-
+	
 	testNetwork.get()->generateAdditionalSegments("F-F+F-F", 2, false);
 	testNetwork.get()->generateAdditionalSegments("F-F-F+F", 3, true);
 	
@@ -68,7 +68,7 @@ void PlayingGameState::initAI()
 	}
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(70.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0f), currentMenu(MENU_PLAYING)
 {
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -358,7 +358,7 @@ PlayingGameState::~PlayingGameState()
 {
 	delete aStar;
 	delete actorManager;
-
+	delete this->cameraObject;
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
 	delete this->objTestPickUp3;
@@ -882,7 +882,10 @@ void PlayingGameState::update(float deltaTime)
 		}*/
 
 	}
-
+	if (this->objectives.isAllDone())
+	{
+		Game::setState(Game::State::STATE_UPGRADING);
+	}
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
 
@@ -902,18 +905,18 @@ void PlayingGameState::update(float deltaTime)
 
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
-//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	//ImGui_ImplDX11_NewFrame();
-	//ImGui_ImplWin32_NewFrame();
-	//ImGui::NewFrame();
-	//ImGui_Driving();
-	////ImGui_ProcGen();
-	////ImGui_AI();
-	//ImGui_Particles();
-	//ImGui_Camera();
-	//ImGui::Render();
-	//ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	//#endif // !_DEBUG
+#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	ImGui_Driving();
+	//ImGui_ProcGen();
+	//ImGui_AI();
+	ImGui_Particles();
+	ImGui_Camera();
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	#endif // !_DEBUG
 
 	graphics.presentScene();
 }
@@ -1304,7 +1307,7 @@ void PlayingGameState::generateObjectives()
 	else
 	{
 		float prob[2] = { 0.5f, 0.5f };
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 0; i++)
 		{
 			int dice = rand() % 10 + 1;
 			if (dice <= prob[0] * 10)
@@ -1324,7 +1327,7 @@ void PlayingGameState::generateObjectives()
 			prob[0] = std::fminf(prob[0], 1.0f);
 			prob[1] = std::fminf(prob[1], 1.0f);
 		}
-		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, Vector3(0.0f));
 	}
 }
 
