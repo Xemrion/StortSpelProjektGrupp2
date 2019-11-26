@@ -52,6 +52,16 @@ void Actor::update(float dt, const Vector3& targetPos)
 //	}
 //}
 
+float Actor::getHealth() const
+{
+	return this->health;
+}
+
+float Actor::getMaxHealth() const
+{
+	return this->stats.maxHealth;
+}
+
 void Actor::setHealth(float health)
 {
 	this->health = std::clamp(health, 0.0f, this->stats.maxHealth);

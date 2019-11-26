@@ -99,6 +99,7 @@ void UIPlaying::updateUI(float deltaTime)
 
 void UIPlaying::drawUI()
 {
+	
 	Vehicle* player = static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer().get();
 	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
 	std::string timeStr = this->getFormattedTime();
@@ -121,6 +122,11 @@ void UIPlaying::drawUI()
 	
 
 	this->healthBar->setAmount(player->getHealth() / static_cast<float>(player->getMaxHealth()));
+	Objective* currObj = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
+	{
+		this->bossHealthBar->setAmount(currObj->getBoss()->getHealth() / static_cast<float>(currObj->getBoss()->getMaxHealth()));
+	}
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	if (time <= 0)
@@ -158,7 +164,10 @@ void UIPlaying::drawUI()
 	}else {
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Realistic", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(500, -320.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
 	}
-	
+	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
+	{
+		this->bossHealthBar->draw(false);
+	}
 	this->healthBar->draw(false);
 	this->objectiveBox->draw(false);
 	this->minimap->draw(false);
@@ -180,6 +189,8 @@ UIPlaying::~UIPlaying()
 void UIPlaying::init()
 {
 	this->healthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 20));
+	this->bossHealthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 680));
+
 	this->minimap = std::make_unique<Minimap>(Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
 	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(10, 10));
 

@@ -343,6 +343,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	graphics.getParticleSystem("smoke")->setSize(0.055f, 0.065f);
 	graphics.getParticleSystem("smoke")->changeVectorField(1.75f, 0.09f);
 
+
 #ifndef _DEBUG
 	spawnObjects();
 #endif
@@ -615,9 +616,8 @@ void PlayingGameState::ImGui_ProcGen()
 void PlayingGameState::nextStage() noexcept {
 	// (TODO: refactor) hacky, but:
 	player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
-
 	RNG rng{ RD()() };
-	rng.seed = config.seed;
+	rng.seed( config.seed );
 	I32_Dist generateSeed{};
 	config.seed = generateSeed(rng);
 
@@ -638,7 +638,9 @@ void PlayingGameState::nextStage() noexcept {
 	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
 
 	graphics.reloadTexture(minimap);
-	static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
+	UIPlaying* menu = static_cast<UIPlaying*>(menues[MENU_PLAYING].get());
+	if(menu!=nullptr)
+		menu->resetMinimapFog();
 	player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
 
 	clearPowerUps();
@@ -955,7 +957,7 @@ void PlayingGameState::update(float deltaTime)
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	ImGui_Driving();
-	//ImGui_ProcGen();
+	ImGui_ProcGen();
 	//ImGui_AI();
 	ImGui_Particles();
 	ImGui_Camera();
