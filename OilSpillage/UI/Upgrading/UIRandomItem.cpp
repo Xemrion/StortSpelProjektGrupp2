@@ -13,7 +13,7 @@ void UIRandomItem::updateUI(float deltaTime)
 		slots[i]->update(slots[i].get() == this->selected, deltaTime);
 	}
 
-	if (Input::checkButton(Keys::CONFIRM, States::HELD))
+	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
 		for (int i = 0; i < UIRandomItem::slotCount; i++)
 		{

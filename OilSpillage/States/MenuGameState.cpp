@@ -28,6 +28,7 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 	this->lightList->addLight(PointLight(Vector3(0,-0.25, -0.25), Vector3(0.4, 0.1, 0), 10));
 
+
 	this->graphics.setLightList(lightList.get());
 
 	this->theVehicle->init(physics.get());

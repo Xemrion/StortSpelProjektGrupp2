@@ -40,9 +40,9 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 
 	if (spawnTimer <= 0)
 	{
-#ifndef _DEBUG
+
 		spawnEnemies(targetPos);
-#endif
+
 		spawnTimer = spawnCooldown;
 	}
 
@@ -168,7 +168,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 					GameObject* laserObject = bulletArray[j].getGameObject();
 					Vector3 rayDir = bulletArray[j].getDirection();
 					Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
-					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z * 2))
+					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 					{
 						if (soundTimer > 0.05f) {
 							Sound::play("./data/sound/HitSound.wav");
@@ -445,15 +445,15 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 		Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
 		if (enemyType == 0)
 		{
-			spawnAttackers(newPos);
+			//spawnAttackers(newPos);
 		}
 		else if (enemyType == 1)
 		{
-			spawnChaseCars(newPos);
+			//spawnChaseCars(newPos);
 		}
 		else if (enemyType == 2)
 		{
-			spawnShootCars(newPos);
+			//spawnShootCars(newPos);
 		}
 		else if (enemyType == 3)
 		{

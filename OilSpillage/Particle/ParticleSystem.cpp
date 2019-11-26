@@ -206,6 +206,11 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 
 bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection)
 {
+	
+	if (!isfinite(position.x) || !isfinite(position.y) || !isfinite(position.z))
+	{
+		return false;
+	}
 	UINT initialCount;
 	if (firstAdd == 0)
 	{
@@ -256,6 +261,10 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 
 bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection)
 {
+	if (!isfinite(position.x) || !isfinite(position.y) || !isfinite(position.z))
+	{
+		return false;
+	}
 	nrOf = 1;
 	UINT initialCount;
 	if (firstAdd == 0)
