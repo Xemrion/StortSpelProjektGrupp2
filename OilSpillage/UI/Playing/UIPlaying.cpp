@@ -44,13 +44,26 @@ void UIPlaying::updateUI(float deltaTime)
 	this->minimap->update(deltaTime);
 	this->objectiveBox->update(deltaTime);
 
+	if (this->timeChangeText.get())
+	{
+		this->timeChangeTimer += deltaTime;
+		if (this->timeChangeTimer <= 1.0f)
+		{
+			this->timeChangeText->setPosition(this->timer->getPosition() + this->timer->getSize() * 0.5f - this->timeChangeText->getSize() * 0.5f + Vector2(0, this->timeChangeTimer * 20.0f));
+		}
+		else
+		{
+			this->timeChangeText.reset();
+		}
+	}
+
 	int thisMinute = static_cast<int>((time - 1.0f) / 60);
-	if (thisMinute != this->lastMinute)
+	if (thisMinute < this->lastMinute)
 	{
 		this->scaleUp = true;
 		this->scaleTimer = 0.0f;
-		this->lastMinute = thisMinute;
 	}
+	this->lastMinute = thisMinute;
 
 	if ((this->scaleUp && this->scaleTimer < 3.0f) || time <= 10.0f)
 	{
@@ -139,11 +152,11 @@ void UIPlaying::drawUI()
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "You died", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)+Vector2(0,70.0f), Colors::Red, 0, Vector2(textSize2.x / 2, textSize2.y / 2), 1.0f);
 
 	}
-	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Driving mode:", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(600, -340.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
+	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Driving mode:", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(500, -340.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
 	if (!Game::getDrivingMode()) {
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Arcade", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(600, -320.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Arcade", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(500, -320.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
 	}else {
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Realistic", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(600, -320.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Realistic", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(500, -320.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
 	}
 	
 	this->healthBar->draw(false);
@@ -151,6 +164,7 @@ void UIPlaying::drawUI()
 	this->minimap->draw(false);
 	this->timerText->draw(false);
 	this->timer->draw(false);
+	if (this->timeChangeText.get()) this->timeChangeText->draw(false);
 	this->score->draw(false);
 	UserInterface::getSpriteBatch()->End();
 }
@@ -189,4 +203,9 @@ bool UIPlaying::hasExploredOnMinimap(Vector3 worldPosition) const
 
 void UIPlaying::addTimeChangeText(float amount)
 {
+	this->timeChangeText = std::make_unique<AnimatedText>((amount < 0 ? "" : "+") + std::to_string(static_cast<int>(amount)), amount < 0 ? Color(Colors::Red) : Color(Colors::Green), 0.5f, Animation::NONE);
+	this->timeChangeText->setPosition(this->timer->getPosition() + this->timer->getSize() * 0.5f - this->timeChangeText->getSize() * 0.5f);
+	this->timeChangeText->beginAnimation();
+
+	this->timeChangeTimer = 0.0f;
 }

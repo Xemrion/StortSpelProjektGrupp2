@@ -21,7 +21,8 @@ private:
 	int lastMinute;
 	bool scaleUp;
 	float scaleTimer;
-
+	float timeChangeTimer;
+	std::unique_ptr<AnimatedText> timeChangeText;
 	std::unique_ptr<AnimatedText> timerText;
 	std::unique_ptr<AnimatedText> timer;
 	std::unique_ptr<AnimatedText> score;
