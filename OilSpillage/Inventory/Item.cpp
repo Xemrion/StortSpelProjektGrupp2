@@ -102,6 +102,11 @@ Item* Item::clone() const
 	return new Item(*this);
 }
 
+bool Item::operator==(const Item& other) const
+{
+	return this->name == other.name && this->description == other.description && this->type == other.type && this->baseColor == other.baseColor;
+}
+
 void Item::randomize()
 {
 	F32_Dist genValue{ -.20f, .20f };
