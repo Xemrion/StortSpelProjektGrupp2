@@ -168,7 +168,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 					GameObject* laserObject = bulletArray[j].getGameObject();
 					Vector3 rayDir = bulletArray[j].getDirection();
 					Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
-					if (this->actors[i]->getAABB().intersect(rayOrigin, rayDir, laserObject->getScale().z * 2))
+					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z * 2))
 					{
 						if (soundTimer > 0.05f) {
 							Sound::play("./data/sound/HitSound.wav");
