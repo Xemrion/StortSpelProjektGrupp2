@@ -618,7 +618,7 @@ void PlayingGameState::ImGui_ProcGen()
 
 void PlayingGameState::nextStage() noexcept {
 	// (TODO: refactor) hacky, but:
-	player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
+	player->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
 	RNG rng{ RD()() };
 	rng.seed( config.seed );
 	I32_Dist generateSeed{};
@@ -629,8 +629,8 @@ void PlayingGameState::nextStage() noexcept {
 	map = nullptr; // clear, then regenerate:
 	map = std::make_unique<Map>(graphics, config, physics.get());
 
-	player->getVehicle()->setPosition(map->getStartPositionInWorldSpace());
-	player->getVehicleBody1()->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
+	player->setPosition(map->getStartPositionInWorldSpace());
+	player->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
 
 	minimap = createMinimapTexture(*map);
 	aStar->generateTileData(map->getTileMap());
@@ -644,7 +644,7 @@ void PlayingGameState::nextStage() noexcept {
 	UIPlaying* menu = static_cast<UIPlaying*>(menues[MENU_PLAYING].get());
 	if(menu!=nullptr)
 		menu->resetMinimapFog();
-	player->getVehicle()->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
+	player->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
 
 	clearPowerUps();
 	generateMapPowerUps();

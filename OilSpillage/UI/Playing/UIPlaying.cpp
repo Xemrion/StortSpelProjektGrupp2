@@ -166,7 +166,10 @@ void UIPlaying::drawUI()
 	}
 	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
 	{
+		Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty");
 		this->bossHealthBar->draw(false);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty", Vector2((SCREEN_WIDTH / 2) , 660), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
+
 	}
 	this->healthBar->draw(false);
 	this->objectiveBox->draw(false);
