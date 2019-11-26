@@ -1272,9 +1272,9 @@ void PlayingGameState::generateMapPowerUps()
 	{
 		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
 		Vector3 indexWorldSpace = Vector3(
-			(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+			(float)(index / map->config.dimensions.y) * map->config.tileSideScaleFactor,
 			0.0,
-			-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+			-(float)(index % map->config.dimensions.x) * map->config.tileSideScaleFactor
 		);
 
 		for (int i = 0; i < 100; ++i)
@@ -1283,9 +1283,9 @@ void PlayingGameState::generateMapPowerUps()
 			{
 				position = map->generateRoadPositionInWorldSpace(rng);
 				indexWorldSpace = Vector3(
-					(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+					(float)(index / map->config.dimensions.y) * map->config.tileSideScaleFactor,
 					0.0,
-					-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+					-(float)(index % map->config.dimensions.x) * map->config.tileSideScaleFactor
 				);
 				break;
 			}
