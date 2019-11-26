@@ -510,7 +510,6 @@ void  Map::generateBuildings( )
 			}
 
 			// place single-tile houses:
-/*
 			while ( (computeCurrentDistrictCoverage() < targetDistrictCoverage) and (++currentTries < maxTries) ) {
 				auto maybeLot = findFixedLot( cellId, 1, 1, {true} );
 				if ( maybeLot ) {
@@ -520,9 +519,9 @@ void  Map::generateBuildings( )
 					house.object.setMaterial( graphics.getMaterial(    util::randomElementOf(singleTileMaterials, rng) ) );
 					house.object.setColor({ .0f, .0f, .0f, .0f });
 					house.object.setPosition({ tilemap->convertTilePositionToWorldPosition(maybeLot.value().nw) - Vector3(0,2,0) } );
-					house.object.setScale({ .0322f * config.tileScaleFactor.x,
-						                     .0322f * config.tileScaleFactor.y,
-						                     .0322f * config.tileScaleFactor.z });
+					house.object.setScale({ .0322f * config.tileSideScaleFactor,
+						                     .0322f * config.tileSideScaleFactor,
+						                     .0322f * config.tileSideScaleFactor });
 					#ifndef _DEBUG
 						btRigidBody *tmp = physics->addBox( btVector3( house.object.getPosition().x,
 						                                               house.object.getPosition().y,
@@ -538,7 +537,6 @@ void  Map::generateBuildings( )
 					++currentArea;
 				}
 			}
-*/
 		}
 	}
 
@@ -551,8 +549,9 @@ void  Map::generateBuildings( )
 	for ( auto &e : houses.multis ) {
 		for ( auto &p: e.parts )
 			graphics.addToDrawStatic( &p ); 
-		for ( auto &hb: e.hitboxes ) // REMOVE
-			graphics.addToDrawStatic( &hb ); 
+	// DEBUG
+		// for ( auto &hb: e.hitboxes ) // REMOVE
+		// 	graphics.addToDrawStatic( &hb ); 
 	}
 	for ( auto &e : houses.singles )
 		graphics.addToDrawStatic( &e.object );
@@ -1332,7 +1331,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 //			//offset = { .5, -99, .5f };
 //			color  = { 1.0f, 1.0f, .0f, 1.0f }; // yellow
 //		}
-		model.setPosition( pos + Vector3{.0f, -1.5f+(config.buildingHeightScaleFactor*0.005f*floorHeightFactor*floor), .0f} + offset );
+		model.setPosition( pos + Vector3{.0f, -1.5f+(config.buildingHeightScaleFactor*floorHeightFactor*0.5f*floor), .0f} + offset );
 		model.setColor( color );
 		model.setScale({ config.tileSideScaleFactor*0.005f,
 		                 config.buildingHeightScaleFactor * 0.005f * floorHeightFactor,
@@ -1374,10 +1373,11 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 						else // south
 							pos.x += (2.5*fracSide);
 
-hitbox.setColor({1.0f, .0f, .0f, 1.0f}); // red
-hitbox.setPosition(pos);
-hitbox.mesh = graphics.getMeshPointer("Cube");
-hitbox.setScale(sca);
+					// DEBUG
+						// hitbox.setColor({1.0f, .0f, .0f, 1.0f}); // red
+						// hitbox.setPosition(pos);
+						// hitbox.mesh = graphics.getMeshPointer("Cube");
+						// hitbox.setScale(sca);
 
 						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
 						                                    btVector3( sca.x, sca.y, sca.z ),
@@ -1386,7 +1386,7 @@ hitbox.setScale(sca);
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
 						instantiateTilePart( "w_oc", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
-					//instantiateTilePart(    "r_oc", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
+					instantiateTilePart(    "r_oc", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
 				}
 				else if ( (quadmask & 0b00000'111) == 0b00000'101 ) { // 101 => inner corner
 						instantiateTilePart( "f_ic", basePosition, 90.0f*q, .0f );
@@ -1409,10 +1409,11 @@ hitbox.setScale(sca);
 						house.hitboxes.emplace_back();
 						auto    &hitboxA = house.hitboxes.back();
 
-	hitboxA.setColor({1.0f, 1.0f, .0f, 1.0f}); // yellow
-	hitboxA.setPosition(posA);
-	hitboxA.mesh = graphics.getMeshPointer("Cube");
-	hitboxA.setScale(scaA);
+					// DEBUG
+						// hitboxA.setColor({1.0f, 1.0f, .0f, 1.0f}); // yellow
+						// hitboxA.setPosition(posA);
+						// hitboxA.mesh = graphics.getMeshPointer("Cube");
+						// hitboxA.setScale(scaA);
 
 						btRigidBody *tmpA = physics->addBox( btVector3( posA.x, posA.y, posA.z ),
 						                                     btVector3( scaA.x, scaA.y, scaA.z ),
@@ -1423,10 +1424,11 @@ hitbox.setScale(sca);
 						house.hitboxes.emplace_back();
 						auto    &hitboxB = house.hitboxes.back();
 
-	hitboxB.setColor({1.0f, 0.0f, 1.0f, 1.0f}); // magenta
-	hitboxB.setPosition(posB);
-	hitboxB.mesh = graphics.getMeshPointer("Cube");
-	hitboxB.setScale(scaB);
+					// DEBUG
+						//	hitboxB.setColor({1.0f, 0.0f, 1.0f, 1.0f}); // magenta
+						//	hitboxB.setPosition(posB);
+						//	hitboxB.mesh = graphics.getMeshPointer("Cube");
+						//	hitboxB.setScale(scaB);
 
 						btRigidBody *tmpB = physics->addBox( btVector3( posB.x, posB.y, posB.z ),
 						                                     btVector3( scaB.x, scaB.y, scaB.z ),
@@ -1434,7 +1436,7 @@ hitbox.setScale(sca);
 						hitboxB.setRigidBody( tmpB, physics );
 					#endif
 
-					//instantiateTilePart(    "r_ic", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
+					instantiateTilePart(    "r_ic", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
 				}
 				else if ( (quadmask & 0b00000'101) == 0b00000'100 ) { // 100 or 110 => side A
 					instantiateTilePart( "f_sa", basePosition, 90.0f*q, .0f );
@@ -1450,10 +1452,12 @@ hitbox.setScale(sca);
 							case quadrant_northwest: pos.x -= halfSide;  pos.z += halfSide;  break;
 							case quadrant_northeast: pos.z += halfSide;  pos.x += halfSide;  break;
 						}
-	hitbox.setColor({.0f, 1.0f, .0f, 1.0f}); // green
-	hitbox.setPosition(pos);
-	hitbox.mesh = graphics.getMeshPointer("Cube");
-	hitbox.setScale(sca);
+
+					// DEBUG
+						//	hitbox.setColor({.0f, 1.0f, .0f, 1.0f}); // green
+						//	hitbox.setPosition(pos);
+						//	hitbox.mesh = graphics.getMeshPointer("Cube");
+						//	hitbox.setScale(sca);
 
 						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
 						                                    btVector3( sca.x, sca.y, sca.z ),
@@ -1462,7 +1466,7 @@ hitbox.setScale(sca);
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
 						instantiateTilePart( "w_sa", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
-					//instantiateTilePart(    "r_sa", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
+					instantiateTilePart(    "r_sa", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
 				}
 				else if ( (quadmask & 0b00000'101) == 0b00000'001 ) { // 001 or 011 => side B
 					instantiateTilePart(    "f_sb", basePosition, 90.0f*q, .0f );
@@ -1478,10 +1482,12 @@ hitbox.setScale(sca);
 							case quadrant_northwest: pos.z += halfSide;  pos.x -= halfSide;  break;
 							case quadrant_northeast: pos.x += halfSide;  pos.z += halfSide;  break;
 						}
-	hitbox.setColor({.0f, 0.0f, 1.0f, 1.0f}); // blues
-	hitbox.setPosition(pos);
-	hitbox.mesh = graphics.getMeshPointer("Cube");
-	hitbox.setScale(sca);
+
+					// DEBUG
+						// hitbox.setColor({.0f, 0.0f, 1.0f, 1.0f}); // blues
+						// hitbox.setPosition(pos);
+						// hitbox.mesh = graphics.getMeshPointer("Cube");
+						// hitbox.setScale(sca);
 
 						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
 						                                    btVector3( sca.x, sca.y, sca.z ),
@@ -1490,10 +1496,10 @@ hitbox.setScale(sca);
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
 						instantiateTilePart( "w_sb", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
-					//instantiateTilePart(    "r_sb", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
+					instantiateTilePart(    "r_sb", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
 				}
 				else if ( (quadmask & 0b00000'111) == 0b00000'111 ) { // 111 => midpiece
-					//instantiateTilePart(     "r_m", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
+					instantiateTilePart(     "r_m", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
 				}
 			}
 		}

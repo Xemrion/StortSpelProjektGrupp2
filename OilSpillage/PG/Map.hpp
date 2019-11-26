@@ -72,7 +72,6 @@ public:
 	Vector3                    generateRoadPositionInWorldSpace( RNG & ) const noexcept;
 	V2u                        generateGroundPositionInTileSpace(  RNG & ) const noexcept;
 	Vector3                    generateGroundPositionInWorldSpace( RNG & ) const noexcept;
-	void                       setDistrictColorCoding ( Bool useColorCoding ) noexcept;
 	V2u                        getStartPositionInTileSpace()  const noexcept;
 	Vector3                    getStartPositionInWorldSpace() const noexcept;
 	TileMap const &            getTileMap() const noexcept;
