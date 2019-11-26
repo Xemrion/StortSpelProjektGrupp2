@@ -100,6 +100,11 @@ TypeOfTarget Objective::getTargetType() const
 	return this->mission->typeOfTarget;
 }
 
+Actor* Objective::getBoss() const
+{
+	return this->mission->boss;
+}
+
 int Objective::getRewardTime() const
 {
 	return this->mission->rewardTime;
@@ -164,7 +169,7 @@ bool Objective::isDone()
 	}
 	else if (this->mission->typeMission == TypeOfMission::BossEvent)
 	{
-		if (this->mission->boss == nullptr)
+		if (this->mission->boss->getHealth()<=0.0f)
 		{
 			return true;
 		}
@@ -257,7 +262,18 @@ void Objective::update(Vector3 playerPosition)
 			this->done = true;
 		}
 	}
-	this->closestToPlayer = findClosestPlayer;
+	if (this->mission->typeMission == TypeOfMission::GetToPoint)
+	{
+		this->closestToPlayer = this->mission->generalPosition;
+	}
+	else if(this->mission->typeMission == TypeOfMission::FindAndCollect)
+	{
+		this->closestToPlayer = findClosestPlayer;
+	}
+	else if (this->mission->typeMission == TypeOfMission::BossEvent)
+	{
+		this->closestToPlayer = this->mission->boss->getPosition();
+	}
 }
 
 int Objective::getNrOfMax() const

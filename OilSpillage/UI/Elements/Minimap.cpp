@@ -119,7 +119,7 @@ void Minimap::init()
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Vector3 mapSize((state->getBottomRight() - state->getTopLeft() + Vector3(0, 1, 0)) * Vector3(1, 1, -1));
 	Vector3 mapScale(Vector3(this->textureMap->getWidth(), 1, this->textureMap->getHeight()) / mapSize);
-
+	
 	this->mapMatrix = Matrix::CreateTranslation(-Vector3(state->getTopLeft().x, 0, state->getBottomRight().z));
 	this->mapMatrix *= Matrix::CreateScale(mapScale);
 }
@@ -131,8 +131,8 @@ void Minimap::draw(bool selected)
 {
 
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
-	float playerRot = state->getPlayer()->getVehicle()->getRotation().y;
-	Vector3 playerPos(state->getPlayer()->getVehicle()->getPosition() * Vector3(1, 0, 1));
+	float playerRot = state->getPlayer()->getRotation().y;
+	Vector3 playerPos(state->getPlayer()->getPosition() * Vector3(1, 0, 1));
 	Vector3 minimapSize(this->textureMap->getWidth(), 1, this->textureMap->getHeight());
 	Vector3 zoomedMinimapSize(minimapSize * zoom);
 	Vector3 zoomedMinimapScale(Vector3(Minimap::size.x, 0, Minimap::size.y) / zoomedMinimapSize);
@@ -201,7 +201,7 @@ void Minimap::draw(bool selected)
 	{
 		for (int i = 0; i < state->getObjHandler().getObjective(0)->getNrOfMax(); i++)
 		{
-			if (state->getObjHandler().getObjective(0)->getType() != TypeOfMission::KillingSpree)
+			if (state->getObjHandler().getObjective(0)->getType() == TypeOfMission::FindAndCollect)
 			{
 				if (state->getObjHandler().getObjective(0)->getTarget(i) != nullptr)
 				{
@@ -240,8 +240,8 @@ void Minimap::draw(bool selected)
 		Vector2 arrowPositionUI(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f);
 		float alphaLength = 1.0f;
 		arrowPositionUI += Vector2(camToObj.x, -camToObj.z);
-		float startFade = 50.0f;
-		float endFade = 20.0f;
+		float startFade = 50.0f+20.0f;
+		float endFade = 20.0f+20.0f;
 		if (playerToObj.Length() <= startFade && playerToObj.Length() > 0.0f)
 		{
 			alphaLength = playerToObj.Length() / startFade;
@@ -259,7 +259,7 @@ void Minimap::update(float deltaTime)
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
 	if (state != nullptr)
 	{
-		Vector3 playerPos(state->getPlayer()->getVehicle()->getPosition() * Vector3(1, 0, 1));
+		Vector3 playerPos(state->getPlayer()->getPosition() * Vector3(1, 0, 1));
 		timerForCompass += deltaTime * compassSpeed;
 		timerForCompass = fmod(timerForCompass, 2 * XM_PI);
 
