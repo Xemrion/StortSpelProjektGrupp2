@@ -34,7 +34,7 @@ public:
 	void spawnTurrets(const Vector3& position, Radius radius, float angle);
 
 	void seperation(const Vector3& targetPos);
-	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
+	void intersectPlayerBullets(Bullet* bulletArray, size_t size, float deltaTime);
 private:
 	const int maxNrOfEnemies = 25;
 	const int spawnCooldown = 2;

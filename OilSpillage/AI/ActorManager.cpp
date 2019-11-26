@@ -184,7 +184,7 @@ const std::vector<AIGroup>& ActorManager::getGroups() const
 	return this->groups;
 }
 //Player vs AI
-void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
+void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, float deltaTime)
 {
 	for (int i = 0; i < this->actors.size(); i++)
 	{
@@ -203,7 +203,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
-						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
+						this->actors[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
 					}
 				}
 				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
