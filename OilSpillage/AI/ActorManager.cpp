@@ -206,18 +206,18 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createAttacker(originPos.x + i, originPos.z, (rand() % 4) + 1);
-		createAttacker(originPos.x, originPos.z + i, (rand() % 4) + 1);
-		createAttacker(originPos.x - i, originPos.z, (rand() % 4) + 1);
+		createAttacker(originPos.x + i, originPos.z, (rand() % 8) + 1);
+		createAttacker(originPos.x, originPos.z + i, (rand() % 8) + 1);
+		createAttacker(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
 void ActorManager::spawnSnipers(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createSniper(originPos.x + i, originPos.z, (rand() % 4) + 1);
-		createSniper(originPos.x, originPos.z + i, (rand() % 4) + 1);
-		createSniper(originPos.x - i, originPos.z, (rand() % 4) + 1);
+		createSniper(originPos.x + i, originPos.z, (rand() % 8) + 1);
+		createSniper(originPos.x, originPos.z + i, (rand() % 8) + 1);
+		createSniper(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
 void ActorManager::spawnChaseCars(const Vector3& originPos)
@@ -234,9 +234,9 @@ void ActorManager::spawnShootCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createShootCar(originPos.x + i, originPos.z, (rand() % 4) + 1);
-		createShootCar(originPos.x, originPos.z + i, (rand() % 4) + 1);
-		createShootCar(originPos.x - i, originPos.z, (rand() % 4) + 1);
+		createShootCar(originPos.x + i, originPos.z, (rand() % 8) + 1);
+		createShootCar(originPos.x, originPos.z + i, (rand() % 8) + 1);
+		createShootCar(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
 
@@ -449,11 +449,11 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 		}
 		else if (enemyType == 1)
 		{
-			spawnChaseCars(newPos);
+			spawnAttackers(newPos);
 		}
 		else if (enemyType == 2)
 		{
-			spawnShootCars(newPos);
+			spawnSwarm(newPos);
 		}
 		else if (enemyType == 3)
 		{
