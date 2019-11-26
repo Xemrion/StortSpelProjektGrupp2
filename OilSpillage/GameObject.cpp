@@ -401,3 +401,13 @@ Vector3 GameObject::btTransformGetPosition(btTransform const& trans) const
 	btVector3 const Position = trans.getOrigin();
 	return Vector3(Position.getX(), Position.getY(), Position.getZ());
 }
+
+bool GameObject::isPlayer() const
+{
+	return this->player;
+}
+
+void GameObject::makePlayer()
+{
+	this->player = true;
+}
