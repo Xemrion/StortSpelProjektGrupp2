@@ -982,6 +982,21 @@ void Vehicle::updateWeapon(float deltaTime)
 						}
 					}
 				}
+				else if (weapon.type == WeaponType::MachineGun)
+				{
+					SpotLight* flash = static_cast<SpotLight*>(weapon.light);
+
+					if (flash != nullptr)
+					{
+						Vector3 rotation = weaponObject->getRotation();
+						Vector3 dir = Vector3::TransformNormal(Vector3(0.0, 0.0, 1.0), Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z));
+						float heightOffset = (Slots)i == Slots::MOUNTED ? 0.0 : -0.5;
+						
+						flash->setDirection(dir);
+						flash->setPos(this->vehicleBody1->getPosition() + dir * 1.5f + Vector3(0.0f, heightOffset, 0.0f));
+						flash->setLuminance(max(0.5f - (weapon.timeSinceLastShot * 20.0), 0.0f));
+					}
+				}
 			}
 		}
 	}
@@ -1020,6 +1035,21 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 						if (static_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
 						{
 							itemWeapon->getWeapon().light = (Light*)static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(laser);
+						}
+					}
+					else if (itemWeapon->getWeapon().type == WeaponType::MachineGun)
+					{
+						SpotLight flash = SpotLight(
+							Vector3(0, 0, 0),
+							Vector3(1.0, 0.7, 0.0),
+							0.0,
+							Vector3(0, 0, 0),
+							1.0
+						);
+
+						if (static_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
+						{
+							itemWeapon->getWeapon().light = (Light*)static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(flash);
 						}
 					}
 				}
