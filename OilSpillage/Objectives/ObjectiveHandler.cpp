@@ -42,7 +42,7 @@ ObjectiveHandler::~ObjectiveHandler()
 
 }
 
-void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfTargets, std::string info, TypeOfTarget targetType, GameObject** target, Actor** enemies)
+void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfTargets, std::string info, TypeOfTarget targetType,Vector3 getToPos, GameObject** target, Actor* boss)
 {
 	PlayingGameState* ptrState = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Objective *temp = new Objective;
@@ -55,7 +55,7 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 	std::string typeInfo = this->types.getType(TypeOfTarget(typeInt));
 	
 	temp->setReward(rewardTime);
-	
+	temp->setScore(500 * (1 + (0.1*Game::getGameInfo().nrOfClearedStages)));
 	if (type == TypeOfMission::FindAndCollect)
 	{
 		temp->setInfo(info + typeInfo);
@@ -91,10 +91,16 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 		this->pickUpArrs.push_back(targets);
 		temp->setTarget(this->pickUpArrs.at(this->pickUpArrs.size()-1), nrOfTargets);
 	}
+	else if (type == TypeOfMission::GetToPoint)
+	{
+		temp->setInfo(info);
+		temp->setGeneralPosition(getToPos);
+	}
 	else
 	{
 		temp->setInfo(info);
-		temp->setEnemies(enemies, nrOfTargets);
+		temp->setEnemies(nrOfTargets);
+		temp->setBoss(boss);
 	}
 	this->objectiveVec.push_back(temp);
 }
@@ -109,6 +115,10 @@ bool ObjectiveHandler::isAllDone()
 		{
 			break;//om den hittar minst en så är alla inte klara
 		}
+	}
+	if (this->objectiveVec.size() == 0)
+	{
+		return true;
 	}
 	return allDone;
 }
@@ -128,7 +138,9 @@ void ObjectiveHandler::update(Vector3 playerPos)
 					Game::getGraphics().removeFromDraw(this->pickUpArrs.at(0)[j]);
 				}
 			}
-			static_cast<PlayingGameState*>(Game::getCurrentState())->addTime(this->objectiveVec.at(0)->getRewardTime());
+			static_cast<PlayingGameState*>(Game::getCurrentState())->changeTime(this->objectiveVec.at(0)->getRewardTime());
+			Game::getGameInfo().highScore += objectiveVec[0]->getScore();
+			Game::getGameInfo().nrOfObjectives++;
 			delete this->objectiveVec.at(0);
 			this->objectiveVec.erase(this->objectiveVec.begin());
 			this->eventNewObj = true;

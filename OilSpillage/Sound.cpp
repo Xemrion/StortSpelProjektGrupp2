@@ -26,6 +26,8 @@ void Sound::init()
 
 void Sound::deinit()
 {
+	instance->soloud.stopAll();
+	instance->loopingSounds.clear();
 	instance->soloud.deinit();
 }
 
@@ -47,6 +49,16 @@ void Sound::load(const std::string& fileName)
 		instance->sounds[fileName] = std::make_unique<SoLoud::Wav>();
 		instance->sounds[fileName]->load(fileName.c_str());
 	}
+}
+
+float Sound::getMasterVolume()
+{
+	return instance->soloud.getGlobalVolume();
+}
+
+void Sound::setMasterVolume(float volume)
+{
+	instance->soloud.setGlobalVolume(std::clamp(volume, 0.0f, 1.0f));
 }
 
 void Sound::sayText(const std::string& text)
@@ -234,7 +246,7 @@ void Sound::fadeSoundtrack(bool toAgressive, float fadeTime)
 {
 	//Get the aggressive factor (the time of the fade that is left) so this function can be called every frame if needed.
 	float aggressiveFactor = (instance->soloud.getFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY) - 10.0f) / 10000.0f;
-	if (toAgressive) aggressiveFactor = 1 - aggressiveFactor; 
+	if (toAgressive) aggressiveFactor = 1 - aggressiveFactor;
 
 	instance->soloud.fadeFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY, toAgressive ? 10000.0f : 10.0f, fadeTime * aggressiveFactor);
 }
@@ -243,6 +255,20 @@ void Sound::stopSoundtrack(float fadeOutTime)
 {
 	instance->soloud.fadeVolume(instance->soundtrack.handleGroup, 0, fadeOutTime);
 	instance->soloud.scheduleStop(instance->soundtrack.handleGroup, fadeOutTime);
+}
+
+void Sound::changeSoundtrackVolume(float volume)
+{
+	instance->soloud.setVolume(instance->soundtrack.handleGroup,volume);
+}
+
+void Sound::stopAllSoundsExceptSoundtrack()
+{
+	for (int i = 0; i < instance->loopingSounds.size(); i++) {
+		if (!(instance->loopingSounds.at(i) == instance->soundtrack.handleCalm || instance->loopingSounds.at(i) == instance->soundtrack.handleAggressive)) {
+			instance->soloud.scheduleStop(instance->loopingSounds.at(i), 0);
+		}
+	}
 }
 
 void Sound::updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity)

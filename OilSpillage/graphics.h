@@ -152,6 +152,7 @@ public:
 	float getCullingDistance();
 	//Randompower means hom large the random position area is. 
 	void addParticle(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
+	void addParticle(std::string particleSystem, int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection, float randomPower);
 	void addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f, float randomPower = 0.5f);
 	void setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
@@ -172,4 +173,7 @@ public:
 	void setTestColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	float farZTempShadow;
 	void setSpotLightShadow(SpotLight* spotLight);
+
+	void setFog(FogMaterial material, int layers, float spacing);
+	void setFogWindSpeed(Vector2 speed);
 };

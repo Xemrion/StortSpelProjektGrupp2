@@ -106,7 +106,7 @@ private:
 	btVehicleRaycaster* m_vehicleRayCaster;
 	btCollisionShape* m_wheelShape;
 	SpotLight* spotLight;
-	int health;
+	float health;
 	bool deadImpulse;
 	bool immortal;
 	float immortalTimer;
@@ -119,17 +119,11 @@ private:
 	float trailTimer = 0.0f;
 	float driftForce = 0.0f;
 
-	float timeSinceLastShot;
-	float timeSinceLastShot2;
-	Weapon weapon;
-	Weapon weapon2;
-	Weapon mountedWeaponData;
 	Stats defaultStats;
 	Stats updatedStats;
 
 	static const int bulletCount = 512;
 	Bullet bullets[bulletCount];
-	LaserLight* laserLight;
 
 	float gunRotation;
 	DirectX::XMFLOAT2 velocity;
@@ -141,7 +135,6 @@ private:
 	float acceleratorTempZ;
 
 	float targetRotation;
-	int drivingMode;
 	float topSpeed;
 	float counter = 0.0f;
 	float rotateAcceleration = 0.0f;
@@ -159,7 +152,16 @@ private:
 	bool dmg;
 	bool player = false;
 	
-
+	int soundHandle = 0;
+	int driftHandle = 0;
+	int starPowerHandle = 0;
+	bool driftBool;
+	float driftVolume;
+	float enginePitch;
+	float engineGears;
+	int randomGears;
+	float time;
+	float wheelRotation;
 	Vector2 aimLerp;
 	Vector2 curDir;
 	Vector2 currentDir;
@@ -180,29 +182,29 @@ public:
 	GameObject* getVehicle() { return this->vehicle; }
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
+	void startEngineSound();
+	void stopEngineSound();
 
 	Stats getStats()const; 
 
 	void setSpotLight(SpotLight* theLight);
 	SpotLight* getSpotLight();
 	void setLaserLight(LaserLight* light);
-	void setDrivingMode(int i);
-	bool getDrivingMode();
 	Vector3 getVelocity();
 	float getVelocitySpeed();
 	float getRotator();
 	Vector3 getCameraDistance(float deltaTime);
 	void setAccelForce(Vector3 accelForce, float deltaTime);
-	void setWheelRotation();
+	void setWheelRotation(float deltaTime);
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;
 	int getHealth() const;
 	int getMaxHealth() const;
-	void setHealth(int health);
-	void setMaxHealth(int maxHealth);
+	void setHealth(float health);
+	void setMaxHealth(float maxHealth);
 	void resetHealth();
-	void changeHealth(int amount);
+	void changeHealth(float amount);
 	bool isDead() const;
 	float getTotalRespawnTime()const;
 	float getRespawnTimer()const;

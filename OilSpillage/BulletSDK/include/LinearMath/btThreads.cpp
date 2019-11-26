@@ -11,7 +11,9 @@ subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
-
+//#define BT_THREADSAFE 1
+//#define BT_USE_PPL 1
+//#define BT_USE_OPENMP 1
 #include "btThreads.h"
 #include "btQuickprof.h"
 #include <algorithm>  // for min and max
@@ -285,7 +287,6 @@ static ThreadId_t getDebugThreadId()
 }
 
 #endif  // #if BT_DETECT_BAD_THREAD_INDEX
-
 // return a unique index per thread, main thread is 0, worker threads are in [1, BT_MAX_THREAD_COUNT)
 unsigned int btGetCurrentThreadIndex()
 {

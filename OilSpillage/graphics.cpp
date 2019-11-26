@@ -43,11 +43,18 @@ Graphics::Graphics()
 	Vector4 fireX[4] = {
 		Vector4(1.0f,0.0f,1.0f,1.0f)
 	};
-	this->particleHandler->addParticleSystem("explosion","ParticleUpdateCS.cso", "ExplosionCreateCS.cso");
 
+	Vector4 debrisColor[4] = {
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f)
+	};
+	this->particleHandler->addParticleSystem("explosion","ParticleUpdateCS.cso", "ExplosionCreateCS.cso");
+	this->particleHandler->addParticleSystem("debris", debrisColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 
 	this->particleHandler->loadParticleSystems();
-
+	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
 }
 
@@ -414,10 +421,23 @@ bool Graphics::init(Window* window)
 		Vector4(0.0f,0.0f,0.0f,1.0f),
 		Vector4(0.0f,0.0f,0.0f,1.0f)
 	};
-	this->particleTrail->changeColornSize(colors, 1, 0.1f, 0.1f);
-	this->particleSystem->changeColornSize(colorFire, 4, 0.05f, 0.1f);
+	
 	//this->particleHandler->getParticleSystem("electro")->changeColornSize(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
+	Vector4 debrisColor[4] = {
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f),
+		Vector4(0.0f,0.0f,0.0f,1.0f)
+	};
+	//this->particleHandler->getParticleSystem("debris")->changeColornSize(debrisColor, 4, 0.1f, 0.1f);
+	//this->particleHandler->getParticleSystem("debris")->changeVectorField(0.0f, 1.0f);
+
+	//this->particleHandler->getParticleSystem("debris")->saveSystem();
+
+	//this->particleHandler->getParticleSystem("electro")->setParticleShaders(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("electro")->setGeometryShader("ParticleGS.cso");
+	this->particleHandler->getParticleSystem("electro")->setPixelShader("ParticlePS.cso");
 
 
 	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());
@@ -425,6 +445,7 @@ bool Graphics::init(Window* window)
 	this->particleTrail->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleHandler->getParticleSystem("debris")->initiateParticles(device.Get(), deviceContext.Get());
 
 
 	this->particleSystem->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
@@ -432,6 +453,7 @@ bool Graphics::init(Window* window)
 	this->particleTrail->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("electro")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("explosion")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("debris")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 
 	
 	FogMaterial fogMaterial;
@@ -445,6 +467,7 @@ bool Graphics::init(Window* window)
 	uiCamera.setPosition(Vector3(0, 0, -10));
 
 	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
+
 	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
 	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
 	deviceContext->RSSetViewports(1, &this->vp);
@@ -824,6 +847,17 @@ void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfPartic
 	this->particleHandler->getParticleSystem("fire")->addParticle(nrOfParticles, lifeTime, randomPos,initialDirection);
 }
 
+void Graphics::addParticle(std::string particleSystem, int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection, float randomPower)
+{
+	Vector3 randomPos = randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+	Vector3 randomPos2 = -1.0f * randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
+	randomPos += position;
+	randomPos += randomPos2;
+	float grey = float(rand()) / RAND_MAX;
+	this->particleHandler->getParticleSystem(particleSystem)->addParticle(nrOf, lifeTime, randomPos, initialDirection);
+}
+
 void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime, float randomPower)
 {
 	Vector3 randomPos = randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
@@ -863,7 +897,7 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 
 void Graphics::addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime)
 {
-	this->particleTrail->addParticle(nrOfParticles, lifeTime, pos, initialDirection);
+	this->particleTrail->addParticle(1, lifeTime, pos, initialDirection);
 }
 
 void Graphics::changeTrailColor(Vector3 color)
@@ -1804,7 +1838,6 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		SimpleMath::Matrix world = object->getTransform();
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 
-		mappedResource;
 		HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
 		deviceContext->Unmap(worldBuffer.Get(), 0);
@@ -1824,7 +1857,6 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 			normalSRV = material.normal->getShaderResView();
 		}
 
-
 		Vector4 modColor = object->getColor();
 		hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
@@ -1837,7 +1869,8 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
-		Vector4 t = Vector4(time, 0.0005 + (i % 3) * 0.00003, 0.0005 + (i % 2) * 0.000045, 0.0);
+		const Vector2 windSpeed = fog->getWindSpeed();
+		Vector4 t = Vector4(time, windSpeed.x + (i % 3) * 0.00003, windSpeed.y + (i % 2) * 0.000045, 0.0);
 		deviceContext->Map(fogAnimationBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &t, sizeof(Vector4));
 		deviceContext->Unmap(fogAnimationBuffer.Get(), 0);
@@ -1849,4 +1882,15 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 
 	ID3D11ShaderResourceView* nullSRV = NULL;
 	deviceContext->PSSetShaderResources(7, 1, &nullSRV);
+}
+
+void Graphics::setFog(FogMaterial material, int layers, float spacing)
+{
+	fog = std::make_unique<Fog>();
+	fog->initialize(device, deviceContext, layers, spacing, material);
+}
+
+void Graphics::setFogWindSpeed(Vector2 speed)
+{
+	fog->setWindSpeed(std::move(speed));
 }

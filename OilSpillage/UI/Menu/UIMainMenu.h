@@ -16,6 +16,7 @@ private:
 	std::unique_ptr<Button> buttonPlay;
 	std::unique_ptr<Button> buttonOptions;
 	std::unique_ptr<Button> buttonCredits;
+	std::unique_ptr<Button> buttonHighscore;
 	std::unique_ptr<Button> buttonQuit;
 	std::unique_ptr<ButtonPromptBar> promptBar;
 	Element* selected;

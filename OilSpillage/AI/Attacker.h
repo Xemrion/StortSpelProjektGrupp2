@@ -9,6 +9,7 @@ public:
 	virtual ~Attacker();
 	void update(float dt, const Vector3& targetPos);
 private:
+	void createRigidbody(Physics* physics);
 	void setUpActor();
 	Vector3 seek();
 };

@@ -5,6 +5,7 @@
 #include "../Elements/Slider.h"
 #include "../Elements/Minimap.h"
 #include "../Elements/ObjectiveBox.h"
+#include "../Elements/AnimatedText.h"
 
 class UIPlaying : public UserInterface
 {
@@ -15,7 +16,16 @@ private:
 
 	bool shouldInit;
 	float respawnTimer;
+	float timerScale;
 
+	int lastMinute;
+	bool scaleUp;
+	float scaleTimer;
+	float timeChangeTimer;
+	std::unique_ptr<AnimatedText> timeChangeText;
+	std::unique_ptr<AnimatedText> timerText;
+	std::unique_ptr<AnimatedText> timer;
+	std::unique_ptr<AnimatedText> score;
 	std::unique_ptr<Slider> healthBar;
 	std::unique_ptr<Minimap> minimap;
 	std::unique_ptr<ObjectiveBox> objectiveBox;
@@ -26,6 +36,7 @@ public:
 	void init();
 	void resetMinimapFog();
 	bool hasExploredOnMinimap(Vector3 worldPosition) const;
+	void addTimeChangeText(float amount);
 };
 
 #endif // !UI_PLAYING_H

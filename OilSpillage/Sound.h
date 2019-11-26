@@ -44,6 +44,8 @@ public:
 	static void update(float deltaTime);
 	static void stopAll();
 	static void load(const std::string& fileName);
+	static float getMasterVolume();
+	static void setMasterVolume(float volume);
 
 	static void sayText(const std::string& text);
 
@@ -60,6 +62,9 @@ public:
 	static void playSoundtrack(std::string fileNameCalm, std::string fileNameAggressive, float volume = 1.0f);
 	static void fadeSoundtrack(bool toAgressive, float fadeTime);
 	static void stopSoundtrack(float fadeOutTime = 0.0f);
+	static void changeSoundtrackVolume(float volume);
+
+	static void stopAllSoundsExceptSoundtrack();
 
 	static void updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity);
 };
