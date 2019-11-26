@@ -59,7 +59,7 @@ void PlayingGameState::initAI()
 	aStar->generateTileData(map->getTileMap());
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0f), currentMenu(MENU_PLAYING)
 {
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -256,7 +256,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(240.0
 	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
 	menues[MENU_PAUSED]->init();
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
-	menues[MENU_OPTIONS]->init();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	auto playerVehicle = player->getVehicle();
@@ -681,14 +680,6 @@ void PlayingGameState::update(float deltaTime)
 		if (Input::isKeyDown_DEBUG(Keyboard::E)) {
 			deltaTime /= 4;
 		}
-		if (Input::isKeyDown_DEBUG(Keyboard::Q)) {
-			if (player->getDrivingMode() == 0) {
-				player->setDrivingMode(1);
-			}
-			else if (player->getDrivingMode() == 1) {
-				player->setDrivingMode(0);
-			}
-		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 		if (Input::isKeyDown_DEBUG(Keyboard::LeftAlt))
@@ -901,11 +892,21 @@ void PlayingGameState::update(float deltaTime)
 	graphics.render(camera.get(), deltaTime);
 
 	// render UI
-	menues[MENU_PLAYING]->update(deltaTime);
 	if (currentMenu != MENU_PLAYING)
+	{
+		menues[MENU_PLAYING]->update(0);
 		menues[currentMenu]->update(deltaTime);
-	else if (Input::checkButton(Keys::MENU, States::PRESSED))
-		setCurrentMenu(PlayingGameState::MENU_PAUSED);
+	}
+	else
+	{
+		menues[MENU_PLAYING]->update(deltaTime);
+
+		if (Input::checkButton(Keys::MENU, States::PRESSED))
+		{
+			setCurrentMenu(PlayingGameState::MENU_PAUSED);
+		}
+	}
+	
 
 
 	//Render all objects
@@ -942,10 +943,12 @@ void PlayingGameState::setTime(float time) noexcept {
 
 void PlayingGameState::changeTime(float timeDiff) noexcept {
 	time = std::max(time + timeDiff, .0f);
+	static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->addTimeChangeText(timeDiff);
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
 	currentMenu = static_cast<int>(menu);
+	if (menu == Menu::MENU_OPTIONS) menues[MENU_OPTIONS]->init();
 }
 
 Vehicle* PlayingGameState::getPlayer() const {
@@ -1223,11 +1226,6 @@ ObjectiveHandler& PlayingGameState::getObjHandler()
 	return this->objectives;
 }
 
-void PlayingGameState::addTime(float time)
-{
-	this->time += time;
-}
-
 void PlayingGameState::updateObjects()
 {
 	if (abs(player->getVelocitySpeed()) > 1.0f) {
@@ -1319,13 +1317,13 @@ void PlayingGameState::generateObjectives()
 			int dice = rand() % 10 + 1;
 			if (dice <= prob[0] * 10)
 			{
-				objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5*Game::getLocalScale(), "Pick up the important", TypeOfTarget::Crate);
+				objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5*Game::getLocalScale(), "Pick up ", TypeOfTarget::Crate);
 				prob[0] -= 0.1f;
 				prob[1] += 0.1f;
 			}
 			else if (dice > (1 - prob[1]) * 10)
 			{
-				objectives.addObjective(TypeOfMission::KillingSpree, 120, 100*Game::getLocalScale(), "Kill the enemies");
+				objectives.addObjective(TypeOfMission::KillingSpree, 120, 100*Game::getLocalScale(), "Kill enemies");
 				prob[0] += 0.1f;
 				prob[1] -= 0.1f;
 			}
@@ -1334,7 +1332,7 @@ void PlayingGameState::generateObjectives()
 			prob[0] = std::fminf(prob[0], 1.0f);
 			prob[1] = std::fminf(prob[1], 1.0f);
 		}
-		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out!", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
 	}
 }
 
