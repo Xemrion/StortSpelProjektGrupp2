@@ -722,6 +722,16 @@ void PlayingGameState::update(float deltaTime)
 		player->updatePlayer(deltaTime);
 		physics->update(deltaTime);
 
+		if (player->isDead()) {
+			cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			cameraTimer = 0;
+		}
+		else {
+			cameraTimer += deltaTime;
+			if (cameraTimer > 100) {
+				cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+			}
+		}
 		Vector3 cameraMovement(player->getCameraDistance(deltaTime));
 		btVector3 positionCam{ playerVehicle->getRigidBody()->getWorldTransform().getOrigin() };
 		Vector3 destinationCamPos = Vector3(positionCam.getX(),
