@@ -626,7 +626,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 		}
 	}
 	
-	drawStaticGameObjects(camera, frustum, 10.0);
+	drawStaticGameObjects(camera, frustum, 15.0);
 	
 	drawFog(camera, deltaTime);
 

@@ -46,6 +46,7 @@ struct SingleTileHouse {
 
 struct MultiTileHouse {
 	Vector<GameObject> parts;
+	Vector<GameObject> hitboxes;
 	Bounds             bounds;
 };
 
@@ -97,7 +98,6 @@ private:
 	UPtr<Voronoi>            districtMap;
 	Vector<District::Enum>   districtLookupTable;
 	Vector<UPtr<GameObject>> groundTiles;
-	Vector<GameObject>       houseTiles;
 	Physics * const          physics;
 	// TODO: refactor out:
 	using DistrictID = U16;

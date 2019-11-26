@@ -64,9 +64,9 @@ currentTileType += ((y < height-1) and (tileAt(x,y+1) == Tile::road))? '1' : '0'
 			auto  &tile        { tiles[ index(x, y)] };
 			tile.mesh        = graphics.getMeshPointer( currentTileType.c_str() );
 			tile.setMaterial(  graphics.getMaterial(    currentTileType.c_str() ) );
-			tile.setScale(Vector3{ 1.0f * config.tileScaleFactor.x,
-			                       1.0f * config.tileScaleFactor.y,
-			                       1.0f * config.tileScaleFactor.z }); // TODO: scale models instead
+			tile.setScale(Vector3{ 1.0f * config.tileSideScaleFactor,
+			                       1.0f * config.tileSideScaleFactor,
+			                       1.0f * config.tileSideScaleFactor }); // TODO: scale models instead
 			tile.setPosition(convertTilePositionToWorldPosition(x, y) - Vector3{ .0f, 1.5f, .0f } );
 		}
 	}
@@ -285,7 +285,7 @@ Vector<String> const  TileMap::tileTerminalColorTable{
 Bounds TileMap::calculateBounds( Vector3 const &o, F32 r ) const noexcept
 {
    V2u     ots { convertWorldPositionToTilePosition(o) }; // origin tile xy
-   U32     rts = U32(std::ceil(r / config.tileScaleFactor.x));
+   U32     rts = U32(std::ceil(r / config.tileSideScaleFactor));
 	Bounds  b   { { ots.x-rts, ots.y-rts },
                  { ots.x+rts, ots.y+rts } };
    if ( (Size)b.min.x >= width  )

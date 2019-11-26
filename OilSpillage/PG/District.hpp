@@ -49,7 +49,7 @@ namespace District {
 	                  park         { "park",          2.0f,   .00f,    .0f,     0,     0,     1,        1 },
 	                  metropolitan { "metropolitan",  2.0f,   .95f,    .0f,     1,     1,     8,       16 },
 	                  suburban     { "suburban",      2.0f,   .30f,    .0f,     1,     4,     1,        2 },
-	                  downtown     { "downtown",      2.0f,   .90f,    .3f,     2,     8,     3,        4 };
+	                  downtown     { "downtown",      2.0f,   .90f,    .3f,     6,     16,    1,        6 };
 
 	inline Vector<Type const *> all { &residential, &park, &metropolitan, &suburban, &downtown };
 

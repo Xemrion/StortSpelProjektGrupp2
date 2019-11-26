@@ -3,6 +3,112 @@
 #include "Profiler.hpp"
 
 
+
+// 
+// 00
+// X0  OC
+// 
+// 
+// 10
+// X0  SA
+// 
+// 
+// 01
+// X0  OC
+// 
+// 
+// 11
+// X0  SA
+// 
+// 
+// 00
+// X1  SB
+// 
+// 
+// 10
+// X1  IC
+// 
+// 
+// 01
+// X1  SB
+// 
+// 
+// 11
+// X1  MP
+// 
+// 
+// for roof:
+//   0 = neighbourFloorNo != myFloorNo
+//   1 = neighbourFloorNo == myFloorNo
+// 
+// auto placeHouse = []( I32 x, I32 y ) { 
+//    placeMesh(); // house
+//    placeMesh(); // floor
+// };
+// 
+// 
+// auto startDirection;
+// 
+// for ( ++x = 0 < map.width ) {
+//    for ( ++n = 0 < borderWidth ) {
+//       if ( !(startDirection == Direction::north and startPos.x == x) and selection(rng) < .90f )
+//          placeHouse(x,-n);
+//       if ( !(startDirection == Direction::south and startPos.x == x) and selection(rng) < .90f )
+//          placeHouse(x,map.height+n);
+//    }
+// }
+// 
+// for ( ++y = 0 < map.height )
+//    for ( ++n = 0 < borderWidth ) {
+//       if ( !(startDirection == Direction::west and startPos.y == y) and selection(rng) < .90f )
+//          placeHouse(x,-n);
+//       if ( !(startDirection == Direction::south and startPos.y == y) and selection(rng) < .90f )
+//          placeHouse(x,map.height+n);
+//    }
+// }
+// 
+// if ( startDirection != Direction::north )
+//    placeFence(north);
+// else {
+//    westLength = map.width - startPos.x; // confirm?
+//    eastLength = startPos.x;
+//    // place at -1-1, rotate 90 deg, scale by west length
+//    // place at startPos.x+1,-1, rotate 90 deg, scale by east length
+// }
+// 
+// if ( startDirection != Direction::east )
+//    placeFence(east);
+// else {
+//    northLength = map.length - startPos.y; // confirm?
+//    southLength = startPos.y;
+//    // place at map.width+1.-1 rotate 180 deg, scale by north length
+//    // place at map.width+1,startPos.y+1 rotate 180 deg, scale by south length
+// }
+// 
+// if ( startDirection != Direction::south )
+//    placeFence(south);
+// else {
+//    westLength = map.width - startPos.x; // confirm?
+//    eastLength = startPos.x;
+//    // place at -1,map.length+1 rotate 90 deg, scale by west length
+//    // place at startPos.x+1,map.length+1, rotate 90 deg, scale by east length
+// }
+// 
+// if ( startDirection != Direction::west )
+//    placeFence(west);
+// else {
+//    northLength = map.length - startPos.y; // confirm?
+//    southLength = startPos.y;
+//    // place at map.width+1.-1 rotate 180 deg, scale by north length
+//    // place at map.width+1,startPos.y+1 rotate 180 deg, scale by south length
+// }
+// 
+// // floor x4
+
+// fence
+
+
+
 // TODO: 1. make road coverage affect district type
 //       2. scale up road maps
 //       3. improve base road tileset
@@ -124,8 +230,16 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
 Map::~Map() noexcept
 {
 	graphics.clearStaticObjects();
-	for ( auto &e : houseTiles )
-		physics->DeleteRigidBody( e.getRigidBody() );
+	for ( auto &e : houses.composites ) {
+		physics->DeleteRigidBody( e.walls.getRigidBody() );
+		physics->DeleteRigidBody( e.windows.getRigidBody() );
+		physics->DeleteRigidBody( e.roof.getRigidBody() );
+	}
+	for ( auto &e : houses.singles )
+		physics->DeleteRigidBody( e.object.getRigidBody() );
+	for ( auto &e : houses.multis )
+		for ( auto &p : e.parts)
+		physics->DeleteRigidBody( p.getRigidBody() );
 	//for ( auto &e : houseTiles )
 	//	graphics.removeFromDraw( &e );
 	//for ( auto &e : groundTiles )
@@ -292,18 +406,18 @@ void  Map::generateBuildings( )
 						}
 						house.object.mesh       = graphics.getMeshPointer( "Hospital" );
 						house.object.setMaterial( graphics.getMaterial(    "Hospital" ) );
-						house.object.setScale({ .048f * config.tileScaleFactor.x,
-													.048f * config.tileScaleFactor.y,
-													.048f * config.tileScaleFactor.z });
+						house.object.setScale({ .048f * config.tileSideScaleFactor,
+						                        .048f * config.tileSideScaleFactor,
+						                        .048f * config.tileSideScaleFactor });
 						house.object.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePos) } );
 						#ifndef _DEBUG
 							btRigidBody *tmp = physics->addBox( btVector3( house.object.getPosition().x,
-																		              house.object.getPosition().y,
-																		              house.object.getPosition().z ),
-																		 btVector3( 10.5f * house.object.getScale().x,
-																		            10.5f * house.object.getScale().y,
-																		            10.5f * house.object.getScale().z ),
-																		 .0f );
+							                                               house.object.getPosition().y,
+							                                               house.object.getPosition().z ),
+							                                    btVector3( 10.5f * house.object.getScale().x,
+							                                               10.5f * house.object.getScale().y,
+							                                               10.5f * house.object.getScale().z ),
+							                                    .0f );
 							house.object.setRigidBody( tmp, physics );
 						#endif
 						tilemap->applyLot( maybeLot.value(), Tile::building );
@@ -388,12 +502,12 @@ void  Map::generateBuildings( )
 						                     .0322f * config.tileScaleFactor.z });
 					#ifndef _DEBUG
 						btRigidBody *tmp = physics->addBox( btVector3( house.object.getPosition().x,
-																	              house.object.getPosition().y,
-																	              house.object.getPosition().z ),
-																	   btVector3( 15.5f * house.object.getScale().x,
-																	              15.5f * house.object.getScale().y,
-																	              15.5f * house.object.getScale().z ),
-																	   .0f );
+						                                               house.object.getPosition().y,
+						                                               house.object.getPosition().z ),
+						                                    btVector3( 15.5f * house.object.getScale().x,
+						                                               15.5f * house.object.getScale().y,
+						                                               15.5f * house.object.getScale().z ),
+						                                    .0f );
 						house.object.setRigidBody( tmp, physics );
 					#endif
 					tilemap->applyLot( maybeLot.value(), Tile::building );
@@ -411,9 +525,12 @@ void  Map::generateBuildings( )
 		graphics.addToDrawStatic( &e.windows );
 		graphics.addToDrawStatic( &e.roof    );
 	}
-	for ( auto &e : houses.multis )
+	for ( auto &e : houses.multis ) {
 		for ( auto &p: e.parts )
-			graphics.addToDrawStatic( &p );
+			graphics.addToDrawStatic( &p ); 
+		for ( auto &hb: e.hitboxes ) // REMOVE
+			graphics.addToDrawStatic( &hb ); 
+	}
 	for ( auto &e : houses.singles )
 		graphics.addToDrawStatic( &e.object );
 }
@@ -693,14 +810,14 @@ Direction Map::getHospitalOrientation( V2u const xy ) const noexcept
 Vector3 Map::getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept
 {
    // TODO: bryt ut tileScaleFactor x/z till en float tileSideScaleFactor i MapConfig
-   F32 offsetDistance { config.tileScaleFactor.x / 1.6f }; // TODO: tune!
+   F32 offsetDistance { config.tileSideScaleFactor / 1.6f }; // TODO: tune!
    auto orientation = getHospitalOrientation( hospitalTilePos );
    auto result = tilemap->convertTilePositionToWorldPosition( hospitalTilePos );
    switch ( orientation ) { 
       case Direction::south: result += Vector3(  .0f, .0f,  -offsetDistance ); break;
-      case Direction::west:  result += Vector3( -offsetDistance, .0f, .0f  ); break;
-      case Direction::east:  result += Vector3(  offsetDistance, .0f, .0f  ); break;
-      case Direction::north: result += Vector3(  .0f, .0f, offsetDistance ); break;
+      case Direction::west:  result += Vector3( -offsetDistance, .0f, .0f   ); break;
+      case Direction::east:  result += Vector3(  offsetDistance, .0f, .0f   ); break;
+      case Direction::north: result += Vector3(  .0f, .0f, offsetDistance   ); break;
    }
    return result;
 }
@@ -728,9 +845,7 @@ District::Enum  Map::districtAt( U32 x, U32 y ) const noexcept {
 //
 // c is not included (it's intrinsic based off of the currently processed tiled)
 
-// Wraps a tile's type and encodes the possible existence of neighbouring road tiles in the 8 eight directions into bits.
-struct TileInfo {
-   union {
+union NeighbourMask {
 		U8 bitmap  { 0x00 }; // <- encoding byte; default unset
 		struct {             // <- individual bit access interface
 			U8 n  : 1,
@@ -742,7 +857,11 @@ struct TileInfo {
 			   w  : 1,
 			   nw : 1;
 		};
-	} roadmap, housemap, concreteMap;
+};
+
+// Wraps a tile's type and encodes the possible existence of neighbouring road tiles in the 8 eight directions into bits.
+struct TileInfo {
+   NeighbourMask   roadmap, housemap, concreteMap;
 	Vector3         origin;
 	Tile            tileType;
 	District::Enum  districtType;
@@ -1122,43 +1241,36 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 {
 	auto  index = [&layout]( U32 x, U32 y) { return y * layout.width + x; };
 	// generate masks and compute the final number of parts:
-	auto  masks    = Vector<U8>( Size(layout.width * layout.length), 0x00 );
+	auto  masks    = Vector<NeighbourMask>( Size(layout.width) * layout.length );
 	U32   numParts = { 0 };
 	for ( U32 x = 0;  x < layout.width;  ++x ) {
 		for ( U32 y = 0;  y < layout.length;  ++y ) {
-			U8   tilemask   = 0x00;
-			auto floorCount = layout.floors[index(x,y)];
-			U32  idx        = index(x,y);
+			U32  idx    = index(x,y);
+			auto &mask  = masks[idx];
+			mask.bitmap = 0x00;
+			auto floorCount = layout.floors[idx];
 			if ( layout.floors[idx] != 0 ) {
 				// compute mask:
-				if ( (y-1 < layout.length) and (layout.floors[index(x,y-1)] < floorCount ) )
-					masks[idx] += 1 << 0; // N
-				if ( (y-1 < layout.length) and (x+1 < layout.width) and (layout.floors[index(x+1,y-1)] < floorCount ) )
-					masks[idx] += 1 << 1; // NE
-				if ( (x+1 < layout.width) and (layout.floors[index(x+1,y)]  < floorCount ) )
-					masks[idx] += 1 << 2; // E
-				if ( (y+1 < layout.length) and (x+1 < layout.width) and (layout.floors[index(x+1,y+1)] < floorCount ) )
-					masks[idx] += 1 << 3; // SE
-				if ( (y+1 < layout.length) and (layout.floors[index(x,y+1)] < floorCount ) )
-					masks[idx] += 1 << 4; // S
-				if ( (y+1 < layout.length) and (x-1 < layout.width) and (layout.floors[index(x-1,y+1)] < floorCount ) )
-					masks[idx] += 1 << 5; // SW
-				if ( (x-1 < layout.width) and (layout.floors[index(x-1,y)]  < floorCount ) )
-					masks[idx] += 1 << 6; // W
-				if ( (y-1 < layout.length) and (x-1 < layout.width) and (layout.floors[index(x-1,y-1)] < floorCount ) )
-					masks[idx] += 1 << 7; // NW
-				// process mask:
+				mask.n  = ((y-1 < layout.length) and                          (layout.floors[index( x,   y-1 )] >= floorCount ));//?  1:0;
+				mask.ne = ((y-1 < layout.length) and (x+1 < layout.width) and (layout.floors[index( x+1, y-1 )] >= floorCount ));//?  1:0;
+				mask.e  = (                          (x+1 < layout.width) and (layout.floors[index( x+1, y   )] >= floorCount ));//?  1:0;
+				mask.se = ((y+1 < layout.length) and (x+1 < layout.width) and (layout.floors[index( x+1, y+1 )] >= floorCount ));//?  1:0;
+				mask.s  = ((y+1 < layout.length) and                          (layout.floors[index( x,   y+1 )] >= floorCount ));//?  1:0;
+				mask.sw = ((y+1 < layout.length) and (x-1 < layout.width) and (layout.floors[index( x-1, y+1 )] >= floorCount ));//?  1:0;
+				mask.w  = (                          (x-1 < layout.width) and (layout.floors[index( x-1, y   )] >= floorCount ));//?  1:0;
+				mask.nw = ((y-1 < layout.length) and (x-1 < layout.width) and (layout.floors[index( x-1, y-1 )] >= floorCount ));//?  1:0;
+				// process mask for parts count:
 				for ( auto q=0; q<4; ++q ) { // quadrants
-					U8 quadmask = (masks[idx] >> (2 * q)) & 0b111;
-					if ( (quadmask & 0b101) == 0 )  // outer corner
+					U8 quadmask = util::cycleRight( mask.bitmap, 2*q) & 0b00000'111;
+					if      ( (quadmask & 0b00000'101) == 0b00000'000 )  // 010 or 000 => outer corner
 						numParts += floorCount + 2;
-					else if ( quadmask == 0b101 ) // inner corner
+					else if ( (quadmask & 0b00000'111) == 0b00000'101 )  // 101 => inner corner
 						numParts += floorCount + 2;
-					else if ( quadmask == 0b100 ) // side A
+					else if ( (quadmask & 0b00000'101) == 0b00000'100 )  // 100 or 110 => side A
 						numParts += floorCount + 2;
-					else if ( quadmask == 0b001 ) // side B
+					else if ( (quadmask & 0b00000'101) == 0b00000'001 )  // 001 or 010 => side B
 						numParts += floorCount + 2;
-					else if ( quadmask == 0b111 )  // midpiece
+					else if ( (quadmask & 0b00000'111) == 0b00000'111 )  // 111 => midpiece
 						++numParts; // roof only
 				}
 			}
@@ -1169,61 +1281,202 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 	house.parts = {};
 	house.parts.reserve(numParts);
 
-	auto instantiateTilePart = [&]( std::string partName, Vector3 const &pos, F32 deg=.0f, F32 yOffset=.0f, F32 floorHeightFactor=1.0f ) {
+	auto instantiateTilePart = [&]( std::string const &partName, Vector3 const &pos, F32 deg, U8 floor, F32 floorHeightFactor=1.0f ) {
 		house.parts.emplace_back();
 		auto &model      = house.parts.back();
 		std::string name = std::string("Houses/tilesets/")+tileset.name+"/"+partName;
-		model.mesh       = graphics.getMeshPointer(  name.c_str() );
-		model.setMaterial( graphics.getMaterial(     name.c_str() ) );
+		model.mesh       = graphics.getMeshPointer( name.c_str() );
+		model.setMaterial( graphics.getMaterial(    name.c_str() ) );
 		if ( deg > 1.0f )
 			model.setRotation({ .0f, util::degToRad(deg), .0f });
-		model.setPosition( pos + Vector3{.0f, yOffset+(config.tileScaleFactor.y*0.50f*floorHeightFactor), .0f} );
-		model.setColor({ .0f, .0f, .0f, .0f });
-		model.setScale({ config.tileScaleFactor.x*0.50f,
-		                 config.tileScaleFactor.y*0.50f*floorHeightFactor,
-		                 config.tileScaleFactor.z*0.50f });
+
+		Vector4 color  { .0f, .0f, .0f, .0f };
+		Vector3 offset {};
+//	debug colour coding
+//		if      ( std::round(deg) ==   0 ) {
+//			//offset = { .5,   0, .5f };
+//			color  = { 1.0f, .0f, .0f, 1.0f }; // red
+//		}
+//		else if ( std::round(deg) ==  90 ) {
+//			//offset = { .5, -99, .5f };
+//			color  = { .0f, 1.0f, .0f, 1.0f }; // green
+//		}
+//		else if ( std::round(deg) == 180 ) {
+//			//offset = { .5, -99, .5f };
+//			color  = { .0f, .0f, 1.0f, 1.0f }; // blue
+//		}
+//		else if ( std::round(deg) == 270 ) {
+//			//offset = { .5, -99, .5f };
+//			color  = { 1.0f, 1.0f, .0f, 1.0f }; // yellow
+//		}
+		model.setPosition( pos + Vector3{.0f, -1.5f+(config.buildingHeightScaleFactor*0.005f*floorHeightFactor*floor), .0f} + offset );
+		model.setColor( color );
+		model.setScale({ config.tileSideScaleFactor*0.005f,
+		                 config.buildingHeightScaleFactor * 0.005f * floorHeightFactor,
+		                 config.tileSideScaleFactor*0.005f });
 	};
 
+	constexpr auto quadrant_southeast = 0, // 00
+	               quadrant_southwest = 1, // 01
+	               quadrant_northwest = 2, // 10
+	               quadrant_northeast = 3; // 11	               
+
+	F32 const fullSide = tilemap->config.tileSideScaleFactor / 2;
+	F32 const halfSide = fullSide / 2;
+	F32 const fracSide = halfSide * 0.25;
+	house.hitboxes.reserve(8);
 	for ( U32 x = 0;  x < layout.width;  ++x ) {
 		for ( U32 y = 0;  y < layout.length;  ++y ) {
-			auto mask         = masks[index(x,y)];
-			auto floorCount   = layout.floors[index(x,y)];
+			auto idx          = index(x,y);
+			auto mask         = masks[idx];
+			auto floorCount   = layout.floors[idx];
 			auto basePosition = tilemap->convertTilePositionToWorldPosition(nw.x+x, nw.y+y);
 			// process mask:
-			if (mask) for ( auto q=0; q<4; ++q ) { // quadrants
-				U8 quadmask = (mask >> (2 * q)) & 0b111;
-				if ( (quadmask & 0b101) == 0x00 ) {
+			U8 quadmask = mask.bitmap;
+			if (mask.bitmap != 0x00) for ( auto q=0;  q<4;  ++q ) { // quadrants
+				quadmask = util::cycleRight(quadmask, 2);
+				if      ( (quadmask & 0b00000'101) == 0x00000'000 ) { // 000 or 010 => outer corner
 					instantiateTilePart( "f_oc", basePosition, 90.0f*q, .0f );
+					#ifndef _DEBUG // add rigid body to quadrant
+						house.hitboxes.emplace_back();
+						auto &hitbox = house.hitboxes.back();
+						auto     sca = Vector3 { fracSide*2.5f, 999.0f, fracSide*2.5f };
+						auto     pos = basePosition;
+						if ( (q == quadrant_northeast) or (q == quadrant_northwest) )
+							pos.z += (2.5*fracSide);
+						else // south
+							pos.z -= (2.5*fracSide);
+						if ( (q == quadrant_northwest) or (q == quadrant_southwest) )
+							pos.x -= (2.5*fracSide);
+						else // south
+							pos.x += (2.5*fracSide);
+
+hitbox.setColor({1.0f, .0f, .0f, 1.0f}); // red
+hitbox.setPosition(pos);
+hitbox.mesh = graphics.getMeshPointer("Cube");
+hitbox.setScale(sca);
+
+						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
+						                                    btVector3( sca.x, sca.y, sca.z ),
+						                                   .0f );
+						hitbox.setRigidBody( tmp, physics );
+					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
-						instantiateTilePart( "w_oc", basePosition, 90.0f*q, currFloor*tileset.floorHeight );
-					instantiateTilePart( "r_oc", basePosition, 90.0f*q, floorCount*tileset.floorHeight );
+						instantiateTilePart( "w_oc", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
+					//instantiateTilePart(    "r_oc", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
 				}
-				else if ( quadmask == 0b101 ) {
+				else if ( (quadmask & 0b00000'111) == 0b00000'101 ) { // 101 => inner corner
 						instantiateTilePart( "f_ic", basePosition, 90.0f*q, .0f );
-					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
-						instantiateTilePart( "w_ic", basePosition, 90.0f*q, currFloor*tileset.floorHeight );
-					instantiateTilePart( "r_ic", basePosition, 90.0f*q, floorCount*tileset.floorHeight );
+					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor ) 
+						instantiateTilePart( "w_ic", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
+
+					#ifndef _DEBUG // add rigid body to quadrant
+						bool  isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
+						auto        scaB = Vector3 { isVertical? halfSide:fracSide, 999.0f, isVertical? fracSide:halfSide };
+						auto        posA = basePosition;
+						auto        scaA = Vector3 { isVertical? fracSide:halfSide, 999.0f, isVertical? halfSide:fracSide };
+						auto        posB = basePosition;
+						switch (q) {
+							case quadrant_southeast: posA.z -= halfSide; posA.x += halfSide;   posB.x += halfSide; posB.z -= halfSide;  break;
+							case quadrant_southwest: posA.x -= halfSide; posA.z -= halfSide;   posB.z -= halfSide; posB.x -= halfSide;  break;
+							case quadrant_northwest: posA.z += halfSide; posA.x -= halfSide;   posB.x -= halfSide; posB.z += halfSide;  break;
+							case quadrant_northeast: posA.x += halfSide; posA.z += halfSide;   posB.z += halfSide; posB.x += halfSide;  break;
+						}
+
+						house.hitboxes.emplace_back();
+						auto    &hitboxA = house.hitboxes.back();
+
+	hitboxA.setColor({1.0f, 1.0f, .0f, 1.0f}); // yellow
+	hitboxA.setPosition(posA);
+	hitboxA.mesh = graphics.getMeshPointer("Cube");
+	hitboxA.setScale(scaA);
+
+						btRigidBody *tmpA = physics->addBox( btVector3( posA.x, posA.y, posA.z ),
+						                                     btVector3( scaA.x, scaA.y, scaA.z ),
+						                                    .0f );
+						hitboxA.setRigidBody( tmpA, physics );
+
+
+						house.hitboxes.emplace_back();
+						auto    &hitboxB = house.hitboxes.back();
+
+	hitboxB.setColor({1.0f, 0.0f, 1.0f, 1.0f}); // magenta
+	hitboxB.setPosition(posB);
+	hitboxB.mesh = graphics.getMeshPointer("Cube");
+	hitboxB.setScale(scaB);
+
+						btRigidBody *tmpB = physics->addBox( btVector3( posB.x, posB.y, posB.z ),
+						                                     btVector3( scaB.x, scaB.y, scaB.z ),
+						                                    .0f );
+						hitboxB.setRigidBody( tmpB, physics );
+					#endif
+
+					//instantiateTilePart(    "r_ic", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
 				}
-				else if ( quadmask == 0b100 ) {
+				else if ( (quadmask & 0b00000'101) == 0b00000'100 ) { // 100 or 110 => side A
 					instantiateTilePart( "f_sa", basePosition, 90.0f*q, .0f );
+					#ifndef _DEBUG // add rigid body to quadrant
+						house.hitboxes.emplace_back();
+						auto    &hitbox = house.hitboxes.back();
+						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
+						auto        sca = Vector3 { isVertical? fracSide:halfSide, 999.0f, isVertical? halfSide:fracSide };
+						auto        pos = basePosition;
+						switch (q) {
+							case quadrant_southeast: pos.x += halfSide;  pos.z -= halfSide;  break;
+							case quadrant_southwest: pos.z -= halfSide;  pos.x -= halfSide;  break;
+							case quadrant_northwest: pos.x -= halfSide;  pos.z += halfSide;  break;
+							case quadrant_northeast: pos.z += halfSide;  pos.x += halfSide;  break;
+						}
+	hitbox.setColor({.0f, 1.0f, .0f, 1.0f}); // green
+	hitbox.setPosition(pos);
+	hitbox.mesh = graphics.getMeshPointer("Cube");
+	hitbox.setScale(sca);
+
+						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
+						                                    btVector3( sca.x, sca.y, sca.z ),
+						                                   .0f );
+						hitbox.setRigidBody( tmp, physics );
+					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
-						instantiateTilePart( "w_sa", basePosition, 90.0f*q, currFloor*tileset.floorHeight );
-					instantiateTilePart( "r_sa", basePosition, 90.0f*q, floorCount*tileset.floorHeight );
+						instantiateTilePart( "w_sa", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
+					//instantiateTilePart(    "r_sa", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
 				}
-				else if ( quadmask == 0b001 ) {
-					instantiateTilePart( "f_sb", basePosition, 90.0f*q, .0f );
+				else if ( (quadmask & 0b00000'101) == 0b00000'001 ) { // 001 or 011 => side B
+					instantiateTilePart(    "f_sb", basePosition, 90.0f*q, .0f );
+					#ifndef _DEBUG // add rigid body to quadrant
+						house.hitboxes.emplace_back();
+						auto    &hitbox = house.hitboxes.back();
+						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
+						auto        sca = Vector3 { isVertical? halfSide:fracSide, 999.0f, isVertical? fracSide:halfSide };
+						auto        pos = basePosition;
+						switch (q) {
+							case quadrant_southeast: pos.z -= halfSide;  pos.x += halfSide;  break;
+							case quadrant_southwest: pos.x -= halfSide;  pos.z -= halfSide;  break;
+							case quadrant_northwest: pos.z += halfSide;  pos.x -= halfSide;  break;
+							case quadrant_northeast: pos.x += halfSide;  pos.z += halfSide;  break;
+						}
+	hitbox.setColor({.0f, 0.0f, 1.0f, 1.0f}); // blues
+	hitbox.setPosition(pos);
+	hitbox.mesh = graphics.getMeshPointer("Cube");
+	hitbox.setScale(sca);
+
+						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
+						                                    btVector3( sca.x, sca.y, sca.z ),
+						                                   .0f );
+						hitbox.setRigidBody( tmp, physics );
+					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
-						instantiateTilePart( "w_sb", basePosition, 90.0f*q, currFloor*tileset.floorHeight );
-					instantiateTilePart( "r_sb", basePosition, 90.0f*q, floorCount*tileset.floorHeight );
+						instantiateTilePart( "w_sb", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
+					//instantiateTilePart(    "r_sb", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
 				}
-				else if ( quadmask == 0b111 ) {
-					instantiateTilePart( "r_m", basePosition, .0f, floorCount*tileset.floorHeight );
+				else if ( (quadmask & 0b00000'111) == 0b00000'111 ) { // 111 => midpiece
+					//instantiateTilePart(     "r_m", basePosition, 90.0f*q, floorCount, tileset.floorHeight );
 				}
 			}
 		}
 	}
-	for ( auto &part : house.parts )
-		part.addRotation({ 0.5f*3.1415926535f, .0f, .0f  });
+	//for ( auto &part : house.parts )
+	//	part.addRotation({ .0f, 3.1415926535f, .0f  });
 
 	return std::move( house );
 }
@@ -1244,7 +1497,7 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 			model.setRotation({ .0f, util::degToRad(deg), .0f });
 		model.setPosition( pos + Vector3{.0f, yOffset, .0f} );
 		model.setColor({ .0f, .0f, .0f, .0f });
-		model.setScale({ tilemap->config.tileScaleFactor.x, 1.0f, tilemap->config.tileScaleFactor.z });
+		model.setScale({ tilemap->config.tileSideScaleFactor, 1.0f, tilemap->config.tileSideScaleFactor });
 		model.setSpotShadow( noShadowcasting );
 		model.setSunShadow(  noShadowcasting );
 	};

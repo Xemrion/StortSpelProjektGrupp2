@@ -88,9 +88,9 @@ public:
 	}
 
 	inline Vector3  convertTilePositionToWorldPosition( U16 const tileX, U16 const tileY ) const {
-		Vector3 result { tileX * config.tileScaleFactor.x, 
+		Vector3 result { tileX * config.tileSideScaleFactor, 
 		                 .0f,
-		                 tileY * -config.tileScaleFactor.y };
+		                 tileY * -config.tileSideScaleFactor };
 		//assert( result.x >= .0f );
 		//assert( result.z >= .0f );
 		return result;
@@ -104,8 +104,8 @@ public:
 	inline V2u  convertWorldPositionToTilePosition( Vector3 const &worldPosition ) const
 	{
 		
-		V2u result { static_cast<U32>( std::round(worldPosition.x /  config.tileScaleFactor.x) ),
-		             static_cast<U32>( std::round(worldPosition.z / -config.tileScaleFactor.y) ) };
+		V2u result { static_cast<U32>( std::round(worldPosition.x /  config.tileSideScaleFactor) ),
+		             static_cast<U32>( std::round(worldPosition.z / -config.tileSideScaleFactor) ) };
 		//assert( result.x <  width );
 		//assert( result.y < height );
 		return result;

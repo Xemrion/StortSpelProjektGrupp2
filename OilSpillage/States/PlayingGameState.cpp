@@ -218,8 +218,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(360.0
 	map = std::make_unique<Map>(graphics, config, physics.get());
 	// Minimap stuff
 	auto tilemap = map->getTileMap();
-	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
-	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, .0f, config.tileSideScaleFactor);
+	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
 	// Needs to be loaded before the menues
 	minimap = createMinimapTexture(*map);
 	createFogOfWarTexture(*map);
@@ -462,7 +462,7 @@ void PlayingGameState::ImGui_ProcGen()
 
 	// (TODO! bugged!) ImGui::InputFloat3( "Tile scale", &config.tileScaleFactor.data[0] );
 
-	ImGui::InputFloat("Floor height factor", &config.buildingFloorHeightFactor);
+	//ImGui::InputFloat("Floor height factor", &config.buildingFloorHeightFactor);
 
 	ImGui::InputInt("Seed", &config.seed);
 
@@ -499,13 +499,13 @@ void PlayingGameState::ImGui_ProcGen()
 	else if (config.roadDepthMax < 1)
 		config.roadDepthMax = 1;
 
-	ImGui::InputInt("Base min length", &config.roadLengthMin);
-	if (config.roadLengthMin > config.roadLengthMax)
-		config.roadLengthMin = config.roadLengthMax;
+	ImGui::SliderFloat("Base min length factor", &config.roadLengthFactorMin, .0f, 1.0f );
+	if (config.roadLengthFactorMin > config.roadLengthFactorMax)
+		config.roadLengthFactorMin = config.roadLengthFactorMax;
 
-	ImGui::InputInt("Base max length", &config.roadLengthMax);
-	if (config.roadLengthMax < config.roadLengthMin)
-		config.roadLengthMax = config.roadLengthMin;
+	ImGui::SliderFloat("Base max length factor", &config.roadLengthFactorMax, .0f, 1.0f );
+	if (config.roadLengthFactorMax < config.roadLengthFactorMin)
+		config.roadLengthFactorMax = config.roadLengthFactorMin;
 
 	ImGui::SliderFloat("Child length factor", &config.roadLengthFactor, .001f, 10.0f);
 
@@ -546,8 +546,8 @@ void PlayingGameState::ImGui_ProcGen()
 		aStar->generateTileData(map->getTileMap());
 		// minimap stuff
 		auto tilemap = map->getTileMap();
-		topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
-		bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+		topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, 0, config.tileSideScaleFactor);
+		bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
 
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
@@ -800,9 +800,9 @@ void PlayingGameState::update(float deltaTime)
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	ImGui_Driving();
-	//ImGui_ProcGen();
+	ImGui_ProcGen();
 	//ImGui_AI();
-	ImGui_Particles();
+	//ImGui_Particles();
 	ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
