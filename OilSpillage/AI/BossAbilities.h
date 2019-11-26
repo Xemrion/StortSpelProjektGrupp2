@@ -28,7 +28,6 @@ private:
 	Weapon weapon;
 	static const int bulletCount = 128;
 	Bullet bullets[bulletCount];
-	//Bullet bullets2[bulletCount];
 
 	void assignWeapon(int weaponType);
 protected:

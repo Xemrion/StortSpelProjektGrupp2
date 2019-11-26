@@ -11,26 +11,28 @@ Boss::Boss()
 	this->phaseShoot = this->phase;
 	this->currentPointNr = 0;
 	this->dt = 0;
-	this->attackRange = 75;
+	this->attackRange = 85;
 
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
-
-	this->frontVector = Vector3{ 0, 0, 0 };
+	
 }
 
 Boss::Boss(Boss&& boss)
 {
-	this->setScale(Vector3(0.04f, 0.04f, 0.04f));
-	this->setPosition(Vector3(boss.position.x, boss.position.y + 4.5f, boss.position.z));
 	setUpActor();
-	Game::getGraphics().addToDraw(this);
 
 	this->stats = VehicleStats::AIBoss;
 	setHealth(this->stats.maxHealth);
-	Game::getGraphics().loadModel("Entities/Roller_Melee");
-	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
-	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
+
+	Game::getGraphics().loadModel("Entities/Boss");
+
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Boss");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Boss"));
+	this->setScale(Vector3(1, 1, 1));
+	this->setPosition(Vector3(position.x, position.y, position.z));
+	Game::getGraphics().addToDraw(this);
+
 
 	this->attackRange = boss.attackRange;
 
@@ -52,18 +54,20 @@ Boss::Boss(Boss&& boss)
 Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	:DynamicActor(x, z, physics), BossAbilities(&this->position, &this->targetPos, &this->velocity, weaponType)
 {
-	this->setScale(Vector3(0.04f, 0.04f, 0.04f));
-	this->setPosition(Vector3(position.x, position.y + 4.5f, position.z));
 	setUpActor();
-	Game::getGraphics().addToDraw(this);
 
 	this->stats = VehicleStats::AIBoss;
 	setHealth(this->stats.maxHealth);
-	Game::getGraphics().loadModel("Entities/Roller_Melee");
-	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
-	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 
-	this->attackRange = 75;
+	Game::getGraphics().loadModel("Entities/Boss");
+
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Boss");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Boss"));
+	this->setScale(Vector3(1, 1, 1));
+	this->setPosition(Vector3(position.x, position.y, position.z));
+	Game::getGraphics().addToDraw(this);
+
+	this->attackRange = 85;
 
 	this->timeTilNextPoint = 0.0f;
 	this->timeTilRotationChange = 0.0f;
@@ -74,6 +78,7 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	this->currentPoint = { 0, 0, 0 };
 	this->playerPos = { 0, 0, 0 };
 	this->dt = 0;
+
 
 	//weakpoints
 	this->weakSpots.push_back(Weakspot(0));
@@ -189,7 +194,7 @@ void Boss::movementVariables(float dt)
 	// Decides when boss moves to next point
 	if (this->phase == 1)
 	{
-		if (this->timeTilNextPoint >= 1.0f)
+		if (this->timeTilNextPoint >= 1.1f)
 		{
 			this->currentPointNr += this->rotationVar;
 
@@ -231,29 +236,36 @@ void Boss::move()
 	}
 
 	if (this->phase == 1)
-		velocity *= 4.5;
+		velocity *= 4.25;
 	else if (this->phase == 2)
-		velocity *= 7;
+		velocity *= 6.5;
 
 	//move rigid body
 	//Vector3 temp = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.maxSpeed;
 	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 200);
+
 	this->currentVelocityVector = (btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 200);
 	Vector3 targetToSelf = (this->playerPos - position);
 	this->targetToSelf = targetToSelf;
+
 	//Rotate
 	if ((targetToSelf).Dot(vecForward) < 0.8)
 	{
 		vecForward -= (targetToSelf * deltaTime) / 0.02f;
 		vecForward.Normalize();
-		this->frontVector = vecForward;
 		this->frontVecShoot = vecForward;
 
 		float newRot = atan2(this->vecForward.x, this->vecForward.z);
 
-		this->setRotation(Vector3(0, newRot - (DirectX::XM_PI / 2), 0));
+		this->setRotation(Vector3(0, (newRot - (DirectX::XM_PI / 2)), 0));
 
-		
+		if (this->weakSpots.size() > 0)
+		{
+			for (int i = 0; i < this->weakSpots.size(); i++)
+			{
+				weakSpots[i].setRotation(Vector3(0, (newRot - (DirectX::XM_PI / 2)), 0));
+			}
+		}
 	}
 
 	//position = temp;, DOESNT SET BODY ANYMORE, JUST MOVING THE RIGID BODY
@@ -330,14 +342,14 @@ void Boss::updateWeakPoints()
 
 		//Vectors for position
 		Vector3 upVector = { 0, 1, 0 };
-		Vector3 rightVector = XMVector3Cross(this->frontVector, upVector);
+		Vector3 rightVector = XMVector3Cross(this->vecForward, upVector);
 		this->rightVecShoot = rightVector;
 
 		//make the offsets
 		float sideVar = 2.5;
 		Vector3 sideOffset = Vector3((rightVector.x * sideVar), 0.0f, (rightVector.z * sideVar));
-		Vector3 frontOffset = Vector3((-this->frontVector.x * 5.5), 0.0f, (-this->frontVector.z * 5.5));
-		Vector3 heightOffset = Vector3(0, -4.5, 0);
+		Vector3 frontOffset = Vector3((-this->vecForward.x * 4.0), 0.0f, (-this->vecForward.z * 4.0));
+		Vector3 heightOffset = Vector3(0, 0.3f, 0);
 
 		//update position
 		for (int i = 0; i < this->weakSpots.size(); i++)
@@ -345,7 +357,7 @@ void Boss::updateWeakPoints()
 			if (this->weakSpots[i].getWeakspotNr() == 0)
 			{
 				this->weakSpots[i].shortMove(sideOffset);
-				this->weakSpots[i].shortMove(frontOffset); //moves y, should just move x and z
+				this->weakSpots[i].shortMove(frontOffset);
 				this->weakSpots[i].shortMove(heightOffset);
 			}
 			else if (this->weakSpots[i].getWeakspotNr() == 1)

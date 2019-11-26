@@ -20,10 +20,10 @@ private:
 	int currentPointNr;
 	int rotationVar; //which way to rotate
 	int phase;
+
 	Vector3 currentPoint;
 	Vector3 playerPos;
 	std::vector<Weakspot> weakSpots; //need to be pointers?
-	Vector3 frontVector;
 	btVector3 currentVelocityVector;
 
 	void setUpActor();

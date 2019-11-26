@@ -15,9 +15,9 @@ Weakspot::Weakspot(Weakspot&& weakspot) //move constructor for ex. vectors
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
 
-	Game::getGraphics().loadModel("Entities/Barrel");
-	this->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
-	this->setMaterial(Game::getGraphics().getMaterial("Entities/Barrel"));
+	Game::getGraphics().loadModel("Entities/Shield");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Shield");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Shield"));
 
 	Game::getGraphics().addToDraw(this);
 }
@@ -30,9 +30,9 @@ Weakspot::Weakspot(int weaponType)
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
 
-	Game::getGraphics().loadModel("Entities/Barrel");
-	this->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
-	this->setMaterial(Game::getGraphics().getMaterial("Entities/Barrel"));
+	Game::getGraphics().loadModel("Entities/Shield");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Shield");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Shield"));
 
 	Game::getGraphics().addToDraw(this);
 }
@@ -45,9 +45,9 @@ Weakspot::Weakspot(const Weakspot& other)	//copy constructor
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
 
-	Game::getGraphics().loadModel("Entities/Barrel");
-	this->mesh = Game::getGraphics().getMeshPointer("Entities/Barrel");
-	this->setMaterial(Game::getGraphics().getMaterial("Entities/Barrel"));
+	Game::getGraphics().loadModel("Entities/Shield");
+	this->mesh = Game::getGraphics().getMeshPointer("Entities/Shield");
+	this->setMaterial(Game::getGraphics().getMaterial("Entities/Shield"));
 
 	Game::getGraphics().addToDraw(this);
 }

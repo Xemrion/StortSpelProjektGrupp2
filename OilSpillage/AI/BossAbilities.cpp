@@ -75,7 +75,7 @@ BossAbilities& BossAbilities::operator=(const BossAbilities& other)
 		this->weapon = other.weapon;
 		for (int i = 0; i < other.bulletCount; i++)
 		{
-			this->bullets[i] = other.bullets[i];
+			this->bullets[i] = other.bullets[i];;
 		}
 		this->dt = other.dt;
 		this->frontVecShoot = other.frontVecShoot;
@@ -176,10 +176,10 @@ Status BossAbilities::shoot()
 							Vector3 dir2 = (*targetPosPtr - *this->positionPtr);
 							dir.Normalize();
 							dir2.Normalize();
-							Vector3 bulletOrigin = *this->positionPtr + (this->rightVecShoot * 4);
-							Vector3 bulletOriginLeft = *this->positionPtr + (this->rightVecShoot * 4 * -1);
-							bulletOrigin.y = 0.1;
-							bulletOriginLeft.y = 0.1;
+							Vector3 bulletOrigin = *this->positionPtr + (this->rightVecShoot * 2.5) + (this->frontVecShoot * -3);
+							Vector3 bulletOriginLeft = *this->positionPtr + (this->rightVecShoot * 2.5 * -1) + (this->frontVecShoot * -3);
+							bulletOrigin.y = 0.5;
+							bulletOriginLeft.y = 0.5;
 							dir = (offsetPos - bulletOrigin);
 							dir2 = (offsetPos - bulletOriginLeft);
 							dir.Normalize();
@@ -417,7 +417,6 @@ Status BossAbilities::shoot()
 					this->turnToShoot = 0;
 				}
 			}
-			this->weaponNr = 5;
 		}
 		if (this->weaponNr == 5)
 		{
@@ -450,8 +449,8 @@ Status BossAbilities::shoot()
 							Vector3 dir2 = (*targetPosPtr - *this->positionPtr);
 							dir.Normalize();
 							dir2.Normalize();
-							Vector3 bulletOrigin = *this->positionPtr + (this->rightVecShoot * 4);
-							Vector3 bulletOriginLeft = *this->positionPtr + (this->rightVecShoot * 4 * -1);
+							Vector3 bulletOrigin = *this->positionPtr + (this->rightVecShoot * 2.5) + (this->frontVecShoot * -3);
+							Vector3 bulletOriginLeft = *this->positionPtr + (this->rightVecShoot * 2.5 * -1) + (this->frontVecShoot * -3);
 							bulletOrigin.y = 0.1;
 							bulletOriginLeft.y = 0.1;
 							dir = (offsetPos - bulletOrigin);
@@ -484,7 +483,6 @@ Status BossAbilities::shoot()
 					this->turnToShoot2 = 0;
 				}
 			}
-			this->weaponNr = 4;
 		}
 	}
 	return Status::SUCCESS;
@@ -503,12 +501,12 @@ Status BossAbilities::switchWeapon()
 
 	if (this->phaseShoot == 1)
 	{
-		if (length <= 20.0f) //flame
+		if (length <= 18.5f) //flame
 		{
 			this->weaponNr = 2;
 			assignWeapon(this->weaponNr);
 		}
-		else if (length > 20 && length <= 35) //machine
+		else if (length > 18.5 && length <= 35) //machine
 		{
 			this->weaponNr = 1;
 			assignWeapon(this->weaponNr);

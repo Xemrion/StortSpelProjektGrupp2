@@ -63,7 +63,7 @@ public:
 		{      6,     0.015f,        25.0f,          2.0f,		Vector3(1.0f, 1.0f, 1.0f),		 0.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossFlamethrowerPhase2 },
 		{      1,     0.025f,        30.0f,          4.0f,		Vector3(1.0f, 1.0f, 1.0f),	  	 0.2f, 60.0f,  20.0f,  0.0f,  0.7f,  0.0,  WeaponType::aiBossMachineGun },
 		{      3,     0.022f,        45.0f,          3.5f,		Vector3(1.0f, 1.0f, 1.0f),	  	 0.1f, 10.0f,  10.0f,  0.0f,  0.7f,  0.0,  WeaponType::aiBossMachineGunPhase2 },
-		{    200,       0.5f,        50.0f,         15.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossMissileLauncher },
+		{    100,       0.5f,        40.0f,         15.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossMissileLauncher },
 		{0, 0, 0, 0, Vector3(0,0,0), 0, 0, 0, 0, 0, 0, WeaponType::None}
 	};
 
