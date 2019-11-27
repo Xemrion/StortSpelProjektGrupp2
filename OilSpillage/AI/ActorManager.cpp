@@ -486,7 +486,7 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 		{
 			if (bosses[0]->isDead())
 			{
-				//Game::getGameInfo().highScore += actors[i]->getPoints();
+				Game::getGameInfo().highScore += 25000;
 				destroyBoss(0);
 			}
 		}
@@ -524,7 +524,7 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 {
 	if (actors.size() < maxNrOfEnemies)
 	{
-		int enemyType = rand() % 100 +1;
+		int enemyType = rand() % 100 + 1;
 		Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
 		if (enemyType < 60)
 		{
