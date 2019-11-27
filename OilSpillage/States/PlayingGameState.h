@@ -24,7 +24,7 @@ public:
 		MENUCOUNT
 	};
 
-	             PlayingGameState();
+	             PlayingGameState(int seed, float time);
 	virtual     ~PlayingGameState();
 	void         update(float delta);
 	const float &getTimeRef() const noexcept;

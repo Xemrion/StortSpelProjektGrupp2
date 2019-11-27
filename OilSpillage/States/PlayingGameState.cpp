@@ -60,7 +60,7 @@ void PlayingGameState::initAI()
 	aStar->generateTileData(map->getTileMap());
 }
 
-PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0f), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_PLAYING)
 {
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -68,6 +68,7 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 #endif // _DEBUG
 	this->current_item = NULL;
 
+	config.seed = seed;
 	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
 	camera = std::make_unique<DynamicCamera>();
@@ -1346,9 +1347,9 @@ void PlayingGameState::generateMapPowerUps()
 
 void PlayingGameState::generateObjectives()
 {
-	if (Game::getNrOfStagesDone() % 3 == 0)
+	if (Game::getNrOfStagesDone() % 3 == 1)
 	{
-		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1)); //fix pos
+		//this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1)); //fix pos
 		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
 	}
 	else

@@ -16,6 +16,7 @@ struct GameInfo
 	int nrOfCars = 0;
 	int nrOfBosses = 0;
 	int highScore = 0;
+	float time = 0.0f;
 };
 
 class Game
