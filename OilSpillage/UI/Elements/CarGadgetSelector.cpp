@@ -64,6 +64,12 @@ void CarGadgetSelector::update(bool selected, float deltaTime)
 
 void CarGadgetSelector::init()
 {
+	VehicleSlots* vehicleSlots = static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getSlots();
+
+	for (int i = 0; i < Slots::SIZEOF; i++)
+	{
+		this->used[static_cast<Slots>(i)] = vehicleSlots->getInventorySlot(static_cast<Slots>(i));
+	}
 }
 
 void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
@@ -74,7 +80,7 @@ void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
 		{
 			this->slots[i]->setSlot(nullptr);
 			this->used[i] = nullptr;
-			static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(static_cast<Slots>(i), nullptr);
+			static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(static_cast<Slots>(i), nullptr, nullptr);
 		}
 	}
 
@@ -85,8 +91,8 @@ void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
 		this->used[Slots::LEFT] = slot;
 		this->used[Slots::RIGHT] = slot;
 
-		static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots::RIGHT, slot->getItem()->clone());
-		static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots::LEFT, slot->getItem()->clone());
+		static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots::RIGHT, slot->getItem()->clone(), slot);
+		static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(Slots::LEFT, slot->getItem()->clone(), slot);
 	}
 	else
 	{
@@ -98,7 +104,7 @@ void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
 			if (this->slots[i].get() == this->selected)
 			{
 				this->used[i] = slot;
-				static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(static_cast<Slots>(i), slot->getItem()->clone());
+				static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(static_cast<Slots>(i), slot->getItem()->clone(), slot);
 				break;
 			}
 		}

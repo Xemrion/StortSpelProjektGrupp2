@@ -9,6 +9,7 @@
 #include"Lights.h"
 #include"Inventory/Item.h"
 #include"Inventory/ItemWeapon.h"
+#include "Inventory/Container.h"
 using namespace DirectX::SimpleMath;
 enum Slots
 {
@@ -21,14 +22,19 @@ enum Slots
 };
 struct VehicleSlots
 {
-	Item** slots;
-	void setSlot(Slots slot, Item* item)
+	Item* slots[Slots::SIZEOF];
+	Container::Slot* inventorySlots[Slots::SIZEOF];
+
+	void setSlot(Slots slot, Item* item, Container::Slot* inventorySlot)
 	{
 		if (this->slots[int(slot)] != nullptr)
 		{
 			delete this->slots[int(slot)];
 		}
+
 		this->slots[int(slot)] = item;
+		this->inventorySlots[int(slot)] = inventorySlot;
+
 		if (item != nullptr)
 		{
 			if (item->getObject() != nullptr)
@@ -50,12 +56,23 @@ struct VehicleSlots
 			return nullptr;
 		}
 	};
+	Container::Slot* getInventorySlot(Slots slot)
+	{
+		if (this->slots[int(slot)] != nullptr)
+		{
+			return this->inventorySlots[int(slot)];
+		}
+		else
+		{
+			return nullptr;
+		}
+	};
 	VehicleSlots()
 	{
-		slots = new Item * [Slots::SIZEOF];
 		for (int i = 0; i < Slots::SIZEOF; i++)
 		{
 			this->slots[i] = nullptr;
+			this->inventorySlots[i] = nullptr;
 		}
 	};
 	~VehicleSlots()
@@ -67,20 +84,20 @@ struct VehicleSlots
 				delete this->slots[i];
 			}
 		}
-		delete[] this->slots;
 	};
 	VehicleSlots(const VehicleSlots& obj)
 	{
-		this->slots = new Item * [Slots::SIZEOF];
 		for (int i = 0; i < Slots::SIZEOF; i++)
 		{
 			if (obj.slots[i] != nullptr)
 			{
 				this->slots[i] = obj.slots[i]->clone();//will make new item/itemWeapon
+				this->inventorySlots[i] = obj.inventorySlots[i];
 			}
 			else
 			{
 				this->slots[i] = nullptr;
+				this->inventorySlots[i] = nullptr;
 			}
 		}
 	}
@@ -175,7 +192,7 @@ public:
 	void update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput);
 	void updateWeapon(float deltaTime);
 	void setVehicleSlots(VehicleSlots* slots);
-	void setSpecSlot(Slots slot, Item* item);
+	void setSpecSlot(Slots slot, Item* item, Container::Slot* inventorySlot);
 	VehicleSlots* getSlots();
 	GameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();

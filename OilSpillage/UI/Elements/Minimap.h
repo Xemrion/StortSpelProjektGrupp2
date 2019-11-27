@@ -9,6 +9,8 @@ class Minimap : public Element
 private:
 	float fogClearRadius;
 	float zoom;
+	float objectiveViewDist;
+	float enemyViewDist;
 	Matrix mapMatrix;
 
 	ID3D11ShaderResourceView* resourceFog;

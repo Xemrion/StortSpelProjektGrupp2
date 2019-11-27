@@ -1059,7 +1059,7 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 	}
 }
 
-void Vehicle::setSpecSlot(Slots slot, Item* item)
+void Vehicle::setSpecSlot(Slots slot, Item* item, Container::Slot* inventorySlot)
 {
 	if (this->vehicleSlots->getSlot(slot) != nullptr)
 	{
@@ -1072,7 +1072,7 @@ void Vehicle::setSpecSlot(Slots slot, Item* item)
 			Game::getGraphics().addToDraw(item->getObject());
 		}
 	}
-	this->vehicleSlots->setSlot(slot, item);
+	this->vehicleSlots->setSlot(slot, item, inventorySlot);
 }
 
 VehicleSlots* Vehicle::getSlots()
