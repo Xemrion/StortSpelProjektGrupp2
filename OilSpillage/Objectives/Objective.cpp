@@ -186,10 +186,9 @@ void Objective::update(Vector3 playerPosition)
 	{
 		if (started)
 		{
-			if (this->mission->target[0] != nullptr)
-			{
-				findClosestPlayer = this->mission->target[0]->getPosition();
-			}
+			
+			findClosestPlayer = this->mission->target[0]->getPosition();
+			
 			//collision check
 			int nrOfDone = 0;
 			for (int i = 0; i < nrOfMax; i++)
