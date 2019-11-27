@@ -20,10 +20,12 @@ Actor::Actor(float x, float z,Physics* physics)
 }
 Actor::~Actor()
 {
-	for(int i = 0; i < 30; i++)
+	for(int i = 0; i < 2; i++)
 	{
-		Game::getGraphics().addParticle(position, Vector3(0.0f), 25, 3);
-		Game::getGraphics().addParticle2(position, Vector3(0.0f), 25, 3);
+		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
 	}
 }
 
@@ -74,7 +76,7 @@ void Actor::changeHealth(float amount)
 	}
 	setColor(Vector4(max(getColor().x + -amount * 0.1f, 0), getColor().y, getColor().z, 1));
 	this->health = std::clamp(this->health + amount, 0.0f, this->stats.maxHealth);
-	Game::getGraphics().addParticle2(this->getPosition(), Vector3(0, 0, 0), 2, 1);
+	Game::getGraphics().addParticle2(this->getPosition(), Vector3(0, 0, 0), 1, 0.5f);
 }
 
 bool Actor::isDead() const
