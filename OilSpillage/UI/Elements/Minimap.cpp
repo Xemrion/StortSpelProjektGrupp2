@@ -22,7 +22,7 @@ Minimap::Minimap(Vector2 position)
 	this->textureObjectiveMarker = Game::getGraphics().getTexturePointer("UI/mapObjective");
 	this->textureEnemyMarker = Game::getGraphics().getTexturePointer("UI/mapEnemy");
 	this->textureCompass = Game::getGraphics().getTexturePointer("UI/mapCompass");
-	this->textureFogTemp = Game::getGraphics().getTexturePointer("UI/mapFog");
+	//this->textureFogTemp = Game::getGraphics().getTexturePointer("UI/mapFog");
 	this->textureArrow = Game::getGraphics().getTexturePointer("UI/arrowObjective2");
 
 	assert(textureOutline && "Texture failed to load!");
