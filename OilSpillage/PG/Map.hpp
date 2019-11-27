@@ -56,6 +56,11 @@ struct HouseGenData {
 	Vector<CompositeHouse>   composites;
 };
 
+struct Border {
+	Vector<GameObject>  meshes;
+	Vector<GameObject>  bounds { Size(4) };
+};
+
 class Map {
 public:
 	Map( Graphics &, MapConfig const &, Physics * );
@@ -88,6 +93,7 @@ private:
 	void                       generateRoads();
 	void                       generateBuildings();
 	void                       generateMultitileBuildings();
+	void								generateBorder();
 	Opt<Lot>                   findRandomLot( U16 districtId ) noexcept;
 	Opt<Lot>                   findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
 	Vector<UPtr<GameObject>>   instantiateTilesAsModels() noexcept;
@@ -113,4 +119,5 @@ private:
 	Biome                    biome;
 	HouseGenData             houses;
 	RNG                      rng; // TODO, instantiate in ctor
+	Border                   border;
 };

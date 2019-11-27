@@ -49,13 +49,14 @@ void PlayingGameState::createElectric(int randNr, float deltaTime)
 	
 	testNetwork.get()->generateAdditionalSegments("F-F+F-F", 2, false);
 	testNetwork.get()->generateAdditionalSegments("F-F-F+F", 3, true);
-	
 }
 
 void PlayingGameState::initAI()
 {
-	aStar = new AStar(map->getTileMap());
-	actorManager = new ActorManager(aStar, physics.get(), map.get(), &rng);
+	aStar = nullptr;
+	aStar = std::make_unique<AStar>( map->getTileMap() );
+	actorManager = nullptr;
+	actorManager = std::make_unique<ActorManager>( aStar.get(), physics.get(), map.get(), &rng );
 	aStar->generateTileData(map->getTileMap());
 }
 
@@ -81,6 +82,12 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	graphics.loadTexture("brickwallnormal");
 	graphics.loadModel("Entities/Turret");
 	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
+
+	// clutter
+	graphics.loadModel("Entities/Barrel");
+	graphics.loadModel("Entities/Garbage_Bag");
+	graphics.loadModel("Entities/Quad");
+	graphics.loadTexture("brownPaperCardboard");
 
 	//graphics.loadModel("Roads/Metro/0000");
 	//graphics.loadModel("Roads/Metro/0001");
@@ -366,8 +373,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 
 PlayingGameState::~PlayingGameState()
 {
-	delete aStar;
-	delete actorManager;
 	delete this->cameraObject;
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
@@ -601,6 +606,7 @@ void PlayingGameState::ImGui_ProcGen()
 		player->getVehicleBody1()->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
 		minimap = createMinimapTexture(*map);
 		createFogOfWarTexture(*map);
+		initAI();
 		aStar->generateTileData(map->getTileMap());
 		// minimap stuff
 		auto tilemap = map->getTileMap();
@@ -953,18 +959,18 @@ void PlayingGameState::update(float deltaTime)
 
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
-#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	ImGui_Driving();
+	//ImGui_Driving();
 	ImGui_ProcGen();
 	//ImGui_AI();
 	//ImGui_Particles();
 	ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	#endif // !_DEBUG
+	//#endif // !_DEBUG
 
 	graphics.presentScene();
 }
@@ -1012,9 +1018,6 @@ Vector3 PlayingGameState::getBottomRight() const
 
 void PlayingGameState::spawnObjects()
 {
-	graphics.loadModel("Entities/Barrel");
-	graphics.loadModel("Entities/Garbage_Bag");
-	graphics.loadModel("Entities/Quad");
 	physicsObjID = 0;
 	physicsObjects.reserve(300);
 	btRigidBody* tempo2;
@@ -1023,7 +1026,6 @@ void PlayingGameState::spawnObjects()
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
 		objPtr->mesh = graphics.getMeshPointer("Cube");
-		graphics.loadTexture("brownPaperCardboard");
 		objPtr->setTexture(graphics.getTexturePointer("brownPaperCardboard"));
 		graphics.addToDraw(objPtr);
 		randomValue = (rand() % 3 + 8) * 0.125f;

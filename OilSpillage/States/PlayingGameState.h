@@ -59,7 +59,7 @@ public:
 
 	std::unique_ptr<Vehicle>& getPlayer();
 	void setPlayer(Vehicle* theVehicle);
-	ActorManager* actorManager;
+	UPtr<ActorManager> actorManager;
 
 private:
 	friend class Game;
@@ -75,7 +75,7 @@ private:
 	float                           time;
 	MapConfig                       config;
 	Graphics                       &graphics;
-	AStar                          *aStar;
+	UPtr<AStar>                     aStar;
 	std::unique_ptr<Map>            map;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;

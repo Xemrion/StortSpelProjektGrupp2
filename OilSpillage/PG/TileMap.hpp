@@ -87,10 +87,10 @@ public:
 		return tilePos.x < width and tilePos.y < height;
 	}
 
-	inline Vector3  convertTilePositionToWorldPosition( U16 const tileX, U16 const tileY ) const {
-		Vector3 result { tileX * config.tileSideScaleFactor, 
+	inline Vector3  convertTilePositionToWorldPosition( I32 const tileX, I32 const tileY ) const {
+		Vector3 result { config.tileSideScaleFactor * tileX, 
 		                 .0f,
-		                 tileY * -config.tileSideScaleFactor };
+		                -config.tileSideScaleFactor * tileY };
 		//assert( result.x >= .0f );
 		//assert( result.z >= .0f );
 		return result;
@@ -98,7 +98,7 @@ public:
 
 	inline Vector3  convertTilePositionToWorldPosition( V2u const &tilePosition ) const
 	{
-		return convertTilePositionToWorldPosition( tilePosition.x, tilePosition.y );
+		return convertTilePositionToWorldPosition( I32(tilePosition.x), I32(tilePosition.y) );
 	}
 
 	inline V2u  convertWorldPositionToTilePosition( Vector3 const &worldPosition ) const
