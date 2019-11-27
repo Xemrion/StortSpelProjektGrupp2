@@ -54,6 +54,7 @@ private:
 	void assignPathsToGroups(const Vector3& targetPos);
 	void updateGroups();
 	void destroyActor(int index);
+	void destroyBoss(int index);
 	void initGroupForActor(DynamicActor* actor);
 	void createGroup(DynamicActor* actor);
 	Vector3 predictPlayerPos(const Vector3& targetPos);
