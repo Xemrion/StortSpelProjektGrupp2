@@ -96,6 +96,48 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 	return true;
 }
 
+bool Texture::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int width, int height)
+{
+	this->width = width;
+	this->height = height;
+
+	// Setup the description of the texture.
+	D3D11_TEXTURE2D_DESC textureDesc;
+	textureDesc.Height = this->height;
+	textureDesc.Width = this->width;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = 0;
+
+	// Create the empty texture.
+	HRESULT hResult = device->CreateTexture2D(&textureDesc, NULL, &texture);
+	if (FAILED(hResult))
+	{
+		return false;
+	}
+
+	// Setup the shader resource view description.
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = textureDesc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = 1;//Miplevels in parameter
+
+	hResult = device->CreateShaderResourceView(texture, &srvDesc, &textureView);
+	if (FAILED(hResult))
+	{
+		return false;
+	}
+
+	return true;
+}
+
 void Texture::Shutdown()
 {
 	// Release the texture view resource.
