@@ -52,7 +52,8 @@ public:
 	GameObject* getTarget(int id)const;
 	TypeOfMission getType()const;
 	TypeOfTarget getTargetType()const;
-
+	
+	Actor* getBoss()const;
 	int getRewardTime()const;
 	int getScore()const;
 	std::string getInfo()const;

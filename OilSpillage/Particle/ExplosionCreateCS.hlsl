@@ -43,7 +43,7 @@ void main(uint3 DispatchThreadID : SV_DispatchThreadID)
     p.position.xyz = emitterLocation.xyz; 
     p.position.w = randomVector.w;
     p.direction = normalize(float4(reflect(direction[DispatchThreadID.x], hash(randomVector.xyz * 5.1 + float3(DispatchThreadID.x * 2.3f, DispatchThreadID.x * 1.4, DispatchThreadID.x * 4.3))) * 1.f, randomVector.w));
-    p.direction *= 1.0f;
+    p.direction *= initialDirection.w;
     p.time.x = 0.0f;
     p.time.y = emitterLocation.w;
     NewSimulationState.Append(p);

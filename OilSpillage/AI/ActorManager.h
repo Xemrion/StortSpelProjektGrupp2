@@ -4,6 +4,8 @@ class Physics;
 #include "TurretHandler.h"
 #include "AStar.h"
 #include "..//PG/Map.hpp"
+#include "Boss.h"
+
 class ActorManager
 {
 public:
@@ -16,7 +18,7 @@ public:
 	void createSniper(float x, float z, int weaponType = 0);
 	void createTurret(float x, float z, int weaponType = 0);
 	void createSwarm(float x, float z);
-	void createBoss(float x, float z, int weaponType);
+	Boss* createBoss(float x, float z, int weaponType);
 
 	void createSpitFire(float x, float z);
 	void createChaseCar(float x, float z);
@@ -30,12 +32,11 @@ public:
 	void spawnShootCars(const Vector3& originPos);
 	void spawnSwarm(const Vector3& originPos);
 	void spawnTurrets(const Vector3& position, Radius radius, float angle);
-	void spawnBoss(const Vector3& originPos, int weaponType);
 
 	void seperation(const Vector3& targetPos);
-	void intersectPlayerBullets(Bullet* bulletArray, size_t size);
+	void intersectPlayerBullets(Bullet* bulletArray, size_t size, float deltaTime);
 private:
-	const int maxNrOfEnemies = 50;
+	const int maxNrOfEnemies = 25;
 	const int spawnCooldown = 2;
 	float spawnTimer = 0;
 	float soundTimer = 0;

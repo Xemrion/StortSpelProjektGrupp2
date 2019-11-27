@@ -25,7 +25,7 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 
 	this->physics = std::make_unique<Physics>();
 	this->theVehicle->init(physics.get());
-	this->theVehicle->getVehicle()->setPosition(Vector3(0, 0, 0));
+	this->theVehicle->setPosition(Vector3(0, 0, 0));
 	this->theVehicle->getVehicleBody1()->setPosition(Vector3(0, 0.55, 0));
 
 	Game::getGraphics().loadTexture("UI/garageThing");
@@ -52,15 +52,15 @@ void UpgradingGameState::update(float deltaTime)
 
 	if (Input::getStrengthRnoMouse() > 0.0f)
 	{
-		Quaternion rotationNow = this->theVehicle->getVehicle()->getRotationQuaternion();
+		Quaternion rotationNow = this->theVehicle->getRotationQuaternion();
 		Quaternion rotationDest = Quaternion::Lerp(rotationNow, Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), std::atan2f(Input::getDirectionRnoMouse().x, Input::getDirectionRnoMouse().y)), deltaTime * 4);
 
 		btQuaternion trams(rotationDest.x, rotationDest.y, rotationDest.z, rotationDest.w);
-		this->theVehicle->getVehicle()->getRigidBody()->getWorldTransform().setRotation(trams);
+		this->theVehicle->getRigidBody()->getWorldTransform().setRotation(trams);
 	}
 	else
 	{
-		this->theVehicle->getVehicle()->getRigidBody()->setAngularVelocity(btVector3(0, deltaTime * 150, 0));
+		this->theVehicle->getRigidBody()->setAngularVelocity(btVector3(0, deltaTime * 150, 0));
 	}
 	
 	this->theVehicle->setWheelRotation(deltaTime);
