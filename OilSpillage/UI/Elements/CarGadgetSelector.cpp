@@ -110,6 +110,19 @@ void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
 	}
 }
 
+void CarGadgetSelector::removeSlotOfSelected(Container::Slot* slot)
+{
+	for (int i = 0; i < Slots::SIZEOF; i++)
+	{
+		if (this->slots[i]->getSlot() == slot)
+		{
+			this->slots[i]->setSlot(nullptr);
+			this->used[i] = nullptr;
+			static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setSpecSlot(static_cast<Slots>(i), nullptr, nullptr);
+		}
+	}
+}
+
 Container::Slot** CarGadgetSelector::getUsed()
 {
 	return this->used;

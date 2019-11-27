@@ -26,6 +26,7 @@ public:
 	void init();
 
 	void setSlotOfSelected(Container::Slot* slot);
+	void removeSlotOfSelected(Container::Slot* slot);
 	Container::Slot** getUsed();
 };
 
