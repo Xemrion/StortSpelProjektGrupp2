@@ -21,12 +21,17 @@ Lsystem::~Lsystem()
 	storedPositions.clear();
 }
 
-//Add a constant, requires a char, a Rule type or forward. (Higher priority)
+//Add a constant, requires a char, a Rule:: type or forward. (If forward is true, Rule set to Rule::NONE)
 void Lsystem::addConstant(char character, Rule action, bool forward)
 { 
 	Constant newConstant;
 	newConstant.character = character;
-	newConstant.action = action;
+	if (forward) {
+		newConstant.action = Rule::NONE;
+	}
+	else {
+		newConstant.action = action;
+	}
 	newConstant.forward = forward;
 	bool added = false;
 	for (int i = 0; i < this->constants.size(); i++) {
