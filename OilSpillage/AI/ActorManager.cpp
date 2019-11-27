@@ -38,12 +38,15 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	//seperation(targetPos);
 	updateActors(dt, targetPos);
 
-	if (spawnTimer <= 0)
+	if (this->bosses.size() > 0)
 	{
+		if (spawnTimer <= 0)
+		{
 
-		spawnEnemies(targetPos);
+			spawnEnemies(targetPos);
 
-		spawnTimer = spawnCooldown;
+			spawnTimer = spawnCooldown;
+		}
 	}
 
 	if (this->bosses.size() > 0)
@@ -522,27 +525,30 @@ void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 
 void ActorManager::spawnEnemies(const Vector3& targetPos)
 {
-	if (actors.size() < maxNrOfEnemies)
+	if (this->bosses.size() > 0)
 	{
-		int enemyType = rand() % 100 +1;
-		Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
-		if (enemyType < 60)
+		if (actors.size() < maxNrOfEnemies)
 		{
-			spawnAttackers(newPos);
-		}
-		else if (enemyType < 75)
-		{
-			spawnChaseCars(newPos);
-			//spawnAttackers(newPos);
-		}
-		else if (enemyType < 80)
-		{
-			spawnShootCars(newPos);
-			//spawnSwarm(newPos);
-		}
-		else if (enemyType <= 100)
-		{
-			spawnSwarm(newPos);
+			int enemyType = rand() % 100 + 1;
+			Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
+			if (enemyType < 60)
+			{
+				spawnAttackers(newPos);
+			}
+			else if (enemyType < 75)
+			{
+				spawnChaseCars(newPos);
+				//spawnAttackers(newPos);
+			}
+			else if (enemyType < 80)
+			{
+				spawnShootCars(newPos);
+				//spawnSwarm(newPos);
+			}
+			else if (enemyType <= 100)
+			{
+				spawnSwarm(newPos);
+			}
 		}
 	}
 }
