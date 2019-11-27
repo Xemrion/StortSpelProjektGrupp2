@@ -6,7 +6,7 @@
 
 Vector2 CarGadgetSelector::size = Vector2(325, 490);
 
-CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position)
+CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position), used{ nullptr }
 {
 	Game::getGraphics().loadTexture("UI/statBG");
 	Game::getGraphics().loadTexture("UI/carTopdown");
@@ -30,8 +30,6 @@ CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position)
 	this->slots[Slots::LEFT]->setNeighbours(this->slots[Slots::RIGHT].get(), this->slots[Slots::MOUNTED].get(), this->slots[Slots::FRONT].get(), this->slots[Slots::BACK].get());
 	this->slots[Slots::RIGHT]->setNeighbours(this->slots[Slots::MOUNTED].get(), this->slots[Slots::LEFT].get(), this->slots[Slots::FRONT].get(), this->slots[Slots::BACK].get());
 	this->selected = this->slots[Slots::FRONT].get();
-
-	this->used = std::make_unique<Container::Slot*[]>(Slots::SIZEOF);
 }
 
 CarGadgetSelector::~CarGadgetSelector()
@@ -69,6 +67,7 @@ void CarGadgetSelector::init()
 	for (int i = 0; i < Slots::SIZEOF; i++)
 	{
 		this->used[static_cast<Slots>(i)] = vehicleSlots->getInventorySlot(static_cast<Slots>(i));
+		this->slots[i]->setSlot(vehicleSlots->getInventorySlot(static_cast<Slots>(i)));
 	}
 }
 
@@ -113,5 +112,5 @@ void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
 
 Container::Slot** CarGadgetSelector::getUsed()
 {
-	return this->used.get();
+	return this->used;
 }
