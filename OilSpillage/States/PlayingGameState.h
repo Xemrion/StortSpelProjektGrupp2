@@ -136,7 +136,6 @@ private:
 	float timerEMP = 0.0f;
 	void createElectric(int randNr, float deltaTime);
     void initAI();
-	void nextStage() noexcept;
 	void ImGui_ProcGen();
 	void ImGui_Driving();
 	void ImGui_Particles();
