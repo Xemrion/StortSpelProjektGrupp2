@@ -53,6 +53,11 @@ Item* ItemWeapon::clone() const
 	return new ItemWeapon(*this);
 }
 
+bool ItemWeapon::operator==(const ItemWeapon& other) const
+{
+	return Item::operator==(other) /*&& this->weapon == other.weapon*/;
+}
+
 void ItemWeapon::randomize()
 {
 	//damage

@@ -62,6 +62,10 @@ void CarGadgetSelector::update(bool selected, float deltaTime)
 	}
 }
 
+void CarGadgetSelector::init()
+{
+}
+
 void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
 {
 	for (int i = 0; i < Slots::SIZEOF; i++)
