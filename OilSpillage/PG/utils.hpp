@@ -72,10 +72,15 @@ namespace util {
 		return 3.1415926535f / 180.0f * deg;
 	}
 
-	template <class Container, class T_RNG=RNG>
-	auto &randomElementOf( Container &c, T_RNG &rng={RD()()} ) noexcept {
+	template <class Container>//, class T_RNG>
+	auto &randomElementOf( Container &c, RNG &rng ) noexcept {
 		auto const idx = U32_Dist{}( rng ) % c.size();
 		return c[idx];
+	}
+
+	template <class Container, class T>
+	Bool isElementOf( Container const &c, T const &e ) noexcept {
+		return std::find( c.begin(), c.end(), e) != c.end();
 	}
 
 	RGBA constexpr blendColor( RGBA a, RGBA b, F32 fac ) noexcept {

@@ -32,9 +32,9 @@ Graphics::Graphics()
 	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
 	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso", "TrailPS.cso");
 
-	this->particleHandler->addParticleSystem(this->particleSystem, "fire");
+	this->particleHandler->addParticleSystem(this->particleSystem,  "fire");
 	this->particleHandler->addParticleSystem(this->particleSystem2, "smoke");
-	this->particleHandler->addParticleSystem(this->particleTrail, "trail");
+	this->particleHandler->addParticleSystem(this->particleTrail,   "trail");
 	Vector4 colors[4] = {
 		Vector4(0.0f,0.0f,1.0f,1.0f)
 	};
@@ -55,7 +55,7 @@ Graphics::Graphics()
 
 	this->particleHandler->loadParticleSystems();
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
-	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
+	this->quadTree = std::make_unique<QuadTree>(Vector2(-48.f * 20.f, -48.f * 20.f), Vector2(48.f * 20.f, 48.0f * 20.0f), 4);
 }
 
 Graphics::~Graphics()
@@ -649,7 +649,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 		}
 	}
 	
-	drawStaticGameObjects(camera, frustum, 10.0);
+	drawStaticGameObjects(camera, frustum, 15.0);
 	
 	drawFog(camera, deltaTime);
 
@@ -995,11 +995,12 @@ ID3D11Device* Graphics::getDevice()
 	return this->device.Get();
 }
 
-void Graphics::loadMesh(std::string fileName, Vector3 rotation)
+void Graphics::loadMesh( std::string const &fileName, Vector3 rotation )
 {
+	if ( fileName == "Cube" or fileName == "Quad" ) return;
+
 	Mesh newMesh;
 
-	
 	Importer imp;
 	std::string meshBinPath = fileName + "/mesh.bin";
 	if (imp.loadMesh(meshBinPath.c_str()))
@@ -1128,20 +1129,26 @@ void Graphics::loadMesh(std::string fileName, Vector3 rotation)
 		}
 
 	}
-	
+	else assert( false and "Failed to load mesh!" );
+}
+
+void Graphics::loadModel( std::string const &path, Vector3 rotation )
+{
+   std::string  modelDir {MODEL_ROOT_DIR};
+                modelDir += path;
+	loadMesh(    modelDir, rotation );
+	loadMaterial( path );
 }
 
 
-void Graphics::loadModel(std::string path, Vector3 rotation)
+void Graphics::loadMaterial( std::string const &path )
 {
-   std::string modelDir {MODEL_ROOT_DIR};
-               modelDir += path;
-	loadMesh( modelDir ,rotation);
-	loadTexture( modelDir+"/_diffuse.tga", true );
-   // TODO: load other texture channels
-	loadTexture(modelDir + "/_specular.tga", true);
-	loadTexture(modelDir + "/_normal.tga", true);
-	loadTexture(modelDir + "/_gloss.tga", true);
+	std::string  modelDir {MODEL_ROOT_DIR};
+                modelDir += path;
+	loadTexture( modelDir + "/_diffuse.tga",  true );
+	loadTexture( modelDir + "/_specular.tga", true );
+	loadTexture( modelDir + "/_normal.tga",   true );
+	loadTexture( modelDir + "/_gloss.tga",    true );
 }
 
 void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
@@ -1466,7 +1473,7 @@ void Graphics::clearDraw()
 
 void Graphics::clearStaticObjects()
 {
-	quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
+	quadTree = std::make_unique<QuadTree>(Vector2(-48.f * 20.f, -48.f * 20.f), Vector2(48.f * 20.f, 48.0f * 20.0f), 4);
 }
 
 void Graphics::addToUIDraw(GameObject* obj, Matrix* world)

@@ -49,13 +49,14 @@ void PlayingGameState::createElectric(int randNr, float deltaTime)
 	
 	testNetwork.get()->generateAdditionalSegments("F-F+F-F", 2, false);
 	testNetwork.get()->generateAdditionalSegments("F-F-F+F", 3, true);
-	
 }
 
 void PlayingGameState::initAI()
 {
-	aStar = new AStar(map->getTileMap());
-	actorManager = new ActorManager(aStar, physics.get(), map.get(), &rng);
+	aStar = nullptr;
+	aStar = std::make_unique<AStar>( map->getTileMap() );
+	actorManager = nullptr;
+	actorManager = std::make_unique<ActorManager>( aStar.get(), physics.get(), map.get(), &rng );
 	aStar->generateTileData(map->getTileMap());
 }
 
@@ -78,11 +79,15 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	graphics.loadShape(SHAPE_CUBE);
 	graphics.loadTexture("brickwall");
 	graphics.loadTexture("grass3");
-
 	graphics.loadTexture("brickwallnormal");
-	graphics.loadModel("Roller_Melee");
 	graphics.loadModel("Entities/Turret");
 	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
+
+	// clutter
+	graphics.loadModel("Entities/Barrel");
+	graphics.loadModel("Entities/Garbage_Bag");
+	graphics.loadModel("Entities/Quad");
+	graphics.loadTexture("brownPaperCardboard");
 
 	//graphics.loadModel("Roads/Metro/0000");
 	//graphics.loadModel("Roads/Metro/0001");
@@ -102,7 +107,8 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	//graphics.loadModel("Roads/Metro/1111");
 
 	graphics.loadModel("Entities/Star");
-	
+	graphics.loadModel("Entities/Streetlight");
+
 	graphics.loadModel("Tiles/Quad_SS"); // single-sided
 	graphics.loadTexture("Tiles/asphalt");
 	graphics.loadTexture("Tiles/asphalt_nor");
@@ -147,6 +153,13 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	graphics.loadTexture("Tiles/road_2file_4way_nor");
 	// missing: single tile road!
 
+	for ( auto &tileset: houseTilesets )
+		for ( auto &part: std::vector{ "f_ic", "f_oc", "f_sa", "f_sb", "w_ic", "w_oc", "w_sa", "w_sb",
+                                     "r_ic", "r_oc", "r_sa", "r_sb", "r_m" } )
+			graphics.loadModel( "Houses/tilesets/" + tileset.name + "/" + part );
+
+	loadMultitileLayouts("data/layouts/multitilePrefabs.dat");
+
 	graphics.loadModel("Hospital");
 	//graphics.loadModel("Roads/Road_pavement");
 	//graphics.loadModel("Roads/Road_deadend");
@@ -160,24 +173,19 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	graphics.loadModel("Houses/testHouse4");
 	graphics.loadModel("Houses/testHouse5");
 	graphics.loadModel("Houses/testHouse6");
-	graphics.loadModel("Houses/houseMaterial");
-	graphics.loadModel("Houses/houseMaterial2");
-	graphics.loadModel("Houses/houseMaterial3");
+	graphics.loadMaterial("Houses/houseMaterial");
+	graphics.loadMaterial("Houses/houseMaterial2");
+	graphics.loadMaterial("Houses/houseMaterial3");
 	graphics.loadModel("Entities/PowerUps/HealthBoost");
 	graphics.loadModel("Entities/PowerUps/SpeedBoost");
 	graphics.loadModel("Entities/PowerUps/TimeBoost");
 
 	player = std::make_unique<Vehicle>();
 	player->makePlayer();
-	//if constexpr ( isDebugging ) {
-		// light tests
-	lightList->addLight(SpotLight(Vector3(-2.f, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 1.f, Vector3(-2.f, -1.0f, 0.0f), 0.5));
-	lightList->addLight(SpotLight(Vector3(2.f, 1.0f, 0.0f), Vector3(0.3f, 0.3f, 1.0f), 1.f, Vector3(2.f, -1.0f, 0.0f), 0.5));
-	lightList->addLight(SpotLight(Vector3(0.f, 1.0f, 2.0f), Vector3(1.0f, 0.3f, 0.3f), 1.f, Vector3(0.f, -1.0f, 2.0f), 0.5));
-	lightList->addLight(SpotLight(Vector3(0.f, 1.0f, -2.0f), Vector3(0.3f, 1.0f, 0.3f), 1.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
-	lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f)));
+	//lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f))); // wot????
 
+	/*
 	for (int i = 0; i < 100; ++i) {
 		Vector3 randPos = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
 		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand())) / RAND_MAX;
@@ -188,21 +196,22 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 				randPos,
 				randColor,
 				10.0f));
-	}
+	}*/
 
-	testSystem = std::make_unique<Lsystem>();
-	testSystem.get()->updateLSystem();
+	//testSystem = std::make_unique<Lsystem>();
+	//testSystem.get()->setupDragonCurveSystem();
+	//testSystem.get()->updateLSystem();
 
 
 	 //Road Network Turtlewalker
 	//FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF
 
 
-	testNetwork.get()->generateInitialSegments("F");
+	//testNetwork.get()->generateInitialSegments("F");
 	//testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
 
-	testNetwork.get()->setAngle(30);
-	testNetwork.get()->generateAdditionalSegments("F--FF++FF", 1, false);
+	//testNetwork.get()->setAngle(30);
+	//testNetwork.get()->generateAdditionalSegments("F--FF++FF", 1, false);
 	/*testNetwork.get()->generateAdditionalSegments("F-F", 1, false);
 	for (int i = 2; i < 4; i++)
 	{
@@ -240,21 +249,21 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.0f);
 	this->player->setSpotLight(lightList->addLight(tempLight));
 
-	LaserLight tempLaserLight(Vector3(0.0, 0.0, 0.0), Vector3(0.9, 0.1, 0.9), 10.0, Vector3(1.0, 0.0, 0.0), 10.0);
-	this->player->setLaserLight(lightList->addLight(tempLaserLight));
+	//LaserLight tempLaserLight(Vector3(0.0, 0.0, 0.0), Vector3(0.9, 0.1, 0.9), 10.0, Vector3(1.0, 0.0, 0.0), 10.0);
+	//this->player->setLaserLight(lightList->addLight(tempLaserLight));
 
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
 
-	map = std::make_unique<Map>(graphics, config, physics.get());
-	map->setDistrictColorCoding(isDebugging);
+	map = std::make_unique<Map>(graphics, config, physics.get(), *lightList );
 	// Minimap stuff
 	auto tilemap = map->getTileMap();
-	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
-	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, .0f, config.tileSideScaleFactor);
+	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
 	// Needs to be loaded before the menues
 	minimap = createMinimapTexture(*map);
 	generateMapPowerUps();
+	createFogOfWarTexture(*map);
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
@@ -360,8 +369,6 @@ PlayingGameState::PlayingGameState() : graphics(Game::getGraphics()), time(250.0
 
 PlayingGameState::~PlayingGameState()
 {
-	delete aStar;
-	delete actorManager;
 	delete this->cameraObject;
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
@@ -495,21 +502,12 @@ void PlayingGameState::ImGui_Particles()
 #include "../PG/MinimapTextureGenerator.hpp"
 void PlayingGameState::ImGui_ProcGen()
 {
-	static Bool shouldColorCodeDistricts{ true };
 	ImGui::Begin("Map Generation:");
 	if (static bool isFirstFrame = true;  isFirstFrame) {
 		ImGui::SetWindowPos({ 0,  75 });
 		ImGui::SetWindowSize({ 525, 475 });
 		isFirstFrame = false;
 	}
-
-	ImGui::Separator();
-
-	// debug colors toggle:
-	bool shouldColorCodeDistrictsPrevFrame = shouldColorCodeDistricts;
-	ImGui::Checkbox("Show district colors", &shouldColorCodeDistricts);
-	if (shouldColorCodeDistricts != shouldColorCodeDistrictsPrevFrame)
-		map->setDistrictColorCoding(shouldColorCodeDistricts);
 
 	ImGui::Separator();
 
@@ -522,7 +520,7 @@ void PlayingGameState::ImGui_ProcGen()
 
 	// (TODO! bugged!) ImGui::InputFloat3( "Tile scale", &config.tileScaleFactor.data[0] );
 
-	ImGui::InputFloat("Floor height factor", &config.buildingFloorHeightFactor);
+	//ImGui::InputFloat("Floor height factor", &config.buildingFloorHeightFactor);
 
 	ImGui::InputInt("Seed", &config.seed);
 
@@ -559,13 +557,14 @@ void PlayingGameState::ImGui_ProcGen()
 	else if (config.roadDepthMax < 1)
 		config.roadDepthMax = 1;
 
-	ImGui::InputInt("Base min length", &config.roadLengthMin);
-	if (config.roadLengthMin > config.roadLengthMax)
-		config.roadLengthMin = config.roadLengthMax;
+	ImGui::SliderFloat("Base min length factor", &config.roadLengthFactorMin, .0f, 1.0f );
+	if (config.roadLengthFactorMin > config.roadLengthFactorMax)
+		config.roadLengthFactorMin = config.roadLengthFactorMax;
 
-	ImGui::InputInt("Base max length", &config.roadLengthMax);
-	if (config.roadLengthMax < config.roadLengthMin)
-		config.roadLengthMax = config.roadLengthMin;
+	ImGui::SliderFloat("Base max length factor", &config.roadLengthFactorMax, .0f, 1.0f );
+	if (config.roadLengthFactorMax < config.roadLengthFactorMin)
+		config.roadLengthFactorMax = config.roadLengthFactorMin;
+
 
 	ImGui::SliderFloat("Child length factor", &config.roadLengthFactor, .001f, 10.0f);
 
@@ -597,17 +596,19 @@ void PlayingGameState::ImGui_ProcGen()
 		player->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
 
 		map = nullptr; // clear, then regenerate:
-		map = std::make_unique<Map>(graphics, config, physics.get());
+		map = std::make_unique<Map>(graphics, config, physics.get(), *lightList);
 
 		player->setPosition(map->getStartPositionInWorldSpace());
 		player->getVehicleBody1()->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
-		map->setDistrictColorCoding(shouldColorCodeDistricts);
 		minimap = createMinimapTexture(*map);
+		generateMapPowerUps();
+		createFogOfWarTexture(*map);
+		initAI();
 		aStar->generateTileData(map->getTileMap());
 		// minimap stuff
 		auto tilemap = map->getTileMap();
-		topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
-		bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+		topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, 0, config.tileSideScaleFactor);
+		bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
 
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
@@ -630,23 +631,24 @@ void PlayingGameState::nextStage() noexcept {
 	// TODO: use RNG to decide width/length of map
 
 	map = nullptr; // clear, then regenerate:
-	map = std::make_unique<Map>(graphics, config, physics.get());
+	map = std::make_unique<Map>(graphics, config, physics.get(), *lightList);
 
 	player->setPosition(map->getStartPositionInWorldSpace());
 	player->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
 
-	minimap = createMinimapTexture(*map);
+	graphics.reloadTexture( createMinimapTexture( *map) );
+	graphics.reloadTexture( createFogOfWarTexture(*map) );
 	aStar->generateTileData(map->getTileMap());
 
 	// minimap stuff
 	auto tilemap = map->getTileMap();
-	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
-	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
-
-	graphics.reloadTexture(minimap);
+	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, 0, config.tileSideScaleFactor);
+	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
 	UIPlaying* menu = static_cast<UIPlaying*>(menues[MENU_PLAYING].get());
+
 	if(menu!=nullptr)
 		menu->resetMinimapFog();
+
 	player->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
 
 	clearPowerUps();
@@ -955,18 +957,18 @@ void PlayingGameState::update(float deltaTime)
 
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
-#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	ImGui_Driving();
+	//ImGui_Driving();
 	ImGui_ProcGen();
 	//ImGui_AI();
-	ImGui_Particles();
+	//ImGui_Particles();
 	ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	#endif // !_DEBUG
+	//#endif // !_DEBUG
 
 	graphics.presentScene();
 }
@@ -1014,9 +1016,6 @@ Vector3 PlayingGameState::getBottomRight() const
 
 void PlayingGameState::spawnObjects()
 {
-	graphics.loadModel("Entities/Barrel");
-	graphics.loadModel("Entities/Garbage_Bag");
-	graphics.loadModel("Entities/Quad");
 	physicsObjID = 0;
 	physicsObjects.reserve(300);
 	btRigidBody* tempo2;
@@ -1024,9 +1023,7 @@ void PlayingGameState::spawnObjects()
 	for (int i = 0; i < 20; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
 		auto objPtr = physicsObjects.back().get();
-		graphics.loadModel("Cube");
 		objPtr->mesh = graphics.getMeshPointer("Cube");
-		graphics.loadTexture("brownPaperCardboard");
 		objPtr->setTexture(graphics.getTexturePointer("brownPaperCardboard"));
 		graphics.addToDraw(objPtr);
 		randomValue = (rand() % 3 + 8) * 0.125f;
@@ -1320,9 +1317,9 @@ void PlayingGameState::generateMapPowerUps()
 	{
 		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
 		Vector3 indexWorldSpace = Vector3(
-			(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+			(float)(index / map->config.dimensions.y) * map->config.tileSideScaleFactor,
 			0.0,
-			-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+			-(float)(index % map->config.dimensions.x) * map->config.tileSideScaleFactor
 		);
 
 		for (int i = 0; i < 100; ++i)
@@ -1331,9 +1328,9 @@ void PlayingGameState::generateMapPowerUps()
 			{
 				position = map->generateRoadPositionInWorldSpace(rng);
 				indexWorldSpace = Vector3(
-					(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+					(float)(index / map->config.dimensions.y) * map->config.tileSideScaleFactor,
 					0.0,
-					-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+					-(float)(index % map->config.dimensions.x) * map->config.tileSideScaleFactor
 				);
 				break;
 			}

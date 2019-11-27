@@ -24,9 +24,9 @@ String  mapConfigToFilename( MapConfig const &config, String extension ) {
             << '_'
             <<  config.roadMinTilesBeforeTurn
             << '_'
-            <<  config.roadLengthMin
+            <<  config.roadLengthFactorMin
             << '-'
-            <<  config.roadLengthMax
+            <<  config.roadLengthFactorMax
             << 'x'
             <<  config.roadLengthFactor
             << '_'
