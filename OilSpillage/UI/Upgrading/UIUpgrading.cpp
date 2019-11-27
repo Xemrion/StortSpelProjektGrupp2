@@ -23,7 +23,7 @@ void UIUpgrading::updateUI(float deltaTime)
 		}
 		else if (Input::checkButton(Keys::CANCEL, States::PRESSED) && this->itemSelector->isSelectedValid())
 		{
-			//Remove from car
+			this->gadgetSelector->removeSlotOfSelected(this->itemSelector->getSelectedSlot());
 		}
 		else if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 		{

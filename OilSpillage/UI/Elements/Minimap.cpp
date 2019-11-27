@@ -7,7 +7,7 @@
 Vector2 Minimap::size = Vector2(96 * 2, 96 * 2);
 
 Minimap::Minimap(Vector2 position)
-	: Element(position, 0.0f), compassMoveSize(6.0f), compassSpeed(6.0f), fogClearRadius(25.0f), zoom(0.25f), textureMap(nullptr), textureFog(nullptr), textureFogTemp(nullptr), resourceFog(nullptr), pixels(nullptr), compassRot(0.0f)
+	: Element(position, 0.0f), compassMoveSize(6.0f), compassSpeed(6.0f), objectiveViewDist(300.0f), enemyViewDist(150.0f), fogClearRadius(25.0f), zoom(0.25f), textureMap(nullptr), textureFog(nullptr), textureFogTemp(nullptr), resourceFog(nullptr), pixels(nullptr), compassRot(0.0f)
 {
 	Game::getGraphics().loadTexture("UI/mapOutline");
 	Game::getGraphics().loadTexture("UI/mapPlayerMarker");
@@ -112,6 +112,8 @@ void Minimap::init()
 	unsigned short minDimension = min(this->textureMap->getWidth(), this->textureMap->getHeight());
 	this->zoom = min(72.0f / minDimension, 1.0f);
 	this->fogClearRadius = min(25.0f * (minDimension / 72.0f), 25.0f);
+	this->objectiveViewDist = min(300.0f * (minDimension / 288.0f), 300.0f);
+	this->enemyViewDist = min(150.0f * (minDimension / 288.0f), 150.0f);
 
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Vector3 mapSize((state->getBottomRight() - state->getTopLeft() + Vector3(0, 1, 0)) * Vector3(1, 1, -1));
@@ -120,9 +122,6 @@ void Minimap::init()
 	this->mapMatrix = Matrix::CreateTranslation(-Vector3(state->getTopLeft().x, 0, state->getBottomRight().z));
 	this->mapMatrix *= Matrix::CreateScale(mapScale);
 }
-
-	
-
 
 void Minimap::draw(bool selected)
 {
@@ -178,7 +177,7 @@ void Minimap::draw(bool selected)
 	for (int i = 0; i < static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->getGroups().size(); i++)
 	{
 		targetPos = static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->getGroups()[i].getAveragePos();
-		if ((targetPos - playerPos).Length() < 150.0f)
+		if ((targetPos - playerPos).Length() < this->enemyViewDist)
 		{
 			targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
 			targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
@@ -203,7 +202,7 @@ void Minimap::draw(bool selected)
 				if (state->getObjHandler().getObjective(0)->getTarget(i) != nullptr)
 				{
 					targetPos = state->getObjHandler().getObjective(0)->getTarget(i)->getPosition();
-					if ((targetPos - playerPos).Length() < 300.0f)
+					if ((targetPos - playerPos).Length() < this->objectiveViewDist)
 					{
 						targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
 						targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
