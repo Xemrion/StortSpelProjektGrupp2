@@ -35,6 +35,7 @@ public:
 	Vector<Size>        getNeighbouringIndices( V2u tilePosition ) const noexcept;	
 	Vector<V2u>         getNeighbouringTilePositions( V2u tilePosition ) const noexcept;
 	Vector<GameObject>  loadAsModels( Graphics & ) const;
+	void                applyLot( Lot const &, Tile ) noexcept;
 
 	// returns the proper look-up index for the tile @ x,y in the graphics table
 	inline Size  getTileLookupIndex( U16 tileX, U16 tileY ) const noexcept
@@ -86,10 +87,10 @@ public:
 		return tilePos.x < width and tilePos.y < height;
 	}
 
-	inline Vector3  convertTilePositionToWorldPosition( U16 const tileX, U16 const tileY ) const {
-		Vector3 result { tileX * config.tileScaleFactor.x, 
+	inline Vector3  convertTilePositionToWorldPosition( I32 const tileX, I32 const tileY ) const {
+		Vector3 result { config.tileSideScaleFactor * tileX, 
 		                 .0f,
-		                 tileY * -config.tileScaleFactor.y };
+		                -config.tileSideScaleFactor * tileY };
 		//assert( result.x >= .0f );
 		//assert( result.z >= .0f );
 		return result;
@@ -97,14 +98,14 @@ public:
 
 	inline Vector3  convertTilePositionToWorldPosition( V2u const &tilePosition ) const
 	{
-		return convertTilePositionToWorldPosition( tilePosition.x, tilePosition.y );
+		return convertTilePositionToWorldPosition( I32(tilePosition.x), I32(tilePosition.y) );
 	}
 
 	inline V2u  convertWorldPositionToTilePosition( Vector3 const &worldPosition ) const
 	{
 		
-		V2u result { static_cast<U32>( std::round(worldPosition.x /  config.tileScaleFactor.x) ),
-		             static_cast<U32>( std::round(worldPosition.z / -config.tileScaleFactor.y) ) };
+		V2u result { static_cast<U32>( std::round(worldPosition.x /  config.tileSideScaleFactor) ),
+		             static_cast<U32>( std::round(worldPosition.z / -config.tileSideScaleFactor) ) };
 		//assert( result.x <  width );
 		//assert( result.y < height );
 		return result;

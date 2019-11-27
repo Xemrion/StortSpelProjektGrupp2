@@ -6,8 +6,10 @@ Branch::Branch( RoadGenBranchArgs args ):
    currentY          ( args.startY         ),
    currentDirection  ( args.startDirection )
 {
-   U16_Dist  gen_tiles_to_walk( args.map.config.roadLengthMin, args.map.config.roadLengthMax );
-   tilesToWalk = gen_tiles_to_walk( args.rng );
+	U16 minLength = args.map.config.roadLengthFactorMin * args.map.config.dimensions.x * args.map.config.dimensions.y,
+	    maxLength = args.map.config.roadLengthFactorMax * args.map.config.dimensions.x * args.map.config.dimensions.y;
+	U16_Dist  gen_tiles_to_walk( minLength, maxLength );
+	tilesToWalk = gen_tiles_to_walk( args.rng );
 }
 
 
@@ -31,8 +33,8 @@ RoadGenBranchArgs  createChildArgs( RoadGenBranchArgs const &parentArgs,
        startY,
        startDirection,
 (U8)  (parentArgs.currentDepth + 1),
-(U16) (parentArgs.map.config.roadLengthFactor            * parentArgs.currentLengthMin),
-(U16) (parentArgs.map.config.roadLengthFactor            * parentArgs.currentLengthMax),
+(F32) (parentArgs.map.config.roadLengthFactor            * parentArgs.currentLengthFactorMin),
+(F32) (parentArgs.map.config.roadLengthFactor            * parentArgs.currentLengthFactorMax),
        parentArgs.map.config.roadTurnProbabilityFactor   * parentArgs.currentTurnProbability,
        parentArgs.map.config.roadBranchProbabilityFactor * parentArgs.currentBranchProbability,
        parentArgs.map,
@@ -143,8 +145,8 @@ RoadGenerator::RoadGenerator( TileMap &map ):
                             startY,
                             startDirection,
                             0, // startDepth
-                      (U16) map.config.roadLengthMin,
-                      (U16) map.config.roadLengthMax,
+                      (F32) map.config.roadLengthFactorMin,
+                      (F32) map.config.roadLengthFactorMax,
                             map.config.roadTurnProbability,
                             map.config.roadBranchProbability,
                             map,

@@ -32,23 +32,23 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->graphics.setLightList(lightList.get());
 
 	this->theVehicle->init(physics.get());
-	this->theVehicle->setPosition(Vector3(0, -0.25, -0.25));
-	this->theVehicle->getVehicleBody1()->setPosition(Vector3(0, 0.55, 0));
+	this->theVehicle->setPosition(Vector3(3.15, -0.25, 0));
+	this->theVehicle->getVehicleBody1()->setPosition(Vector3(3.15, 0.45, 0));
 	
-	this->theVehicle->setRotation(Vector3(0, 90, 0));
+	this->theVehicle->setRotation(Vector3(0, 2.65, 0));
 
 	this->camera = std::make_unique<DynamicCamera>(Vector3(2.0f, 0.5f, -2.0f), Vector3(0, 0, 0));
 	barrels = std::make_unique<GameObject>();
 	graphics.loadModel("Entities/Barrel");
 	barrels.get()->mesh = graphics.getMeshPointer("Entities/Barrel");;
 	barrels.get()->setTexture(graphics.getMaterial("Entities/Barrel").diffuse);
-	barrels.get()->setPosition(Vector3(0, -0.65f, 0));
+	barrels.get()->setPosition(Vector3(0.1, -0.55f, 0));
 	barrels.get()->setScale(Vector3(0.4f,0.4f,0.4f));
 	
-	graphics.getParticleSystem("fire")->setGravity(-0.1f);
+	graphics.getParticleSystem("fire")->setGravity(-0.3f);
 	
-	graphics.getParticleSystem("fire")->setSize(0.02f,0.01f);
-	graphics.getParticleSystem("fire")->changeVectorField(1.75f,0.09f);
+	graphics.getParticleSystem("fire")->setSize(0.03f,0.02f);
+	graphics.getParticleSystem("fire")->changeVectorField(0.75f,0.09f);
 
 
 	graphics.addToDraw(barrels.get());

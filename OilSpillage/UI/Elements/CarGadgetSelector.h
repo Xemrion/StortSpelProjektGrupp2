@@ -23,6 +23,7 @@ public:
 
 	void draw(bool selected);
 	void update(bool selected, float deltaTime);
+	void init();
 
 	void setSlotOfSelected(Container::Slot* slot);
 	Container::Slot** getUsed();

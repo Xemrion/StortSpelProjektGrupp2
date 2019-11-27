@@ -33,6 +33,7 @@ public:
 	virtual ~Item();
 	Item(const Item& obj);
 	virtual Item* clone()const;
+	virtual bool operator==(const Item& other) const;
 
 	virtual void randomize();
 
