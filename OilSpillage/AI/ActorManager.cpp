@@ -53,27 +53,6 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	float deltaX;
 	float deltaZ;
 	float distance;
-	//for (int i = 0; i < groups.size(); i++)
-	//{
-	//	deltaX = groups[i].averagePos.x - targetPos.x;
-	//	deltaZ = groups[i].averagePos.z - targetPos.z;
-	//	distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-	//	//(TileSize * nrOfTiles)^2
-	//	if (distance > (20 * 10) * (20 * 10))
-	//	{
-	//		newPos = generateObjectivePos(targetPos, 0, 50);
-	//		for (int j = 0; j < groups[i].actors.size(); j++)
-	//		{
-	//			Actor* current = groups[i].actors[j];
-	//			current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-	//			physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-	//			if (j % 5 == 0)
-	//			{
-	//				newPos = generateObjectivePos(targetPos, 0, 50);
-	//			}
-	//		}
-	//	}
-	//}
 	for (int i = 0; i < groups.size(); i++)
 	{
 		deltaX = groups[i].averagePos.x - targetPos.x;
@@ -82,21 +61,42 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		//(TileSize * nrOfTiles)^2
 		if (distance > (20 * 10) * (20 * 10))
 		{
-			newPos = generateObjectivePos(targetPos, 50, 60);
+			newPos = generateObjectivePos(targetPos, 0, 50);
 			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
 				Actor* current = groups[i].actors[j];
-				//current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				current->getRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
-				current->setPosition(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-				/*if (j % 5 == 0)
+				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+				if (j % 5 == 0)
 				{
 					newPos = generateObjectivePos(targetPos, 0, 50);
-				}*/
+				}
 			}
 		}
 	}
+	//for (int i = 0; i < groups.size(); i++)
+	//{
+	//	deltaX = groups[i].averagePos.x - targetPos.x;
+	//	deltaZ = groups[i].averagePos.z - targetPos.z;
+	//	distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+	//	//(TileSize * nrOfTiles)^2
+	//	if (distance > (20 * 10) * (20 * 10))
+	//	{
+	//		newPos = generateObjectivePos(targetPos, 50, 60);
+	//		for (int j = 0; j < groups[i].actors.size(); j++)
+	//		{
+	//			Actor* current = groups[i].actors[j];
+	//			//current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+	//			current->getRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
+	//			current->setPosition(Vector3(newPos.x, current->getPosition().y, newPos.z));
+	//			//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+	//			/*if (j % 5 == 0)
+	//			{
+	//				newPos = generateObjectivePos(targetPos, 0, 50);
+	//			}*/
+	//		}
+	//	}
+	//}
 	for (int i = 0; i < groups.size(); i++)
 	{
 		groups[i].update(targetPos);
