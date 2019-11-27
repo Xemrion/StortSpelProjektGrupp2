@@ -4,9 +4,9 @@
 #include "Profiler.hpp"
 
 
-std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techni", "Pleasant", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodpath", "Factory", "Electro", "Skull" };
+std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Pleasant", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo" };
 
-std::array constexpr citySuffix { "town", "Town", " City", "Village", "ville", "burg", "stadt", "polis", "heim" };
+std::array constexpr citySuffix { "town", " Town", " City", "Village", "ville", "burg", "stadt", "polis", "heim", "Meadows", "Creek", "Base", "Metropolis" };
 
 auto generateCityName( RNG &rng ) noexcept {
 	return std::string(util::randomElementOf(cityPrefix, rng)) + util::randomElementOf(citySuffix, rng);
@@ -338,10 +338,12 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	hospitalTable   ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide ),
 	rng             ( RD()()                                                                                        )
 {
-	if ( config.seed != -1 )
-		rng.seed( config.seed );
 	DBG_PROBE(Map::Map);
-	biome = static_cast<Biome>( config.seed % 3 );
+	U32_Dist genBiome { 0, 3 };
+	if ( config.seed != -1 )  
+		rng.seed( config.seed );
+
+	biome = static_cast<Biome>( genBiome(rng) );
 
 	info.name    = generateCityName(rng);
 	info.width   = config.dimensions.x;
@@ -1349,7 +1351,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 	house.parts = {};
 	house.parts.reserve(numParts);
 	house.hitboxes = {};
-	house.hitboxes.reserve(numHitboxes);
+	house.hitboxes.reserve(numHitboxes+20); // hack
 	house.nw     = nw;
 	house.layout = std::move(layout);
 
@@ -1396,7 +1398,6 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 	F32 const fullSide = tilemap->config.tileSideScaleFactor / 2;
 	F32 const halfSide = fullSide / 2;
 	F32 const fracSide = halfSide * 0.25;
-	house.hitboxes.reserve(8);
 	for ( U32 x = 0;  x < house.layout.width;  ++x ) {
 		for ( U32 y = 0;  y < house.layout.length;  ++y ) {
 			auto idx          = index(x,y);

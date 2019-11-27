@@ -4,7 +4,7 @@
 #include <sstream>
 
 struct MapConfig {
-	I32   seed                           {  69474 };
+	I32   seed                           {     -1 };
 	I32   distanceMapSearchRadius        {      3 };
 	V2i   dimensions                     { 32, 32 };
 	I32   districtCellSide               {     16 };

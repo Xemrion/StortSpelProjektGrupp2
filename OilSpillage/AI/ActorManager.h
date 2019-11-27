@@ -54,6 +54,7 @@ private:
 	void assignPathsToGroups(const Vector3& targetPos);
 	void updateGroups();
 	void destroyActor(int index);
+	void destroyBoss(int index);
 	void initGroupForActor(DynamicActor* actor);
 	void createGroup(DynamicActor* actor);
 	Vector3 predictPlayerPos(const Vector3& targetPos);
@@ -62,6 +63,7 @@ private:
 	Vector2& generateRandom(const float& x, const float& z, Radius radius);
 	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
 	std::vector<DynamicActor*> actors;
+	std::vector<Boss*> bosses;
 	TurretHandler turretHandler;
 	std::vector<DynamicActor*> sendToPlayer;
 	AStar* aStar;

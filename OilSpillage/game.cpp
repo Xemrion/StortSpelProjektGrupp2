@@ -149,10 +149,14 @@ void Game::createCurrentState()
 	VehicleSlots* transfer = nullptr;
 	VehicleSlots* newSlots = nullptr;
 	Vehicle*temp = nullptr;
+	if (oldState == STATE_PLAYING)
+	{
+		this->gameInfo.time = static_cast<PlayingGameState*>(state.get())->getTime();
+	}
 	if (currentState == STATE_MENU)
 	{
 		Container::playerInventory = std::make_unique<Container>();
-
+		this->gameInfo = GameInfo();
 		nrOfStagesDone = 0.0f;
 		localScale = 1.0f;
 		state = std::make_unique<MenuGameState>();
@@ -171,10 +175,14 @@ void Game::createCurrentState()
 			 // increase everytime a new stage is created
 			
 		}
-		state = std::make_unique<PlayingGameState>();
-		if (nrOfStagesDone > 0)
+		
+		if (nrOfStagesDone <= 0)
 		{
-			static_cast<PlayingGameState*>(state.get())->nextStage();
+			state = std::make_unique<PlayingGameState>(1231,7.0f*60.0f);
+		}
+		else
+		{
+			state = std::make_unique<PlayingGameState>(-1,gameInfo.time);
 		}
 		nrOfStagesDone++;
 		static_cast<PlayingGameState*>(state.get())->generateObjectives();
@@ -208,6 +216,7 @@ void Game::createCurrentState()
 			
 		}
 	}
+	
 }
 
 void Game::run()

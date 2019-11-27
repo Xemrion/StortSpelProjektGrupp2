@@ -46,6 +46,9 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		spawnTimer = spawnCooldown;
 	}
 
+	if (this->bosses.size() > 0)
+		bosses[0]->update(dt, targetPos);
+
 	Vector3 newPos;
 	float deltaX;
 	float deltaZ;
@@ -152,8 +155,8 @@ void ActorManager::createSwarm(float x, float z)
 Boss* ActorManager::createBoss(float x, float z, int weaponType)
 {
 	Boss* boss = new Boss(x, z, weaponType, physics);
-	this->actors.push_back(boss);
-	initGroupForActor(actors.at(actors.size() - 1));
+	this->bosses.push_back(boss);
+	//initGroupForActor(bosses.at(bosses.size() - 1));
 
 	return boss;
 }
@@ -228,6 +231,54 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 		}
 	}
 	turretHandler.intersectPlayerBullets(bulletArray, size, soundTimer);
+
+	if (this->bosses.size() > 0)
+	{
+		this->bosses[0]->checkIfWeakPointHit(bulletArray, size, soundTimer);
+
+		bosses[0]->checkIfWeakPointHit(bulletArray, size, soundTimer);
+		for (int i = 0; i < this->bosses.size(); i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				if (!this->bosses[i]->isDead())
+				{
+					if (bulletArray[j].getWeaponType() == WeaponType::Laser)
+					{
+						GameObject* laserObject = bulletArray[j].getGameObject();
+						Vector3 rayDir = bulletArray[j].getDirection();
+						Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
+						if (this->bosses[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
+						{
+							if (soundTimer > 0.05f) {
+								Sound::play("./data/sound/HitSound.wav");
+								soundTimer = 0;
+							}
+							this->bosses[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
+						}
+					}
+					else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
+					{
+						if (soundTimer > 0.05f) {
+							Sound::play("./data/sound/HitSound.wav");
+							soundTimer = 0;
+						}
+						this->bosses[i]->changeHealth(-bulletArray[j].getDamage());
+						bulletArray[j].destroy();
+					}
+					if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
+					{
+						if (soundTimer > 0.05f) {
+							Sound::play("data/sound/HitSound.wav");
+							soundTimer = 0;
+						}
+						this->bosses[i]->changeHealth(-bulletArray[j].getDamage());
+						// dont remove the melee weapon
+					}
+				}
+			}
+		}
+	}
 
 }
 
@@ -396,7 +447,8 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 		{
 			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
 			{
-				groups[i].actors[j]->update(dt, targetPos);
+
+				groups[i].actors[j]->update(dt, targetPos); //creash
 			}
 			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
 			{
@@ -414,7 +466,6 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 	}
 	if (hasDied)
 	{
-
 		for (int i = this->actors.size() - 1; i >= 0; i--)
 		{
 			float normalizedRandom = float(rand()) / RAND_MAX;
@@ -429,6 +480,14 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 			{
 				Game::getGameInfo().highScore += actors[i]->getPoints();
 				destroyActor(i);
+			}
+		}
+		for (int i = this->bosses.size() - 1; i >= 0; i--)
+		{
+			if (bosses[i]->isDead())
+			{
+				//Game::getGameInfo().highScore += actors[i]->getPoints();
+				destroyBoss(i);
 			}
 		}
 	}
@@ -587,6 +646,16 @@ void ActorManager::destroyActor(int index)
 	}
 	delete actors[index];
 	actors.erase(actors.begin() + index);
+}
+
+void ActorManager::destroyBoss(int index)
+{
+	if (bosses[index]->getRigidBody() != nullptr)
+	{
+		physics->DeleteRigidBody(bosses[index]->getRigidBody());
+	}
+	delete bosses[index];
+	//bosses.erase(bosses.begin() + index);
 }
 
 void ActorManager::initGroupForActor(DynamicActor* actor)
