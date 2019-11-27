@@ -373,7 +373,7 @@ Map::~Map() noexcept
 		physics->DeleteRigidBody( e.object.getRigidBody() );
 
 	for ( auto &e : houses.multis )
-		for ( auto &p : e.parts)
+		for ( auto &p : e.parts )
 			physics->DeleteRigidBody( p.getRigidBody() );
 
 	for ( auto &e : border.bounds )

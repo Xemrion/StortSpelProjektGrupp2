@@ -1473,7 +1473,7 @@ void Graphics::clearDraw()
 
 void Graphics::clearStaticObjects()
 {
-	quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
+	quadTree = std::make_unique<QuadTree>(Vector2(-48.f * 20.f, -48.f * 20.f), Vector2(48.f * 20.f, 48.0f * 20.0f), 4);
 }
 
 void Graphics::addToUIDraw(GameObject* obj, Matrix* world)
