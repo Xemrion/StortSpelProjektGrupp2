@@ -273,7 +273,7 @@ bool Input::checkButtonGamePad(Keys key, GamePad::ButtonStateTracker::ButtonStat
 
 bool Input::isKeyDown_DEBUG(Keyboard::Keys key)
 {
-	return instance->keyboard.GetState().IsKeyDown(key);
+	return instance->keyboardTracker.IsKeyPressed(key);;
 }
 
 void Input::init(Window* window)

@@ -28,7 +28,8 @@ public:
 	{
 		STATE_MENU,
 		STATE_PLAYING,
-		STATE_UPGRADING
+		STATE_UPGRADING,
+		STATE_HIGHSCORE
 	};
 	static void							start(Window* window);
 	static void							quit();

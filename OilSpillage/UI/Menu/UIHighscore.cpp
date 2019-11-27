@@ -67,7 +67,7 @@ UIHighscore::~UIHighscore()
 	if (this->sendHighscore.joinable()) this->sendHighscore.join();
 }
 
-void UIHighscore::init()
+void UIHighscore::init(bool send, std::string name)
 {
 	this->highscore = std::make_unique<AnimatedText>("Highscore", Color(Colors::White), 1.0f, Animation::UP_DOWN_FADE_IN);
 	this->highscore->setPosition(Vector2(SCREEN_WIDTH / 2 - this->highscore->getSize().x / 2, 10.0f));
@@ -87,21 +87,28 @@ void UIHighscore::init()
 	this->timer = 0.0f;
 
 	if (this->sendHighscore.joinable()) this->sendHighscore.join();
-	this->sendHighscore = std::thread(&UIHighscore::loadHighscore, this);
+	this->sendHighscore = std::thread(&UIHighscore::loadHighscore, this, send, name);
 }
 
-void UIHighscore::loadHighscore(UIHighscore* ui)
+void UIHighscore::loadHighscore(UIHighscore* ui, bool send, std::string name)
 {
 	while (!ui->loadingMutex.try_lock()) {}
 
-	PlayerStat myStat("killerboi", 7);
 	std::vector<PlayerStat> stats;
 	Color color;
 	MyClient client;
 
 	if (PNet::Network::Initialize() && client.Connect(PNet::IPEndpoint("192.168.43.233", 6113)))
 	{
-		client.SendPlayerStats(myStat);
+		if (send)
+		{
+			client.SendPlayerStats(PlayerStat(name, Game::getGameInfo().highScore));
+		}
+		else
+		{
+			client.SendPlayerStats(PlayerStat("Unknown", 0));
+		}
+		
 		while (client.IsConnected())
 		{
 			client.Frame();
@@ -152,20 +159,24 @@ void UIHighscore::loadHighscore(UIHighscore* ui)
 
 			localHighscore.close();
 
-			stats.push_back(myStat);
-			std::sort(stats.begin(), stats.end(), [](const PlayerStat& a, const PlayerStat& b) { return a.score > b.score; });
-			if (stats.size() > 10) stats.resize(10);
-
-			localHighscoreOut.open("highscore.txt", std::ios::trunc);
-			localHighscoreOut << stats.size() << "\n";
-
-			for (int i = 0; i < stats.size(); i++)
+			if (send)
 			{
-				localHighscoreOut << stats[i].name << "\n";
-				localHighscoreOut << stats[i].score << "\n";
-			}
+				stats.push_back(PlayerStat(name, Game::getGameInfo().highScore));
+				std::sort(stats.begin(), stats.end(), [](const PlayerStat& a, const PlayerStat& b) { return a.score > b.score; });
+				if (stats.size() > 10) stats.resize(10);
 
-			localHighscoreOut.close();
+				localHighscoreOut.open("highscore.txt", std::ios::trunc);
+				localHighscoreOut << stats.size() << "\n";
+
+				for (int i = 0; i < stats.size(); i++)
+				{
+					localHighscoreOut << stats[i].name << "\n";
+					localHighscoreOut << stats[i].score << "\n";
+				}
+
+				localHighscoreOut.close();
+			}
+			
 		}
 
 		ui->noConnection = std::make_unique<AnimatedText>("Server is offline :(", Color(Colors::Red), 0.25f, Animation::SHAKING_FADE_IN_STOP);
