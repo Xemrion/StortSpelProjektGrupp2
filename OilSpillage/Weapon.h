@@ -132,12 +132,17 @@ public:
 		}
 		else if (weapon.type == WeaponType::Laser && weapon.flameBool == true)
 		{
-			int randomSound = rand() % 4 + 1;
-			std::string soundEffect = "./data/sound/Lazer" + std::to_string(randomSound) + ".mp3";
-			Sound::stopLooping(weapon.soundHandle);
-			weapon.soundHandle = Sound::playLooping(soundEffect, 0.5f);
-			Sound::play("./data/sound/LazerImpact.mp3", 0.75f);
-			weapon.flameBool = false;
+			if (weapon.remainingCooldown <= 0) {
+				int randomSound = rand() % 4 + 1;
+				std::string soundEffect = "./data/sound/Lazer" + std::to_string(randomSound) + ".mp3";
+				Sound::stopLooping(weapon.soundHandle);
+				weapon.soundHandle = Sound::playLooping(soundEffect, 0.5f);
+				Sound::play("./data/sound/LazerImpact.mp3", 0.75f);
+				weapon.flameBool = false;
+			}
+			else {
+				weaponEndSound(weapon);
+			}
 		}
 	};
 

@@ -621,43 +621,6 @@ void PlayingGameState::ImGui_ProcGen()
 	ImGui::End();
 }
 
-void PlayingGameState::nextStage() noexcept {
-	// (TODO: refactor) hacky, but:
-	player->getRigidBody()->setLinearFactor(btVector3(.0, .0f, .0f));
-	RNG rng{ RD()() };
-	rng.seed( config.seed );
-	I32_Dist generateSeed{};
-	config.seed = generateSeed(rng);
-
-	// TODO: use RNG to decide width/length of map
-
-	map = nullptr; // clear, then regenerate:
-	map = std::make_unique<Map>(graphics, config, physics.get(), *lightList);
-
-	player->setPosition(map->getStartPositionInWorldSpace());
-	player->setPosition(map->getStartPositionInWorldSpace() + Vector3(.0f, .55f, .0f));
-
-	graphics.reloadTexture( createMinimapTexture( *map) );
-	graphics.reloadTexture( createFogOfWarTexture(*map) );
-	aStar->generateTileData(map->getTileMap());
-
-	// minimap stuff
-	auto tilemap = map->getTileMap();
-	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, 0, config.tileSideScaleFactor);
-	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
-	UIPlaying* menu = static_cast<UIPlaying*>(menues[MENU_PLAYING].get());
-
-	if(menu!=nullptr)
-		menu->resetMinimapFog();
-
-	player->getRigidBody()->setLinearFactor(btVector3(1.0f, .0f, 1.0f));
-
-	clearPowerUps();
-	generateMapPowerUps();
-
-}
-
-
 void  PlayingGameState::ImGui_Camera() {
 	ImGui::Begin("Camera & Culling:");
 	if (static bool firstFrame = true; firstFrame) {
@@ -869,7 +832,7 @@ void PlayingGameState::update(float deltaTime)
 			}
 			*/
 
-			this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()+Vector3(0.0f,0.0f,5.0f)), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
+			//this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()+Vector3(0.0f,0.0f,5.0f)), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
 			timer = 0.0f;
 		}
 
@@ -958,18 +921,18 @@ void PlayingGameState::update(float deltaTime)
 
 	//testNetwork.get()->drawRoadNetwork(&graphics);
 
-//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	//ImGui_Driving();
+	ImGui_Driving();
 	ImGui_ProcGen();
 	//ImGui_AI();
-	//ImGui_Particles();
+	ImGui_Particles();
 	ImGui_Camera();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	//#endif // !_DEBUG
+	#endif // !_DEBUG
 
 	graphics.presentScene();
 }
