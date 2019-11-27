@@ -179,8 +179,7 @@ void Game::createCurrentState()
 		
 		if (nrOfStagesDone <= 0)
 		{
-			//this->gameInfo.highScore = 1234;
-			state = std::make_unique<PlayingGameState>(1231,7.0f*60.0f/*0.0f*/);
+			state = std::make_unique<PlayingGameState>(1231,7.0f*60.0f);
 		}
 		else
 		{

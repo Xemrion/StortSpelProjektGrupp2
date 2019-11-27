@@ -703,7 +703,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else if (time <= 0.0f)
 		{
-			Game::setState(Game::STATE_MENU);
+			Game::setState(Game::STATE_HIGHSCORE);
 		}
 #else
 		if (time > 0.0f)
@@ -712,7 +712,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 		{
-			Game::setState(Game::STATE_MENU);
+			Game::setState(Game::STATE_HIGHSCORE);
 		}
 #endif // !_DEBUG
 		prevAccelForce = Vector3(player->getRigidBody()->getLinearVelocity());

@@ -23,7 +23,17 @@ void UIHighscore::updateUI(float deltaTime)
 
 		if (Input::checkButton(Keys::CONFIRM, States::PRESSED) || Input::checkButton(Keys::CANCEL, States::PRESSED))
 		{
-			static_cast<MenuGameState*>(Game::getCurrentState())->setCurrentMenu(MenuGameState::MENU_MAIN);
+			MenuGameState* state = dynamic_cast<MenuGameState*>(Game::getCurrentState());
+
+			if (state)
+			{
+				state->setCurrentMenu(MenuGameState::MENU_MAIN);
+			}
+			else
+			{
+				Game::setState(Game::STATE_MENU);
+			}
+			
 		}
 
 		this->loadingMutex.unlock();

@@ -12,7 +12,7 @@ void UIBefore::updateUI(float deltaTime)
 	}
 	else if (Input::isKeyDown_DEBUG(Keyboard::Keys::B))
 	{
-		this->name += "c";
+		this->name += "b";
 	}
 	else if(Input::isKeyDown_DEBUG(Keyboard::Keys::C))
 	{
@@ -106,9 +106,13 @@ void UIBefore::updateUI(float deltaTime)
 	{
 		this->name += "y";
 	}
-	else if(Input::isKeyDown_DEBUG(Keyboard::Keys::Z))
+	else if (Input::isKeyDown_DEBUG(Keyboard::Keys::Z))
 	{
 		this->name += "z";
+	}
+	else if (Input::isKeyDown_DEBUG(Keyboard::Keys::Back) && this->name.size() > 0)
+	{
+		this->name.resize(this->name.size() - 1);
 	}
 
 	this->theName->setVariables(this->name, {}, {});
@@ -120,7 +124,7 @@ void UIBefore::updateUI(float deltaTime)
 	{
 		static_cast<HighscoreGameState*>(Game::getCurrentState())->setCurrentMenu(HighscoreGameState::MENU_HIGHSCORE);
 	}
-	else if (Input::checkButton(Keys::CANCEL, States::PRESSED))
+	else if (Input::checkButton(Keys::MENU, States::PRESSED))
 	{
 		Game::setState(Game::STATE_MENU);
 	}
@@ -128,9 +132,11 @@ void UIBefore::updateUI(float deltaTime)
 
 void UIBefore::drawUI()
 {
+	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	this->yourName->draw(false);
 	this->theName->draw(false);
 	this->promptBar->draw(false);
+	UserInterface::getSpriteBatch()->End();
 }
 
 UIBefore::UIBefore()
@@ -144,7 +150,7 @@ UIBefore::~UIBefore()
 void UIBefore::init()
 {
 	this->yourName = std::make_unique<AnimatedText>("Your name:", Color(Colors::White), 0.5f, Animation::SHAKING_FADE_IN_STOP);
-	this->yourName->setPosition(Vector2(SCREEN_WIDTH / 2 - this->yourName->getSize().x / 2, SCREEN_HEIGHT / 2 - this->yourName->getSize().y / 2));
+	this->yourName->setPosition(Vector2(SCREEN_WIDTH / 2 - this->yourName->getSize().x / 2, SCREEN_HEIGHT / 2 - this->yourName->getSize().y / 2 - 10));
 	this->yourName->beginAnimation();
 
 	this->theName = std::make_unique<AnimatedText>(this->name, Color(Colors::White), 0.5f, Animation::NONE);
@@ -153,7 +159,7 @@ void UIBefore::init()
 	
 	Prompt prompts[] = {
 		{ Keys::CONFIRM, "Submit Highscore", Color(Colors::White) },
-		{ Keys::CANCEL, "Return To Menu", Color(Colors::White) }
+		{ Keys::MENU, "Return To Menu", Color(Colors::White) }
 	};
 
 	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 2);
