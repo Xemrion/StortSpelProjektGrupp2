@@ -62,6 +62,7 @@ private:
 	Vector2& generateRandom(const float& x, const float& z, Radius radius);
 	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
 	std::vector<DynamicActor*> actors;
+	std::vector<Boss*> bosses;
 	TurretHandler turretHandler;
 	std::vector<DynamicActor*> sendToPlayer;
 	AStar* aStar;
