@@ -482,12 +482,12 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 				destroyActor(i);
 			}
 		}
-		for (int i = this->bosses.size() - 1; i >= 0; i--)
+		if (bosses.size() > 0)
 		{
-			if (bosses[i]->isDead())
+			if (bosses[0]->isDead())
 			{
 				//Game::getGameInfo().highScore += actors[i]->getPoints();
-				destroyBoss(i);
+				destroyBoss(0);
 			}
 		}
 	}
