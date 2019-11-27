@@ -174,7 +174,7 @@ void Game::createCurrentState()
 		state = std::make_unique<PlayingGameState>();
 		if (nrOfStagesDone > 0)
 		{
-			static_cast<PlayingGameState*>(state.get())->nextStage();
+			//static_cast<PlayingGameState*>(state.get())->nextStage();
 		}
 		nrOfStagesDone++;
 		static_cast<PlayingGameState*>(state.get())->generateObjectives();
