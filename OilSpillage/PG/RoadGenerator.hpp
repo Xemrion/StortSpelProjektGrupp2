@@ -18,9 +18,9 @@ struct RoadGenBranchArgs {
                                 startY;
       Direction                 startDirection;
       U8                        currentDepth;
-      U16                       currentLengthMin,
-                                currentLengthMax;
-      F32                       currentTurnProbability,
+      F32                       currentLengthFactorMin,
+                                currentLengthFactorMax,
+                                currentTurnProbability,
                                 currentBranchProbability;
       TileMap                  &map;
       RNG                      &rng;
