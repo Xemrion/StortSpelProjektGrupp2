@@ -36,6 +36,7 @@ public:
 	~Texture();
 
 	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, const char* filename, int mipLevels, bool cpuOnly);
+	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int width, int height);
 	void Shutdown();
 
 	ID3D11Texture2D* getTexture2D();

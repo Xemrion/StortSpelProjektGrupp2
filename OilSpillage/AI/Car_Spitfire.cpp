@@ -93,7 +93,7 @@ void Spitfire::move()
 			throttleInputStrength = 1;
 		}
 	}
-	/*else if ((car->getVehicle()->getPosition() - destination).Length() < 5)
+	/*else if ((car->getPosition() - destination).Length() < 5)
 	{
 		throttleInputStrength -= 0.5 * deltaTime;
 		if (throttleInputStrength < 0)

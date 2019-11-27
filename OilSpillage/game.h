@@ -32,6 +32,7 @@ public:
 	static void							start(Window* window);
 	static void							quit();
 	static GameState				   *getCurrentState();
+	static int							getCurrentStateIndex();
 	static void							setState(State);
 	static Graphics					   &getGraphics() noexcept;
 	static float						lerp(float v0, float v1, float t);

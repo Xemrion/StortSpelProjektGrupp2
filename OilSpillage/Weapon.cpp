@@ -42,7 +42,7 @@ void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower)
+	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrowerPhase2)
 	{
 		flamethrowerShoot(weapon, position, direction, additionalVelocity, deltaTime);
 	}
@@ -165,7 +165,12 @@ void Bullet::update(float deltaTime)
 	}
 	else if (this->weapon.type == WeaponType::aiMachineGun		or
 			 this->weapon.type == WeaponType::aiFlamethrower	or
-			 this->weapon.type == WeaponType::aiMissileLauncher)
+			 this->weapon.type == WeaponType::aiMissileLauncher or
+			 this->weapon.type == WeaponType::aiBossFlamethrower or
+			 this->weapon.type == WeaponType::aiBossFlamethrowerPhase2 or
+		 	 this->weapon.type == WeaponType::aiBossMachineGun or
+			 this->weapon.type == WeaponType::aiBossMachineGunPhase2 or
+			 this->weapon.type == WeaponType::aiBossMissileLauncher)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}
@@ -208,7 +213,7 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 	{
 		obj->move(dir * min(deltaTime, timeLeft));
 
-		if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition()).Length() < 1.5f)
+		if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getPosition()).Length() < 1.5f)
 		{
 			if (soundTimer > 0.05f) {
 				int randomSound = rand() % 3 + 1;
@@ -228,7 +233,7 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 void Bullet::enemyMeleeUpdate(float& deltaTime)
 {
 
-	if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getPosition()).Length() < 1.5f)
+	if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getPosition()).Length() < 1.5f)
 	{
 		if (soundTimer > 0.05f) {
 			int randomSound = rand() % 3 + 1;
@@ -247,7 +252,7 @@ void Bullet::laserEnemyUpdate(float& deltaTime)
 	GameObject* laserObject = this->getGameObject();
 	Vector3 rayDir = this->getDirection();
 	Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
-	if (static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getAABB().intersect(rayOrigin, rayDir, 1000))
+	if (static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getAABB().intersect(rayOrigin, rayDir, 1000))
 	{
 		if (soundTimer > 0.05f)
 		{

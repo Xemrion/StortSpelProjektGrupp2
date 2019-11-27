@@ -15,6 +15,7 @@ private:
 	bool spotShadow = true;
 	bool sunShadow = true;
 	bool shading = true;
+	bool player = false;
 protected:
 	Vector3  position{ 1.0f, 1.0f, 1.0f };
 	Vector3  scale{ 1.0f, 1.0f, 1.0f };
@@ -37,6 +38,8 @@ public:
 	bool getShading()const;
 	bool getSpotShadow()const;
 	bool getSunShadow()const;
+	bool isPlayer() const;
+	void makePlayer();
 	Matrix   getTransform();
 	void setShading(bool arg);
 	void setSunShadow(bool arg);

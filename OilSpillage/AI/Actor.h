@@ -17,6 +17,8 @@ public:
 	virtual void update(float dt, const Vector3& targetPos);
 	virtual void setUpActor() = 0 {};
 
+	float getHealth()const;
+	float getMaxHealth()const;
 	void setHealth(float health);
 	void changeHealth(float amount);
 	bool isDead() const;

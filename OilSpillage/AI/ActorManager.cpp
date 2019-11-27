@@ -50,27 +50,53 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	float deltaX;
 	float deltaZ;
 	float distance;
+	//for (int i = 0; i < groups.size(); i++)
+	//{
+	//	deltaX = groups[i].averagePos.x - targetPos.x;
+	//	deltaZ = groups[i].averagePos.z - targetPos.z;
+	//	distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+	//	//(TileSize * nrOfTiles)^2
+	//	if (distance > (20 * 10) * (20 * 10))
+	//	{
+	//		newPos = generateObjectivePos(targetPos, 0, 50);
+	//		for (int j = 0; j < groups[i].actors.size(); j++)
+	//		{
+	//			Actor* current = groups[i].actors[j];
+	//			current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+	//			physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+	//			if (j % 5 == 0)
+	//			{
+	//				newPos = generateObjectivePos(targetPos, 0, 50);
+	//			}
+	//		}
+	//	}
+	//}
 	for (int i = 0; i < groups.size(); i++)
 	{
-		groups[i].update(targetPos);
 		deltaX = groups[i].averagePos.x - targetPos.x;
 		deltaZ = groups[i].averagePos.z - targetPos.z;
 		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		//(TileSize * nrOfTiles)^2
 		if (distance > (20 * 10) * (20 * 10))
 		{
-			//newPos = generateObjectivePos(targetPos, 50, 100);
+			newPos = generateObjectivePos(targetPos, 50, 60);
 			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
 				Actor* current = groups[i].actors[j];
 				//current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+				current->getRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
+				current->setPosition(Vector3(newPos.x, current->getPosition().y, newPos.z));
 				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-				if (j % 5 == 0)
+				/*if (j % 5 == 0)
 				{
-					//newPos = generateObjectivePos(targetPos, 50, 100);
-				}
+					newPos = generateObjectivePos(targetPos, 0, 50);
+				}*/
 			}
 		}
+	}
+	for (int i = 0; i < groups.size(); i++)
+	{
+		groups[i].update(targetPos);
 	}
 	updateGroups();
 	turretHandler.update(dt, targetPos);
@@ -123,10 +149,13 @@ void ActorManager::createSwarm(float x, float z)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-void ActorManager::createBoss(float x, float z, int weaponType)
+Boss* ActorManager::createBoss(float x, float z, int weaponType)
 {
-	this->actors.push_back(new Boss(x, z, weaponType, physics));
+	Boss* boss = new Boss(x, z, weaponType, physics);
+	this->actors.push_back(boss);
 	initGroupForActor(actors.at(actors.size() - 1));
+
+	return boss;
 }
 
 float ActorManager::distanceToPlayer(const Vector3& position)
@@ -155,7 +184,7 @@ const std::vector<AIGroup>& ActorManager::getGroups() const
 	return this->groups;
 }
 //Player vs AI
-void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
+void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, float deltaTime)
 {
 	for (int i = 0; i < this->actors.size(); i++)
 	{
@@ -174,7 +203,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size)
 							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
-						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
+						this->actors[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
 					}
 				}
 				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
@@ -206,9 +235,9 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		createAttacker(originPos.x + i, originPos.z, 7);
-		createAttacker(originPos.x, originPos.z + i, 7);
-		createAttacker(originPos.x - i, originPos.z, 7);
+		createAttacker(originPos.x + i, originPos.z, (rand() % 8) + 1);
+		createAttacker(originPos.x, originPos.z + i, (rand() % 8) + 1);
+		createAttacker(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
 void ActorManager::spawnSnipers(const Vector3& originPos)
@@ -262,11 +291,6 @@ void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float an
 		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
 		createTurret(newPosition.x, newPosition.y, 1);
 	}
-}
-
-void ActorManager::spawnBoss(const Vector3& originPos, int weaponType)
-{
-	//createBoss(originPos.x, originPos.z, weaponType);
 }
 
 Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)
@@ -441,23 +465,23 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 {
 	if (actors.size() < maxNrOfEnemies)
 	{
-		int enemyType = rand() % 4;
+		int enemyType = rand() % 100 +1;
 		Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
-		if (enemyType == 0)
+		if (enemyType < 60)
 		{
 			spawnAttackers(newPos);
 		}
-		else if (enemyType == 1)
+		else if (enemyType < 75)
 		{
-			//spawnChaseCars(newPos);
-			spawnAttackers(newPos);
+			spawnChaseCars(newPos);
+			//spawnAttackers(newPos);
 		}
-		else if (enemyType == 2)
+		else if (enemyType < 80)
 		{
-			//spawnShootCars(newPos);
-			spawnSwarm(newPos);
+			spawnShootCars(newPos);
+			//spawnSwarm(newPos);
 		}
-		else if (enemyType == 3)
+		else if (enemyType <= 100)
 		{
 			spawnSwarm(newPos);
 		}
@@ -591,7 +615,7 @@ void ActorManager::createGroup(DynamicActor* actor)
 
 Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 {
-	Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getVehicle()->getRigidBody()->getLinearVelocity());
+	Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getRigidBody()->getLinearVelocity());
 	targetVelocity.Normalize();
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
@@ -605,6 +629,15 @@ Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos, float minDi
 		if ((distance <= maxDistance + i) && (distance >= minDistance))
 		{
 			return position;
+		}
+		else
+		{
+			position = map->generateGroundPositionInWorldSpace(*rng);
+			float distance = (position - targetPos).Length();
+			if ((distance <= maxDistance + i) && (distance >= minDistance))
+			{
+				return position;
+			}
 		}
 	}
 	assert(false and "BUG: Shouldn't be possible!");
