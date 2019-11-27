@@ -604,8 +604,11 @@ void Vehicle::updateWeapon(float deltaTime)
 			}
 		}
 		/*END*/
-		Vector2 dir = Input::getDirectionR();
+		Vector2 dir = Input::getDirectionRnoMouse();
 		
+		if (Input::getStrengthRnoMouse() > 0.1f) {
+			tempCurDir = dir;
+		}
 		dir.Normalize();
 		if ((dir - curDir).Length() > 0.01f)
 		{
@@ -616,12 +619,12 @@ void Vehicle::updateWeapon(float deltaTime)
 				dir.Normalize();
 				curDir = Vector2(0.5f + curDir.x * 0.5f, 0.5f + curDir.y * 0.5f);
 			}
-			curDir = Vector2::Lerp(curDir, dir, deltaTime * 50);
+			curDir = tempCurDir;//Vector2::Lerp(curDir, dir, deltaTime * 50);
 			curDir.Normalize();
 		}
 		else
 		{
-			curDir = dir;
+			curDir = tempCurDir;
 		}
 
 		if (this->health > 0)

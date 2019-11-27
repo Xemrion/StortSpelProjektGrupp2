@@ -27,6 +27,11 @@ Actor::~Actor()
 		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
 		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
 	}
+	for (int i = 0; i < 24; i++)
+	{
+		Game::getGraphics().addParticle(position, Vector3(0.0f), 1, 3);
+		Game::getGraphics().addParticle2(position, Vector3(0.0f), 1, 3);
+	}
 }
 
 void Actor::update(float dt, const Vector3& targetPos)
