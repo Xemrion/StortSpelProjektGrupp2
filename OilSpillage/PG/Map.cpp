@@ -4,9 +4,9 @@
 #include "Profiler.hpp"
 
 
-std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Pleasant", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo" };
+std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Pleasant", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo" };
 
-std::array constexpr citySuffix { "town", "Town", " City", "Village", "ville", "burg", "stadt", "polis", "heim", "Meadows", "Creek", "Base", "Metropolis" };
+std::array constexpr citySuffix { "town", " Town", " City", "Village", "ville", "burg", "stadt", "polis", "heim", "Meadows", "Creek", "Base", "Metropolis" };
 
 auto generateCityName( RNG &rng ) noexcept {
 	return std::string(util::randomElementOf(cityPrefix, rng)) + util::randomElementOf(citySuffix, rng);
