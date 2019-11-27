@@ -4,6 +4,15 @@
 #include "Profiler.hpp"
 
 
+std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techni", "Pleasant", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodpath", "Factory", "Electro", "Skull" };
+
+std::array constexpr citySuffix { "town", "Town", " City", "Village", "ville", "burg", "stadt", "polis", "heim" };
+
+auto generateCityName( RNG &rng ) noexcept {
+	return std::string(util::randomElementOf(cityPrefix, rng)) + util::randomElementOf(citySuffix, rng);
+}
+
+
 // NE "outer corner":
 //     map     mask    predicate
 //     x01     011     001
@@ -215,6 +224,28 @@ void Map::generateBorder() {
 	
 }
 
+void Map::generateStreetlights()
+{
+	streetlights.reserve(200);
+	for ( auto x = 1;  x < tilemap->width;  ++x ) {
+		for ( auto y = 1;  y < tilemap->height;  ++y ) {
+			U8 bitmask = 0x00;
+			bitmask += tilemap->tileAt(x-1, y-1)==Tile::road? 1:0;
+			bitmask += tilemap->tileAt(x-1, y  )==Tile::road? 2:0;
+			bitmask += tilemap->tileAt(x,   y-1)==Tile::road? 4:0;
+			bitmask += tilemap->tileAt(x,   y  )==Tile::road? 8:0;
+			if ( bitmask ) {
+				Vector3 rotation { .0f, .0f, .0f };
+				for ( auto q = 0;  q < 4;  ++q )
+					if ( (util::cycleRight(bitmask,q) & 0b11) == 0b11) 
+						rotation = { .0f, util::degToRad(45.0f+q*90.0f), .0f };
+				auto worldPosition = tilemap->convertTilePositionToWorldPosition(x,y) - Vector3(tilemap->config.tileSideScaleFactor/2, .0f, tilemap->config.tileSideScaleFactor/2);
+				placeStreetlight(worldPosition);
+			}
+		}
+	}
+}
+
 
 // TODO: 1. make road coverage affect district type
 //       2. scale up road maps
@@ -235,18 +266,6 @@ Vector<HouseTileset> const houseTilesets {
 };
 
 Vector<MultitileLayout> multitileLayouts {};
-
-// for transition screen
-struct MapInfo
-{
-   U8       act, stage;
-	Biome    biome;
-	Size     size;
-	//Weather  weather; // clear, foggy, cloudy, thunderstorm, rain, sandstorm, blizzard
-	//Time     time;    // day, sunset, night
-	String   name;
-	// ...
-};
 
 auto getCompatibleTilesets( District::Enum d ) noexcept
 {
@@ -308,27 +327,34 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum d, RNG &rng ) no
 	return {}; // no valid layout found
 }
 
-
-Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics ):
+Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightList &lights                         ):
 	graphics        ( graphics                                                                                      ),
 	physics         ( physics                                                                                       ),
+	lights          ( lights                                                                                        ),
 	config          ( config                                                                                        ),
 	tilemap         ( std::make_unique<TileMap>( config )                                                           ),
    roadDistanceMap ( config.dimensions.x * config.dimensions.y                                                     ),
 	buildingIDs     ( config.dimensions.x * config.dimensions.y                                                     ),
-	hospitalTable	 ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide ),
+	hospitalTable   ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide ),
 	rng             ( RD()()                                                                                        )
 {
 	if ( config.seed != -1 )
 		rng.seed( config.seed );
 	DBG_PROBE(Map::Map);
 	biome = static_cast<Biome>( config.seed % 3 );
+
+	info.name    = generateCityName(rng);
+	info.width   = config.dimensions.x;
+	info.length  = config.dimensions.y;
+	info.biome   = biome;
+
 	// TODO: generate water etc
 	generateRoads();
 	generateRoadDistanceMap();
 	generateDistricts();
 	generateBuildings();
 	generateBorder();
+	generateStreetlights();
 	groundTiles = instantiateTilesAsModels();
 	for ( auto &e : groundTiles ) 
 		graphics.addToDrawStatic( e.get() );
@@ -391,6 +417,11 @@ void  Map::generateRoads()
 		   roadGenerationLog.close();
 		}
 	}
+}
+
+void Map::placeStreetlight( Vector3 const &worldPosition, Vector3 const &rotation ) noexcept
+{
+	streetlights.emplace_back( std::make_unique<Streetlight>(worldPosition, graphics, lights, rotation) );
 }
 
 void  Map::generateDistricts()
@@ -596,7 +627,7 @@ void  Map::generateBuildings( )
 							currentTries = 0; // reset counter
 							currentArea += lot.getCoverage();
 							tilemap->applyLot(lot, Tile::building );
-							houses.multis.push_back( instantiateMultitileHouse(  lot.nw, *maybeLayout.value(), *util::randomElementOf(tilesets,rng) ) );
+							houses.multis.push_back( instantiateMultitileHouse(  lot.nw, MultitileLayout(*maybeLayout.value()), *util::randomElementOf(tilesets,rng) ) );
 						}
 					}
 				}
@@ -618,7 +649,7 @@ void  Map::generateBuildings( )
 								layout.floors[index] = lot.intersects(x+lot.nw.x, y+lot.nw.y)? numFloors : 0;
 							}
 						}
-						houses.multis.push_back( instantiateMultitileHouse( lot.nw, layout, *util::randomElementOf(tilesets,rng) ) );
+						houses.multis.push_back( instantiateMultitileHouse( lot.nw, std::move(layout), *util::randomElementOf(tilesets,rng) ) );
 					}
 				}
 			}
@@ -969,31 +1000,7 @@ District::Enum  Map::districtAt( U32 x, U32 y ) const noexcept {
 
 
 
-// Tile neighbours bit layout:
-//
-//  7     0     1
-//    NW  N  NE
-//
-//  6 W   c   E 2
-//
-//    SW  S  SE 
-//  5     4     3
-//
-// c is not included (it's intrinsic based off of the currently processed tiled)
 
-union NeighbourMask {
-		U8 bitmap  { 0x00 }; // <- encoding byte; default unset
-		struct {             // <- individual bit access interface
-			U8 n  : 1,
-			   ne : 1,
-			   e  : 1,
-			   se : 1,
-			   s  : 1,
-			   sw : 1,
-			   w  : 1,
-			   nw : 1;
-		};
-};
 
 // Wraps a tile's type and encodes the possible existence of neighbouring road tiles in the 8 eight directions into bits.
 struct TileInfo {
@@ -1288,7 +1295,7 @@ void Map::instantiateHousesAsModels() noexcept {
 
 }*/
 
-MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout const &layout, HouseTileset const &tileset ) const noexcept
+MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &&layout, HouseTileset const &tileset ) const noexcept
 {
 	auto  index = [&layout]( U32 x, U32 y) { return y * layout.width + x; };
 	// generate masks and compute the final number of parts:
@@ -1303,14 +1310,14 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 			auto floorCount = layout.floors[idx];
 			if ( layout.floors[idx] != 0 ) {
 				// compute mask:
-				mask.n  = ((y-1 < layout.length) and                          (layout.floors[index( x,   y-1 )] >= floorCount ));//?  1:0;
-				mask.ne = ((y-1 < layout.length) and (x+1 < layout.width) and (layout.floors[index( x+1, y-1 )] >= floorCount ));//?  1:0;
-				mask.e  = (                          (x+1 < layout.width) and (layout.floors[index( x+1, y   )] >= floorCount ));//?  1:0;
-				mask.se = ((y+1 < layout.length) and (x+1 < layout.width) and (layout.floors[index( x+1, y+1 )] >= floorCount ));//?  1:0;
-				mask.s  = ((y+1 < layout.length) and                          (layout.floors[index( x,   y+1 )] >= floorCount ));//?  1:0;
-				mask.sw = ((y+1 < layout.length) and (x-1 < layout.width) and (layout.floors[index( x-1, y+1 )] >= floorCount ));//?  1:0;
-				mask.w  = (                          (x-1 < layout.width) and (layout.floors[index( x-1, y   )] >= floorCount ));//?  1:0;
-				mask.nw = ((y-1 < layout.length) and (x-1 < layout.width) and (layout.floors[index( x-1, y-1 )] >= floorCount ));//?  1:0;
+				mask.n  = ((y-1 < layout.length) and                          (layout.floors[index( x,   y-1 )] >= floorCount ));
+				mask.ne = ((y-1 < layout.length) and (x+1 < layout.width) and (layout.floors[index( x+1, y-1 )] >= floorCount ));
+				mask.e  = (                          (x+1 < layout.width) and (layout.floors[index( x+1, y   )] >= floorCount ));
+				mask.se = ((y+1 < layout.length) and (x+1 < layout.width) and (layout.floors[index( x+1, y+1 )] >= floorCount ));
+				mask.s  = ((y+1 < layout.length) and                          (layout.floors[index( x,   y+1 )] >= floorCount ));
+				mask.sw = ((y+1 < layout.length) and (x-1 < layout.width) and (layout.floors[index( x-1, y+1 )] >= floorCount ));
+				mask.w  = (                          (x-1 < layout.width) and (layout.floors[index( x-1, y   )] >= floorCount ));
+				mask.nw = ((y-1 < layout.length) and (x-1 < layout.width) and (layout.floors[index( x-1, y-1 )] >= floorCount ));
 				// process mask for parts count:
 				for ( auto q=0; q<4; ++q ) { // quadrants
 					U8 quadmask = util::cycleRight( mask.bitmap, 2*q) & 0b00000'111;
@@ -1343,6 +1350,8 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 	house.parts.reserve(numParts);
 	house.hitboxes = {};
 	house.hitboxes.reserve(numHitboxes);
+	house.nw     = nw;
+	house.layout = std::move(layout);
 
 	auto instantiateTilePart = [&]( std::string const &partName, Vector3 const &pos, F32 deg, U8 floor, F32 floorHeightFactor=1.0f ) {
 		house.parts.emplace_back();
@@ -1388,11 +1397,11 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout c
 	F32 const halfSide = fullSide / 2;
 	F32 const fracSide = halfSide * 0.25;
 	house.hitboxes.reserve(8);
-	for ( U32 x = 0;  x < layout.width;  ++x ) {
-		for ( U32 y = 0;  y < layout.length;  ++y ) {
+	for ( U32 x = 0;  x < house.layout.width;  ++x ) {
+		for ( U32 y = 0;  y < house.layout.length;  ++y ) {
 			auto idx          = index(x,y);
 			auto mask         = masks[idx];
-			auto floorCount   = layout.floors[idx];
+			auto floorCount   = house.layout.floors[idx];
 			auto basePosition = tilemap->convertTilePositionToWorldPosition(nw.x+x, nw.y+y);
 			// process mask:
 			U8 quadmask = mask.bitmap;
@@ -1571,6 +1580,9 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 		model.setSpotShadow( noShadowcasting );
 		model.setSunShadow(  noShadowcasting );
 	};
+
+	F32_Dist genSelection {};
+
 	for ( auto const &e : extractTileInfo(*this) ) {
 		// place eventual outer sidewalk borders:
 		if ( (e.concreteMap.bitmap & maskHole) == predHole )
@@ -1622,8 +1634,9 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 
 				// place eventual road lines:
 				auto maskedMap = e.roadmap.bitmap & maskRoad;
-				if ( maskedMap == pred4Way )
+				if ( maskedMap == pred4Way ) {
 					instantiatePart( "Tiles/road_marker_4way", e.origin, .0f, markerOffsetY, false );
+				}
 				if ( maskedMap == predStraight )
 					instantiatePart( "Tiles/road_marker_straight_n", e.origin, .0f, markerOffsetY, false );
 				else if ( maskedMap == util::cycleLeft( predStraight, 2 ) )
@@ -1638,7 +1651,7 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 						break;
 					}
 					if ( maskedMap == util::cycleLeft( predDeadend, d ) ) {
-						instantiatePart( "Tiles/road_marker_deadend_n", e.origin, 180.0f+45.0f*d, markerOffsetY, false );
+						instantiatePart( "Tiles/road_marker_deadend_n", e.origin, 180.0f+45.0f*d, markerOffsetY, false );	
 						break;
 					}
 				}
@@ -1700,4 +1713,14 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 
 Biome Map::getBiome() const noexcept {
 	return biome;
+}
+
+HouseGenData const& Map::getHouseData() const noexcept
+{
+	return houses;
+}
+
+Map::Info const& Map::getInfo() const noexcept
+{
+	return info;
 }
