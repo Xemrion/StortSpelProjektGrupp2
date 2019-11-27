@@ -1051,7 +1051,7 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 							1.0
 						);
 
-						if (static_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
+						if (static_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr && Game::getCurrentStateIndex() ==Game::State::STATE_PLAYING)
 						{
 							itemWeapon->getWeapon().light = (Light*)static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(flash);
 						}

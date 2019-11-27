@@ -343,7 +343,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	if ( config.seed != -1 )  
 		rng.seed( config.seed );
 
-	biome = static_cast<Biome>( genBiome(rng) );
+	biome = static_cast<Biome>( genBiome(rng) % 3 );
 
 	info.name    = generateCityName(rng);
 	info.width   = config.dimensions.x;
