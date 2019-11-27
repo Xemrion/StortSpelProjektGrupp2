@@ -149,6 +149,7 @@ private:
 	float soundTimer;
 	bool flameBool;
 	bool dmg;
+	Vector2 tempCurDir;
 	
 	int soundHandle = 0;
 	int driftHandle = 0;
