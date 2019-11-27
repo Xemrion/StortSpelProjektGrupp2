@@ -637,8 +637,8 @@ void PlayingGameState::nextStage() noexcept {
 
 	// minimap stuff
 	auto tilemap = map->getTileMap();
-	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileScaleFactor.x, 0, config.tileScaleFactor.z);
-	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileScaleFactor.x, 0, -config.tileScaleFactor.z);
+	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, 0, config.tileSideScaleFactor);
+	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
 
 	graphics.reloadTexture(minimap);
 	UIPlaying* menu = static_cast<UIPlaying*>(menues[MENU_PLAYING].get());
@@ -1316,9 +1316,9 @@ void PlayingGameState::generateMapPowerUps()
 	{
 		Vector3 position = map->generateRoadPositionInWorldSpace(rng);
 		Vector3 indexWorldSpace = Vector3(
-			(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+			(float)(index / map->config.dimensions.y) * map->config.tileSideScaleFactor,
 			0.0,
-			-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+			-(float)(index % map->config.dimensions.x) * map->config.tileSideScaleFactor
 		);
 
 		for (int i = 0; i < 100; ++i)
@@ -1327,9 +1327,9 @@ void PlayingGameState::generateMapPowerUps()
 			{
 				position = map->generateRoadPositionInWorldSpace(rng);
 				indexWorldSpace = Vector3(
-					(float)(index / map->config.dimensions.y) * map->config.tileScaleFactor.y,
+					(float)(index / map->config.dimensions.y) * map->config.tileSideScaleFactor,
 					0.0,
-					-(float)(index % map->config.dimensions.x) * map->config.tileScaleFactor.x
+					-(float)(index % map->config.dimensions.x) * map->config.tileSideScaleFactor
 				);
 				break;
 			}
