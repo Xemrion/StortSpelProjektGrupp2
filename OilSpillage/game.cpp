@@ -156,7 +156,7 @@ void Game::createCurrentState()
 	if (currentState == STATE_MENU)
 	{
 		Container::playerInventory = std::make_unique<Container>();
-
+		this->gameInfo = GameInfo();
 		nrOfStagesDone = 0.0f;
 		localScale = 1.0f;
 		state = std::make_unique<MenuGameState>();
