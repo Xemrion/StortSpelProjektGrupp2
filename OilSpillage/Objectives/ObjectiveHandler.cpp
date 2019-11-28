@@ -71,7 +71,7 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 			pos.z += i * -10;
 			targets[i]->mesh = Game::getGraphics().getMeshPointer("Cube");
 			targets[i]->setRotation(Vector3(0, (23 + 0.3f * 3.14 * (rand() % 200))-(23+0.3f*3.14*(rand()%400)),0));
-			targets[i]->setScale(Vector3((rand() % 7) * 0.1f + 0.4f));
+			targets[i]->setScale(Vector3((rand()%3) * 0.1f + 1.0f));
 			pos.y = -1.5f + targets[i]->getScale().y * 0.5f;
 			targets[i]->setPosition(pos);
 
@@ -95,6 +95,8 @@ void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfT
 	{
 		temp->setInfo(info);
 		temp->setGeneralPosition(getToPos);
+		SpotLight newSpot = SpotLight(getToPos+Vector3(0.0f,4.0f,0.0f), Vector3(1, 0, 0), 0, Vector3(0, -1, 0), 45);
+		temp->setSpotLight(static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(newSpot));
 	}
 	else
 	{

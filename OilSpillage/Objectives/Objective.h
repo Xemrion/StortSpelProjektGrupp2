@@ -32,6 +32,7 @@ struct Mission
 	TypeOfTarget typeOfTarget;
 	int rewardTime;
 	int points;
+	SpotLight* aLight;
 	std::string info;
 };
 class Objective
@@ -40,6 +41,7 @@ public:
 	Objective();
 	~Objective();
 	void setTarget(GameObject* *target, int nrOfTargets);
+	void setSpotLight(SpotLight* theLight);
 	void setEnemies(int nrOfEnemies);
 	void setBoss(Actor* boss);
 	void setType(TypeOfMission type);
