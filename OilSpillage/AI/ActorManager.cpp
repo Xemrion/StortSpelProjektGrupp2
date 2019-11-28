@@ -234,11 +234,9 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 
 	if (this->bosses.size() > 0)
 	{
-		this->bosses[0]->checkIfWeakPointHit(bulletArray, size, soundTimer);
-
-		bosses[0]->checkIfWeakPointHit(bulletArray, size, soundTimer);
 		for (int i = 0; i < this->bosses.size(); i++)
 		{
+			this->bosses[i]->checkIfWeakPointHit(bulletArray, size, soundTimer);
 			for (int j = 0; j < size; j++)
 			{
 				if (!this->bosses[i]->isDead())
@@ -482,13 +480,13 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 				destroyActor(i);
 			}
 		}
-		if (bosses.size() > 0)
+	}
+	if (bosses.size() > 0)
+	{
+		if (bosses[0]->isDead())
 		{
-			if (bosses[0]->isDead())
-			{
-				Game::getGameInfo().highScore += 25000;
-				destroyBoss(0);
-			}
+			Game::getGameInfo().highScore += 25000;
+			destroyBoss(0);
 		}
 	}
 }
@@ -655,6 +653,7 @@ void ActorManager::destroyBoss(int index)
 		physics->DeleteRigidBody(bosses[index]->getRigidBody());
 	}
 	delete bosses[index];
+	bosses.pop_back();
 	//bosses.erase(bosses.begin() + index);
 }
 
