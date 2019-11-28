@@ -455,18 +455,36 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("explosion")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("debris")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 
-	
-	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
-	fogMaterial.scale = 50.0;
-	fogMaterial.density = 0.1;
-	fogMaterial.ambientDensity = 0.08;
-	fogMaterial.densityThreshold = 0.15;
+
+	FogMaterial noFog;
+	noFog.scale = 50.0;
+	noFog.density = 0.01;
+	noFog.ambientDensity = 0.08;
+	noFog.densityThreshold = 0.15;
+
+	/*FogMaterial slightFog; //3 layers, 2.25 spacing
+	slightFog.scale = 50.0;
+	slightFog.density = 0.15;
+	slightFog.ambientDensity = 0.08;
+	slightFog.densityThreshold = 0.15;
+
+	FogMaterial mediumFog; //3 layers, 2.5 spacing
+	mediumFog.scale = 50.0;
+	mediumFog.density = 0.35;
+	mediumFog.ambientDensity = 0.08;
+	mediumFog.densityThreshold = 0.15;
+
+	FogMaterial heavyFog; //4 layers, 2.5 spacing
+	heavyFog.scale = 50.0;
+	heavyFog.density = 0.5;
+	heavyFog.ambientDensity = 0.08;
+	heavyFog.densityThreshold = 0.15;*/
 
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
 
-	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
+	fog->initialize(device, deviceContext, 3, 2.25, noFog);
 	fog->setWindSpeed(Vector2(4.0f / 1024.f, 4.0f / 1024.f));
 	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
 	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
