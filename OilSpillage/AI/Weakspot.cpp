@@ -5,6 +5,7 @@ Weakspot::Weakspot()
 	this->weakspotNr = 0;
 	this->stats = VehicleStats::AIPart;
 	this->health = this->stats.maxHealth;
+	this->isHit = 1;
 }
 
 Weakspot::Weakspot(Weakspot&& weakspot) //move constructor for ex. vectors
@@ -12,6 +13,7 @@ Weakspot::Weakspot(Weakspot&& weakspot) //move constructor for ex. vectors
 	this->weakspotNr = weakspot.weakspotNr;
 	this->stats = VehicleStats::AIPart;
 	this->health = this->stats.maxHealth;
+	this->isHit = weakspot.isHit;
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
 
@@ -27,6 +29,7 @@ Weakspot::Weakspot(int weaponType)
 	this->weakspotNr = 0;
 	this->stats = VehicleStats::AIPart;
 	this->health = this->stats.maxHealth;
+	this->isHit = 1;
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
 
@@ -42,6 +45,7 @@ Weakspot::Weakspot(const Weakspot& other)	//copy constructor
 	this->weakspotNr = other.weakspotNr;
 	this->stats = other.stats;
 	this->health = other.health;
+	this->isHit = other.isHit;
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
 
@@ -83,14 +87,23 @@ void Weakspot::shortMove(Vector3 posVec)
 	this->setPosition(newPos);
 }
 
-void Weakspot::changeHealth(int damage)
+void Weakspot::changeHealth(int damage, float dt)
 {
+	isHit = true; //start lowering redness
+
+	this->setColor(Vector4(max((this->getColor().x + (damage * 0.1f)), 0), this->getColor().y, this->getColor().z, 1)); //makes it really red
+	Game::getGraphics().addParticle2(this->getPosition(), Vector3(0, 0, 0), 1, 0.5f);
 	this->health -= damage;
 }
 
 void Weakspot::setWeakspotNr(int weakspotNr)
 {
 	this->weakspotNr = weakspotNr;
+}
+
+void Weakspot::setIsHit(bool isHit)
+{
+	this->isHit = isHit;
 }
 
 const bool Weakspot::getDead()
@@ -109,6 +122,11 @@ const int Weakspot::getWeakspotNr()
 const int Weakspot::getHealth()
 {
 	return this->health;
+}
+
+const bool Weakspot::getIsHit()
+{
+	return this->isHit;
 }
 
 //Problem

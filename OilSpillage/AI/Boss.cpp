@@ -105,7 +105,6 @@ void Boss::update(float dt, const Vector3& targetPos)
 	this->movementVariables(dt);
 	this->circulatePlayer(targetPos);
 
-	this->updateBullets(dt);
 
 	if (this->phase == 1)
 		this->updateWeakPoints();
@@ -114,6 +113,7 @@ void Boss::update(float dt, const Vector3& targetPos)
 		this->enterPhase2();
 	}
 
+	this->updateBullets(dt);
 }
 
 void Boss::setUpActor()
@@ -318,6 +318,7 @@ void Boss::circulatePlayer(Vector3 targetPos)
 
 void Boss::enterPhase2()
 {
+	//should only be done once
 	this->phaseShoot = this->phase;
 	this->switchWeapon();
 	this->stats = VehicleStats::AIBossWeak;
@@ -337,7 +338,23 @@ void Boss::initiateWeakPoints()
 
 void Boss::updateWeakPoints()
 {
-	//their own update
+	//lower red color from hit
+	for (int i = 0; i < this->weakSpots.size(); i++) // checks to remove red
+	{
+		if (this->weakSpots[i].getIsHit())
+		{
+			this->weakSpots[i].setColor(Vector4(
+				max(this->weakSpots[i].getColor().x / (1 + (15.0f * this->dt)), 0), 
+				this->weakSpots[i].getColor().y,
+				this->weakSpots[i].getColor().z,
+				1));
+			if (this->weakSpots[i].getColor().x <= 0.01f)
+			{
+				this->weakSpots[i].setIsHit(false); //stop lowering redness
+			}
+		}
+	}
+
 	if (this->weakSpots.size() > 0)
 	{
 		Vector3 bossPos = this->getPosition();
@@ -392,7 +409,8 @@ void Boss::checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTime
 					Sound::play("data/sound/HitSound.wav");
 					soundTimer = 0;
 				}
-				this->weakSpots[i].changeHealth(bulletArray[j].getDamage());
+
+				this->weakSpots[i].changeHealth(bulletArray[j].getDamage(), deltaTime);
 				bulletArray[j].destroy();
 			}
 		}
@@ -401,12 +419,29 @@ void Boss::checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTime
 	for (int i = 0; i < this->weakSpots.size(); i++)
 	{
 		//check if any weakpoint died
-		if (this->weakSpots[i].getDead()) //ERROR!? when [0] is killed first?
+		if (this->weakSpots[i].getDead())
 		{
 			this->weakSpots[i] = this->weakSpots.back();
 			this->weakSpots.pop_back();
 			i--;
 		}
+	}
+}
+
+void Boss::changeHealth(float amount)
+{
+	if (amount < 0)
+		this->isHit = true;
+
+	if (this->phase == 1)
+	{
+
+	}
+	else if (this->phase == 2)
+	{
+		setColor(Vector4(max(getColor().x + -amount * 0.1f, 0), getColor().y, getColor().z, 1));
+		this->setHealth(std::clamp(this->getHealth() + amount, 0.0f, this->stats.maxHealth));
+		Game::getGraphics().addParticle2(this->getPosition(), Vector3(0, 0, 0), 1, 0.5f);
 	}
 }
 

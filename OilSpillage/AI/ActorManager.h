@@ -46,6 +46,7 @@ private:
 	std::mt19937* rng;
 	void updateAveragePos();
 	void updateActors(float dt, Vector3 targetPos);
+	void updateBosses(float dt, Vector3 targetPos);
 	//Returns index for the group within the radius with the most members
 	int groupInRange(const Vector3& actorPos, int currentGroupSize);
 	void joinGroup(DynamicActor* actor, int groupIndex);

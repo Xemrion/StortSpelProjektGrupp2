@@ -16,16 +16,20 @@ public:
 
 	void startPos(Vector3 startPos);
 	void shortMove(Vector3 posVec);
-	void changeHealth(int damage);
+	void changeHealth(int damage, float dt);
 
 	//gets and sets
 	void setWeakspotNr(int weakspotNr);
+	void setIsHit(bool isHit);
+
 	const bool getDead();
 	const int getWeakspotNr();
 	const int getHealth();
+	const bool getIsHit();
 
 private:
 	int weakspotNr;
 	Stats stats;
 	int health;
+	bool isHit;
 };
