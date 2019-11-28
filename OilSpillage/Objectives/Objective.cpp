@@ -37,6 +37,11 @@ void Objective::setTarget(GameObject* *target, int nrOfTargets)
 	this->nrOfTargets = nrOfTargets;
 }
 
+void Objective::setSpotLight(SpotLight* theLight)
+{
+	this->mission->aLight = theLight;
+}
+
 void Objective::setEnemies(int nrOfEnemies)
 {
 	started = true;
@@ -256,10 +261,19 @@ void Objective::update(Vector3 playerPosition)
 	}
 	else if (this->mission->typeMission == TypeOfMission::GetToPoint)
 	{
-		if ((this->mission->generalPosition - playerPosition).Length() < 5.0f)
+		if (!started)
 		{
-			this->done = true;
+			started = true;
+			this->mission->aLight->setLuminance(10.0f);
 		}
+		else
+		{
+			if ((this->mission->generalPosition - playerPosition).Length() < 5.0f)
+			{
+				this->done = true;
+			}
+		}
+		
 	}
 	if (this->mission->typeMission == TypeOfMission::GetToPoint)
 	{
