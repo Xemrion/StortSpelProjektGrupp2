@@ -49,7 +49,7 @@ void Objective::setEnemies(int nrOfEnemies)
 	this->nrOfTargets = nrOfEnemies;
 }
 
-void Objective::setBoss(Actor* boss)
+void Objective::setBoss(Boss* boss)
 {
 	this->mission->boss = boss;
 }
@@ -105,7 +105,7 @@ TypeOfTarget Objective::getTargetType() const
 	return this->mission->typeOfTarget;
 }
 
-Actor* Objective::getBoss() const
+Boss* Objective::getBoss() const
 {
 	return this->mission->boss;
 }

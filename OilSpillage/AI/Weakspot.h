@@ -25,11 +25,13 @@ public:
 	const bool getDead();
 	const int getWeakspotNr();
 	const int getHealth();
+	const int getMaxHP();
 	const bool getIsHit();
 
 private:
 	int weakspotNr;
 	Stats stats;
 	int health;
+	int maxHP;
 	bool isHit;
 };

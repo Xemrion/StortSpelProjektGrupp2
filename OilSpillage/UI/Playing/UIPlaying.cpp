@@ -126,6 +126,8 @@ void UIPlaying::drawUI()
 	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
 	{
 		this->bossHealthBar->setAmount(currObj->getBoss()->getHealth() / static_cast<float>(currObj->getBoss()->getMaxHealth()));
+		this->bossShieldBar->setAmount((currObj->getBoss()->getWeakSpotHealth1() + currObj->getBoss()->getWeakSpotHealth2())
+		/ (static_cast<float>(currObj->getBoss()->getWeakSpotHealthMax1()) + static_cast<float>(currObj->getBoss()->getWeakSpotHealthMax2())));
 	}
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
@@ -164,12 +166,19 @@ void UIPlaying::drawUI()
 	}else {
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Realistic", Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2) + Vector2(500, -320.0f), Colors::White, 0, Vector2(0.2f, 0.2f), 0.2f);
 	}
+
 	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
 	{
-		Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty");
-		this->bossHealthBar->draw(false);
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty", Vector2((SCREEN_WIDTH / 2) , 660), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
+		if ((currObj->getBoss()->getWeakSpotHealth1() + currObj->getBoss()->getWeakSpotHealth2()) > 0) //draw sield only if exists
+		{
+			Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty SHIELDS");
+			this->bossShieldBar->draw(false);
+			UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty SHIELDS", Vector2((SCREEN_WIDTH / 2), 590), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
+		}
 
+		Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty");
+		this->bossHealthBar->draw(false); //false = change color to gray
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty", Vector2((SCREEN_WIDTH / 2) , 660), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
 	}
 	this->healthBar->draw(false);
 	this->objectiveBox->draw(false);
@@ -192,7 +201,8 @@ UIPlaying::~UIPlaying()
 void UIPlaying::init()
 {
 	this->healthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 20));
-	this->bossHealthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 680),Colors::Red);
+	this->bossHealthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 680), Colors::Red);
+	this->bossShieldBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 610), Colors::DarkGray);
 
 	this->minimap = std::make_unique<Minimap>(Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
 	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(10, 10));

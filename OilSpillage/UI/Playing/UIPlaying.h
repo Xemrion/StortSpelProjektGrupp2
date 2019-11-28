@@ -28,6 +28,7 @@ private:
 	std::unique_ptr<AnimatedText> score;
 	std::unique_ptr<Slider> healthBar;
 	std::unique_ptr<Slider> bossHealthBar;
+	std::unique_ptr<Slider> bossShieldBar;
 
 	std::unique_ptr<Minimap> minimap;
 	std::unique_ptr<ObjectiveBox> objectiveBox;

@@ -445,6 +445,25 @@ void Boss::changeHealth(float amount)
 	}
 }
 
+const float Boss::getWeakSpotHealth1()
+{
+	return this->weakSpots[0].getHealth();
+}
+
+const float Boss::getWeakSpotHealth2()
+{
+	return this->weakSpots[1].getHealth();
+}
+
+const float Boss::getWeakSpotHealthMax1()
+{
+	return this->weakSpots[0].getMaxHP();
+}
+
+const float Boss::getWeakSpotHealthMax2()
+{
+	return this->weakSpots[1].getMaxHP();
+}
 
 //HEALTHBAR
 //blink when taking damage

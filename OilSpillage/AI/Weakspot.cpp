@@ -5,6 +5,7 @@ Weakspot::Weakspot()
 	this->weakspotNr = 0;
 	this->stats = VehicleStats::AIPart;
 	this->health = this->stats.maxHealth;
+	this->maxHP = this->stats.maxHealth;
 	this->isHit = 1;
 }
 
@@ -13,6 +14,7 @@ Weakspot::Weakspot(Weakspot&& weakspot) //move constructor for ex. vectors
 	this->weakspotNr = weakspot.weakspotNr;
 	this->stats = VehicleStats::AIPart;
 	this->health = this->stats.maxHealth;
+	this->maxHP = this->stats.maxHealth;
 	this->isHit = weakspot.isHit;
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
@@ -29,6 +31,7 @@ Weakspot::Weakspot(int weaponType)
 	this->weakspotNr = 0;
 	this->stats = VehicleStats::AIPart;
 	this->health = this->stats.maxHealth;
+	this->maxHP = this->stats.maxHealth;
 	this->isHit = 1;
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
@@ -45,6 +48,7 @@ Weakspot::Weakspot(const Weakspot& other)	//copy constructor
 	this->weakspotNr = other.weakspotNr;
 	this->stats = other.stats;
 	this->health = other.health;
+	this->maxHP = other.maxHP;
 	this->isHit = other.isHit;
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
@@ -68,6 +72,7 @@ Weakspot& Weakspot::operator=(const Weakspot& other)	//equal operator
 		this->weakspotNr = other.weakspotNr;
 		this->stats = other.stats;
 		this->health = other.health;
+		this->maxHP = other.maxHP;
 	}
 	return *this;
 }
@@ -122,6 +127,11 @@ const int Weakspot::getWeakspotNr()
 const int Weakspot::getHealth()
 {
 	return this->health;
+}
+
+const int Weakspot::getMaxHP()
+{
+	return this->maxHP;
 }
 
 const bool Weakspot::getIsHit()

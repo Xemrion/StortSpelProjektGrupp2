@@ -42,7 +42,7 @@ ObjectiveHandler::~ObjectiveHandler()
 
 }
 
-void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfTargets, std::string info, TypeOfTarget targetType,Vector3 getToPos, GameObject** target, Actor* boss)
+void ObjectiveHandler::addObjective(TypeOfMission type, int rewardTime,int nrOfTargets, std::string info, TypeOfTarget targetType,Vector3 getToPos, GameObject** target, Boss* boss)
 {
 	PlayingGameState* ptrState = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Objective *temp = new Objective;
