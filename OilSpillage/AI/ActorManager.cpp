@@ -483,6 +483,26 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 
 void ActorManager::updateBosses(float dt, Vector3 targetPos)
 {
+	//gives a new pos if too far away from player
+	//for (int i = 0; i < this->bosses.size(); i++)
+	//{
+	//	float deltaX = this->bosses[i]->getPosition().x - targetPos.x;
+	//	float deltaZ = this->bosses[i]->getPosition().z - targetPos.z;
+	//	float distanceToPlayer = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
+	//	//(TileSize * nrOfTiles)^2
+	//	if (distanceToPlayer > (100))
+	//	{
+	//		Vector3 newPos = generateObjectivePos(targetPos, 50, 150);
+
+	//		Boss* current = this->bosses[i];
+	//		current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+	//		physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+	//	}
+	//}
+
+	/*Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
+	createAttacker(originPos.x + i, originPos.z, (rand() % 8) + 1);*/
+
 	bool hasDied = false;
 
 	for (int i = 0; i < this->bosses.size(); i++)
