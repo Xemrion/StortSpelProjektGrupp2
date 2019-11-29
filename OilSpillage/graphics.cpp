@@ -1539,7 +1539,6 @@ void Graphics::renderUI(float deltaTime, int selectedIndex)
 
 	//set up Shaders
 
-
 	deviceContext->PSSetShader(this->uiPixelShader.getShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->uiVertexShader.getShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
