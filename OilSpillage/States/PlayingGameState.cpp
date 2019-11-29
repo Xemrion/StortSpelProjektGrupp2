@@ -7,6 +7,7 @@
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
 #include <future>
+#include "../UI/Playing/UICompletedStage.h"
 
 void PlayingGameState::fillTestParticle()
 {
@@ -271,6 +272,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
 	menues[MENU_PAUSED]->init();
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
+	menues[MENU_COMPLETED_STAGE] = std::make_unique<UICompletedStage>();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
@@ -444,7 +446,7 @@ void PlayingGameState::ImGui_AI()
 	/*	+ std::to_string(player->getPosition().y).c_str()
 							+ std::to_string(player->getPosition().z).c_str()));*/
 	
-	ImGui::Text(("Score: " + std::to_string(Game::getGameInfo().highScore)).c_str());
+	//ImGui::Text(("Score: " + std::to_string(Game::getGameInfo().highScore)).c_str());
 	
 	ImGui::End();
 }
@@ -692,7 +694,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
-		if (Input::isKeyDown_DEBUG(Keyboard::LeftAlt))
+		if (Input::isKeyPressed(Keyboard::LeftAlt))
 		{
 			pausedTime = !pausedTime;
 		}
@@ -703,7 +705,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else if (time <= 0.0f)
 		{
-			Game::setState(Game::STATE_MENU);
+			Game::setState(Game::STATE_HIGHSCORE);
 		}
 #else
 		if (time > 0.0f)
@@ -712,7 +714,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 		{
-			Game::setState(Game::STATE_MENU);
+			Game::setState(Game::STATE_HIGHSCORE);
 		}
 #endif // !_DEBUG
 		prevAccelForce = Vector3(player->getRigidBody()->getLinearVelocity());
@@ -788,8 +790,6 @@ void PlayingGameState::update(float deltaTime)
 		}
 		if (timer > 0.1f&&timerEMP>0.0f)
 		{
-
-			
 			/*testNetwork->clearSegments();
 			testNetwork.get()->setAngle(rand() % 360 + 1);
 
@@ -870,28 +870,12 @@ void PlayingGameState::update(float deltaTime)
 			Sound::fadeSoundtrack(false, 3.0f);
 		}
 
-		/*if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
-			soundAggro += 0.2f * deltaTime;
-		}
-		else if (soundAggro > 0.0f) {
-			soundAggro -= 0.1f * deltaTime;
-		}
-		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);*/
-
-		/*timerForParticle += deltaTime;
-		if ( timerForParticle > .01f )
+		if (this->objectives.isAllDone())
 		{
-			graphics.addParticle( player->getPosition() + Vector3(0, 5, 0),
-								  5 * Vector3(0,0,0),
-								  addNrOfParticles, lifeTime, randomPosPower);
-			timerForParticle = 0;
-		}*/
+			this->setCurrentMenu(MENU_COMPLETED_STAGE);
+		}
+	}
 
-	}
-	if (this->objectives.isAllDone())
-	{
-		Game::setState(Game::State::STATE_UPGRADING);
-	}
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
 
@@ -915,23 +899,17 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 	
-
-
-	//Render all objects
-
-	//testNetwork.get()->drawRoadNetwork(&graphics);
-
 	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	ImGui_Driving();
-	ImGui_ProcGen();
-	//ImGui_AI();
-	ImGui_Particles();
-	ImGui_Camera();
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+		ImGui_Driving();
+		ImGui_ProcGen();
+		//ImGui_AI();
+		ImGui_Particles();
+		ImGui_Camera();
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	#endif // !_DEBUG
 
 	graphics.presentScene();
@@ -956,7 +934,7 @@ void PlayingGameState::changeTime(float timeDiff) noexcept {
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
 	currentMenu = static_cast<int>(menu);
-	if (menu == Menu::MENU_OPTIONS) menues[MENU_OPTIONS]->init();
+	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE) menues[currentMenu]->init();
 }
 
 Vehicle* PlayingGameState::getPlayer() const {

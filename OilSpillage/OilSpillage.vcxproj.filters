@@ -143,7 +143,6 @@
     <ClCompile Include="UI\Menu\UICredits.cpp" />
     <ClCompile Include="UI\Menu\UIMainMenu.cpp" />
     <ClCompile Include="UI\Menu\UIOptions.cpp" />
-    <ClCompile Include="UI\Playing\UIBefore.cpp" />
     <ClCompile Include="UI\Playing\UIPaused.cpp" />
     <ClCompile Include="UI\Playing\UIPlaying.cpp" />
     <ClCompile Include="UI\Upgrading\UIRandomItem.cpp" />
@@ -163,6 +162,9 @@
     <ClCompile Include="AI\Boss.cpp" />
     <ClCompile Include="AI\BossAbilities.cpp" />
     <ClCompile Include="AI\Weakspot.cpp" />
+    <ClCompile Include="States\HighscoreGameState.cpp" />
+    <ClCompile Include="UI\Highscore\UIBeforeHighscore.cpp" />
+    <ClCompile Include="UI\Playing\UICompletedStage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -296,7 +298,6 @@
     <ClInclude Include="UI\Menu\UICredits.h" />
     <ClInclude Include="UI\Menu\UIMainMenu.h" />
     <ClInclude Include="UI\Menu\UIOptions.h" />
-    <ClInclude Include="UI\Playing\UIBefore.h" />
     <ClInclude Include="UI\Playing\UIPaused.h" />
     <ClInclude Include="UI\Playing\UIPlaying.h" />
     <ClInclude Include="UI\Upgrading\UIRandomItem.h" />
@@ -360,7 +361,6 @@
     <ClInclude Include="SoLoud\src\audiosource\speech\klatt.h" />
     <ClInclude Include="SoLoud\src\audiosource\speech\resonator.h" />
     <ClInclude Include="SoLoud\src\audiosource\speech\tts.h" />
-    <ClInclude Include="UI\Playing\UIBefore.h" />
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="physics.h" />
@@ -375,6 +375,9 @@
     <ClInclude Include="AI\Boss.h" />
     <ClInclude Include="AI\BossAbilities.h" />
     <ClInclude Include="AI\Weakspot.h" />
+    <ClInclude Include="States\HighscoreGameState.h" />
+    <ClInclude Include="UI\Highscore\UIBeforeHighscore.h" />
+    <ClInclude Include="UI\Playing\UICompletedStage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

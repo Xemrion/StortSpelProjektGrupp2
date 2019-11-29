@@ -85,7 +85,7 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	this->weakSpots.push_back(Weakspot(0));
 	this->initiateWeakPoints();
 
-	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(position.x, position.y, position.z), 0.5f, this);
+	btRigidBody* tempo = physics->addSphere(3.5f, btVector3(position.x, position.y, position.z), 1.5f, this);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
@@ -445,26 +445,27 @@ void Boss::changeHealth(float amount)
 	}
 }
 
-const float Boss::getWeakSpotHealth1()
+const float Boss::getTotalWeakSpotCurrHp()
 {
-	return this->weakSpots[0].getHealth();
+	float currentHP = 0;
+	for (int i = 0; i < this->weakSpots.size(); i++)
+	{
+		currentHP += this->weakSpots[i].getHealth();
+	}
+
+	return currentHP;
 }
 
-const float Boss::getWeakSpotHealth2()
+const float Boss::getTotalWeakSpotMaxHP()
 {
-	return this->weakSpots[1].getHealth();
+	float maxHP = 0;
+	if (this->weakSpots.size() > 0)
+	{
+		maxHP = (this->weakSpots[0].getMaxHP() * 2); // 2 = nr of weakspots from the beginning
+	}
+
+	return maxHP;
 }
 
-const float Boss::getWeakSpotHealthMax1()
-{
-	return this->weakSpots[0].getMaxHP();
-}
 
-const float Boss::getWeakSpotHealthMax2()
-{
-	return this->weakSpots[1].getMaxHP();
-}
-
-//HEALTHBAR
-//blink when taking damage
-//behaviour tree?
+//spin when entering phase 2

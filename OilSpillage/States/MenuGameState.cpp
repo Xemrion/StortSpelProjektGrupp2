@@ -86,6 +86,6 @@ void MenuGameState::setCurrentMenu(Menu menu)
 
 	if (menu == MENU_HIGHSCORE)
 	{
-		this->menues[MENU_HIGHSCORE]->init();
+		static_cast<UIHighscore*>(this->menues[MENU_HIGHSCORE].get())->init(false, "");
 	}
 }
