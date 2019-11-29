@@ -1,10 +1,10 @@
-#include "UIBefore.h"
+#include "UIBeforeHighscore.h"
 #include "../../game.h"
 #include "../../Input.h"
 #include <cassert>
 #include "../../States/HighscoreGameState.h"
 
-void UIBefore::updateUI(float deltaTime)
+void UIBeforeHighscore::updateUI(float deltaTime)
 {
 	if (Input::isKeyPressed(Keyboard::Keys::A))
 	{
@@ -130,7 +130,7 @@ void UIBefore::updateUI(float deltaTime)
 	}
 }
 
-void UIBefore::drawUI()
+void UIBeforeHighscore::drawUI()
 {
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	this->yourName->draw(false);
@@ -139,15 +139,15 @@ void UIBefore::drawUI()
 	UserInterface::getSpriteBatch()->End();
 }
 
-UIBefore::UIBefore()
+UIBeforeHighscore::UIBeforeHighscore()
 {
 }
 
-UIBefore::~UIBefore()
+UIBeforeHighscore::~UIBeforeHighscore()
 {
 }
 
-void UIBefore::init()
+void UIBeforeHighscore::init()
 {
 	this->yourName = std::make_unique<AnimatedText>("Your name:", Color(Colors::White), 0.5f, Animation::SHAKING_FADE_IN_STOP);
 	this->yourName->setPosition(Vector2(SCREEN_WIDTH / 2 - this->yourName->getSize().x / 2, SCREEN_HEIGHT / 2 - this->yourName->getSize().y / 2 - 10));
@@ -166,7 +166,7 @@ void UIBefore::init()
 	this->promptBar->setPositon(Vector2(SCREEN_WIDTH / 2 - this->promptBar->getSize().x / 2, SCREEN_HEIGHT - this->promptBar->getSize().y - 8.0f));
 }
 
-std::string UIBefore::getName() const
+std::string UIBeforeHighscore::getName() const
 {
 	return this->name;
 }

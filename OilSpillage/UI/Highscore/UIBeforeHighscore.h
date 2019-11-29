@@ -1,12 +1,12 @@
-#ifndef UI_BEFORE_H
-#define UI_BEFORE_H
+#ifndef UI_BEFORE_HIGHSCORE_H
+#define UI_BEFORE_HIGHSCORE_H
 
 #include "../UserInterface.h"
 #include "../../Texture.h"
 #include "../Elements/AnimatedText.h"
 #include "../Elements/ButtonPromtBar.h"
 
-class UIBefore : public UserInterface
+class UIBeforeHighscore : public UserInterface
 {
 private:
 	void updateUI(float deltaTime);
@@ -17,11 +17,11 @@ private:
 	std::unique_ptr<AnimatedText> yourName;
 	std::unique_ptr<AnimatedText> theName;
 public:
-	UIBefore();
-	virtual ~UIBefore();
+	UIBeforeHighscore();
+	virtual ~UIBeforeHighscore();
 
 	void init();
 	std::string getName() const;
 };
 
-#endif // !UI_BEFORE_H
+#endif // !UI_BEFORE_HIGHSCORE_H
