@@ -281,7 +281,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	cameraObject->mesh = Game::getGraphics().getMeshPointer("Cube");
 	//Game::getGraphics().addToDraw(vehicle);
 	cameraObject->setPosition(Vector3(player->getPosition().x, 10.0f, player->getPosition().z));
-	cameraObject->setScale(Vector3(0.5f, 0.14f, 0.9f));
+	cameraObject->setScale(Vector3(1.5f, 1.5f, 1.5f));
 	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x, btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 10.0f);
 	cameraObject->setRigidBody(tempo, physics.get());
 	cameraObject->getRigidBody()->activate();
