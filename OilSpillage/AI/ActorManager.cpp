@@ -36,6 +36,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	soundTimer += dt;
 	spawnTimer -= dt;
 	updateActors(dt, targetPos);
+	updateBosses(dt, targetPos);
 
 	if (spawnTimer <= 0)
 	{
@@ -44,9 +45,6 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 
 		spawnTimer = spawnCooldown;
 	}
-
-	if (this->bosses.size() > 0)
-		bosses[0]->update(dt, targetPos);
 
 	Vector3 newPos;
 	float deltaX;
@@ -456,12 +454,33 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 			}
 		}
 	}
-	if (bosses.size() > 0)
+}
+
+void ActorManager::updateBosses(float dt, Vector3 targetPos)
+{
+	bool hasDied = false;
+
+	for (int i = 0; i < this->bosses.size(); i++)
 	{
-		if (bosses[0]->isDead())
+		if (!bosses[i]->isDead() && bosses[i] != nullptr)
 		{
-			Game::getGameInfo().highScore += 25000;
-			destroyBoss(0);
+			bosses[i]->update(dt, targetPos); //creash
+		}
+		else if (bosses[i]->isDead() && bosses[i] != nullptr)
+		{
+			hasDied = true;
+		}
+	}
+
+	if (hasDied)
+	{
+		for (int i = this->bosses.size() - 1; i >= 0; i--)
+		{
+			if (bosses[i]->isDead())
+			{
+				Game::getGameInfo().highScore += bosses[i]->getPoints();
+				destroyBoss(i);
+			}
 		}
 	}
 }
