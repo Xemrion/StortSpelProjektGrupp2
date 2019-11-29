@@ -164,6 +164,8 @@ void Game::createCurrentState()
 	}
 	else if (currentState == STATE_PLAYING)
 	{
+		gameInfo.highScoreStage = 0;
+
 		if (oldState == STATE_UPGRADING)
 		{
 			transfer = static_cast<UpgradingGameState*>(state.get())->getPlayer()->getSlots();

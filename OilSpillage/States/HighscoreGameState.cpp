@@ -1,11 +1,11 @@
 #include "HighscoreGameState.h"
 #include <cassert>
 #include "../UI/Menu/UIHighscore.h"
-#include "../UI/Highscore/UIBefore.h"
+#include "../UI/Highscore/UIBeforeHighscore.h"
 
 HighscoreGameState::HighscoreGameState() : graphics(Game::getGraphics()), currentMenu(MENU_BEFORE)
 {
-	this->menues[MENU_BEFORE] = std::make_unique<UIBefore>();
+	this->menues[MENU_BEFORE] = std::make_unique<UIBeforeHighscore>();
 	this->menues[MENU_BEFORE]->init();
 	this->menues[MENU_HIGHSCORE] = std::make_unique<UIHighscore>();
 
@@ -69,6 +69,6 @@ void HighscoreGameState::setCurrentMenu(Menu menu)
 
 	if (menu == MENU_HIGHSCORE)
 	{
-		static_cast<UIHighscore*>(this->menues[MENU_HIGHSCORE].get())->init(true, static_cast<UIBefore*>(this->menues[MENU_BEFORE].get())->getName());
+		static_cast<UIHighscore*>(this->menues[MENU_HIGHSCORE].get())->init(true, static_cast<UIBeforeHighscore*>(this->menues[MENU_BEFORE].get())->getName());
 	}
 }

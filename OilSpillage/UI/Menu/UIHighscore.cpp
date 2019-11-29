@@ -112,7 +112,7 @@ void UIHighscore::loadHighscore(UIHighscore* ui, bool send, std::string name)
 	{
 		if (send)
 		{
-			client.SendPlayerStats(PlayerStat(name, Game::getGameInfo().highScore));
+			client.SendPlayerStats(PlayerStat(name, Game::getGameInfo().highScoreTotal));
 		}
 		else
 		{
@@ -171,7 +171,7 @@ void UIHighscore::loadHighscore(UIHighscore* ui, bool send, std::string name)
 
 			if (send)
 			{
-				stats.push_back(PlayerStat(name, Game::getGameInfo().highScore));
+				stats.push_back(PlayerStat(name, Game::getGameInfo().highScoreTotal));
 				std::sort(stats.begin(), stats.end(), [](const PlayerStat& a, const PlayerStat& b) { return a.score > b.score; });
 				if (stats.size() > 10) stats.resize(10);
 

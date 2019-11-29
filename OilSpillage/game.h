@@ -15,8 +15,15 @@ struct GameInfo
 	int nrOfAttackers = 0;
 	int nrOfCars = 0;
 	int nrOfBosses = 0;
-	int highScore = 0;
+	int highScoreTotal = 0;
+	int highScoreStage = 0;
 	float time = 0.0f;
+
+	void addHighScore(int amount) 
+	{
+		highScoreStage += amount;
+		highScoreTotal += amount;
+	};
 };
 
 class Game

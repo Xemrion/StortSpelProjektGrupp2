@@ -94,7 +94,7 @@ void UIPlaying::updateUI(float deltaTime)
 	this->timer->setPosition(position);
 	this->timer->update(deltaTime);
 
-	this->score->setVariables("Score: " + std::to_string(Game::getGameInfo().highScore), {}, {});
+	this->score->setVariables("Score: " + std::to_string(Game::getGameInfo().highScoreTotal), {}, {});
 }
 
 void UIPlaying::drawUI()
