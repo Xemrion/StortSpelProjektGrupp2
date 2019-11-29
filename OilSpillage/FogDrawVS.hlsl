@@ -55,7 +55,7 @@ VS_OUT main(VS_IN input)
 	output.wPos = output.Pos;
 	output.Pos = mul(output.Pos, viewProj);
 
-	output.Tex = input.Tex * 2.0 + time * speed;
+	output.Tex = input.Tex * 4.0 + time * speed;
 
 	output.Normal = mul(float4(input.Normal, 0.0f), world);
 	output.Normal.xyz = normalize(output.Normal.xyz);

@@ -8,7 +8,6 @@ struct VS_OUT
 struct PS_OUT
 {
 	float4 color;
-	float4 normal;
 };
 
 cbuffer MaterialBuffer : register(b0)
@@ -47,10 +46,6 @@ PS_OUT main(VS_OUT input) : SV_TARGET
 	if (n <= densityThreshold) n = 0.0;
 	PS_OUT output;
 	output.color = float4(color.r, color.g, color.b, max(n * density, ambientDensity));
-	float eps = 0.01;
-	float dx = noise((input.Tex.xy + float2(eps, 0.0)) * scale) - noise((input.Tex.xy - float2(eps, 0.0)) * scale);
-	float dy = noise((input.Tex.xy + float2(0.0, eps)) * scale) - noise((input.Tex.xy - float2(0.0, eps)) * scale);
-	output.normal.xyz = float3(dx, dy, 2.0) * 0.5 + 0.5;
 
 	return output;
 }
