@@ -7,6 +7,7 @@
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
 #include <future>
+#include "../UI/Playing/UICompletedStage.h"
 
 void PlayingGameState::fillTestParticle()
 {
@@ -271,6 +272,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
 	menues[MENU_PAUSED]->init();
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
+	menues[MENU_COMPLETED_STAGE] = std::make_unique<UICompletedStage>();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
@@ -867,11 +869,11 @@ void PlayingGameState::update(float deltaTime)
 		{
 			Sound::fadeSoundtrack(false, 3.0f);
 		}
-	}
 
-	if (this->objectives.isAllDone())
-	{
-		Game::setState(Game::State::STATE_UPGRADING);
+		if (this->objectives.isAllDone())
+		{
+			this->setCurrentMenu(MENU_COMPLETED_STAGE);
+		}
 	}
 
 	/*-------------------------RENDERING-------------------------*/
@@ -932,7 +934,7 @@ void PlayingGameState::changeTime(float timeDiff) noexcept {
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
 	currentMenu = static_cast<int>(menu);
-	if (menu == Menu::MENU_OPTIONS) menues[MENU_OPTIONS]->init();
+	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE) menues[currentMenu]->init();
 }
 
 Vehicle* PlayingGameState::getPlayer() const {
