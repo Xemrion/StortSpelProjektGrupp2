@@ -872,6 +872,7 @@ void PlayingGameState::update(float deltaTime)
 
 		if (this->objectives.isAllDone())
 		{
+			Sound::stopAllSoundsExceptSoundtrack();
 			this->setCurrentMenu(MENU_COMPLETED_STAGE);
 		}
 	}
