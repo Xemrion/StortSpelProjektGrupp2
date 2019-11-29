@@ -85,7 +85,7 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	this->weakSpots.push_back(Weakspot(0));
 	this->initiateWeakPoints();
 
-	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(position.x, position.y, position.z), 0.5f, this);
+	btRigidBody* tempo = physics->addSphere(3.5f, btVector3(position.x, position.y, position.z), 1.5f, this);
 	setRigidBody(tempo, physics);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
@@ -464,7 +464,3 @@ const float Boss::getWeakSpotHealthMax2()
 {
 	return this->weakSpots[1].getMaxHP();
 }
-
-//HEALTHBAR
-//blink when taking damage
-//behaviour tree?
