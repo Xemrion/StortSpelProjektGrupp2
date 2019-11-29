@@ -268,6 +268,7 @@
     <ClCompile Include="UI\Menu\UIMainMenu.cpp" />
     <ClCompile Include="UI\Menu\UIOptions.cpp" />
     <ClCompile Include="UI\Highscore\UIBeforeHighscore.cpp" />
+    <ClCompile Include="UI\Playing\UIBeforePlaying.cpp" />
     <ClCompile Include="UI\Playing\UICompletedStage.cpp" />
     <ClCompile Include="UI\Playing\UIPaused.cpp" />
     <ClCompile Include="UI\Playing\UIPlaying.cpp" />
@@ -419,6 +420,7 @@
     <ClInclude Include="UI\Menu\UIMainMenu.h" />
     <ClInclude Include="UI\Menu\UIOptions.h" />
     <ClInclude Include="UI\Highscore\UIBeforeHighscore.h" />
+    <ClInclude Include="UI\Playing\UIBeforePlaying.h" />
     <ClInclude Include="UI\Playing\UICompletedStage.h" />
     <ClInclude Include="UI\Playing\UIPaused.h" />
     <ClInclude Include="UI\Playing\UIPlaying.h" />

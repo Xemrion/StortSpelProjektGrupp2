@@ -160,7 +160,7 @@ void Game::createCurrentState()
 		this->gameInfo = GameInfo();
 		localScale = 1.0f;
 		state = std::make_unique<MenuGameState>();
-		Sound::stopAllSoundsExceptSoundtrack();
+		Sound::stopAllLoops();
 	}
 	else if (currentState == STATE_PLAYING)
 	{
@@ -173,7 +173,7 @@ void Game::createCurrentState()
 			temp = static_cast<UpgradingGameState*>(state.get())->getPlayer().get();
 			temp->stopEngineSound();
 			
-			Sound::stopAllSoundsExceptSoundtrack();
+			Sound::stopAllLoops();
 			 // increase everytime a new stage is created
 			
 		}
@@ -187,11 +187,12 @@ void Game::createCurrentState()
 			state = std::make_unique<PlayingGameState>(-1,gameInfo.time);
 		}
 		gameInfo.nrOfClearedStages++;
+		static_cast<PlayingGameState*>(state.get())->setCurrentMenu(PlayingGameState::MENU_BEFORE_PLAYING);
 		static_cast<PlayingGameState*>(state.get())->generateObjectives();
 		if (oldState == STATE_UPGRADING)
 		{	
 			static_cast<PlayingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
-			Sound::stopAllSoundsExceptSoundtrack();
+			Sound::stopAllLoops();
 			static_cast<PlayingGameState*>(state.get())->getPlayer()->startEngineSound();
 			//static_cast<PlayingGameState*>(state.get())->initiatePlayer();
 		}
@@ -206,14 +207,14 @@ void Game::createCurrentState()
 			newSlots = new VehicleSlots(*transfer);
 			temp = static_cast<PlayingGameState*>(state.get())->getPlayer().get();
 			temp->stopEngineSound();
-			Sound::stopAllSoundsExceptSoundtrack();
+			Sound::stopAllLoops();
 		}
 
 		state = std::make_unique<UpgradingGameState>();
 
 		if (oldState == STATE_PLAYING)
 		{
-			Sound::stopAllSoundsExceptSoundtrack();
+			Sound::stopAllLoops();
 			static_cast<UpgradingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
 			
 		}

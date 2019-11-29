@@ -114,6 +114,11 @@ void AnimatedText::setPosition(const Vector2& position)
 	this->position = position;
 }
 
+float AnimatedText::getLength(int charCount) const
+{
+	return this->animation->getLength(charCount);
+}
+
 Vector2 AnimatedText::getSize() const
 {
 	return this->size;
@@ -205,6 +210,16 @@ Color AnimatedText::TextAnimation::getColor() const
 float AnimatedText::TextAnimation::getScale() const
 {
 	return this->scale;
+}
+
+float AnimatedText::TextAnimation::getLength(int charCount) const
+{
+	if (charCount > this->text.length() || charCount <= 0)
+	{
+		return UserInterface::getFontArial()->MeasureString(this->text.c_str()).m128_f32[0] * this->scale;
+	}
+
+	return UserInterface::getFontArial()->MeasureString(this->text.substr(0, charCount).c_str()).m128_f32[0] * this->scale;
 }
 
 AnimatedText::ShakingAnimation::ShakingAnimation(const std::string& text, const Color& color, float scale)

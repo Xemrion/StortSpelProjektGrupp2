@@ -64,7 +64,7 @@ public:
 	static void stopSoundtrack(float fadeOutTime = 0.0f);
 	static void changeSoundtrackVolume(float volume);
 
-	static void stopAllSoundsExceptSoundtrack();
+	static void stopAllLoops();
 
 	static void updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity);
 };
