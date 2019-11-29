@@ -141,7 +141,7 @@ void ObjectiveHandler::update(Vector3 playerPos)
 				}
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->changeTime(this->objectiveVec.at(0)->getRewardTime());
-			Game::getGameInfo().highScore += objectiveVec[0]->getScore();
+			Game::getGameInfo().addHighScore(objectiveVec[0]->getScore());
 			Game::getGameInfo().nrOfObjectives++;
 			delete this->objectiveVec.at(0);
 			this->objectiveVec.erase(this->objectiveVec.begin());

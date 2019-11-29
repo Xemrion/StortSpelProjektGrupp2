@@ -444,7 +444,7 @@ void PlayingGameState::ImGui_AI()
 	/*	+ std::to_string(player->getPosition().y).c_str()
 							+ std::to_string(player->getPosition().z).c_str()));*/
 	
-	ImGui::Text(("Score: " + std::to_string(Game::getGameInfo().highScore)).c_str());
+	//ImGui::Text(("Score: " + std::to_string(Game::getGameInfo().highScore)).c_str());
 	
 	ImGui::End();
 }

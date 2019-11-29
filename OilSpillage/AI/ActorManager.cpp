@@ -474,7 +474,7 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 			}
 			if (actors[i]->isDead())
 			{
-				Game::getGameInfo().highScore += actors[i]->getPoints();
+				Game::getGameInfo().addHighScore(actors[i]->getPoints());
 				destroyActor(i);
 			}
 		}
@@ -503,7 +503,7 @@ void ActorManager::updateBosses(float dt, Vector3 targetPos)
 		{
 			if (bosses[i]->isDead())
 			{
-				Game::getGameInfo().highScore += bosses[i]->getPoints();
+				Game::getGameInfo().addHighScore(bosses[i]->getPoints());
 				destroyBoss(i);
 			}
 		}
