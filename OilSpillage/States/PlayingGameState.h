@@ -22,6 +22,7 @@ public:
 		MENU_PAUSED,
 		MENU_OPTIONS,
 		MENU_COMPLETED_STAGE,
+		MENU_BEFORE_PLAYING,
 		MENUCOUNT
 	};
 
@@ -33,6 +34,7 @@ public:
 	void         setTime(float) noexcept;
 	void         changeTime(float delta) noexcept;
 	void         setCurrentMenu(Menu);
+	Map::Info	 getMapInfo() const;
 	Vehicle     *getPlayer() const;
 	std::string  getMinimap() const;
 	Vector3      getTopLeft() const;
