@@ -12,6 +12,11 @@ public:
 	virtual ~Boss();
 	void update(float dt, const Vector3& targetPos);
 	void checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTimer);
+	void changeHealth(float amount); //changef rom actor
+
+
+	const float getTotalWeakSpotCurrHp();
+	const float getTotalWeakSpotMaxHP();
 
 private:
 	float timeTilNextPoint;

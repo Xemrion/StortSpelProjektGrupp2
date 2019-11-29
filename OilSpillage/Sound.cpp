@@ -262,13 +262,14 @@ void Sound::changeSoundtrackVolume(float volume)
 	instance->soloud.setVolume(instance->soundtrack.handleGroup,volume);
 }
 
-void Sound::stopAllSoundsExceptSoundtrack()
+void Sound::stopAllLoops()
 {
-	for (int i = 0; i < instance->loopingSounds.size(); i++) {
-		if (!(instance->loopingSounds.at(i) == instance->soundtrack.handleCalm || instance->loopingSounds.at(i) == instance->soundtrack.handleAggressive)) {
-			instance->soloud.scheduleStop(instance->loopingSounds.at(i), 0);
-		}
+	for (int i = 0; i < instance->loopingSounds.size(); i++)
+	{
+		instance->soloud.stop(instance->loopingSounds.at(i));
 	}
+
+	instance->loopingSounds.clear();
 }
 
 void Sound::updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity)

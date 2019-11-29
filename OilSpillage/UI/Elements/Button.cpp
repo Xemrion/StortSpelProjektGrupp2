@@ -18,7 +18,7 @@ Button::~Button()
 
 void Button::draw(bool selected)
 {
-	UserInterface::getSpriteBatch()->Draw(this->texture->getShaderResView(), this->position, nullptr, selected ? Colors::Gray : Colors::White);
+	UserInterface::getSpriteBatch()->Draw(this->texture->getShaderResView(), this->position, nullptr, selected ? Colors::White : Colors::Gray);
 
 	Vector2 textSize(UserInterface::getFontArial()->MeasureString(this->text.text.c_str()) * 0.4f);
 	Vector2 pos(this->position);

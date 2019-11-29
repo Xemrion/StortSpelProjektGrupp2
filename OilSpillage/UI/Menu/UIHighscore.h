@@ -10,7 +10,7 @@
 class UIHighscore : public UserInterface
 {
 private:
-	static void loadHighscore(UIHighscore* ui);
+	static void loadHighscore(UIHighscore* ui, bool send, std::string name);
 	void updateUI(float deltaTime);
 	void drawUI();
 
@@ -27,7 +27,8 @@ public:
 	UIHighscore();
 	virtual ~UIHighscore();
 
-	void init();
+	void init() {}
+	void init(bool send, std::string name);
 };
 
 #endif // !UI_HIGHSCORE_H

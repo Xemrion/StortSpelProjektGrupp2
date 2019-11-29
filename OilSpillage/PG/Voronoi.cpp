@@ -144,7 +144,6 @@ F32 Voronoi::computeCellRoadCoverage( U32 const cellId, TileMap const &map ) con
    return F32(roadCounter) / tileCounter;
 }
 
-
 // TODO: refactor out?
 Bounds  Voronoi::computeCellBounds( U32 const cellId ) const noexcept {
    assert( cellId < (width * height) && "Cell ID is too low!" );
@@ -165,9 +164,7 @@ Bounds  Voronoi::computeCellBounds( U32 const cellId ) const noexcept {
          if ( diagram[diagramIndex( x, y )] == cellId ) {
             result.min.x = x;
             goto max_x_search;
-         }   
-      }
-   }
+   }	}	}
 
 max_x_search: // find max x by probing column by column from the right
    for ( U32 x = (cell.max.x+1) * cellSize - 1, xEnd = cell.min.x * cellSize;  x > xEnd;  --x ) {
@@ -175,9 +172,7 @@ max_x_search: // find max x by probing column by column from the right
          if ( diagram[diagramIndex( x, y )] == cellId ) {
             result.max.x = x;
             goto min_y_search;
-         }   
-      }
-   }
+   }	}	}
 
 min_y_search: // find min y by probing row by row from the top
    for ( U32 y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y ) {
@@ -185,9 +180,7 @@ min_y_search: // find min y by probing row by row from the top
          if ( diagram[diagramIndex( x, y )] == cellId ) {
             result.min.y = y;
             goto max_y_search;;
-         }   
-      }
-   }
+   }	}	}
 
 max_y_search: // find max y by probing row by row from the bottom
    for ( U32 y = (cell.max.y+1) * cellSize - 1, yEnd = cell.min.y * cellSize;  y > yEnd;  --y ) {
@@ -195,9 +188,7 @@ max_y_search: // find max y by probing row by row from the bottom
          if ( diagram[diagramIndex( x, y )] == cellId ) {
             result.max.y = y;
             goto end;
-         }   
-      }
-   }
+   }	}	}
 
 end:
    return result;

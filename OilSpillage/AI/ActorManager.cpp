@@ -29,6 +29,11 @@ ActorManager::~ActorManager()
 		delete actors[i];
 	}
 	actors.clear();
+	for (int i = 0; i < bosses.size(); i++)
+	{
+		delete bosses[i];
+	}
+	bosses.clear();
 }
 
 void ActorManager::update(float dt, const Vector3& targetPos)
@@ -37,6 +42,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	spawnTimer -= dt;
 	//seperation(targetPos);
 	updateActors(dt, targetPos);
+	updateBosses(dt, targetPos);
 
 	if (spawnTimer <= 0)
 	{
@@ -46,34 +52,10 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		spawnTimer = spawnCooldown;
 	}
 
-	if (this->bosses.size() > 0)
-		bosses[0]->update(dt, targetPos);
-
 	Vector3 newPos;
 	float deltaX;
 	float deltaZ;
 	float distance;
-	//for (int i = 0; i < groups.size(); i++)
-	//{
-	//	deltaX = groups[i].averagePos.x - targetPos.x;
-	//	deltaZ = groups[i].averagePos.z - targetPos.z;
-	//	distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-	//	//(TileSize * nrOfTiles)^2
-	//	if (distance > (20 * 10) * (20 * 10))
-	//	{
-	//		newPos = generateObjectivePos(targetPos, 0, 50);
-	//		for (int j = 0; j < groups[i].actors.size(); j++)
-	//		{
-	//			Actor* current = groups[i].actors[j];
-	//			current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-	//			physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-	//			if (j % 5 == 0)
-	//			{
-	//				newPos = generateObjectivePos(targetPos, 0, 50);
-	//			}
-	//		}
-	//	}
-	//}
 	for (int i = 0; i < groups.size(); i++)
 	{
 		deltaX = groups[i].averagePos.x - targetPos.x;
@@ -82,21 +64,42 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		//(TileSize * nrOfTiles)^2
 		if (distance > (20 * 10) * (20 * 10))
 		{
-			newPos = generateObjectivePos(targetPos, 50, 60);
+			newPos = generateObjectivePos(targetPos, 0, 50);
 			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
 				Actor* current = groups[i].actors[j];
-				//current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				current->getRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
-				current->setPosition(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-				/*if (j % 5 == 0)
+				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+				if (j % 5 == 0)
 				{
 					newPos = generateObjectivePos(targetPos, 0, 50);
-				}*/
+				}
 			}
 		}
 	}
+	//for (int i = 0; i < groups.size(); i++)
+	//{
+	//	deltaX = groups[i].averagePos.x - targetPos.x;
+	//	deltaZ = groups[i].averagePos.z - targetPos.z;
+	//	distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+	//	//(TileSize * nrOfTiles)^2
+	//	if (distance > (20 * 10) * (20 * 10))
+	//	{
+	//		newPos = generateObjectivePos(targetPos, 50, 60);
+	//		for (int j = 0; j < groups[i].actors.size(); j++)
+	//		{
+	//			Actor* current = groups[i].actors[j];
+	//			//current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+	//			current->getRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
+	//			current->setPosition(Vector3(newPos.x, current->getPosition().y, newPos.z));
+	//			//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+	//			/*if (j % 5 == 0)
+	//			{
+	//				newPos = generateObjectivePos(targetPos, 0, 50);
+	//			}*/
+	//		}
+	//	}
+	//}
 	for (int i = 0; i < groups.size(); i++)
 	{
 		groups[i].update(targetPos);
@@ -234,11 +237,9 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 
 	if (this->bosses.size() > 0)
 	{
-		this->bosses[0]->checkIfWeakPointHit(bulletArray, size, soundTimer);
-
-		bosses[0]->checkIfWeakPointHit(bulletArray, size, soundTimer);
 		for (int i = 0; i < this->bosses.size(); i++)
 		{
+			this->bosses[i]->checkIfWeakPointHit(bulletArray, size, soundTimer);
 			for (int j = 0; j < size; j++)
 			{
 				if (!this->bosses[i]->isDead())
@@ -478,16 +479,57 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 			}
 			if (actors[i]->isDead())
 			{
-				Game::getGameInfo().highScore += actors[i]->getPoints();
+				Game::getGameInfo().addHighScore(actors[i]->getPoints());
 				destroyActor(i);
 			}
 		}
-		if (bosses.size() > 0)
+	}
+}
+
+void ActorManager::updateBosses(float dt, Vector3 targetPos)
+{
+	//gives a new pos if too far away from player
+	//for (int i = 0; i < this->bosses.size(); i++)
+	//{
+	//	float deltaX = this->bosses[i]->getPosition().x - targetPos.x;
+	//	float deltaZ = this->bosses[i]->getPosition().z - targetPos.z;
+	//	float distanceToPlayer = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
+	//	//(TileSize * nrOfTiles)^2
+	//	if (distanceToPlayer > (100))
+	//	{
+	//		Vector3 newPos = generateObjectivePos(targetPos, 50, 150);
+
+	//		Boss* current = this->bosses[i];
+	//		current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+	//		physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+	//	}
+	//}
+
+	/*Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
+	createAttacker(originPos.x + i, originPos.z, (rand() % 8) + 1);*/
+
+	bool hasDied = false;
+
+	for (int i = 0; i < this->bosses.size(); i++)
+	{
+		if (!bosses[i]->isDead() && bosses[i] != nullptr)
 		{
-			if (bosses[0]->isDead())
+			bosses[i]->update(dt, targetPos); //creash
+		}
+		else if (bosses[i]->isDead() && bosses[i] != nullptr)
+		{
+			hasDied = true;
+		}
+	}
+
+	if (hasDied)
+	{
+		for (int i = this->bosses.size() - 1; i >= 0; i--)
+		{
+			if (bosses[i]->isDead())
 			{
-				Game::getGameInfo().highScore += 25000;
-				destroyBoss(0);
+				Game::getGameInfo().addHighScore(bosses[i]->getPoints());
+				destroyBoss(i);
 			}
 		}
 	}
@@ -655,7 +697,8 @@ void ActorManager::destroyBoss(int index)
 		physics->DeleteRigidBody(bosses[index]->getRigidBody());
 	}
 	delete bosses[index];
-	//bosses.erase(bosses.begin() + index);
+	//bosses.pop_back();
+	bosses.erase(bosses.begin() + index);
 }
 
 void ActorManager::initGroupForActor(DynamicActor* actor)

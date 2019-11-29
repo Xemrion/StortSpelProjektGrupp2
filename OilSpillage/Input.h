@@ -85,6 +85,7 @@ public:
 	virtual ~Input();
 
 	static bool isKeyDown_DEBUG(Keyboard::Keys key);
+	static bool isKeyPressed(Keyboard::Keys key);
 
 	static void init(Window* window);
 	static void update(float deltaTime);

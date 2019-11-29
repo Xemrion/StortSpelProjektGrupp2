@@ -45,6 +45,7 @@ private:
 		std::string getText() const;
 		Color getColor() const;
 		float getScale() const;
+		float getLength(int charCount) const;
 	};
 
 	class NoAnimation : public TextAnimation
@@ -177,6 +178,7 @@ public:
 	void setAnimation(Animation animation, const std::string& text, const Color& color, float scale);
 	void setVariables(std::optional<std::string> text, std::optional<Color> color, std::optional<float> scale);
 	void setPosition(const Vector2& position);
+	float getLength(int charCount) const;
 	Vector2 getSize() const;
 };
 
