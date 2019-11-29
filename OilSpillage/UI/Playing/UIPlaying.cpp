@@ -126,8 +126,8 @@ void UIPlaying::drawUI()
 	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
 	{
 		this->bossHealthBar->setAmount(currObj->getBoss()->getHealth() / static_cast<float>(currObj->getBoss()->getMaxHealth()));
-		this->bossShieldBar->setAmount((currObj->getBoss()->getWeakSpotHealth1() + currObj->getBoss()->getWeakSpotHealth2())
-		/ (static_cast<float>(currObj->getBoss()->getWeakSpotHealthMax1()) + static_cast<float>(currObj->getBoss()->getWeakSpotHealthMax2())));
+		this->bossShieldBar->setAmount((currObj->getBoss()->getTotalWeakSpotCurrHp())
+		/ (static_cast<float>(currObj->getBoss()->getTotalWeakSpotMaxHP())));
 	}
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
@@ -169,7 +169,7 @@ void UIPlaying::drawUI()
 
 	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
 	{
-		if ((currObj->getBoss()->getWeakSpotHealth1() + currObj->getBoss()->getWeakSpotHealth2()) > 0) //draw sield only if exists
+		if ((currObj->getBoss()->getTotalWeakSpotCurrHp()) > 0) //draw sield only if exists
 		{
 			Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty SHIELDS");
 			this->bossShieldBar->draw(false);

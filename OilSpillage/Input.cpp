@@ -276,6 +276,11 @@ bool Input::isKeyDown_DEBUG(Keyboard::Keys key)
 	return instance->keyboard.GetState().IsKeyDown(key);
 }
 
+bool Input::isKeyPressed(Keyboard::Keys key)
+{
+	return instance->keyboardTracker.IsKeyPressed(key);
+}
+
 void Input::init(Window* window)
 {
 	instance = std::make_unique<Input>();

@@ -7,6 +7,7 @@
 #include "States/MenuGameState.h"
 #include "States/PlayingGameState.h"
 #include "States/UpgradingGameState.h"
+#include "States/HighscoreGameState.h"
 
 std::unique_ptr<Game> Game::instance;
 
@@ -215,7 +216,10 @@ void Game::createCurrentState()
 			
 		}
 	}
-	
+	else if (currentState == STATE_HIGHSCORE)
+	{
+		state = std::make_unique<HighscoreGameState>();
+	}
 }
 
 void Game::run()
