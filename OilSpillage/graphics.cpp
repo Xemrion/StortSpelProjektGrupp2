@@ -1506,7 +1506,7 @@ void Graphics::setUISun(Vector3 direction, Vector4 color)
 	this->uiSun.setDirection(this->uiSunDir);
 }
 
-void Graphics::renderUI(float deltaTime)
+void Graphics::renderUI(float deltaTime, int selectedIndex)
 {
 	float color[4] = {
 		0,0,0,1
@@ -1548,10 +1548,20 @@ void Graphics::renderUI(float deltaTime)
 
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	if (selectedIndex > -1 && this->uiObjects.size()>1)
+	{
+		//std::swap(this->uiObjects[selectedIndex], this->uiObjects[this->uiObjects.size()-1]);
+	}
 	int index = 0;
 	for (std::pair<GameObject*,Matrix*> object : this->uiObjects)
 	{
+		//if (selectedIndex!=-1&&object == this->uiObjects.back())
+		//{
+		//	ID3D11DepthStencilView* nulView = nullptr;
+
+		//	/*deviceContext->OMSetDepthStencilState(nulView, 0);*/
+		//	deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
+		//}
 		SimpleMath::Matrix world = *object.second;//worlds[]
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
