@@ -15,7 +15,15 @@ struct GameInfo
 	int nrOfAttackers = 0;
 	int nrOfCars = 0;
 	int nrOfBosses = 0;
-	int highScore = 0;
+	int highScoreTotal = 0;
+	int highScoreStage = 0;
+	float time = 0.0f;
+
+	void addHighScore(int amount) 
+	{
+		highScoreStage += amount;
+		highScoreTotal += amount;
+	};
 };
 
 class Game
@@ -27,7 +35,8 @@ public:
 	{
 		STATE_MENU,
 		STATE_PLAYING,
-		STATE_UPGRADING
+		STATE_UPGRADING,
+		STATE_HIGHSCORE
 	};
 	static void							start(Window* window);
 	static void							quit();
@@ -54,7 +63,6 @@ private:
 	Window                             *window       = nullptr;
 
 	float								localScale = 1.0f;
-	int									nrOfStagesDone = 0;
 	float								deltaTime    = 0.0f;
 	long long							curTime      = 0;
 	long long							prevTime     = 0;

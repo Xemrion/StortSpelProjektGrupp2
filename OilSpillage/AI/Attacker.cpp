@@ -12,14 +12,19 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	Game::getGraphics().addToDraw(this);
 
 	this->stats = VehicleStats::AIAttacker;
-	setHealth(this->stats.maxHealth * (1 + (0.3 * Game::getGameInfo().nrOfClearedStages)));
+	//setHealth(this->stats.maxHealth * (1 + (0.3 * Game::getGameInfo().nrOfClearedStages)));
+	float newHealth = stats.maxHealth;
+	scaling(newHealth, 1.3);
+	setMaxHealth(newHealth);
+	setHealth(newHealth);
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 	this->attackRange = 10;
 	createRigidbody(physics);
 	this->setPoints(100 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
-	this->weapon.damage = this->weapon.damage * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages));
+	//this->weapon.damage = this->weapon.damage * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages));
+	scaling(weapon.damage, 1.1);
 }
 
 void Attacker::update(float dt, const Vector3& targetPos)

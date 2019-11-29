@@ -32,6 +32,7 @@ Vehicle::Vehicle()
 	this->reverseTimer = 0;
 	this->reverseTimer2 = 0;
 
+	
 	this->curDir = Vector2(0.0f, 1.0f);//UP
 
 	this->defaultStats = VehicleStats::fastCar;
@@ -1051,7 +1052,7 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 							1.0
 						);
 
-						if (static_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
+						if (static_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr && Game::getCurrentStateIndex() ==Game::State::STATE_PLAYING)
 						{
 							itemWeapon->getWeapon().light = (Light*)static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(flash);
 						}
@@ -1062,7 +1063,7 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 	}
 }
 
-void Vehicle::setSpecSlot(Slots slot, Item* item)
+void Vehicle::setSpecSlot(Slots slot, Item* item, Container::Slot* inventorySlot)
 {
 	if (this->vehicleSlots->getSlot(slot) != nullptr)
 	{
@@ -1075,7 +1076,7 @@ void Vehicle::setSpecSlot(Slots slot, Item* item)
 			Game::getGraphics().addToDraw(item->getObject());
 		}
 	}
-	this->vehicleSlots->setSlot(slot, item);
+	this->vehicleSlots->setSlot(slot, item, inventorySlot);
 }
 
 VehicleSlots* Vehicle::getSlots()

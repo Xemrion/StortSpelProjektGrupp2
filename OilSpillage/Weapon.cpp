@@ -112,42 +112,42 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
-		weapon.bulletLifetime + 0.5f,
+		weapon.bulletLifetime,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
-		weapon.bulletLifetime + 0.5f,
+		weapon.bulletLifetime,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
-		weapon.bulletLifetime + 0.5f,
+		weapon.bulletLifetime,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
-		weapon.bulletLifetime + 0.5f,
+		weapon.bulletLifetime,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
-		weapon.bulletLifetime + 0.5f,
+		weapon.bulletLifetime,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
-		weapon.bulletLifetime + 0.5f,
+		weapon.bulletLifetime,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
-		weapon.bulletLifetime + 0.5f,
+		weapon.bulletLifetime,
 		0.25f);
 	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
 		this->dir,
 		1,
-		weapon.bulletLifetime + 0.5f,
+		weapon.bulletLifetime,
 		0.25f);
 }
 

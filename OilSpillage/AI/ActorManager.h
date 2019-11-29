@@ -46,6 +46,7 @@ private:
 	std::mt19937* rng;
 	void updateAveragePos();
 	void updateActors(float dt, Vector3 targetPos);
+	void updateBosses(float dt, Vector3 targetPos);
 	//Returns index for the group within the radius with the most members
 	int groupInRange(const Vector3& actorPos, int currentGroupSize);
 	void joinGroup(DynamicActor* actor, int groupIndex);
@@ -54,6 +55,7 @@ private:
 	void assignPathsToGroups(const Vector3& targetPos);
 	void updateGroups();
 	void destroyActor(int index);
+	void destroyBoss(int index);
 	void initGroupForActor(DynamicActor* actor);
 	void createGroup(DynamicActor* actor);
 	Vector3 predictPlayerPos(const Vector3& targetPos);

@@ -21,10 +21,11 @@ public:
 		MENU_PLAYING,
 		MENU_PAUSED,
 		MENU_OPTIONS,
+		MENU_COMPLETED_STAGE,
 		MENUCOUNT
 	};
 
-	             PlayingGameState();
+	             PlayingGameState(int seed, float time);
 	virtual     ~PlayingGameState();
 	void         update(float delta);
 	const float &getTimeRef() const noexcept;
