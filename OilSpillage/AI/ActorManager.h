@@ -58,7 +58,7 @@ private:
 	void initGroupForActor(DynamicActor* actor);
 	void createGroup(DynamicActor* actor);
 	Vector3 predictPlayerPos(const Vector3& targetPos);
-	Vector3 generateObjectivePos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept;
+	Vector3 findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept;
 	std::vector<AIGroup> groups;
 	Vector2& generateRandom(const float& x, const float& z, Radius radius);
 	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);

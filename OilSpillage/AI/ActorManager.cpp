@@ -35,7 +35,6 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
 	spawnTimer -= dt;
-	//seperation(targetPos);
 	updateActors(dt, targetPos);
 
 	if (spawnTimer <= 0)
@@ -61,7 +60,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		//(TileSize * nrOfTiles)^2
 		if (distance > (20 * 10) * (20 * 10))
 		{
-			newPos = generateObjectivePos(targetPos, 50, 100);
+			newPos = findTeleportPos(targetPos, 50, 100);
 			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
 				Actor* current = groups[i].actors[j];
@@ -69,7 +68,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
 				if (j % 5 == 0)
 				{
-					newPos = generateObjectivePos(targetPos, 50, 100);
+					newPos = findTeleportPos(targetPos, 50, 100);
 				}
 			}
 		}
@@ -133,7 +132,6 @@ Boss* ActorManager::createBoss(float x, float z, int weaponType)
 {
 	Boss* boss = new Boss(x, z, weaponType, physics);
 	this->bosses.push_back(boss);
-	//initGroupForActor(bosses.at(bosses.size() - 1));
 
 	return boss;
 }
@@ -500,7 +498,7 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 	if (actors.size() < maxNrOfEnemies)
 	{
 		int enemyType = rand() % 100 + 1;
-		Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
+		Vector3 newPos = findTeleportPos(targetPos, 50, 100);
 		if (enemyType < 60)
 		{
 			spawnAttackers(newPos);
@@ -665,7 +663,7 @@ Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
 }
-Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
+Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
 	for (float i = 0;; i += 1.0) {
