@@ -139,7 +139,7 @@ static F32 constexpr sidewalkOffsetY   { -1.47f };
 //   1 = neighbourFloorNo == myFloorNo
 
 void Map::generateBorder() {
-	auto constexpr borderThickness = 3;
+	auto constexpr borderThickness = 4;
 
 	for ( I32 x = -borderThickness;  x <= I32(tilemap->width)+borderThickness;  ++x ) {
 		for ( I32 y = -borderThickness;  y <= I32(tilemap->height)+borderThickness;  ++y ) {
@@ -219,27 +219,30 @@ void Map::generateBorder() {
 	                                     btVector3( sca3 ),
 	                                     .0f );
 	border.bounds[3].setRigidBody( tmp3, physics );
-
-	
-	
 }
 
 void Map::generateStreetlights()
 {
-	streetlights.reserve(200);
+	auto isValid = [=]( U32 x, U32 y ) {
+		auto tile     = tilemap->tileAt(x,y);
+		auto district = districtAt(x,y);
+		return tile == Tile::road and district != &District::suburban and district != &District::park;
+	};
+
+	streetlights.reserve(128);
 	for ( auto x = 1;  x < tilemap->width;  ++x ) {
 		for ( auto y = 1;  y < tilemap->height;  ++y ) {
 			U8 bitmask = 0x00;
-			bitmask += tilemap->tileAt(x-1, y-1)==Tile::road? 1:0;
-			bitmask += tilemap->tileAt(x-1, y  )==Tile::road? 2:0;
-			bitmask += tilemap->tileAt(x,   y-1)==Tile::road? 4:0;
-			bitmask += tilemap->tileAt(x,   y  )==Tile::road? 8:0;
+			bitmask += isValid(x-1, y-1)? 1:0;
+			bitmask += isValid(x-1, y  )? 2:0;
+			bitmask += isValid(x,   y-1)? 4:0;
+			bitmask += isValid(x,   y  )? 8:0;
 			if ( bitmask ) {
 				Vector3 rotation { .0f, .0f, .0f };
 				for ( auto q = 0;  q < 4;  ++q )
 					if ( (util::cycleRight(bitmask,q) & 0b11) == 0b11) 
 						rotation = { .0f, util::degToRad(45.0f+q*90.0f), .0f };
-				auto worldPosition = tilemap->convertTilePositionToWorldPosition(x,y) - Vector3(tilemap->config.tileSideScaleFactor/2, .0f, tilemap->config.tileSideScaleFactor/2);
+				auto worldPosition = tilemap->convertTilePositionToWorldPosition(x,y) - Vector3(tilemap->config.tileSideScaleFactor/2, .0f, tilemap->config.tileSideScaleFactor/-2);
 				placeStreetlight(worldPosition);
 			}
 		}

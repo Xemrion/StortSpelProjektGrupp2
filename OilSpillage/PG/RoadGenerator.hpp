@@ -79,6 +79,7 @@ private:
    void  scheduleBranch( RoadGenBranchArgs && );
    void  cleanIsles() noexcept;
 
+	V2u                     start;
    TileMap                &map;
    RD                      rd;
    RNG                     rng;

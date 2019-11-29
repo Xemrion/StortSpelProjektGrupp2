@@ -186,6 +186,8 @@ void  RoadGenerator::generate( MapConfig const &config ) {
          #endif
       }
    }
+	start.x = branchTree[0][0].args.startX;
+	start.y = branchTree[0][0].args.startY;
    cleanIsles();
 }
 
@@ -205,11 +207,12 @@ void  RoadGenerator::cleanIsles() noexcept {
 }
 
 V2u  RoadGenerator::getStartPosition() const noexcept {
-   return { branchTree[0][0].args.startX, branchTree[0][0].args.startY };
+	return start;
 }
 
 void RoadGenerator::upscale() noexcept
 {
+	// TODO: slumpa deadends
 	MapConfig  newConfig   { map.config };
 	newConfig.dimensions = { map.config.dimensions.x*2, map.config.dimensions.y*2 };
 	TileMap    newMap      { newConfig };
@@ -219,13 +222,15 @@ void RoadGenerator::upscale() noexcept
 			if ( x*2+1 < newMap.width )
 				newMap.data[newMap.index(x*2+1,y*2)]
 					= (map.data[map.index(x,y)] == Tile::road
-						and (x+1 >= map.width or map.data[map.index(x+1,y)]==Tile::road))
+						and (x+1 < map.width and map.data[map.index(x+1,y)]==Tile::road))
 					? Tile::road : Tile::ground;
 			if ( y*2+1 < newMap.height )
 				newMap.data[newMap.index(x*2,y*2+1)]
 					= (map.data[map.index(x,y)] == Tile::road
-						and (y+1 >= map.height or map.data[map.index(x,y+1)]==Tile::road))
+						and (y+1 < map.height and map.data[map.index(x,y+1)]==Tile::road))
 					? Tile::road : Tile::ground;
 	}
+	start.x *= 2;
+	start.y *= 2;
 	map = std::move(newMap);
 }
