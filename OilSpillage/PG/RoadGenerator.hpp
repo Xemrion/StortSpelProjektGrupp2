@@ -71,6 +71,7 @@ public:
    // generates the tree, one depth at a time, one tile per branch at a time
    void  generate( MapConfig const & );
    V2u   getStartPosition() const noexcept;
+	void  upscale() noexcept;
 
 private:
    // TODO: increasing depth value starting at 0!
@@ -78,8 +79,9 @@ private:
    void  scheduleBranch( RoadGenBranchArgs && );
    void  cleanIsles() noexcept;
 
-   TileMap          &map;
-   RD                rd;
-   RNG               rng;
+	V2u                     start;
+   TileMap                &map;
+   RD                      rd;
+   RNG                     rng;
    Vector<Vector<Branch>>  branchTree;
 };

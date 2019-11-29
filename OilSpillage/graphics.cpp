@@ -6,6 +6,9 @@
 #include "UI/UserInterface.h"
 #include <cassert>
 
+// quad tree side (+ border)
+#define MAX_SIDE  68.0f
+
 Graphics::Graphics()
 {
 	this->window = nullptr;
@@ -55,7 +58,7 @@ Graphics::Graphics()
 
 	this->particleHandler->loadParticleSystems();
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
-	this->quadTree = std::make_unique<QuadTree>(Vector2(-48.f * 20.f, -48.f * 20.f), Vector2(48.f * 20.f, 48.0f * 20.0f), 4);
+	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 }
 
 Graphics::~Graphics()
@@ -1473,7 +1476,7 @@ void Graphics::clearDraw()
 
 void Graphics::clearStaticObjects()
 {
-	quadTree = std::make_unique<QuadTree>(Vector2(-48.f * 20.f, -48.f * 20.f), Vector2(48.f * 20.f, 48.0f * 20.0f), 4);
+	quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 }
 
 void Graphics::addToUIDraw(GameObject* obj, Matrix* world)

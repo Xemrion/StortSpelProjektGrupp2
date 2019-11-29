@@ -92,23 +92,6 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadModel("Entities/Quad");
 	graphics.loadTexture("brownPaperCardboard");
 
-	//graphics.loadModel("Roads/Metro/0000");
-	//graphics.loadModel("Roads/Metro/0001");
-	//graphics.loadModel("Roads/Metro/0010");
-	//graphics.loadModel("Roads/Metro/0011");
-	//graphics.loadModel("Roads/Metro/0100");
-	//graphics.loadModel("Roads/Metro/0101");
-	//graphics.loadModel("Roads/Metro/0110");
-	//graphics.loadModel("Roads/Metro/0111");
-	//graphics.loadModel("Roads/Metro/1000");
-	//graphics.loadModel("Roads/Metro/1001");
-	//graphics.loadModel("Roads/Metro/1010");
-	//graphics.loadModel("Roads/Metro/1011");
-	//graphics.loadModel("Roads/Metro/1100");
-	//graphics.loadModel("Roads/Metro/1101");
-	//graphics.loadModel("Roads/Metro/1110");
-	//graphics.loadModel("Roads/Metro/1111");
-
 	graphics.loadModel("Entities/Star");
 	graphics.loadModel("Entities/Streetlight");
 
@@ -915,10 +898,10 @@ void PlayingGameState::update(float deltaTime)
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-		ImGui_Driving();
+		//ImGui_Driving();
 		ImGui_ProcGen();
 		//ImGui_AI();
-		ImGui_Particles();
+		//ImGui_Particles();
 		ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
