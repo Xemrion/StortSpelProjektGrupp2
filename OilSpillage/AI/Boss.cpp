@@ -96,6 +96,8 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 Boss::~Boss()
 {
 	Game::getGraphics().removeFromDraw(this);
+	Game::getGameInfo().nrOfBosses++;
+
 }
 
 void Boss::update(float dt, const Vector3& targetPos)

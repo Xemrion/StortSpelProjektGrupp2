@@ -8,6 +8,7 @@
 #include "../PG/Profiler.hpp"
 #include <future>
 #include "../UI/Playing/UICompletedStage.h"
+#include "../UI/Playing/UIBeforePlaying.h"
 
 void PlayingGameState::fillTestParticle()
 {
@@ -61,7 +62,7 @@ void PlayingGameState::initAI()
 	aStar->generateTileData(map->getTileMap());
 }
 
-PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_BEFORE_PLAYING)
 {
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -256,6 +257,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	menues[MENU_PAUSED]->init();
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_COMPLETED_STAGE] = std::make_unique<UICompletedStage>();
+	menues[MENU_BEFORE_PLAYING] = std::make_unique<UIBeforePlaying>();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
@@ -669,6 +671,7 @@ void PlayingGameState::update(float deltaTime)
 		testNetwork.get()->generateAdditionalSegments("F-F-F-FF-F+F-F-F", i + 4 * 2, i % 2);
 	}*/
 	//this->createElectric(rand() % 360, deltaTime);
+
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{
@@ -855,6 +858,7 @@ void PlayingGameState::update(float deltaTime)
 
 		if (this->objectives.isAllDone())
 		{
+			Sound::stopAllLoops();
 			this->setCurrentMenu(MENU_COMPLETED_STAGE);
 		}
 	}
@@ -863,13 +867,21 @@ void PlayingGameState::update(float deltaTime)
 	// render all objects
 
 	graphics.clearScreen(Vector4(0, 0, 0, 1));
-	graphics.setSpotLightShadow(playerLight);
-	graphics.render(camera.get(), deltaTime);
+
+	if (currentMenu != MENU_BEFORE_PLAYING)
+	{
+		graphics.setSpotLightShadow(playerLight);
+		graphics.render(camera.get(), deltaTime);
+	}
 
 	// render UI
 	if (currentMenu != MENU_PLAYING)
 	{
-		menues[MENU_PLAYING]->update(0);
+		if (currentMenu != MENU_BEFORE_PLAYING)
+		{
+			menues[MENU_PLAYING]->update(0);
+		}
+
 		menues[currentMenu]->update(deltaTime);
 	}
 	else
@@ -917,7 +929,12 @@ void PlayingGameState::changeTime(float timeDiff) noexcept {
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
 	currentMenu = static_cast<int>(menu);
-	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE) menues[currentMenu]->init();
+	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING) menues[currentMenu]->init();
+}
+
+Map::Info PlayingGameState::getMapInfo() const
+{
+	return this->map->getInfo();
 }
 
 Vehicle* PlayingGameState::getPlayer() const {
@@ -1271,7 +1288,7 @@ void PlayingGameState::generateMapPowerUps()
 
 void PlayingGameState::generateObjectives()
 {
-	if (Game::getNrOfStagesDone() % 3 == 0)
+	if (Game::getNrOfStagesDone() % 3 == 1)
 	{
 		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1)); //fix pos
 		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());

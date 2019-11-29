@@ -29,6 +29,11 @@ ActorManager::~ActorManager()
 		delete actors[i];
 	}
 	actors.clear();
+	for (int i = 0; i < bosses.size(); i++)
+	{
+		delete bosses[i];
+	}
+	bosses.clear();
 }
 
 void ActorManager::update(float dt, const Vector3& targetPos)
@@ -692,8 +697,8 @@ void ActorManager::destroyBoss(int index)
 		physics->DeleteRigidBody(bosses[index]->getRigidBody());
 	}
 	delete bosses[index];
-	bosses.pop_back();
-	//bosses.erase(bosses.begin() + index);
+	//bosses.pop_back();
+	bosses.erase(bosses.begin() + index);
 }
 
 void ActorManager::initGroupForActor(DynamicActor* actor)
