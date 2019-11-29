@@ -332,7 +332,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	physics         ( physics                                                                                       ),
 	lights          ( lights                                                                                        ),
 	config          ( config                                                                                        ),
-	tilemap         ( std::make_unique<TileMap>( config )                                                           ),
+	tilemap         ( nullptr                                                                                       ),
    roadDistanceMap ( config.dimensions.x * config.dimensions.y                                                     ),
 	buildingIDs     ( config.dimensions.x * config.dimensions.y                                                     ),
 	hospitalTable   ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide ),
@@ -393,12 +393,13 @@ Map::~Map() noexcept
 // TODO: ensure Map.config doesn't stays synchronized during re-rolls.
 void  Map::generateRoads()
 {
-	DBG_PROBE(Map::generateRoads);
+	DBG_PROBE( Map::generateRoads );
 	I32_Dist   generateSeed {};
 	MapConfig  roadConfig { config };
 	// generate roads at a lower resolution so we can uspscale the road network to our desired resolution later
-	// roadConfig.dimensions.x = config.dimensions.x / 2;
-	// roadConfig.dimensions.y = config.dimensions.y / 2;
+	roadConfig.dimensions.x = config.dimensions.x / 2;
+	roadConfig.dimensions.y = config.dimensions.y / 2;
+	tilemap = std::make_unique<TileMap>( roadConfig );
 	for(;;) { // TODO: add MAX_TRIES?
 		RoadGenerator roadGenerator{ *tilemap };
 		roadGenerator.generate(roadConfig);
@@ -407,10 +408,12 @@ void  Map::generateRoads()
 			tilemap = std::make_unique<TileMap>( roadConfig );
 		}
 		else {
+			roadGenerator.upscale();
 			startPositionInTileSpace = roadGenerator.getStartPosition();
 			break;
 		}
 	}
+
 	
 	if constexpr ( isDebugging ) {
 	   std::ofstream roadGenerationLog(String("PG/logs/") + mapConfigToFilename(config, "_road_gen.txt"));
@@ -420,6 +423,7 @@ void  Map::generateRoads()
 		}
 	}
 }
+
 
 void Map::placeStreetlight( Vector3 const &worldPosition, Vector3 const &rotation ) noexcept
 {

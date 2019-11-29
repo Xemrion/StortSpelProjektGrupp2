@@ -7,13 +7,46 @@ TileMap::TileMap()
 }
 
 TileMap::TileMap(MapConfig const& config):
-	config(config),
-	width(static_cast<Size>(config.dimensions.y)),
-	height(static_cast<Size>(config.dimensions.x)),
-	data(Vector<Tile>(width* height, Tile::ground))
+	config ( config                                    ),
+	width  ( static_cast<Size>(config.dimensions.y)    ),
+	height ( static_cast<Size>(config.dimensions.x)    ),
+	data   ( Vector<Tile>(width* height, Tile::ground) )
 {}
 
-TileMap::~TileMap() {}
+TileMap::TileMap( TileMap const &other ) noexcept:
+	config ( other.config ),
+	width  ( other.width  ),
+	height ( other.height ),
+	data   ( other.data   )
+{}
+
+TileMap::TileMap( TileMap &&other ) noexcept:
+	config ( std::move(other.config) ),
+	width  ( other.width             ),
+	height ( other.height            ),
+	data   ( std::move(other.data)   )
+{}
+
+TileMap::~TileMap() noexcept {}
+
+TileMap& TileMap::operator=(TileMap const &other) noexcept {
+	if ( this != &other ) {
+		width  = other.width;
+		height = other.height;
+		config = other.config;
+		data   = other.data;
+	}
+	return *this;
+}
+
+TileMap& TileMap::operator=(TileMap &&other) noexcept
+{
+	width  = other.width;
+	height = other.height;
+	config = std::move( other.config );
+	data   = std::move( other.data   );
+	return *this;
+}
 
 // x = current X (may be mutated if successful)
 // y = current Y (may be mutated if successful)

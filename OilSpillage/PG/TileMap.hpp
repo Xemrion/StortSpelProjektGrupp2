@@ -19,15 +19,19 @@ public:
 
 	// used with a cellular automata to beautify the terminal output
 	static Vector<TileEntry> const  tileGraphicsTable;
-	static Vector<String> const     tileTerminalGraphicsTable;
-	static Vector<String> const     tileTerminalColorTable;
+	static Vector<String>    const  tileTerminalGraphicsTable;
+	static Vector<String>    const  tileTerminalColorTable;
 	static char constexpr           terminalColorDefault[6] { "\033[0m" };
 	Size                            width,height;
-	MapConfig const                 config;
+	MapConfig                       config;
 	Vector<Tile>                    data;
 	TileMap();
-	TileMap( MapConfig const & );
-	~TileMap();
+	TileMap( MapConfig const &  );
+	TileMap( TileMap const &  ) noexcept;	
+	TileMap( TileMap       && ) noexcept;
+	~TileMap() noexcept;
+	TileMap &operator=( TileMap const  & ) noexcept;
+	TileMap &operator=( TileMap       && ) noexcept;
 	F32                 getRoadCoverage() const noexcept;
 	Bool                walk( U16 &tileX, U16 &tileY, Direction, Tile ); // side-effects: mutates tileX/tileY if walk successful
 	Bool                neighbourIsRoad( Direction, U16 tileX, U16 tileY ) const noexcept; // pretends that all out-of-bounds tiles are roads
