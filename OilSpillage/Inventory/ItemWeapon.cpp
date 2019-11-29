@@ -80,7 +80,7 @@ void ItemWeapon::randomize()
 	}
 	else if (weapon.type == WeaponType::Laser) 
 	{
-		this->weapon.damage = static_cast<int>(this->weapon.damage * (((rand() % 201+200) * 0.01f) + (1 * Game::getLocalScale())));
+		this->weapon.damage = static_cast<int>(this->weapon.damage * (((rand() % 201+400) * 0.01f) + (1 * Game::getLocalScale())));
 		this->weapon.bulletSpeed = this->weapon.bulletSpeed * 1;
 		this->weapon.bulletLifetime = this->weapon.bulletLifetime * 1;
 		this->weapon.spreadRadians = this->weapon.spreadRadians * (((rand() % 101) * 0.01f) + (1 * Game::getLocalScale()));

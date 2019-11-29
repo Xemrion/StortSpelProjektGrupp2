@@ -136,7 +136,7 @@ public:
 	void removeFromUIDraw(GameObject* obj, Matrix* world);
 	void removeAllUIDraw();
 	void setUISun(Vector3 direction, Vector4 color);
-	void renderUI(float deltaTime);
+	void renderUI(float deltaTime, int selectedIndex = -1);
 
 	void setLightList(LightList* lightList);
 	void presentScene();

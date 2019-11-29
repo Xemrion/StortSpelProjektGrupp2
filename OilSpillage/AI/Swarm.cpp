@@ -14,8 +14,14 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	Game::getGraphics().addToDraw(this);
 
 	this->stats = VehicleStats::AISwarm;
-	setHealth(this->stats.maxHealth * (1 + (0.3 * Game::getGameInfo().nrOfClearedStages)));
-	this->stats.maxSpeed = this->stats.maxSpeed * (1.1 + (0.2 * Game::getGameInfo().nrOfClearedStages));
+
+	float newHealth = stats.maxHealth;
+	scaling(newHealth, 1.3);
+	setMaxHealth(newHealth);
+	setHealth(newHealth);
+
+	scaling(stats.maxSpeed, 1.1);
+
 	Game::getGraphics().loadModel("Entities/Drone");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Drone");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Drone"));
@@ -24,7 +30,7 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	this->aggroRange = 40;
 	createRigidbody(physics);
 	this->setPoints(50 * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages)));
-	this->weapon.damage = this->weapon.damage * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages));
+	scaling(weapon.damage, 1.1f);
 }
 
 void Swarm::update(float dt, const Vector3& targetPos)
