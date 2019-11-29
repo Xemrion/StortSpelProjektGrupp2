@@ -74,6 +74,11 @@ void Actor::setHealth(float health)
 	this->health = std::clamp(health, 0.0f, this->stats.maxHealth);
 }
 
+void Actor::setMaxHealth(float health)
+{
+	this->stats.maxHealth = health;
+}
+
 void Actor::changeHealth(float amount)
 {
 	if (amount < 0) {
@@ -97,4 +102,12 @@ int Actor::getPoints()
 void Actor::setPoints(int amount)
 {
 	this->points = amount;
+}
+
+void Actor::scaling(float& stat, float ratio)
+{
+	for(int i = 0; i < Game::getGameInfo().nrOfClearedStages; i++)
+	{
+		stat *= ratio;
+	}
 }

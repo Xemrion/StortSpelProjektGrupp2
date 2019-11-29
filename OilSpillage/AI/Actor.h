@@ -20,10 +20,12 @@ public:
 	float getHealth()const;
 	float getMaxHealth()const;
 	void setHealth(float health);
+	void setMaxHealth(float health);
 	void changeHealth(float amount);
 	bool isDead() const;
 	int getPoints();
 	void setPoints(int amount);
+	void scaling(float& stat, float ratio);
 
 private:
 	float health;
