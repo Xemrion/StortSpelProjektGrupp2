@@ -20,6 +20,7 @@ public:
 
 	virtual void draw(bool selected);
 
+
 	void setAmount(float amount);
 	float getAmount() const;
 };

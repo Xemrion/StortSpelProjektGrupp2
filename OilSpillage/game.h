@@ -56,7 +56,6 @@ private:
 	Window                             *window       = nullptr;
 
 	float								localScale = 1.0f;
-	int									nrOfStagesDone = 0;
 	float								deltaTime    = 0.0f;
 	long long							curTime      = 0;
 	long long							prevTime     = 0;

@@ -20,7 +20,14 @@ Turret::Turret(float x, float z, int weaponType, Physics* physics)
 	Game::getGraphics().addToDraw(&this->body);
 	Game::getGraphics().addToDraw(this);
 	this->stats = VehicleStats::AITurret;
-	setHealth(this->stats.maxHealth);
+
+	float newHealth = stats.maxHealth;
+	scaling(newHealth, 1.3);
+	setMaxHealth(newHealth);
+	setHealth(newHealth);
+	scaling(weapon.damage, 1.1);
+	this->setPoints(100 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
+
 	this->velocity = Vector3();
 	createRigidbody(physics);
 }

@@ -37,6 +37,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	spawnTimer -= dt;
 	//seperation(targetPos);
 	updateActors(dt, targetPos);
+	updateBosses(dt, targetPos);
 
 	if (spawnTimer <= 0)
 	{
@@ -45,9 +46,6 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 
 		spawnTimer = spawnCooldown;
 	}
-
-	if (this->bosses.size() > 0)
-		bosses[0]->update(dt, targetPos);
 
 	Vector3 newPos;
 	float deltaX;
@@ -234,11 +232,9 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 
 	if (this->bosses.size() > 0)
 	{
-		this->bosses[0]->checkIfWeakPointHit(bulletArray, size, soundTimer);
-
-		bosses[0]->checkIfWeakPointHit(bulletArray, size, soundTimer);
 		for (int i = 0; i < this->bosses.size(); i++)
 		{
+			this->bosses[i]->checkIfWeakPointHit(bulletArray, size, soundTimer);
 			for (int j = 0; j < size; j++)
 			{
 				if (!this->bosses[i]->isDead())
@@ -482,12 +478,33 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 				destroyActor(i);
 			}
 		}
-		if (bosses.size() > 0)
+	}
+}
+
+void ActorManager::updateBosses(float dt, Vector3 targetPos)
+{
+	bool hasDied = false;
+
+	for (int i = 0; i < this->bosses.size(); i++)
+	{
+		if (!bosses[i]->isDead() && bosses[i] != nullptr)
 		{
-			if (bosses[0]->isDead())
+			bosses[i]->update(dt, targetPos); //creash
+		}
+		else if (bosses[i]->isDead() && bosses[i] != nullptr)
+		{
+			hasDied = true;
+		}
+	}
+
+	if (hasDied)
+	{
+		for (int i = this->bosses.size() - 1; i >= 0; i--)
+		{
+			if (bosses[i]->isDead())
 			{
-				Game::getGameInfo().highScore += 25000;
-				destroyBoss(0);
+				Game::getGameInfo().highScore += bosses[i]->getPoints();
+				destroyBoss(i);
 			}
 		}
 	}
@@ -655,6 +672,7 @@ void ActorManager::destroyBoss(int index)
 		physics->DeleteRigidBody(bosses[index]->getRigidBody());
 	}
 	delete bosses[index];
+	bosses.pop_back();
 	//bosses.erase(bosses.begin() + index);
 }
 

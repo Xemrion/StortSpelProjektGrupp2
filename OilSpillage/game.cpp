@@ -140,7 +140,7 @@ void Game::setDrivingMode(bool realistic)
 
 int Game::getNrOfStagesDone()
 {
-	return instance->nrOfStagesDone;
+	return instance->gameInfo.nrOfClearedStages;
 }
 
 
@@ -158,7 +158,6 @@ void Game::createCurrentState()
 	{
 		Container::playerInventory = std::make_unique<Container>();
 		this->gameInfo = GameInfo();
-		nrOfStagesDone = 0.0f;
 		localScale = 1.0f;
 		state = std::make_unique<MenuGameState>();
 		Sound::stopAllSoundsExceptSoundtrack();
@@ -177,7 +176,7 @@ void Game::createCurrentState()
 			
 		}
 		
-		if (nrOfStagesDone <= 0)
+		if (gameInfo.nrOfClearedStages <= 0)
 		{
 			state = std::make_unique<PlayingGameState>(1231,7.0f*60.0f);
 		}
@@ -185,7 +184,7 @@ void Game::createCurrentState()
 		{
 			state = std::make_unique<PlayingGameState>(-1,gameInfo.time);
 		}
-		nrOfStagesDone++;
+		gameInfo.nrOfClearedStages++;
 		static_cast<PlayingGameState*>(state.get())->generateObjectives();
 		if (oldState == STATE_UPGRADING)
 		{	

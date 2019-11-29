@@ -32,6 +32,7 @@ Vehicle::Vehicle()
 	this->reverseTimer = 0;
 	this->reverseTimer2 = 0;
 
+	
 	this->curDir = Vector2(0.0f, 1.0f);//UP
 
 	this->defaultStats = VehicleStats::fastCar;
