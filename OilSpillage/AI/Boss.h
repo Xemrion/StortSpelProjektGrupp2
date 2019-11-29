@@ -14,6 +14,11 @@ public:
 	void checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTimer);
 	void changeHealth(float amount); //changef rom actor
 
+	const float getWeakSpotHealth1();
+	const float getWeakSpotHealth2();
+	const float getWeakSpotHealthMax1();
+	const float getWeakSpotHealthMax2();
+
 private:
 	float timeTilNextPoint;
 	float timeTilRotationChange;

@@ -1,6 +1,7 @@
 #pragma once
 #include"..///GameObject.h"
 #include"..///AI/Actor.h"
+#include"..///AI/Boss.h"
 enum class TypeOfTarget
 {
 	Box,
@@ -25,7 +26,7 @@ enum class Reward
 };
 struct Mission
 {
-	Actor* boss;
+	Boss* boss;
 	GameObject* *target;//target or targets
 	Vector3 generalPosition;
 	TypeOfMission typeMission;
@@ -43,7 +44,7 @@ public:
 	void setTarget(GameObject* *target, int nrOfTargets);
 	void setSpotLight(SpotLight* theLight);
 	void setEnemies(int nrOfEnemies);
-	void setBoss(Actor* boss);
+	void setBoss(Boss* boss);
 	void setType(TypeOfMission type);
 	void setGeneralPosition(Vector3 pos);
 	void setTargetType(TypeOfTarget targetType);
@@ -55,7 +56,7 @@ public:
 	TypeOfMission getType()const;
 	TypeOfTarget getTargetType()const;
 	
-	Actor* getBoss()const;
+	Boss* getBoss()const;
 	int getRewardTime()const;
 	int getScore()const;
 	std::string getInfo()const;
