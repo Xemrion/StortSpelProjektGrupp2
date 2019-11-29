@@ -53,6 +53,7 @@ void TurretHandler::update(float dt,const Vector3& targetPos)
 		{
 			if (turrets[i]->isDead())
 			{
+				Game::getGameInfo().highScore += turrets[i]->getPoints();
 				destroyTurret(i);
 			}
 		}
