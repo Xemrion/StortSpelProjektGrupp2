@@ -34,8 +34,8 @@ Minimap::Minimap(Vector2 position)
 Minimap::~Minimap()
 {
 	delete this->pixels;
-	this->textureFog->Release();
-	this->resourceFog->Release();
+	if (this->textureFog) this->textureFog->Release();
+	if (this->resourceFog) this->resourceFog->Release();
 }
 
 void Minimap::init()
