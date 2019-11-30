@@ -7,11 +7,11 @@
 
 // TODO (low prio) animated scanlines & gauss effects on map? coloured mode?
 
-static auto constexpr tileSide         {  5U };
-static auto constexpr scanlineInterval {  4U };
-static auto constexpr scanlineStrength { .0f };
-static auto constexpr multitileBorder  {  1U };
-static auto constexpr roadBorder       {  1U };
+static auto constexpr tileSide         {  5U  };
+static auto constexpr scanlineInterval {  4U  };
+static auto constexpr scanlineStrength { .03f };
+static auto constexpr multitileBorder  {  1U  };
+static auto constexpr roadBorder       {  1U  };
 
 #pragma warning( disable : 4715 ) 
 String createMinimapTexture( Map const &map, Bool isDistrictColoured )
