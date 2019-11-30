@@ -1420,7 +1420,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 					#ifndef _DEBUG // add rigid body to quadrant
 						house.hitboxes.emplace_back();
 						auto &hitbox = house.hitboxes.back();
-						auto     sca = Vector3 { fracSide*2.5f, 500.0f, fracSide*2.5f };
+						auto     sca = Vector3 { fracSide*2.5f, 999.0f, fracSide*2.5f };
 						auto     pos = basePosition;
 						if ( (q == quadrant_northeast) or (q == quadrant_northwest) )
 							pos.z += (2.5*fracSide);
@@ -1453,9 +1453,9 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 
 					#ifndef _DEBUG // add rigid body to quadrant
 						bool  isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        scaB = Vector3 { isVertical? halfSide:fracSide, 500.0f, isVertical? fracSide:halfSide };
+						auto        scaB = Vector3 { isVertical? halfSide:fracSide, 999.0f, isVertical? fracSide:halfSide };
 						auto        posA = basePosition;
-						auto        scaA = Vector3 { isVertical? fracSide:halfSide, 500.0f, isVertical? halfSide:fracSide };
+						auto        scaA = Vector3 { isVertical? fracSide:halfSide, 999.0f, isVertical? halfSide:fracSide };
 						auto        posB = basePosition;
 						switch (q) {
 							case quadrant_southeast: posA.z -= halfSide; posA.x += halfSide;   posB.x += halfSide; posB.z -= halfSide;  break;
@@ -1502,7 +1502,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						house.hitboxes.emplace_back();
 						auto    &hitbox = house.hitboxes.back();
 						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        sca = Vector3 { isVertical? fracSide:halfSide, 500.0f, isVertical? halfSide:fracSide };
+						auto        sca = Vector3 { isVertical? fracSide:halfSide, 999.0f, isVertical? halfSide:fracSide };
 						auto        pos = basePosition;
 						switch (q) {
 							case quadrant_southeast: pos.x += halfSide;  pos.z -= halfSide;  break;
@@ -1532,7 +1532,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						house.hitboxes.emplace_back();
 						auto    &hitbox = house.hitboxes.back();
 						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        sca = Vector3 { isVertical? halfSide:fracSide, 500.0f, isVertical? fracSide:halfSide };
+						auto        sca = Vector3 { isVertical? halfSide:fracSide, 999.0f, isVertical? fracSide:halfSide };
 						auto        pos = basePosition;
 						switch (q) {
 							case quadrant_southeast: pos.z -= halfSide;  pos.x += halfSide;  break;
@@ -1719,7 +1719,8 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 	return models;
 }
 
-Biome Map::getBiome() const noexcept {
+Biome Map::getBiome() const noexcept
+{
 	return biome;
 }
 
