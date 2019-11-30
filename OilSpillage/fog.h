@@ -23,8 +23,8 @@ class Fog
 {
 private:
 	D3D11_VIEWPORT vp;
-	const int textureWidth = 1024;
-	const int textureHeight = 1024;
+	const int textureWidth = 1024 / 4;
+	const int textureHeight = 1024 / 4;
 	Mesh* quad;
 	std::vector<GameObject*> quads;
 	std::vector<Texture*> fogTextures;

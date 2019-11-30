@@ -18,8 +18,8 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->menues[MENU_CONTROLS]->init();
 	this->menues[MENU_HIGHSCORE] = std::make_unique<UIHighscore>();
 
-	Game::getGraphics().loadTexture("UI/image");
-	this->textureBG = Game::getGraphics().getTexturePointer("UI/image");
+	Game::getGraphics().loadTexture("UI/image2");
+	this->textureBG = Game::getGraphics().getTexturePointer("UI/image2");
 	assert(textureBG && "Could not load texture!");
 	this->theVehicle = std::make_unique<Vehicle>();
 	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
@@ -27,7 +27,6 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->lightList = std::make_unique<LightList>();
 	this->lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 	this->lightList->addLight(PointLight(Vector3(0,-0.25, -0.25), Vector3(0.4, 0.1, 0), 10));
-
 
 	this->graphics.setLightList(lightList.get());
 
@@ -73,7 +72,7 @@ void MenuGameState::update(float deltaTime)
 	this->graphics.clearScreen(Vector4(0,0,0,0));
 	this->graphics.render(this->camera.get(), deltaTime);
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2(SCREEN_WIDTH / 2 - textureBG->getWidth() / 2,textureBG->getHeight()));
+	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2(SCREEN_WIDTH / 2 - textureBG->getWidth() / 2,textureBG->getHeight()-170));
 	UserInterface::getSpriteBatch()->End();
 
 	this->menues[this->currentMenu]->update(deltaTime);

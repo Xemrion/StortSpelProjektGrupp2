@@ -191,6 +191,7 @@ void Map::generateBorder() {
 	btRigidBody *tmp0 = physics->addBox( btVector3( pos0.x, pos0.y, pos0.z ),
 	                                     btVector3( sca0 ),
 	                                     .0f );
+	tmp0->setFriction(0);
 	border.bounds[0].setRigidBody( tmp0, physics );
 
 	// east
@@ -200,6 +201,7 @@ void Map::generateBorder() {
 	btRigidBody *tmp1 = physics->addBox( btVector3( pos1.x, pos1.y, pos1.z ),
 	                                     btVector3( sca1 ),
 	                                     .0f );
+	tmp1->setFriction(0);
 	border.bounds[1].setRigidBody( tmp1, physics );
 
 	// north
@@ -209,6 +211,7 @@ void Map::generateBorder() {
 	btRigidBody *tmp2 = physics->addBox( btVector3( pos2.x, pos2.y, pos2.z ),
 	                                     btVector3( sca2 ),
 	                                     .0f );
+	tmp2->setFriction(0);
 	border.bounds[2].setRigidBody( tmp2, physics );
 
 	// south
@@ -218,6 +221,7 @@ void Map::generateBorder() {
 	btRigidBody *tmp3 = physics->addBox( btVector3( pos3.x, pos3.y, pos3.z ),
 	                                     btVector3( sca3 ),
 	                                     .0f );
+	tmp3->setFriction(0);
 	border.bounds[3].setRigidBody( tmp3, physics );
 }
 
@@ -595,6 +599,7 @@ void  Map::generateBuildings( )
 							                                               500.0f,
 							                                               10.5f  * house.object.getScale().z ),
 							                                    .0f );
+							tmp->setFriction(0);
 							house.object.setRigidBody( tmp, physics );
 						#endif
 						tilemap->applyLot( maybeLot.value(), Tile::building );
@@ -684,6 +689,7 @@ void  Map::generateBuildings( )
 						                                               500.0f,
 						                                               15.5f * house.object.getScale().z ),
 						                                    .0f );
+						tmp->setFriction(0);
 						house.object.setRigidBody( tmp, physics );
 					#endif
 					tilemap->applyLot( maybeLot.value(), Tile::building );
@@ -1440,6 +1446,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
 						                                    btVector3( sca.x, sca.y, sca.z ),
 						                                   .0f );
+						tmp->setFriction(0);
 						hitbox.setRigidBody( tmp, physics );
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
@@ -1476,6 +1483,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						btRigidBody *tmpA = physics->addBox( btVector3( posA.x, posA.y, posA.z ),
 						                                     btVector3( scaA.x, scaA.y, scaA.z ),
 						                                    .0f );
+						tmpA->setFriction(0);
 						hitboxA.setRigidBody( tmpA, physics );
 
 
@@ -1491,6 +1499,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						btRigidBody *tmpB = physics->addBox( btVector3( posB.x, posB.y, posB.z ),
 						                                     btVector3( scaB.x, scaB.y, scaB.z ),
 						                                    .0f );
+						tmpB->setFriction(0);
 						hitboxB.setRigidBody( tmpB, physics );
 					#endif
 
@@ -1520,6 +1529,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
 						                                    btVector3( sca.x, sca.y, sca.z ),
 						                                   .0f );
+						tmp->setFriction(0);
 						hitbox.setRigidBody( tmp, physics );
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
@@ -1550,6 +1560,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
 						                                    btVector3( sca.x, sca.y, sca.z ),
 						                                   .0f );
+						tmp->setFriction(0);
 						hitbox.setRigidBody( tmp, physics );
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
