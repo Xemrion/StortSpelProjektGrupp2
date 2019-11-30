@@ -5,13 +5,12 @@
 #include "MapConfig.hpp"
 #include "District.hpp"
 
-// TODO (low prio) animated scanlines & gauss effects on map? coloured mode?
-
-static auto constexpr tileSide         {  5U  };
-static auto constexpr scanlineInterval {  4U  };
-static auto constexpr scanlineStrength { .03f };
-static auto constexpr multitileBorder  {  1U  };
-static auto constexpr roadBorder       {  1U  };
+// Tweak these to alter minimap generation:
+static auto constexpr tileSide         {  5U  }; // e.g. 5 => 5x5 pixel tiles
+static auto constexpr scanlineInterval {  4U  }; // lines between scanlines
+static auto constexpr scanlineStrength { .03f }; // brightening/darkening impact of scanlines; 0 = disabled
+static auto constexpr multitileBorder  {  1U  }; // thickness of border around multitile houses (in pixels)
+static auto constexpr roadBorder       {  1U  }; // thickness of sidewalk around roads          (in pixels)
 
 #pragma warning( disable : 4715 ) 
 String createMinimapTexture( Map const &map, Bool isDistrictColoured )
