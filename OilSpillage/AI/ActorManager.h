@@ -20,7 +20,6 @@ public:
 	void createSwarm(float x, float z);
 	Boss* createBoss(float x, float z, int weaponType);
 
-	void createSpitFire(float x, float z);
 	void createChaseCar(float x, float z);
 	void createShootCar(float x, float z, int weaponType = 0);
 

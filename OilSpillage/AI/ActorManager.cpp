@@ -102,12 +102,6 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 	turretHandler.createTurret(x, z, weaponType, physics);
 }
 
-void ActorManager::createSpitFire(float x, float z)
-{
-	this->actors.push_back(new Spitfire(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
-}
-
 void ActorManager::createChaseCar(float x, float z)
 {
 	this->actors.push_back(new ChaseCar(x, z, physics));
@@ -525,14 +519,12 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 		else if (enemyType < 75)
 		{
 			spawnChaseCars(newPos);
-			//spawnAttackers(newPos);
 		}
 		else if (enemyType < 80)
 		{
 			spawnShootCars(newPos);
-			//spawnSwarm(newPos);
 		}
-		else if (enemyType <= 100)
+		else
 		{
 			spawnSwarm(newPos);
 		}
@@ -603,7 +595,7 @@ void ActorManager::updateGroups()
 					}
 					//create its own group
 					else
-					{
+					{	
 						leaveGroup(i, k);
 						createGroup(current);
 					}
@@ -647,8 +639,8 @@ void ActorManager::destroyBoss(int index)
 		physics->DeleteRigidBody(bosses[index]->getRigidBody());
 	}
 	delete bosses[index];
-	bosses.pop_back();
-	//bosses.erase(bosses.begin() + index);
+	bosses.erase(bosses.begin() + index);
+
 }
 
 void ActorManager::initGroupForActor(DynamicActor* actor)
