@@ -54,8 +54,8 @@ private:
 	void destroyBoss(int index);
 	void initGroupForActor(DynamicActor* actor);
 	void createGroup(DynamicActor* actor);
-	Vector3 predictPlayerPos(const Vector3& targetPos);
-	Vector3 findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept;
+	const Vector3& predictPlayerPos(const Vector3& targetPos);
+	const Vector3& findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept;
 	std::vector<AIGroup> groups;
 	std::vector<DynamicActor*> actors;
 	std::vector<Boss*> bosses;
