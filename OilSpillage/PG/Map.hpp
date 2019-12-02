@@ -21,7 +21,7 @@ public:
 
 		model->mesh       = graphics.getMeshPointer( "Entities/Streetlight"   );
 		model->setScale({ .25f, .25f, .25f });
-		model->setColor({ 0.25f, .20f, .20f, 1.0f });
+		model->setColor({ .75f, .7f, .7f, 1.0f });
 		//model->setSpotShadow( false );
 		graphics.addToDraw( model.get() );
 
@@ -104,7 +104,7 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum, RNG & ) noexcep
 struct CompositeHouse {
 	GameObject          walls, windows, roof;
 	Vector<GameObject>  hitboxes;
-	Bounds              bounds;
+	V2u                 dimensions;
 };
 
 struct SingleTileHouse {

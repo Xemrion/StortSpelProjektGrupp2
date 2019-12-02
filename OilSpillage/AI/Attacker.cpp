@@ -12,7 +12,6 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	Game::getGraphics().addToDraw(this);
 
 	this->stats = VehicleStats::AIAttacker;
-	//setHealth(this->stats.maxHealth * (1 + (0.3 * Game::getGameInfo().nrOfClearedStages)));
 	float newHealth = stats.maxHealth;
 	scaling(newHealth, 1.3);
 	setMaxHealth(newHealth);
@@ -23,7 +22,6 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	this->attackRange = 10;
 	createRigidbody(physics);
 	this->setPoints(100 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
-	//this->weapon.damage = this->weapon.damage * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages));
 	scaling(weapon.damage, 1.1);
 }
 
@@ -44,7 +42,10 @@ void Attacker::createRigidbody(Physics* physics)
 Attacker::~Attacker()
 {
 	Game::getGraphics().removeFromDraw(this);
-	Game::getGameInfo().nrOfAttackers++;
+	if(this->isDead())
+	{
+		Game::getGameInfo().nrOfAttackers++;
+	}
 }
 
 void Attacker::setUpActor()
@@ -56,8 +57,6 @@ void Attacker::setUpActor()
 
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Attacker::inAttackRange, std::ref(*this)));
-	//Behavior& waitTimer = bt.getAction();
-	//waitTimer.addAction(std::bind(&Attacker::WaitTime, std::ref(*this)));
 	Behavior& chase = bt.getAction();
 	chase.addAction(std::bind(&Attacker::setChaseState, std::ref(*this)));
 	Behavior& roam = bt.getAction();
@@ -78,7 +77,6 @@ void Attacker::setUpActor()
 
 	seq2.addChildren(inRange);
 	
-	//seq2.addChildren(waitTimer);
 	seq2.addChildren(shoot);
 }
 
@@ -90,7 +88,6 @@ Vector3 Attacker::seek()
 	if (!vActive)
 	{
 		desiredDirection -= position - destination;
-		//desired *= maxSpeed;
 		if (this->stats.maxSpeed != 3.0)
 		{
 			this->stats.maxSpeed = 3.0;
@@ -112,7 +109,6 @@ Vector3 Attacker::seek()
 	{
 		acceleration /= acceleration.Length();
 	}
-	//vActive = false;
 	return acceleration;
 }
 
