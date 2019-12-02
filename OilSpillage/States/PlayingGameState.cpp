@@ -1027,6 +1027,8 @@ void PlayingGameState::generateObjectives()
 	{
 		//difficulty scale
 		float scalingNr = Game::getNrOfStagesDone() / 3; // /3
+		if (scalingNr == 0)
+			scalingNr = 1;
 
 		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1, scalingNr)); //fix pos
 		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
