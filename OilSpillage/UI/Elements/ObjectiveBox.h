@@ -14,6 +14,8 @@ private:
 	std::unique_ptr<AnimatedText> objectiveText;
 	std::unique_ptr<AnimatedText> info;
 	std::unique_ptr<AnimatedText> rewardInfo;
+	int blinkTimer = 1;
+	float objectiveTimer;
 public:
 	static Vector2 size;
 
@@ -23,6 +25,9 @@ public:
 	void init();
 	void draw(bool selected);
 	void update(float deltaTime);
+	void setPosition(Vector2 position);
+	void setInfoPosition(Vector2 position, float scale);
+	Vector2 getInfoSize() const;
 };
 
 

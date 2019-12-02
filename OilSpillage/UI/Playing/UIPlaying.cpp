@@ -31,6 +31,8 @@ void UIPlaying::updateUI(float deltaTime)
 	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
 	Color color(Colors::Yellow);
 	Vector2 position = this->timer->getPosition();
+	Vector2 objPosition = Vector2(SCREEN_WIDTH / 2 - ObjectiveBox::size.x / 2, SCREEN_HEIGHT / 2 - ObjectiveBox::size.y / 2);
+	float objScale = 2.0;
 
 	if (this->shouldInit)
 	{
@@ -41,8 +43,29 @@ void UIPlaying::updateUI(float deltaTime)
 	}
 
 	this->respawnTimer += deltaTime;
+	this->objectiveTimer += deltaTime;
 	this->minimap->update(deltaTime);
 	this->objectiveBox->update(deltaTime);
+
+	if(objectiveTimer >= 0.5f && objectiveTimer < 3.0f)
+	{
+		objPosition = Vector2::Lerp(Vector2(SCREEN_WIDTH / 2 - objectiveBox->getInfoSize().x / 2, SCREEN_HEIGHT / 2 - objectiveBox->getInfoSize().y / 2),
+			Vector2(10, 10) + Vector2(16, 64), 
+			(objectiveTimer-0.5f)/2.5);
+
+		objScale = Game::lerp(1.5f, 0.2f, (objectiveTimer - 0.5f) / 2.5);
+	}
+	else if(objectiveTimer >= 3.0f)
+	{
+		objPosition = Vector2(10, 10) + Vector2(16, 64);
+		objScale = 0.2f;
+	}
+	else
+	{
+		objPosition = Vector2(SCREEN_WIDTH / 2 - objectiveBox->getInfoSize().x / 2, SCREEN_HEIGHT / 2 - objectiveBox->getInfoSize().y / 2);
+		objScale = 1.5f;
+	}
+	objectiveBox->setInfoPosition(objPosition, objScale);
 
 	if (this->timeChangeText.get())
 	{
@@ -181,7 +204,7 @@ void UIPlaying::drawUI()
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty", Vector2((SCREEN_WIDTH / 2) , 660), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
 	}
 	this->healthBar->draw(false);
-	this->objectiveBox->draw(false);
+	objectiveBox->draw(false);
 	this->minimap->draw(false);
 	this->timerText->draw(false);
 	this->timer->draw(false);
@@ -205,7 +228,7 @@ void UIPlaying::init()
 	this->bossShieldBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 610), Colors::DarkGray);
 
 	this->minimap = std::make_unique<Minimap>(Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
-	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(10, 10));
+	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(10,10));
 
 	this->timerText = std::make_unique<AnimatedText>("Time: ", Color(Colors::Yellow), 0.5f, Animation::NONE, Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2 - 115 - 100, 10));
 	this->timerText->beginAnimation();
