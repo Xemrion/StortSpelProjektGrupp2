@@ -261,7 +261,7 @@ void Bullet::laserEnemyUpdate(float& deltaTime)
 			Sound::play(soundEffect);
 			soundTimer = 0;
 		}
-		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage());
+		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage()*deltaTime);
 	}
 	this->obj->setScale(weapon.bulletScale * Vector3(timeLeft / weapon.bulletLifetime, timeLeft / weapon.bulletLifetime, 1.0));
 	if (timeLeft > 0.0f)
