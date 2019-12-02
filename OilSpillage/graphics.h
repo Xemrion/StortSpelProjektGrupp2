@@ -117,15 +117,13 @@ public:
 	HRESULT createFrustumBuffer(DynamicCamera* camera);
 	Debug* getdebugger();
 	Window* getWindow();
-	void loadMesh(std::string path, Vector3 rotation = Vector3(0, 0, 0));
-	void loadMesh(std::string name, std::vector<Vertex3D>& vertices, Vector3 rotation = Vector3(0, 0, 0)); //Construct mesh from vector of Vertex3D.
-	void unloadMesh(std::string name);
-	void loadModel(std::string path, Vector3 rotation = Vector3(0,0,0));
+	void loadMesh(     std::string const &path, Vector3 rotation={.0f,.0f,.0f} );
+	void loadMaterial( std::string const &path );
+	void loadModel(    std::string const &path, Vector3 rotation={.0f,.0f,.0f} );
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
 	bool loadTexture(std::string fileName, bool overridePath = false, bool cpuOnly = false);
-	bool reloadTexture(std::string fileName, bool overridePath=false);
+	bool reloadTexture( std::string fileName, bool overridePath=false );
 	const Mesh* getMeshPointer(const char *path);
-	const Mesh* getPGMeshPointer(const char* path);
 	Texture* getTexturePointer(const char *path);
 	Material getMaterial(const char* modelPath);
 	void addToDraw(GameObject* o);
@@ -138,7 +136,7 @@ public:
 	void removeFromUIDraw(GameObject* obj, Matrix* world);
 	void removeAllUIDraw();
 	void setUISun(Vector3 direction, Vector4 color);
-	void renderUI(float deltaTime);
+	void renderUI(float deltaTime, int selectedIndex = -1);
 
 	void setLightList(LightList* lightList);
 	void presentScene();

@@ -6,6 +6,9 @@
 #include "UI/UserInterface.h"
 #include <cassert>
 
+// quad tree side (+ border)
+#define MAX_SIDE  68.0f
+
 Graphics::Graphics()
 {
 	this->window = nullptr;
@@ -32,9 +35,9 @@ Graphics::Graphics()
 	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
 	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso", "TrailPS.cso");
 
-	this->particleHandler->addParticleSystem(this->particleSystem, "fire");
+	this->particleHandler->addParticleSystem(this->particleSystem,  "fire");
 	this->particleHandler->addParticleSystem(this->particleSystem2, "smoke");
-	this->particleHandler->addParticleSystem(this->particleTrail, "trail");
+	this->particleHandler->addParticleSystem(this->particleTrail,   "trail");
 	Vector4 colors[4] = {
 		Vector4(0.0f,0.0f,1.0f,1.0f)
 	};
@@ -55,7 +58,7 @@ Graphics::Graphics()
 
 	this->particleHandler->loadParticleSystems();
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
-	this->quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
+	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 }
 
 Graphics::~Graphics()
@@ -459,15 +462,15 @@ bool Graphics::init(Window* window)
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
 	fogMaterial.scale = 50.0;
-	fogMaterial.density = 0.3;
-	fogMaterial.ambientDensity = 0.025;
-	fogMaterial.densityThreshold = 0.0;
+	fogMaterial.density = 0.1;
+	fogMaterial.ambientDensity = 0.08;
+	fogMaterial.densityThreshold = 0.15;
 
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
 
-	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
-
+	fog->initialize(device, deviceContext, 15, 2.25/5, fogMaterial);
+	fog->setWindSpeed(Vector2(4.0f / 1024.f, 4.0f / 1024.f));
 	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
 	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
 	deviceContext->RSSetViewports(1, &this->vp);
@@ -649,7 +652,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 		}
 	}
 	
-	drawStaticGameObjects(camera, frustum, 10.0);
+	drawStaticGameObjects(camera, frustum, 15.0);
 	
 	drawFog(camera, deltaTime);
 
@@ -995,11 +998,12 @@ ID3D11Device* Graphics::getDevice()
 	return this->device.Get();
 }
 
-void Graphics::loadMesh(std::string fileName, Vector3 rotation)
+void Graphics::loadMesh( std::string const &fileName, Vector3 rotation )
 {
+	if ( fileName == "Cube" or fileName == "Quad" ) return;
+
 	Mesh newMesh;
 
-	
 	Importer imp;
 	std::string meshBinPath = fileName + "/mesh.bin";
 	if (imp.loadMesh(meshBinPath.c_str()))
@@ -1128,105 +1132,26 @@ void Graphics::loadMesh(std::string fileName, Vector3 rotation)
 		}
 
 	}
-	
+	else assert( false and "Failed to load mesh!" );
 }
 
-void Graphics::loadMesh(std::string name, std::vector<Vertex3D>& vertices, Vector3 rotation)
+void Graphics::loadModel( std::string const &path, Vector3 rotation )
 {
-	Mesh newMesh;
-	if (meshes.find(name) == meshes.end())
-	{
-		meshes[name] = newMesh;
-
-		meshes[name].insertDataToMesh(vertices);
-
-		AABB aabb;
-		Vector3 max = vertices[0].position, min = vertices[0].position;
-		Vector4 temp(0.0f);
-		for (int i = 0; i < vertices.size(); i++) {
-			temp = Vector4::Transform(Vector4(vertices[i].position.x, vertices[i].position.y, vertices[i].position.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
-			vertices[i].position.x = temp.x;
-			vertices[i].position.y = temp.y;
-			vertices[i].position.z = temp.z;
-
-			temp = Vector4::Transform(Vector4(vertices[i].normal.x, vertices[i].normal.y, vertices[i].normal.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
-			vertices[i].normal.x = temp.x;
-			vertices[i].normal.y = temp.y;
-			vertices[i].normal.z = temp.z;
-
-			temp = Vector4::Transform(Vector4(vertices[i].tangent.x, vertices[i].tangent.y, vertices[i].tangent.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
-			vertices[i].tangent.x = temp.x;
-			vertices[i].tangent.y = temp.y;
-			vertices[i].tangent.z = temp.z;
-
-			temp = Vector4::Transform(Vector4(vertices[i].bitangent.x, vertices[i].bitangent.y, vertices[i].bitangent.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
-			vertices[i].bitangent.x = temp.x;
-			vertices[i].bitangent.y = temp.y;
-			vertices[i].bitangent.z = temp.z;
-
-			if (vertices[i].position.x > max.x) {
-				max.x = vertices[i].position.x;
-			}
-			if (vertices[i].position.x < min.x) {
-				min.x = vertices[i].position.x;
-			}
-			if (vertices[i].position.y > max.y) {
-				max.y = vertices[i].position.y;
-			}
-			if (vertices[i].position.y < min.y) {
-				min.y = vertices[i].position.y;
-			}
-			if (vertices[i].position.z > max.z) {
-				max.z = vertices[i].position.z;
-			}
-			if (vertices[i].position.z < min.z) {
-				min.z = vertices[i].position.z;
-			}
-		}
-		aabb.maxPos = max;
-		aabb.minPos = min;
-		meshes[name].setAABB(aabb);
-
-		int bufferSize = static_cast<int>(meshes[name].vertices.size()) * sizeof(Vertex3D);
-		UINT stride = sizeof(Vertex3D);
-
-		D3D11_BUFFER_DESC vBufferDesc;
-		ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
-
-		vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vBufferDesc.ByteWidth = bufferSize;
-		vBufferDesc.CPUAccessFlags = 0;
-		vBufferDesc.MiscFlags = 0;
-
-		D3D11_SUBRESOURCE_DATA subData;
-		ZeroMemory(&subData, sizeof(subData));
-		subData.pSysMem = meshes[name].vertices.data();
-
-		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[name].vertexBuffer.GetAddressOf());
-		meshes[name].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
-	}
-
-}
-
-void Graphics::unloadMesh(std::string name)
-{
-	if (meshes.find(name) != meshes.end()) {
-		meshes.erase(meshes.find(name));
-	}
+   std::string  modelDir {MODEL_ROOT_DIR};
+                modelDir += path;
+	loadMesh(    modelDir, rotation );
+	loadMaterial( path );
 }
 
 
-void Graphics::loadModel(std::string path, Vector3 rotation)
+void Graphics::loadMaterial( std::string const &path )
 {
-   std::string modelDir {MODEL_ROOT_DIR};
-               modelDir += path;
-	loadMesh( modelDir ,rotation);
-	loadTexture( modelDir+"/_diffuse.tga", true );
-   // TODO: load other texture channels
-	loadTexture(modelDir + "/_specular.tga", true);
-	loadTexture(modelDir + "/_normal.tga", true);
-	loadTexture(modelDir + "/_gloss.tga", true);
+	std::string  modelDir {MODEL_ROOT_DIR};
+                modelDir += path;
+	loadTexture( modelDir + "/_diffuse.tga",  true );
+	loadTexture( modelDir + "/_specular.tga", true );
+	loadTexture( modelDir + "/_normal.tga",   true );
+	loadTexture( modelDir + "/_gloss.tga",    true );
 }
 
 void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
@@ -1465,20 +1390,6 @@ const Mesh* Graphics::getMeshPointer(const char* localPath)
    return &meshes[meshPath];
 }
 
-const Mesh* Graphics::getPGMeshPointer(const char* localPath)
-{
-	std::string meshPath;
-	if (localPath != nullptr)
-	{
-		meshPath = std::string(localPath);
-	}
-
-	if (meshes.find(meshPath) == meshes.end()) {
-		return nullptr;
-	}
-	return &meshes[meshPath];
-}
-
 Texture* Graphics::getTexturePointer(const char* path)
 {
 	std::string texturePath;
@@ -1565,7 +1476,7 @@ void Graphics::clearDraw()
 
 void Graphics::clearStaticObjects()
 {
-	quadTree = std::make_unique<QuadTree>(Vector2(0.0f, -96.f * 20.f), Vector2(96.f * 20.f, 0.0f), 4);
+	quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 }
 
 void Graphics::addToUIDraw(GameObject* obj, Matrix* world)
@@ -1598,7 +1509,7 @@ void Graphics::setUISun(Vector3 direction, Vector4 color)
 	this->uiSun.setDirection(this->uiSunDir);
 }
 
-void Graphics::renderUI(float deltaTime)
+void Graphics::renderUI(float deltaTime, int selectedIndex)
 {
 	float color[4] = {
 		0,0,0,1
@@ -1631,7 +1542,6 @@ void Graphics::renderUI(float deltaTime)
 
 	//set up Shaders
 
-
 	deviceContext->PSSetShader(this->uiPixelShader.getShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->uiVertexShader.getShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
@@ -1640,10 +1550,20 @@ void Graphics::renderUI(float deltaTime)
 
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	if (selectedIndex > -1 && this->uiObjects.size()>1)
+	{
+		//std::swap(this->uiObjects[selectedIndex], this->uiObjects[this->uiObjects.size()-1]);
+	}
 	int index = 0;
 	for (std::pair<GameObject*,Matrix*> object : this->uiObjects)
 	{
+		//if (selectedIndex!=-1&&object == this->uiObjects.back())
+		//{
+		//	ID3D11DepthStencilView* nulView = nullptr;
+
+		//	/*deviceContext->OMSetDepthStencilState(nulView, 0);*/
+		//	deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
+		//}
 		SimpleMath::Matrix world = *object.second;//worlds[]
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -1962,7 +1882,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
 		const Vector2 windSpeed = fog->getWindSpeed();
-		Vector4 t = Vector4(time, windSpeed.x + (i % 3) * 0.00003, windSpeed.y + (i % 2) * 0.000045, 0.0);
+		Vector4 t = Vector4(time, windSpeed.x + (i % 3) * 0.00001, windSpeed.y + (i % 3) * 0.000015, 0.0);
 		deviceContext->Map(fogAnimationBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &t, sizeof(Vector4));
 		deviceContext->Unmap(fogAnimationBuffer.Get(), 0);
