@@ -110,7 +110,7 @@ bool AStar::isInVector(std::vector<Size>& vector, Size node)
 void AStar::reconstructPath(Size goalIndex, std::vector<Vector3>& path)
 {
 	Size current;
-	current = goalIndex;
+	current = goalIndex;		
 	while (tileData.at(current).prevIndex != -1)
 	{
 		path.emplace_back(map.getWorldPosByIndex(current));

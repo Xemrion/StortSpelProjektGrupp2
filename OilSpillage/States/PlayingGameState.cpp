@@ -40,7 +40,6 @@ void PlayingGameState::createElectric(int randNr, float deltaTime)
 	electricNew = randNr;
 	testNetwork->clearSegments();
 	testNetwork.get()->generateInitialSegments("F");
-	//testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
 
 	if (true)
 		testNetwork.get()->setAngle(electricNew);
@@ -100,13 +99,10 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadTexture("Tiles/asphalt_nor");
 	graphics.loadTexture("Tiles/grass");
 	graphics.loadTexture("Tiles/grass_nor");
-	// graphics.loadTexture("Tiles/grass_spec");
 	graphics.loadTexture("Tiles/snow");
 	graphics.loadTexture("Tiles/snow_nor");
-	// graphics.loadTexture("Tiles/snow_spec");
 	graphics.loadTexture("Tiles/desert");
 	graphics.loadTexture("Tiles/desert_nor");
-	// graphics.loadTexture("Tiles/desert_spec");
 	graphics.loadTexture("Tiles/road_trans_2file2metro");
 	graphics.loadTexture("Tiles/road_trans_2file2metro_nor");
 	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne");
@@ -147,12 +143,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	loadMultitileLayouts("data/layouts/multitilePrefabs.dat");
 
 	graphics.loadModel("Hospital");
-	//graphics.loadModel("Roads/Road_pavement");
-	//graphics.loadModel("Roads/Road_deadend");
-	//graphics.loadModel("Roads/Road_bend");
-	//graphics.loadModel("Roads/Road_straight");
-	//graphics.loadModel("Roads/Road_3way");
-	//graphics.loadModel("Roads/Road_4way");
+
 	graphics.loadModel("Houses/testHouse");
 	graphics.loadModel("Houses/testHouse2");
 	graphics.loadModel("Houses/testHouse3");
@@ -169,74 +160,11 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	player = std::make_unique<Vehicle>();
 	player->makePlayer();
 
-	//lightList->removeLight(lightList->addLight(PointLight(Vector3(0, 1.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 5000.f))); // wot????
-
-	/*
-	for (int i = 0; i < 100; ++i) {
-		Vector3 randPos = Vector3(static_cast<float>(rand() % 1000), static_cast<float>(rand() % 9 + 1), -static_cast<float>(rand() % 1000));
-		Vector3 randColor = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand())) / RAND_MAX;
-		randColor.Clamp(Vector3(0.2f, 0.2f, 0.2f), Vector3(1.0f, 1.0f, 1.0f));
-
-		lightList->addLight(
-			PointLight(
-				randPos,
-				randColor,
-				10.0f));
-	}*/
-
-	//testSystem = std::make_unique<Lsystem>();
-	//testSystem.get()->setupDragonCurveSystem();
-	//testSystem.get()->updateLSystem();
-
-
-	 //Road Network Turtlewalker
-	//FFFFFFFFFFFFFFF - FF - FF - FFH + F + F + FF + FF + FF + FFFFFFFFF + FF - F - FF - FFF - FFF
-
-
-	//testNetwork.get()->generateInitialSegments("F");
-	//testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-
-	//testNetwork.get()->setAngle(30);
-	//testNetwork.get()->generateAdditionalSegments("F--FF++FF", 1, false);
-	/*testNetwork.get()->generateAdditionalSegments("F-F", 1, false);
-	for (int i = 2; i < 4; i++)
-	{
-		testNetwork.get()->generateAdditionalSegments("F-F-F-F", i, i%2);
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		testNetwork.get()->generateAdditionalSegments("F-FF-F+F-FF-F-F-F", i + 4, i % 2);
-		testNetwork.get()->generateAdditionalSegments("F-F-F-FF-F+F-F-F", i + 4*2, i % 2);
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		testNetwork.get()->generateAdditionalSegments("F-FF-F+F-FF-F-F-F", i + 4, i % 2);
-		testNetwork.get()->generateAdditionalSegments("F-F-F-FF-F+F-F-F", i + 4 * 2, i % 2);
-	}*/
-	//for (int i = 0; i < 5; i++) 
-	//{
-	//	// testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	//}
-	//testNetwork.get()->setAngle(90+45);
-
-	//for (int i = 0; i < 5; i++)
-	//{
-	//	testNetwork.get()->generateAdditionalSegments("F-F+F+FF-F-F+F", i, false);
-	//	testNetwork.get()->generateAdditionalSegments("H-F+FFF+F+H+F", ((i * i) + 1) + 2, true);
-	//}
-	/* testNetwork.get()->cleanRoadNetwork();
-	 testNetwork.get()->saveTestNetwork("test-network");
-	*/
-	//}
-
 	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 
 	graphics.setLightList(lightList.get());
 	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.0f);
 	this->player->setSpotLight(lightList->addLight(tempLight));
-
-	//LaserLight tempLaserLight(Vector3(0.0, 0.0, 0.0), Vector3(0.9, 0.1, 0.9), 10.0, Vector3(1.0, 0.0, 0.0), 10.0);
-	//this->player->setLaserLight(lightList->addLight(tempLaserLight));
 
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
@@ -266,7 +194,6 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	this->cameraObject = new GameObject;
 	Game::getGraphics().loadShape(Shapes::SHAPE_CUBE);
 	cameraObject->mesh = Game::getGraphics().getMeshPointer("Cube");
-	//Game::getGraphics().addToDraw(vehicle);
 	cameraObject->setPosition(Vector3(player->getPosition().x, 10.0f, player->getPosition().z));
 	cameraObject->setScale(Vector3(1.5f, 1.5f, 1.5f));
 	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x, btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 0.01f);
@@ -304,40 +231,8 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 	graphics.setParticle2ColorNSize(colorP2, 2, 0.025f, 0.05f);
 
-
-	//addPowerUp(PowerUp(Vector3(10, 0.0, -500), PowerUpType::Star, 90.0));
-
-	/*objectives.addObjective(TypeOfMission::KillingSpree, 120, 20, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 5, "Pick up the important", TypeOfTarget::Crate);
-	objectives.addObjective(TypeOfMission::GetToPoint, 0, 5, "Go to the exit now!!!", TypeOfTarget::Crate);
-
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::KillingSpree, 240, 75, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 50, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 6, "Pick up the important");
-	objectives.addObjective(TypeOfMission::KillingSpree, 120, 25, "Kill the enemies");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 2, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 8, "Pick up the important");
-	objectives.addObjective(TypeOfMission::FindAndCollect, 240, 7, "Pick up the important");*/
-
-
 	this->graphics.setTestParticleSystem(this->graphics.getParticleSystem("explosion"));
 	this->fillTestParticle();
-
-
-
-	//Bullet
-	/*buildingTest = std::make_unique<GameObject>();
-	graphics.loadModel("Vehicles/Player");
-	buildingTest->mesh = graphics.getMeshPointer("Vehicles/Player");
-	graphics.addToDraw(buildingTest.get());
-	btRigidBody* tempo2 = physics->addBox(btVector3(-15, 0.0f, -15.0f), btVector3(10.0f, 100.0f, 10.0f), 0.0f);
-	buildingTest->setPosition(Vector3(-15, 0.0f, -15.0f));
-	buildingTest->setScale(Vector3(10.0f, 100.0f, 10.0f));
-	buildingTest->setColor(Vector4(0.5, 0.5, 0.5, 1));
-	buildingTest->setRigidBody(tempo2, physics.get());*/
-
 	graphics.getParticleSystem("fire")->setGravity(-0.1f);
 	graphics.getParticleSystem("fire")->setSize(0.055f, 0.065f);
 	graphics.getParticleSystem("fire")->changeVectorField(1.75f, 0.5f);
@@ -398,42 +293,6 @@ void PlayingGameState::ImGui_AI()
 {
 	ImGui::Begin("AI");
 	ImGui::SetWindowSize({ 400,150 });
-
-	//ImGui::Text(("Groups: " + std::to_string(actorManager->groups.size())).c_str());
-	//for (int i = 0; i < actorManager->groups.size(); i++)
-	//{
-	//	ImGui::Text(("Group " + std::to_string(i) + ":" + std::to_string(actorManager->groups.at(i).size())).c_str());
-	//}
-	//ImGui::Text(("x: " + std::to_string(player->getPosition().x)).c_str());
-	//ImGui::Text(("y: " + std::to_string(player->getPosition().y)).c_str());
-	//ImGui::Text(("z: " + std::to_string(player->getPosition().z)).c_str());
-
-	//Vector3 xzPos = Vector3(player->getPosition().x, 0, -player->getPosition().z);
-	/*float goalX = actorManager->groups.at(0).actors.at(0)->destination.x;
-	float goalZ = actorManager->groups.at(0).actors.at(0)->destination.z;
-	ImGui::Text((("GoalPosX: " + std::to_string(goalX)).c_str()));
-	ImGui::Text((("GoalPosZ: " + std::to_string(goalZ)).c_str()));
-
-	float posX = actorManager->groups.at(0).actors.at(0)->getPosition().x;
-	float posZ = actorManager->groups.at(0).actors.at(0)->getPosition().z;
-
-	ImGui::Text((("PosX: " + std::to_string(posX)).c_str()));
-	ImGui::Text((("PosZ: " + std::to_string(posZ)).c_str()));
-
-	float distance = (actorManager->groups.at(0).actors.at(0)->destination - actorManager->groups.at(0).actors.at(0)->getPosition()).Length();
-
-	ImGui::Text((("Distance: " + std::to_string(distance)).c_str()));
-
-	float pathSize = actorManager->groups.at(0).actors.at(0)->path->size();
-	ImGui::Text((("Path size: " + std::to_string(pathSize)).c_str()));*/
-	//ImGui::Text(("VelocityX: " + std::to_string(this->player->getRigidBody()->getLinearVelocity().getX())).c_str());
-	//ImGui::Text(("VelocityY: " + std::to_string(this->player->getRigidBody()->getLinearVelocity().getY())).c_str());
-	//ImGui::Text(("VelocityZ: " + std::to_string(this->player->getRigidBody()->getLinearVelocity().getZ())).c_str());
-	/*	+ std::to_string(player->getPosition().y).c_str()
-							+ std::to_string(player->getPosition().z).c_str()));*/
-	
-	//ImGui::Text(("Score: " + std::to_string(Game::getGameInfo().highScore)).c_str());
-	
 	ImGui::End();
 }
 
@@ -653,25 +512,6 @@ void PlayingGameState::setPlayer(Vehicle* theVehicle)
 
 void PlayingGameState::update(float deltaTime)
 {
-	
-	/*testNetwork->clearSegments();
-	testNetwork.get()->generateInitialSegments("F");
-	testNetwork->setAngle(40.0f);
-	for (int i = 2; i < 4; i++)
-	{
-		testNetwork.get()->generateAdditionalSegments("F-F-F-F", i, i % 2);
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		testNetwork.get()->generateAdditionalSegments("F-FF-F+F-FF-F-F-F", i + 4, i % 2);
-		testNetwork.get()->generateAdditionalSegments("F-F-F-FF-F+F-F-F", i + 4 * 2, i % 2);
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		testNetwork.get()->generateAdditionalSegments("F-FF-F+F-FF-F-F-F", i + 4, i % 2);
-		testNetwork.get()->generateAdditionalSegments("F-F-F-FF-F+F-F-F", i + 4 * 2, i % 2);
-	}*/
-	//this->createElectric(rand() % 360, deltaTime);
 
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
@@ -777,49 +617,6 @@ void PlayingGameState::update(float deltaTime)
 		}
 		if (timer > 0.1f&&timerEMP>0.0f)
 		{
-			/*testNetwork->clearSegments();
-			testNetwork.get()->setAngle(rand() % 360 + 1);
-
-			testNetwork.get()->generateInitialSegments("+F");
-
-			testNetwork.get()->setAngle(rand()%30+1);
-
-			testNetwork.get()->generateInitialSegments("H--H--H--H--H--H--H--H");
-			int scale = 10;
-			std::string temp = "F--FFFF++FFFF-FFF--FF";
-			std::string addedTemp = temp;
-			for (int i = 1; i < scale; i++)
-			{
-				if (i % 2)
-				{
-					addedTemp.replace("-", "+");
-				}
-				temp += addedTemp;
-			}
-			if (rand() % 2)
-			{
-				temp += "FF-F+F+FF";
-			}
-			std::string branch = "FF-FF+F";
-			if (rand() % 2)
-			{
-				branch += "F+FF-FF";
-			}
-			testNetwork.get()->generateAdditionalSegments(temp.c_str(), 1, rand() % 2);
-			testNetwork.get()->generateAdditionalSegments(branch.c_str(), scale*2, rand() % 2);
-			testNetwork.get()->generateAdditionalSegments(branch.c_str(), 12, rand() % 2);
-			testNetwork.get()->generateAdditionalSegments(branch.c_str(), 22, rand() % 2);
-
-			timer = 0.0f;
-			int iteration = rand() % this->testNetwork->getSegments().size() + 10;
-			iteration = this->testNetwork->getSegments().size();
-			for (int i = 1; i < iteration; i++)
-			{
-				this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()) +Vector3(0,0,5.0f)+ Vector3(this->testNetwork->getSegments().at(i).firstPoint.x, this->testNetwork->getSegments().at(i).firstPoint.y, this->testNetwork->getSegments().at(i).firstPoint.z), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
-			}
-			*/
-
-			//this->graphics.addTestParticle(Vector3(player->getVehicleBody1()->getPosition()+Vector3(0.0f,0.0f,5.0f)), Vector4(0, 0, 0, 0.0f), this->addNrOfParticles, this->lifeTime, this->randomPosPower);
 			timer = 0.0f;
 		}
 
@@ -972,13 +769,6 @@ void PlayingGameState::spawnObjects()
 		randomValue = (rand() % 3 + 8) * 0.125f;
 		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
 		objPtr->setScale(Vector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue));
-
-		//objPtr->setColor(Vector4(0.8, 0.6, 0.38, 1));
-		/*tempo2 = physics->addBox(btVector3(-200, 0.2f + i, -200), btVector3(0.38f * randomValue, 0.38f * randomValue, 0.38f * randomValue), 0.01f);
-		objPtr->setRigidBody(tempo2, physics.get());
-		objPtr->getRigidBody()->setFriction(0.7f);
-		objPtr->getRigidBody()->setActivationState(0);
-		objPtr->getRigidBody()->setDeactivationTime(0.1f);*/
 	}
 	float size = 1.3f * 0.38f;
 	randomValue = 0;
@@ -1015,13 +805,6 @@ void PlayingGameState::spawnObjects()
 		objPtr->setScale(Vector3(size, size, size));
 		tempo2 = physics->addSphere(size, btVector3(0, 0.0f, 0), 0.01f);
 		objPtr->setPosition(Vector3(0, 0, 0));
-
-		//objPtr->setColor(Vector4(0.8, 0.6, 0.38, 1));
-		/*objPtr->setRigidBody(tempo2, physics.get());
-		objPtr->getRigidBody()->setDamping(0, 0.98f);
-		objPtr->getRigidBody()->setFriction(0.7f);
-		objPtr->getRigidBody()->setActivationState(0);
-		objPtr->getRigidBody()->setDeactivationTime(0.1f);*/
 	}
 	for (int i = 0; i < 250; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
@@ -1037,53 +820,6 @@ void PlayingGameState::spawnObjects()
 		objPtr->setSpotShadow(false);
 		objPtr->setSunShadow(false);
 	}
-
-	//physicsObjects.emplace_back(std::make_unique<GameObject>());
-	//auto objPtr = physicsObjects.back().get();
-	//graphics.loadModel("Cube");
-	//objPtr->mesh = graphics.getMeshPointer("Cube");
-	//graphics.addToDraw(objPtr);
-	//tempo2 = physics->addBox(btVector3(20, 0.2f, -20), btVector3(5.5f, 12.5f, 5.5f), 0);
-	//objPtr->setPosition(Vector3(20, 0.2f, -20));
-	//objPtr->setScale(Vector3(5.5f, 12.5f, 5.5f));
-	//objPtr->setColor(Vector4(0.3, 0.3, 0.9, 1));
-	//objPtr->setRigidBody(tempo2, physics.get());
-	//Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(XM_PI / 3, 0, 0));
-	//btQuaternion qt = btQuaternion(qt1.x,qt1.y,qt1.z,qt1.w);
-	//objPtr->getRigidBody()->getWorldTransform().setRotation(qt);
-	//objPtr->getRigidBody()->setFriction(1);
-
-	//physicsObjects.reserve(2000);
-	//auto tilemap = map->getTileMap();
-	//for (int tileY = 0; tileY < tilemap.width; ++tileY ) {
-	//	for (int tileX = 0; tileX < tilemap.height; ++tileX) {
-	//		if (tilemap.tileAt(tileX, tileY) == Tile::road) {
-	//			Vector3 min{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) - Vector3 { config.tileScaleFactor.x / 2,
-	//																							 config.tileScaleFactor.y / 2,
-	//																							 config.tileScaleFactor.x / 2 } };
-
-	//			Vector3 max{ tilemap.convertTilePositionToWorldPosition(tileX,tileY) + Vector3 { config.tileScaleFactor.x / 2,
-	//																							 config.tileScaleFactor.y / 2,
-	//																							 config.tileScaleFactor.x / 2 } };
-	//			/*for (int i = 0; i < 4; i++) {
-	//				physicsObjects.emplace_back(std::make_unique<GameObject>());
-	//				auto objPtr = physicsObjects.back().get();
-	//				graphics.loadModel("Cube");
-	//				objPtr->mesh = graphics.getMeshPointer("Cube");
-	//				graphics.addToDraw(objPtr);
-	//				tempo2 = physics->addBox(btVector3(min.x, 0.2f+i, min.z), btVector3(0.5f, 0.5f, 0.5f), 3.0f);
-	//				objPtr->setPosition(Vector3(min.x, 0.2f+i, min.z));
-	//				objPtr->setScale(Vector3(0.5f, 0.5f, 0.5f));
-	//				objPtr->setColor(Vector4(0.7, 0.7, 0.3, 1));
-	//				objPtr->setRigidBody(tempo2, physics.get());
-	//				objPtr->getRigidBody()->setFriction(2);
-	//				objPtr->getRigidBody()->setActivationState(0);
-	//				
-	//			}*/
-	//		}
-	//	}
-	//}
-
 }
 
 void PlayingGameState::moveObjects()
@@ -1289,9 +1025,12 @@ void PlayingGameState::generateMapPowerUps()
 
 void PlayingGameState::generateObjectives()
 {
-	if (Game::getNrOfStagesDone() % 3 == 1)
+	if (Game::getNrOfStagesDone() % 3 == 0) //nrOfStagesBEGUN
 	{
-		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1)); //fix pos
+		//difficulty scale
+		float scalingNr = Game::getNrOfStagesDone() / 3; // /3
+
+		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1, scalingNr)); //fix pos
 		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
 	}
 	else

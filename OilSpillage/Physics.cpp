@@ -47,14 +47,10 @@ Physics::Physics() :broadphase(new btDbvtBroadphase())
 	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
 
 #else
-
-	//btSetTaskScheduler(btGetOpenMPTaskScheduler());
-	//btGetTaskScheduler()->setNumThreads(BT_MAX_THREAD_COUNT);
 	btDefaultCollisionConstructionInfo cci;
 	collisionConfig = new btDefaultCollisionConfiguration(cci);
 	dispatcherMt = new btCollisionDispatcherMt(collisionConfig, 40);
 	btConstraintSolverPoolMt* solverPool = new btConstraintSolverPoolMt(BT_MAX_THREAD_COUNT);
-	btSequentialImpulseConstraintSolverMt* solverMt = new btSequentialImpulseConstraintSolverMt();
 	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver();
 	world = new btDiscreteDynamicsWorldMt(dispatcherMt, broadphase, solverPool, solver, collisionConfig);
 	world->getSolverInfo().m_solverMode = gSolverMode;
@@ -134,14 +130,8 @@ void Physics::teleportRigidbody(Vector3 newPos, btRigidBody* body)
 }
 
 void Physics::update(float deltaTime)
-{
-
-	//this->world->stepSimulation(deltaTime);
-	
+{	
 	this->world->stepSimulation(deltaTime, 6, 1. / 120.);
-
-	//this->world->stepSimulation(deltaTime, 0);
-	//this->world->stepSimulation(btScalar(deltaTime));
 }
 
 btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, GameObject* obj)
@@ -261,10 +251,6 @@ btGeneric6DofSpring2Constraint* Physics::addSpring(btRigidBody* box1, btRigidBod
 btPoint2PointConstraint* Physics::addPointJoint(btRigidBody* box1, btRigidBody* box2)
 {
 	btPoint2PointConstraint* pointJoint = new btPoint2PointConstraint(*box1, *box2, btVector3(0, 0.00f, 0), btVector3(0, -0.55f, 0));
-	//pointJoint->enableFeedback(true);
-	/*btJointFeedback* hej = new btJointFeedback;
-	hej->m_appliedForceBodyA = btVector3(1, 0, 1);
-	pointJoint->setJointFeedback(hej);*/
 	pointJoints.push_back(pointJoint);
 
 	this->world->addConstraint(pointJoint);

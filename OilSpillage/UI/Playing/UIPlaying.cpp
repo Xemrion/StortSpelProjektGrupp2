@@ -31,6 +31,8 @@ void UIPlaying::updateUI(float deltaTime)
 	int time = static_cast<int>(static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
 	Color color(Colors::Yellow);
 	Vector2 position = this->timer->getPosition();
+	Vector2 objPosition = Vector2(SCREEN_WIDTH / 2 - ObjectiveBox::size.x / 2, SCREEN_HEIGHT / 2 - ObjectiveBox::size.y / 2);
+	float objScale = 2.0;
 
 	if (this->shouldInit)
 	{
@@ -41,8 +43,29 @@ void UIPlaying::updateUI(float deltaTime)
 	}
 
 	this->respawnTimer += deltaTime;
+	this->objectiveTimer += deltaTime;
 	this->minimap->update(deltaTime);
 	this->objectiveBox->update(deltaTime);
+
+	if(objectiveTimer >= 0.5f && objectiveTimer < 3.0f)
+	{
+		objPosition = Vector2::Lerp(Vector2(SCREEN_WIDTH / 2 - objectiveBox->getInfoSize().x / 2, SCREEN_HEIGHT / 2 - objectiveBox->getInfoSize().y / 2),
+			Vector2(10, 10) + Vector2(16, 64), 
+			(objectiveTimer-0.5f)/2.5);
+
+		objScale = Game::lerp(1.5f, 0.2f, (objectiveTimer - 0.5f) / 2.5);
+	}
+	else if(objectiveTimer >= 3.0f)
+	{
+		objPosition = Vector2(10, 10) + Vector2(16, 64);
+		objScale = 0.2f;
+	}
+	else
+	{
+		objPosition = Vector2(SCREEN_WIDTH / 2 - objectiveBox->getInfoSize().x / 2, SCREEN_HEIGHT / 2 - objectiveBox->getInfoSize().y / 2);
+		objScale = 1.5f;
+	}
+	objectiveBox->setInfoPosition(objPosition, objScale);
 
 	if (this->timeChangeText.get())
 	{
@@ -123,11 +146,32 @@ void UIPlaying::drawUI()
 
 	this->healthBar->setAmount(player->getHealth() / static_cast<float>(player->getMaxHealth()));
 	Objective* currObj = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+
 	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
 	{
+		std::vector<Weakspot> weakspots = currObj->getBoss()->getWeakspots();
+
+		if (weakspots.size() > 0) //draw shield only if exists
+		{
+			if (weakspots.size() == 2) //draw shield only if exists
+			{
+				this->bossShieldBar1->setAmount(weakspots[0].getHealth() / static_cast<float>(weakspots[0].getMaxHP()));
+				this->bossShieldBar2->setAmount(weakspots[1].getHealth() / static_cast<float>(weakspots[1].getMaxHP()));
+			}
+			else if (weakspots.size() == 1) //draw shield only if exists
+			{
+				if (weakspots[0].getWeakspotNr() == 0)
+				{
+					this->bossShieldBar1->setAmount(weakspots[0].getHealth() / static_cast<float>(weakspots[0].getMaxHP()));
+				}
+				else if (weakspots[0].getWeakspotNr() == 1)
+				{
+					this->bossShieldBar2->setAmount(weakspots[0].getHealth() / static_cast<float>(weakspots[0].getMaxHP()));
+				}
+			}
+		}
+
 		this->bossHealthBar->setAmount(currObj->getBoss()->getHealth() / static_cast<float>(currObj->getBoss()->getMaxHealth()));
-		this->bossShieldBar->setAmount((currObj->getBoss()->getTotalWeakSpotCurrHp())
-		/ (static_cast<float>(currObj->getBoss()->getTotalWeakSpotMaxHP())));
 	}
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
@@ -169,19 +213,37 @@ void UIPlaying::drawUI()
 
 	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
 	{
-		if ((currObj->getBoss()->getTotalWeakSpotCurrHp()) > 0) //draw sield only if exists
-		{
-			Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty SHIELDS");
-			this->bossShieldBar->draw(false);
-			UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty SHIELDS", Vector2((SCREEN_WIDTH / 2), 590), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
-		}
-
 		Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty");
 		this->bossHealthBar->draw(false); //false = change color to gray
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty", Vector2((SCREEN_WIDTH / 2) , 660), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty", Vector2((SCREEN_WIDTH / 2), 660), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
+		
+		std::vector<Weakspot> weakspots = currObj->getBoss()->getWeakspots();
+		if (weakspots.size() > 0) //draw shield only if exists
+		{
+			if (weakspots.size() == 2) //draw shield only if exists
+			{
+				this->bossShieldBar1->draw(false);
+				this->bossShieldBar2->draw(false);
+			}
+			else if (weakspots.size() == 1) //draw shield only if exists
+			{
+				if (weakspots[0].getWeakspotNr() == 0)
+				{
+					this->bossShieldBar1->draw(false);
+				}
+				else if (weakspots[0].getWeakspotNr() == 1)
+				{
+					this->bossShieldBar2->draw(false);
+				}
+			}
+
+			Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty SHIELDS");
+			UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty SHIELDS", Vector2((SCREEN_WIDTH / 2), 590), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
+		}
 	}
+
 	this->healthBar->draw(false);
-	this->objectiveBox->draw(false);
+	objectiveBox->draw(false);
 	this->minimap->draw(false);
 	this->timerText->draw(false);
 	this->timer->draw(false);
@@ -202,10 +264,11 @@ void UIPlaying::init()
 {
 	this->healthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 20));
 	this->bossHealthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 680), Colors::Red);
-	this->bossShieldBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 610), Colors::DarkGray);
+	this->bossShieldBar1 = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / (3) - Slider::size.x / 2, 610), Colors::DarkGray);
+	this->bossShieldBar2 = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / (1.5) - Slider::size.x / 2, 610), Colors::DarkGray);
 
 	this->minimap = std::make_unique<Minimap>(Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
-	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(10, 10));
+	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(10,10));
 
 	this->timerText = std::make_unique<AnimatedText>("Time: ", Color(Colors::Yellow), 0.5f, Animation::NONE, Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2 - 115 - 100, 10));
 	this->timerText->beginAnimation();

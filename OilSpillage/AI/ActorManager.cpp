@@ -10,7 +10,6 @@
 
 ActorManager::ActorManager()
 {
-	this->aStar = nullptr;
 }
 
 ActorManager::ActorManager(AStar* aStar, Physics* physics, Map* map, std::mt19937* RNG)
@@ -125,9 +124,12 @@ void ActorManager::createSwarm(float x, float z)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-Boss* ActorManager::createBoss(float x, float z, int weaponType)
+Boss* ActorManager::createBoss(float x, float z, int weaponType, float scalingNr)
 {
-	Boss* boss = new Boss(x, z, weaponType, physics);
+	//generate start pos for boss
+	Vector3 newPos = findTeleportPos(Vector3(x, 0, z), 50, 100);
+
+	Boss* boss = new Boss(newPos.x, newPos.z, weaponType, physics, scalingNr);
 	this->bosses.push_back(boss);
 
 	return boss;
@@ -300,115 +302,7 @@ void ActorManager::spawnSwarm(const Vector3& originPos)
 	}
 }
 
-void ActorManager::spawnTurrets(const Vector3& position, Radius radius, float angle)
-{
-	if (angle != 0)
-	{
-		Vector2& newPosition = generateAroundaPoint(position.x, position.z, angle);
-		createTurret(newPosition.x, newPosition.y, 1);
-	}
-	else
-	{
-		Vector2& newPosition = this->generateRandom(position.x, position.z, radius);
-		createTurret(newPosition.x, newPosition.y, 1);
-	}
-}
-
-Vector2& ActorManager::generateRandom(const float& x, const float& z, Radius radius)
-{
-	/*blocksize 10, 4* 10 w, 3 * 10 l */
-	Vector2 newPosition;
-
-	if (radius == Radius::CLOSE)
-	{// max + min ( from min to max )
-		newPosition.x = rand() % 10 + (x + 2);
-		newPosition.y = rand() % 10 + (z + 2);
-	}
-	else if (radius == Radius::MIDDLE)
-	{
-		newPosition.x = rand() % 40 + (x + 2 + 10);
-		newPosition.y = rand() % 40 + (z + 2 + 10);
-	}
-	else if (radius == Radius::OUTER)
-	{
-		newPosition.x = rand() % 60 + (x + 40);
-		newPosition.y = rand() % 60 + (z + 40);
-	}
-	return newPosition;
-
-}
-
-Vector2& ActorManager::generateAroundaPoint(const float& x, const float& z, float angle)
-{
-
-	float radians = angle * (3.14f / 180.f);
-	Vector2 newPosition;
-	newPosition.x = x + (cos(radians) * x + sin(radians) * z);
-	newPosition.y = z + (cos(radians) * x - sin(radians) * z);
-	return newPosition;
-}
-
-void ActorManager::seperation(const Vector3& targetPos)
-{
-	std::vector<Vector3> buildings;
-	float desiredSeparationDistance;
-	for (int i = 0; i < groups.size(); i++)
-	{
-		for (int j = 0; j < groups[i].actors.size(); j++)
-		{
-			// Distance of field of vision for separation between boids
-			desiredSeparationDistance = groups[i].actors[j]->getBoidOffset();
-			Vector3 direction(0.0f);
-			float nrInProximity = 0.0f;
-			// For every boid in the system, check if it's too close
-			for (int k = 0; k < actors.size(); k++)
-			{
-				// Calculate distance from current boid to boid we're looking at
-				Vector3 curBoidPos = actors[k]->getPosition();
-				float deltaX = groups[i].actors[j]->getPosition().x - curBoidPos.x;
-				float deltaZ = groups[i].actors[j]->getPosition().z - curBoidPos.z;
-				float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-				// If this is a fellow boid and it's too close, move away from it
-				if ((distance < desiredSeparationDistance) && distance != 0)
-				{
-					Vector3 difference(0.0f);
-					difference = groups[i].actors[j]->getPosition() - actors[k]->getPosition();
-					difference.Normalize();
-					difference /= distance;      // Weight by distance
-					direction += difference;
-					nrInProximity++;
-				}
-			}
-			// Adds average difference of location to acceleration
-			if (nrInProximity > 0)
-			{
-				direction /= nrInProximity;
-			}
-			if (direction.Length() > 0.0f)
-			{
-				// Steering = Desired - Velocity
-				direction.Normalize();
-				direction *= groups[i].actors[j]->getMaxSpeed();
-				direction -= groups[i].actors[j]->getVelocity();
-				if (direction.Length() > groups[i].actors[j]->getMaxForce())
-				{
-					direction /= direction.Length();
-				}
-			}
-			groups[i].actors[j]->applyForce(direction * 4);
-		}
-	}
-}
-
-void ActorManager::updateAveragePos()
-{
-	for (int i = 0; i < groups.size(); i++)
-	{
-		groups[i].updateAveragePos();
-	}
-}
-
-void ActorManager::updateActors(float dt, Vector3 targetPos)
+void ActorManager::updateActors(float dt, const Vector3& targetPos)
 {
 	bool hasDied = false;
 	for (int i = 0; i < this->groups.size(); i++)
@@ -418,7 +312,7 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
 			{
 
-				groups[i].actors[j]->update(dt, targetPos); //creash
+				groups[i].actors[j]->update(dt, targetPos);
 			}
 			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
 			{
@@ -455,7 +349,7 @@ void ActorManager::updateActors(float dt, Vector3 targetPos)
 	}
 }
 
-void ActorManager::updateBosses(float dt, Vector3 targetPos)
+void ActorManager::updateBosses(float dt, const Vector3& targetPos)
 {
 	//gives a new pos if too far away from player
 	//for (int i = 0; i < this->bosses.size(); i++)
@@ -687,19 +581,19 @@ void ActorManager::createGroup(DynamicActor* actor)
 {
 	AIGroup temp;
 	temp.actors.push_back(actor);
-	temp.updateAveragePos();
+	temp.averagePos = actor->getPosition();
 	groups.push_back(temp);
 	groups[groups.size() - 1].updateDuty();
 }
 
-Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
+const Vector3& ActorManager::predictPlayerPos(const Vector3& targetPos)
 {
 	Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getRigidBody()->getLinearVelocity());
 	targetVelocity.Normalize();
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
 }
-Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
+const Vector3& ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
 	for (float i = 0;; i += 1.0) {
