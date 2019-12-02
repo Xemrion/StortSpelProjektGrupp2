@@ -29,7 +29,7 @@ Graphics::Graphics()
 	this->particleSystem2 = new ParticleSystem;
 	this->particleTrail = new ParticleSystem;
 
-
+	this->selectedObjUI = nullptr;
 
 	this->particleSystem->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
 	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
@@ -1509,7 +1509,7 @@ void Graphics::setUISun(Vector3 direction, Vector4 color)
 	this->uiSun.setDirection(this->uiSunDir);
 }
 
-void Graphics::renderUI(float deltaTime, int selectedIndex)
+void Graphics::renderUI(float deltaTime)
 {
 	float color[4] = {
 		0,0,0,1
@@ -1550,20 +1550,27 @@ void Graphics::renderUI(float deltaTime, int selectedIndex)
 
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	if (selectedIndex > -1 && this->uiObjects.size()>1)
+	if (this->uiObjects.size()>1 && this->selectedObjUI != nullptr && this->selectedObjUI!=this->uiObjects[this->uiObjects.size()-1].first)
 	{
-		//std::swap(this->uiObjects[selectedIndex], this->uiObjects[this->uiObjects.size()-1]);
+		int posInVec = -1;
+		for (int i = 0; i < this->uiObjects.size() && posInVec==-1; i++)
+		{
+			if (this->uiObjects[i].first == this->selectedObjUI)
+			{
+				posInVec = i;
+			}
+		}
+		std::swap(this->uiObjects[posInVec], this->uiObjects[this->uiObjects.size()-1]);
 	}
 	int index = 0;
 	for (std::pair<GameObject*,Matrix*> object : this->uiObjects)
 	{
-		//if (selectedIndex!=-1&&object == this->uiObjects.back())
-		//{
-		//	ID3D11DepthStencilView* nulView = nullptr;
+		if (object == this->uiObjects.back() && this->selectedObjUI!=nullptr)
+		{
+			ID3D11DepthStencilView* nulView = nullptr;
 
-		//	/*deviceContext->OMSetDepthStencilState(nulView, 0);*/
-		//	deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
-		//}
+			deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
+		}
 		SimpleMath::Matrix world = *object.second;//worlds[]
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -1619,6 +1626,11 @@ void Graphics::renderUI(float deltaTime, int selectedIndex)
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDebug.ps.getShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDebug.vs.getShader(), nullptr, 0);
+}
+
+void Graphics::setSelectedUI(GameObject* obj)
+{
+	this->selectedObjUI = obj;
 }
 
 void Graphics::setLightList(LightList* lightList)

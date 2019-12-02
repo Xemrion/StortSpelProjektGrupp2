@@ -41,6 +41,7 @@ void ItemSlot::update(bool selected, float deltaTime)
 	{
 		if (selected)
 		{
+			Game::getGraphics().setSelectedUI(this->slot->getItem()->getObject());
 			rotationTimer = std::fmodf(rotationTimer + deltaTime * 4, XM_2PI);
 			//rotation = Quaternion::CreateFromYawPitchRoll(rotationTimer, 0.0f, 0.0f);
 			rotation = Quaternion::Slerp(rotation, Quaternion::CreateFromYawPitchRoll(rotationTimer, 0, 0), deltaTime * 10);

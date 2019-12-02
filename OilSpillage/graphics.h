@@ -106,6 +106,7 @@ class Graphics {
 	Sun uiSun;
 	Vector3 uiSunDir = Vector3(0.0, 1.0, 0.0);
 	std::vector<std::pair<GameObject*,Matrix*>> uiObjects;
+	GameObject* selectedObjUI;
 
 	void cullLights(Matrix view);
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
@@ -136,7 +137,9 @@ public:
 	void removeFromUIDraw(GameObject* obj, Matrix* world);
 	void removeAllUIDraw();
 	void setUISun(Vector3 direction, Vector4 color);
-	void renderUI(float deltaTime, int selectedIndex = -1);
+	void renderUI(float deltaTime);
+	void setSelectedUI(GameObject* obj);
+
 
 	void setLightList(LightList* lightList);
 	void presentScene();
