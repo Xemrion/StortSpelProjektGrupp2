@@ -3,7 +3,6 @@
 class Spitfire : public DynamicActor
 {
 private:
-	//GameObject* vehicle;
 	btScalar mRotation;
 	GameObject* wheel1;
 	GameObject* wheel2;
@@ -41,8 +40,6 @@ public:
 
 	void setAccelForce(Vector3 accelForce, float deltaTime);
 	void setWheelRotation();
-	//void onCollision(Vector2 direction);
-
 
 	float getYaw(DirectX::XMVECTOR Quaternion);
 	float getHeading(Quaternion qt);

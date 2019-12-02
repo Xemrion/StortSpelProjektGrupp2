@@ -95,7 +95,6 @@ Vector3 Swarm::seek()
 	if (!vActive)
 	{
 		desiredDirection -= position - destination;
-		//desired *= maxSpeed;
 		if (this->stats.maxSpeed != 7.0)
 		{
 			this->stats.maxSpeed = 7.0;
