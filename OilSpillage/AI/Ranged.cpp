@@ -10,8 +10,6 @@ void Ranged::updateBullets(float deltaTime)
 		if (bullets[i].getWeaponType() == WeaponType::aiLaser)
 		{
 			bullets[i].getGameObject()->setPosition(*positionPtr);
-			//Vector3 selfToTarget = (*positionPtr - *targetPosPtr);
-			//bullets[i].setDirection(selfToTarget);
 			const float laserDropOffSpeed = 1.0;
 			laser->setDirection(bullets[i].getDirection());
 			laser->setPos(bullets[i].getGameObject()->getPosition());

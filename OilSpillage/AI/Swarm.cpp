@@ -55,7 +55,10 @@ void Swarm::createRigidbody(Physics* physics)
 Swarm::~Swarm()
 {
 	Game::getGraphics().removeFromDraw(this);
-	Game::getGameInfo().nrOfSwarm++;
+	if (this->isDead())
+	{
+		Game::getGameInfo().nrOfSwarm++;
+	}
 }
 
 void Swarm::setUpActor()
@@ -92,7 +95,6 @@ Vector3 Swarm::seek()
 	if (!vActive)
 	{
 		desiredDirection -= position - destination;
-		//desired *= maxSpeed;
 		if (this->stats.maxSpeed != 7.0)
 		{
 			this->stats.maxSpeed = 7.0;

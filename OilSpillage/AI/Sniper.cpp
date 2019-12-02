@@ -40,8 +40,6 @@ void Sniper::setUpActor()
 
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Sniper::inAttackRange, std::ref(*this)));
-	//Behavior& waitTimer = bt.getAction();
-	//waitTimer.addAction(std::bind(&Sniper::WaitTime, std::ref(*this)));
 	Behavior& chase = bt.getAction();
 	chase.addAction(std::bind(&Sniper::setChaseState, std::ref(*this)));
 	Behavior& roam = bt.getAction();
@@ -62,7 +60,6 @@ void Sniper::setUpActor()
 
 	seq2.addChildren(inRange);
 
-	//seq2.addChildren(waitTimer);
 	seq2.addChildren(shoot);
 }
 
