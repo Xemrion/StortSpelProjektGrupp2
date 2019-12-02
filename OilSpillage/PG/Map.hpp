@@ -7,6 +7,7 @@
 #include "RoadGenerator.hpp"
 #include "Voronoi.hpp"
 #include "District.hpp"
+#include "Skyscraper.h"
 #include "../UI/Playing/UIPlaying.h"
 #include "Biome.hpp"
 #include "../Lights.h"
@@ -101,8 +102,10 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum, RNG & ) noexcep
 // };
 
 struct CompositeHouse {
-	GameObject  walls, windows, roof;
-	Bounds      bounds;
+	GameObject			walls, windows, roof;
+	Vector<GameObject>	hitboxes;
+	V2u					bounds;
+	String				skyscraperMeshIndex;
 };
 
 struct SingleTileHouse {
@@ -136,8 +139,8 @@ public:
 		Biome    biome;
 		Size     width,length;
 		String   name;
-		//Weather  weather; // clear, foggy, cloudy, thunderstorm, rain, sandstorm, blizzard
-		//Time     time;    // day, sunset, night
+		//Weather  weather; // clear, foggy(heavy, medium, slight), smog, fallout gas/smoke, cloudy, thunderstorm, rain, sandstorm, blizzard
+		//Time     time;    // day, sunrise, night, dusk, evening
 		// ...
 	};
 
@@ -180,6 +183,7 @@ private:
 	Vector<UPtr<GameObject>>   instantiateTilesAsModels() noexcept;
 	void                       instantiateHousesAsModels() noexcept;
 	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout &&, HouseTileset const & ) const noexcept;
+	CompositeHouse			   instantiateSkyscraper();
 	//void                       generateTransitions() noexcept;
 	Graphics &                 graphics;
 	V2u                        startPositionInTileSpace;
@@ -189,6 +193,7 @@ private:
 	Vector<UPtr<GameObject>>   groundTiles;
 	Physics * const            physics;
 	LightList &                lights;
+	UPtr<Skyscraper>		   skyscraperGenerator;
 	// TODO: refactor out:
 	using DistrictID = U16;
 	using BuildingID = U16;                         // 0 = unused tile

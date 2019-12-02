@@ -351,6 +351,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 		rng.seed( config.seed );
 
 	biome = static_cast<Biome>( genBiome(rng) % 3 );
+	skyscraperGenerator = std::make_unique<Skyscraper>();
 
 	info.name    = generateCityName(rng);
 	info.width   = config.dimensions.x;
@@ -1577,6 +1578,31 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 	//	part.addRotation({ .0f, 3.1415926535f, .0f  });
 
 	return std::move( house );
+}
+
+CompositeHouse Map::instantiateSkyscraper()
+{
+	static U32 nrOfSkyscrapers = 0;
+	String skyscraperName = "skyscraper" + std::to_string(nrOfSkyscrapers++);
+	skyscraperGenerator->generateASkyscraper(skyscraperName);
+
+	CompositeHouse temp;
+	temp.skyscraperMeshIndex = skyscraperName;
+
+	skyscraperGenerator->setRoofMesh(skyscraperName, &temp.roof);
+	skyscraperGenerator->setWallMesh(skyscraperName, &temp.walls);
+	skyscraperGenerator->setWindowMesh(skyscraperName, &temp.windows);
+	temp.roof.setScale(Vector3(2.0f, 1.0f, 2.0f));
+	temp.walls.setScale(Vector3(2.0f, 1.0f, 2.0f));
+	temp.windows.setScale(Vector3(2.0f, 1.0f, 2.0f));
+	
+	Vector3 tempVec = temp.walls.getAABB().maxPos - temp.walls.getAABB().minPos;
+	tempVec.x *= 2;
+	tempVec.z *= 2;
+	temp.bounds.x = (tempVec.x / config.tileSideScaleFactor) + 1;
+	temp.bounds.y = (tempVec.z / config.tileSideScaleFactor) + 1;
+	
+	return temp;
 }
 
 
