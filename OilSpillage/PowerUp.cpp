@@ -61,14 +61,17 @@ void PowerUp::loadModel()
 	if (type == PowerUpType::Health)
 	{
 		mesh = Game::getGraphics().getMeshPointer("Entities/PowerUps/HealthBoost");
+		setMaterial(Game::getGraphics().getMaterial("Entities/PowerUps/HealthBoost"));
 	}
 	else if (type == PowerUpType::Speed)
 	{
 		mesh = Game::getGraphics().getMeshPointer("Entities/PowerUps/SpeedBoost");
+		setMaterial(Game::getGraphics().getMaterial("Entities/PowerUps/SpeedBoost"));
 	}
 	else if (type == PowerUpType::Time)
 	{
 		mesh = Game::getGraphics().getMeshPointer("Entities/PowerUps/TimeBoost");
+		setMaterial(Game::getGraphics().getMaterial("Entities/PowerUps/TimeBoost"));
 	}
 	else if (type == PowerUpType::Star)
 	{
