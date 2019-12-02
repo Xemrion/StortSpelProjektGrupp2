@@ -49,6 +49,7 @@ Boss::Boss(Boss&& boss)
 	//weakspots
 	this->weakSpots.push_back(boss.weakSpots[0]);
 	this->weakSpots.push_back(boss.weakSpots[1]);
+	this->setPoints(2000 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
 }
 
 Boss::Boss(float x, float z, int weaponType, Physics* physics)
