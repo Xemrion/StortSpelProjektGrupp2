@@ -21,13 +21,14 @@ public:
 
 		model->mesh       = graphics.getMeshPointer( "Entities/Streetlight"   );
 		model->setScale({ .25f, .25f, .25f });
-		model->setColor({ 0.15f, .10f, .10f, 1.0f });
+		model->setColor({ 0.25f, .20f, .20f, 1.0f });
 		//model->setSpotShadow( false );
 		graphics.addToDraw( model.get() );
 
 		//model->mesh       = graphics.getMeshPointer( "Streetlight"   );
 		//model->setMaterial( graphics.getMaterial(    "Streetlight" ) );
 		model->setPosition( worldPosition+Vector3(.0f,-1.5f,.0f) );
+		model->setRotation( rotation );
 		//light = lights.addLight( PointLight(worldPosition+Vector3{.0f,5.0f,.0f}, {lightColor}, lightStrength) );
 		// rigid body?
 	}
@@ -101,8 +102,9 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum, RNG & ) noexcep
 // };
 
 struct CompositeHouse {
-	GameObject  walls, windows, roof;
-	Bounds      bounds;
+	GameObject          walls, windows, roof;
+	Vector<GameObject>  hitboxes;
+	Bounds              bounds;
 };
 
 struct SingleTileHouse {
