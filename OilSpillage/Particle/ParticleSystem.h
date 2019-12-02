@@ -82,6 +82,7 @@ public:
 	void setCreateShader(std::string csCreate);
 	void setGeometryShader(std::string gsPrimitive);
 	void setPixelShader(std::string pixelShader);
+	void setBufferType(D3D11_BUFFER_UAV_FLAG flag);
 
 	void drawAll(DynamicCamera* camera);
 	bool loadSystem();
@@ -124,7 +125,10 @@ private:
 	SimulationParams sP;
 	ParticleShaders particleShaders;
 	ParticleSData systemData;
+
 	bool onlyAdd;
+	D3D11_BUFFER_UAV_FLAG bufferType;
+	int indexForTrail;
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw

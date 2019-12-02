@@ -448,6 +448,7 @@ bool Graphics::init(Window* window)
 	this->particleSystem2->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleTrail->setCapacity(512 * 20);
 	this->particleTrail->setOnlyAdd(true);
+	this->particleTrail->setBufferType(D3D11_BUFFER_UAV_FLAG_COUNTER);
 
 	this->particleTrail->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());

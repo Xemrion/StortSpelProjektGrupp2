@@ -5,7 +5,7 @@ struct Particle
 	float2 time;
 };
 
-AppendStructuredBuffer<Particle> NewSimulationState : register(u0);
+globallycoherent RWStructuredBuffer<Particle> NewSimulationState : register(u0);
 
 cbuffer ParticleParameters : register(b0)
 {
@@ -25,5 +25,6 @@ void main(uint3 DispatchThreadID : SV_DispatchThreadID)
 	p.direction = initialDirection;
 	p.time.x = 0.0f;
 	p.time.y = emitterLocation.w;
-	NewSimulationState.Append(p);
+    NewSimulationState[DispatchThreadID.x + int(randomVector.x)] = p;
+    NewSimulationState.IncrementCounter();
 }

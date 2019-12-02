@@ -21,6 +21,8 @@ ParticleSystem::ParticleSystem()
 	this->sP.vectorField.y = 1.0f;
 	this->sP.vectorField.z = 2.0f;
 	this->onlyAdd = false;
+	this->bufferType = D3D11_BUFFER_UAV_FLAG_APPEND;
+	this->indexForTrail = 0;
 }
 
 
@@ -36,7 +38,7 @@ void ParticleSystem::setCapacity(int cap)
 
 void ParticleSystem::setOnlyAdd(bool arg)
 {
-	this->onlyAdd;
+	this->onlyAdd = arg;
 }
 
 void ParticleSystem::setNameofSystem(std::string name)
@@ -174,7 +176,7 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 
 	bUAV.FirstElement = 0;
 	bUAV.NumElements = capParticle;
-	bUAV.Flags = D3D11_BUFFER_UAV_FLAG_APPEND;
+	bUAV.Flags = this->bufferType;
 
 	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 	uavDesc.Buffer = bUAV;
@@ -241,6 +243,8 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, initialDirection.w);
 	pParams.emitterLocation = Vector4(position.x,position.y,position.z, lifeTime);
 	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX,1.0f);
+	if(this->onlyAdd)
+		pParams.randomVector.x = this->indexForTrail;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &pParams, sizeof(ParticleParams));
@@ -271,7 +275,11 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 		deviceContext->Dispatch(nrOf, 1, 1);
 	}
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
-
+	this->indexForTrail += 4;
+	if (this->indexForTrail == this->capParticle)
+	{
+		this->indexForTrail = 0;
+	}
 	return true;
 }
 
@@ -333,11 +341,12 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 
 void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 {
+	ID3D11UnorderedAccessView* n = nullptr;
+	UINT initialCount = -1;
 	if (!onlyAdd)
 	{
 		this->frameID++;
 		this->frameID = this->frameID % 60;
-		ID3D11UnorderedAccessView* n = nullptr;
 		ID3D11Buffer* nB = nullptr;
 		ID3D11ShaderResourceView* nSRV = nullptr;
 		this->deltaTime = delta;
@@ -363,7 +372,7 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 		hr = deviceContext->Map(this->collisionViewProj.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &viewProjTemp, sizeof(Matrix));
 		deviceContext->Unmap(this->collisionViewProj.Get(), 0);
-		UINT initialCount = -1;
+		
 		if (otherFrame == 1.0f)
 		{
 			deviceContext->CopyStructureCount(this->nrOfParticlesCB.Get(), offset, this->particlesUAV.Get());
@@ -382,9 +391,9 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 		this->deviceContext->CSSetConstantBuffers(0, 1, this->simParams.GetAddressOf());
 		this->deviceContext->CSSetShader(this->computeShader.Get(), nullptr, 0);
 		this->deviceContext->Dispatch(capParticle / 512, 1, 1);
-		deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
-		deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
 	}
+	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
+	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
 }
 
 void ParticleSystem::changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
@@ -476,6 +485,10 @@ void ParticleSystem::setPixelShader(std::string pixelShader)
 {
 	strcpy(this->particleShaders.pixelShader, pixelShader.c_str());
 	strcpy(this->systemData.shaders.pixelShader, pixelShader.c_str());
+}
+void ParticleSystem::setBufferType(D3D11_BUFFER_UAV_FLAG flag)
+{
+	this->bufferType = flag;
 }
 void ParticleSystem::drawAll(DynamicCamera* camera)
 {
