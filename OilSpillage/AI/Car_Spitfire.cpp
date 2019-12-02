@@ -69,7 +69,10 @@ Spitfire::~Spitfire()
 	delete wheel2;
 	delete wheel3;
 	delete wheel4;
-	Game::getGameInfo().nrOfCars++;
+	if (this->isDead())
+	{
+		Game::getGameInfo().nrOfCars++;
+	}
 }
 
 void Spitfire::updateVehicle()

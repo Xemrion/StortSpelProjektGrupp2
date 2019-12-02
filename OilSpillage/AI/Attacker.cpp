@@ -44,7 +44,10 @@ void Attacker::createRigidbody(Physics* physics)
 Attacker::~Attacker()
 {
 	Game::getGraphics().removeFromDraw(this);
-	Game::getGameInfo().nrOfAttackers++;
+	if(this->isDead())
+	{
+		Game::getGameInfo().nrOfAttackers++;
+	}
 }
 
 void Attacker::setUpActor()

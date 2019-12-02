@@ -55,7 +55,10 @@ void Swarm::createRigidbody(Physics* physics)
 Swarm::~Swarm()
 {
 	Game::getGraphics().removeFromDraw(this);
-	Game::getGameInfo().nrOfSwarm++;
+	if (this->isDead())
+	{
+		Game::getGameInfo().nrOfSwarm++;
+	}
 }
 
 void Swarm::setUpActor()
