@@ -127,7 +127,10 @@ void ActorManager::createSwarm(float x, float z)
 
 Boss* ActorManager::createBoss(float x, float z, int weaponType)
 {
-	Boss* boss = new Boss(x, z, weaponType, physics);
+	//generate start pos for boss
+	Vector3 newPos = findTeleportPos(Vector3(x, 0, z), 50, 100);
+
+	Boss* boss = new Boss(newPos.x, newPos.z, weaponType, physics);
 	this->bosses.push_back(boss);
 
 	return boss;

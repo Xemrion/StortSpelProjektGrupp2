@@ -1319,8 +1319,8 @@ bool Graphics::loadTexture(std::string path, bool overridePath, bool cpuOnly)
 
 	if (textures.find(texturePath) == textures.end()) {
 		Texture* newTexture = new Texture();
-
-		if (!newTexture->Initialize(this->device.Get(), this->deviceContext.Get(), texturePath.c_str(), -1, cpuOnly)) {
+		std::wstring wideTexturePath(texturePath.begin(), texturePath.end());
+		if (!newTexture->Initialize(this->device.Get(), this->deviceContext.Get(), wideTexturePath.c_str(), -1, cpuOnly)) {
 			delete newTexture;
 			return false;
 		}
@@ -1344,8 +1344,8 @@ bool Graphics::reloadTexture(std::string path, bool overridePath)
 	if (texture != textures.end()) {
 		Texture* oldTexture = texture->second;
 		Texture newTexture;
-
-		if (newTexture.Initialize(this->device.Get(), this->deviceContext.Get(), texturePath.c_str(), -1, oldTexture->isCpuOnly()))
+		std::wstring wideTexturePath(texturePath.begin(), texturePath.end());
+		if (newTexture.Initialize(this->device.Get(), this->deviceContext.Get(), wideTexturePath.c_str(), -1, oldTexture->isCpuOnly()))
 		{
 			oldTexture->Shutdown();
 
@@ -1391,12 +1391,19 @@ const Mesh* Graphics::getMeshPointer(const char* localPath)
    return &meshes[meshPath];
 }
 
-Texture* Graphics::getTexturePointer(const char* path)
+Texture* Graphics::getTexturePointer(const char* path, bool tga)
 {
 	std::string texturePath;
 	texturePath += TEXTURE_ROOT_DIR;
 	texturePath += path;
-	texturePath += ".tga";
+	if (tga)
+	{
+		texturePath += ".tga";
+	}
+	else
+	{
+		texturePath += ".dds";
+	}
 
 	if (textures.find(texturePath) == textures.end()) {
 		//assert(false && "Failed to load texture!");
