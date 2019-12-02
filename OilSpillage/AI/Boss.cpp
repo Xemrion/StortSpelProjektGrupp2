@@ -97,7 +97,10 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 Boss::~Boss()
 {
 	Game::getGraphics().removeFromDraw(this);
-	Game::getGameInfo().nrOfBosses++;
+	if (this->isDead())
+	{
+		Game::getGameInfo().nrOfBosses++;
+	}
 
 }
 

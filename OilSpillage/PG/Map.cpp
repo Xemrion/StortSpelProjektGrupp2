@@ -233,19 +233,35 @@ void Map::generateStreetlights()
 	streetlights.reserve(128);
 	for ( auto x = 1;  x < tilemap->width;  ++x ) {
 		for ( auto y = 1;  y < tilemap->height;  ++y ) {
-			U8 bitmask = 0x00;
-			bitmask += isValid(x-1, y-1)? 1:0; // NW
-			bitmask += isValid(x-1, y  )? 2:0; // SW
-			bitmask += isValid(x,   y-1)? 4:0; // NE
-			bitmask += isValid(x,   y  )? 8:0; // SE
+			U8 bitmask = 0x00; // we need to set 2 bits per quadrant to allow cycling (4 quadrants, but 8 bits in a byte)
+			bitmask += isValid(x-1, y-1)? (1 +  16) : 0; // NW
+			bitmask += isValid(x,   y-1)? (2 +  32) : 0; // NE
+			bitmask += isValid(x,   y  )? (4 +  64) : 0; // SE
+			bitmask += isValid(x-1, y  )? (8 + 128) : 0; // SW
+
+			Vector3 rotation { .0f, .0f, .0f };
+			auto setCount = (bitmask&1) + ((bitmask>>1)&1) + ((bitmask>>2)&1) + ((bitmask>>3)&1);
+			if ( setCount == 1 ) {
+				for ( auto q = 0;  q < 4;  ++q )
+					if ( (util::cycleRight(bitmask,q)&1) == 1 )
+						rotation = { .0f, util::degToRad(225.0f+q*90.0f), .0f };
+			}
+			else if ( setCount == 2 ) {
+				for ( auto q = 0;  q < 4;  ++q )
+					// 11
+					// 00 case:
+					if ( (util::cycleRight(bitmask,q)&0b11) == 0b00 )
+						rotation = { .0f, util::degToRad(180.0f+q*90.0f), .0f };
+					// ignore 01
+					//        10 case
+			}
+			else if ( setCount == 3 ) {
+				for ( auto q = 0;  q < 4;  ++q )
+					if ( (util::cycleRight(bitmask,q)&1) == 0 )
+						rotation = { .0f, util::degToRad(135.0f+q*90.0f), .0f };
+			}
+
 			if ( bitmask ) {
-				Vector3 rotation { .0f, .0f, .0f };
-				for ( auto q = 0;  q < 4;  ++q ) {
-					if ( (util::cycleRight(bitmask,q) & 0b1011) == 0b1011) {
-						rotation = { .0f, util::degToRad(45.0f+q*90.0f), .0f };
-						break;
-					}
-				}
 				auto worldPosition = tilemap->convertTilePositionToWorldPosition(x,y) - Vector3(tilemap->config.tileSideScaleFactor/2, .0f, tilemap->config.tileSideScaleFactor/-2);
 				placeStreetlight(worldPosition, rotation);
 			}

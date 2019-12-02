@@ -194,7 +194,6 @@ void Game::createCurrentState()
 			static_cast<PlayingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
 			Sound::stopAllLoops();
 			static_cast<PlayingGameState*>(state.get())->getPlayer()->startEngineSound();
-			//static_cast<PlayingGameState*>(state.get())->initiatePlayer();
 		}
 	}
 	else if (currentState == STATE_UPGRADING)
@@ -240,10 +239,8 @@ void Game::run()
 	QueryPerformanceCounter((LARGE_INTEGER*)&prevTime);
 
 	while (running && window->update()) {
-		//deltaTime
 		curTime = 0;
 		QueryPerformanceCounter((LARGE_INTEGER*)&curTime);
-		//Calculate deltaTime
 		deltaTime = (curTime - prevTime) * secPerCount;
 
 		Input::update(deltaTime);
@@ -258,7 +255,6 @@ void Game::run()
 			QueryPerformanceCounter((LARGE_INTEGER*)& curTime);
 			oldState = -1;
 		}
-		//camera.setPos(player.getVehicle()->getPosition() + Vector3(0.0, 500.0f, 0.0));
 		
 
 		//deltaTime reset

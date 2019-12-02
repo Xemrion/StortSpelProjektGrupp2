@@ -62,14 +62,16 @@ Spitfire::~Spitfire()
 	Game::getGraphics().removeFromDraw(wheel2);
 	Game::getGraphics().removeFromDraw(wheel3);
 	Game::getGraphics().removeFromDraw(wheel4);
-	//physics->DeleteRigidBody(vehicleBody1->getRigidBody());
 	physics->deletePointJoint(pointJoint);
 	delete vehicleBody1;
 	delete wheel1;
 	delete wheel2;
 	delete wheel3;
 	delete wheel4;
-	Game::getGameInfo().nrOfCars++;
+	if (this->isDead())
+	{
+		Game::getGameInfo().nrOfCars++;
+	}
 }
 
 void Spitfire::updateVehicle()
