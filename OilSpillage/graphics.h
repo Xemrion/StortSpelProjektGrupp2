@@ -125,7 +125,7 @@ public:
 	bool loadTexture(std::string fileName, bool overridePath = false, bool cpuOnly = false);
 	bool reloadTexture( std::string fileName, bool overridePath=false );
 	const Mesh* getMeshPointer(const char *path);
-	Texture* getTexturePointer(const char *path);
+	Texture* getTexturePointer(const char *path, bool tga = true);
 	Material getMaterial(const char* modelPath);
 	void addToDraw(GameObject* o);
 	void addToDrawStatic(GameObject* o);

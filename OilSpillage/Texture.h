@@ -35,7 +35,7 @@ public:
 	Texture(const Texture&) = delete;
 	~Texture();
 
-	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, const char* filename, int mipLevels, bool cpuOnly);
+	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, std::wstring filename, int mipLevels, bool cpuOnly);
 	bool Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int width, int height);
 	void Shutdown();
 
