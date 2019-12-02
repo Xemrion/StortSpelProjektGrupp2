@@ -17,6 +17,7 @@ private:
 	bool shouldInit;
 	float respawnTimer;
 	float timerScale;
+	float objectiveTimer;
 
 	int lastMinute;
 	bool scaleUp;

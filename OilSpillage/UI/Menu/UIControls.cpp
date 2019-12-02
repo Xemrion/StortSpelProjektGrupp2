@@ -34,8 +34,9 @@ UIControls::~UIControls()
 
 void UIControls::init()
 {
-	Game::getGraphics().loadTexture("UI/controls");
-	this->textureControls = Game::getGraphics().getTexturePointer("UI/controls");
+	std::string path = std::string(TEXTURE_ROOT_DIR) + std::string("UI/controls") + std::string(".dds");
+	Game::getGraphics().loadTexture(path, true);
+	this->textureControls = Game::getGraphics().getTexturePointer("UI/controls", false);
 	assert(textureControls && "Texture not loaded correctly!");
 
 	Prompt prompts[] = {
