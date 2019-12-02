@@ -448,26 +448,9 @@ void Boss::changeHealth(float amount)
 	}
 }
 
-const float Boss::getTotalWeakSpotCurrHp()
+const std::vector<Weakspot>& Boss::getWeakspots()
 {
-	float currentHP = 0;
-	for (int i = 0; i < this->weakSpots.size(); i++)
-	{
-		currentHP += this->weakSpots[i].getHealth();
-	}
-
-	return currentHP;
-}
-
-const float Boss::getTotalWeakSpotMaxHP()
-{
-	float maxHP = 0;
-	if (this->weakSpots.size() > 0)
-	{
-		maxHP = (this->weakSpots[0].getMaxHP() * 2); // 2 = nr of weakspots from the beginning
-	}
-
-	return maxHP;
+	return this->weakSpots;
 }
 
 
