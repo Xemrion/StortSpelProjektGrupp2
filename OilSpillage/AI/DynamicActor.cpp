@@ -44,7 +44,6 @@ void DynamicActor::move()
 		this->setRotation(Vector3(0, newRot - (DirectX::XM_PI / 2), 0));
 	}
 
-	//position = temp;
 	// Reset accelertion to 0 each cycle
 	acceleration *= 0;
 }
@@ -120,7 +119,6 @@ void DynamicActor::moveCirculate(const Vector3& desiredDirection)
 	//To make the slow down not as abrupt
 	acceleration *= 0.4f;
 	// Update velocity
-	//velocity += acceleration;
 	velocity = seekCirculate(desiredDirection);
 	// Limit speed
 	if (velocity.Length() > maxForce)
@@ -171,14 +169,6 @@ void DynamicActor::followPath()
 			pathSize--;
 		}
 	}
-	/*else if (path.size() > 0)
-	{
-		destination = *path[path.size() - 1];
-		if ((*path[path.size() - 1] - position).Length() < 2)
-		{
-			path.pop_back();
-		}
-	}*/
 }
 
 void DynamicActor::circulatePlayer()
