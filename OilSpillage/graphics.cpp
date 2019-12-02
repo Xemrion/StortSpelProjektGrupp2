@@ -29,7 +29,8 @@ Graphics::Graphics()
 	this->particleSystem2 = new ParticleSystem;
 	this->particleTrail = new ParticleSystem;
 
-	this->selectedObjUI = nullptr;
+	this->selectedObjUI.first = nullptr;
+	this->selectedObjUI.second = nullptr;
 
 	this->particleSystem->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
 	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
@@ -1550,22 +1551,25 @@ void Graphics::renderUI(float deltaTime)
 
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	if (this->uiObjects.size()>1 && this->selectedObjUI != nullptr && this->selectedObjUI!=this->uiObjects[this->uiObjects.size()-1].first)
+	if (this->uiObjects.size()>1 && this->selectedObjUI.first != nullptr && this->selectedObjUI!=this->uiObjects[this->uiObjects.size()-1])
 	{
 		int posInVec = -1;
 		for (int i = 0; i < this->uiObjects.size() && posInVec==-1; i++)
 		{
-			if (this->uiObjects[i].first == this->selectedObjUI)
+			if (this->uiObjects[i] == this->selectedObjUI)
 			{
 				posInVec = i;
 			}
 		}
-		std::swap(this->uiObjects[posInVec], this->uiObjects[this->uiObjects.size()-1]);
+		if (posInVec != -1)
+		{
+			std::swap(this->uiObjects[posInVec], this->uiObjects[this->uiObjects.size() - 1]);
+		}
 	}
 	int index = 0;
 	for (std::pair<GameObject*,Matrix*> object : this->uiObjects)
 	{
-		if (object == this->uiObjects.back() && this->selectedObjUI!=nullptr)
+		if (object == this->uiObjects.back() && this->selectedObjUI.first!=nullptr)
 		{
 			ID3D11DepthStencilView* nulView = nullptr;
 
@@ -1628,9 +1632,10 @@ void Graphics::renderUI(float deltaTime)
 	deviceContext->VSSetShader(this->shaderDebug.vs.getShader(), nullptr, 0);
 }
 
-void Graphics::setSelectedUI(GameObject* obj)
+void Graphics::setSelectedUI(GameObject* obj, Matrix* mat)
 {
-	this->selectedObjUI = obj;
+	this->selectedObjUI.first = obj;
+	this->selectedObjUI.second = mat;
 }
 
 void Graphics::setLightList(LightList* lightList)

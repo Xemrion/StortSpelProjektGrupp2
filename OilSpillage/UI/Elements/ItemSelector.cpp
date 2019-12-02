@@ -102,10 +102,11 @@ void ItemSelector::update(float deltaTime)
 
 		if (i == selectedIndex)
 		{
-			Game::getGraphics().setSelectedUI(object);
 			rotationTimers[i] = std::fmodf(rotationTimers[i] + deltaTime * 4, XM_2PI);
 			rotation[i] = Quaternion::Slerp(rotation[i], Quaternion::CreateFromYawPitchRoll(rotationTimers[i],0,0), deltaTime * 10);
 			transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f), Vector3(1.5f), rotation[i], true);
+			Game::getGraphics().setSelectedUI(object,&transforms[i]);
+
 		}
 		else
 		{

@@ -41,7 +41,6 @@ void ItemSlot::update(bool selected, float deltaTime)
 	{
 		if (selected)
 		{
-			Game::getGraphics().setSelectedUI(this->slot->getItem()->getObject());
 			rotationTimer = std::fmodf(rotationTimer + deltaTime * 4, XM_2PI);
 			//rotation = Quaternion::CreateFromYawPitchRoll(rotationTimer, 0.0f, 0.0f);
 			rotation = Quaternion::Slerp(rotation, Quaternion::CreateFromYawPitchRoll(rotationTimer, 0, 0), deltaTime * 10);
@@ -54,6 +53,11 @@ void ItemSlot::update(bool selected, float deltaTime)
 			transform = Item::generateTransform(this->slot->getItem()->getObject(), this->position + Vector2(ItemSlot::size.x * 0.5f, ItemSlot::size.y - 10.0f), Vector3(1.5f), rotation,true);
 		}
 	}
+}
+
+Matrix& ItemSlot::getTransform()
+{
+	return this->transform;
 }
 
 Container::Slot* ItemSlot::getSlot() const
