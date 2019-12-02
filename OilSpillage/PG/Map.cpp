@@ -251,14 +251,14 @@ void Map::generateStreetlights()
 					// 11
 					// 00 case:
 					if ( (util::cycleRight(bitmask,q)&0b11) == 0b00 )
-						rotation = { .0f, util::degToRad(q*90.0f), .0f };
+						rotation = { .0f, util::degToRad(180.0f+q*90.0f), .0f };
 					// ignore 01
 					//        10 case
 			}
 			else if ( setCount == 3 ) {
 				for ( auto q = 0;  q < 4;  ++q )
 					if ( (util::cycleRight(bitmask,q)&1) == 0 )
-						rotation = { .0f, util::degToRad(45.0f+q*90.0f), .0f };
+						rotation = { .0f, util::degToRad(135.0f+q*90.0f), .0f };
 			}
 
 			if ( bitmask ) {

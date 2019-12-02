@@ -146,11 +146,32 @@ void UIPlaying::drawUI()
 
 	this->healthBar->setAmount(player->getHealth() / static_cast<float>(player->getMaxHealth()));
 	Objective* currObj = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+
 	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
 	{
+		std::vector<Weakspot> weakspots = currObj->getBoss()->getWeakspots();
+
+		if (weakspots.size() > 0) //draw shield only if exists
+		{
+			if (weakspots.size() == 2) //draw shield only if exists
+			{
+				this->bossShieldBar1->setAmount(weakspots[0].getHealth() / static_cast<float>(weakspots[0].getMaxHP()));
+				this->bossShieldBar2->setAmount(weakspots[1].getHealth() / static_cast<float>(weakspots[1].getMaxHP()));
+			}
+			else if (weakspots.size() == 1) //draw shield only if exists
+			{
+				if (weakspots[0].getWeakspotNr() == 0)
+				{
+					this->bossShieldBar1->setAmount(weakspots[0].getHealth() / static_cast<float>(weakspots[0].getMaxHP()));
+				}
+				else if (weakspots[0].getWeakspotNr() == 1)
+				{
+					this->bossShieldBar2->setAmount(weakspots[0].getHealth() / static_cast<float>(weakspots[0].getMaxHP()));
+				}
+			}
+		}
+
 		this->bossHealthBar->setAmount(currObj->getBoss()->getHealth() / static_cast<float>(currObj->getBoss()->getMaxHealth()));
-		this->bossShieldBar->setAmount((currObj->getBoss()->getTotalWeakSpotCurrHp())
-		/ (static_cast<float>(currObj->getBoss()->getTotalWeakSpotMaxHP())));
 	}
 
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
@@ -192,17 +213,35 @@ void UIPlaying::drawUI()
 
 	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
 	{
-		if ((currObj->getBoss()->getTotalWeakSpotCurrHp()) > 0) //draw sield only if exists
-		{
-			Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty SHIELDS");
-			this->bossShieldBar->draw(false);
-			UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty SHIELDS", Vector2((SCREEN_WIDTH / 2), 590), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
-		}
-
 		Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty");
 		this->bossHealthBar->draw(false); //false = change color to gray
-		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty", Vector2((SCREEN_WIDTH / 2) , 660), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
+		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty", Vector2((SCREEN_WIDTH / 2), 660), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
+		
+		std::vector<Weakspot> weakspots = currObj->getBoss()->getWeakspots();
+		if (weakspots.size() > 0) //draw shield only if exists
+		{
+			if (weakspots.size() == 2) //draw shield only if exists
+			{
+				this->bossShieldBar1->draw(false);
+				this->bossShieldBar2->draw(false);
+			}
+			else if (weakspots.size() == 1) //draw shield only if exists
+			{
+				if (weakspots[0].getWeakspotNr() == 0)
+				{
+					this->bossShieldBar1->draw(false);
+				}
+				else if (weakspots[0].getWeakspotNr() == 1)
+				{
+					this->bossShieldBar2->draw(false);
+				}
+			}
+
+			Vector2 textBoss = UserInterface::getFontArial()->MeasureString("Qwerty SHIELDS");
+			UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty SHIELDS", Vector2((SCREEN_WIDTH / 2), 590), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
+		}
 	}
+
 	this->healthBar->draw(false);
 	objectiveBox->draw(false);
 	this->minimap->draw(false);
@@ -225,7 +264,8 @@ void UIPlaying::init()
 {
 	this->healthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 20));
 	this->bossHealthBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 680), Colors::Red);
-	this->bossShieldBar = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / 2 - Slider::size.x / 2, 610), Colors::DarkGray);
+	this->bossShieldBar1 = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / (3) - Slider::size.x / 2, 610), Colors::DarkGray);
+	this->bossShieldBar2 = std::make_unique<Slider>(Vector2(SCREEN_WIDTH / (1.5) - Slider::size.x / 2, 610), Colors::DarkGray);
 
 	this->minimap = std::make_unique<Minimap>(Vector2(SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10) - Minimap::size);
 	this->objectiveBox = std::make_unique<ObjectiveBox>(Vector2(10,10));
