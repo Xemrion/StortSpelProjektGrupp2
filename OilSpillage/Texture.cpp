@@ -29,15 +29,15 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 	if (filename.find(L".tga", 0) != std::wstring::npos)
 	{
 		std::string filenameConvert = std::string(filename.begin(), filename.end());
-		unsigned char* targaData = stbi_load(filenameConvert.c_str(), &this->width, &this->height, &this->bpp, STBI_rgb_alpha);
 		
+		unsigned char* targaData = stbi_load(filenameConvert.c_str(), &this->width, &this->height, &this->bpp, STBI_rgb_alpha);
+		if (!targaData)
+		{
+			return false;
+		}
+
 		if (cpuOnly)
 		{
-			unsigned char* targaData = stbi_load(filenameConvert.c_str(), &this->width, &this->height, &this->bpp, STBI_rgb_alpha);
-			if (!targaData)
-			{
-				return false;
-			}
 
 			long imageSize = this->width * static_cast<long>(this->height)* static_cast<long>(this->bpp);
 			this->data = new unsigned char[imageSize];
