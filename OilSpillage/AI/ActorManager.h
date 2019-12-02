@@ -18,7 +18,7 @@ public:
 	void createSniper(float x, float z, int weaponType = 0);
 	void createTurret(float x, float z, int weaponType = 0);
 	void createSwarm(float x, float z);
-	Boss* createBoss(float x, float z, int weaponType);
+	Boss* createBoss(float x, float z, int weaponType, float scalingNr);
 
 	void createChaseCar(float x, float z);
 	void createShootCar(float x, float z, int weaponType = 0);

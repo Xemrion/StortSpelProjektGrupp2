@@ -2,6 +2,7 @@
 
 Weakspot::Weakspot()
 {
+	this->scalingNr = 1;
 	this->weakspotNr = 0;
 	this->stats = VehicleStats::AIPart;
 	this->health = this->stats.maxHealth;
@@ -11,10 +12,11 @@ Weakspot::Weakspot()
 
 Weakspot::Weakspot(Weakspot&& weakspot) //move constructor for ex. vectors
 {
+	this->scalingNr = weakspot.scalingNr;
 	this->weakspotNr = weakspot.weakspotNr;
 	this->stats = VehicleStats::AIPart;
-	this->health = this->stats.maxHealth;
-	this->maxHP = this->stats.maxHealth;
+	this->health = this->stats.maxHealth * this->scalingNr;
+	this->maxHP = this->health;
 	this->isHit = weakspot.isHit;
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
@@ -26,12 +28,13 @@ Weakspot::Weakspot(Weakspot&& weakspot) //move constructor for ex. vectors
 	Game::getGraphics().addToDraw(this);
 }
 
-Weakspot::Weakspot(int weaponType)
+Weakspot::Weakspot(int weaponType, float scalingNr)
 {
+	this->scalingNr = scalingNr;
 	this->weakspotNr = 0;
 	this->stats = VehicleStats::AIPart;
-	this->health = this->stats.maxHealth;
-	this->maxHP = this->stats.maxHealth;
+	this->health = this->stats.maxHealth * this->scalingNr;
+	this->maxHP = this->health;
 	this->isHit = 1;
 
 	this->setScale(Vector3(1.0f, 1.0f, 1.0f));
@@ -45,6 +48,7 @@ Weakspot::Weakspot(int weaponType)
 
 Weakspot::Weakspot(const Weakspot& other)	//copy constructor
 {
+	this->scalingNr = other.scalingNr;
 	this->weakspotNr = other.weakspotNr;
 	this->stats = other.stats;
 	this->health = other.health;
@@ -69,6 +73,7 @@ Weakspot& Weakspot::operator=(const Weakspot& other)	//equal operator
 {
 	if (this != &other)
 	{
+		this->scalingNr = other.scalingNr;
 		this->weakspotNr = other.weakspotNr;
 		this->stats = other.stats;
 		this->health = other.health;
