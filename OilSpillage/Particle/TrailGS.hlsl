@@ -67,8 +67,8 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	*/
 	float startSize = config.y;
 	float endSize = config.z;
-	size = lerp(startSize, endSize, smoothstep(0.0, totalLifeTime - 1.0f, time)) * (1.0 - smoothstep(totalLifeTime - 1.0f, totalLifeTime, time));
-
+	//size = lerp(startSize, endSize, smoothstep(0.0, totalLifeTime - 1.0f, time)) * (1.0 - smoothstep(totalLifeTime - 1.0f, totalLifeTime, time));
+    size = startSize;
 
 	float nrOfColors = config.x;
 	float4 testColor = float4(1.0f, 0.0f, 1.0f, 1.0f);

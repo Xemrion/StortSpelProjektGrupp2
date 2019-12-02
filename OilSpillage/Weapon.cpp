@@ -72,6 +72,7 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& dir
 	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
 	this->dir *= weapon.bulletSpeed;
 
+
 	this->dir += additionalVelocity;
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);

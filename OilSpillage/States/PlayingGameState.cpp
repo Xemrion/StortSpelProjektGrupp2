@@ -616,6 +616,7 @@ void PlayingGameState::update(float deltaTime)
 		if (timer > 0.1f&&timerEMP>0.0f)
 		{
 			timer = 0.0f;
+			this->graphics.addTestParticle(this->player->getVehicleBody1()->getPosition() + Vector3(0.0f, 0.0f, 5.0f), Vector4(0, 0, 0, 0), 1, lifeTime, randomPosPower);
 		}
 
 
@@ -690,18 +691,18 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 	
-	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 		//ImGui_Driving();
 		ImGui_ProcGen();
 		//ImGui_AI();
-		//ImGui_Particles();
+		ImGui_Particles();
 		ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	#endif // !_DEBUG
+	//#endif // !_DEBUG
 
 	graphics.presentScene();
 }
@@ -1023,7 +1024,7 @@ void PlayingGameState::generateMapPowerUps()
 
 void PlayingGameState::generateObjectives()
 {
-	if (Game::getNrOfStagesDone() % 3 == 1)
+	if (Game::getNrOfStagesDone() % 3 == 0)
 	{
 		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1)); //fix pos
 		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());

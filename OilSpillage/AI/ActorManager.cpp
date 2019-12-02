@@ -46,7 +46,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	if (spawnTimer <= 0)
 	{
 
-		spawnEnemies(targetPos);
+		//spawnEnemies(targetPos);
 
 		spawnTimer = spawnCooldown;
 	}

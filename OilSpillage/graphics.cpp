@@ -441,7 +441,7 @@ bool Graphics::init(Window* window)
 
 	//this->particleHandler->getParticleSystem("electro")->setParticleShaders(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("electro")->setGeometryShader("ParticleGS.cso");
-	this->particleHandler->getParticleSystem("electro")->setPixelShader("ParticlePS.cso");
+	//this->particleHandler->getParticleSystem("electro")->setPixelShader("ParticlePS.cso");
 
 
 	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());
@@ -470,7 +470,7 @@ bool Graphics::init(Window* window)
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
 
-	fog->initialize(device, deviceContext, 15, 2.25/5, fogMaterial);
+	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
 	fog->setWindSpeed(Vector2(4.0f / 1024.f, 4.0f / 1024.f));
 	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
 	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
