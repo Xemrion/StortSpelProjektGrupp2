@@ -8,6 +8,7 @@ void UIUpgrading::updateUI(float deltaTime)
 	if (!this->hasInitStats)
 	{
 		this->statBox->update(dynamic_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getStats());
+		this->gadgetSelector->init();
 		this->hasInitStats = true;
 	}
 	if (this->selectingItem)
@@ -19,6 +20,10 @@ void UIUpgrading::updateUI(float deltaTime)
 		else if (Input::checkButton(Keys::CONFIRM, States::PRESSED) && this->itemSelector->isSelectedValid())
 		{
 			this->selectingItem = false;
+		}
+		else if (Input::checkButton(Keys::CANCEL, States::PRESSED) && this->itemSelector->isSelectedValid())
+		{
+			this->gadgetSelector->removeSlotOfSelected(this->itemSelector->getSelectedSlot());
 		}
 		else if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 		{
@@ -116,7 +121,7 @@ void UIUpgrading::init()
 	Prompt prompts[] = {
 		{ Keys::L_PRESS, "Move", Color(Colors::White) },
 		{ Keys::CONFIRM, "Select Item", Color(Colors::White) },
-		{ Keys::CANCEL, "Delete From Inventory", Color(Colors::White) },
+		{ Keys::CANCEL, "Remove From Car", Color(Colors::White) },
 		{ Keys::R_PRESS, "Rotate Car", Color(Colors::White) },
 		{ Keys::ACTION_1, "Confirm Upgrading", Color(Colors::White) }
 	};

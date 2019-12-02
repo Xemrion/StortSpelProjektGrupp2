@@ -14,7 +14,7 @@ private:
 
 	Element* selected;
 	std::unique_ptr<ItemSlot> slots[Slots::SIZEOF];
-	std::unique_ptr<Container::Slot*[]> used;
+	Container::Slot* used[Slots::SIZEOF];
 public:
 	static Vector2 size;
 
@@ -23,8 +23,10 @@ public:
 
 	void draw(bool selected);
 	void update(bool selected, float deltaTime);
+	void init();
 
 	void setSlotOfSelected(Container::Slot* slot);
+	void removeSlotOfSelected(Container::Slot* slot);
 	Container::Slot** getUsed();
 };
 

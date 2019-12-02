@@ -7,13 +7,46 @@ TileMap::TileMap()
 }
 
 TileMap::TileMap(MapConfig const& config):
-	config(config),
-	width(static_cast<Size>(config.dimensions.y)),
-	height(static_cast<Size>(config.dimensions.x)),
-	data(Vector<Tile>(width* height, Tile::ground))
+	config ( config                                    ),
+	width  ( static_cast<Size>(config.dimensions.y)    ),
+	height ( static_cast<Size>(config.dimensions.x)    ),
+	data   ( Vector<Tile>(width* height, Tile::ground) )
 {}
 
-TileMap::~TileMap() {}
+TileMap::TileMap( TileMap const &other ) noexcept:
+	config ( other.config ),
+	width  ( other.width  ),
+	height ( other.height ),
+	data   ( other.data   )
+{}
+
+TileMap::TileMap( TileMap &&other ) noexcept:
+	config ( std::move(other.config) ),
+	width  ( other.width             ),
+	height ( other.height            ),
+	data   ( std::move(other.data)   )
+{}
+
+TileMap::~TileMap() noexcept {}
+
+TileMap& TileMap::operator=(TileMap const &other) noexcept {
+	if ( this != &other ) {
+		width  = other.width;
+		height = other.height;
+		config = other.config;
+		data   = other.data;
+	}
+	return *this;
+}
+
+TileMap& TileMap::operator=(TileMap &&other) noexcept
+{
+	width  = other.width;
+	height = other.height;
+	config = std::move( other.config );
+	data   = std::move( other.data   );
+	return *this;
+}
 
 // x = current X (may be mutated if successful)
 // y = current Y (may be mutated if successful)
@@ -44,6 +77,8 @@ Bool  TileMap::walk( U16 &x, U16 &y, Direction d, Tile tile )
 	}
 }
 
+
+// deprecate?
 Vector<GameObject>  TileMap::loadAsModels( Graphics &graphics ) const
 {
 	Vector<GameObject> tiles( width * height ); // reserve
@@ -62,9 +97,9 @@ currentTileType += ((y < height-1) and (tileAt(x,y+1) == Tile::road))? '1' : '0'
 			auto  &tile        { tiles[ index(x, y)] };
 			tile.mesh        = graphics.getMeshPointer( currentTileType.c_str() );
 			tile.setMaterial(  graphics.getMaterial(    currentTileType.c_str() ) );
-			tile.setScale(Vector3{ 1.0f * config.tileScaleFactor.x,
-			                       1.0f * config.tileScaleFactor.y,
-			                       1.0f * config.tileScaleFactor.z }); // TODO: scale models instead
+			tile.setScale(Vector3{ 1.0f * config.tileSideScaleFactor,
+			                       1.0f * config.tileSideScaleFactor,
+			                       1.0f * config.tileSideScaleFactor }); // TODO: scale models instead
 			tile.setPosition(convertTilePositionToWorldPosition(x, y) - Vector3{ .0f, 1.5f, .0f } );
 		}
 	}
@@ -88,6 +123,14 @@ currentTileType += ((y < height-1) and (tileAt(x,y+1) == Tile::road))? '1' : '0'
 	}
 	return tiles; // RVO/Copy Elision
 */
+}
+
+void  TileMap::applyLot( Lot const &lot, Tile tile ) noexcept
+{
+	for ( auto x = lot.nw.x;  x < lot.nw.x+lot.width;  ++x )
+		for ( auto y = lot.nw.y;  y < lot.nw.y+lot.length;  ++y )
+			if ( lot.intersects(x,y) )
+				data[index(x,y)] = tile;
 }
 
 Bool  TileMap::neighbourIsRoad(Direction dir, U16 x, U16 y) const noexcept
@@ -275,7 +318,7 @@ Vector<String> const  TileMap::tileTerminalColorTable{
 Bounds TileMap::calculateBounds( Vector3 const &o, F32 r ) const noexcept
 {
    V2u     ots { convertWorldPositionToTilePosition(o) }; // origin tile xy
-   U32     rts = U32(std::ceil(r / config.tileScaleFactor.x));
+   U32     rts = U32(std::ceil(r / config.tileSideScaleFactor));
 	Bounds  b   { { ots.x-rts, ots.y-rts },
                  { ots.x+rts, ots.y+rts } };
    if ( (Size)b.min.x >= width  )

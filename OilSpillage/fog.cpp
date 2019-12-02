@@ -1,5 +1,6 @@
 #include "fog.h"
 #include "States/PlayingGameState.h"
+#include "PG/MapConfig.hpp"
 
 using namespace DirectX::SimpleMath;
 
@@ -17,30 +18,21 @@ Fog::~Fog()
 		fogTextures.erase(fogTextures.end() - 1);
 	}
 
-	while (normalTextures.size() > 0)
-	{
-		delete normalTextures[normalTextures.size() - 1];
-		normalTextures.erase(normalTextures.end() - 1);
-	}
 }
 
 void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, UINT slices, float spacing, FogMaterial material)
 {
 	Game::getGraphics().loadMesh("Quad");
 	Game::getGraphics().loadShape(SHAPE_QUAD);
-	Game::getGraphics().loadTexture("perlin_s4_e8");
-	noiseTexture = Game::getGraphics().getTexturePointer("perlin_s4_e8");
-	//Game::getGraphics().loadTexture("brickwall");
-	//noiseTexture = Game::getGraphics().getTexturePointer("brickwall");
+	Game::getGraphics().loadTexture("white1x1");
 
 	for (UINT i = 1; i <= slices; ++i)
 	{
 		GameObject* q = new GameObject();
 		q->mesh = Game::getGraphics().getMeshPointer("Quad");
-		q->setPosition(Vector3(95*10, i * spacing - 1.5f, -95*10));
-		q->setScale(Vector3(96.0 * 10, 96.0 * 10, 1.0));
+		q->setPosition(Vector3(32*10, i * spacing - 1.5f, -32*10));
+		q->setScale(Vector3(64.0 * 20, 64.0 * 20, 1.0));
 		q->setColor(Vector4(0.0, 0.0, 0.0, (float(i) / slices)));
-		Game::getGraphics().loadTexture("white1x1");
 		q->setGlossMap(Game::getGraphics().getTexturePointer("white1x1"));
 		q->setSpecularMap(Game::getGraphics().getTexturePointer("white1x1"));
 		quads.push_back(q);
@@ -75,8 +67,8 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 	this->generateTextureShader.createVS(device.Get(), shaderfolder + L"SimpleVS.cso", inputDesc, numElements);
 	this->generateTextureShader.createPS(device.Get(), shaderfolder + L"FogPS.cso");
 
-	this->vp.Width = noiseTexture->getWidth();
-	this->vp.Height = noiseTexture->getHeight();
+	this->vp.Width = textureWidth;
+	this->vp.Height = textureHeight;
 	this->vp.MinDepth = 0.0f;
 	this->vp.MaxDepth = 1.0f;
 	this->vp.TopLeftX = 0;
@@ -176,8 +168,8 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		FogMaterial materialCopy;
 		
 		materialCopy.densityThreshold = material.densityThreshold;
-		materialCopy.ambientDensity = material.ambientDensity / quads.size();
-		materialCopy.density = material.density / (1 + i * 0.05);
+		materialCopy.ambientDensity = material.ambientDensity;
+		materialCopy.density = material.density;
 		materialCopy.scale = material.scale;
 
 		hr = deviceContext->Map(materialBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -185,37 +177,24 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		deviceContext->Unmap(materialBuffer.Get(), 0);
 		object->setColor(Vector4(material.color.x, material.color.z, material.color.z, 0.0));
 
-
 		Texture* diffuseTexture = new Texture();
-		diffuseTexture->Initialize(device.Get(), deviceContext.Get(), "data/textures/perlin_s4_e8.tga", 1, false);
-		Texture* normalMap = new Texture();
-		normalMap->Initialize(device.Get(), deviceContext.Get(), "data/textures/perlin_s4_e8.tga", 1, false);
+		diffuseTexture->Initialize(device.Get(), deviceContext.Get(), textureWidth, textureHeight);
 		device.Get()->CreateRenderTargetView(diffuseTexture->getTexture2D(), NULL, textureRTV.ReleaseAndGetAddressOf());
-		device.Get()->CreateRenderTargetView(normalMap->getTexture2D(), NULL, normalRTV.ReleaseAndGetAddressOf());
 		deviceContext.Get()->ClearRenderTargetView(textureRTV.Get(), clearColor);
-		deviceContext.Get()->ClearRenderTargetView(normalRTV.Get(), clearColor);
-		ID3D11RenderTargetView* RTVarray[2]{ textureRTV.Get(), normalRTV.Get() };
-		deviceContext.Get()->OMSetRenderTargets(2, RTVarray, NULL);
+		deviceContext.Get()->OMSetRenderTargets(1, textureRTV.GetAddressOf(), NULL);
 
-
-
-		auto srv = noiseTexture->getShaderResView();
-		deviceContext->PSSetShaderResources(0, 1, &srv);
-		deviceContext->PSSetSamplers(0, 1, sampler.GetAddressOf());
 		deviceContext->VSSetConstantBuffers(0, 1, viewProjBuffer.GetAddressOf());
 		deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
 		deviceContext->PSSetConstantBuffers(0, 1, materialBuffer.GetAddressOf());
 		deviceContext->Draw(vertexCount, 0);
 
 		fogTextures.push_back(diffuseTexture);
-		normalTextures.push_back(normalMap);
 		object->setRotation(Vector3(XM_PIDIV2, 0.0, 0.0));
 	}
 
 	for (int i = 0; i < quads.size(); ++i)
 	{
 		quads[i]->setTexture(fogTextures[i]);
-		//quads[i]->setNormalMap(normalTextures[i]);
 	}
 }
 

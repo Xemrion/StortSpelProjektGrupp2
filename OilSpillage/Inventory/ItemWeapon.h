@@ -15,6 +15,7 @@ public:
 	virtual ~ItemWeapon();
 	ItemWeapon(const ItemWeapon& obj);
 	Item* clone()const;
+	bool operator==(const ItemWeapon& other) const;
 
 	virtual void randomize();
 

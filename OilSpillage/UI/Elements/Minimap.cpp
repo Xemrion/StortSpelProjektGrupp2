@@ -7,14 +7,13 @@
 Vector2 Minimap::size = Vector2(96 * 2, 96 * 2);
 
 Minimap::Minimap(Vector2 position)
-	: Element(position, 0.0f), fogClearRadius(25.0f), zoom(0.25f), textureMap(nullptr), textureFog(nullptr), textureFogTemp(nullptr), resourceFog(nullptr), pixels(nullptr), compassRot(0.0f)
+	: Element(position, 0.0f), compassMoveSize(6.0f), compassSpeed(6.0f), objectiveViewDist(300.0f), enemyViewDist(150.0f), fogClearRadius(25.0f), zoom(0.25f), textureMap(nullptr), textureFog(nullptr), textureFogTemp(nullptr), resourceFog(nullptr), pixels(nullptr), compassRot(0.0f)
 {
 	Game::getGraphics().loadTexture("UI/mapOutline");
 	Game::getGraphics().loadTexture("UI/mapPlayerMarker");
 	Game::getGraphics().loadTexture("UI/mapObjective");
 	Game::getGraphics().loadTexture("UI/mapEnemy");
 	Game::getGraphics().loadTexture("UI/mapCompass");
-	Game::getGraphics().loadTexture("UI/mapFog", false, true);
 	Game::getGraphics().loadTexture("UI/arrowObjective2");
 
 	this->textureOutline = Game::getGraphics().getTexturePointer("UI/mapOutline");
@@ -22,7 +21,6 @@ Minimap::Minimap(Vector2 position)
 	this->textureObjectiveMarker = Game::getGraphics().getTexturePointer("UI/mapObjective");
 	this->textureEnemyMarker = Game::getGraphics().getTexturePointer("UI/mapEnemy");
 	this->textureCompass = Game::getGraphics().getTexturePointer("UI/mapCompass");
-	this->textureFogTemp = Game::getGraphics().getTexturePointer("UI/mapFog");
 	this->textureArrow = Game::getGraphics().getTexturePointer("UI/arrowObjective2");
 
 	assert(textureOutline && "Texture failed to load!");
@@ -30,13 +28,14 @@ Minimap::Minimap(Vector2 position)
 	assert(textureObjectiveMarker && "Texture failed to load!");
 	assert(textureEnemyMarker && "Texture failed to load!");
 	assert(textureCompass && "Texture failed to load!");
+	assert(textureArrow && "Texture failed to load!");
 }
 
 Minimap::~Minimap()
 {
 	delete this->pixels;
-	this->textureFog->Release();
-	this->resourceFog->Release();
+	if (this->textureFog) this->textureFog->Release();
+	if (this->resourceFog) this->resourceFog->Release();
 }
 
 void Minimap::init()
@@ -110,11 +109,11 @@ void Minimap::init()
 		assert(this->textureFog && "Texture failed to create!");
 	}
 
-	//Copy the texture so we can change the alpha later
-	
-
-	this->compassMoveSize = 6.0f;
-	this->compassSpeed = 6.0f;
+	unsigned short minDimension = min(this->textureMap->getWidth(), this->textureMap->getHeight());
+	this->zoom = min(72.0f / minDimension, 1.0f);
+	this->fogClearRadius = min(25.0f * (minDimension / 72.0f), 25.0f);
+	this->objectiveViewDist = min(300.0f * (minDimension / 288.0f), 300.0f);
+	this->enemyViewDist = min(150.0f * (minDimension / 288.0f), 150.0f);
 
 	PlayingGameState* state = static_cast<PlayingGameState*>(Game::getCurrentState());
 	Vector3 mapSize((state->getBottomRight() - state->getTopLeft() + Vector3(0, 1, 0)) * Vector3(1, 1, -1));
@@ -123,9 +122,6 @@ void Minimap::init()
 	this->mapMatrix = Matrix::CreateTranslation(-Vector3(state->getTopLeft().x, 0, state->getBottomRight().z));
 	this->mapMatrix *= Matrix::CreateScale(mapScale);
 }
-
-	
-
 
 void Minimap::draw(bool selected)
 {
@@ -181,7 +177,7 @@ void Minimap::draw(bool selected)
 	for (int i = 0; i < static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->getGroups().size(); i++)
 	{
 		targetPos = static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->getGroups()[i].getAveragePos();
-		if ((targetPos - playerPos).Length() < 75.0f)
+		if ((targetPos - playerPos).Length() < this->enemyViewDist)
 		{
 			targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
 			targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
@@ -206,7 +202,7 @@ void Minimap::draw(bool selected)
 				if (state->getObjHandler().getObjective(0)->getTarget(i) != nullptr)
 				{
 					targetPos = state->getObjHandler().getObjective(0)->getTarget(i)->getPosition();
-					if ((targetPos - playerPos).Length() < 150.0f)
+					if ((targetPos - playerPos).Length() < this->objectiveViewDist)
 					{
 						targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
 						targetMapPos.Clamp(Vector3(), Vector3(this->textureMap->getWidth(), 0, this->textureMap->getHeight()));
@@ -240,8 +236,8 @@ void Minimap::draw(bool selected)
 		Vector2 arrowPositionUI(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f);
 		float alphaLength = 1.0f;
 		arrowPositionUI += Vector2(camToObj.x, -camToObj.z);
-		float startFade = 50.0f;
-		float endFade = 20.0f;
+		float startFade = 50.0f+20.0f;
+		float endFade = 20.0f+20.0f;
 		if (playerToObj.Length() <= startFade && playerToObj.Length() > 0.0f)
 		{
 			alphaLength = playerToObj.Length() / startFade;

@@ -18,8 +18,8 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->menues[MENU_CONTROLS]->init();
 	this->menues[MENU_HIGHSCORE] = std::make_unique<UIHighscore>();
 
-	Game::getGraphics().loadTexture("UI/image");
-	this->textureBG = Game::getGraphics().getTexturePointer("UI/image");
+	Game::getGraphics().loadTexture("UI/image2");
+	this->textureBG = Game::getGraphics().getTexturePointer("UI/image2");
 	assert(textureBG && "Could not load texture!");
 	this->theVehicle = std::make_unique<Vehicle>();
 	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
@@ -28,27 +28,26 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 	this->lightList->addLight(PointLight(Vector3(0,-0.25, -0.25), Vector3(0.4, 0.1, 0), 10));
 
-
 	this->graphics.setLightList(lightList.get());
 
 	this->theVehicle->init(physics.get());
-	this->theVehicle->setPosition(Vector3(0, -0.25, -0.25));
-	this->theVehicle->getVehicleBody1()->setPosition(Vector3(0, 0.55, 0));
+	this->theVehicle->setPosition(Vector3(3.15, -0.25, 0));
+	this->theVehicle->getVehicleBody1()->setPosition(Vector3(3.15, 0.45, 0));
 	
-	this->theVehicle->setRotation(Vector3(0, 90, 0));
+	this->theVehicle->setRotation(Vector3(0, 2.65, 0));
 
 	this->camera = std::make_unique<DynamicCamera>(Vector3(2.0f, 0.5f, -2.0f), Vector3(0, 0, 0));
 	barrels = std::make_unique<GameObject>();
 	graphics.loadModel("Entities/Barrel");
 	barrels.get()->mesh = graphics.getMeshPointer("Entities/Barrel");;
 	barrels.get()->setTexture(graphics.getMaterial("Entities/Barrel").diffuse);
-	barrels.get()->setPosition(Vector3(0, -0.65f, 0));
+	barrels.get()->setPosition(Vector3(0.1, -0.55f, 0));
 	barrels.get()->setScale(Vector3(0.4f,0.4f,0.4f));
 	
-	graphics.getParticleSystem("fire")->setGravity(-0.1f);
+	graphics.getParticleSystem("fire")->setGravity(-0.3f);
 	
-	graphics.getParticleSystem("fire")->setSize(0.02f,0.01f);
-	graphics.getParticleSystem("fire")->changeVectorField(1.75f,0.09f);
+	graphics.getParticleSystem("fire")->setSize(0.03f,0.02f);
+	graphics.getParticleSystem("fire")->changeVectorField(0.75f,0.09f);
 
 
 	graphics.addToDraw(barrels.get());
@@ -73,7 +72,7 @@ void MenuGameState::update(float deltaTime)
 	this->graphics.clearScreen(Vector4(0,0,0,0));
 	this->graphics.render(this->camera.get(), deltaTime);
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2(SCREEN_WIDTH / 2 - textureBG->getWidth() / 2,textureBG->getHeight()));
+	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2(SCREEN_WIDTH / 2 - textureBG->getWidth() / 2,textureBG->getHeight()-170));
 	UserInterface::getSpriteBatch()->End();
 
 	this->menues[this->currentMenu]->update(deltaTime);
@@ -86,6 +85,6 @@ void MenuGameState::setCurrentMenu(Menu menu)
 
 	if (menu == MENU_HIGHSCORE)
 	{
-		this->menues[MENU_HIGHSCORE]->init();
+		static_cast<UIHighscore*>(this->menues[MENU_HIGHSCORE].get())->init(false, "");
 	}
 }

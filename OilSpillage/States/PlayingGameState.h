@@ -22,10 +22,12 @@ public:
 		MENU_PLAYING,
 		MENU_PAUSED,
 		MENU_OPTIONS,
+		MENU_COMPLETED_STAGE,
+		MENU_BEFORE_PLAYING,
 		MENUCOUNT
 	};
 
-	             PlayingGameState();
+	             PlayingGameState(int seed, float time);
 	virtual     ~PlayingGameState();
 	void         update(float delta);
 	const float &getTimeRef() const noexcept;
@@ -33,6 +35,7 @@ public:
 	void         setTime(float) noexcept;
 	void         changeTime(float delta) noexcept;
 	void         setCurrentMenu(Menu);
+	Map::Info	 getMapInfo() const;
 	Vehicle     *getPlayer() const;
 	std::string  getMinimap() const;
 	Vector3      getTopLeft() const;
@@ -60,7 +63,7 @@ public:
 
 	std::unique_ptr<Vehicle>& getPlayer();
 	void setPlayer(Vehicle* theVehicle);
-	ActorManager* actorManager;
+	UPtr<ActorManager> actorManager;
 
 private:
 	friend class Game;
@@ -76,7 +79,7 @@ private:
 	float                           time;
 	MapConfig                       config;
 	Graphics                       &graphics;
-	AStar                          *aStar;
+	UPtr<AStar>                     aStar;
 	std::unique_ptr<Map>            map;
 	std::unique_ptr<LightList>      lightList;
 	std::unique_ptr<Vehicle>        player;

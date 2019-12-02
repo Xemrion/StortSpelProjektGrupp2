@@ -37,6 +37,11 @@ void Objective::setTarget(GameObject* *target, int nrOfTargets)
 	this->nrOfTargets = nrOfTargets;
 }
 
+void Objective::setSpotLight(SpotLight* theLight)
+{
+	this->mission->aLight = theLight;
+}
+
 void Objective::setEnemies(int nrOfEnemies)
 {
 	started = true;
@@ -44,7 +49,7 @@ void Objective::setEnemies(int nrOfEnemies)
 	this->nrOfTargets = nrOfEnemies;
 }
 
-void Objective::setBoss(Actor* boss)
+void Objective::setBoss(Boss* boss)
 {
 	this->mission->boss = boss;
 }
@@ -98,6 +103,11 @@ TypeOfMission Objective::getType() const
 TypeOfTarget Objective::getTargetType() const
 {
 	return this->mission->typeOfTarget;
+}
+
+Boss* Objective::getBoss() const
+{
+	return this->mission->boss;
 }
 
 int Objective::getRewardTime() const
@@ -164,7 +174,7 @@ bool Objective::isDone()
 	}
 	else if (this->mission->typeMission == TypeOfMission::BossEvent)
 	{
-		if (this->mission->boss == nullptr)
+		if (this->mission->boss->getHealth()<=0.0f)
 		{
 			return true;
 		}
@@ -181,10 +191,9 @@ void Objective::update(Vector3 playerPosition)
 	{
 		if (started)
 		{
-			if (this->mission->target[0] != nullptr)
-			{
+			if(this->mission->target[0]!=nullptr)
 				findClosestPlayer = this->mission->target[0]->getPosition();
-			}
+		
 			//collision check
 			int nrOfDone = 0;
 			for (int i = 0; i < nrOfMax; i++)
@@ -252,18 +261,31 @@ void Objective::update(Vector3 playerPosition)
 	}
 	else if (this->mission->typeMission == TypeOfMission::GetToPoint)
 	{
-		if ((this->mission->generalPosition - playerPosition).Length() < 5.0f)
+		if (!started)
 		{
-			this->done = true;
+			started = true;
+			this->mission->aLight->setLuminance(10.0f);
 		}
+		else
+		{
+			if ((this->mission->generalPosition - playerPosition).Length() < 5.0f)
+			{
+				this->done = true;
+			}
+		}
+		
 	}
 	if (this->mission->typeMission == TypeOfMission::GetToPoint)
 	{
 		this->closestToPlayer = this->mission->generalPosition;
 	}
-	else
+	else if(this->mission->typeMission == TypeOfMission::FindAndCollect)
 	{
 		this->closestToPlayer = findClosestPlayer;
+	}
+	else if (this->mission->typeMission == TypeOfMission::BossEvent)
+	{
+		this->closestToPlayer = this->mission->boss->getPosition();
 	}
 }
 

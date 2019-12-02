@@ -19,15 +19,19 @@ public:
 
 	// used with a cellular automata to beautify the terminal output
 	static Vector<TileEntry> const  tileGraphicsTable;
-	static Vector<String> const     tileTerminalGraphicsTable;
-	static Vector<String> const     tileTerminalColorTable;
+	static Vector<String>    const  tileTerminalGraphicsTable;
+	static Vector<String>    const  tileTerminalColorTable;
 	static char constexpr           terminalColorDefault[6] { "\033[0m" };
 	Size                            width,height;
-	MapConfig const                 config;
+	MapConfig                       config;
 	Vector<Tile>                    data;
 	TileMap();
-	TileMap( MapConfig const & );
-	~TileMap();
+	TileMap( MapConfig const &  );
+	TileMap( TileMap const &  ) noexcept;	
+	TileMap( TileMap       && ) noexcept;
+	~TileMap() noexcept;
+	TileMap &operator=( TileMap const  & ) noexcept;
+	TileMap &operator=( TileMap       && ) noexcept;
 	F32                 getRoadCoverage() const noexcept;
 	Bool                walk( U16 &tileX, U16 &tileY, Direction, Tile ); // side-effects: mutates tileX/tileY if walk successful
 	Bool                neighbourIsRoad( Direction, U16 tileX, U16 tileY ) const noexcept; // pretends that all out-of-bounds tiles are roads
@@ -35,6 +39,7 @@ public:
 	Vector<Size>        getNeighbouringIndices( V2u tilePosition ) const noexcept;	
 	Vector<V2u>         getNeighbouringTilePositions( V2u tilePosition ) const noexcept;
 	Vector<GameObject>  loadAsModels( Graphics & ) const;
+	void                applyLot( Lot const &, Tile ) noexcept;
 
 	// returns the proper look-up index for the tile @ x,y in the graphics table
 	inline Size  getTileLookupIndex( U16 tileX, U16 tileY ) const noexcept
@@ -86,10 +91,10 @@ public:
 		return tilePos.x < width and tilePos.y < height;
 	}
 
-	inline Vector3  convertTilePositionToWorldPosition( U16 const tileX, U16 const tileY ) const {
-		Vector3 result { tileX * config.tileScaleFactor.x, 
+	inline Vector3  convertTilePositionToWorldPosition( I32 const tileX, I32 const tileY ) const {
+		Vector3 result { config.tileSideScaleFactor * tileX, 
 		                 .0f,
-		                 tileY * -config.tileScaleFactor.y };
+		                -config.tileSideScaleFactor * tileY };
 		//assert( result.x >= .0f );
 		//assert( result.z >= .0f );
 		return result;
@@ -97,14 +102,14 @@ public:
 
 	inline Vector3  convertTilePositionToWorldPosition( V2u const &tilePosition ) const
 	{
-		return convertTilePositionToWorldPosition( tilePosition.x, tilePosition.y );
+		return convertTilePositionToWorldPosition( I32(tilePosition.x), I32(tilePosition.y) );
 	}
 
 	inline V2u  convertWorldPositionToTilePosition( Vector3 const &worldPosition ) const
 	{
 		
-		V2u result { static_cast<U32>( std::round(worldPosition.x /  config.tileScaleFactor.x) ),
-		             static_cast<U32>( std::round(worldPosition.z / -config.tileScaleFactor.y) ) };
+		V2u result { static_cast<U32>( std::round(worldPosition.x /  config.tileSideScaleFactor) ),
+		             static_cast<U32>( std::round(worldPosition.z / -config.tileSideScaleFactor) ) };
 		//assert( result.x <  width );
 		//assert( result.y < height );
 		return result;

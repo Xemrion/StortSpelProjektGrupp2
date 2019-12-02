@@ -28,7 +28,8 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 	open.push_back(startIndex);
 	std::vector<Size> neighbours;
 	Size curNeighbour;
-	while (!open.empty())
+	int i = 0;
+	while (!open.empty() && i < 500)
 	{
 		current = open.at(open.size() - 1);
 		if (current == goalIndex)
@@ -64,7 +65,7 @@ bool AStar::algorithm(Vector3 startPos, Vector3 endPos, std::vector<Vector3>& pa
 				}
 			}
 		}
-
+		i++;
 	}
 	return false;
 }
