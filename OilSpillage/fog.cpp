@@ -18,11 +18,6 @@ Fog::~Fog()
 		fogTextures.erase(fogTextures.end() - 1);
 	}
 
-	while (normalTextures.size() > 0)
-	{
-		delete normalTextures[normalTextures.size() - 1];
-		normalTextures.erase(normalTextures.end() - 1);
-	}
 }
 
 void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, UINT slices, float spacing, FogMaterial material)
@@ -173,8 +168,8 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		FogMaterial materialCopy;
 		
 		materialCopy.densityThreshold = material.densityThreshold;
-		materialCopy.ambientDensity = material.ambientDensity / quads.size();
-		materialCopy.density = material.density / (1 + i * 0.05);
+		materialCopy.ambientDensity = material.ambientDensity;
+		materialCopy.density = material.density;
 		materialCopy.scale = material.scale;
 
 		hr = deviceContext->Map(materialBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -182,19 +177,11 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		deviceContext->Unmap(materialBuffer.Get(), 0);
 		object->setColor(Vector4(material.color.x, material.color.z, material.color.z, 0.0));
 
-
 		Texture* diffuseTexture = new Texture();
 		diffuseTexture->Initialize(device.Get(), deviceContext.Get(), textureWidth, textureHeight);
-		Texture* normalMap = new Texture();
-		normalMap->Initialize(device.Get(), deviceContext.Get(), textureWidth, textureHeight);
 		device.Get()->CreateRenderTargetView(diffuseTexture->getTexture2D(), NULL, textureRTV.ReleaseAndGetAddressOf());
-		device.Get()->CreateRenderTargetView(normalMap->getTexture2D(), NULL, normalRTV.ReleaseAndGetAddressOf());
 		deviceContext.Get()->ClearRenderTargetView(textureRTV.Get(), clearColor);
-		deviceContext.Get()->ClearRenderTargetView(normalRTV.Get(), clearColor);
-		ID3D11RenderTargetView* RTVarray[2]{ textureRTV.Get(), normalRTV.Get() };
-		deviceContext.Get()->OMSetRenderTargets(2, RTVarray, NULL);
-
-
+		deviceContext.Get()->OMSetRenderTargets(1, textureRTV.GetAddressOf(), NULL);
 
 		deviceContext->VSSetConstantBuffers(0, 1, viewProjBuffer.GetAddressOf());
 		deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
@@ -202,14 +189,12 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		deviceContext->Draw(vertexCount, 0);
 
 		fogTextures.push_back(diffuseTexture);
-		normalTextures.push_back(normalMap);
 		object->setRotation(Vector3(XM_PIDIV2, 0.0, 0.0));
 	}
 
 	for (int i = 0; i < quads.size(); ++i)
 	{
 		quads[i]->setTexture(fogTextures[i]);
-		//quads[i]->setNormalMap(normalTextures[i]);
 	}
 }
 

@@ -139,7 +139,7 @@ static F32 constexpr sidewalkOffsetY   { -1.47f };
 //   1 = neighbourFloorNo == myFloorNo
 
 void Map::generateBorder() {
-	auto constexpr borderThickness = 3;
+	auto constexpr borderThickness = 4;
 
 	for ( I32 x = -borderThickness;  x <= I32(tilemap->width)+borderThickness;  ++x ) {
 		for ( I32 y = -borderThickness;  y <= I32(tilemap->height)+borderThickness;  ++y ) {
@@ -191,6 +191,7 @@ void Map::generateBorder() {
 	btRigidBody *tmp0 = physics->addBox( btVector3( pos0.x, pos0.y, pos0.z ),
 	                                     btVector3( sca0 ),
 	                                     .0f );
+	tmp0->setFriction(0);
 	border.bounds[0].setRigidBody( tmp0, physics );
 
 	// east
@@ -200,6 +201,7 @@ void Map::generateBorder() {
 	btRigidBody *tmp1 = physics->addBox( btVector3( pos1.x, pos1.y, pos1.z ),
 	                                     btVector3( sca1 ),
 	                                     .0f );
+	tmp1->setFriction(0);
 	border.bounds[1].setRigidBody( tmp1, physics );
 
 	// north
@@ -209,6 +211,7 @@ void Map::generateBorder() {
 	btRigidBody *tmp2 = physics->addBox( btVector3( pos2.x, pos2.y, pos2.z ),
 	                                     btVector3( sca2 ),
 	                                     .0f );
+	tmp2->setFriction(0);
 	border.bounds[2].setRigidBody( tmp2, physics );
 
 	// south
@@ -218,28 +221,32 @@ void Map::generateBorder() {
 	btRigidBody *tmp3 = physics->addBox( btVector3( pos3.x, pos3.y, pos3.z ),
 	                                     btVector3( sca3 ),
 	                                     .0f );
+	tmp3->setFriction(0);
 	border.bounds[3].setRigidBody( tmp3, physics );
-
-	
-	
 }
 
 void Map::generateStreetlights()
 {
-	streetlights.reserve(200);
+	auto isValid = [=]( U32 x, U32 y ) {
+		auto tile     = tilemap->tileAt(x,y);
+		auto district = districtAt(x,y);
+		return tile == Tile::road and district != &District::suburban and district != &District::park;
+	};
+
+	streetlights.reserve(128);
 	for ( auto x = 1;  x < tilemap->width;  ++x ) {
 		for ( auto y = 1;  y < tilemap->height;  ++y ) {
 			U8 bitmask = 0x00;
-			bitmask += tilemap->tileAt(x-1, y-1)==Tile::road? 1:0;
-			bitmask += tilemap->tileAt(x-1, y  )==Tile::road? 2:0;
-			bitmask += tilemap->tileAt(x,   y-1)==Tile::road? 4:0;
-			bitmask += tilemap->tileAt(x,   y  )==Tile::road? 8:0;
+			bitmask += isValid(x-1, y-1)? 1:0;
+			bitmask += isValid(x-1, y  )? 2:0;
+			bitmask += isValid(x,   y-1)? 4:0;
+			bitmask += isValid(x,   y  )? 8:0;
 			if ( bitmask ) {
 				Vector3 rotation { .0f, .0f, .0f };
 				for ( auto q = 0;  q < 4;  ++q )
 					if ( (util::cycleRight(bitmask,q) & 0b11) == 0b11) 
 						rotation = { .0f, util::degToRad(45.0f+q*90.0f), .0f };
-				auto worldPosition = tilemap->convertTilePositionToWorldPosition(x,y) - Vector3(tilemap->config.tileSideScaleFactor/2, .0f, tilemap->config.tileSideScaleFactor/2);
+				auto worldPosition = tilemap->convertTilePositionToWorldPosition(x,y) - Vector3(tilemap->config.tileSideScaleFactor/2, .0f, tilemap->config.tileSideScaleFactor/-2);
 				placeStreetlight(worldPosition);
 			}
 		}
@@ -332,7 +339,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	physics         ( physics                                                                                       ),
 	lights          ( lights                                                                                        ),
 	config          ( config                                                                                        ),
-	tilemap         ( std::make_unique<TileMap>( config )                                                           ),
+	tilemap         ( nullptr                                                                                       ),
    roadDistanceMap ( config.dimensions.x * config.dimensions.y                                                     ),
 	buildingIDs     ( config.dimensions.x * config.dimensions.y                                                     ),
 	hospitalTable   ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide ),
@@ -393,12 +400,13 @@ Map::~Map() noexcept
 // TODO: ensure Map.config doesn't stays synchronized during re-rolls.
 void  Map::generateRoads()
 {
-	DBG_PROBE(Map::generateRoads);
+	DBG_PROBE( Map::generateRoads );
 	I32_Dist   generateSeed {};
 	MapConfig  roadConfig { config };
 	// generate roads at a lower resolution so we can uspscale the road network to our desired resolution later
-	// roadConfig.dimensions.x = config.dimensions.x / 2;
-	// roadConfig.dimensions.y = config.dimensions.y / 2;
+	roadConfig.dimensions.x = config.dimensions.x / 2;
+	roadConfig.dimensions.y = config.dimensions.y / 2;
+	tilemap = std::make_unique<TileMap>( roadConfig );
 	for(;;) { // TODO: add MAX_TRIES?
 		RoadGenerator roadGenerator{ *tilemap };
 		roadGenerator.generate(roadConfig);
@@ -407,10 +415,12 @@ void  Map::generateRoads()
 			tilemap = std::make_unique<TileMap>( roadConfig );
 		}
 		else {
+			roadGenerator.upscale();
 			startPositionInTileSpace = roadGenerator.getStartPosition();
 			break;
 		}
 	}
+
 	
 	if constexpr ( isDebugging ) {
 	   std::ofstream roadGenerationLog(String("PG/logs/") + mapConfigToFilename(config, "_road_gen.txt"));
@@ -420,6 +430,7 @@ void  Map::generateRoads()
 		}
 	}
 }
+
 
 void Map::placeStreetlight( Vector3 const &worldPosition, Vector3 const &rotation ) noexcept
 {
@@ -588,6 +599,7 @@ void  Map::generateBuildings( )
 							                                               500.0f,
 							                                               10.5f  * house.object.getScale().z ),
 							                                    .0f );
+							tmp->setFriction(0);
 							house.object.setRigidBody( tmp, physics );
 						#endif
 						tilemap->applyLot( maybeLot.value(), Tile::building );
@@ -677,6 +689,7 @@ void  Map::generateBuildings( )
 						                                               500.0f,
 						                                               15.5f * house.object.getScale().z ),
 						                                    .0f );
+						tmp->setFriction(0);
 						house.object.setRigidBody( tmp, physics );
 					#endif
 					tilemap->applyLot( maybeLot.value(), Tile::building );
@@ -1413,7 +1426,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 					#ifndef _DEBUG // add rigid body to quadrant
 						house.hitboxes.emplace_back();
 						auto &hitbox = house.hitboxes.back();
-						auto     sca = Vector3 { fracSide*2.5f, 500.0f, fracSide*2.5f };
+						auto     sca = Vector3 { fracSide*2.5f, 999.0f, fracSide*2.5f };
 						auto     pos = basePosition;
 						if ( (q == quadrant_northeast) or (q == quadrant_northwest) )
 							pos.z += (2.5*fracSide);
@@ -1433,6 +1446,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
 						                                    btVector3( sca.x, sca.y, sca.z ),
 						                                   .0f );
+						tmp->setFriction(0);
 						hitbox.setRigidBody( tmp, physics );
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
@@ -1446,9 +1460,9 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 
 					#ifndef _DEBUG // add rigid body to quadrant
 						bool  isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        scaB = Vector3 { isVertical? halfSide:fracSide, 500.0f, isVertical? fracSide:halfSide };
+						auto        scaB = Vector3 { isVertical? halfSide:fracSide, 999.0f, isVertical? fracSide:halfSide };
 						auto        posA = basePosition;
-						auto        scaA = Vector3 { isVertical? fracSide:halfSide, 500.0f, isVertical? halfSide:fracSide };
+						auto        scaA = Vector3 { isVertical? fracSide:halfSide, 999.0f, isVertical? halfSide:fracSide };
 						auto        posB = basePosition;
 						switch (q) {
 							case quadrant_southeast: posA.z -= halfSide; posA.x += halfSide;   posB.x += halfSide; posB.z -= halfSide;  break;
@@ -1469,6 +1483,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						btRigidBody *tmpA = physics->addBox( btVector3( posA.x, posA.y, posA.z ),
 						                                     btVector3( scaA.x, scaA.y, scaA.z ),
 						                                    .0f );
+						tmpA->setFriction(0);
 						hitboxA.setRigidBody( tmpA, physics );
 
 
@@ -1484,6 +1499,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						btRigidBody *tmpB = physics->addBox( btVector3( posB.x, posB.y, posB.z ),
 						                                     btVector3( scaB.x, scaB.y, scaB.z ),
 						                                    .0f );
+						tmpB->setFriction(0);
 						hitboxB.setRigidBody( tmpB, physics );
 					#endif
 
@@ -1495,7 +1511,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						house.hitboxes.emplace_back();
 						auto    &hitbox = house.hitboxes.back();
 						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        sca = Vector3 { isVertical? fracSide:halfSide, 500.0f, isVertical? halfSide:fracSide };
+						auto        sca = Vector3 { isVertical? fracSide:halfSide, 999.0f, isVertical? halfSide:fracSide };
 						auto        pos = basePosition;
 						switch (q) {
 							case quadrant_southeast: pos.x += halfSide;  pos.z -= halfSide;  break;
@@ -1513,6 +1529,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
 						                                    btVector3( sca.x, sca.y, sca.z ),
 						                                   .0f );
+						tmp->setFriction(0);
 						hitbox.setRigidBody( tmp, physics );
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
@@ -1525,7 +1542,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						house.hitboxes.emplace_back();
 						auto    &hitbox = house.hitboxes.back();
 						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        sca = Vector3 { isVertical? halfSide:fracSide, 500.0f, isVertical? fracSide:halfSide };
+						auto        sca = Vector3 { isVertical? halfSide:fracSide, 999.0f, isVertical? fracSide:halfSide };
 						auto        pos = basePosition;
 						switch (q) {
 							case quadrant_southeast: pos.z -= halfSide;  pos.x += halfSide;  break;
@@ -1543,6 +1560,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
 						                                    btVector3( sca.x, sca.y, sca.z ),
 						                                   .0f );
+						tmp->setFriction(0);
 						hitbox.setRigidBody( tmp, physics );
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
@@ -1712,7 +1730,8 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 	return models;
 }
 
-Biome Map::getBiome() const noexcept {
+Biome Map::getBiome() const noexcept
+{
 	return biome;
 }
 

@@ -6,6 +6,9 @@
 #include "UI/UserInterface.h"
 #include <cassert>
 
+// quad tree side (+ border)
+#define MAX_SIDE  68.0f
+
 Graphics::Graphics()
 {
 	this->window = nullptr;
@@ -55,7 +58,7 @@ Graphics::Graphics()
 
 	this->particleHandler->loadParticleSystems();
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
-	this->quadTree = std::make_unique<QuadTree>(Vector2(-48.f * 20.f, -48.f * 20.f), Vector2(48.f * 20.f, 48.0f * 20.0f), 4);
+	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 }
 
 Graphics::~Graphics()
@@ -466,7 +469,7 @@ bool Graphics::init(Window* window)
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
 
-	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
+	fog->initialize(device, deviceContext, 15, 2.25/5, fogMaterial);
 	fog->setWindSpeed(Vector2(4.0f / 1024.f, 4.0f / 1024.f));
 	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
 	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
@@ -1473,7 +1476,7 @@ void Graphics::clearDraw()
 
 void Graphics::clearStaticObjects()
 {
-	quadTree = std::make_unique<QuadTree>(Vector2(-48.f * 20.f, -48.f * 20.f), Vector2(48.f * 20.f, 48.0f * 20.0f), 4);
+	quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 }
 
 void Graphics::addToUIDraw(GameObject* obj, Matrix* world)
@@ -1506,7 +1509,7 @@ void Graphics::setUISun(Vector3 direction, Vector4 color)
 	this->uiSun.setDirection(this->uiSunDir);
 }
 
-void Graphics::renderUI(float deltaTime)
+void Graphics::renderUI(float deltaTime, int selectedIndex)
 {
 	float color[4] = {
 		0,0,0,1
@@ -1539,7 +1542,6 @@ void Graphics::renderUI(float deltaTime)
 
 	//set up Shaders
 
-
 	deviceContext->PSSetShader(this->uiPixelShader.getShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->uiVertexShader.getShader(), nullptr, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
@@ -1548,10 +1550,20 @@ void Graphics::renderUI(float deltaTime)
 
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	if (selectedIndex > -1 && this->uiObjects.size()>1)
+	{
+		//std::swap(this->uiObjects[selectedIndex], this->uiObjects[this->uiObjects.size()-1]);
+	}
 	int index = 0;
 	for (std::pair<GameObject*,Matrix*> object : this->uiObjects)
 	{
+		//if (selectedIndex!=-1&&object == this->uiObjects.back())
+		//{
+		//	ID3D11DepthStencilView* nulView = nullptr;
+
+		//	/*deviceContext->OMSetDepthStencilState(nulView, 0);*/
+		//	deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
+		//}
 		SimpleMath::Matrix world = *object.second;//worlds[]
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 		D3D11_MAPPED_SUBRESOURCE mappedResource;

@@ -28,7 +28,7 @@ ShootCar::ShootCar(float x, float z, int weaponType, Physics* physics)
 	setHealth(this->stats.maxHealth);
 	attackRange = 15;
 	createRigidbody(physics);
-	this->weapon.damage = this->weapon.damage * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages));
+	scaling(weapon.damage, 1.1);
 }
 void ShootCar::createRigidbody(Physics* physics)
 {

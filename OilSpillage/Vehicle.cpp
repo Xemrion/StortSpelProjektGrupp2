@@ -239,11 +239,11 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	velocitySpeed = (this->getRigidBody()->getLinearVelocity().getX() * (dx)) + (-this->getRigidBody()->getLinearVelocity().getZ() * (dy));
 
 	Vector3 steering = Vector3(getRigidBody()->getAngularVelocity().getX(),
-		throttleInputStrength * updatedStats.handlingRate * /*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.15f, 1),
+		throttleInputStrength * updatedStats.handlingRate * /*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.25f, 1),
 		getRigidBody()->getAngularVelocity().getZ());
 
 	Vector3 steering2 = Vector3(getRigidBody()->getAngularVelocity().getX(),
-		throttleInputStrength * updatedStats.handlingRate * /*deltaTime*/0.035f * 80 * max(velocitySpeed * 0.15f, -1),
+		throttleInputStrength * updatedStats.handlingRate * /*deltaTime*/0.035f * 80 * max(velocitySpeed * 0.25f, -1),
 		getRigidBody()->getAngularVelocity().getZ());
 
 	//Driving mode: Throttle and turning, realistic
@@ -327,7 +327,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	else {
 
 		Vector3 steering3 = Vector3(getRigidBody()->getAngularVelocity().getX(),
-			/*deltaTime*/0.035f * updatedStats.handlingRate * 80 * min(velocitySpeed * 0.15f, 1),
+			/*deltaTime*/0.035f * updatedStats.handlingRate * 80 * min(velocitySpeed * 0.25f, 1),
 			getRigidBody()->getAngularVelocity().getZ());
 
 		if (throttleInputStrength > 0 && this->health > 0) {
@@ -1211,13 +1211,13 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 	if (vehicleDistance < 10.0f) {
 		vehicleDistance = 0.0f;
 	}
-	vehicleDistance = min(vehicleDistance, 20.0f);
+	vehicleDistance = min(vehicleDistance, 30.0f);
 
 	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionRnoMouse().x * Input::getStrengthRnoMouse() * 3, Input::getDirectionRnoMouse().y * Input::getStrengthRnoMouse() * 3), deltaTime*10.0f);
 
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime * 1.2f + cameraDistance;
-	cameraDistanceX = ((this->getRigidBody()->getLinearVelocity().getX() * 0.3f + aimLerp.x) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
-	cameraDistanceZ = ((this->getRigidBody()->getLinearVelocity().getZ() * 0.25f + aimLerp.y) - cameraDistanceZ) * deltaTime * 12.2f + cameraDistanceZ;
+	cameraDistanceX = ((this->getRigidBody()->getLinearVelocity().getX() * 0.5f + aimLerp.x) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
+	cameraDistanceZ = ((this->getRigidBody()->getLinearVelocity().getZ() * 0.40f + aimLerp.y) - cameraDistanceZ) * deltaTime * 12.2f + cameraDistanceZ;
 
 	return Vector3(cameraDistanceX, cameraDistance, cameraDistanceZ);
 }

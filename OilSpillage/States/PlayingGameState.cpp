@@ -7,6 +7,8 @@
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
 #include <future>
+#include "../UI/Playing/UICompletedStage.h"
+#include "../UI/Playing/UIBeforePlaying.h"
 
 void PlayingGameState::fillTestParticle()
 {
@@ -60,7 +62,7 @@ void PlayingGameState::initAI()
 	aStar->generateTileData(map->getTileMap());
 }
 
-PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_PLAYING)
+PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_BEFORE_PLAYING)
 {
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
@@ -89,23 +91,6 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadModel("Entities/Garbage_Bag");
 	graphics.loadModel("Entities/Quad");
 	graphics.loadTexture("brownPaperCardboard");
-
-	//graphics.loadModel("Roads/Metro/0000");
-	//graphics.loadModel("Roads/Metro/0001");
-	//graphics.loadModel("Roads/Metro/0010");
-	//graphics.loadModel("Roads/Metro/0011");
-	//graphics.loadModel("Roads/Metro/0100");
-	//graphics.loadModel("Roads/Metro/0101");
-	//graphics.loadModel("Roads/Metro/0110");
-	//graphics.loadModel("Roads/Metro/0111");
-	//graphics.loadModel("Roads/Metro/1000");
-	//graphics.loadModel("Roads/Metro/1001");
-	//graphics.loadModel("Roads/Metro/1010");
-	//graphics.loadModel("Roads/Metro/1011");
-	//graphics.loadModel("Roads/Metro/1100");
-	//graphics.loadModel("Roads/Metro/1101");
-	//graphics.loadModel("Roads/Metro/1110");
-	//graphics.loadModel("Roads/Metro/1111");
 
 	graphics.loadModel("Entities/Star");
 	graphics.loadModel("Entities/Streetlight");
@@ -271,6 +256,8 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	menues[MENU_PAUSED] = std::make_unique<UIPaused>();
 	menues[MENU_PAUSED]->init();
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
+	menues[MENU_COMPLETED_STAGE] = std::make_unique<UICompletedStage>();
+	menues[MENU_BEFORE_PLAYING] = std::make_unique<UIBeforePlaying>();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
@@ -281,7 +268,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	cameraObject->mesh = Game::getGraphics().getMeshPointer("Cube");
 	//Game::getGraphics().addToDraw(vehicle);
 	cameraObject->setPosition(Vector3(player->getPosition().x, 10.0f, player->getPosition().z));
-	cameraObject->setScale(Vector3(0.5f, 0.14f, 0.9f));
+	cameraObject->setScale(Vector3(1.5f, 1.5f, 1.5f));
 	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x, btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 10.0f);
 	cameraObject->setRigidBody(tempo, physics.get());
 	cameraObject->getRigidBody()->activate();
@@ -444,7 +431,7 @@ void PlayingGameState::ImGui_AI()
 	/*	+ std::to_string(player->getPosition().y).c_str()
 							+ std::to_string(player->getPosition().z).c_str()));*/
 	
-	ImGui::Text(("Score: " + std::to_string(Game::getGameInfo().highScore)).c_str());
+	//ImGui::Text(("Score: " + std::to_string(Game::getGameInfo().highScore)).c_str());
 	
 	ImGui::End();
 }
@@ -684,6 +671,7 @@ void PlayingGameState::update(float deltaTime)
 		testNetwork.get()->generateAdditionalSegments("F-F-F-FF-F+F-F-F", i + 4 * 2, i % 2);
 	}*/
 	//this->createElectric(rand() % 360, deltaTime);
+
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{
@@ -692,7 +680,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
-		if (Input::isKeyDown_DEBUG(Keyboard::LeftAlt))
+		if (Input::isKeyPressed(Keyboard::LeftAlt))
 		{
 			pausedTime = !pausedTime;
 		}
@@ -703,7 +691,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else if (time <= 0.0f)
 		{
-			Game::setState(Game::STATE_MENU);
+			Game::setState(Game::STATE_HIGHSCORE);
 		}
 #else
 		if (time > 0.0f)
@@ -712,7 +700,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 		{
-			Game::setState(Game::STATE_MENU);
+			Game::setState(Game::STATE_HIGHSCORE);
 		}
 #endif // !_DEBUG
 		prevAccelForce = Vector3(player->getRigidBody()->getLinearVelocity());
@@ -788,8 +776,6 @@ void PlayingGameState::update(float deltaTime)
 		}
 		if (timer > 0.1f&&timerEMP>0.0f)
 		{
-
-			
 			/*testNetwork->clearSegments();
 			testNetwork.get()->setAngle(rand() % 360 + 1);
 
@@ -870,39 +856,32 @@ void PlayingGameState::update(float deltaTime)
 			Sound::fadeSoundtrack(false, 3.0f);
 		}
 
-		/*if ((actorManager->distanceToPlayer(Vector3(positionCam)) < 40.0f && soundAggro < 1.0f) || this->time <= 20.0f) {
-			soundAggro += 0.2f * deltaTime;
-		}
-		else if (soundAggro > 0.0f) {
-			soundAggro -= 0.1f * deltaTime;
-		}
-		Sound::changeVolume(L"data/sound/OilSpillageSoundtrack1_Aggressive.wav", soundAggro);*/
-
-		/*timerForParticle += deltaTime;
-		if ( timerForParticle > .01f )
+		if (this->objectives.isAllDone())
 		{
-			graphics.addParticle( player->getPosition() + Vector3(0, 5, 0),
-								  5 * Vector3(0,0,0),
-								  addNrOfParticles, lifeTime, randomPosPower);
-			timerForParticle = 0;
-		}*/
+			Sound::stopAllLoops();
+			this->setCurrentMenu(MENU_COMPLETED_STAGE);
+		}
+	}
 
-	}
-	if (this->objectives.isAllDone())
-	{
-		Game::setState(Game::State::STATE_UPGRADING);
-	}
 	/*-------------------------RENDERING-------------------------*/
 	// render all objects
 
 	graphics.clearScreen(Vector4(0, 0, 0, 1));
-	graphics.setSpotLightShadow(playerLight);
-	graphics.render(camera.get(), deltaTime);
+
+	if (currentMenu != MENU_BEFORE_PLAYING)
+	{
+		graphics.setSpotLightShadow(playerLight);
+		graphics.render(camera.get(), deltaTime);
+	}
 
 	// render UI
 	if (currentMenu != MENU_PLAYING)
 	{
-		menues[MENU_PLAYING]->update(0);
+		if (currentMenu != MENU_BEFORE_PLAYING)
+		{
+			menues[MENU_PLAYING]->update(0);
+		}
+
 		menues[currentMenu]->update(deltaTime);
 	}
 	else
@@ -915,23 +894,17 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 	
-
-
-	//Render all objects
-
-	//testNetwork.get()->drawRoadNetwork(&graphics);
-
 	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	ImGui_Driving();
-	ImGui_ProcGen();
-	//ImGui_AI();
-	ImGui_Particles();
-	ImGui_Camera();
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+		//ImGui_Driving();
+		ImGui_ProcGen();
+		//ImGui_AI();
+		//ImGui_Particles();
+		ImGui_Camera();
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	#endif // !_DEBUG
 
 	graphics.presentScene();
@@ -956,7 +929,12 @@ void PlayingGameState::changeTime(float timeDiff) noexcept {
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
 	currentMenu = static_cast<int>(menu);
-	if (menu == Menu::MENU_OPTIONS) menues[MENU_OPTIONS]->init();
+	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING) menues[currentMenu]->init();
+}
+
+Map::Info PlayingGameState::getMapInfo() const
+{
+	return this->map->getInfo();
 }
 
 Vehicle* PlayingGameState::getPlayer() const {
@@ -1310,7 +1288,7 @@ void PlayingGameState::generateMapPowerUps()
 
 void PlayingGameState::generateObjectives()
 {
-	if (Game::getNrOfStagesDone() % 3 == 0)
+	if (Game::getNrOfStagesDone() % 3 == 1)
 	{
 		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1)); //fix pos
 		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());

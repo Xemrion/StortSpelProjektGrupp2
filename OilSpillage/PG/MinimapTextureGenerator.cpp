@@ -5,7 +5,12 @@
 #include "MapConfig.hpp"
 #include "District.hpp"
 
-// TODO (low prio) animated scanlines & gauss effects on map? coloured mode?
+// Tweak these to alter minimap generation:
+static auto constexpr tileSide         {  5U  }; // e.g. 5 => 5x5 pixel tiles
+static auto constexpr scanlineInterval {  4U  }; // lines between scanlines
+static auto constexpr scanlineStrength { .03f }; // brightening/darkening impact of scanlines; 0 = disabled
+static auto constexpr multitileBorder  {  1U  }; // thickness of border around multitile houses (in pixels)
+static auto constexpr roadBorder       {  1U  }; // thickness of sidewalk around roads          (in pixels)
 
 #pragma warning( disable : 4715 ) 
 String createMinimapTexture( Map const &map, Bool isDistrictColoured )
@@ -21,18 +26,38 @@ String createMinimapTexture( Map const &map, Bool isDistrictColoured )
 
    auto const &tilemap = map.getTileMap();
    // image data:
-   Size const    TEX_WIDTH   { tilemap.width  * 3 },
-                 TEX_HEIGHT  { tilemap.height * 3 };
+   Size const    TEX_WIDTH   { tilemap.width  * tileSide },
+                 TEX_HEIGHT  { tilemap.height * tileSide };
    Vector<RGBA>  pixels( TEX_WIDTH * TEX_HEIGHT );
 
    // random number generation:
    RNG         rng{ RD()() };
    F32_Dist    generateSelection  { .0f, 1.0f };
 
+	Vector<std::pair<U16,U16>> hospitalMarkerDrawingSchedule {};
+	hospitalMarkerDrawingSchedule.reserve( map.getDistrictMap().noise.size() );
+
+   // sub-tile pixel offsets:
+   I64 const   C   {               0 },
+               N   { -(I64)TEX_WIDTH },
+               E   {              +1 },
+               S   { +(I64)TEX_WIDTH },
+               W   {              -1 };
+   I64 const   NE  {           N + E },
+               SE  {           S + E },
+               SW  {           S + W },
+               NW  {           N + W };
+	auto const &hospitals = map.getHospitalTable();
+
    // converts a tile-space XY into a pixel XY:
    auto centerIndex {
 		[TEX_WIDTH]( I64 const tileX, I64 const tileY ) constexpr {
-			return (3*tileY+1) * TEX_WIDTH + (3*tileX+1);
+			return ((tileSide*tileY)+(tileSide/2)) * TEX_WIDTH + ((tileSide*tileX)+(tileSide/2));
+   }};
+
+	auto nwIndex {
+		[TEX_WIDTH]( I64 const tileX, I64 const tileY ) constexpr {
+			return (tileSide*tileY) * TEX_WIDTH + (tileSide*tileX);
    }};
 
 	auto constexpr concreteColorBase = RGBA(0xFF'888888);
@@ -67,45 +92,26 @@ String createMinimapTexture( Map const &map, Bool isDistrictColoured )
 			return groundColor;
    }};
 
-	Vector<std::pair<U16,U16>> hospitalMarkerDrawingSchedule {};
-	hospitalMarkerDrawingSchedule.reserve( map.getDistrictMap().noise.size() );
-
-   // sub-tile pixel offsets:
-   I64 const   C   {               0 },
-               N   { -(I64)TEX_WIDTH },
-               E   {              +1 },
-               S   { +(I64)TEX_WIDTH },
-               W   {              -1 };
-   I64 const   NE  {           N + E },
-               SE  {           S + E },
-               SW  {           S + W },
-               NW  {           N + W };
-	auto const &hospitals = map.getHospitalTable();
-
    // main loop:
    for ( U16 tileY = 0;  tileY < tilemap.height;  ++tileY ) {
       for ( U16 tileX = 0;  tileX < tilemap.width;  ++tileX ) {
-			auto district      = map.districtAt(tileX,tileY);
-			RGBA districtColor = districtColors[ district->index ];
-
+			auto district      { map.districtAt(tileX,tileY)     };
+			RGBA districtColor { districtColors[district->index] };
+			auto nw            { nwIndex(tileX, tileY)           };
+			auto tileIndex   = [&nw,TEX_WIDTH]( U32 x, U32 y ) {
+				return nw+x+(TEX_WIDTH*y); // return the pixel index of the tile local x,y
+			};
          // TODO: add district borders?
          switch ( tilemap.tileAt(tileX, tileY) ) {
             case Tile::ground: {
-               pixels[centerIndex(tileX,tileY)+NW] = generateGroundColor(districtColor,district);
-               pixels[centerIndex(tileX,tileY)+N ] = generateGroundColor(districtColor,district);
-               pixels[centerIndex(tileX,tileY)+NE] = generateGroundColor(districtColor,district);
-               pixels[centerIndex(tileX,tileY)+ W] = generateGroundColor(districtColor,district);
-               pixels[centerIndex(tileX,tileY)+ C] = generateGroundColor(districtColor,district);
-               pixels[centerIndex(tileX,tileY)+ E] = generateGroundColor(districtColor,district);
-               pixels[centerIndex(tileX,tileY)+SW] = generateGroundColor(districtColor,district);
-               pixels[centerIndex(tileX,tileY)+S ] = generateGroundColor(districtColor,district);
-               pixels[centerIndex(tileX,tileY)+SE] = generateGroundColor(districtColor,district);
+					for ( auto x = 0;  x < tileSide; ++x )
+						for ( auto y = 0;  y < tileSide; ++y )
+							pixels[tileIndex(x,y)] = generateGroundColor(districtColor,district);
             }; break;
             
             // TODO: add building ID or floor influence
             // TODO: add 3D parallax effect?
             case Tile::building: {
-
 					bool isHospital = false;
 					for ( auto const possibleHospitalLocation : hospitals ) {
 						if ( possibleHospitalLocation ) {
@@ -114,21 +120,20 @@ String createMinimapTexture( Map const &map, Bool isDistrictColoured )
 								isHospital = true;
 						}
 					}
-
 					if ( isHospital ) // if hospital, defer drawing until later
 						hospitalMarkerDrawingSchedule.push_back({ tileX, tileY });
-					else {
-						RGBA buildingColor = buildingColorBase;
-						maybeDistrictShade(buildingColor, districtColor);
-						pixels[centerIndex(tileX,tileY)+NW] = buildingColor;
-						pixels[centerIndex(tileX,tileY)+N ] = buildingColor;
-						pixels[centerIndex(tileX,tileY)+NE] = buildingColor;
-						pixels[centerIndex(tileX,tileY)+ W] = buildingColor;
-						pixels[centerIndex(tileX,tileY)+ C] = buildingColor;
-						pixels[centerIndex(tileX,tileY)+ E] = buildingColor;
-						pixels[centerIndex(tileX,tileY)+SW] = buildingColor;
-						pixels[centerIndex(tileX,tileY)+S ] = buildingColor;
-						pixels[centerIndex(tileX,tileY)+SE] = buildingColor;
+					// assume single-tile (overwrite later if multi-tile)
+					RGBA innerBuildingColor { buildingColorBase };
+					RGBA outerBuildingColor { util::blendColor( 0xFF'000000, buildingColorBase, .1f ) };
+					maybeDistrictShade(innerBuildingColor, districtColor);
+					maybeDistrictShade(outerBuildingColor, districtColor);
+					for ( auto x = 0;  x < tileSide; ++x ) {
+						for ( auto y = 0;  y < tileSide; ++y ) {
+							if ( (((x+1) % tileSide)==0) or (((y+1) % tileSide)==0) ) // outer:
+								pixels[tileIndex(x,y)] = outerBuildingColor;
+							else // inner:
+								pixels[tileIndex(x,y)] = innerBuildingColor;
+						}
 					}
             }; break;
 
@@ -137,39 +142,43 @@ String createMinimapTexture( Map const &map, Bool isDistrictColoured )
                RGBA  roadInnerColor = asphaltColorBase;
 					maybeDistrictShade(roadOuterColor, districtColor);
 					maybeDistrictShade(roadInnerColor, districtColor);
-               pixels[centerIndex(tileX,tileY)+NW] = roadOuterColor;
-               pixels[centerIndex(tileX,tileY)+N ] = tilemap.neighbourIsRoad(Direction::north,tileX,tileY)? roadInnerColor:roadOuterColor;
-               pixels[centerIndex(tileX,tileY)+NE] = roadOuterColor;
-               pixels[centerIndex(tileX,tileY)+ W] = tilemap.neighbourIsRoad(Direction::west, tileX,tileY)? roadInnerColor:roadOuterColor;
-               pixels[centerIndex(tileX,tileY)+ C] = roadInnerColor;
-               pixels[centerIndex(tileX,tileY)+ E] = tilemap.neighbourIsRoad(Direction::east, tileX,tileY)? roadInnerColor:roadOuterColor;
-               pixels[centerIndex(tileX,tileY)+SW] = roadOuterColor;
-               pixels[centerIndex(tileX,tileY)+S ] = tilemap.neighbourIsRoad(Direction::south,tileX,tileY)? roadInnerColor:roadOuterColor;
-               pixels[centerIndex(tileX,tileY)+SE] = roadOuterColor;
+
+					F64 constexpr offset    = -.5f * tileSide;
+					F64 constexpr radius    = (.5f * tileSide)- roadBorder;
+					F64 constexpr radiusSqr = radius * radius;
+					for ( F64 x = 0;  x < tileSide; ++x )
+						for ( F64 y = 0;  y < tileSide; ++y )
+							if ( (offset+x)*(offset+x)+(offset+y)*(offset+y) <= radiusSqr )
+								pixels[tileIndex(x,y)] = roadInnerColor;
+							else
+								pixels[tileIndex(x,y)] = roadOuterColor;
+
+					if ( tilemap.neighbourIsRoad(Direction::north, tileX, tileY) )
+						for ( auto y = 0;  y < (tileSide+1)/2; ++y )
+							for ( auto x = roadBorder;  x < tileSide-roadBorder; ++x )
+								pixels[tileIndex(x,y)] = roadInnerColor; 
+					if ( tilemap.neighbourIsRoad(Direction::east, tileX, tileY) )
+						for ( auto y = roadBorder;  y < tileSide-roadBorder; ++y )
+							for ( auto x = tileSide-(tileSide+1)/2;  x < tileSide; ++x )
+								pixels[tileIndex(x,y)] = roadInnerColor; 
+					if ( tilemap.neighbourIsRoad(Direction::south, tileX, tileY) )
+						for ( auto y = tileSide-(tileSide+1)/2;  y < tileSide; ++y )
+							for ( auto x = roadBorder;  x < tileSide-roadBorder; ++x )
+								pixels[tileIndex(x,y)] = roadInnerColor; 
+					if ( tilemap.neighbourIsRoad(Direction::west, tileX, tileY) )
+						for ( auto y = roadBorder;  y < tileSide-roadBorder; ++y )
+							for ( auto x = 0;  x < (tileSide+1)/2; ++x )
+								pixels[tileIndex(x,y)] = roadInnerColor;
             }; break;
 
             case Tile::water: {
-               pixels[centerIndex(tileX,tileY)+NW] = 0xFF'FF0000; // TODO
-               pixels[centerIndex(tileX,tileY)+N ] = 0xFF'FF0000; // TODO
-               pixels[centerIndex(tileX,tileY)+NE] = 0xFF'FF0000; // TODO
-               pixels[centerIndex(tileX,tileY)+ W] = 0xFF'FF0000; // TODO
-               pixels[centerIndex(tileX,tileY)+ C] = 0xFF'FF0000; // TODO
-               pixels[centerIndex(tileX,tileY)+ E] = 0xFF'FF0000; // TODO
-               pixels[centerIndex(tileX,tileY)+SW] = 0xFF'FF0000; // TODO
-               pixels[centerIndex(tileX,tileY)+S ] = 0xFF'FF0000; // TODO
-               pixels[centerIndex(tileX,tileY)+SE] = 0xFF'FF0000; // TODO
+					for ( auto x = 0;  x < tileSide; ++x )
+						for ( auto y = 0;  y < tileSide; ++y )
+							pixels[tileIndex(x,y)] = 0xFF'FF0000; // TODO
             }; break;
 
             default: assert( false and "Unaccounted for enum value!" );
          }
-
-			// scanlines
-			pixels[centerIndex(tileX,tileY)+N+W] = util::blendColor( pixels[centerIndex(tileX,tileY)+N+W], 0xFF000000, .98f );
-			pixels[centerIndex(tileX,tileY)+N  ] = util::blendColor( pixels[centerIndex(tileX,tileY)+N  ], 0xFF000000, .98f );
-			pixels[centerIndex(tileX,tileY)+N+E] = util::blendColor( pixels[centerIndex(tileX,tileY)+N+E], 0xFF000000, .98f );
-			pixels[centerIndex(tileX,tileY)+S+W] = util::blendColor( pixels[centerIndex(tileX,tileY)+S+W], 0xFFFFFFFF, .98f );
-			pixels[centerIndex(tileX,tileY)+S  ] = util::blendColor( pixels[centerIndex(tileX,tileY)+S  ], 0xFFFFFFFF, .98f );
-			pixels[centerIndex(tileX,tileY)+S+E] = util::blendColor( pixels[centerIndex(tileX,tileY)+S+E], 0xFFFFFFFF, .98f );
       }
 	}
 
@@ -183,93 +192,109 @@ String createMinimapTexture( Map const &map, Bool isDistrictColoured )
 		U32   numHitboxes = { 0 };
 		for ( U32 x = 0;  x < layout.width;  ++x ) {
 			for ( U32 y = 0;  y < layout.length;  ++y ) {
-				U32  idx        = index(x,y);
-				auto floorCount = layout.floors[idx];
-				auto tileX      = x + multi.nw.x,
-				     tileY      = y + multi.nw.y;
-				RGBA districtColor = districtColors[ map.districtAt(tileX,tileY)->index ];
-				RGBA  buildingColorInner  { buildingColorBase };
-				RGBA  buildingColorOuter  { util::blendColor( concreteColorBase, 0xFF'FFFFFF, .9f ) };
+				U32   idx                { index(x,y)         };
+				auto  floorCount         { layout.floors[idx] };
+				auto  tileX              { x + multi.nw.x     },
+				      tileY              { y + multi.nw.y     };
+				auto nw           = nwIndex(tileX,tileY);
+				auto tileIndex    = [&nw,TEX_WIDTH]( U32 x, U32 y ) {
+					return nw+x+(TEX_WIDTH*y); // return the pixel index of the tile local x,y
+				};
+
+				RGBA  districtColor      { districtColors[map.districtAt(tileX,tileY)->index] };
+				RGBA  buildingColorInner { buildingColorBase };
+				RGBA  buildingColorOuter { util::blendColor( concreteColorBase, 0xFF'FFFFFF, .9f ) };
 				maybeDistrictShade(buildingColorInner, districtColor);
 				maybeDistrictShade(buildingColorOuter, districtColor);
 				if ( layout.floors[idx] != 0 ) {
-					pixels[centerIndex(tileX,tileY)] = buildingColorInner;
-
 					bool connectsN = (y-1 < layout.length) and (layout.floors[index( x, y-1 )] > 0);
-					if ( connectsN )
-					     pixels[centerIndex(tileX,tileY)+N ] = buildingColorInner;
-					else pixels[centerIndex(tileX,tileY)+N ] = buildingColorOuter;
+					if ( !connectsN )
+						for ( auto x = multitileBorder;  x < (tileSide-multitileBorder);  ++x )
+							for ( auto y = 0;  y < multitileBorder;  ++y )
+								pixels[tileIndex(x,y)] = buildingColorOuter;
 
 					bool connectsE = (x+1 < layout.width) and (layout.floors[index( x+1, y )] > 0 );
-					if ( connectsE )
-					     pixels[centerIndex(tileX,tileY)+E ] = buildingColorInner;
-					else pixels[centerIndex(tileX,tileY)+E ] = buildingColorOuter;
+					if ( !connectsE )
+						for ( auto x = tileSide-multitileBorder;  x < tileSide;  ++x )
+							for ( auto y = multitileBorder;  y < (tileSide-multitileBorder);  ++y )
+								pixels[tileIndex(x,y)] = buildingColorOuter;
 
 					bool connectsS = (y+1 < layout.length) and (layout.floors[index( x, y+1 )] > 0 );
-					if ( connectsS )
-					     pixels[centerIndex(tileX,tileY)+S ] = buildingColorInner;
-					else pixels[centerIndex(tileX,tileY)+S ] = buildingColorOuter;
+					if ( !connectsS )
+						for ( auto x = multitileBorder;  x < (tileSide-multitileBorder);  ++x )
+							for ( auto y = tileSide-multitileBorder;  y < tileSide;  ++y )
+								pixels[tileIndex(x,y)] = buildingColorOuter;
 
 					bool connectsW = (x-1 < layout.width) and (layout.floors[index( x-1, y )] > 0 );
-					if ( connectsW )
-					     pixels[centerIndex(tileX,tileY)+W ] = buildingColorInner;
-					else pixels[centerIndex(tileX,tileY)+W ] = buildingColorOuter;
+					if ( !connectsW )
+						for ( auto x = 0;  x < multitileBorder;  ++x )
+							for ( auto y = multitileBorder;  y < (tileSide-multitileBorder);  ++y )
+								pixels[tileIndex(x,y)] = buildingColorOuter;
 
-					if ( connectsN and connectsE and ((y-1 < layout.length) and (x+1 < layout.width) and (layout.floors[index( x+1, y-1 )] > 0 )) )
-					     pixels[centerIndex(tileX,tileY)+NE] = buildingColorInner;
-					else pixels[centerIndex(tileX,tileY)+NE] = buildingColorOuter;
+					if ( !connectsN or !connectsE or (y-1 >= layout.length)
+					     or (x+1 >= layout.width) or (layout.floors[index(x+1,y-1)] == 0) )
+						for ( auto x = (tileSide-multitileBorder);  x < tileSide;  ++x )
+							for ( auto y = 0;  y < multitileBorder;  ++y )
+								pixels[tileIndex(x,y)] = buildingColorOuter;
 
-					if ( connectsS and connectsE and ((y+1 < layout.length) and (x+1 < layout.width) and (layout.floors[index( x+1, y+1 )] > 0 )) )
-					     pixels[centerIndex(tileX,tileY)+SE] = buildingColorInner;
-					else pixels[centerIndex(tileX,tileY)+SE] = buildingColorOuter;
+					if ( !connectsS or !connectsE or (y+1 >= layout.length)
+					     or (x+1 >= layout.width) or (layout.floors[index(x+1,y+1)] == 0) )
+						for ( auto x = (tileSide-multitileBorder);  x < tileSide;  ++x )
+							for ( auto y = (tileSide-multitileBorder);  y < tileSide;  ++y )
+								pixels[tileIndex(x,y)] = buildingColorOuter;
 
-					if ( connectsS and connectsW and ((y+1 < layout.length) and (x-1 < layout.width) and (layout.floors[index( x-1, y+1 )] > 0 )) )
-					     pixels[centerIndex(tileX,tileY)+SW] = buildingColorInner;
-					else pixels[centerIndex(tileX,tileY)+SW] = buildingColorOuter;
+					if ( !connectsS or !connectsW or (y+1 >= layout.length)
+					     or (x-1 >= layout.width) or (layout.floors[index(x-1,y+1)] == 0) )
+						for ( auto x = 0;  x < multitileBorder;  ++x )
+							for ( auto y = (tileSide-multitileBorder);  y < tileSide;  ++y )
+								pixels[tileIndex(x,y)] = buildingColorOuter;
 
-					if ( connectsN and connectsW and ((y-1 < layout.length) and (x-1 < layout.width) and (layout.floors[index( x-1, y-1 )] > 0 )) )
-					     pixels[centerIndex(tileX,tileY)+NW] = buildingColorInner;
-					else pixels[centerIndex(tileX,tileY)+NW] = buildingColorOuter;
+					if ( !connectsN or !connectsW or (y-1 >= layout.length)
+					     or (x-1 >= layout.width) or (layout.floors[index(x-1,y-1)] == 0) )
+						for ( auto x = 0;  x < multitileBorder;  ++x )
+							for ( auto y = 0;  y < multitileBorder;  ++y )
+								pixels[tileIndex(x,y)] = buildingColorOuter;
 				}
 			}
+		}
+	}
+
+	// scanlines
+	for ( auto y = 0;  y < TEX_HEIGHT;  ++y ) {
+		for ( auto x = 0; x < TEX_WIDTH;  ++x ) {
+			if ((y % scanlineInterval) == 0)
+				pixels[y*TEX_WIDTH+x] = util::blendColor( 0xFF'000000, pixels[y*TEX_WIDTH+x], scanlineStrength );
+			else if ((y % (scanlineInterval+1)) == 0)
+				pixels[y*TEX_WIDTH+x] = util::blendColor( 0xFF'FFFFFF, pixels[y*TEX_WIDTH+x], scanlineStrength );
 		}
 	}
 
 	for ( auto &[tileX,tileY] : hospitalMarkerDrawingSchedule ) {
 		auto hospitalPrimaryColor = 0xFF'FFFFFF;
 		auto hospitalOutlineColor = 0xFF'0000FF;
-		pixels[centerIndex(tileX,tileY)+NW] = hospitalOutlineColor;
-		pixels[centerIndex(tileX,tileY)+N ] = hospitalPrimaryColor;
-		pixels[centerIndex(tileX,tileY)+NE] = hospitalOutlineColor;
-		pixels[centerIndex(tileX,tileY)+ W] = hospitalPrimaryColor;
-		pixels[centerIndex(tileX,tileY)+ C] = hospitalPrimaryColor;
-		pixels[centerIndex(tileX,tileY)+ E] = hospitalPrimaryColor;
-		pixels[centerIndex(tileX,tileY)+SW] = hospitalOutlineColor;
-		pixels[centerIndex(tileX,tileY)+S ] = hospitalPrimaryColor;
-		pixels[centerIndex(tileX,tileY)+SE] = hospitalOutlineColor;
-
-		auto setPixelIfInBounds =	[&]( I64 pixelIndex, RGBA color ) {
-												if ( pixelIndex < TEX_WIDTH * TEX_HEIGHT )
-													pixels[ pixelIndex ] = color;
-											};
-
+		auto center               = centerIndex(tileX,tileY);
+		auto nw                   = nwIndex(tileX,tileY);
+		auto tileIndex            = [&nw,TEX_WIDTH]( U32 x, U32 y ) {
+			return nw+x+(TEX_WIDTH*y); // return the pixel index of the tile local x,y
+		};
+		auto setPixelIfInBounds   = [&]( I64 pixelIndex, RGBA color ) {
+										       if ( pixelIndex < TEX_WIDTH * TEX_HEIGHT )
+										          pixels[ pixelIndex ] = color;
+										  };
 		// hospital border:
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ NW,   hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ NW+W, hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ NW+N, hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ NE,   hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ NE+E, hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ NE+N, hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ SE,   hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ SE+E, hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ SE+S, hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ SW,   hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ SW+W, hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ SW+S, hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ N+N,  hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ S+S,  hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ W+W,  hospitalOutlineColor );
-		setPixelIfInBounds( I64(centerIndex(tileX, tileY))+ E+E,  hospitalOutlineColor );
+		float constexpr radius    = .5f * tileSide;
+		float constexpr radiusSqr = radius * radius;
+		for ( I32 x = -radius;  x < radius; ++x )
+			for ( I32 y = -radius;  y < radius; ++y )
+				if ( (x*x) + (y*y) <= radiusSqr )
+					setPixelIfInBounds( center+x+(y*I32(TEX_WIDTH)), hospitalOutlineColor );
+		// hospital cross:
+		for ( U32 y = .2f * tileSide;  y < .8f * tileSide;  ++y )
+			for ( U32 x = .4f * tileSide;  x < .6f * tileSide;  ++x )
+				pixels[tileIndex(x,y)] = hospitalPrimaryColor;
+		for ( U32 y = .4 * tileSide;  y < .6f * tileSide;  ++y )
+			for ( U32 x = .2f * tileSide;  x < .8f * tileSide;  ++x )
+				setPixelIfInBounds( tileIndex(x,y), hospitalPrimaryColor );
    }
 
    auto path = String("data/textures/map/map.tga");// +mapConfigToFilename(map.config, ".tga");
@@ -286,8 +311,8 @@ String createFogOfWarTexture( Map const &map )
 	// Size side;
 	// for ( side = 1; side < minimum;  side*=2 );
 		
-   Size const    TEX_WIDTH   { map.getTileMap().width  * 3 },
-                 TEX_HEIGHT  { map.getTileMap().height * 3 };
+   Size const    TEX_WIDTH   { map.getTileMap().width  * tileSide },
+                 TEX_HEIGHT  { map.getTileMap().height * tileSide };
    Vector<RGBA>  pixels( TEX_WIDTH * TEX_HEIGHT );
 
    // random number generation:
@@ -298,9 +323,9 @@ String createFogOfWarTexture( Map const &map )
    auto generateFogColor {
 		[&generateSelection,&rng]() {
 			RGBA color;
-			if      ( generateSelection(rng) <= .05f ) color = 0xFF'333333;
-			else if ( generateSelection(rng) <= .95f ) color = 0xFF'000000;
-			else                                       color = 0xFF'212121;
+			if      ( generateSelection(rng) <= .05f ) color = util::blendColor( 0xFF'FFFFFF, 0xFF'000000, .00f );
+			else if ( generateSelection(rng) <= .95f ) color = util::blendColor( 0xFF'FFFFFF, 0xFF'000000, .10f );
+			else                                       color = util::blendColor( 0xFF'FFFFFF, 0xFF'000000, .15f );
 			return color;
    }};
 

@@ -49,6 +49,7 @@ Boss::Boss(Boss&& boss)
 	//weakspots
 	this->weakSpots.push_back(boss.weakSpots[0]);
 	this->weakSpots.push_back(boss.weakSpots[1]);
+	this->setPoints(2000 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
 }
 
 Boss::Boss(float x, float z, int weaponType, Physics* physics)
@@ -96,6 +97,8 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 Boss::~Boss()
 {
 	Game::getGraphics().removeFromDraw(this);
+	Game::getGameInfo().nrOfBosses++;
+
 }
 
 void Boss::update(float dt, const Vector3& targetPos)
@@ -445,22 +448,27 @@ void Boss::changeHealth(float amount)
 	}
 }
 
-const float Boss::getWeakSpotHealth1()
+const float Boss::getTotalWeakSpotCurrHp()
 {
-	return this->weakSpots[0].getHealth();
+	float currentHP = 0;
+	for (int i = 0; i < this->weakSpots.size(); i++)
+	{
+		currentHP += this->weakSpots[i].getHealth();
+	}
+
+	return currentHP;
 }
 
-const float Boss::getWeakSpotHealth2()
+const float Boss::getTotalWeakSpotMaxHP()
 {
-	return this->weakSpots[1].getHealth();
+	float maxHP = 0;
+	if (this->weakSpots.size() > 0)
+	{
+		maxHP = (this->weakSpots[0].getMaxHP() * 2); // 2 = nr of weakspots from the beginning
+	}
+
+	return maxHP;
 }
 
-const float Boss::getWeakSpotHealthMax1()
-{
-	return this->weakSpots[0].getMaxHP();
-}
 
-const float Boss::getWeakSpotHealthMax2()
-{
-	return this->weakSpots[1].getMaxHP();
-}
+//spin when entering phase 2
