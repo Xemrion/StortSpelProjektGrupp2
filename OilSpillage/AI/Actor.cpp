@@ -48,16 +48,6 @@ void Actor::update(float dt, const Vector3& targetPos)
 		}
 	}
 }
-//
-//void Actor::run(vector<Actor*>& boids, float deltaTime, vector<Vector3> buildings, Vector3 targetPos)
-//{
-//	applyForce(separation(boids, buildings, targetPos) * 4);
-//	update(deltaTime, targetPos);
-//	if (this->state != State::Idle)
-//	{
-//		move();
-//	}
-//}
 
 float Actor::getHealth() const
 {

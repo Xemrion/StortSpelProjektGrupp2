@@ -55,6 +55,11 @@ void ItemSlot::update(bool selected, float deltaTime)
 	}
 }
 
+Matrix& ItemSlot::getTransform()
+{
+	return this->transform;
+}
+
 Container::Slot* ItemSlot::getSlot() const
 {
 	return this->slot;

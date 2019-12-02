@@ -11,6 +11,10 @@ void UIRandomItem::updateUI(float deltaTime)
 	for (int i = 0; i < UIRandomItem::slotCount; i++)
 	{
 		slots[i]->update(slots[i].get() == this->selected, deltaTime);
+		if (slots[i].get() == this->selected)
+		{
+			Game::getGraphics().setSelectedUI(slots[i]->getSlot()->getItem()->getObject(),&slots[i]->getTransform());
+		}
 	}
 
 	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))

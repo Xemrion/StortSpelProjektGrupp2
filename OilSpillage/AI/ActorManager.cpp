@@ -40,7 +40,6 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 {
 	soundTimer += dt;
 	spawnTimer -= dt;
-	//seperation(targetPos);
 	updateActors(dt, targetPos);
 	updateBosses(dt, targetPos);
 
@@ -64,7 +63,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		//(TileSize * nrOfTiles)^2
 		if (distance > (20 * 10) * (20 * 10))
 		{
-			newPos = generateObjectivePos(targetPos, 0, 50);
+			newPos = findTeleportPos(targetPos, 50, 100);
 			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
 				Actor* current = groups[i].actors[j];
@@ -72,34 +71,11 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
 				if (j % 5 == 0)
 				{
-					newPos = generateObjectivePos(targetPos, 0, 50);
+					newPos = findTeleportPos(targetPos, 50, 100);
 				}
 			}
 		}
 	}
-	//for (int i = 0; i < groups.size(); i++)
-	//{
-	//	deltaX = groups[i].averagePos.x - targetPos.x;
-	//	deltaZ = groups[i].averagePos.z - targetPos.z;
-	//	distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-	//	//(TileSize * nrOfTiles)^2
-	//	if (distance > (20 * 10) * (20 * 10))
-	//	{
-	//		newPos = generateObjectivePos(targetPos, 50, 60);
-	//		for (int j = 0; j < groups[i].actors.size(); j++)
-	//		{
-	//			Actor* current = groups[i].actors[j];
-	//			//current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-	//			current->getRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
-	//			current->setPosition(Vector3(newPos.x, current->getPosition().y, newPos.z));
-	//			//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-	//			/*if (j % 5 == 0)
-	//			{
-	//				newPos = generateObjectivePos(targetPos, 0, 50);
-	//			}*/
-	//		}
-	//	}
-	//}
 	for (int i = 0; i < groups.size(); i++)
 	{
 		groups[i].update(targetPos);
@@ -131,12 +107,6 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 	turretHandler.createTurret(x, z, weaponType, physics);
 }
 
-void ActorManager::createSpitFire(float x, float z)
-{
-	this->actors.push_back(new Spitfire(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
-}
-
 void ActorManager::createChaseCar(float x, float z)
 {
 	this->actors.push_back(new ChaseCar(x, z, physics));
@@ -159,7 +129,6 @@ Boss* ActorManager::createBoss(float x, float z, int weaponType)
 {
 	Boss* boss = new Boss(x, z, weaponType, physics);
 	this->bosses.push_back(boss);
-	//initGroupForActor(bosses.at(bosses.size() - 1));
 
 	return boss;
 }
@@ -567,7 +536,7 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 	if (actors.size() < maxNrOfEnemies)
 	{
 		int enemyType = rand() % 100 + 1;
-		Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
+		Vector3 newPos = findTeleportPos(targetPos, 50, 100);
 		if (enemyType < 60)
 		{
 			spawnAttackers(newPos);
@@ -575,14 +544,12 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 		else if (enemyType < 75)
 		{
 			spawnChaseCars(newPos);
-			//spawnAttackers(newPos);
 		}
 		else if (enemyType < 80)
 		{
 			spawnShootCars(newPos);
-			//spawnSwarm(newPos);
 		}
-		else if (enemyType <= 100)
+		else
 		{
 			spawnSwarm(newPos);
 		}
@@ -653,7 +620,7 @@ void ActorManager::updateGroups()
 					}
 					//create its own group
 					else
-					{
+					{	
 						leaveGroup(i, k);
 						createGroup(current);
 					}
@@ -697,8 +664,8 @@ void ActorManager::destroyBoss(int index)
 		physics->DeleteRigidBody(bosses[index]->getRigidBody());
 	}
 	delete bosses[index];
-	//bosses.pop_back();
 	bosses.erase(bosses.begin() + index);
+
 }
 
 void ActorManager::initGroupForActor(DynamicActor* actor)
@@ -732,7 +699,7 @@ Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
 }
-Vector3 ActorManager::generateObjectivePos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
+Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
 	for (float i = 0;; i += 1.0) {

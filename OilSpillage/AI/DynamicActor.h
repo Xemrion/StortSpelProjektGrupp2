@@ -33,9 +33,6 @@ protected:
 	enum class State { Idle, Chasing, Circulate };
 	State state;
 
-	// one Laws that boids follow
-	//Vector3 separation(std::vector<Actor*>& boids, std::vector<Vector3> buildings, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
-	// Other function for moving and interacting
 	virtual void move();
 	virtual Vector3 seek();
 	virtual void moveCirculate(const Vector3& desiredDirection);

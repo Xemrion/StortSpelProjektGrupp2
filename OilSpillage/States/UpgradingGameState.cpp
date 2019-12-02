@@ -74,7 +74,7 @@ void UpgradingGameState::update(float deltaTime)
 	this->graphics.render(this->camera.get(), deltaTime);
 
 	this->menues[currentMenu]->update(deltaTime);
-	this->graphics.renderUI(deltaTime,1);
+	this->graphics.renderUI(deltaTime);
 
 	this->graphics.presentScene();
 }

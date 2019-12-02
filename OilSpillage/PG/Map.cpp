@@ -4,9 +4,9 @@
 #include "Profiler.hpp"
 
 
-std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Pleasant", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo" };
+std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Pleasant", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset" };
 
-std::array constexpr citySuffix { "town", " Town", " City", "Village", "ville", "burg", "stadt", "polis", "heim", "Meadows", "Creek", "Base", "Metropolis" };
+std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "polis", "heim", " Meadows", " Creek", " Base", " Metropolis" };
 
 auto generateCityName( RNG &rng ) noexcept {
 	return std::string(util::randomElementOf(cityPrefix, rng)) + util::randomElementOf(citySuffix, rng);
@@ -100,7 +100,6 @@ static F32 constexpr transitionOffsetY { -1.48f };
 static F32 constexpr sidewalkOffsetY   { -1.47f };
 
 
-
 // 
 // 00
 // X0  OC
@@ -173,8 +172,6 @@ void Map::generateBorder() {
 				wallPiece.setColor({ .75f, .75f, .75f, 0.0f });
 				wallPiece.setTexture(   graphics.getTexturePointer("Tiles/concrete"));
 				wallPiece.setNormalMap( graphics.getTexturePointer("Tiles/concrete_nor"));
-				//fence.setMaterial( graphics.getMaterial("FenceMaterial") );+
-				F32      rotationDegs {};
 				Vector3  offset       { isVertical? (isWest? -align:align):.0f, -1.5f, isHorizontal? (isNorth? align:-align):.0f};
 				wallPiece.setPosition( tilemap->convertTilePositionToWorldPosition(x,y) + offset );
 				wallPiece.setScale({ config.tileSideScaleFactor/(isVertical? 8:2), config.tileSideScaleFactor/4, config.tileSideScaleFactor/(isHorizontal? 8:2) });
@@ -236,18 +233,37 @@ void Map::generateStreetlights()
 	streetlights.reserve(128);
 	for ( auto x = 1;  x < tilemap->width;  ++x ) {
 		for ( auto y = 1;  y < tilemap->height;  ++y ) {
-			U8 bitmask = 0x00;
-			bitmask += isValid(x-1, y-1)? 1:0;
-			bitmask += isValid(x-1, y  )? 2:0;
-			bitmask += isValid(x,   y-1)? 4:0;
-			bitmask += isValid(x,   y  )? 8:0;
-			if ( bitmask ) {
-				Vector3 rotation { .0f, .0f, .0f };
+			U8 bitmask = 0x00; // we need to set 2 bits per quadrant to allow cycling (4 quadrants, but 8 bits in a byte)
+			bitmask += isValid(x-1, y-1)? (1 +  16) : 0; // NW
+			bitmask += isValid(x,   y-1)? (2 +  32) : 0; // NE
+			bitmask += isValid(x,   y  )? (4 +  64) : 0; // SE
+			bitmask += isValid(x-1, y  )? (8 + 128) : 0; // SW
+
+			Vector3 rotation { .0f, .0f, .0f };
+			auto setCount = (bitmask&1) + ((bitmask>>1)&1) + ((bitmask>>2)&1) + ((bitmask>>3)&1);
+			if ( setCount == 1 ) {
 				for ( auto q = 0;  q < 4;  ++q )
-					if ( (util::cycleRight(bitmask,q) & 0b11) == 0b11) 
-						rotation = { .0f, util::degToRad(45.0f+q*90.0f), .0f };
+					if ( (util::cycleRight(bitmask,q)&1) == 1 )
+						rotation = { .0f, util::degToRad(225.0f+q*90.0f), .0f };
+			}
+			else if ( setCount == 2 ) {
+				for ( auto q = 0;  q < 4;  ++q )
+					// 11
+					// 00 case:
+					if ( (util::cycleRight(bitmask,q)&0b11) == 0b00 )
+						rotation = { .0f, util::degToRad(180.0f+q*90.0f), .0f };
+					// ignore 01
+					//        10 case
+			}
+			else if ( setCount == 3 ) {
+				for ( auto q = 0;  q < 4;  ++q )
+					if ( (util::cycleRight(bitmask,q)&1) == 0 )
+						rotation = { .0f, util::degToRad(135.0f+q*90.0f), .0f };
+			}
+
+			if ( bitmask ) {
 				auto worldPosition = tilemap->convertTilePositionToWorldPosition(x,y) - Vector3(tilemap->config.tileSideScaleFactor/2, .0f, tilemap->config.tileSideScaleFactor/-2);
-				placeStreetlight(worldPosition);
+				placeStreetlight(worldPosition, rotation);
 			}
 		}
 	}
