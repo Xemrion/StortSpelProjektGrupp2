@@ -24,11 +24,11 @@ public:
 	{}
   
   inline static const std::unordered_map<Biome, std::vector<Weather>> weatherTable {{
-     // key: Biome   // value: list of Weathers valid for the Biome
-     {Biome::grass, { Weather::clear, Weather::overcast, Weather::fog, Weather::rain    }},
-     {Biome::sandy, { Weather::clear, Weather::overcast, Weather::sandstorm             }},
-     {Biome::snowy, { Weather::clear, Weather::overcast, Weather::fog, Weather::snow    }},
-     {Biome::burnt, { Weather::clear, Weather::overcast, Weather::fog, Weather::ashfall }}
+     // key: Biome      // value: list of Weathers valid for the Biome
+     {Biome::grass,     { Weather::clear, Weather::overcast, Weather::fog, Weather::rain    }},
+     {Biome::sandy,     { Weather::clear, Weather::overcast, Weather::sandstorm             }},
+     {Biome::snowy,     { Weather::clear, Weather::overcast, Weather::fog, Weather::snow    }},
+     {Biome::burnt,     { Weather::clear, Weather::overcast, Weather::fog, Weather::ashfall }}
   }};
   
   inline Time    getTime()    const noexcept { return time;    }
