@@ -6,6 +6,7 @@ struct Particle
 };
 
 globallycoherent RWStructuredBuffer<Particle> NewSimulationState : register(u0);
+globallycoherent RWStructuredBuffer<Particle> DeadList : register(u1);
 
 cbuffer ParticleParameters : register(b0)
 {
@@ -25,6 +26,12 @@ void main(uint3 DispatchThreadID : SV_DispatchThreadID)
 	p.direction = initialDirection;
 	p.time.x = 0.0f;
 	p.time.y = emitterLocation.w;
+    //means the particle will be overwritten and should be sent to the deadlist
+    if(NewSimulationState[DispatchThreadID.x + int(randomVector.x)].time.y > 0.0f)
+    {
+        DeadList[DeadList.IncrementCounter()] = NewSimulationState[DispatchThreadID.x + int(randomVector.x)];
+    }
+
     NewSimulationState[DispatchThreadID.x + int(randomVector.x)] = p;
     NewSimulationState.IncrementCounter();
 }
