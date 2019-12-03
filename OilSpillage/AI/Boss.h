@@ -8,7 +8,7 @@ class Boss : public DynamicActor, public BossAbilities
 public:
 	Boss();
 	Boss(Boss&& boss);
-	Boss(float x, float z, int weaponType, Physics* physics); //, std::vector<Weakspot*>
+	Boss(float x, float z, int weaponType, Physics* physics, float scalingNr); //, std::vector<Weakspot*>
 	virtual ~Boss();
 	void update(float dt, const Vector3& targetPos);
 	void checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTimer);
@@ -23,6 +23,7 @@ private:
 	int currentPointNr;
 	int rotationVar; //which way to rotate
 	int phase;
+	float scalingNr;
 
 	Vector3 currentPoint;
 	Vector3 playerPos;
@@ -33,7 +34,7 @@ private:
 	void movementVariables(float dt);
 	//Behaiours
 	void move();
-	Vector3 seek();
+	Vector3 calculateVelocity();
 	void circulatePlayer(Vector3 targetPos);
 	void enterPhase2();
 

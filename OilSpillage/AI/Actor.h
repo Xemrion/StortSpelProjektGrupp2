@@ -26,11 +26,14 @@ public:
 	int getPoints();
 	void setPoints(int amount);
 	void scaling(float& stat, float ratio);
+	void onFire();
+	void setFire();
 
 private:
 	float health;
 	int points;
 protected:
+	float fireTimer;
 	bool isHit = false;
 	float deltaTime;
 	Vector3 targetPos;

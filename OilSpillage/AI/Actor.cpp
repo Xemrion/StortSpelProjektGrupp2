@@ -11,7 +11,7 @@ Actor::Actor()
 	this->points = 0;
 }
 
-Actor::Actor(float x, float z,Physics* physics)
+Actor::Actor(float x, float z, Physics* physics)
 {
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, -1.0f, z);
@@ -20,7 +20,7 @@ Actor::Actor(float x, float z,Physics* physics)
 }
 Actor::~Actor()
 {
-	for(int i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
 		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
@@ -38,11 +38,14 @@ void Actor::update(float dt, const Vector3& targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
-	this->root->func();
-	if(isHit)
+	if (root != nullptr)
+	{
+		this->root->func();
+	}
+	if (isHit)
 	{
 		setColor(Vector4(getColor().x / (1 + 15.0f * deltaTime), getColor().y, getColor().z, 1));
-		if (getColor().x <= 0.01f) 
+		if (getColor().x <= 0.01f)
 		{
 			isHit = false;
 		}
@@ -96,8 +99,27 @@ void Actor::setPoints(int amount)
 
 void Actor::scaling(float& stat, float ratio)
 {
-	for(int i = 0; i < Game::getGameInfo().nrOfClearedStages; i++)
+	for (int i = 0; i < Game::getGameInfo().nrOfClearedStages; i++)
 	{
+		//Ökar exponentiellt?
 		stat *= ratio;
 	}
+}
+
+void Actor::onFire()
+{
+	if(fireTimer > 0.0)
+	{
+		changeHealth(2*deltaTime);
+		fireTimer -= deltaTime;
+		for(int i = 0; i < 10; i++)
+		{
+			Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+		}
+	}
+}
+
+void Actor::setFire()
+{
+	fireTimer = 2;
 }

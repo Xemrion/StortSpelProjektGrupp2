@@ -62,6 +62,7 @@ void Ranged::assignWeapon(int weaponType)
 		else if (weaponType <= 8)
 		{
 			this->weapon = WeaponHandler::getWeapon(WeaponType::aiFlamethrower);
+			this->weapon.doesDoT = true;
 		}
 	}
 

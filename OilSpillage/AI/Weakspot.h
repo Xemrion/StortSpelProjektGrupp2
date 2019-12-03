@@ -9,7 +9,7 @@ public:
 	//operators
 	Weakspot();
 	Weakspot(Weakspot&& weakspot);
-	Weakspot(int weapontype);
+	Weakspot(int weapontype, float scalingNr);
 	Weakspot(const Weakspot& other);
 	~Weakspot();
 	Weakspot& operator=(const Weakspot& other);
@@ -29,6 +29,7 @@ public:
 	const bool getIsHit();
 
 private:
+	float scalingNr;
 	int weakspotNr;
 	Stats stats;
 	int health;

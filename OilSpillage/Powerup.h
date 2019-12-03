@@ -28,7 +28,7 @@ public:
 	~PowerUp();
 	PowerUp& operator=(const PowerUp& p);
 	PowerUp& operator=(PowerUp&& p) noexcept;
-	void update(float time);
+	void update(float time, Vector3 playerPos);
 	void activate();
 	void deactivate();
 	bool isActive() const;
