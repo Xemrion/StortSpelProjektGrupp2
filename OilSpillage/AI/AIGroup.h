@@ -10,7 +10,6 @@ public:
 	void updateAveragePos();
 	std::vector<Vector3>* getPathPtr();
 	void setPath(std::vector<Vector3> path);
-	void formation(const Vector3& targetPos);
 	void updateDuty();
 	const float getGroupRadius() const;
 private:

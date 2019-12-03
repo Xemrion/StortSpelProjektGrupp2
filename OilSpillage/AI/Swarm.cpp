@@ -10,7 +10,6 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	: DynamicActor(x, z, physics), Melee(&position, &velocity, &deltaTime)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
-	//setUpActor();
 	Game::getGraphics().addToDraw(this);
 
 	this->stats = VehicleStats::AISwarm;
@@ -60,52 +59,15 @@ Swarm::~Swarm()
 		Game::getGameInfo().nrOfSwarm++;
 	}
 }
-
-void Swarm::setUpActor()
-{
-	this->root = &bt.getSelector();
-	Sequence& sequence = bt.getSequence();
-	Selector& selector = bt.getSelector();
-	Sequence& seq2 = bt.getSequence();
-
-
-	Behavior& chase = bt.getAction();
-	chase.addAction(std::bind(&Swarm::setChaseState, std::ref(*this)));
-	Behavior& roam = bt.getAction();
-	roam.addAction(std::bind(&Swarm::setIdleState, std::ref(*this)));
-	Behavior& inAggroRange = bt.getAction();
-	inAggroRange.addAction(std::bind(&Swarm::inAggroRange, std::ref(*this)));
-
-	root->addChildren(sequence);
-	root->addChildren(roam);
-
-	sequence.addChildren(inAggroRange);
-	sequence.addChildren(selector);
-
-	selector.addChildren(seq2);
-	selector.addChildren(chase);
-}
-
 Vector3 Swarm::calculateVelocity()
 {
-	Vector3 desiredDirection;
+	Vector3 desiredDirection = destination - position;
 	Vector3 offsetVec;
 	Vector3 eliminatingVec = Vector3(0.0f, -2.0f, 0.0f);
 	//standard group movement
-	if (!vActive)
+	if (desiredDirection.Length() <= 10 && desiredDirection.Length() > 4)
 	{
-		desiredDirection = destination - position;
-		if (this->stats.speed != 7.0)
-		{
-			this->stats.speed = 7.0;
-		}
-	}
-	else
-	{
-		if (this->stats.speed == 7.0)
-		{
-			this->stats.speed = 9.0;
-		}
+		this->stats.speed = 11.0;
 		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
 		offsetVec = crossVector.Cross(eliminatingVec);
 		offsetVec.Normalize();
@@ -113,16 +75,17 @@ Vector3 Swarm::calculateVelocity()
 		if (duty == 1)
 		{
 			desiredDirection = (destination - offsetVec) - position;
-
 		}
 		else if (duty == 2)
 		{
 			desiredDirection = (destination + offsetVec) - position;
-
 		}
 	}
+	else
+	{
+		this->stats.speed = 7;
+	}
 
-	vActive = false;
-	return  desiredDirection - velocity;
+	return  desiredDirection;
 }
 

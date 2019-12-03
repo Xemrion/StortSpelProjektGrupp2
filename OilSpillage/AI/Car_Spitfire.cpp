@@ -1,27 +1,7 @@
 #include "../States/PlayingGameState.h"
 #include "Car_Spitfire.h"
 #include "../Input.h"
-void Spitfire::setUpActor()
-{
-	this->root = &bt.getSelector();
-	Sequence& sequence = bt.getSequence();
 
-	Behavior& inRange = bt.getAction();
-	inRange.addAction(std::bind(&Spitfire::inAggroRange, std::ref(*this)));
-
-	Behavior& idle = bt.getAction();
-	idle.addAction(std::bind(&Spitfire::setIdleState, std::ref(*this)));
-
-	Behavior& chase = bt.getAction();
-	chase.addAction(std::bind(&Spitfire::setChaseState, std::ref(*this)));
-
-	root->addChildren(sequence);
-	root->addChildren(idle);
-
-	sequence.addChildren(inRange);
-	sequence.addChildren(chase);
-
-}
 
 Spitfire::Spitfire(float x, float z, Physics* physics)
 	: DynamicActor(x, z,physics)
@@ -34,7 +14,6 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	this->reverseTimer2 = 0;
 	this->direction = Vector3(1, 0, 0);
 	this->deltaTime = 0;
-	//setUpActor();
 	throttleInputStrength = 0;
 	init(physics);
 	setPosition(Vector3(x,- 1.2f, z));
