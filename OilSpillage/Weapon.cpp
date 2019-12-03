@@ -216,7 +216,7 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 				Sound::play("./data/sound/MetalImpact1.wav");
 				soundTimer = 0;
 			}
-			if(weapon.isFlameThrower)
+			if(weapon.doesDoT)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->setFire();
 			}
@@ -337,7 +337,7 @@ bool Bullet::getMelee() const
 
 bool Bullet::getFlame() const
 {
-	return weapon.isFlameThrower;
+	return weapon.doesDoT;
 }
 
 GameObject* Bullet::getGameObject()
