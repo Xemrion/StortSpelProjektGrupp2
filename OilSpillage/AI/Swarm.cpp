@@ -65,18 +65,18 @@ Vector3 Swarm::calculateVelocity()
 	Vector3 offsetVec;
 	Vector3 eliminatingVec = Vector3(0.0f, -2.0f, 0.0f);
 	//standard group movement
-	if (desiredDirection.Length() <= 10 && desiredDirection.Length() > 4)
+	if (desiredDirection.Length() <= 10 && desiredDirection.Length() > 2.5f)
 	{
 		this->stats.speed = 11.0;
 		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
 		offsetVec = crossVector.Cross(eliminatingVec);
 		offsetVec.Normalize();
 		offsetVec *= 10;
-		if (duty == 1)
+		if (duty == 0)
 		{
 			desiredDirection = (destination - offsetVec) - position;
 		}
-		else if (duty == 2)
+		else if (duty == 1)
 		{
 			desiredDirection = (destination + offsetVec) - position;
 		}
