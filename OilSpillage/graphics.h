@@ -92,6 +92,7 @@ class Graphics {
 	ParticleSystem* particleTrail;
 	ParticleSystem* testParticle;
 	std::unique_ptr<Fog> fog;
+	bool fogActive = false;
 	float time = 0.0;
 	ShaderClass shaderDefault;
 	ShaderClass shaderDebug;
@@ -179,4 +180,6 @@ public:
 
 	void setFog(FogMaterial material, int layers, float spacing);
 	void setFogWindSpeed(Vector2 speed);
+	void disableFog();
+	void enableFog();
 };

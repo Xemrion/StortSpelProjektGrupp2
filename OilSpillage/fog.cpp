@@ -146,10 +146,26 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 	CopyMemory(mappedResource.pData, &viewProjTr, sizeof(SimpleMath::Matrix));
 	deviceContext->Unmap(viewProjBuffer.Get(), 0);
 
+	D3D11_BLEND_DESC blendStateDescription;
+	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
+	blendStateDescription.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 
+	blendStateDescription.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
+
+	device->CreateBlendState(&blendStateDescription, &blendState);
+
+	float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
+	//deviceContext->OMSetBlendState(blendState.Get(), blendFactor, 0xffffffff);
 
 	device->CreateSamplerState(&samplerDesc, sampler.GetAddressOf());
-	fogTextures.clear();
+	deviceContext->OMSetDepthStencilState(NULL, 0);
 	for (UINT i = 0; i < quads.size(); ++i)
 	{
 		GameObject* object = quads[i];
@@ -165,15 +181,8 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
 		deviceContext->Unmap(worldBuffer.Get(), 0);
 
-		FogMaterial materialCopy;
-		
-		materialCopy.densityThreshold = material.densityThreshold;
-		materialCopy.ambientDensity = material.ambientDensity;
-		materialCopy.density = material.density;
-		materialCopy.scale = material.scale;
-
 		hr = deviceContext->Map(materialBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, &materialCopy, sizeof(FogMaterial));
+		CopyMemory(mappedResource.pData, &material, sizeof(FogMaterial));
 		deviceContext->Unmap(materialBuffer.Get(), 0);
 		object->setColor(Vector4(material.color.x, material.color.z, material.color.z, 0.0));
 
