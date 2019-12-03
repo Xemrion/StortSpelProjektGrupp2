@@ -61,6 +61,6 @@ void VehicleStatBox::update(const Stats& stats)
 	this->amounts[1] = stats.durability / (VehicleStats::defaultStats.durability * 2.0f);
 	this->amounts[2] = stats.armour / (VehicleStats::defaultStats.armour * 2.0f);
 	this->amounts[3] = stats.accelerationRate / (VehicleStats::defaultStats.accelerationRate * 2.0f);
-	this->amounts[4] = stats.maxSpeed / (VehicleStats::defaultStats.maxSpeed * 2.0f);
+	this->amounts[4] = stats.speed / (VehicleStats::defaultStats.speed * 2.0f);
 	this->amounts[5] = stats.handlingRate / (VehicleStats::defaultStats.handlingRate * 2.0f);
 }

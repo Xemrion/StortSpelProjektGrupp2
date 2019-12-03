@@ -19,7 +19,7 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
-	this->attackRange = 10;
+	this->attackRange = 12;
 	createRigidbody(physics);
 	this->setPoints(100 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
 	scaling(weapon.damage, 1.1);
@@ -52,35 +52,19 @@ void Attacker::setUpActor()
 {
 	this->root = &bt.getSelector();
 	Sequence& sequence = bt.getSequence();
-	Selector& selector = bt.getSelector();
-	Sequence& seq2 = bt.getSequence();
 
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Attacker::inAttackRange, std::ref(*this)));
-	Behavior& chase = bt.getAction();
-	chase.addAction(std::bind(&Attacker::setChaseState, std::ref(*this)));
-	Behavior& roam = bt.getAction();
-	roam.addAction(std::bind(&Attacker::setIdleState, std::ref(*this)));
 	Behavior& shoot = bt.getAction();
 	shoot.addAction(std::bind(&Attacker::shoot, std::ref(*this)));
-	Behavior& inAggroRange = bt.getAction();
-	inAggroRange.addAction(std::bind(&Attacker::inAggroRange, std::ref(*this)));
 
 	root->addChildren(sequence);
-	root->addChildren(roam);
+	sequence.addChildren(inRange);
+	sequence.addChildren(shoot);
 
-	sequence.addChildren(inAggroRange);
-	sequence.addChildren(selector);
-
-	selector.addChildren(seq2);
-	selector.addChildren(chase);
-
-	seq2.addChildren(inRange);
-	
-	seq2.addChildren(shoot);
 }
 
-Vector3 Attacker::seek()
+Vector3 Attacker::calculateVelocity()
 {
 	Vector3 desiredDirection;
 	Vector3 offsetVec;
@@ -88,9 +72,9 @@ Vector3 Attacker::seek()
 	if (!vActive)
 	{
 		desiredDirection -= position - destination;
-		if (this->stats.maxSpeed != 3.0)
+		if (this->stats.speed != 3.0)
 		{
-			this->stats.maxSpeed = 3.0;
+			this->stats.speed = 3.0;
 		}
 	}
 
@@ -102,13 +86,6 @@ Vector3 Attacker::seek()
 		crossVector *= -10;
 		desiredDirection -= position - (destination - crossVector);
 	}
-	
-
-	acceleration = desiredDirection - velocity;
-	if (acceleration.Length() > maxForce)
-	{
-		acceleration /= acceleration.Length();
-	}
-	return acceleration;
+	return desiredDirection - velocity;
 }
 
