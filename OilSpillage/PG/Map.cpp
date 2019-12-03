@@ -3,7 +3,6 @@
 #include "Map.hpp"
 #include "Profiler.hpp"
 
-
 std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Pleasant", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset" };
 
 std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "polis", "heim", " Meadows", " Creek", " Base", " Metropolis" };
@@ -139,7 +138,7 @@ static F32 constexpr sidewalkOffsetY   { -1.47f };
 
 void Map::generateBorder() {
 	auto constexpr borderThickness = 4;
-
+	auto biome = info.environment.getBiome();
 	for ( I32 x = -borderThickness;  x <= I32(tilemap->width)+borderThickness;  ++x ) {
 		for ( I32 y = -borderThickness;  y <= I32(tilemap->height)+borderThickness;  ++y ) {
 			if ( (x < 0) or (x >= I32(tilemap->width)) or (y < 0) or (y >= I32(tilemap->height)) ) {
@@ -362,16 +361,14 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	rng             ( RD()()                                                                                        )
 {
 	DBG_PROBE(Map::Map);
-	U32_Dist genBiome { 0, 3 };
+
 	if ( config.seed != -1 )  
 		rng.seed( config.seed );
 
-	biome = static_cast<Biome>( genBiome(rng) % 3 );
-
-	info.name    = generateCityName(rng);
-	info.width   = config.dimensions.x;
-	info.length  = config.dimensions.y;
-	info.biome   = biome;
+	info.environment = {rng};
+	info.width       = config.dimensions.x;
+	info.length      = config.dimensions.y;
+	info.name        = generateCityName(rng);
 
 	// TODO: generate water etc
 	generateRoads();
@@ -1442,8 +1439,8 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 					#ifndef _DEBUG // add rigid body to quadrant
 						house.hitboxes.emplace_back();
 						auto &hitbox = house.hitboxes.back();
-						auto     sca = Vector3 { fracSide*2.5f, 999.0f, fracSide*2.5f };
-						auto     pos = basePosition;
+						auto     sca = Vector3 { fracSide*2.5f, 499.0f, fracSide*2.5f };
+						auto     pos = basePosition + Vector3(.0f, 249.0f, .0f);
 						if ( (q == quadrant_northeast) or (q == quadrant_northwest) )
 							pos.z += (2.5*fracSide);
 						else // south
@@ -1476,10 +1473,10 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 
 					#ifndef _DEBUG // add rigid body to quadrant
 						bool  isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        scaB = Vector3 { isVertical? halfSide:fracSide, 999.0f, isVertical? fracSide:halfSide };
-						auto        posA = basePosition;
-						auto        scaA = Vector3 { isVertical? fracSide:halfSide, 999.0f, isVertical? halfSide:fracSide };
-						auto        posB = basePosition;
+						auto        scaB = Vector3 { isVertical? halfSide:fracSide, 499.0f, isVertical? fracSide:halfSide };
+						auto        posA = basePosition + Vector3(.0f, 249.0f, .0f);
+						auto        scaA = Vector3 { isVertical? fracSide:halfSide, 499.0f, isVertical? halfSide:fracSide };
+						auto        posB = basePosition + Vector3(.0f, 249.0f, .0f);
 						switch (q) {
 							case quadrant_southeast: posA.z -= halfSide; posA.x += halfSide;   posB.x += halfSide; posB.z -= halfSide;  break;
 							case quadrant_southwest: posA.x -= halfSide; posA.z -= halfSide;   posB.z -= halfSide; posB.x -= halfSide;  break;
@@ -1504,7 +1501,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 
 
 						house.hitboxes.emplace_back();
-						auto    &hitboxB = house.hitboxes.back();
+						auto  &hitboxB = house.hitboxes.back();
 
 					// DEBUG
 						//	hitboxB.setColor({1.0f, 0.0f, 1.0f, 1.0f}); // magenta
@@ -1519,7 +1516,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						hitboxB.setRigidBody( tmpB, physics );
 					#endif
 
-					instantiateTilePart(    "r_ic", basePosition, 90.0f*q, floorCount-1, tileset.floorHeight );
+					instantiateTilePart( "r_ic", basePosition, 90.0f*q, floorCount-1, tileset.floorHeight );
 				}
 				else if ( (quadmask & 0b00000'101) == 0b00000'100 ) { // 100 or 110 => side A
 					instantiateTilePart( "f_sa", basePosition, 90.0f*q, .0f );
@@ -1527,8 +1524,8 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						house.hitboxes.emplace_back();
 						auto    &hitbox = house.hitboxes.back();
 						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        sca = Vector3 { isVertical? fracSide:halfSide, 999.0f, isVertical? halfSide:fracSide };
-						auto        pos = basePosition;
+						auto        sca = Vector3 { isVertical? fracSide:halfSide, 499.0f, isVertical? halfSide:fracSide };
+						auto        pos = basePosition + Vector3(.0f, 249.0f, .0f);
 						switch (q) {
 							case quadrant_southeast: pos.x += halfSide;  pos.z -= halfSide;  break;
 							case quadrant_southwest: pos.z -= halfSide;  pos.x -= halfSide;  break;
@@ -1558,8 +1555,8 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						house.hitboxes.emplace_back();
 						auto    &hitbox = house.hitboxes.back();
 						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        sca = Vector3 { isVertical? halfSide:fracSide, 999.0f, isVertical? fracSide:halfSide };
-						auto        pos = basePosition;
+						auto        sca = Vector3 { isVertical? halfSide:fracSide, 499.0f, isVertical? fracSide:halfSide };
+						auto        pos = basePosition + Vector3(.0f, 249.0f, .0f);
 						switch (q) {
 							case quadrant_southeast: pos.z -= halfSide;  pos.x += halfSide;  break;
 							case quadrant_southwest: pos.x -= halfSide;  pos.z -= halfSide;  break;
@@ -1598,6 +1595,8 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 
 Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 {
+	auto biome = info.environment.getBiome();
+
 	Vector<UPtr<GameObject>> models;
 	models.reserve( tilemap->data.size() * 3 );// TODO: use worst case scenario: 6 quads per tile?
 	auto instantiatePart = [&]( std::string_view name, Vector3 const &pos, F32 deg=.0f, F32 yOffset=baseOffsetY, Bool hasNormal=true, Bool noShadowcasting=false ) {
@@ -1744,11 +1743,6 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 		}
 	}
 	return models;
-}
-
-Biome Map::getBiome() const noexcept
-{
-	return biome;
 }
 
 HouseGenData const& Map::getHouseData() const noexcept

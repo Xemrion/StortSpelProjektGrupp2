@@ -1,6 +1,7 @@
 #include "UIBeforePlaying.h"
 #include "../../game.h"
 #include "../../States/PlayingGameState.h"
+#include "../../PG/Environment.hpp"
 
 void UIBeforePlaying::updateUI(float deltaTime)
 {
@@ -56,13 +57,13 @@ void UIBeforePlaying::init()
 	this->textSize = std::make_unique<AnimatedText>("Size: " + std::to_string(info.width) + "x" + std::to_string(info.length), Color(Colors::White), 0.5f, Animation::SHAKING_FADE_IN_STOP);
 	this->textSize->setPosition(Vector2(SCREEN_WIDTH / 2 - this->textSize->getLength(6), 300));
 	this->textSize->beginAnimation();
-	this->textBiome = std::make_unique<AnimatedText>("Biome: " + stringify(info.biome), Color(Colors::White), 0.5f, Animation::SHAKING_FADE_IN_STOP);
+	this->textBiome = std::make_unique<AnimatedText>("Biome: " + stringify(info.environment.getBiome()), Color(Colors::White), 0.5f, Animation::SHAKING_FADE_IN_STOP);
 	this->textBiome->setPosition(Vector2(SCREEN_WIDTH / 2 - this->textBiome->getLength(7), 350));
 	this->textBiome->beginAnimation();
-	this->textTime = std::make_unique<AnimatedText>("Time: Day"/* + stringify(info.time)*/, Color(Colors::White), 0.5f, Animation::SHAKING_FADE_IN_STOP);
+	this->textTime = std::make_unique<AnimatedText>("Time: " + stringify(info.environment.getTime()), Color(Colors::White), 0.5f, Animation::SHAKING_FADE_IN_STOP);
 	this->textTime->setPosition(Vector2(SCREEN_WIDTH / 2 - this->textTime->getLength(6), 400));
 	this->textTime->beginAnimation();
-	this->textWeather = std::make_unique<AnimatedText>("Weather: Sunny"/* + stringify(info.weather)*/, Color(Colors::White), 0.5f, Animation::SHAKING_FADE_IN_STOP);
+	this->textWeather = std::make_unique<AnimatedText>("Weather: " + stringify(info.environment.getWeather()), Color(Colors::White), 0.5f, Animation::SHAKING_FADE_IN_STOP);
 	this->textWeather->setPosition(Vector2(SCREEN_WIDTH / 2 - this->textWeather->getLength(9), 450));
 	this->textWeather->beginAnimation();
 
