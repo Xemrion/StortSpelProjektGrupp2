@@ -462,19 +462,17 @@ bool Graphics::init(Window* window)
 	
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
-	fogMaterial.scale = 50.0;
+	fogMaterial.color = Vector3(1.0, 1.0, 1.0);
+	fogMaterial.scale = 15.0;
 	fogMaterial.density = 0.1;
-	fogMaterial.ambientDensity = 0.08;
-	fogMaterial.densityThreshold = 0.15;
+	fogMaterial.ambientDensity = 0.0;
+	fogMaterial.densityThreshold = 0.5;
 
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
 
-	fog->initialize(device, deviceContext, 15, 2.25/5, fogMaterial);
+	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
 	fog->setWindSpeed(Vector2(4.0f / 1024.f, 4.0f / 1024.f));
-	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
-	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
-	deviceContext->RSSetViewports(1, &this->vp);
 
 	// Turn on the alpha blending.
 	deviceContext->OMSetBlendState(alphaEnableBlendingState.Get(), blendFactor, 0xffffffff);
@@ -591,7 +589,6 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->PSSetConstantBuffers(4, 1, this->cameraBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-
 	for (GameObject* object : drawableObjects)
 	{
 		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
@@ -655,7 +652,10 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	
 	drawStaticGameObjects(camera, frustum, 15.0);
 	
-	drawFog(camera, deltaTime);
+	if (fogActive)
+	{
+		drawFog(camera, deltaTime);
+	}
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDebug.ps.getShader(), nullptr, 0);
@@ -1867,6 +1867,9 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 	
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	deviceContext->PSSetShaderResources(7, 1, depthSRV.GetAddressOf());
+	float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
+	deviceContext->OMSetBlendState(alphaEnableBlendingState.Get(), blendFactor, 0xffffffff);
+
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	int i = 1;
 	for (GameObject* object : fog->getQuads())
@@ -1923,10 +1926,25 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 void Graphics::setFog(FogMaterial material, int layers, float spacing)
 {
 	fog = std::make_unique<Fog>();
+	float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
+	deviceContext->OMSetBlendState(alphaEnableBlendingState.Get(), blendFactor, 0xffffffff);
 	fog->initialize(device, deviceContext, layers, spacing, material);
+	deviceContext->RSSetViewports(1, &vp);
+	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
 void Graphics::setFogWindSpeed(Vector2 speed)
 {
 	fog->setWindSpeed(std::move(speed));
 }
+
+void Graphics::disableFog()
+{
+	fogActive = false;
+}
+
+void Graphics::enableFog()
+{
+	fogActive = true;
+}
+

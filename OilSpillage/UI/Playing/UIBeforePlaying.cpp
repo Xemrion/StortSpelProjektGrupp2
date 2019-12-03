@@ -14,6 +14,7 @@ void UIBeforePlaying::updateUI(float deltaTime)
 	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
 		static_cast<PlayingGameState*>(Game::getCurrentState())->setCurrentMenu(PlayingGameState::MENU_PLAYING);
+		Game::getGraphics().enableFog();
 	}
 }
 
