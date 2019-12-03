@@ -194,6 +194,8 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 	for (int i = 0; i < itemCount; i++)
 	{
 		std::string name = saveSystem.getString("Item" + std::to_string(i) + "Name");
+		std::replace(name.begin(), name.end(), '$', '\n');
+		std::replace(name.begin(), name.end(), '#', ' ');
 		std::string className = saveSystem.getString("Item" + std::to_string(i) + "Class");
 
 		if (className == "ItemWeapon")
@@ -214,6 +216,7 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 			weapon.lightColor.y = saveSystem.getFloat("Item" + std::to_string(i) + "LightColorG");
 			weapon.lightColor.z = saveSystem.getFloat("Item" + std::to_string(i) + "LightColorB");
 			weapon.melee = saveSystem.getInteger("Item" + std::to_string(i) + "Melee") == 1;
+			weapon.doesDoT = saveSystem.getInteger("Item" + std::to_string(i) + "DoT") == 1;
 
 			Container::playerInventory->addItem(new ItemWeapon(name, weapon, new GameObject(*Item::getObjectByName(name))));
 		}
@@ -233,7 +236,7 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 			if (itemSlots[j] == i)
 			{
 				Container::Slot* slot = Container::playerInventory->getLatestAdded();
-				slots->setSlot(static_cast<Slots>(j), new Item(*slot->getItem()), slot);
+				slots->setSlot(static_cast<Slots>(j), slot->getItem()->clone(), slot);
 			}
 		}
 	}
@@ -259,7 +262,10 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 		{
 			Item* item = (*stack)[j]->getItem();
 
-			saveSystem.set("Item" + std::to_string(itemId) + "Name", item->getName());
+			std::string name = item->getName();
+			std::replace(name.begin(), name.end(), '\n', '$');
+			std::replace(name.begin(), name.end(), ' ', '#');
+			saveSystem.set("Item" + std::to_string(itemId) + "Name", name);
 
 			ItemWeapon* itemWeapon = dynamic_cast<ItemWeapon*>(item);
 			if (itemWeapon)
@@ -280,6 +286,7 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 				saveSystem.set("Item" + std::to_string(itemId) + "LightColorG", weapon.lightColor.y);
 				saveSystem.set("Item" + std::to_string(itemId) + "LightColorB", weapon.lightColor.z);
 				saveSystem.set("Item" + std::to_string(itemId) + "Melee", weapon.melee ? 1 : 0);
+				saveSystem.set("Item" + std::to_string(itemId) + "DoT", weapon.doesDoT ? 1 : 0);
 
 				saveSystem.set("Item" + std::to_string(itemId) + "Class", "ItemWeapon");
 			}
@@ -298,6 +305,11 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 			if (slot != -1)
 			{
 				saveSystem.set("Slot" + std::to_string(slot), itemId);
+
+				if (slot == 1 || slot == 2)
+				{
+					saveSystem.set("Slot" + std::to_string(slot == 1 ? 2 : 1), itemId);
+				}
 			}
 
 			itemId++;
@@ -323,9 +335,9 @@ std::string SaveSystem::fileInfo(int id)
 	int seconds = time % 60;
 
 	std::stringstream strStream;
-	strStream << "Stage " << ((stages - 1) % 3 + 1);
-	strStream << " Act " << (((stages - 1) / 3) + 1);
-	strStream << " / Score: " << score;
+	strStream << "Act " << (((stages - 1) / 3) + 1);
+	strStream << " - Stage " << ((stages - 1) % 3 + 1) << '\n';
+	strStream << "Score: " << score;
 	strStream << " / Time: ";
 
 	if (minutes < 10) strStream << "0";
