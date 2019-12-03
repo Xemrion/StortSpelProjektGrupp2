@@ -52,16 +52,16 @@ void AIGroup::formation(const Vector3& targetPos)
 
 	if (distance < 70 && distance > 3)
 	{
-		this->groupRadius = expandedGroupRadius;
+		//this->groupRadius = expandedGroupRadius;
 		for (int i = 0; i < actors.size(); i++)
 		{
-			actors[i]->vActive = true;
+			//actors[i]->vActive = true;
 			//actors[i]->groupPos = averagePos;
 		}
 	}
 	else
 	{
-		this->groupRadius = defaultGroupRadius;
+		//this->groupRadius = defaultGroupRadius;
 	}
 }
 

@@ -18,9 +18,21 @@ DynamicActor::~DynamicActor()
 
 void DynamicActor::move()
 {
-	velocity = calculateVelocity();
-	velocity.Normalize();
+	Vector3 newVelocity = calculateVelocity();
+	if (newVelocity != Vector3())
+	{
+		velocity = calculateVelocity();
+		velocity.Normalize();
+	}
+	else
+	{
+		velocity.x -= deltaTime;
+		velocity.z -= deltaTime;
+		velocity.x = max(velocity.x, 0);
+		velocity.z = max(velocity.z, 0);
+	}
 	Vector3 nextPos = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.speed;
+
 	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x, 0.0f, velocity.z) * (stats.speed) * 1.5);
 	Vector3 targetToSelf = (nextPos - position);
 
@@ -34,7 +46,6 @@ void DynamicActor::move()
 
 		this->setRotation(Vector3(0, newRot - (DirectX::XM_PI / 2), 0));
 	}
-
 }
 
 void DynamicActor::setPath(Vector3* path)
