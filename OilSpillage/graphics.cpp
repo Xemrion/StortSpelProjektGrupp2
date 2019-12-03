@@ -38,7 +38,8 @@ Graphics::Graphics()
 
 	this->particleHandler->addParticleSystem(this->particleSystem,  "fire");
 	this->particleHandler->addParticleSystem(this->particleSystem2, "smoke");
-	this->particleHandler->addParticleSystem(this->particleTrail,   "trail");
+	//this->particleHandler->addParticleSystem(this->particleTrail,   "trail");
+	this->particleTrail->setNameofSystem("trail");
 	Vector4 colors[4] = {
 		Vector4(0.0f,0.0f,1.0f,1.0f)
 	};
@@ -58,6 +59,7 @@ Graphics::Graphics()
 	this->particleHandler->addParticleSystem("debris", debrisColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 
 	this->particleHandler->loadParticleSystems();
+	this->particleTrail->loadSystem();
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 }
@@ -202,7 +204,6 @@ bool Graphics::init(Window* window)
 	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-
 	// Create depth stencil state
 	result = device->CreateDepthStencilState(&depthStencilDesc, depthStencilState.ReleaseAndGetAddressOf());
 	if (FAILED(result))
@@ -210,6 +211,12 @@ bool Graphics::init(Window* window)
 		return false;
 	}
 
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ZERO;
+	result = device->CreateDepthStencilState(&depthStencilDesc, readOnlyDST.ReleaseAndGetAddressOf());
+	if (FAILED(result))
+	{
+		return false;
+	}
 	this->vp.Width = (float)this->window->width;
 	this->vp.Height = (float)this->window->height;
 	this->vp.MinDepth = 0.0f;
@@ -449,6 +456,10 @@ bool Graphics::init(Window* window)
 	this->particleTrail->setCapacity(512 * 20);
 	this->particleTrail->setOnlyAdd(true);
 	this->particleTrail->setBufferType(D3D11_BUFFER_UAV_FLAG_COUNTER);
+	loadTexture("trail");
+	this->particleTrail->setTexture(getTexturePointer("trail"));
+	Vector4 testTC[4] = { Vector4(0.6f,0.6f,0.6f,0.1f) };
+	this->particleTrail->setColor(testTC, 1);
 
 	this->particleTrail->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
@@ -550,6 +561,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	this->particleHandler->renderParticleSystems(camera);
 
+	
 
 	/*this->particleSystem->updateParticles(deltaTime, viewProj);
 
@@ -659,6 +671,31 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	
 	drawStaticGameObjects(camera, frustum, 15.0);
 	
+	
+	this->particleTrail->updateParticles(deltaTime, viewProj);
+
+	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->PSSetSamplers(0, 1, &this->sampler);
+	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
+
+	deviceContext->OMSetDepthStencilState(readOnlyDST.Get(), 0);
+
+
+	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(3, 1, this->indexSpot.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(4, 1, this->cameraBuffer.GetAddressOf());
+	deviceContext->PSSetShaderResources(2, 1, this->culledLightBufferSRV.GetAddressOf());
+
+	this->particleTrail->drawAll(camera);
+	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+
+	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
+	deviceContext->VSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->VSSetConstantBuffers(3, 1, this->shadowMap.getViewProjSpot().GetAddressOf());
+	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
+
 	drawFog(camera, deltaTime);
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());

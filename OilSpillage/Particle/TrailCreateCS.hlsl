@@ -2,7 +2,7 @@ struct Particle
 {
 	float4 position;
 	float4 direction;
-	float2 time;
+	float2 time;//in trail time.y = index
 };
 
 globallycoherent RWStructuredBuffer<Particle> NewSimulationState : register(u0);
@@ -34,4 +34,7 @@ void main(uint3 DispatchThreadID : SV_DispatchThreadID)
 
     NewSimulationState[DispatchThreadID.x + int(randomVector.x)] = p;
     NewSimulationState.IncrementCounter();
+    
+   
+
 }

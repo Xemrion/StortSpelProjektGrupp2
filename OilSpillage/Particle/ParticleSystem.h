@@ -72,7 +72,9 @@ public:
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setSize(float startSize, float endSize);
+	void setColor(Vector4 colors[4], int nrOfColors);
 	void setMass(float mass);
+	void setTexture(Texture* texture);
 	//gravity = -1 means -1 * 9.82
 	void setGravity(float gravity);
 	void changeVectorField(float vectorFieldPower, float vectorFieldSize);
@@ -129,7 +131,7 @@ private:
 	bool onlyAdd;
 	D3D11_BUFFER_UAV_FLAG bufferType;
 	int indexForTrail;
-
+	Texture* texture;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;

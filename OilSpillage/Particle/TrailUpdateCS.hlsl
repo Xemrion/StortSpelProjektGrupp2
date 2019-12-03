@@ -6,6 +6,7 @@ struct Particle
 };
 AppendStructuredBuffer<Particle> NewSimulationState : register(u0);
 ConsumeStructuredBuffer<Particle> CurrentSimulationState : register(u1);
+
 Texture2D DepthTexture : register(t0);
 SamplerState Sampler: register(s0);
 cbuffer SimulationParams : register(b0)
