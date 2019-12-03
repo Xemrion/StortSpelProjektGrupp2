@@ -618,7 +618,6 @@ void PlayingGameState::update(float deltaTime)
 		if (timer > 0.1f&&timerEMP>0.0f)
 		{
 			timer = 0.0f;
-			this->graphics.addTestParticle(this->player->getVehicleBody1()->getPosition() + Vector3(0.0f, 0.0f, 5.0f), Vector4(0, 0, 0, 0), 1, lifeTime, randomPosPower);
 		}
 
 
@@ -693,18 +692,18 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 	
-	//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 		//ImGui_Driving();
 		ImGui_ProcGen();
 		//ImGui_AI();
-		ImGui_Particles();
+		//ImGui_Particles();
 		ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	//#endif // !_DEBUG
+	#endif // !_DEBUG
 
 	graphics.presentScene();
 }
@@ -1026,7 +1025,7 @@ void PlayingGameState::generateMapPowerUps()
 
 void PlayingGameState::generateObjectives()
 {
-	if (Game::getNrOfStagesDone() % 3 == 0) //nrOfStagesBEGUN
+	if (Game::getNrOfStagesDone() % 3 == 1)
 	{
 		//difficulty scale
 		float scalingNr = Game::getNrOfStagesDone() / 3; // /3

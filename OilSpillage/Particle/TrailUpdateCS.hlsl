@@ -28,8 +28,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
 	if (myID < NumParticles.x && NumParticles.x > 0)
 	{
 		Particle p = CurrentSimulationState.Consume();
-        p.time.x = p.time.x + TimeFactors.x;
-		if (NumParticles.x < 10000 || p.time.x < 25)
+
+		p.time.x = p.time.x + TimeFactors.x;
+		if (p.time.x < p.time.y)
 		{
 			NewSimulationState.Append(p);
 		}
