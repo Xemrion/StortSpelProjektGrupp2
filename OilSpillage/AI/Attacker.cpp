@@ -23,7 +23,6 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	createRigidbody(physics);
 	this->setPoints(100 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
 	scaling(weapon.damage, 1.1);
-	weapon.damage = 0;
 }
 
 void Attacker::update(float dt, const Vector3& targetPos)
