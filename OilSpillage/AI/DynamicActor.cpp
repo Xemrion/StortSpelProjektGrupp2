@@ -71,6 +71,7 @@ void DynamicActor::update(float dt, const Vector3& targetPos)
 	{
 		this->circulatePlayer();
 	}
+	onFire();
 }
 
 void DynamicActor::applyForce(const Vector3& force)

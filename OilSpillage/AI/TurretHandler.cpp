@@ -107,6 +107,10 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 						Sound::play("data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
+					if(bulletArray[j].getFlame())
+					{
+						turrets[i]->setFire();
+					}
 					this->turrets[i]->changeHealth(-bulletArray[j].getDamage());
 				}
 				else if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->turrets[i]->getAABB()))

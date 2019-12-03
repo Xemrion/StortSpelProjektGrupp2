@@ -185,6 +185,7 @@ private:
 	float velocitySpeed;
 	class Physics* physics;
 public:
+	float fireTimer;
 	Vehicle();
 	virtual ~Vehicle();
 
@@ -233,6 +234,9 @@ public:
 	void addPowerUp(PowerUpType p);
 	void updatePowerUpEffects(float deltaTime);
 	float getPowerUpTimer(PowerUpType p);
+
+	void onFire(float dt);
+	void setFire();
 };
 
 #endif // !VEHICLE_H

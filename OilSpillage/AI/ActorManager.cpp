@@ -190,6 +190,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
+					if(bulletArray[j].getFlame())
+					{
+						actors[i]->setFire();
+					}
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					bulletArray[j].destroy();
 				}
@@ -235,6 +239,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						if (soundTimer > 0.05f) {
 							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
+						}
+						if(bulletArray[j].getFlame())
+						{
+							bosses[i]->setFire();
 						}
 						this->bosses[i]->changeHealth(-bulletArray[j].getDamage());
 						bulletArray[j].destroy();

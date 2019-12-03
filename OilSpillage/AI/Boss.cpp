@@ -110,7 +110,7 @@ void Boss::update(float dt, const Vector3& targetPos)
 	Actor::update(dt, targetPos);
 	this->movementVariables(dt);
 	this->circulatePlayer(targetPos);
-
+	onFire();
 
 	if (this->phase == 1)
 		this->updateWeakPoints();

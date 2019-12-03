@@ -38,7 +38,8 @@ void Ranged::assignWeapon(int weaponType)
 {
 	if (Game::getGameInfo().nrOfClearedStages < 3)
 	{
-		this->weapon = WeaponHandler::getWeapon(WeaponType::aiMachineGun);
+		this->weapon = WeaponHandler::getWeapon(WeaponType::aiFlamethrower);
+		this->weapon.isFlameThrower = true;
 	}
 	else
 	{
@@ -62,6 +63,7 @@ void Ranged::assignWeapon(int weaponType)
 		else if (weaponType <= 8)
 		{
 			this->weapon = WeaponHandler::getWeapon(WeaponType::aiFlamethrower);
+			this->weapon.isFlameThrower = true;
 		}
 	}
 
