@@ -23,6 +23,7 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	createRigidbody(physics);
 	this->setPoints(100 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
 	scaling(weapon.damage, 1.1);
+	weapon.damage = 0;
 }
 
 void Attacker::update(float dt, const Vector3& targetPos)
@@ -66,26 +67,18 @@ void Attacker::setUpActor()
 
 Vector3 Attacker::calculateVelocity()
 {
-	Vector3 desiredDirection;
-	Vector3 offsetVec;
+	//Move away from player if within 11, move towards it if further than 12, stand still if between the two
 
-	if (vActive)
-	{
-		Vector3 crossVector = Vector3(destination.x - position.x, 0.0f, destination.z - position.z);
-		crossVector.Normalize();
-		crossVector *= 10;
-		desiredDirection = (destination - crossVector) - position;
-	}
+	Vector3 desiredDirection = destination - position;
 
-	//strafe to the left of player
-	else
+	if (desiredDirection.Length() <= 11)
 	{
-		desiredDirection = destination - position;
-		if (this->stats.speed != 3.0)
-		{
-			this->stats.speed = 3.0;
-		}
+		desiredDirection = -desiredDirection;
 	}
-	return desiredDirection - velocity;
+	else if (desiredDirection.Length() < 12)
+	{
+		desiredDirection = Vector3();
+	}
+	return desiredDirection;
 }
 
