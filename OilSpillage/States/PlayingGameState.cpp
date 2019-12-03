@@ -196,12 +196,14 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	cameraObject->mesh = Game::getGraphics().getMeshPointer("Cube");
 	cameraObject->setPosition(Vector3(player->getPosition().x, 10.0f, player->getPosition().z));
 	cameraObject->setScale(Vector3(1.5f, 1.5f, 1.5f));
-	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x, btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 10.0f);
+	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x, btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 0.01f);
+	//btRigidBody* tempo = physics->addBox(btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), btVector3(0.5f, 0.5f, 0.5f), 10.0f);
 	cameraObject->setRigidBody(tempo, physics.get());
 	cameraObject->getRigidBody()->activate();
 	cameraObject->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	cameraObject->getRigidBody()->setFriction(0);
 	cameraObject->getRigidBody()->setGravity(btVector3(0, 0, 0));
+	cameraObject->getRigidBody()->setDamping(10,0);
 	cameraTimer = 0;
 
 	initAI();
@@ -564,7 +566,7 @@ void PlayingGameState::update(float deltaTime)
 			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z);
 		Vector3 currentCamPos = Vector3(cameraObject->getRigidBody()->getWorldTransform().getOrigin().getX(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getY(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getZ());
 		Vector3 directionCam =  destinationCamPos- currentCamPos;
-		cameraObject->getRigidBody()->setLinearVelocity(btVector3(directionCam.x, directionCam.y, directionCam.z)*10);
+		cameraObject->getRigidBody()->applyForce(btVector3(directionCam.x, directionCam.y, directionCam.z) * 10,btVector3(0,0,0));
 		camera->setPosition(Vector3(currentCamPos.x, currentCamPos.y, currentCamPos.z));
 		camera->update(deltaTime);
 
@@ -1024,9 +1026,14 @@ void PlayingGameState::generateMapPowerUps()
 
 void PlayingGameState::generateObjectives()
 {
-	if (Game::getNrOfStagesDone() % 3 == 0)
+	if (Game::getNrOfStagesDone() % 3 == 0) //nrOfStagesBEGUN
 	{
-		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1)); //fix pos
+		//difficulty scale
+		float scalingNr = Game::getNrOfStagesDone() / 3; // /3
+		if (scalingNr == 0)
+			scalingNr = 1;
+
+		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1, scalingNr)); //fix pos
 		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
 	}
 	else

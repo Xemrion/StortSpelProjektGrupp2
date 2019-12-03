@@ -17,6 +17,7 @@ private:
 	bool shouldInit;
 	float respawnTimer;
 	float timerScale;
+	float objectiveTimer;
 
 	int lastMinute;
 	bool scaleUp;
@@ -28,7 +29,8 @@ private:
 	std::unique_ptr<AnimatedText> score;
 	std::unique_ptr<Slider> healthBar;
 	std::unique_ptr<Slider> bossHealthBar;
-	std::unique_ptr<Slider> bossShieldBar;
+	std::unique_ptr<Slider> bossShieldBar1;
+	std::unique_ptr<Slider> bossShieldBar2;
 
 	std::unique_ptr<Minimap> minimap;
 	std::unique_ptr<ObjectiveBox> objectiveBox;

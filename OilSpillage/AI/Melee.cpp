@@ -4,6 +4,7 @@ void Melee::meleeAttack()
 {
 	if (curCooldown <= 0)
 	{
+		velocityPtr->Normalize();
 		bullet.shoot(weapon, *positionPtr, *velocityPtr, Vector3(), *deltaTimePtr);
 		bullet.update(*deltaTimePtr);
 		curCooldown = attackCooldown;

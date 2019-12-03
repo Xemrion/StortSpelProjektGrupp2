@@ -32,37 +32,43 @@ Bullet::~Bullet()
 	delete obj;
 }
 
-void Bullet::shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity, float deltaTime)
+void Bullet::shoot(Weapon& weapon, const Vector3& position, const Vector3& normalizedDir, const Vector3& additionalVelocity, float deltaTime)
 {
 	this->initPos = position;
-	this->initDir = direction;
+	this->initDir = normalizedDir;
 
 	this->weapon = Weapon(weapon);
 	if (this->weapon.type == WeaponType::None)
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::Flamethrower or this->weapon.type == WeaponType::aiFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrower or this->weapon.type == WeaponType::aiBossFlamethrowerPhase2)
+	else if (this->weapon.type == WeaponType::Flamethrower or
+		this->weapon.type == WeaponType::aiFlamethrower or
+		this->weapon.type == WeaponType::aiBossFlamethrower or
+		this->weapon.type == WeaponType::aiBossFlamethrowerPhase2)
 	{
-		flamethrowerShoot(weapon, position, direction, additionalVelocity, deltaTime);
+		flamethrowerShoot(position, normalizedDir, additionalVelocity);
 	}
 	else if (this->weapon.type == WeaponType::Laser or this->weapon.type == WeaponType::aiLaser)
 	{
-		laserShoot(weapon, position, direction, additionalVelocity, deltaTime);
+		laserShoot(weapon, normalizedDir, deltaTime);
 	}
 	else if (weapon.type == WeaponType::aiMelee)
 	{
-		meleeShoot(position,direction);
+		meleeShoot(position, normalizedDir);
+	}
+	else if (weapon.type == WeaponType::aiMachineGun or weapon.type == WeaponType::aiMissileLauncher or weapon.type == WeaponType::aiBossMachineGun or weapon.type == WeaponType::aiBossMachineGunPhase2 or weapon.type == WeaponType::aiBossMissileLauncher)
+	{
+		defaultShootEnemy(weapon, position, normalizedDir, additionalVelocity, deltaTime);
 	}
 	else
 	{
-		defaultShoot(weapon, position, direction, additionalVelocity, deltaTime);
+		defaultShoot(weapon, position, normalizedDir, additionalVelocity, deltaTime);
 	}
 }
 
-void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
+void Bullet::defaultShoot(Weapon& vehicleWeapon, const Vector3& position, const Vector3& direction, const Vector3& additionalVelocity, float deltaTime)
 {
-	direction.Normalize();
 	this->dir = direction;
 
 	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
@@ -80,18 +86,39 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& dir
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-	if(!vehicleWeapon.melee)
+	if (!vehicleWeapon.melee)
 		Game::getGraphics().addToDraw(this->obj);
 }
 
-void Bullet::meleeShoot(Vector3& position,Vector3& direction)
+void Bullet::defaultShootEnemy(Weapon& vehicleWeapon, const Vector3& position, const Vector3& direction, const Vector3& additionalVelocity, float deltaTime)
+{
+	this->dir = direction;
+
+	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
+	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
+	vehicleWeapon.currentSpreadIncrease = min(vehicleWeapon.currentSpreadIncrease + vehicleWeapon.spreadIncreasePerSecond * vehicleWeapon.maxSpread * deltaTime, vehicleWeapon.maxSpread);
+	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
+	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
+	this->dir *= weapon.bulletSpeed;
+
+	this->dir += additionalVelocity;
+	this->timeLeft = weapon.bulletLifetime;
+	this->obj->setPosition(position);
+	this->obj->setColor(Vector4(1.0f, 0.0f, 0.0f, 1));
+
+	float newRot = atan2(direction.x, direction.z);
+	this->obj->setRotation(Vector3(0, newRot, 0));
+	if (!vehicleWeapon.melee)
+		Game::getGraphics().addToDraw(this->obj);
+}
+
+void Bullet::meleeShoot(const Vector3& position, const Vector3& direction)
 {
 	this->obj->setPosition(position + direction);
 }
 
-void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
+void Bullet::flamethrowerShoot(const Vector3& position, const Vector3& direction, const Vector3& additionalVelocity)
 {
-	direction.Normalize();
 	this->dir = direction;
 
 	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
@@ -107,49 +134,16 @@ void Bullet::flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
 
-	//Game::getGraphics().addToDraw(this->obj);
 	this->dir.y = 0.0f;
 
-	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
-		1,
-		weapon.bulletLifetime,
-		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
-		1,
-		weapon.bulletLifetime,
-		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
-		1,
-		weapon.bulletLifetime,
-		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
-		1,
-		weapon.bulletLifetime,
-		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
-		1,
-		weapon.bulletLifetime,
-		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
-		1,
-		weapon.bulletLifetime,
-		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
-		1,
-		weapon.bulletLifetime,
-		0.25f);
-	Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
-		this->dir,
-		1,
-		weapon.bulletLifetime,
-		0.25f);
+	for (int i = 0; i < 8; i++)
+	{
+		Game::getGraphics().addParticle(obj->getPosition() + Vector3(0, 1, 0),
+			this->dir,
+			1,
+			weapon.bulletLifetime,
+			0.25f);
+	}
 }
 
 void Bullet::update(float deltaTime)
@@ -164,14 +158,14 @@ void Bullet::update(float deltaTime)
 	{
 
 	}
-	else if (this->weapon.type == WeaponType::aiMachineGun		or
-			 this->weapon.type == WeaponType::aiFlamethrower	or
-			 this->weapon.type == WeaponType::aiMissileLauncher or
-			 this->weapon.type == WeaponType::aiBossFlamethrower or
-			 this->weapon.type == WeaponType::aiBossFlamethrowerPhase2 or
-		 	 this->weapon.type == WeaponType::aiBossMachineGun or
-			 this->weapon.type == WeaponType::aiBossMachineGunPhase2 or
-			 this->weapon.type == WeaponType::aiBossMissileLauncher)
+	else if (this->weapon.type == WeaponType::aiMachineGun or
+		this->weapon.type == WeaponType::aiFlamethrower or
+		this->weapon.type == WeaponType::aiMissileLauncher or
+		this->weapon.type == WeaponType::aiBossFlamethrower or
+		this->weapon.type == WeaponType::aiBossFlamethrowerPhase2 or
+		this->weapon.type == WeaponType::aiBossMachineGun or
+		this->weapon.type == WeaponType::aiBossMachineGunPhase2 or
+		this->weapon.type == WeaponType::aiBossMissileLauncher)
 	{
 		defaultEnemyUpdate(deltaTime);
 	}
@@ -185,7 +179,7 @@ void Bullet::update(float deltaTime)
 	}
 	else if (weapon.type == WeaponType::aiMelee)
 	{
-		enemyMeleeUpdate(deltaTime);
+		enemyMeleeUpdate();
 	}
 	else
 	{
@@ -231,7 +225,7 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 	}
 }
 
-void Bullet::enemyMeleeUpdate(float& deltaTime)
+void Bullet::enemyMeleeUpdate()
 {
 
 	if ((this->obj->getPosition() - static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getPosition()).Length() < 1.5f)
@@ -262,7 +256,7 @@ void Bullet::laserEnemyUpdate(float& deltaTime)
 			Sound::play(soundEffect);
 			soundTimer = 0;
 		}
-		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage()*deltaTime);
+		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage() * deltaTime);
 	}
 	this->obj->setScale(weapon.bulletScale * Vector3(timeLeft / weapon.bulletLifetime, timeLeft / weapon.bulletLifetime, 1.0));
 	if (timeLeft > 0.0f)
@@ -274,14 +268,13 @@ void Bullet::laserEnemyUpdate(float& deltaTime)
 	}
 }
 
-void Bullet::laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime)
+void Bullet::laserShoot(Weapon& vehicleWeapon, const Vector3& direction, float deltaTime)
 {
 	if (vehicleWeapon.remainingCooldown > 0.0)
 	{
 		this->weapon.type == WeaponType::None;
 		return;
 	}
-	direction.Normalize();
 	this->dir = direction;
 	vehicleWeapon.currentSpreadIncrease += vehicleWeapon.spreadIncreasePerSecond * vehicleWeapon.maxSpread * deltaTime;
 
