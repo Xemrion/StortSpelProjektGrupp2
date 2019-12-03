@@ -29,7 +29,7 @@ public:
 
 	void draw(bool selected);
 	void update(bool selected, float deltaTime);
-
+	Matrix& getTransform();
 	Container::Slot* getSlot() const;
 	void setSlot(Container::Slot* slot);
 };

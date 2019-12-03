@@ -29,7 +29,8 @@ Graphics::Graphics()
 	this->particleSystem2 = new ParticleSystem;
 	this->particleTrail = new ParticleSystem;
 
-
+	this->selectedObjUI.first = nullptr;
+	this->selectedObjUI.second = nullptr;
 
 	this->particleSystem->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
 	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
@@ -461,19 +462,17 @@ bool Graphics::init(Window* window)
 	
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
-	fogMaterial.scale = 50.0;
+	fogMaterial.color = Vector3(1.0, 1.0, 1.0);
+	fogMaterial.scale = 15.0;
 	fogMaterial.density = 0.1;
-	fogMaterial.ambientDensity = 0.08;
-	fogMaterial.densityThreshold = 0.15;
+	fogMaterial.ambientDensity = 0.0;
+	fogMaterial.densityThreshold = 0.5;
 
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
 
-	fog->initialize(device, deviceContext, 15, 2.25/5, fogMaterial);
+	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
 	fog->setWindSpeed(Vector2(4.0f / 1024.f, 4.0f / 1024.f));
-	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
-	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());
-	deviceContext->RSSetViewports(1, &this->vp);
 
 	// Turn on the alpha blending.
 	deviceContext->OMSetBlendState(alphaEnableBlendingState.Get(), blendFactor, 0xffffffff);
@@ -590,7 +589,6 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->PSSetConstantBuffers(4, 1, this->cameraBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-
 	for (GameObject* object : drawableObjects)
 	{
 		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
@@ -654,7 +652,10 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	
 	drawStaticGameObjects(camera, frustum, 15.0);
 	
-	drawFog(camera, deltaTime);
+	if (fogActive)
+	{
+		drawFog(camera, deltaTime);
+	}
 
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDebug.ps.getShader(), nullptr, 0);
@@ -1318,8 +1319,8 @@ bool Graphics::loadTexture(std::string path, bool overridePath, bool cpuOnly)
 
 	if (textures.find(texturePath) == textures.end()) {
 		Texture* newTexture = new Texture();
-
-		if (!newTexture->Initialize(this->device.Get(), this->deviceContext.Get(), texturePath.c_str(), -1, cpuOnly)) {
+		std::wstring wideTexturePath(texturePath.begin(), texturePath.end());
+		if (!newTexture->Initialize(this->device.Get(), this->deviceContext.Get(), wideTexturePath.c_str(), -1, cpuOnly)) {
 			delete newTexture;
 			return false;
 		}
@@ -1343,8 +1344,8 @@ bool Graphics::reloadTexture(std::string path, bool overridePath)
 	if (texture != textures.end()) {
 		Texture* oldTexture = texture->second;
 		Texture newTexture;
-
-		if (newTexture.Initialize(this->device.Get(), this->deviceContext.Get(), texturePath.c_str(), -1, oldTexture->isCpuOnly()))
+		std::wstring wideTexturePath(texturePath.begin(), texturePath.end());
+		if (newTexture.Initialize(this->device.Get(), this->deviceContext.Get(), wideTexturePath.c_str(), -1, oldTexture->isCpuOnly()))
 		{
 			oldTexture->Shutdown();
 
@@ -1390,12 +1391,19 @@ const Mesh* Graphics::getMeshPointer(const char* localPath)
    return &meshes[meshPath];
 }
 
-Texture* Graphics::getTexturePointer(const char* path)
+Texture* Graphics::getTexturePointer(const char* path, bool tga)
 {
 	std::string texturePath;
 	texturePath += TEXTURE_ROOT_DIR;
 	texturePath += path;
-	texturePath += ".tga";
+	if (tga)
+	{
+		texturePath += ".tga";
+	}
+	else
+	{
+		texturePath += ".dds";
+	}
 
 	if (textures.find(texturePath) == textures.end()) {
 		//assert(false && "Failed to load texture!");
@@ -1509,7 +1517,7 @@ void Graphics::setUISun(Vector3 direction, Vector4 color)
 	this->uiSun.setDirection(this->uiSunDir);
 }
 
-void Graphics::renderUI(float deltaTime, int selectedIndex)
+void Graphics::renderUI(float deltaTime)
 {
 	float color[4] = {
 		0,0,0,1
@@ -1550,20 +1558,30 @@ void Graphics::renderUI(float deltaTime, int selectedIndex)
 
 	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	if (selectedIndex > -1 && this->uiObjects.size()>1)
+	if (this->uiObjects.size()>1 && this->selectedObjUI.first != nullptr && this->selectedObjUI!=this->uiObjects[this->uiObjects.size()-1])
 	{
-		//std::swap(this->uiObjects[selectedIndex], this->uiObjects[this->uiObjects.size()-1]);
+		int posInVec = -1;
+		for (int i = 0; i < this->uiObjects.size() && posInVec==-1; i++)
+		{
+			if (this->uiObjects[i] == this->selectedObjUI)
+			{
+				posInVec = i;
+			}
+		}
+		if (posInVec != -1)
+		{
+			std::swap(this->uiObjects[posInVec], this->uiObjects[this->uiObjects.size() - 1]);
+		}
 	}
 	int index = 0;
 	for (std::pair<GameObject*,Matrix*> object : this->uiObjects)
 	{
-		//if (selectedIndex!=-1&&object == this->uiObjects.back())
-		//{
-		//	ID3D11DepthStencilView* nulView = nullptr;
+		if (object == this->uiObjects.back() && this->selectedObjUI.first!=nullptr)
+		{
+			ID3D11DepthStencilView* nulView = nullptr;
 
-		//	/*deviceContext->OMSetDepthStencilState(nulView, 0);*/
-		//	deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
-		//}
+			deviceContext->ClearDepthStencilView(this->depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
+		}
 		SimpleMath::Matrix world = *object.second;//worlds[]
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -1619,6 +1637,12 @@ void Graphics::renderUI(float deltaTime, int selectedIndex)
 	deviceContext->IASetInputLayout(this->shaderDebug.vs.getInputLayout());
 	deviceContext->PSSetShader(this->shaderDebug.ps.getShader(), nullptr, 0);
 	deviceContext->VSSetShader(this->shaderDebug.vs.getShader(), nullptr, 0);
+}
+
+void Graphics::setSelectedUI(GameObject* obj, Matrix* mat)
+{
+	this->selectedObjUI.first = obj;
+	this->selectedObjUI.second = mat;
 }
 
 void Graphics::setLightList(LightList* lightList)
@@ -1843,6 +1867,9 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 	
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	deviceContext->PSSetShaderResources(7, 1, depthSRV.GetAddressOf());
+	float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
+	deviceContext->OMSetBlendState(alphaEnableBlendingState.Get(), blendFactor, 0xffffffff);
+
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	int i = 1;
 	for (GameObject* object : fog->getQuads())
@@ -1899,10 +1926,25 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 void Graphics::setFog(FogMaterial material, int layers, float spacing)
 {
 	fog = std::make_unique<Fog>();
+	float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
+	deviceContext->OMSetBlendState(alphaEnableBlendingState.Get(), blendFactor, 0xffffffff);
 	fog->initialize(device, deviceContext, layers, spacing, material);
+	deviceContext->RSSetViewports(1, &vp);
+	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
 void Graphics::setFogWindSpeed(Vector2 speed)
 {
 	fog->setWindSpeed(std::move(speed));
 }
+
+void Graphics::disableFog()
+{
+	fogActive = false;
+}
+
+void Graphics::enableFog()
+{
+	fogActive = true;
+}
+

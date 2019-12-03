@@ -52,16 +52,16 @@ void AIGroup::formation(const Vector3& targetPos)
 
 	if (distance < 70 && distance > 3)
 	{
-		this->groupRadius = expandedGroupRadius;
+		//this->groupRadius = expandedGroupRadius;
 		for (int i = 0; i < actors.size(); i++)
 		{
-			actors[i]->vActive = true;
-			actors[i]->groupPos = averagePos;
+			//actors[i]->vActive = true;
+			//actors[i]->groupPos = averagePos;
 		}
 	}
 	else
 	{
-		this->groupRadius = defaultGroupRadius;
+		//this->groupRadius = defaultGroupRadius;
 	}
 }
 
@@ -87,7 +87,8 @@ const float AIGroup::getGroupRadius() const
 
 void AIGroup::removeDeadActors()
 {
-	for (int i = actors.size() - 1; i >= 0; i--)
+	int size = actors.size() - 1;
+	for (int i = size; i >= 0; i--)
 	{
 		if (actors[i]->isDead())
 		{

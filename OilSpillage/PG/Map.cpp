@@ -1439,8 +1439,8 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 					#ifndef _DEBUG // add rigid body to quadrant
 						house.hitboxes.emplace_back();
 						auto &hitbox = house.hitboxes.back();
-						auto     sca = Vector3 { fracSide*2.5f, 499.0f, fracSide*2.5f };
-						auto     pos = basePosition + Vector3(.0f, 249.0f, .0f);
+						auto     sca = Vector3 { fracSide*2.5f, 10.0f, fracSide*2.5f };
+						auto     pos = basePosition;
 						if ( (q == quadrant_northeast) or (q == quadrant_northwest) )
 							pos.z += (2.5*fracSide);
 						else // south
@@ -1473,10 +1473,10 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 
 					#ifndef _DEBUG // add rigid body to quadrant
 						bool  isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        scaB = Vector3 { isVertical? halfSide:fracSide, 499.0f, isVertical? fracSide:halfSide };
-						auto        posA = basePosition + Vector3(.0f, 249.0f, .0f);
-						auto        scaA = Vector3 { isVertical? fracSide:halfSide, 499.0f, isVertical? halfSide:fracSide };
-						auto        posB = basePosition + Vector3(.0f, 249.0f, .0f);
+						auto        scaB = Vector3 { isVertical? halfSide:fracSide, 10.0f, isVertical? fracSide:halfSide };
+						auto        posA = basePosition;
+						auto        scaA = Vector3 { isVertical? fracSide:halfSide, 10.0f, isVertical? halfSide:fracSide };
+						auto        posB = basePosition;
 						switch (q) {
 							case quadrant_southeast: posA.z -= halfSide; posA.x += halfSide;   posB.x += halfSide; posB.z -= halfSide;  break;
 							case quadrant_southwest: posA.x -= halfSide; posA.z -= halfSide;   posB.z -= halfSide; posB.x -= halfSide;  break;
@@ -1524,8 +1524,8 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						house.hitboxes.emplace_back();
 						auto    &hitbox = house.hitboxes.back();
 						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        sca = Vector3 { isVertical? fracSide:halfSide, 499.0f, isVertical? halfSide:fracSide };
-						auto        pos = basePosition + Vector3(.0f, 249.0f, .0f);
+						auto        sca = Vector3 { isVertical? fracSide:halfSide, 10.0f, isVertical? halfSide:fracSide };
+						auto        pos = basePosition;
 						switch (q) {
 							case quadrant_southeast: pos.x += halfSide;  pos.z -= halfSide;  break;
 							case quadrant_southwest: pos.z -= halfSide;  pos.x -= halfSide;  break;
@@ -1555,8 +1555,8 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						house.hitboxes.emplace_back();
 						auto    &hitbox = house.hitboxes.back();
 						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        sca = Vector3 { isVertical? halfSide:fracSide, 499.0f, isVertical? fracSide:halfSide };
-						auto        pos = basePosition + Vector3(.0f, 249.0f, .0f);
+						auto        sca = Vector3 { isVertical? halfSide:fracSide, 10.0f, isVertical? fracSide:halfSide };
+						auto        pos = basePosition;
 						switch (q) {
 							case quadrant_southeast: pos.z -= halfSide;  pos.x += halfSide;  break;
 							case quadrant_southwest: pos.x -= halfSide;  pos.z -= halfSide;  break;
