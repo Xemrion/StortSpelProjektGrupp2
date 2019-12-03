@@ -5,7 +5,7 @@ Attacker::Attacker()
 }
 
 Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
-	:DynamicActor(x, z,physics), Ranged(&this->position, &this->targetPos, &this->velocity,&this->deltaTime, weaponType)
+	:DynamicActor(x, z, physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
@@ -42,7 +42,7 @@ void Attacker::createRigidbody(Physics* physics)
 Attacker::~Attacker()
 {
 	Game::getGraphics().removeFromDraw(this);
-	if(this->isDead())
+	if (this->isDead())
 	{
 		Game::getGameInfo().nrOfAttackers++;
 	}
@@ -66,26 +66,18 @@ void Attacker::setUpActor()
 
 Vector3 Attacker::calculateVelocity()
 {
-	Vector3 desiredDirection;
-	Vector3 offsetVec;
-	//standard group movement
-	if (!vActive)
-	{
-		desiredDirection -= position - destination;
-		if (this->stats.speed != 3.0)
-		{
-			this->stats.speed = 3.0;
-		}
-	}
+	//Move away from player if within 11, move towards it if further than 12, stand still if between the two
 
-	//strafe to the left of player
-	else if (vActive)
+	Vector3 desiredDirection = destination - position;
+
+	if (desiredDirection.Length() <= 11)
 	{
-		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
-		crossVector.Normalize();
-		crossVector *= -10;
-		desiredDirection -= position - (destination - crossVector);
+		desiredDirection = -desiredDirection;
 	}
-	return desiredDirection - velocity;
+	else if (desiredDirection.Length() < 12)
+	{
+		desiredDirection = Vector3();
+	}
+	return desiredDirection;
 }
 

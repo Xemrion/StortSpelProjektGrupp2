@@ -7,7 +7,7 @@
 #include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
-#define SPAWN_ENEMIES 1
+#define SPAWN_ENEMIES 0
 ActorManager::ActorManager()
 {
 }
@@ -345,7 +345,7 @@ void ActorManager::updateActors(float dt, const Vector3& targetPos)
 			if (normalizedRandom >= 0.995)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-					PowerUp(actors[i]->getPosition(),
+					PowerUp(actors[i]->getPosition(), physics, 
 						PowerUpType::Health)
 				);
 			}
@@ -595,14 +595,14 @@ void ActorManager::createGroup(DynamicActor* actor)
 	groups[groups.size() - 1].updateDuty();
 }
 
-const Vector3& ActorManager::predictPlayerPos(const Vector3& targetPos)
+Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 {
 	Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getRigidBody()->getLinearVelocity());
 	targetVelocity.Normalize();
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
-}
-const Vector3& ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
+} 
+Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
 	for (float i = 0;; i += 1.0) {

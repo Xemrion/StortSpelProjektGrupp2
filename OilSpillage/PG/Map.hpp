@@ -8,7 +8,7 @@
 #include "Voronoi.hpp"
 #include "District.hpp"
 #include "../UI/Playing/UIPlaying.h"
-#include "Biome.hpp"
+#include "Environment.hpp"
 #include "../Lights.h"
 
 // TODO: refactor out
@@ -135,12 +135,9 @@ class Map {
 public:
 	// for transition screen
 	struct Info {
-		Biome    biome;
-		Size     width,length;
-		String   name;
-		//Weather  weather; // clear, foggy, cloudy, thunderstorm, rain, sandstorm, blizzard
-		//Time     time;    // day, sunset, night
-		// ...
+		Environment environment;
+		Size        width,length;
+		String      name;
 	};
 
 	Map( Graphics &, MapConfig const &, Physics *, LightList &lights );
@@ -167,7 +164,6 @@ public:
 	Direction                  getHospitalOrientation(   V2u const hospitalTilePos ) const noexcept;
 	Vector3                    getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept;
 	District::Enum             districtAt( U32 x, U32 y ) const noexcept;
-	Biome                      getBiome() const noexcept;
 	HouseGenData const &       getHouseData() const noexcept;
 	Info const &               getInfo() const noexcept;
 private:
@@ -201,7 +197,6 @@ private:
 	void                       generateRoadDistanceMap() noexcept;
 	Vector<UPtr<Streetlight>>  streetlights;
 	Vector<Opt<V2u>>           hospitalTable;
-	Biome                      biome;
 	HouseGenData               houses;
 	RNG                        rng; // TODO, instantiate in ctor
 	Border                     border;

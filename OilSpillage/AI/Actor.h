@@ -15,7 +15,6 @@ public:
 	Actor(float x, float z,Physics* physics);
 	virtual ~Actor();
 	virtual void update(float dt, const Vector3& targetPos);
-	virtual void setUpActor() = 0 {};
 
 	float getHealth()const;
 	float getMaxHealth()const;

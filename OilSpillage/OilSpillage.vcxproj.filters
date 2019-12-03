@@ -184,7 +184,6 @@
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="fog.h" />
     <ClInclude Include="Particle\ParticleHandler.h" />
-    <ClInclude Include="PG\Biome.hpp" />
     <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="Inventory\Container.h" />
     <ClInclude Include="Inventory\ItemWeapon.h" />
@@ -380,6 +379,7 @@
     <ClInclude Include="UI\Highscore\UIBeforeHighscore.h" />
     <ClInclude Include="UI\Playing\UICompletedStage.h" />
     <ClInclude Include="UI\Playing\UIBeforePlaying.h" />
+    <ClInclude Include="PG\Environment.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

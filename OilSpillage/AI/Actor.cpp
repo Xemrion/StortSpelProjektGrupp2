@@ -3,8 +3,6 @@
 
 Actor::Actor()
 {
-	this->setUpActor();
-
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(0, 0.0f, 0);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
@@ -108,7 +106,7 @@ void Actor::scaling(float& stat, float ratio)
 
 void Actor::onFire()
 {
-	if(fireTimer > 0.0)
+	if(fireTimer > 0.0 && !isDead())
 	{
 		changeHealth(2*deltaTime);
 		fireTimer -= deltaTime;
