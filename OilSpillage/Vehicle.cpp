@@ -1059,7 +1059,7 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 					}
 					else if (itemWeapon->getWeapon().type == WeaponType::Flamethrower)
 					{
-						itemWeapon->getWeapon().isFlameThrower = true;
+						itemWeapon->getWeapon().doesDoT = true;
 					}
 				}
 			}

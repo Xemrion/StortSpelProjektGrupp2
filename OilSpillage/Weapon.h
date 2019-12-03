@@ -46,7 +46,7 @@ struct Weapon
 	float soundTimer = 0.0f;
 	float timeSinceLastShot = 0.0f;
 	bool flameBool = false;
-	bool isFlameThrower = false;
+	bool doesDoT = false;
 	int soundHandle = 0;
 	Vector3 lightColor = Vector3(0, 0, 0);
 	Light* light = nullptr;
