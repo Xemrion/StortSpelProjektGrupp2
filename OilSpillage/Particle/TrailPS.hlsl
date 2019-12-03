@@ -180,7 +180,7 @@ float4 main(PSInput input) : SV_Target
     float4 outColor = (texColor + setColor) * (diffuseLight + ambient);
     outColor += (specularColor + setColor) * specularLight;
     
-    return outColor;
+    return texColor;
     //float4 texColor = Texture.Sample(Sampler, input.uv);
    // float4 finCol = float4(texColor.xyz,texColor.w);
    // return float4((1 - shadowVisible(input.shadowPos, ShadowMap, 0.00015f)) * finCol.xyz, finCol.w);

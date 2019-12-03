@@ -261,6 +261,10 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	if (otherFrame==1 || onlyAdd)
 	{
 		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
+		if (onlyAdd)
+		{
+			deviceContext->CSSetUnorderedAccessViews(1, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
+		}
 	}
 	else
 	{
@@ -322,6 +326,10 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	if (otherFrame == 1 || onlyAdd)
 	{
 		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
+		if (onlyAdd)
+		{
+			deviceContext->CSSetUnorderedAccessViews(1, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
+		}
 	}
 	else
 	{
@@ -393,6 +401,49 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 		this->deviceContext->CSSetShader(this->computeShader.Get(), nullptr, 0);
 		this->deviceContext->Dispatch(capParticle / 512, 1, 1);
 	}
+	
+	else
+	{
+		this->frameID++;
+		this->frameID = this->frameID % 60;
+		ID3D11Buffer* nB = nullptr;
+		ID3D11ShaderResourceView* nSRV = nullptr;
+		this->deltaTime = delta;
+		UINT offset = 0;
+		this->sinMovement += 0.7f * delta;
+		if (this->sinMovement > (26 * XM_PI) / 9)
+		{
+			this->sinMovement = 0.0f;
+		}
+
+		sP.vectorField.x = sinMovement;// = Vector4(sinMovement, 0.0f, 0.0f, 0.0f);
+		sP.timeFactors = Vector4(delta, 0.0f, 0.0f, 0.0f);
+
+		//run update computeshader here
+		//deviceContext->CopyStructureCount(this->particl)
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = deviceContext->Map(simParams.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &sP, sizeof(ParticleParams));
+		deviceContext->Unmap(simParams.Get(), 0);
+
+		Matrix viewProjTemp = viewProj;
+		hr = deviceContext->Map(this->collisionViewProj.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &viewProjTemp, sizeof(Matrix));
+		deviceContext->Unmap(this->collisionViewProj.Get(), 0);
+
+		
+		deviceContext->CopyStructureCount(this->nrOfParticlesCB.Get(), offset, this->particlesUAV2.Get());
+		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
+		
+		this->deviceContext->CSSetSamplers(0, 1, this->sampler.GetAddressOf());
+		this->deviceContext->CSSetConstantBuffers(2, 1, this->collisionViewProj.GetAddressOf());
+		this->deviceContext->CSSetConstantBuffers(1, 1, this->nrOfParticlesCB.GetAddressOf());
+		this->deviceContext->CSSetConstantBuffers(0, 1, this->simParams.GetAddressOf());
+		this->deviceContext->CSSetShader(this->computeShader.Get(), nullptr, 0);
+		this->deviceContext->Dispatch(capParticle / 512, 1, 1);
+	}
+	
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &initialCount);
 	deviceContext->CSSetUnorderedAccessViews(1, 1, &n, &initialCount);
 }
@@ -569,12 +620,19 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 	//deviceContext->IASetInputLayout(this->inputLayout.Get());
 	//this->deviceContext->DrawInstanced(16, 1, 0, 0);
 	if(this->texture!=nullptr)
-	{ 
+	{
 		ID3D11ShaderResourceView* rsv = nullptr;
 		rsv = this->texture->getShaderResView();
 		this->deviceContext->PSSetShaderResources(0, 1, &rsv);
 	}
 	this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
+	if (onlyAdd)
+	{
+		this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV2.GetAddressOf());
+		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV2.Get());
+		this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
+
+	}
 	this->deviceContext->GSSetShader(nullptr, 0, 0);
 	this->deviceContext->VSSetShaderResources(0, 1, &n);
 	if (otherFrame > 0.9f)
