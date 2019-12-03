@@ -7,7 +7,7 @@
 #include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
-#define SPAWN_ENEMIES 1
+#define SPAWN_ENEMIES 0
 ActorManager::ActorManager()
 {
 }
