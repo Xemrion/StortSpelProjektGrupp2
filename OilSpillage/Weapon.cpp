@@ -216,6 +216,10 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 				Sound::play("./data/sound/MetalImpact1.wav");
 				soundTimer = 0;
 			}
+			if(weapon.doesDoT)
+			{
+				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->setFire();
+			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);
 			this->timeLeft = 0.f;
 		}
@@ -329,6 +333,11 @@ float Bullet::getDamage() const
 bool Bullet::getMelee() const
 {
 	return weapon.melee;
+}
+
+bool Bullet::getFlame() const
+{
+	return weapon.doesDoT;
 }
 
 GameObject* Bullet::getGameObject()

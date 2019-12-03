@@ -54,8 +54,6 @@ Texture2D Tex : register(t0);
 Texture2D NormalMap : register(t1);
 Texture2D ShadowMap : register(t3);
 Texture2D ShadowMapSpot : register(t4);
-Texture2D SpecularMap : register(t5);
-Texture2D GlossMap : register(t6);
 Texture2DMS<float, 4> depthBuffer : register(t7);
 SamplerState SampSt : register(s0);
 SamplerState ShadowSamp : register(s1);

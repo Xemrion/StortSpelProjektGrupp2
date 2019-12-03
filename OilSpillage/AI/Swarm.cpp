@@ -10,7 +10,6 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	: DynamicActor(x, z, physics), Melee(&position, &velocity, &deltaTime)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
-	setUpActor();
 	Game::getGraphics().addToDraw(this);
 
 	this->stats = VehicleStats::AISwarm;
@@ -20,7 +19,7 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	setMaxHealth(newHealth);
 	setHealth(newHealth);
 
-	scaling(stats.maxSpeed, 1.1);
+	scaling(stats.speed, 1.1);
 
 	Game::getGraphics().loadModel("Entities/Drone");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Drone");
@@ -60,81 +59,33 @@ Swarm::~Swarm()
 		Game::getGameInfo().nrOfSwarm++;
 	}
 }
-
-void Swarm::setUpActor()
+Vector3 Swarm::calculateVelocity()
 {
-	this->root = &bt.getSelector();
-	Sequence& sequence = bt.getSequence();
-	Selector& selector = bt.getSelector();
-	Sequence& seq2 = bt.getSequence();
-
-
-	Behavior& chase = bt.getAction();
-	chase.addAction(std::bind(&Swarm::setChaseState, std::ref(*this)));
-	Behavior& roam = bt.getAction();
-	roam.addAction(std::bind(&Swarm::setIdleState, std::ref(*this)));
-	Behavior& inAggroRange = bt.getAction();
-	inAggroRange.addAction(std::bind(&Swarm::inAggroRange, std::ref(*this)));
-
-	root->addChildren(sequence);
-	root->addChildren(roam);
-
-	sequence.addChildren(inAggroRange);
-	sequence.addChildren(selector);
-
-	selector.addChildren(seq2);
-	selector.addChildren(chase);
-}
-
-Vector3 Swarm::seek()
-{
-	Vector3 desiredDirection;
+	Vector3 desiredDirection = destination - position;
 	Vector3 offsetVec;
-	Vector3 eliminatingVec = Vector3(0.0f, -1.0f, 0.0f) - Vector3(0.0f, 1.0f, 0.0f);
+	Vector3 eliminatingVec = Vector3(0.0f, -2.0f, 0.0f);
 	//standard group movement
-	if (!vActive)
+	if (desiredDirection.Length() <= 10 && desiredDirection.Length() > 2.5f)
 	{
-		desiredDirection -= position - destination;
-		if (this->stats.maxSpeed != 7.0)
-		{
-			this->stats.maxSpeed = 7.0;
-		}
-	}
-
-	//strafe to the left of player
-	else if (vActive && duty == 1)
-	{
-		if (this->stats.maxSpeed == 7.0)
-		{
-			this->stats.maxSpeed = 9.0;
-		}
+		this->stats.speed = 11.0;
 		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
 		offsetVec = crossVector.Cross(eliminatingVec);
 		offsetVec.Normalize();
 		offsetVec *= 10;
-		desiredDirection -= position - (destination - offsetVec);
-	}
-
-	//strafe to the right of player
-	else if (vActive && duty == 2)
-	{
-		if (this->stats.maxSpeed == 7.0)
+		if (duty == 0)
 		{
-			this->stats.maxSpeed = 9.0;
+			desiredDirection = (destination - offsetVec) - position;
 		}
-		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
-		offsetVec = crossVector.Cross(eliminatingVec);
-		offsetVec.Normalize();
-		offsetVec *= 10;
-		desiredDirection -= position - (destination + offsetVec);
+		else if (duty == 1)
+		{
+			desiredDirection = (destination + offsetVec) - position;
+		}
+	}
+	else
+	{
+		this->stats.speed = 7;
 	}
 
-	acceleration = desiredDirection - velocity;
-	if (acceleration.Length() > maxForce)
-	{
-		acceleration /= acceleration.Length();
-	}
-	vActive = false;
-	return acceleration;
+	return  desiredDirection;
 }
 

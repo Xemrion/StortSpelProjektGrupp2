@@ -78,6 +78,11 @@ namespace util {
 		return c[idx];
 	}
 
+	template <class Enum>
+	auto constexpr randomEnumOf( RNG &rng ) noexcept {
+	  return (Enum)( U32_Dist{}(rng) % (size_t)Enum::size );
+	}
+
 	template <class Container, class T>
 	Bool isElementOf( Container const &c, T const &e ) noexcept {
 		return std::find( c.begin(), c.end(), e) != c.end();

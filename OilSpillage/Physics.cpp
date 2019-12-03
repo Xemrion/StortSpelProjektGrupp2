@@ -47,6 +47,7 @@ Physics::Physics() :broadphase(new btDbvtBroadphase())
 	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
 
 #else
+	btSetTaskScheduler(btGetOpenMPTaskScheduler());
 	btDefaultCollisionConstructionInfo cci;
 	collisionConfig = new btDefaultCollisionConfiguration(cci);
 	dispatcherMt = new btCollisionDispatcherMt(collisionConfig, 40);

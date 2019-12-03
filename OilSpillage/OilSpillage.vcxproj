@@ -305,7 +305,7 @@
     <ClInclude Include="Inventory\ItemWheel.h" />
     <ClInclude Include="MyClient.h" />
     <ClInclude Include="Particle\ParticleHandler.h" />
-    <ClInclude Include="PG\Biome.hpp" />
+    <ClInclude Include="PG\Environment.hpp" />
     <ClInclude Include="PG\Generic L-System.h" />
     <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="Inventory\Container.h" />
