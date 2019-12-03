@@ -237,16 +237,8 @@ void Boss::movementVariables(float dt)
 
 void Boss::move()
 {
-	//To make the slow down not as abrupt
-	acceleration *= 0.4f;
-	// Update velocity
-	velocity += acceleration;
-	velocity += seek();
-	// Limit speed
-	if (velocity.Length() > maxForce)
-	{
-		velocity /= velocity.Length();
-	}
+	velocity += calculateVelocity();
+	velocity.Normalize();
 
 	if (this->phase == 1)
 		velocity *= 4.25;
@@ -282,22 +274,13 @@ void Boss::move()
 	}
 
 	//position = temp;, DOESNT SET BODY ANYMORE, JUST MOVING THE RIGID BODY
-	// Reset accelertion to 0 each cycle
-	acceleration *= 0;
 }
 
-Vector3 Boss::seek()
+Vector3 Boss::calculateVelocity()
 {
-	Vector3 desiredDirection;
-	desiredDirection -= position - this->currentPoint;
-	//desired *= maxSpeed;
+	Vector3 desiredDirection = this->currentPoint - position;
 
-	acceleration = desiredDirection - velocity;
-	if (acceleration.Length() > maxForce)
-	{
-		acceleration /= acceleration.Length();
-	}
-	return acceleration;
+	return desiredDirection - velocity;
 }
 
 void Boss::circulatePlayer(Vector3 targetPos)

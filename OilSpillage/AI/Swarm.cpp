@@ -10,7 +10,7 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	: DynamicActor(x, z, physics), Melee(&position, &velocity, &deltaTime)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
-	setUpActor();
+	//setUpActor();
 	Game::getGraphics().addToDraw(this);
 
 	this->stats = VehicleStats::AISwarm;
@@ -20,7 +20,7 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	setMaxHealth(newHealth);
 	setHealth(newHealth);
 
-	scaling(stats.maxSpeed, 1.1);
+	scaling(stats.speed, 1.1);
 
 	Game::getGraphics().loadModel("Entities/Drone");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Drone");
@@ -86,55 +86,43 @@ void Swarm::setUpActor()
 	selector.addChildren(chase);
 }
 
-Vector3 Swarm::seek()
+Vector3 Swarm::calculateVelocity()
 {
 	Vector3 desiredDirection;
 	Vector3 offsetVec;
-	Vector3 eliminatingVec = Vector3(0.0f, -1.0f, 0.0f) - Vector3(0.0f, 1.0f, 0.0f);
+	Vector3 eliminatingVec = Vector3(0.0f, -2.0f, 0.0f);
 	//standard group movement
 	if (!vActive)
 	{
-		desiredDirection -= position - destination;
-		if (this->stats.maxSpeed != 7.0)
+		desiredDirection = destination - position;
+		if (this->stats.speed != 7.0)
 		{
-			this->stats.maxSpeed = 7.0;
+			this->stats.speed = 7.0;
 		}
 	}
-
-	//strafe to the left of player
-	else if (vActive && duty == 1)
+	else
 	{
-		if (this->stats.maxSpeed == 7.0)
+		if (this->stats.speed == 7.0)
 		{
-			this->stats.maxSpeed = 9.0;
+			this->stats.speed = 9.0;
 		}
 		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
 		offsetVec = crossVector.Cross(eliminatingVec);
 		offsetVec.Normalize();
 		offsetVec *= 10;
-		desiredDirection -= position - (destination - offsetVec);
-	}
-
-	//strafe to the right of player
-	else if (vActive && duty == 2)
-	{
-		if (this->stats.maxSpeed == 7.0)
+		if (duty == 1)
 		{
-			this->stats.maxSpeed = 9.0;
+			desiredDirection = (destination - offsetVec) - position;
+
 		}
-		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
-		offsetVec = crossVector.Cross(eliminatingVec);
-		offsetVec.Normalize();
-		offsetVec *= 10;
-		desiredDirection -= position - (destination + offsetVec);
+		else if (duty == 2)
+		{
+			desiredDirection = (destination + offsetVec) - position;
+
+		}
 	}
 
-	acceleration = desiredDirection - velocity;
-	if (acceleration.Length() > maxForce)
-	{
-		acceleration /= acceleration.Length();
-	}
 	vActive = false;
-	return acceleration;
+	return  desiredDirection - velocity;
 }
 

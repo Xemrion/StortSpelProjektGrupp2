@@ -33,7 +33,7 @@ private:
 	void movementVariables(float dt);
 	//Behaiours
 	void move();
-	Vector3 seek();
+	Vector3 calculateVelocity();
 	void circulatePlayer(Vector3 targetPos);
 	void enterPhase2();
 
