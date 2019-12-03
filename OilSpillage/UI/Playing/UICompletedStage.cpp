@@ -5,6 +5,7 @@
 
 void UICompletedStage::updateUI(float deltaTime)
 {
+	Game::getGraphics().disableFog();
 	this->selected = UserInterface::changeSelected(this->selected);
 	this->textResults->update(deltaTime);
 

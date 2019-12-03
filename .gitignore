@@ -710,4 +710,5 @@ OilSpillage/data/textures/map/map.tga
 /OilSpillage/BulletSDK/include/out/build/x64-Debug
 /OilSpillage/glm/out/build/x64-Debug
 /OilSpillage/highscore.txt
+/enc_temp_folder
 *.sav

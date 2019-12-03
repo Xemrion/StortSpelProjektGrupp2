@@ -11,5 +11,5 @@ public:
 private:
 	void createRigidbody(Physics* physics);
 	void setUpActor();
-	Vector3 seek();
+	Vector3 calculateVelocity();
 };

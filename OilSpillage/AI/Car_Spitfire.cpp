@@ -34,7 +34,7 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	this->reverseTimer2 = 0;
 	this->direction = Vector3(1, 0, 0);
 	this->deltaTime = 0;
-	setUpActor();
+	//setUpActor();
 	throttleInputStrength = 0;
 	init(physics);
 	setPosition(Vector3(x,- 1.2f, z));
@@ -62,14 +62,16 @@ Spitfire::~Spitfire()
 	Game::getGraphics().removeFromDraw(wheel2);
 	Game::getGraphics().removeFromDraw(wheel3);
 	Game::getGraphics().removeFromDraw(wheel4);
-	physics->DeleteRigidBody(vehicleBody1->getRigidBody());
 	physics->deletePointJoint(pointJoint);
 	delete vehicleBody1;
 	delete wheel1;
 	delete wheel2;
 	delete wheel3;
 	delete wheel4;
-	Game::getGameInfo().nrOfCars++;
+	if (this->isDead())
+	{
+		Game::getGameInfo().nrOfCars++;
+	}
 }
 
 void Spitfire::updateVehicle()
@@ -98,15 +100,6 @@ void Spitfire::move()
 			throttleInputStrength = 1;
 		}
 	}
-	/*else if ((car->getPosition() - destination).Length() < 5)
-	{
-		throttleInputStrength -= 0.5 * deltaTime;
-		if (throttleInputStrength < 0)
-		{
-			throttleInputStrength = 0;
-		}
-	}*/
-
 }
 
 void Spitfire::update(float dt,const Vector3& targetPos)
@@ -267,7 +260,7 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 		}
 		else {
 			reverseTimer2 = 0;
-			if (velocitySpeed < (40 * stats.maxSpeed)) {
+			if (velocitySpeed < (40 * stats.speed)) {
 				getRigidBody()->applyImpulse(btVector3(dx * deltaTime * 160.0f * stats.accelerationRate, 0, -(dy * deltaTime * 160.0f * stats.accelerationRate)) * throttleInputStrength, btVector3(0, 0, 0));
 			}
 		}

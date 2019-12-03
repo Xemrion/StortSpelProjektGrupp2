@@ -69,15 +69,12 @@ public:
 	btGeneric6DofSpring2Constraint* addSpring(btRigidBody* box1, btRigidBody* box2);
 	btPoint2PointConstraint* addPointJoint(btRigidBody* box1, btRigidBody* box2);
 	btRaycastVehicle* addVehicle(btRaycastVehicle* vehicle);
-	/*btRigidBody* addPlayer(btVector3 Origin, btVector3 size, float mass,Player *player);*/
 
 	bool DeleteRigidBody(btRigidBody* rb);
 	bool deletePointJoint(btPoint2PointConstraint* pointJoint);
 	static bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2,
 		int id2, int index2);
-	//void renderSphere(btRigidBody* sphere);
-	//void renderPlane(btRigidBody* plane);
-	//void renderBox(btRigidBody* box);
+
 	btStaticPlaneShape* getPlaneRigidBody();
 };
 

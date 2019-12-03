@@ -46,6 +46,7 @@ struct Weapon
 	float soundTimer = 0.0f;
 	float timeSinceLastShot = 0.0f;
 	bool flameBool = false;
+	bool doesDoT = false;
 	int soundHandle = 0;
 	Vector3 lightColor = Vector3(0, 0, 0);
 	Light* light = nullptr;
@@ -171,14 +172,15 @@ public:
 
 class Bullet
 {
-	void defaultShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
-	void meleeShoot(Vector3& position, Vector3& direction);
+	void defaultShoot(Weapon& vehicleWeapon, const Vector3& position, const Vector3& direction, const Vector3& additionalVelocity, float deltaTime);
+	void defaultShootEnemy(Weapon& vehicleWeapon, const Vector3& position, const Vector3& direction, const Vector3& additionalVelocity, float deltaTime);
+	void meleeShoot(const Vector3& position,const Vector3& direction);
 	void defaultUpdate(float& deltaTime);
 	void defaultEnemyUpdate(float& deltaTime);
-	void enemyMeleeUpdate(float& deltaTime);
+	void enemyMeleeUpdate();
 	void laserEnemyUpdate(float& deltaTime);
-	void flamethrowerShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
-	void laserShoot(Weapon& vehicleWeapon, Vector3& position, Vector3& direction, Vector3& additionalVelocity, float deltaTime);
+	void flamethrowerShoot(const Vector3& position, const Vector3& direction, const Vector3& additionalVelocity);
+	void laserShoot(Weapon& vehicleWeapon, const Vector3& direction, float deltaTime);
 	void laserUpdate(float& deltaTime);
 	GameObject* obj = nullptr;
 	Vector3 dir;
@@ -196,7 +198,8 @@ public:
 	WeaponType getWeaponType() const;
 	float getDamage() const;
 	bool getMelee() const;
-	void shoot(Weapon& weapon, Vector3 position, Vector3 direction, Vector3 additionalVelocity, float deltaTime);
+	bool getFlame() const;
+	void shoot(Weapon& weapon, const Vector3& position, const Vector3& normalizedDir,const Vector3& additionalVelocity, float deltaTime);
 	void update(float deltaTime);
 	float getTimeLeft() const;
 	void destroy();

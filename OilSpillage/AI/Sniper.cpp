@@ -40,8 +40,6 @@ void Sniper::setUpActor()
 
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Sniper::inAttackRange, std::ref(*this)));
-	//Behavior& waitTimer = bt.getAction();
-	//waitTimer.addAction(std::bind(&Sniper::WaitTime, std::ref(*this)));
 	Behavior& chase = bt.getAction();
 	chase.addAction(std::bind(&Sniper::setChaseState, std::ref(*this)));
 	Behavior& roam = bt.getAction();
@@ -62,11 +60,10 @@ void Sniper::setUpActor()
 
 	seq2.addChildren(inRange);
 
-	//seq2.addChildren(waitTimer);
 	seq2.addChildren(shoot);
 }
 
-Vector3 Sniper::seek()
+Vector3 Sniper::calculateVelocity()
 {
 	Vector3 desiredDirection;
 	Vector3 offsetVec;
@@ -75,9 +72,9 @@ Vector3 Sniper::seek()
 	//Ray casting stuff
 	if (this->getAABB().intersect(targetPos, aimRay, 1000))
 	{
-		if (this->stats.maxSpeed == 3.0)
+		if (this->stats.speed == 3.0)
 		{
-			this->stats.maxSpeed = 7.0;
+			this->stats.speed = 7.0;
 		}
 		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
 		offsetVec = crossVector.Cross(eliminatingVec);
@@ -92,9 +89,9 @@ Vector3 Sniper::seek()
 		{
 			desiredDirection -= position - destination;
 			//desired *= maxSpeed;
-			if (this->stats.maxSpeed != 3.0)
+			if (this->stats.speed != 3.0)
 			{
-				this->stats.maxSpeed = 3.0;
+				this->stats.speed = 3.0;
 			}
 		}
 
@@ -107,11 +104,6 @@ Vector3 Sniper::seek()
 			desiredDirection -= position - (destination - crossVector);
 		}
 	}
-	acceleration = desiredDirection - velocity;
-	if (acceleration.Length() > maxForce)
-	{
-		acceleration /= acceleration.Length();
-	}
 	vActive = false;
-	return acceleration;
+	return  desiredDirection - velocity;
 }
