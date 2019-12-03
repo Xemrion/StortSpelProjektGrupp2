@@ -85,7 +85,7 @@ PowerUp::~PowerUp()
 	Game::getGraphics().removeFromDraw(this);
 }
 
-void PowerUp::update(float deltaTime)
+void PowerUp::update(float deltaTime, Vector3 playerPos)
 {
 	this->time += deltaTime;
 	if (this->currentRespawnTimer > 0.0)
@@ -108,6 +108,18 @@ void PowerUp::update(float deltaTime)
 		else {
 			this->setScale(Vector3(sin(time * 3.0) * 0.05 + 0.8, sin(time * 3.0) * 0.05 + 0.8, sin(time * 3.0) * 0.05 + 0.8));
 		}
+	}
+
+	float distanceFromPlayerToPowerup = sqrtf((this->position.x - playerPos.x) * (this->position.x - playerPos.x) +
+											  (this->position.y - playerPos.y) * (this->position.y - playerPos.y) +
+											  (this->position.z - playerPos.z) * (this->position.z - playerPos.z));
+	if (distanceFromPlayerToPowerup <= 5)
+	{
+		//move closer to player here!!
+		Vector3 towardsPlayer = playerPos - this->position;
+		//towardsPlayer.Normalize(); //so not faster if closer
+
+		//this->getRigidBody()->setLinearVelocity(btVector3(towardsPlayer.x * 0.01, 0.0f, towardsPlayer.z * 0.01));
 	}
 }
 

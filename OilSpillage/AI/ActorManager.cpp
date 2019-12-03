@@ -7,7 +7,7 @@
 #include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
-
+#define SPAWN_ENEMIES 1
 ActorManager::ActorManager()
 {
 }
@@ -42,13 +42,14 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	updateActors(dt, targetPos);
 	updateBosses(dt, targetPos);
 
+#if SPAWN_ENEMIES
 	if (spawnTimer <= 0)
 	{
-
 		spawnEnemies(targetPos);
-
+		
 		spawnTimer = spawnCooldown;
 	}
+#endif
 
 	Vector3 newPos;
 	float deltaX;

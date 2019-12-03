@@ -59,6 +59,8 @@ void PlayingGameState::initAI()
 	actorManager = nullptr;
 	actorManager = std::make_unique<ActorManager>( aStar.get(), physics.get(), map.get(), &rng );
 	aStar->generateTileData(map->getTileMap());
+	//actorManager->createAttacker(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+
 }
 
 PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_BEFORE_PLAYING)
@@ -580,7 +582,7 @@ void PlayingGameState::update(float deltaTime)
 
 		for (std::unique_ptr<PowerUp>& p : powerUps)
 		{
-			p->update(deltaTime);
+			p->update(deltaTime, player->getPosition());
 			if (p->isActive() && !player->isDead())
 			{
 				if (p->getAABB().intersectXZ(player->getAABB()))
