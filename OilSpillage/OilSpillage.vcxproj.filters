@@ -166,6 +166,8 @@
     <ClCompile Include="UI\Highscore\UIBeforeHighscore.cpp" />
     <ClCompile Include="UI\Playing\UICompletedStage.cpp" />
     <ClCompile Include="UI\Playing\UIBeforePlaying.cpp" />
+    <ClCompile Include="Inventory\ItemChassi.cpp" />
+    <ClCompile Include="Inventory\ItemWheel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -380,6 +382,8 @@
     <ClInclude Include="UI\Highscore\UIBeforeHighscore.h" />
     <ClInclude Include="UI\Playing\UICompletedStage.h" />
     <ClInclude Include="UI\Playing\UIBeforePlaying.h" />
+    <ClInclude Include="Inventory\ItemChassi.h" />
+    <ClInclude Include="Inventory\ItemWheel.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

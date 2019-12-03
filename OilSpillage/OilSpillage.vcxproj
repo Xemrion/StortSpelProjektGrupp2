@@ -169,8 +169,10 @@
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Inventory\Container.cpp" />
     <ClCompile Include="Inventory\Item.cpp" />
+    <ClCompile Include="Inventory\ItemChassi.cpp" />
     <ClCompile Include="Inventory\ItemWeapon.cpp" />
     <ClCompile Include="fog.cpp" />
+    <ClCompile Include="Inventory\ItemWheel.cpp" />
     <ClCompile Include="MyClient.cpp" />
     <ClCompile Include="Objectives\Objective.cpp" />
     <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
@@ -299,6 +301,8 @@
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="AI\Weakspot.h" />
     <ClInclude Include="fog.h" />
+    <ClInclude Include="Inventory\ItemChassi.h" />
+    <ClInclude Include="Inventory\ItemWheel.h" />
     <ClInclude Include="MyClient.h" />
     <ClInclude Include="Particle\ParticleHandler.h" />
     <ClInclude Include="PG\Biome.hpp" />

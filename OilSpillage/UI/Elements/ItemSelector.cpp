@@ -55,7 +55,7 @@ void ItemSelector::update(float deltaTime)
 {
 	std::vector<Container::Slot*>* list = nullptr;
 
-	if (this->selectedTypeLastDraw == -1)
+	if (this->selectedTypeLastDraw == -1 && Container::playerInventory->getItemStack(static_cast<ItemType>(this->selectedType))->size() > 0)
 	{
 		this->addTextbox();
 	}
