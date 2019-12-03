@@ -5,6 +5,19 @@
 
 std::vector<std::shared_ptr<Item>> Item::premadeItems;
 
+GameObject* Item::getObjectByName(std::string name)
+{
+	for (int i = 0; i < Item::premadeItems.size(); i++)
+	{
+		if (Item::premadeItems[i]->name == name)
+		{
+			return Item::premadeItems[i]->object;
+		}
+	}
+
+	return nullptr;
+}
+
 void Item::init()
 {
 	Graphics& graphics = Game::getGraphics();

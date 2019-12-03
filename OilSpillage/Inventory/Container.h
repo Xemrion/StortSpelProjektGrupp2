@@ -26,10 +26,13 @@ public:
 	static std::unique_ptr<Container> playerInventory;
 private:
 	std::vector<Slot*> itemLists[ItemType::TYPES_SIZE];
+	Slot* latest;
 public:
 	Container();
 	virtual ~Container();
 
+	Slot* getLatestAdded() const;
+	int getItemCount() const;
 	void addItem(Item* item);
 	void removeItem(Slot* slot);
 	bool containsItem(Slot* slot);

@@ -25,6 +25,7 @@ protected:
 	Vector4 baseColor;
 	GameObject* object;
 public:
+	static GameObject* getObjectByName(std::string name);
 	static void init();
 	static Item* getRandom();
 	static Matrix generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale = Vector3::One, Quaternion rotation = Quaternion::Identity, bool ignoreObjectRotation = false);

@@ -4,6 +4,7 @@ std::unique_ptr<Container> Container::playerInventory;
 
 Container::Container()
 {
+	this->latest = nullptr;
 }
 
 Container::~Container()
@@ -17,9 +18,27 @@ Container::~Container()
 	}
 }
 
+Container::Slot* Container::getLatestAdded() const
+{
+	return this->latest;
+}
+
+int Container::getItemCount() const
+{
+	int count = 0;
+
+	for (int i = 0; i < ItemType::TYPES_SIZE; i++)
+	{
+		count += this->itemLists[i].size();
+	}
+
+	return count;
+}
+
 void Container::addItem(Item* item)
 {
-	this->itemLists[item->getType()].push_back(new Slot(this, item));
+	this->latest = new Slot(this, item);
+	this->itemLists[item->getType()].push_back(this->latest);
 }
 
 void Container::removeItem(Slot* slot)
@@ -28,6 +47,11 @@ void Container::removeItem(Slot* slot)
 
 	if (found != this->itemLists[slot->getItem()->getType()].end())
 	{
+		if (*found == this->latest)
+		{
+			this->latest = nullptr;
+		}
+
 		delete *found;
 		this->itemLists[slot->getItem()->getType()].erase(found);
 	}

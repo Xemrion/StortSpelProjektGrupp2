@@ -43,3 +43,8 @@ void Button::draw(bool selected)
 
 	UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), this->text.text.c_str(), pos, this->text.colour, 0.0f, Vector2(), 0.4f);
 }
+
+void Button::setText(std::string text)
+{
+	this->text.text = text;
+}

@@ -1,5 +1,7 @@
 #include "UICompletedStage.h"
 #include "../../game.h"
+#include "../../SaveSystem.h"
+#include "../../States/PlayingGameState.h"
 
 void UICompletedStage::updateUI(float deltaTime)
 {
@@ -18,6 +20,8 @@ void UICompletedStage::updateUI(float deltaTime)
 
 	if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
 	{
+		SaveSystem::saveGame(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getSlots());
+
 		if (this->selected == this->buttonSaveContinue.get())
 		{
 			Game::setState(Game::STATE_UPGRADING);

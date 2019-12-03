@@ -22,9 +22,10 @@ enum Slots
 };
 struct VehicleSlots
 {
+private:
 	Item* slots[Slots::SIZEOF];
 	Container::Slot* inventorySlots[Slots::SIZEOF];
-
+public:
 	void setSlot(Slots slot, Item* item, Container::Slot* inventorySlot)
 	{
 		if (this->slots[int(slot)] != nullptr)
@@ -45,7 +46,7 @@ struct VehicleSlots
 			}
 		}
 	};
-	Item* getSlot(Slots slot)
+	Item* getItem(Slots slot)
 	{
 		if (this->slots[int(slot)] != nullptr)
 		{
@@ -66,6 +67,18 @@ struct VehicleSlots
 		{
 			return nullptr;
 		}
+	};
+	int checkForSlot(Container::Slot* inventorySlot)
+	{
+		for (int i = 0; i < Slots::SIZEOF; i++)
+		{
+			if (this->inventorySlots[i] == inventorySlot)
+			{
+				return i;
+			}
+		}
+
+		return -1;
 	};
 	VehicleSlots()
 	{

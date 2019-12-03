@@ -18,6 +18,7 @@ struct GameInfo
 	int highScoreTotal = 0;
 	int highScoreStage = 0;
 	float time = 0.0f;
+	int saveFileID = -1;
 
 	void addHighScore(int amount) 
 	{

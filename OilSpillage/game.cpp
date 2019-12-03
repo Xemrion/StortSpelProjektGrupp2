@@ -209,6 +209,11 @@ void Game::createCurrentState()
 			temp->stopEngineSound();
 			Sound::stopAllLoops();
 		}
+		else if (oldState == STATE_MENU)
+		{
+			transfer = static_cast<MenuGameState*>(state.get())->getSlots();
+			newSlots = new VehicleSlots(*transfer);
+		}
 
 		state = std::make_unique<UpgradingGameState>();
 
@@ -216,7 +221,10 @@ void Game::createCurrentState()
 		{
 			Sound::stopAllLoops();
 			static_cast<UpgradingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
-			
+		}
+		else if (oldState == STATE_MENU)
+		{
+			static_cast<UpgradingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
 		}
 	}
 	else if (currentState == STATE_HIGHSCORE)
