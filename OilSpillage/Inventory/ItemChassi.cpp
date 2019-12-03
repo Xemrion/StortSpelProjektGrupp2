@@ -5,7 +5,7 @@ std::string ItemChassi::generateDescription(Stats chassi)
 {
 	std::stringstream stream;
 	stream << "Durability: " << chassi.maxHealth << "\n";
-	stream << "Top Speed: " << chassi.maxSpeed << "\n";
+	stream << "Top Speed: " << chassi.speed << "\n";
 
 	return stream.str();
 }
@@ -38,7 +38,7 @@ void ItemChassi::randomize()
 {
 
 	this->stats.maxHealth = static_cast<int>((((rand() % 100 +1)) + (10 * Game::getLocalScale())));
-	this->stats.maxSpeed = ((rand() % 100 + 1)*0.01f) + (1 * Game::getLocalScale());
+	this->stats.speed = ((rand() % 100 + 1)*0.01f) + (1 * Game::getLocalScale());
 	
 
 	this->description = generateDescription(this->stats);

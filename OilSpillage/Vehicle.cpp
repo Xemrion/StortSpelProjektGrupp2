@@ -1361,9 +1361,9 @@ GameObject* Vehicle::getWheel()
 void Vehicle::setChassi(GameObject* newChassi, Stats stats)
 {
 	this->updatedStats.maxHealth = stats.maxHealth;
-	this->updatedStats.maxSpeed = stats.maxSpeed;
+	this->updatedStats.speed = stats.speed;
 	this->defaultStats.maxHealth = stats.maxHealth;
-	this->defaultStats.maxSpeed = stats.maxSpeed;
+	this->defaultStats.speed = stats.speed;
 	
 	this->vehicleBody1->mesh = newChassi->mesh;
 	this->vehicleBody1->setMaterial(newChassi->getMaterial());
