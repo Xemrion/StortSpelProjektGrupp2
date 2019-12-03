@@ -580,7 +580,7 @@ void PlayingGameState::update(float deltaTime)
 
 		for (std::unique_ptr<PowerUp>& p : powerUps)
 		{
-			p->update(deltaTime);
+			p->update(deltaTime, player->getPosition());
 			if (p->isActive() && !player->isDead())
 			{
 				if (p->getAABB().intersectXZ(player->getAABB()))
