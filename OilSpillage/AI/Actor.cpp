@@ -108,7 +108,7 @@ void Actor::scaling(float& stat, float ratio)
 
 void Actor::onFire()
 {
-	if(fireTimer > 0.0)
+	if(fireTimer > 0.0 && !isDead())
 	{
 		changeHealth(2*deltaTime);
 		fireTimer -= deltaTime;
