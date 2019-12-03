@@ -23,6 +23,7 @@ ParticleSystem::ParticleSystem()
 	this->onlyAdd = false;
 	this->bufferType = D3D11_BUFFER_UAV_FLAG_APPEND;
 	this->indexForTrail = 0;
+	this->texture = nullptr;
 }
 
 
@@ -424,9 +425,26 @@ void ParticleSystem::setSize(float startSize, float endSize)
 
 }
 
+void ParticleSystem::setColor(Vector4 colors[4], int nrOfColors)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		colorNSize.colors[i] = colors[i];
+		this->systemData.renderParams.colors[i] = colors[i];
+	}
+	colorNSize.config.x = float(nrOfColors);
+
+	this->systemData.renderParams.config.x = float(nrOfColors);
+}
+
 void ParticleSystem::setMass(float mass)
 {
 	sP.physicsConfig.x = mass;
+}
+
+void ParticleSystem::setTexture(Texture* texture)
+{
+	this->texture = texture;
 }
 
 void ParticleSystem::setGravity(float gravity)
@@ -550,6 +568,12 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 	}
 	//deviceContext->IASetInputLayout(this->inputLayout.Get());
 	//this->deviceContext->DrawInstanced(16, 1, 0, 0);
+	if(this->texture!=nullptr)
+	{ 
+		ID3D11ShaderResourceView* rsv = nullptr;
+		rsv = this->texture->getShaderResView();
+		this->deviceContext->PSSetShaderResources(0, 1, &rsv);
+	}
 	this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
 	this->deviceContext->GSSetShader(nullptr, 0, 0);
 	this->deviceContext->VSSetShaderResources(0, 1, &n);
