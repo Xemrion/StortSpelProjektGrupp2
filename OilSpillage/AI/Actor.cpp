@@ -105,3 +105,21 @@ void Actor::scaling(float& stat, float ratio)
 		stat *= ratio;
 	}
 }
+
+void Actor::onFire()
+{
+	if(fireTimer > 0.0)
+	{
+		changeHealth(2*deltaTime);
+		fireTimer -= deltaTime;
+		for(int i = 0; i < 10; i++)
+		{
+			Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+		}
+	}
+}
+
+void Actor::setFire()
+{
+	fireTimer = 2;
+}

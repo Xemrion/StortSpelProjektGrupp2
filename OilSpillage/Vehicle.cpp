@@ -160,7 +160,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 	if (playing != nullptr)
 	{
-
+		onFire(deltaTime);
 		if (this->deadImpulse == true && this->health <= 0)
 		{
 			this->respawnTimer += deltaTime;
@@ -1057,6 +1057,10 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 							itemWeapon->getWeapon().light = (Light*)static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(flash);
 						}
 					}
+					else if (itemWeapon->getWeapon().type == WeaponType::Flamethrower)
+					{
+						itemWeapon->getWeapon().isFlameThrower = true;
+					}
 				}
 			}
 		}
@@ -1424,4 +1428,22 @@ void Vehicle::updatePowerUpEffects(float deltaTime)
 float Vehicle::getPowerUpTimer(PowerUpType p)
 {
 	return this->powerUpTimers[(int)p];
+}
+
+void Vehicle::onFire(float dt)
+{
+	if (fireTimer > 0.0)
+	{
+		changeHealth(-(2 * dt));
+		fireTimer -= dt;
+		for (int i = 0; i < 10; i++)
+		{
+			Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+		}
+	}
+}
+
+void Vehicle::setFire()
+{
+	fireTimer = 2;
 }

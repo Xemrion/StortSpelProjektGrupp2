@@ -46,6 +46,7 @@ struct Weapon
 	float soundTimer = 0.0f;
 	float timeSinceLastShot = 0.0f;
 	bool flameBool = false;
+	bool isFlameThrower = false;
 	int soundHandle = 0;
 	Vector3 lightColor = Vector3(0, 0, 0);
 	Light* light = nullptr;
@@ -171,7 +172,8 @@ public:
 
 class Bullet
 {
-	void defaultShoot(Weapon& vehicleWeapon,const Vector3& position, const Vector3& direction,const Vector3& additionalVelocity, float deltaTime);
+	void defaultShoot(Weapon& vehicleWeapon, const Vector3& position, const Vector3& direction, const Vector3& additionalVelocity, float deltaTime);
+	void defaultShootEnemy(Weapon& vehicleWeapon, const Vector3& position, const Vector3& direction, const Vector3& additionalVelocity, float deltaTime);
 	void meleeShoot(const Vector3& position,const Vector3& direction);
 	void defaultUpdate(float& deltaTime);
 	void defaultEnemyUpdate(float& deltaTime);
@@ -196,6 +198,7 @@ public:
 	WeaponType getWeaponType() const;
 	float getDamage() const;
 	bool getMelee() const;
+	bool getFlame() const;
 	void shoot(Weapon& weapon, const Vector3& position, const Vector3& normalizedDir,const Vector3& additionalVelocity, float deltaTime);
 	void update(float deltaTime);
 	float getTimeLeft() const;

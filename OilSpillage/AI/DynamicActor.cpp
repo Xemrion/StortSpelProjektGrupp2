@@ -47,7 +47,8 @@ void DynamicActor::update(float dt, const Vector3& targetPos)
 	Actor::update(dt, targetPos);
 
 	followPath();
-	move();
+	move()
+	onFire();
 }
 
 Vector3 DynamicActor::calculateVelocity()

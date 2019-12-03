@@ -125,12 +125,12 @@ void ActorManager::createSwarm(float x, float z)
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
-Boss* ActorManager::createBoss(float x, float z, int weaponType)
+Boss* ActorManager::createBoss(float x, float z, int weaponType, float scalingNr)
 {
 	//generate start pos for boss
 	Vector3 newPos = findTeleportPos(Vector3(x, 0, z), 50, 100);
 
-	Boss* boss = new Boss(newPos.x, newPos.z, weaponType, physics);
+	Boss* boss = new Boss(newPos.x, newPos.z, weaponType, physics, scalingNr);
 	this->bosses.push_back(boss);
 
 	return boss;
@@ -190,6 +190,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
+					if(bulletArray[j].getFlame())
+					{
+						actors[i]->setFire();
+					}
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					bulletArray[j].destroy();
 				}
@@ -235,6 +239,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						if (soundTimer > 0.05f) {
 							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
+						}
+						if(bulletArray[j].getFlame())
+						{
+							bosses[i]->setFire();
 						}
 						this->bosses[i]->changeHealth(-bulletArray[j].getDamage());
 						bulletArray[j].destroy();

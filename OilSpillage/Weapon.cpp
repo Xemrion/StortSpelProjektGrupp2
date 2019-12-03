@@ -57,6 +57,10 @@ void Bullet::shoot(Weapon& weapon, const Vector3& position, const Vector3& norma
 	{
 		meleeShoot(position, normalizedDir);
 	}
+	else if (weapon.type == WeaponType::aiMachineGun or weapon.type == WeaponType::aiMissileLauncher or weapon.type == WeaponType::aiBossMachineGun or weapon.type == WeaponType::aiBossMachineGunPhase2 or weapon.type == WeaponType::aiBossMissileLauncher)
+	{
+		defaultShootEnemy(weapon, position, normalizedDir, additionalVelocity, deltaTime);
+	}
 	else
 	{
 		defaultShoot(weapon, position, normalizedDir, additionalVelocity, deltaTime);
@@ -78,6 +82,28 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, const Vector3& position, const 
 	this->timeLeft = weapon.bulletLifetime;
 	this->obj->setPosition(position);
 	this->obj->setColor(Vector4(1.2f, 1.2f, 0, 1));
+
+	float newRot = atan2(direction.x, direction.z);
+	this->obj->setRotation(Vector3(0, newRot, 0));
+	if (!vehicleWeapon.melee)
+		Game::getGraphics().addToDraw(this->obj);
+}
+
+void Bullet::defaultShootEnemy(Weapon& vehicleWeapon, const Vector3& position, const Vector3& direction, const Vector3& additionalVelocity, float deltaTime)
+{
+	this->dir = direction;
+
+	float randomNumber = (float(rand()) / (float(RAND_MAX) * 0.5f)) - 1.0f;
+	float spread = randomNumber * (weapon.spreadRadians + weapon.currentSpreadIncrease) * 0.5f;
+	vehicleWeapon.currentSpreadIncrease = min(vehicleWeapon.currentSpreadIncrease + vehicleWeapon.spreadIncreasePerSecond * vehicleWeapon.maxSpread * deltaTime, vehicleWeapon.maxSpread);
+	this->dir.x = direction.x * cos(spread) - direction.z * sin(spread);
+	this->dir.z = direction.x * sin(spread) + direction.z * cos(spread);
+	this->dir *= weapon.bulletSpeed;
+
+	this->dir += additionalVelocity;
+	this->timeLeft = weapon.bulletLifetime;
+	this->obj->setPosition(position);
+	this->obj->setColor(Vector4(1.0f, 0.0f, 0.0f, 1));
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
@@ -189,6 +215,10 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 				Sound::play(soundEffect);
 				Sound::play("./data/sound/MetalImpact1.wav");
 				soundTimer = 0;
+			}
+			if(weapon.isFlameThrower)
+			{
+				static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->setFire();
 			}
 			static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);
 			this->timeLeft = 0.f;
@@ -303,6 +333,11 @@ float Bullet::getDamage() const
 bool Bullet::getMelee() const
 {
 	return weapon.melee;
+}
+
+bool Bullet::getFlame() const
+{
+	return weapon.isFlameThrower;
 }
 
 GameObject* Bullet::getGameObject()
