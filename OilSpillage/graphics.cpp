@@ -463,10 +463,10 @@ bool Graphics::init(Window* window)
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
 	fogMaterial.color = Vector3(1.0, 1.0, 1.0);
-	fogMaterial.scale = 15.0;
-	fogMaterial.density = 0.1;
+	fogMaterial.scale = 5.0;
+	fogMaterial.density = 0.951;
 	fogMaterial.ambientDensity = 0.0;
-	fogMaterial.densityThreshold = 0.5;
+	fogMaterial.densityThreshold = 0.15;
 
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
@@ -1871,7 +1871,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 	deviceContext->OMSetBlendState(alphaEnableBlendingState.Get(), blendFactor, 0xffffffff);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	int i = 1;
+	int i = 0;
 	for (GameObject* object : fog->getQuads())
 	{
 		SimpleMath::Matrix world = object->getTransform();
@@ -1909,7 +1909,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
 		const Vector2 windSpeed = fog->getWindSpeed();
-		Vector4 t = Vector4(time, windSpeed.x + (i % 3) * 0.00001, windSpeed.y + (i % 3) * 0.000015, 0.0);
+		Vector4 t = Vector4(time, windSpeed.x + (i % 3) * 0.00001, windSpeed.y + (i % 3) * 0.000015, 0.0) * (1 / (1 + object->getPosition().y * 0.25));
 		deviceContext->Map(fogAnimationBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &t, sizeof(Vector4));
 		deviceContext->Unmap(fogAnimationBuffer.Get(), 0);
