@@ -5,7 +5,7 @@
 
 std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Pleasant", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset", "Chrome", "Graveyard", "Pleasant" };
 
-std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "polis", "heim", " Meadows", " Creek", " Base", " Metropolis" };
+std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "opolis", "heim", " Meadows", " Creek", " Base", " Metropolis" };
 
 auto generateCityName( RNG &rng ) noexcept {
 	return std::string(util::randomElementOf(cityPrefix, rng)) + util::randomElementOf(citySuffix, rng);
@@ -742,8 +742,8 @@ Opt<Lot>  Map::findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool>
 	Vector<V2u> eliminatedPositions {};
 
 	Bounds districtBounds = districtMap->computeCellBounds(districtId);
-	auto genX = U32_Dist { districtBounds.min.x, districtBounds.max.x-width  };
-	auto genY = U32_Dist { districtBounds.min.y, districtBounds.max.y-length };
+	auto genX = U32_Dist { districtBounds.min.x, districtBounds.max.x-width+1  };
+	auto genY = U32_Dist { districtBounds.min.y, districtBounds.max.y-length+1 };
 	
 
 	for ( U32 attempt = 0;  attempt < maxTries;  ++attempt ) {
@@ -881,14 +881,14 @@ void Map::generateRoadDistanceMap() noexcept
 {
 	DBG_PROBE(Map::generateRoadDistanceMap);
 
-	U16 searchRadius = config.distanceMapSearchRadius;
+	U32 searchRadius = config.distanceMapSearchRadius;
 
 	struct  TileDistanceEntry {
 		F32   distance;
 		V2u   position;
 	};
 
-	auto  candidates { Vector<TileDistanceEntry>( (searchRadius*2+1) * (searchRadius*2+1) ) };
+	auto  candidates { Vector<TileDistanceEntry>( (Size(searchRadius)*2+1) * (Size(searchRadius)*2+1) ) };
 
 	auto manhattanDistance = []( V2u const &a, V2u const &b ) {
 		return F32( util::abs<I32>( I32(a.x) - b.x )  +  util::abs<I32>( I32(a.y)- b.y ) );

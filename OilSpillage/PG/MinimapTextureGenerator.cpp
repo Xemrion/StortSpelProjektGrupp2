@@ -12,11 +12,11 @@ static auto constexpr scanlineInterval {  4U  }; // lines between scanlines
 static auto constexpr scanlineStrength { .03f }; // brightening/darkening impact of scanlines; 0 = disabled
 static auto constexpr multitileBorder  {  1U  }; // thickness of border around multitile houses (in pixels)
 static auto constexpr roadBorder       {  1U  }; // thickness of sidewalk around roads          (in pixels)
+static auto constexpr districtBlendFac { .1f };
 
 #pragma warning( disable : 4715 ) 
 String createMinimapTexture( Map const &map, Bool isDistrictColoured )
 {
-	static auto constexpr districtBlendFac { .05f };
 	auto numDistricts = District::Type::size();
 	Vector<RGBA> districtColors( numDistricts );
 					 districtColors[District::residential  .index] = 0xFF'00FFFF;
