@@ -259,9 +259,9 @@ void Map::generateZebraCrossings()
 										+ (tilemap->neighbourIsRoad( Direction::east,  x, y )? 1:0)
 										+ (tilemap->neighbourIsRoad( Direction::south, x, y )? 1:0)
 										+ (tilemap->neighbourIsRoad( Direction::west,  x, y )? 1:0);
-				if ( (connections == 2) and (generateSelection(rng) <= 15ssss.0f) ) {
+				if ( (connections == 2) and (generateSelection(rng) <= 15.0f) ) {
 					if ( isVertical )
-						instantiateCrossing( tilemap->convertTilePositionToWorldPosition(x,y), 180.0f );
+						instantiateCrossing( tilemap->convertTilePositionToWorldPosition(x,y), 90.0f );
 					else if ( isHorizontal )
 						instantiateCrossing( tilemap->convertTilePositionToWorldPosition(x,y), .0f );
 				}
