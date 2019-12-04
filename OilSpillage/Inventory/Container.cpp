@@ -9,7 +9,7 @@ Container::Container()
 
 Container::~Container()
 {
-	for (int i = 0; i < ItemType::TYPES_SIZE; i++)
+	for (int i = 0; i < ItemType::TYPES_SIZEOF; i++)
 	{
 		for (Container::Slot* slot : this->itemLists[i])
 		{
@@ -27,7 +27,7 @@ int Container::getItemCount() const
 {
 	int count = 0;
 
-	for (int i = 0; i < ItemType::TYPES_SIZE; i++)
+	for (int i = 0; i < ItemType::TYPES_SIZEOF; i++)
 	{
 		count += this->itemLists[i].size();
 	}
@@ -64,7 +64,7 @@ bool Container::containsItem(Slot* slot)
 
 bool Container::containsItem(Item* item)
 {
-	for (int i = 0; i < ItemType::TYPES_SIZE; i++)
+	for (int i = 0; i < ItemType::TYPES_SIZEOF; i++)
 	{
 		for (Container::Slot* slot : this->itemLists[i])
 		{

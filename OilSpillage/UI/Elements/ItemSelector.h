@@ -27,8 +27,8 @@ private:
 	int selectedIndexLastDraw;
 	int startIndexLastDraw;
 	int selectedType;
-	int selectedIndex[ItemType::TYPES_SIZE];
-	int startIndex[ItemType::TYPES_SIZE];
+	int selectedIndex[ItemType::TYPES_SIZEOF];
+	int startIndex[ItemType::TYPES_SIZEOF];
 public:
 	static Vector2 size;
 

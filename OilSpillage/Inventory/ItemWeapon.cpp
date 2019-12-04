@@ -23,7 +23,7 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 		stream << "Fire Rate: " << weapon.fireRate << "\n";
 		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
 		stream << "Max Spread: " << weapon.maxSpread << "\n";
-		stream << "DoT: " << "True" << "\n";
+		stream << "DoT: " << weapon.doesDoT << "\n";
 	}
 	else if(weapon.type == WeaponType::Spikes){
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
@@ -40,9 +40,8 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 	return stream.str();
 }
 
-ItemWeapon::ItemWeapon(std::string name, Weapon weapon, GameObject * object) : Item(name, generateDescription(weapon), ItemType::WEAPON, object), weapon(weapon)
+ItemWeapon::ItemWeapon(std::string name, Weapon weapon, GameObject * object) : Item(name, generateDescription(weapon), ItemType::TYPE_WEAPON, object), weapon(weapon)
 {
-
 }
 
 ItemWeapon::~ItemWeapon()
@@ -57,11 +56,6 @@ ItemWeapon::ItemWeapon(const ItemWeapon& obj) : Item(obj)
 Item* ItemWeapon::clone() const
 {
 	return new ItemWeapon(*this);
-}
-
-bool ItemWeapon::operator==(const ItemWeapon& other) const
-{
-	return Item::operator==(other) /*&& this->weapon == other.weapon*/;
 }
 
 void ItemWeapon::randomize()

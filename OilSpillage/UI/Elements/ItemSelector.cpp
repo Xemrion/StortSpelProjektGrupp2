@@ -130,11 +130,11 @@ void ItemSelector::changeSelectedType(bool down)
 {
 	if (down)
 	{
-		this->selectedType = (this->selectedType + 1) % ItemType::TYPES_SIZE;
+		this->selectedType = (this->selectedType + 1) % ItemType::TYPES_SIZEOF;
 	}
 	else
 	{
-		this->selectedType = (this->selectedType - 1 + ItemType::TYPES_SIZE) % ItemType::TYPES_SIZE;
+		this->selectedType = (this->selectedType - 1 + ItemType::TYPES_SIZEOF) % ItemType::TYPES_SIZEOF;
 	}
 
 	int listSize = Container::playerInventory->getItemStack(static_cast<ItemType>(this->selectedType))->size();

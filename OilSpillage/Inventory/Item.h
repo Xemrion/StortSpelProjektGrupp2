@@ -8,11 +8,11 @@
 
 enum ItemType
 {
-	WEAPON,
-	GADGET,
-	CHASSI,
-	WHEEL,
-	TYPES_SIZE
+	TYPE_WEAPON,
+	TYPE_GADGET,
+	TYPE_CHASSI,
+	TYPE_WHEEL,
+	TYPES_SIZEOF
 };
 
 class Item
@@ -35,7 +35,6 @@ public:
 	virtual ~Item();
 	Item(const Item& obj);
 	virtual Item* clone()const;
-	virtual bool operator==(const Item& other) const;
 
 	virtual void randomize();
 

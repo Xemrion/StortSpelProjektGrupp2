@@ -23,6 +23,8 @@ CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position), used
 	this->slots[Slots::BACK] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x / 2 - ItemSlot::size.x / 2, CarGadgetSelector::size.y - ItemSlot::size.y - 32.0f), false);
 	this->slots[Slots::LEFT] = std::make_unique<ItemSlot>(position + Vector2(21.0f, CarGadgetSelector::size.y / 2 - ItemSlot::size.y / 2), false);
 	this->slots[Slots::RIGHT] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x - ItemSlot::size.y - 21.0f, CarGadgetSelector::size.y / 2 - ItemSlot::size.y / 2), false);
+	this->slots[Slots::WHEEL] = std::make_unique<ItemSlot>();
+	this->slots[Slots::CHASSI] = std::make_unique<ItemSlot>();
 
 	this->slots[Slots::FRONT]->setNeighbours(this->slots[Slots::LEFT].get(), this->slots[Slots::RIGHT].get(), this->slots[Slots::BACK].get(), this->slots[Slots::MOUNTED].get());
 	this->slots[Slots::MOUNTED]->setNeighbours(this->slots[Slots::LEFT].get(), this->slots[Slots::RIGHT].get(), this->slots[Slots::FRONT].get(), this->slots[Slots::BACK].get());
@@ -41,7 +43,7 @@ void CarGadgetSelector::draw(bool selected)
 	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), this->position);
 	UserInterface::getSpriteBatch()->Draw(this->textureCar->getShaderResView(), this->position + (CarGadgetSelector::size * 0.5f - this->textureCar->getCenter()));
 
-	for (int i = 0; i < Slots::SIZEOF; i++)
+	for (int i = 0; i < 5/*Slots::SIZEOF*/; i++)
 	{
 		this->slots[i]->draw(slots[i].get() == this->selected);
 	}
@@ -69,6 +71,14 @@ void CarGadgetSelector::init()
 		this->used[static_cast<Slots>(i)] = vehicleSlots->getInventorySlot(static_cast<Slots>(i));
 		this->slots[i]->setSlot(vehicleSlots->getInventorySlot(static_cast<Slots>(i)));
 	}
+}
+
+void CarGadgetSelector::setSlot(Slots slots, Container::Slot* slot)
+{
+	auto temp = this->selected;
+	this->selected = this->slots[slots].get();
+	this->setSlotOfSelected(slot);
+	this->selected = temp;
 }
 
 void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
@@ -110,7 +120,7 @@ void CarGadgetSelector::setSlotOfSelected(Container::Slot* slot)
 	}
 }
 
-void CarGadgetSelector::removeSlotOfSelected(Container::Slot* slot)
+void CarGadgetSelector::removeSlot(Container::Slot* slot)
 {
 	for (int i = 0; i < Slots::SIZEOF; i++)
 	{

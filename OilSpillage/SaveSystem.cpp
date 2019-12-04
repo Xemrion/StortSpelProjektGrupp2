@@ -181,7 +181,7 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 	info.highScoreTotal = saveSystem.getInteger("GameScore");
 	info.time = saveSystem.getFloat("GameTime");
 
-	int itemSlots[] = { -1, -1, -1, -1, -1 };
+	int itemSlots[] = { -1, -1, -1, -1, -1, -1, -1 };
 	for (int i = 0; i < Slots::SIZEOF; i++)
 	{
 		if (saveSystem.existsInteger("Slot" + std::to_string(i)))
@@ -198,6 +198,16 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 		std::replace(name.begin(), name.end(), '#', ' ');
 		std::string className = saveSystem.getString("Item" + std::to_string(i) + "Class");
 
+		GameObject* object = new GameObject(*Item::getObjectByName(name));
+		if (object)
+		{
+			Vector4 color;
+			color.x = saveSystem.getFloat("Item" + std::to_string(i) + "BaseColorX");
+			color.y = saveSystem.getFloat("Item" + std::to_string(i) + "BaseColorY");
+			color.z = saveSystem.getFloat("Item" + std::to_string(i) + "BaseColorZ");
+			object->setColor(color);
+		}
+		
 		if (className == "ItemWeapon")
 		{
 			Weapon weapon;
@@ -218,7 +228,21 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 			weapon.melee = saveSystem.getInteger("Item" + std::to_string(i) + "Melee") == 1;
 			weapon.doesDoT = saveSystem.getInteger("Item" + std::to_string(i) + "DoT") == 1;
 
-			Container::playerInventory->addItem(new ItemWeapon(name, weapon, new GameObject(*Item::getObjectByName(name))));
+			Container::playerInventory->addItem(new ItemWeapon(name, weapon, object));
+		}
+		else if (className == "ItemWheel")
+		{
+			float acceleration = saveSystem.getFloat("Item" + std::to_string(i) + "AccelRate");
+			float handling = saveSystem.getFloat("Item" + std::to_string(i) + "Handling");
+
+			Container::playerInventory->addItem(new ItemWheel(name, acceleration, handling, object));
+		}
+		else if (className == "ItemChassi")
+		{
+			float maxHealth = saveSystem.getFloat("Item" + std::to_string(i) + "MaxHealth");
+			float topSpeed = saveSystem.getFloat("Item" + std::to_string(i) + "TopSpeed");
+
+			Container::playerInventory->addItem(new ItemChassi(name, maxHealth, topSpeed, object));
 		}
 		else
 		{
@@ -228,7 +252,7 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 			std::replace(description.begin(), description.end(), '$', '\n');
 			std::replace(description.begin(), description.end(), '#', ' ');
 
-			Container::playerInventory->addItem(new Item(name, description, type, new GameObject(*Item::getObjectByName(name))));
+			Container::playerInventory->addItem(new Item(name, description, type, object));
 		}
 
 		for (int j = 0; j < Slots::SIZEOF; j++)
@@ -254,7 +278,7 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 	saveSystem.set("GameScore", info.highScoreTotal);
 	saveSystem.set("GameTime", static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
 
-	for (int i = 0; i < ItemType::TYPES_SIZE; i++)
+	for (int i = 0; i < ItemType::TYPES_SIZEOF; i++)
 	{
 		auto stack = Container::playerInventory->getItemStack(static_cast<ItemType>(i));
 
@@ -266,8 +290,13 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 			std::replace(name.begin(), name.end(), '\n', '$');
 			std::replace(name.begin(), name.end(), ' ', '#');
 			saveSystem.set("Item" + std::to_string(itemId) + "Name", name);
+			saveSystem.set("Item" + std::to_string(itemId) + "BaseColorX", item->getBaseColor().x);
+			saveSystem.set("Item" + std::to_string(itemId) + "BaseColorY", item->getBaseColor().y);
+			saveSystem.set("Item" + std::to_string(itemId) + "BaseColorZ", item->getBaseColor().z);
 
 			ItemWeapon* itemWeapon = dynamic_cast<ItemWeapon*>(item);
+			ItemWheel* itemWheel = dynamic_cast<ItemWheel*>(item);
+			ItemChassi* itemChassi = dynamic_cast<ItemChassi*>(item);
 			if (itemWeapon)
 			{
 				Weapon weapon = itemWeapon->getWeapon();
@@ -289,6 +318,20 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 				saveSystem.set("Item" + std::to_string(itemId) + "DoT", weapon.doesDoT ? 1 : 0);
 
 				saveSystem.set("Item" + std::to_string(itemId) + "Class", "ItemWeapon");
+			}
+			else if (itemWheel)
+			{
+				saveSystem.set("Item" + std::to_string(itemId) + "AccelRate", itemWheel->getAccelerationRate());
+				saveSystem.set("Item" + std::to_string(itemId) + "Handling", itemWheel->getHandlingRate());
+
+				saveSystem.set("Item" + std::to_string(itemId) + "Class", "ItemWheel");
+			}
+			else if (itemChassi)
+			{
+				saveSystem.set("Item" + std::to_string(itemId) + "MaxHealth", itemChassi->getMaxHealth());
+				saveSystem.set("Item" + std::to_string(itemId) + "TopSpeed", itemChassi->getSpeed());
+
+				saveSystem.set("Item" + std::to_string(itemId) + "Class", "ItemChassi");
 			}
 			else
 			{

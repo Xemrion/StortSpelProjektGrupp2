@@ -25,7 +25,7 @@ public:
 
 	static std::unique_ptr<Container> playerInventory;
 private:
-	std::vector<Slot*> itemLists[ItemType::TYPES_SIZE];
+	std::vector<Slot*> itemLists[ItemType::TYPES_SIZEOF];
 	Slot* latest;
 public:
 	Container();

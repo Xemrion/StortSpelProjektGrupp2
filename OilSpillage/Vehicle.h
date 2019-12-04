@@ -6,9 +6,11 @@
 #include "VehicleStats.h"
 #include "Powerup.h"
 #include "Sound.h"
-#include"Lights.h"
-#include"Inventory/Item.h"
-#include"Inventory/ItemWeapon.h"
+#include "Lights.h"
+#include "Inventory/Item.h"
+#include "Inventory/ItemWeapon.h"
+#include "Inventory/ItemWheel.h"
+#include "Inventory/ItemChassi.h"
 #include "Inventory/Container.h"
 using namespace DirectX::SimpleMath;
 enum Slots
@@ -18,6 +20,8 @@ enum Slots
 	RIGHT,
 	MOUNTED,
 	BACK,
+	WHEEL,
+	CHASSI,
 	SIZEOF
 };
 struct VehicleSlots
@@ -180,8 +184,6 @@ private:
 	bool flameBool;
 	bool dmg;
 	Vector2 tempCurDir;
-	std::string curChassi;
-	std::string curWheel;
 	
 	int soundHandle = 0;
 	int driftHandle = 0;
@@ -227,9 +229,8 @@ public:
 	Vector3 getCameraDistance(float deltaTime);
 	void setAccelForce(Vector3 accelForce, float deltaTime);
 	void setWheelRotation(float deltaTime);
-	void setChassi(GameObject* newChassi, Stats stats);
-	void setWheels(GameObject* newWheel, Stats stats);
-	GameObject* getWheel();
+	void setChassi(ItemChassi* chassi);
+	void setWheels(ItemWheel* wheel);
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;
