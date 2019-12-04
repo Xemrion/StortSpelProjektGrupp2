@@ -340,9 +340,19 @@ bool Bullet::getFlame() const
 	return weapon.doesDoT;
 }
 
+float Bullet::getFlameTimer() const
+{
+	return weapon.doTTimer;
+}
+
 bool Bullet::getKnockback() const
 {
 	return weapon.doesKnockBack;
+}
+
+float Bullet::getKnockbackForce() const
+{
+	return weapon.knockbackForce;
 }
 
 bool Bullet::getSplashBool() const
