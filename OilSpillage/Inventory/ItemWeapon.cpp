@@ -91,12 +91,16 @@ void ItemWeapon::randomize()
 		{
 			weapon.doesDoT = true;
 		}
-		else if(chance > 10 && chance < 20)
+		else if(chance > 10 && chance <= 20)
 		{
 			weapon.doesKnockBack = true;
 		}
-		weapon.doesSplashDmg = true;
-		weapon.splashRange = 100;
+		else if (chance > 20 && chance <= 30)
+		{
+			weapon.doesSplashDmg = true;
+			weapon.splashRange = 100;
+		}
+
 	}
 	else if (weapon.type == WeaponType::Laser) 
 	{
