@@ -42,6 +42,7 @@ void Turret::update(float dt, const Vector3& targetPos)
 {
 	Actor::update(dt, targetPos);
 	updateBullets(dt);
+	onFire();
 }
 
 void Turret::createRigidbody(Physics* physics)

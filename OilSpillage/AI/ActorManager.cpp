@@ -7,7 +7,7 @@
 #include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
-
+#define SPAWN_ENEMIES 1
 ActorManager::ActorManager()
 {
 }
@@ -42,13 +42,14 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	updateActors(dt, targetPos);
 	updateBosses(dt, targetPos);
 
+#if SPAWN_ENEMIES
 	if (spawnTimer <= 0)
 	{
-
-		spawnEnemies(targetPos);
-
+		//spawnEnemies(targetPos);
+		
 		spawnTimer = spawnCooldown;
 	}
+#endif
 
 	Vector3 newPos;
 	float deltaX;
@@ -180,6 +181,27 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
+						if (bulletArray[j].getFlame())// Damage over Time
+						{
+							actors[i]->setFire(bulletArray[j].getFlameTimer());
+						}
+						if (bulletArray[j].getKnockback())// Knockback
+						{
+							actors[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
+						}
+						if (bulletArray[j].getSplashBool())
+						{
+							for (int k = 0; k < actors.size(); k++)
+							{
+								float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
+								float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
+								float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+								if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
+								{
+									actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+								}
+							}
+						}
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
 					}
 				}
@@ -189,6 +211,28 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
+					if(bulletArray[j].getFlame())// Damage over Time
+					{
+						actors[i]->setFire(bulletArray[j].getFlameTimer());
+					}
+					if(bulletArray[j].getKnockback())// Knockback
+					{
+						actors[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
+					}
+					if(bulletArray[j].getSplashBool())
+					{
+						for(int k = 0; k < actors.size(); k++)
+						{
+							float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
+							float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
+							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+							if(k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
+							{
+								actors[k]->changeHealth(-bulletArray[j].getDamage()/(20-Game::getGameInfo().nrOfClearedStages));
+							}
+						}
+					}
+
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					bulletArray[j].destroy();
 				}
@@ -197,6 +241,27 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (soundTimer > 0.05f) {
 						Sound::play("data/sound/HitSound.wav");
 						soundTimer = 0;
+					}
+					if (bulletArray[j].getFlame())// Damage over Time
+					{
+						actors[i]->setFire(bulletArray[j].getFlameTimer());
+					}
+					if (bulletArray[j].getKnockback())// Knockback
+					{
+						actors[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
+					}
+					if (bulletArray[j].getSplashBool())
+					{
+						for (int k = 0; k < actors.size(); k++)
+						{
+							float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
+							float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
+							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+							if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
+							{
+								actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+							}
+						}
 					}
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					// dont remove the melee weapon
@@ -226,6 +291,27 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 								Sound::play("./data/sound/HitSound.wav");
 								soundTimer = 0;
 							}
+							if (bulletArray[j].getFlame())// Damage over Time
+							{
+								bosses[i]->setFire(bulletArray[j].getFlameTimer());
+							}
+							if (bulletArray[j].getKnockback())// Knockback
+							{
+								bosses[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
+							}
+							if (bulletArray[j].getSplashBool())
+							{
+								for (int k = 0; k < actors.size(); k++)
+								{
+									float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
+									float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
+									float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+									if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
+									{
+										actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+									}
+								}
+							}
 							this->bosses[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
 						}
 					}
@@ -235,6 +321,27 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
+						if (bulletArray[j].getFlame())// Damage over Time
+						{
+							bosses[i]->setFire(bulletArray[j].getFlameTimer());
+						}
+						if (bulletArray[j].getKnockback())// Knockback
+						{
+							bosses[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
+						}
+						if (bulletArray[j].getSplashBool())
+						{
+							for (int k = 0; k < actors.size(); k++)
+							{
+								float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
+								float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
+								float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+								if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
+								{
+									actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+								}
+							}
+						}
 						this->bosses[i]->changeHealth(-bulletArray[j].getDamage());
 						bulletArray[j].destroy();
 					}
@@ -243,6 +350,27 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						if (soundTimer > 0.05f) {
 							Sound::play("data/sound/HitSound.wav");
 							soundTimer = 0;
+						}
+						if (bulletArray[j].getFlame())// Damage over Time
+						{
+							bosses[i]->setFire(bulletArray[j].getFlameTimer());
+						}
+						if (bulletArray[j].getKnockback())// Knockback
+						{
+							bosses[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
+						}
+						if (bulletArray[j].getSplashBool())
+						{
+							for (int k = 0; k < actors.size(); k++)
+							{
+								float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
+								float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
+								float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+								if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
+								{
+									actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+								}
+							}
 						}
 						this->bosses[i]->changeHealth(-bulletArray[j].getDamage());
 						// dont remove the melee weapon
@@ -336,7 +464,7 @@ void ActorManager::updateActors(float dt, const Vector3& targetPos)
 			if (normalizedRandom >= 0.995)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-					PowerUp(actors[i]->getPosition(),
+					PowerUp(actors[i]->getPosition(), physics, 
 						PowerUpType::Health)
 				);
 			}
@@ -586,14 +714,14 @@ void ActorManager::createGroup(DynamicActor* actor)
 	groups[groups.size() - 1].updateDuty();
 }
 
-const Vector3& ActorManager::predictPlayerPos(const Vector3& targetPos)
+Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 {
 	Vector3 targetVelocity = Vector3(static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->getRigidBody()->getLinearVelocity());
 	targetVelocity.Normalize();
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
-}
-const Vector3& ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
+} 
+Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
 	for (float i = 0;; i += 1.0) {

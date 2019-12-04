@@ -5,7 +5,7 @@ Attacker::Attacker()
 }
 
 Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
-	:DynamicActor(x, z,physics), Ranged(&this->position, &this->targetPos, &this->velocity,&this->deltaTime, weaponType)
+	:DynamicActor(x, z, physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
@@ -19,7 +19,7 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	Game::getGraphics().loadModel("Entities/Roller_Melee");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
-	this->attackRange = 10;
+	this->attackRange = 12;
 	createRigidbody(physics);
 	this->setPoints(100 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
 	scaling(weapon.damage, 1.1);
@@ -42,7 +42,7 @@ void Attacker::createRigidbody(Physics* physics)
 Attacker::~Attacker()
 {
 	Game::getGraphics().removeFromDraw(this);
-	if(this->isDead())
+	if (this->isDead())
 	{
 		Game::getGameInfo().nrOfAttackers++;
 	}
@@ -52,63 +52,32 @@ void Attacker::setUpActor()
 {
 	this->root = &bt.getSelector();
 	Sequence& sequence = bt.getSequence();
-	Selector& selector = bt.getSelector();
-	Sequence& seq2 = bt.getSequence();
 
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Attacker::inAttackRange, std::ref(*this)));
-	Behavior& chase = bt.getAction();
-	chase.addAction(std::bind(&Attacker::setChaseState, std::ref(*this)));
-	Behavior& roam = bt.getAction();
-	roam.addAction(std::bind(&Attacker::setIdleState, std::ref(*this)));
 	Behavior& shoot = bt.getAction();
 	shoot.addAction(std::bind(&Attacker::shoot, std::ref(*this)));
-	Behavior& inAggroRange = bt.getAction();
-	inAggroRange.addAction(std::bind(&Attacker::inAggroRange, std::ref(*this)));
 
 	root->addChildren(sequence);
-	root->addChildren(roam);
+	sequence.addChildren(inRange);
+	sequence.addChildren(shoot);
 
-	sequence.addChildren(inAggroRange);
-	sequence.addChildren(selector);
-
-	selector.addChildren(seq2);
-	selector.addChildren(chase);
-
-	seq2.addChildren(inRange);
-	
-	seq2.addChildren(shoot);
 }
 
-Vector3 Attacker::seek()
+Vector3 Attacker::calculateVelocity()
 {
-	Vector3 desiredDirection;
-	Vector3 offsetVec;
-	//standard group movement
-	if (!vActive)
-	{
-		desiredDirection -= position - destination;
-		if (this->stats.maxSpeed != 3.0)
-		{
-			this->stats.maxSpeed = 3.0;
-		}
-	}
+	//Move away from player if within 11, move towards it if further than 12, stand still if between the two
 
-	//strafe to the left of player
-	else if (vActive)
-	{
-		Vector3 crossVector = Vector3(position.x - destination.x, 0.0f, position.z - destination.z);
-		crossVector.Normalize();
-		crossVector *= -10;
-		desiredDirection -= position - (destination - crossVector);
-	}
-	
+	Vector3 desiredDirection = destination - position;
 
-	acceleration = desiredDirection - velocity;
-	if (acceleration.Length() > maxForce)
+	if (desiredDirection.Length() <= 11)
 	{
-		acceleration /= acceleration.Length();
+		desiredDirection = -desiredDirection;
 	}
-	return acceleration;
+	else if (desiredDirection.Length() < 12)
+	{
+		desiredDirection = Vector3();
+	}
+	return desiredDirection;
 }
 

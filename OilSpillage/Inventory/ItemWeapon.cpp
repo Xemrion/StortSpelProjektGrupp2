@@ -4,15 +4,40 @@
 std::string ItemWeapon::generateDescription(Weapon weapon)
 {
 	std::stringstream stream;
+	stream << std::boolalpha;
 	if (weapon.type == WeaponType::MachineGun) {
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
 		stream << "Fire Rate: " << weapon.fireRate << "\n";
 		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
 		stream << "Max Spread: " << weapon.maxSpread << "\n";
+		if(weapon.doesDoT)
+		{
+			stream << "DoT duration: " << weapon.doTTimer << "\n";
+		}
+		if (weapon.doesKnockBack)
+		{
+			stream << "Knockback force: " << weapon.knockbackForce << "\n";
+		}
+		if (weapon.doesSplashDmg)
+		{
+			stream << "Splash damage range: " << weapon.splashRange << "\n";
+		}
 	}
 	else if(weapon.type == WeaponType::Laser){
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
 		stream << "Overheat : " << weapon.maxSpread << "\n";
+		if (weapon.doesDoT)
+		{
+			stream << "DoT duration: " << weapon.doTTimer << "\n";
+		}
+		if (weapon.doesKnockBack)
+		{
+			stream << "Knockback force: " << weapon.knockbackForce << "\n";
+		}
+		if (weapon.doesSplashDmg)
+		{
+			stream << "Splash damage range: " << weapon.splashRange << "\n";
+		}
 
 	}
 	else if(weapon.type == WeaponType::Flamethrower) {
@@ -20,23 +45,58 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 		stream << "Fire Rate: " << weapon.fireRate << "\n";
 		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
 		stream << "Max Spread: " << weapon.maxSpread << "\n";
+		if (weapon.doesDoT)
+		{
+			stream << "DoT duration: " << weapon.doTTimer << "\n";
+		}
+		if (weapon.doesKnockBack)
+		{
+			stream << "Knockback force: " << weapon.knockbackForce << "\n";
+		}
+		if (weapon.doesSplashDmg)
+		{
+			stream << "Splash damage range: " << weapon.splashRange << "\n";
+		}
 	}
 	else if(weapon.type == WeaponType::Spikes){
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
+		if (weapon.doesDoT)
+		{
+			stream << "DoT duration: " << weapon.doTTimer << "\n";
+		}
+		if (weapon.doesKnockBack)
+		{
+			stream << "Knockback force: " << weapon.knockbackForce << "\n";
+		}
+		if (weapon.doesSplashDmg)
+		{
+			stream << "Splash damage range: " << weapon.splashRange << "\n";
+		}
 	}
 	else {
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
 		stream << "Fire Rate: " << weapon.fireRate << "\n";
 		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
 		stream << "Max Spread: " << weapon.maxSpread << "\n";
+		if (weapon.doesDoT)
+		{
+			stream << "DoT duration: " << weapon.doTTimer << "\n";
+		}
+		if (weapon.doesKnockBack)
+		{
+			stream << "Knockback force: " << weapon.knockbackForce << "\n";
+		}
+		if (weapon.doesSplashDmg)
+		{
+			stream << "Splash damage range: " << weapon.splashRange << "\n";
+		}
 	}
 	
 	return stream.str();
 }
 
-ItemWeapon::ItemWeapon(std::string name, Weapon weapon, GameObject * object) : Item(name, generateDescription(weapon), ItemType::WEAPON, object), weapon(weapon)
+ItemWeapon::ItemWeapon(std::string name, Weapon weapon, GameObject * object) : Item(name, generateDescription(weapon), ItemType::TYPE_WEAPON, object), weapon(weapon)
 {
-
 }
 
 ItemWeapon::~ItemWeapon()
@@ -51,11 +111,6 @@ ItemWeapon::ItemWeapon(const ItemWeapon& obj) : Item(obj)
 Item* ItemWeapon::clone() const
 {
 	return new ItemWeapon(*this);
-}
-
-bool ItemWeapon::operator==(const ItemWeapon& other) const
-{
-	return Item::operator==(other) /*&& this->weapon == other.weapon*/;
 }
 
 void ItemWeapon::randomize()
@@ -77,6 +132,23 @@ void ItemWeapon::randomize()
 		this->weapon.maxSpread = this->weapon.maxSpread + ((rand() % 101) * 0.01f+1.0f) * this->weapon.spreadRadians;
 		this->weapon.spreadIncreasePerSecond = this->weapon.spreadIncreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
 		this->weapon.spreadDecreasePerSecond = this->weapon.spreadDecreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		int chance = (rand() % 100) + 1;
+		if(chance <= 10)
+		{
+			weapon.doesDoT = true;
+			weapon.doTTimer = 2;
+		}
+		else if(chance > 10 && chance <= 20)
+		{
+			weapon.doesKnockBack = true;
+			weapon.knockbackForce = 2;
+		}
+		else if (chance > 20 && chance <= 30)
+		{
+			weapon.doesSplashDmg = true;
+			weapon.splashRange = 20;
+		}
+
 	}
 	else if (weapon.type == WeaponType::Laser) 
 	{
@@ -87,6 +159,22 @@ void ItemWeapon::randomize()
 		this->weapon.maxSpread = this->weapon.maxSpread * (((rand() % 101) * 0.01f) + (1 * Game::getLocalScale()));
 		this->weapon.spreadIncreasePerSecond = this->weapon.spreadIncreasePerSecond * 1/*(((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()))*/;
 		this->weapon.spreadDecreasePerSecond = this->weapon.spreadDecreasePerSecond *1 /*(((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()))*/;
+		int chance = (rand() % 100) + 1;
+		if (chance <= 10)
+		{
+			weapon.doesDoT = true;
+			weapon.doTTimer = 2;
+		}
+		else if (chance > 10 && chance <= 20)
+		{
+			weapon.doesKnockBack = true;
+			weapon.knockbackForce = 2;
+		}
+		else if (chance > 20 && chance <= 30)
+		{
+			weapon.doesSplashDmg = true;
+			weapon.splashRange = 20;
+		}
 	}
 	else if (weapon.type == WeaponType::Flamethrower) 
 	{
@@ -97,10 +185,37 @@ void ItemWeapon::randomize()
 		this->weapon.maxSpread = this->weapon.maxSpread + ((rand() % 101) * 0.01f + 1.0f) * this->weapon.spreadRadians;
 		this->weapon.spreadIncreasePerSecond = this->weapon.spreadIncreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
 		this->weapon.spreadDecreasePerSecond = this->weapon.spreadDecreasePerSecond * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
+		int chance = (rand() % 100) + 1;
+		if (chance > 10 && chance <= 20)
+		{
+			weapon.doesKnockBack = true;
+			weapon.knockbackForce = 2;
+		}
+		else if (chance > 20 && chance <= 30)
+		{
+			weapon.doesSplashDmg = true;
+			weapon.splashRange = 20;
+		}
 	}
 	else if (weapon.type == WeaponType::Spikes) 
 	{
 		this->weapon.damage = static_cast<int>(this->weapon.damage * (((rand() % 500 + 200) * 0.01f) + (1 * Game::getLocalScale())));
+		int chance = (rand() % 100) + 1;
+		if (chance <= 10)
+		{
+			weapon.doesDoT = true;
+			weapon.doTTimer = 2;
+		}
+		else if (chance > 10 && chance <= 20)
+		{
+			weapon.doesKnockBack = true;
+			weapon.knockbackForce = 2;
+		}
+		else if (chance > 20 && chance <= 30)
+		{
+			weapon.doesSplashDmg = true;
+			weapon.splashRange = 20;
+		}
 		/*this->weapon.bulletSpeed = this->weapon.bulletSpeed * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
 		this->weapon.bulletLifetime = this->weapon.bulletLifetime * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
 		this->weapon.spreadRadians = this->weapon.spreadRadians * (((rand() % 1000 + 1) / 100) + (1));

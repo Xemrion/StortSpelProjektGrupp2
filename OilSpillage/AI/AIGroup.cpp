@@ -1,4 +1,5 @@
 #include "AIGroup.h"
+#include <algorithm>
 
 AIGroup::AIGroup()
 {
@@ -13,7 +14,6 @@ void AIGroup::update(const Vector3& targetPos)
 {
 	removeDeadActors();
 	updateAveragePos();
-	formation(targetPos);
 }
 
 const Vector3& AIGroup::getAveragePos() const
@@ -44,39 +44,12 @@ void AIGroup::setPath(std::vector<Vector3> path)
 {
 	this->path = path;
 }
-void AIGroup::formation(const Vector3& targetPos)
-{
-	float deltaX = averagePos.x - targetPos.x;
-	float deltaZ = averagePos.z - targetPos.z;
-	float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-
-	if (distance < 70 && distance > 3)
-	{
-		this->groupRadius = expandedGroupRadius;
-		for (int i = 0; i < actors.size(); i++)
-		{
-			actors[i]->vActive = true;
-			actors[i]->groupPos = averagePos;
-		}
-	}
-	else
-	{
-		this->groupRadius = defaultGroupRadius;
-	}
-}
 
 void AIGroup::updateDuty()
 {
 	for (int i = 0; i < actors.size(); i++)
 	{
-		if (i < actors.size() / 2)
-		{
-			actors[i]->duty = 1;
-		}
-		else
-		{
-			actors[i]->duty = 2;
-		}
+		actors[i]->duty = i % 2;
 	}
 }
 
@@ -87,11 +60,10 @@ const float AIGroup::getGroupRadius() const
 
 void AIGroup::removeDeadActors()
 {
-	for (int i = actors.size() - 1; i >= 0; i--)
-	{
-		if (actors[i]->isDead())
-		{
-			actors.erase(actors.begin() + i);
-		}
-	}
+	actors.erase( std::remove_if( actors.begin(),
+		                           actors.end(),
+		                           []( DynamicActor const *e ) {
+		                                 return e->isDead();
+		                           } ),
+		           actors.end() );
 }

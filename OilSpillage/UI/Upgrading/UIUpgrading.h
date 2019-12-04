@@ -6,7 +6,8 @@
 #include "../Elements/CarGadgetSelector.h"
 #include "../Elements/VehicleStatBox.h"
 #include "../Elements/ButtonPromtBar.h"
-#include"../..//Vehicle.h"
+#include"../../Vehicle.h"
+#include"../../Texture.h"
 
 class UIUpgrading : public UserInterface
 {

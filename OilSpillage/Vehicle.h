@@ -6,9 +6,11 @@
 #include "VehicleStats.h"
 #include "Powerup.h"
 #include "Sound.h"
-#include"Lights.h"
-#include"Inventory/Item.h"
-#include"Inventory/ItemWeapon.h"
+#include "Lights.h"
+#include "Inventory/Item.h"
+#include "Inventory/ItemWeapon.h"
+#include "Inventory/ItemWheel.h"
+#include "Inventory/ItemChassi.h"
 #include "Inventory/Container.h"
 using namespace DirectX::SimpleMath;
 enum Slots
@@ -18,13 +20,16 @@ enum Slots
 	RIGHT,
 	MOUNTED,
 	BACK,
+	WHEEL,
+	CHASSI,
 	SIZEOF
 };
 struct VehicleSlots
 {
+private:
 	Item* slots[Slots::SIZEOF];
 	Container::Slot* inventorySlots[Slots::SIZEOF];
-
+public:
 	void setSlot(Slots slot, Item* item, Container::Slot* inventorySlot)
 	{
 		if (this->slots[int(slot)] != nullptr)
@@ -45,7 +50,7 @@ struct VehicleSlots
 			}
 		}
 	};
-	Item* getSlot(Slots slot)
+	Item* getItem(Slots slot)
 	{
 		if (this->slots[int(slot)] != nullptr)
 		{
@@ -66,6 +71,18 @@ struct VehicleSlots
 		{
 			return nullptr;
 		}
+	};
+	int checkForSlot(Container::Slot* inventorySlot)
+	{
+		for (int i = 0; i < Slots::SIZEOF; i++)
+		{
+			if (this->inventorySlots[i] == inventorySlot)
+			{
+				return i;
+			}
+		}
+
+		return -1;
 	};
 	VehicleSlots()
 	{
@@ -129,6 +146,7 @@ private:
 	float respawnTimer;
 	float totalRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
+	float particleTimer = 0.0f;
 
 	VehicleSlots* vehicleSlots;
 
@@ -185,6 +203,7 @@ private:
 	float velocitySpeed;
 	class Physics* physics;
 public:
+	float fireTimer;
 	Vehicle();
 	virtual ~Vehicle();
 
@@ -211,6 +230,8 @@ public:
 	Vector3 getCameraDistance(float deltaTime);
 	void setAccelForce(Vector3 accelForce, float deltaTime);
 	void setWheelRotation(float deltaTime);
+	void setChassi(ItemChassi* chassi);
+	void setWheels(ItemWheel* wheel);
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;
@@ -233,6 +254,9 @@ public:
 	void addPowerUp(PowerUpType p);
 	void updatePowerUpEffects(float deltaTime);
 	float getPowerUpTimer(PowerUpType p);
+
+	void onFire(float dt);
+	void setFire();
 };
 
 #endif // !VEHICLE_H
