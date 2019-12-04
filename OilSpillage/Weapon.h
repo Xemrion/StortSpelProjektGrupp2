@@ -44,9 +44,14 @@ struct Weapon
 	WeaponType type = WeaponType::Default;
 	bool melee = false;
 	bool doesDoT = false;
+	bool doesSplashDmg = false;
+	float splashRange = 0.0;
 	float soundTimer = 0.0f;
 	float timeSinceLastShot = 0.0f;
 	bool flameBool = false;
+	float doTTimer = 0.0f;
+	bool doesKnockBack = false;
+	float knockbackForce = 0.0f;
 	int soundHandle = 0;
 	Vector3 lightColor = Vector3(0, 0, 0);
 	Light* light = nullptr;
@@ -82,7 +87,7 @@ public:
 		//damage	fireRate	bulletSpeed		bulletLifetime	bulletScale			spreadRadians maxSpread spreadIncreasePerSecond currentSpreadIncrease spreadDecreasePerSecond  remainingCooldown WeaponType melee dot
 		Weapon(), //default gun
 		{      6,      0.05f,        55.0f,          1.4f,		Vector3(0.07f, 0.07f, 0.3f),	 0.1f,  0.3f,  0.11f,  0.0f,  0.7f,  0.0,  WeaponType::MachineGun },
-		{     10,       1.5f,        13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::MissileLauncher },
+		{     10,       1.5f,        13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::MissileLauncher, false, false, true },
 		{      2,     0.015f,         0.0f,         0.15f,		Vector3(0.37f, 0.37f, 50.0f),	 0.0f,  5.0f,  1.75f,  0.0f,  1.5f,  0.0,  WeaponType::Laser },
 		{    300,       1.5f,         0.0f,         0.15f,		Vector3(0.17f, 0.17f, 30.0f),	 0.0f,  0.0f,  0.11f,  0.0f,  2.0f,  0.0,  WeaponType::Railgun },
 		{      4,      0.01f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Flamethrower, false, true },
@@ -199,6 +204,11 @@ public:
 	float getDamage() const;
 	bool getMelee() const;
 	bool getFlame() const;
+	float getFlameTimer()const;
+	bool getKnockback() const;
+	float getKnockbackForce() const;
+	bool getSplashBool() const;
+	float getSplashRange() const;
 	void shoot(Weapon& weapon, const Vector3& position, const Vector3& normalizedDir,const Vector3& additionalVelocity, float deltaTime);
 	void update(float deltaTime);
 	float getTimeLeft() const;

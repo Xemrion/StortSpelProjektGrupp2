@@ -679,7 +679,7 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	Frustum frustum = shadowMap.getSunFrustum();
 	Frustum spotFrustum = shadowMap.getSpotFrustum();
 
-	shadowMap.setDSun();
+	
 	for (GameObject* object : drawableObjects)
 	{
 		AABB boundingBox = object->getAABB();
@@ -693,16 +693,24 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 			shadowMap.setWorld(worldTr);
 			deviceContext->PSSetShader(nullptr, nullptr, 0);
 			deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+			
 			if (object->getSunShadow())
 			{
+				shadowMap.setDSun();
+				deviceContext->Draw(vertexCount, 0);
+			}
+
+			if (object->getSpotShadow() && spotFrustum.intersect(boundingBox, 5.0f, false))
+			{
+				shadowMap.setDSpot();
 				deviceContext->Draw(vertexCount, 0);
 			}
 
 		}
 	}
 
-	shadowMap.setDSpot();
-	for (GameObject* object : drawableObjects)
+	
+	/*for (GameObject* object : drawableObjects)
 	{
 		AABB boundingBox = object->getAABB();
 		if (frustum.intersect(boundingBox, 0.0f))
@@ -721,11 +729,11 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 				deviceContext->Draw(vertexCount, 0);
 			}
 		}
-	}
+	}*/
 
 	std::vector<GameObject*> objects;
 	quadTree->getGameObjects(objects, frustum, 0.0f);
-	shadowMap.setDSun();
+	
 	for (GameObject* o : objects)
 	{
 		AABB boundingBox = o->getAABB();
@@ -739,12 +747,19 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		if (o->getSunShadow())
 		{
+			shadowMap.setDSun();
+			deviceContext->Draw(vertexCount, 0);
+		}
+
+		if (o->getSpotShadow() && spotFrustum.intersect(boundingBox, 5.0f))
+		{
+			shadowMap.setDSpot();
 			deviceContext->Draw(vertexCount, 0);
 		}
 	}
 
-	shadowMap.setDSpot();
-	for (GameObject* o : objects)
+	
+	/*for (GameObject* o : objects)
 	{
 		AABB boundingBox = o->getAABB();
 		UINT vertexCount = o->mesh->getVertexCount();
@@ -756,11 +771,8 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 		deviceContext->PSSetShader(nullptr, nullptr, 0);
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 
-		if (o->getSpotShadow() && spotFrustum.intersect(boundingBox, 5.0f))
-		{
-			deviceContext->Draw(vertexCount, 0);
-		}
-	}
+		
+	}*/
 }
 
 bool Graphics::createShaders()
