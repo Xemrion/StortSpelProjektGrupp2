@@ -102,7 +102,7 @@ PowerUp::~PowerUp()
 	Game::getGraphics().removeFromDraw(this);
 }
 
-void PowerUp::update(float deltaTime, Vector3 playerPos)
+void PowerUp::update(float deltaTime, Vector3 playerPos) 
 {
 	this->time += deltaTime;
 	if (this->currentRespawnTimer > 0.0)
@@ -135,7 +135,7 @@ void PowerUp::update(float deltaTime, Vector3 playerPos)
 		  sqrtf((this->position.x - playerPos.x) * (this->position.x - playerPos.x) +
 				(this->position.y - playerPos.y) * (this->position.y - playerPos.y) +
 				(this->position.z - playerPos.z) * (this->position.z - playerPos.z));
-	if (distanceFromPlayerToPowerup <= 17.5) //increases when player dead, do another check for player hp?, send in here then check
+	if (distanceFromPlayerToPowerup <= 17.5) //do another check for player hp
 	{
 		this->acceleration += accelerationChange;
 	}
