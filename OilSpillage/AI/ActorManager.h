@@ -18,9 +18,8 @@ public:
 	void createSniper(float x, float z, int weaponType = 0);
 	void createTurret(float x, float z, int weaponType = 0);
 	void createSwarm(float x, float z);
-	Boss* createBoss(float x, float z, int weaponType);
+	Boss* createBoss(float x, float z, int weaponType, float scalingNr);
 
-	void createSpitFire(float x, float z);
 	void createChaseCar(float x, float z);
 	void createShootCar(float x, float z, int weaponType = 0);
 
@@ -31,9 +30,7 @@ public:
 	void spawnChaseCars(const Vector3& originPos);
 	void spawnShootCars(const Vector3& originPos);
 	void spawnSwarm(const Vector3& originPos);
-	void spawnTurrets(const Vector3& position, Radius radius, float angle);
 
-	void seperation(const Vector3& targetPos);
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size, float deltaTime);
 private:
 	const int maxNrOfEnemies = 25;
@@ -44,9 +41,8 @@ private:
 	Physics* physics;
 	Map* map;
 	std::mt19937* rng;
-	void updateAveragePos();
-	void updateActors(float dt, Vector3 targetPos);
-	void updateBosses(float dt, Vector3 targetPos);
+	void updateActors(float dt, const Vector3& targetPos);
+	void updateBosses(float dt, const Vector3& targetPos);
 	//Returns index for the group within the radius with the most members
 	int groupInRange(const Vector3& actorPos, int currentGroupSize);
 	void joinGroup(DynamicActor* actor, int groupIndex);
@@ -59,10 +55,8 @@ private:
 	void initGroupForActor(DynamicActor* actor);
 	void createGroup(DynamicActor* actor);
 	Vector3 predictPlayerPos(const Vector3& targetPos);
-	Vector3 generateObjectivePos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept;
+	Vector3 findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept;
 	std::vector<AIGroup> groups;
-	Vector2& generateRandom(const float& x, const float& z, Radius radius);
-	Vector2& generateAroundaPoint(const float& x, const float& z, float angle);
 	std::vector<DynamicActor*> actors;
 	std::vector<Boss*> bosses;
 	TurretHandler turretHandler;

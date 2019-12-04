@@ -55,7 +55,7 @@ void ItemSelector::update(float deltaTime)
 {
 	std::vector<Container::Slot*>* list = nullptr;
 
-	if (this->selectedTypeLastDraw == -1)
+	if (this->selectedTypeLastDraw == -1 && Container::playerInventory->getItemStack(static_cast<ItemType>(this->selectedType))->size() > 0)
 	{
 		this->addTextbox();
 	}
@@ -105,6 +105,8 @@ void ItemSelector::update(float deltaTime)
 			rotationTimers[i] = std::fmodf(rotationTimers[i] + deltaTime * 4, XM_2PI);
 			rotation[i] = Quaternion::Slerp(rotation[i], Quaternion::CreateFromYawPitchRoll(rotationTimers[i],0,0), deltaTime * 10);
 			transforms[i] = Item::generateTransform(object, this->position + Vector2(145.0f + 96.0f * i, 140.0f), Vector3(1.5f), rotation[i], true);
+			Game::getGraphics().setSelectedUI(object,&transforms[i]);
+
 		}
 		else
 		{

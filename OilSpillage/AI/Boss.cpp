@@ -8,6 +8,7 @@ Boss::Boss()
 	this->timeRotateDelay = 0;
 	this->rotationVar = 0;
 	this->phase = 1;
+	this->scalingNr = 1;
 	this->phaseShoot = this->phase;
 	this->currentPointNr = 0;
 	this->dt = 0;
@@ -40,6 +41,7 @@ Boss::Boss(Boss&& boss)
 	this->timeTilRotationChange = boss.timeTilRotationChange;
 	this->rotationVar = boss.rotationVar;
 	this->phase = boss.rotationVar;
+	this->scalingNr = boss.scalingNr;
 	this->phaseShoot = this->phase;
 	this->currentPointNr = boss.currentPointNr;
 	this->currentPoint = boss.currentPoint;
@@ -49,9 +51,10 @@ Boss::Boss(Boss&& boss)
 	//weakspots
 	this->weakSpots.push_back(boss.weakSpots[0]);
 	this->weakSpots.push_back(boss.weakSpots[1]);
+	this->setPoints(2000 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
 }
 
-Boss::Boss(float x, float z, int weaponType, Physics* physics)
+Boss::Boss(float x, float z, int weaponType, Physics* physics, float scalingNr)
 	:DynamicActor(x, z, physics), BossAbilities(&this->position, &this->targetPos, &this->velocity, weaponType)
 {
 	setUpActor();
@@ -73,6 +76,7 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 	this->timeTilRotationChange = 0.0f;
 	this->rotationVar = 0;
 	this->phase = 1;
+	this->scalingNr = scalingNr;
 	this->phaseShoot = this->phase;
 	this->currentPointNr = 0;
 	this->currentPoint = { 0, 0, 0 };
@@ -81,8 +85,8 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 
 
 	//weakpoints
-	this->weakSpots.push_back(Weakspot(0));
-	this->weakSpots.push_back(Weakspot(0));
+	this->weakSpots.push_back(Weakspot(0, this->scalingNr));
+	this->weakSpots.push_back(Weakspot(0, this->scalingNr));
 	this->initiateWeakPoints();
 
 	btRigidBody* tempo = physics->addSphere(3.5f, btVector3(position.x, position.y, position.z), 1.5f, this);
@@ -96,7 +100,10 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics)
 Boss::~Boss()
 {
 	Game::getGraphics().removeFromDraw(this);
-	Game::getGameInfo().nrOfBosses++;
+	if (this->isDead())
+	{
+		Game::getGameInfo().nrOfBosses++;
+	}
 
 }
 
@@ -106,7 +113,7 @@ void Boss::update(float dt, const Vector3& targetPos)
 	Actor::update(dt, targetPos);
 	this->movementVariables(dt);
 	this->circulatePlayer(targetPos);
-
+	onFire();
 
 	if (this->phase == 1)
 		this->updateWeakPoints();
@@ -233,16 +240,8 @@ void Boss::movementVariables(float dt)
 
 void Boss::move()
 {
-	//To make the slow down not as abrupt
-	acceleration *= 0.4f;
-	// Update velocity
-	velocity += acceleration;
-	velocity += seek();
-	// Limit speed
-	if (velocity.Length() > maxForce)
-	{
-		velocity /= velocity.Length();
-	}
+	velocity += calculateVelocity();
+	velocity.Normalize();
 
 	if (this->phase == 1)
 		velocity *= 4.25;
@@ -278,22 +277,13 @@ void Boss::move()
 	}
 
 	//position = temp;, DOESNT SET BODY ANYMORE, JUST MOVING THE RIGID BODY
-	// Reset accelertion to 0 each cycle
-	acceleration *= 0;
 }
 
-Vector3 Boss::seek()
+Vector3 Boss::calculateVelocity()
 {
-	Vector3 desiredDirection;
-	desiredDirection -= position - this->currentPoint;
-	//desired *= maxSpeed;
+	Vector3 desiredDirection = this->currentPoint - position;
 
-	acceleration = desiredDirection - velocity;
-	if (acceleration.Length() > maxForce)
-	{
-		acceleration /= acceleration.Length();
-	}
-	return acceleration;
+	return desiredDirection - velocity;
 }
 
 void Boss::circulatePlayer(Vector3 targetPos)
@@ -324,6 +314,7 @@ void Boss::enterPhase2()
 	this->phaseShoot = this->phase;
 	this->switchWeapon();
 	this->stats = VehicleStats::AIBossWeak;
+	this->stats.maxHealth *= this->scalingNr;
 }
 
 void Boss::initiateWeakPoints()
@@ -442,32 +433,16 @@ void Boss::changeHealth(float amount)
 	else if (this->phase == 2)
 	{
 		setColor(Vector4(max(getColor().x + -amount * 0.1f, 0), getColor().y, getColor().z, 1));
-		this->setHealth(std::clamp(this->getHealth() + amount, 0.0f, this->stats.maxHealth));
+		this->setHealth(std::clamp(this->getHealth() + amount, 0.0f, (this->stats.maxHealth * this->scalingNr)));
 		Game::getGraphics().addParticle2(this->getPosition(), Vector3(0, 0, 0), 1, 0.5f);
 	}
 }
 
-const float Boss::getTotalWeakSpotCurrHp()
+const std::vector<Weakspot>& Boss::getWeakspots()
 {
-	float currentHP = 0;
-	for (int i = 0; i < this->weakSpots.size(); i++)
-	{
-		currentHP += this->weakSpots[i].getHealth();
-	}
-
-	return currentHP;
-}
-
-const float Boss::getTotalWeakSpotMaxHP()
-{
-	float maxHP = 0;
-	if (this->weakSpots.size() > 0)
-	{
-		maxHP = (this->weakSpots[0].getMaxHP() * 2); // 2 = nr of weakspots from the beginning
-	}
-
-	return maxHP;
+	return this->weakSpots;
 }
 
 
 //spin when entering phase 2
+//constrcutor gets nr of stages cleared och scales from that / 3 sains every 3 level is boss

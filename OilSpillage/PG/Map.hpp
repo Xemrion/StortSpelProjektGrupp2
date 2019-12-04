@@ -9,7 +9,7 @@
 #include "District.hpp"
 #include "Skyscraper.h"
 #include "../UI/Playing/UIPlaying.h"
-#include "Biome.hpp"
+#include "Environment.hpp"
 #include "../Lights.h"
 
 // TODO: refactor out
@@ -22,13 +22,14 @@ public:
 
 		model->mesh       = graphics.getMeshPointer( "Entities/Streetlight"   );
 		model->setScale({ .25f, .25f, .25f });
-		model->setColor({ 0.15f, .10f, .10f, 1.0f });
+		model->setColor({ .75f, .7f, .7f, 1.0f });
 		//model->setSpotShadow( false );
 		graphics.addToDraw( model.get() );
 
 		//model->mesh       = graphics.getMeshPointer( "Streetlight"   );
 		//model->setMaterial( graphics.getMaterial(    "Streetlight" ) );
 		model->setPosition( worldPosition+Vector3(.0f,-1.5f,.0f) );
+		model->setRotation( rotation );
 		//light = lights.addLight( PointLight(worldPosition+Vector3{.0f,5.0f,.0f}, {lightColor}, lightStrength) );
 		// rigid body?
 	}
@@ -135,12 +136,9 @@ class Map {
 public:
 	// for transition screen
 	struct Info {
-		Biome    biome;
-		Size     width,length;
-		String   name;
-		//Weather  weather; // clear, foggy(heavy, medium, slight), smog, fallout gas/smoke, cloudy, thunderstorm, rain, sandstorm, blizzard
-		//Time     time;    // day, sunrise, night, dusk, evening
-		// ...
+		Environment environment;
+		Size        width,length;
+		String      name;
 	};
 
 	Map( Graphics &, MapConfig const &, Physics *, LightList &lights );
@@ -167,9 +165,9 @@ public:
 	Direction                  getHospitalOrientation(   V2u const hospitalTilePos ) const noexcept;
 	Vector3                    getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept;
 	District::Enum             districtAt( U32 x, U32 y ) const noexcept;
-	Biome                      getBiome() const noexcept;
 	HouseGenData const &       getHouseData() const noexcept;
 	Info const &               getInfo() const noexcept;
+	Vector<F32> const &        getRoadDistanceMap() const noexcept;
 private:
 	void                       placeStreetlight( Vector3 const &worldPosition, Vector3 const &rotation={.0f,.0f,.0f} ) noexcept;
 	void                       generateDistricts();
@@ -180,7 +178,6 @@ private:
 	Opt<Lot>                   findRandomLot( U16 districtId ) noexcept;
 	Opt<Lot>                   findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
 	Vector<UPtr<GameObject>>   instantiateTilesAsModels() noexcept;
-	void                       instantiateHousesAsModels() noexcept;
 	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout &&, HouseTileset const & ) const noexcept;
 	CompositeHouse			   instantiateSkyscraper();
 	//void                       generateTransitions() noexcept;
@@ -203,9 +200,8 @@ private:
 	void                       generateRoadDistanceMap() noexcept;
 	Vector<UPtr<Streetlight>>  streetlights;
 	Vector<Opt<V2u>>           hospitalTable;
-	Biome                      biome;
 	HouseGenData               houses;
-	RNG                        rng; // TODO, instantiate in ctor
+	RNG                        rng;
 	Border                     border;
 	Info                       info;
 };

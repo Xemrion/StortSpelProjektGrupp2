@@ -167,6 +167,8 @@ private:
 	bool flameBool;
 	bool dmg;
 	Vector2 tempCurDir;
+	std::string curChassi;
+	std::string curWheel;
 	
 	int soundHandle = 0;
 	int driftHandle = 0;
@@ -185,6 +187,7 @@ private:
 	float velocitySpeed;
 	class Physics* physics;
 public:
+	float fireTimer;
 	Vehicle();
 	virtual ~Vehicle();
 
@@ -211,6 +214,9 @@ public:
 	Vector3 getCameraDistance(float deltaTime);
 	void setAccelForce(Vector3 accelForce, float deltaTime);
 	void setWheelRotation(float deltaTime);
+	void setChassi(GameObject* newChassi, Stats stats);
+	void setWheels(GameObject* newWheel, Stats stats);
+	GameObject* getWheel();
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;
@@ -233,6 +239,9 @@ public:
 	void addPowerUp(PowerUpType p);
 	void updatePowerUpEffects(float deltaTime);
 	float getPowerUpTimer(PowerUpType p);
+
+	void onFire(float dt);
+	void setFire();
 };
 
 #endif // !VEHICLE_H

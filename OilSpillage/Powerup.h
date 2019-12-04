@@ -20,15 +20,18 @@ class PowerUp : public GameObject
 	int soundHandle;
 	void loadModel();
 	void clone(const PowerUp& p);
+	Physics* physics;
+	float acceleration;
+	void initRigidBody();
 public:
 	PowerUp();
-	PowerUp(Vector3 position, PowerUpType type = PowerUpType::Time, float respawnTime = 10000000.0);
+	PowerUp(Vector3 position, Physics* physics, PowerUpType type = PowerUpType::Time, float respawnTime = 10000000.0);
 	PowerUp(const PowerUp& p);
 	PowerUp(PowerUp&& p) noexcept;
 	~PowerUp();
 	PowerUp& operator=(const PowerUp& p);
 	PowerUp& operator=(PowerUp&& p) noexcept;
-	void update(float time);
+	void update(float time, Vector3 playerPos);
 	void activate();
 	void deactivate();
 	bool isActive() const;

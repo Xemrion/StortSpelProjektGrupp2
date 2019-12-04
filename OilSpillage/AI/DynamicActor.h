@@ -8,42 +8,20 @@ public:
 	virtual ~DynamicActor();
 	void setPath(Vector3* path);
 	virtual void update(float dt, const Vector3& targetPos);
-	void applyForce(const Vector3& force);
-	int getBoidOffset()const;
-	float getMaxSpeed()const;
-	float getMaxForce()const;
-	const Vector3& getVelocity()const;
+	virtual void knockBack(Vector3 direction, float force);
 
 	int duty; 
 	bool vActive;
-	Vector3 groupPos;
 	Vector3* path;
 	int pathSize;
 protected:	
 	int aggroRange;
-	int boidOffset;
-	Vector3 predictedTargetPos;
 	Vector3 destination;
-	Vector3 acceleration;
 	Vector3 velocity;
 
-	float maxSpeed;
-	float maxForce;
-	
-	enum class State { Idle, Chasing, Circulate };
-	State state;
-
-	// one Laws that boids follow
-	//Vector3 separation(std::vector<Actor*>& boids, std::vector<Vector3> buildings, Vector3 targetPos = Vector3(0.0f, -100.0f, 0.0f));
-	// Other function for moving and interacting
 	virtual void move();
-	virtual Vector3 seek();
-	virtual void moveCirculate(const Vector3& desiredDirection);
-	virtual Vector3 seekCirculate(const Vector3& desiredDirection);
+	virtual Vector3 calculateVelocity();
 	virtual void followPath();
-	virtual void circulatePlayer();
-	Status setChaseState();
 	Status inAggroRange();
-	Status setIdleState();
-	Status setCirculateState();
+
 };
