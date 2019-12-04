@@ -227,6 +227,11 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 			weapon.lightColor.z = saveSystem.getFloat("Item" + std::to_string(i) + "LightColorB");
 			weapon.melee = saveSystem.getInteger("Item" + std::to_string(i) + "Melee") == 1;
 			weapon.doesDoT = saveSystem.getInteger("Item" + std::to_string(i) + "DoT") == 1;
+			weapon.doTTimer = saveSystem.getFloat("Item" + std::to_string(i) + "DoTTimer");
+			weapon.doesSplashDmg = saveSystem.getInteger("Item" + std::to_string(i) + "Splash") == 1;
+			weapon.splashRange = saveSystem.getFloat("Item" + std::to_string(i) + "SplashRange");
+			weapon.doesKnockBack = saveSystem.getInteger("Item" + std::to_string(i) + "Knockback") == 1;
+			weapon.knockbackForce = saveSystem.getFloat("Item" + std::to_string(i) + "KnockbackForce");
 
 			Container::playerInventory->addItem(new ItemWeapon(name, weapon, object));
 		}
@@ -316,6 +321,11 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 				saveSystem.set("Item" + std::to_string(itemId) + "LightColorB", weapon.lightColor.z);
 				saveSystem.set("Item" + std::to_string(itemId) + "Melee", weapon.melee ? 1 : 0);
 				saveSystem.set("Item" + std::to_string(itemId) + "DoT", weapon.doesDoT ? 1 : 0);
+				saveSystem.set("Item" + std::to_string(itemId) + "DoTTimer", weapon.doTTimer);
+				saveSystem.set("Item" + std::to_string(itemId) + "Splash", weapon.doesSplashDmg ? 1 : 0);
+				saveSystem.set("Item" + std::to_string(itemId) + "SplashRange", weapon.splashRange);
+				saveSystem.set("Item" + std::to_string(i) + "Knockback", weapon.doesKnockBack ? 1 : 0);
+				saveSystem.set("Item" + std::to_string(i) + "KnockbackForce", weapon.knockbackForce);
 
 				saveSystem.set("Item" + std::to_string(itemId) + "Class", "ItemWeapon");
 			}

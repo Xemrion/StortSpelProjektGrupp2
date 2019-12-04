@@ -196,7 +196,6 @@ void ItemWeapon::randomize()
 			weapon.doesSplashDmg = true;
 			weapon.splashRange = 20;
 		}
-		weapon.doTTimer = 2;
 	}
 	else if (weapon.type == WeaponType::Spikes) 
 	{

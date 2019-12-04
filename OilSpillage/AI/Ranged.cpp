@@ -59,6 +59,10 @@ void Ranged::assignWeapon(int weaponType)
 			PlayingGameState* gameState = static_cast<PlayingGameState*>(Game::getCurrentState());
 			laser = gameState->addLight(tempLaser);
 		}
+		else if (weaponType <= 8)
+		{
+			this->weapon = WeaponHandler::getWeapon(WeaponType::aiFlamethrower);
+		}
 	}
 
 }
