@@ -99,8 +99,8 @@ Status DynamicActor::inAggroRange()
 	return status;
 }
 
-void DynamicActor::knockBack(Vector3 direction)
+void DynamicActor::knockBack(Vector3 direction, float force)
 {
 	direction.Normalize();
-	this->getRigidBody()->setLinearVelocity(-btVector3(direction.x, 0.0f, direction.z) );
+	this->getRigidBody()->setLinearVelocity(-btVector3(direction.x, 0.0f, direction.z) * force);
 }
