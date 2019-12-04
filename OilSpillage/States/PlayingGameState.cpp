@@ -186,6 +186,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	minimap = createMinimapTexture(*map);
 	generateMapPowerUps();
 	createFogOfWarTexture(*map);
+	createDistanceTexture(*map);
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();

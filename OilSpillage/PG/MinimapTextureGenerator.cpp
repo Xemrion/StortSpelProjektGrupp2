@@ -340,3 +340,37 @@ String createFogOfWarTexture( Map const &map )
                    4, pixels.data() );
 	return String("map/fog");
 }
+
+#pragma warning( disable : 4715 ) 
+String createDistanceTexture( Map const &map )
+{
+   Size const    TEX_WIDTH   { map.getTileMap().width  },
+                 TEX_HEIGHT  { map.getTileMap().height };
+   Vector<RGBA>  pixels( TEX_WIDTH * TEX_HEIGHT );
+
+	auto const &tilemap     = map.getTileMap();
+	auto const &distanceMap = map.getRoadDistanceMap();
+
+	float furthest = .0f;
+	for ( auto x=0;  x < tilemap.width; ++x )
+		for ( auto y=0;  y < tilemap.height; ++y ) {
+			auto dist = distanceMap[tilemap.index(x,y)];
+			if ( dist > furthest )
+				furthest = dist;
+			}
+
+	for ( auto x=0;  x < tilemap.width; ++x )
+		for ( auto y=0;  y < tilemap.height; ++y ) {
+			auto dist = distanceMap[tilemap.index(x,y)];
+			pixels[y*TEX_WIDTH+x] = I32(dist/furthest*255)         // RR
+                              + (I32(dist/furthest*255) <<  8)  // GG
+                              + (I32(dist/furthest*255) << 16)  // BB
+                              + (I32(255)               << 24); // AA
+		}
+
+	stbi_write_tga( "data/textures/map/distance.tga",
+                   static_cast<I32>(TEX_WIDTH),
+                   static_cast<I32>(TEX_HEIGHT),
+                   4, pixels.data() );
+	return String("map/distance");
+}
