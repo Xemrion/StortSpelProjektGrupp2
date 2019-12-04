@@ -150,21 +150,21 @@ void UIHighscore::loadHighscore(UIHighscore* ui, bool send, std::string name)
 		if (localHighscore.is_open())
 		{
 			int players = 0;
-			std::string name;
+			std::string playerName;
 			std::string score;
-			std::getline(localHighscore, name);
+			std::getline(localHighscore, playerName);
 
 			try
 			{
-				players = std::stoi(name);
+				players = std::stoi(playerName);
 			}
 			catch (...) {}
 
 			for (int i = 0; i < min(players, 10); i++)
 			{
-				std::getline(localHighscore, name);
+				std::getline(localHighscore, playerName);
 				std::getline(localHighscore, score);
-				stats.push_back(PlayerStat(name, std::stoi(score)));
+				stats.push_back(PlayerStat(playerName, std::stoi(score)));
 			}
 
 			localHighscore.close();

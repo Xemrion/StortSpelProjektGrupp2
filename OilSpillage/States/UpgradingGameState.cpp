@@ -18,7 +18,7 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 	this->graphics.setUISun(Vector3(0, 0, 1), Vector4(1, 1, 1, 1));
 	graphics.loadShape(SHAPE_CUBE);
 
-	this->camera = std::make_unique<DynamicCamera>(Vector3(0, 0.5f, -5.0f),Vector3(0,0,0));
+	this->camera = std::make_unique<DynamicCamera>(Vector3(0, 0.75f, -3.0f),Vector3(0,0,0));
 
 	this->theVehicle = std::make_unique<Vehicle>();
 	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));

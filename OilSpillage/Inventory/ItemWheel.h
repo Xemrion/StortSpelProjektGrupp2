@@ -8,19 +8,20 @@
 class ItemWheel : public Item
 {
 private:
-	static std::string generateDescription(Stats wheel);
-	Stats stats;
+	static std::string generateDescription(float accelerationRate, float handlingRate);
+
+	float accelerationRate;
+	float handlingRate;
 public:
-	ItemWheel(std::string name,GameObject* object);
+	ItemWheel(std::string name, float accelerationRate, float handlingRate, GameObject* object);
 	virtual ~ItemWheel();
 	ItemWheel(const ItemWheel& obj);
 	Item* clone()const;
-	bool operator==(const ItemWheel& other) const;
 
 	virtual void randomize();
 
-	Stats& getWheel();
-	Stats getStats();
+	float getAccelerationRate() const;
+	float getHandlingRate() const;
 };
 
 #endif // !ITEM_WEAPON_H

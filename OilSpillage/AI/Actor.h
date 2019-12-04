@@ -30,6 +30,7 @@ public:
 
 private:
 	float health;
+	float particleTimer = 0.0f;
 	int points;
 protected:
 	float fireTimer;
