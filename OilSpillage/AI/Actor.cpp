@@ -117,7 +117,7 @@ void Actor::onFire()
 	}
 }
 
-void Actor::setFire()
+void Actor::setFire(float timer)
 {
-	fireTimer = 2;
+	fireTimer = timer;
 }

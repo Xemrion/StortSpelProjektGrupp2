@@ -48,14 +48,7 @@ void AIGroup::updateDuty()
 {
 	for (int i = 0; i < actors.size(); i++)
 	{
-		if (i < actors.size() / 2)
-		{
-			actors[i]->duty = 1;
-		}
-		else
-		{
-			actors[i]->duty = 2;
-		}
+		actors[i]->duty = i % 2;
 	}
 }
 

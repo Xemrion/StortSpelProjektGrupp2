@@ -1,16 +1,18 @@
 #include "UIUpgrading.h"
 #include "../../Input.h"
 #include "../../game.h"
+#include "../../Inventory/ItemChassi.h"
+#include "../../Inventory/ItemWheel.h"
 #include "../../States/UpgradingGameState.h"
 
 void UIUpgrading::updateUI(float deltaTime)
 {
-	if (!this->hasInitStats)
-	{
+	/*if (!this->hasInitStats)
+	{*/
 		this->statBox->update(dynamic_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getStats());
 		this->gadgetSelector->init();
-		this->hasInitStats = true;
-	}
+		/*this->hasInitStats = true;*/
+	/*}*/
 	if (this->selectingItem)
 	{
 		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
@@ -19,7 +21,17 @@ void UIUpgrading::updateUI(float deltaTime)
 		}
 		else if (Input::checkButton(Keys::CONFIRM, States::PRESSED) && this->itemSelector->isSelectedValid())
 		{
-			this->selectingItem = false;
+			if (this->itemSelector->getSelectedType() == ItemType::CHASSI) {
+				ItemChassi* chassi = dynamic_cast<ItemChassi*>(this->itemSelector->getSelectedSlot()->getItem());
+				dynamic_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setChassi(chassi->getObject(),chassi->getStats());
+			}
+			else if (this->itemSelector->getSelectedType() == ItemType::WHEEL) {
+				ItemWheel* wheel = dynamic_cast<ItemWheel*>(this->itemSelector->getSelectedSlot()->getItem());
+				dynamic_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setWheels(wheel->getObject(), wheel->getStats());
+			}
+			else {
+				this->selectingItem = false;
+			}
 		}
 		else if (Input::checkButton(Keys::CANCEL, States::PRESSED) && this->itemSelector->isSelectedValid())
 		{

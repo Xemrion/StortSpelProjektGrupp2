@@ -59,6 +59,7 @@ void PlayingGameState::initAI()
 	actorManager = nullptr;
 	actorManager = std::make_unique<ActorManager>( aStar.get(), physics.get(), map.get(), &rng );
 	aStar->generateTileData(map->getTileMap());
+	/*
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
@@ -66,6 +67,7 @@ void PlayingGameState::initAI()
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+	*/
 
 }
 
@@ -608,8 +610,8 @@ void PlayingGameState::update(float deltaTime)
 			this->player->setHealth(0);
 		}
 
-		actorManager->update(deltaTime, player->getPosition());
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount, deltaTime);
+		actorManager->update(deltaTime, player->getPosition());
 		accelForce = Vector3(player->getRigidBody()->getLinearVelocity().getX(), player->getRigidBody()->getLinearVelocity().getY(), player->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation(deltaTime);
@@ -1036,7 +1038,7 @@ void PlayingGameState::generateMapPowerUps()
 
 void PlayingGameState::generateObjectives()
 {
-	if (Game::getNrOfStagesDone() % 3 == 0) //nrOfStagesBEGUN
+	if (Game::getNrOfStagesDone() % 3 == 0)
 	{
 		//difficulty scale
 		float scalingNr = Game::getNrOfStagesDone() / 3; // /3

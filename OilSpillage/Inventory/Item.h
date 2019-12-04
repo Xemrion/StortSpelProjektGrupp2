@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "../VehicleStats.h"
 #include "../GameObject.h"
 
 enum ItemType
