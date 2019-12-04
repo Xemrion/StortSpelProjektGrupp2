@@ -43,15 +43,15 @@ struct Weapon
 	float remainingCooldown = 0.0;
 	WeaponType type = WeaponType::Default;
 	bool melee = false;
+	bool doesDoT = false;
 	bool doesSplashDmg = false;
+	bool doesKnockBack = false;
+	float doTTimer = 0.0f;
 	float splashRange = 0.0;
+	float knockbackForce = 0.0f;
 	float soundTimer = 0.0f;
 	float timeSinceLastShot = 0.0f;
 	bool flameBool = false;
-	bool doesDoT = false;
-	float doTTimer = 0.0f;
-	bool doesKnockBack = false;
-	float knockbackForce = 0.0f;
 	int soundHandle = 0;
 	Vector3 lightColor = Vector3(0, 0, 0);
 	Light* light = nullptr;
@@ -84,21 +84,21 @@ class WeaponHandler
 {
 public:
 	static constexpr Weapon weapons[] = {
-		//damage	fireRate	bulletSpeed		bulletLifetime	bulletScale			spreadRadians maxSpread spreadIncreasePerSecond currentSpreadIncrease spreadDecreasePerSecond  remainingCooldown WeaponType melee 
+		//damage	fireRate	bulletSpeed		bulletLifetime	bulletScale			spreadRadians maxSpread spreadIncreasePerSecond currentSpreadIncrease spreadDecreasePerSecond  remainingCooldown WeaponType melee dot
 		Weapon(), //default gun
 		{      6,      0.05f,        55.0f,          1.4f,		Vector3(0.07f, 0.07f, 0.3f),	 0.1f,  0.3f,  0.11f,  0.0f,  0.7f,  0.0,  WeaponType::MachineGun },
-		{     10,       1.5f,        13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::MissileLauncher },
+		{     10,       1.5f,        13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::MissileLauncher, false, false, true, true, 0.0f, 20.0f, 5.0f },
 		{      2,     0.015f,         0.0f,         0.15f,		Vector3(0.37f, 0.37f, 50.0f),	 0.0f,  5.0f,  1.75f,  0.0f,  1.5f,  0.0,  WeaponType::Laser },
 		{    300,       1.5f,         0.0f,         0.15f,		Vector3(0.17f, 0.17f, 30.0f),	 0.0f,  0.0f,  0.11f,  0.0f,  2.0f,  0.0,  WeaponType::Railgun },
-		{      4,      0.01f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Flamethrower },
-		{      5,      0.005f,         1.0f,          0.2f,	Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Spikes ,true },
+		{      4,      0.01f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Flamethrower, false, true, false, false, 4.0f },
+		{      5,      0.005f,         1.0f,          0.2f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Spikes, true },
 		{	   2,       0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::aiMachineGun },
 		{	   5,       0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::aiMelee },
-		{     50,       1.5f,         4.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiMissileLauncher },
-		{   0.33,       1.0f,         0.0f,          0.5f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f,  5.0f,  1.5f,  0.0f,  2.0f,  0.0f, WeaponType::aiLaser },
-		{      1,      0.05f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiFlamethrower },
-		{      2,     0.015f,        20.0f,          1.0f,		Vector3(1.0f, 1.0f, 1.0f),		 0.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossFlamethrower },
-		{      6,     0.015f,        25.0f,          2.0f,		Vector3(1.0f, 1.0f, 1.0f),		 0.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossFlamethrowerPhase2 },
+		{     50,       1.5f,         4.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiMissileLauncher, false, false, true, true, 0.0f, 10.0f, 3.0f },
+		{   0.33,       1.0f,         0.0f,          0.5f,		Vector3(1.0f, 1.0f, 10.0f),	     1.0f,  5.0f,   1.5f,  0.0f,  2.0f,  0.0f, WeaponType::aiLaser },
+		{      1,      0.05f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiFlamethrower, false, true, false, false, 2.0f },
+		{      2,     0.015f,        20.0f,          1.0f,		Vector3(1.0f, 1.0f, 1.0f),		 0.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossFlamethrower, false, true, false, false, 2.0f },
+		{      6,     0.015f,        25.0f,          2.0f,		Vector3(1.0f, 1.0f, 1.0f),		 0.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossFlamethrowerPhase2, false, true, false, false, 2.0f },
 		{      1,     0.025f,        30.0f,          4.0f,		Vector3(1.0f, 1.0f, 1.0f),	  	 0.2f, 60.0f,  20.0f,  0.0f,  0.7f,  0.0,  WeaponType::aiBossMachineGun },
 		{      3,     0.022f,        45.0f,          3.5f,		Vector3(1.0f, 1.0f, 1.0f),	  	 0.1f, 10.0f,  10.0f,  0.0f,  0.7f,  0.0,  WeaponType::aiBossMachineGunPhase2 },
 		{    100,       0.5f,        40.0f,         15.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossMissileLauncher },

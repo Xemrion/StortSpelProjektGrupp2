@@ -173,10 +173,11 @@ private:
 	void                       generateRoads();
 	void                       generateBuildings();
 	void                       generateBorder();
+	void                       generateZebraCrossings();
 	void                       generateStreetlights();
 	Opt<Lot>                   findRandomLot( U16 districtId ) noexcept;
 	Opt<Lot>                   findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
-	Vector<UPtr<GameObject>>   instantiateTilesAsModels() noexcept;
+	void                       instantiateTilesAsModels() noexcept;
 	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout &&, HouseTileset const & ) const noexcept;
 	Graphics &                 graphics;
 	V2u                        startPositionInTileSpace;
@@ -184,6 +185,7 @@ private:
 	UPtr<Voronoi>              districtMap;
 	Vector<District::Enum>     districtLookupTable;
 	Vector<UPtr<GameObject>>   groundTiles;
+	Vector<UPtr<GameObject>>   crossingTiles;
 	Physics * const            physics;
 	LightList &                lights;
 	// TODO: refactor out:

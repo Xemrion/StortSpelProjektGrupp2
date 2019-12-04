@@ -7,12 +7,13 @@
 
 void UIUpgrading::updateUI(float deltaTime)
 {
-	/*if (!this->hasInitStats)
-	{*/
-		this->statBox->update(dynamic_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getStats());
+	if (!this->hasInitStats)
+	{
+		this->statBox->update(static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getStats());
 		this->gadgetSelector->init();
-		/*this->hasInitStats = true;*/
-	/*}*/
+		this->hasInitStats = true;
+	}
+
 	if (this->selectingItem)
 	{
 		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
@@ -21,21 +22,27 @@ void UIUpgrading::updateUI(float deltaTime)
 		}
 		else if (Input::checkButton(Keys::CONFIRM, States::PRESSED) && this->itemSelector->isSelectedValid())
 		{
-			if (this->itemSelector->getSelectedType() == ItemType::CHASSI) {
-				ItemChassi* chassi = dynamic_cast<ItemChassi*>(this->itemSelector->getSelectedSlot()->getItem());
-				dynamic_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setChassi(chassi->getObject(),chassi->getStats());
+			if (this->itemSelector->getSelectedType() == ItemType::TYPE_CHASSI)
+			{
+				this->gadgetSelector->setSlot(Slots::CHASSI, this->itemSelector->getSelectedSlot());
+				this->statBox->update(static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getStats());
 			}
-			else if (this->itemSelector->getSelectedType() == ItemType::WHEEL) {
-				ItemWheel* wheel = dynamic_cast<ItemWheel*>(this->itemSelector->getSelectedSlot()->getItem());
-				dynamic_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->setWheels(wheel->getObject(), wheel->getStats());
+			else if (this->itemSelector->getSelectedType() == ItemType::TYPE_WHEEL)
+			{
+				this->gadgetSelector->setSlot(Slots::WHEEL, this->itemSelector->getSelectedSlot());
+				this->statBox->update(static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getStats());
 			}
-			else {
+			else
+			{
 				this->selectingItem = false;
 			}
 		}
 		else if (Input::checkButton(Keys::CANCEL, States::PRESSED) && this->itemSelector->isSelectedValid())
 		{
-			this->gadgetSelector->removeSlotOfSelected(this->itemSelector->getSelectedSlot());
+			if (this->itemSelector->getSelectedType() != ItemType::TYPE_CHASSI && this->itemSelector->getSelectedType() != ItemType::TYPE_WHEEL)
+			{
+				this->gadgetSelector->removeSlot(this->itemSelector->getSelectedSlot());
+			}
 		}
 		else if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 		{
@@ -85,16 +92,16 @@ void UIUpgrading::drawUI()
 	const char* type = "";
 	switch (this->itemSelector->getSelectedType())
 	{
-	case WEAPON:
+	case TYPE_WEAPON:
 		type = "Weapons";
 		break;
-	case GADGET:
+	case TYPE_GADGET:
 		type = "Gadgets";
 		break;
-	case CHASSI:
+	case TYPE_CHASSI:
 		type = "Chassis";
 		break;
-	case WHEEL:
+	case TYPE_WHEEL:
 		type = "Wheels";
 		break;
 	}
