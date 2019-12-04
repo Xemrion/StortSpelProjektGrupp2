@@ -259,7 +259,7 @@ void Map::generateZebraCrossings()
 										+ (tilemap->neighbourIsRoad( Direction::east,  x, y )? 1:0)
 										+ (tilemap->neighbourIsRoad( Direction::south, x, y )? 1:0)
 										+ (tilemap->neighbourIsRoad( Direction::west,  x, y )? 1:0);
-				if ( (connections == 2) and (generateSelection(rng) <= 15ssss.0f) ) {
+				if ( (connections == 2) and (generateSelection(rng) <= 15.0f) ) {
 					if ( isVertical )
 						instantiateCrossing( tilemap->convertTilePositionToWorldPosition(x,y), 180.0f );
 					else if ( isHorizontal )
@@ -410,7 +410,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 
 	if ( config.seed != -1 )  
 		rng.seed( config.seed );
-
+	skyscraperGenerator = std::make_unique<Skyscraper>();
 	info.environment = {rng};
 	info.width       = config.dimensions.x;
 	info.length      = config.dimensions.y;
@@ -1645,7 +1645,27 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 
 CompositeHouse Map::instantiateSkyscraper()
 {
-	return CompositeHouse();
+	static U32 nrOfSkyscrapers = 0;
+	String skyscraperName = "skyscraper" + std::to_string(nrOfSkyscrapers++);
+	skyscraperGenerator->generateASkyscraper(skyscraperName);
+
+	CompositeHouse temp;
+	temp.skyscraperMeshIndex = skyscraperName;
+
+	skyscraperGenerator->setRoofMesh(temp.skyscraperMeshIndex, &temp.roof);
+	skyscraperGenerator->setWallMesh(temp.skyscraperMeshIndex, &temp.walls);
+	skyscraperGenerator->setWindowMesh(temp.skyscraperMeshIndex, &temp.windows);
+	temp.roof.setScale(Vector3(2.0f, 1.0f, 2.0f));
+	temp.walls.setScale(Vector3(2.0f, 1.0f, 2.0f));
+	temp.windows.setScale(Vector3(2.0f, 1.0f, 2.0f));
+
+	Vector3 tempVec = temp.walls.getAABB().maxPos - temp.walls.getAABB().minPos;
+	tempVec.x *= 2;
+	tempVec.z *= 2;
+	temp.dimensions.x = (tempVec.x / config.tileSideScaleFactor) + 1;
+	temp.dimensions.y = (tempVec.z / config.tileSideScaleFactor) + 1;
+
+	return temp;
 }
 
 
