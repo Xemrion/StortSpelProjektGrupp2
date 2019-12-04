@@ -43,10 +43,15 @@ struct Weapon
 	float remainingCooldown = 0.0;
 	WeaponType type = WeaponType::Default;
 	bool melee = false;
+	bool doesSplashDmg = false;
+	float splashRange = 0.0;
 	float soundTimer = 0.0f;
 	float timeSinceLastShot = 0.0f;
 	bool flameBool = false;
 	bool doesDoT = false;
+	float doTTimer = 0.0f;
+	bool doesKnockBack = false;
+	float knockbackForce = 0.0f;
 	int soundHandle = 0;
 	Vector3 lightColor = Vector3(0, 0, 0);
 	Light* light = nullptr;
@@ -199,6 +204,11 @@ public:
 	float getDamage() const;
 	bool getMelee() const;
 	bool getFlame() const;
+	float getFlameTimer()const;
+	bool getKnockback() const;
+	float getKnockbackForce() const;
+	bool getSplashBool() const;
+	float getSplashRange() const;
 	void shoot(Weapon& weapon, const Vector3& position, const Vector3& normalizedDir,const Vector3& additionalVelocity, float deltaTime);
 	void update(float deltaTime);
 	float getTimeLeft() const;
