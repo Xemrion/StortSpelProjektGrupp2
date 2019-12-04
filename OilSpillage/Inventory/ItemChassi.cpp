@@ -33,8 +33,8 @@ Item* ItemChassi::clone() const
 
 void ItemChassi::randomize()
 {
-	this->maxHealth = static_cast<int>((((rand() % 100 +1)) + (10 * Game::getLocalScale())));
-	this->speed = ((rand() % 100 + 1)*0.01f) + (1 * Game::getLocalScale());
+	this->maxHealth = this->maxHealth * static_cast<int>((((rand() % 100 +1)) + (10 * Game::getLocalScale())));
+	this->speed = this->speed * ((rand() % 100 + 1)*0.01f) + (1 * Game::getLocalScale());
 	
 	this->description = generateDescription(this->maxHealth, this->speed);
 	Item::randomize();

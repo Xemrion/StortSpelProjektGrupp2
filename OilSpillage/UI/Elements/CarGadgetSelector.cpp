@@ -23,8 +23,8 @@ CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position), used
 	this->slots[Slots::BACK] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x / 2 - ItemSlot::size.x / 2, CarGadgetSelector::size.y - ItemSlot::size.y - 32.0f), false);
 	this->slots[Slots::LEFT] = std::make_unique<ItemSlot>(position + Vector2(21.0f, CarGadgetSelector::size.y / 2 - ItemSlot::size.y / 2), false);
 	this->slots[Slots::RIGHT] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x - ItemSlot::size.y - 21.0f, CarGadgetSelector::size.y / 2 - ItemSlot::size.y / 2), false);
-	this->slots[Slots::WHEEL] = std::make_unique<ItemSlot>();
-	this->slots[Slots::CHASSI] = std::make_unique<ItemSlot>();
+	this->slots[Slots::WHEEL] = std::make_unique<ItemSlot>(Vector2(-1000), false);
+	this->slots[Slots::CHASSI] = std::make_unique<ItemSlot>(Vector2(-1000), false);
 
 	this->slots[Slots::FRONT]->setNeighbours(this->slots[Slots::LEFT].get(), this->slots[Slots::RIGHT].get(), this->slots[Slots::BACK].get(), this->slots[Slots::MOUNTED].get());
 	this->slots[Slots::MOUNTED]->setNeighbours(this->slots[Slots::LEFT].get(), this->slots[Slots::RIGHT].get(), this->slots[Slots::FRONT].get(), this->slots[Slots::BACK].get());
