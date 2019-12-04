@@ -562,29 +562,6 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	this->particleHandler->renderParticleSystems(camera);
 
 	
-
-	/*this->particleSystem->updateParticles(deltaTime, viewProj);
-
-	this->particleSystem->drawAll(camera);
-
-	this->particleSystem2->updateParticles(deltaTime, viewProj);
-
-	this->particleSystem2->drawAll(camera);
-
-	this->particleHandler->getParticleSystem("electro")->updateParticles(deltaTime, viewProj);
-
-	this->particleHandler->getParticleSystem("electro")->drawAll(camera);
-
-	this->particleHandler->getParticleSystem("explosion")->updateParticles(deltaTime, viewProj);
-
-	this->particleHandler->getParticleSystem("explosion")->drawAll(camera);
-
-	this->particleTrail->updateParticles(deltaTime, viewProj);
-
-	
-
-	this->particleTrail->drawAll(camera);*/
-	
 	//set up Shaders
 
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
@@ -695,7 +672,6 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->VSSetConstantBuffers(3, 1, this->shadowMap.getViewProjSpot().GetAddressOf());
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
 
-	drawFog(camera, deltaTime);
 	if (fogActive)
 	{
 		drawFog(camera, deltaTime);
@@ -723,19 +699,19 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	Frustum frustum = shadowMap.getSunFrustum();
 	Frustum spotFrustum = shadowMap.getSpotFrustum();
 
-	
+	deviceContext->PSSetShader(nullptr, nullptr, 0);
+	UINT stride = sizeof(Vertex3D);
+	UINT offset = 0;
 	for (GameObject* object : drawableObjects)
 	{
 		AABB boundingBox = object->getAABB();
 		if (frustum.intersect(boundingBox, 0.0f))
 		{
 			UINT vertexCount = object->mesh->getVertexCount();
-			UINT stride = sizeof(Vertex3D);
-			UINT offset = 0;
+			
 			SimpleMath::Matrix world = object->getTransform();
 			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 			shadowMap.setWorld(worldTr);
-			deviceContext->PSSetShader(nullptr, nullptr, 0);
 			deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 			
 			if (object->getSunShadow())
@@ -753,28 +729,6 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 		}
 	}
 
-	
-	/*for (GameObject* object : drawableObjects)
-	{
-		AABB boundingBox = object->getAABB();
-		if (frustum.intersect(boundingBox, 0.0f))
-		{
-			UINT vertexCount = object->mesh->getVertexCount();
-			UINT stride = sizeof(Vertex3D);
-			UINT offset = 0;
-			SimpleMath::Matrix world = object->getTransform();
-			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-			shadowMap.setWorld(worldTr);
-			deviceContext->PSSetShader(nullptr, nullptr, 0);
-			deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-
-			if (object->getSpotShadow() && spotFrustum.intersect(boundingBox, 5.0f, false))
-			{
-				deviceContext->Draw(vertexCount, 0);
-			}
-		}
-	}*/
-
 	std::vector<GameObject*> objects;
 	quadTree->getGameObjects(objects, frustum, 0.0f);
 	
@@ -782,12 +736,9 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	{
 		AABB boundingBox = o->getAABB();
 		UINT vertexCount = o->mesh->getVertexCount();
-		UINT stride = sizeof(Vertex3D);
-		UINT offset = 0;
 		SimpleMath::Matrix world = o->getTransform().Transpose();
 		SimpleMath::Matrix worldTr = world;
 		shadowMap.setWorld(worldTr);
-		deviceContext->PSSetShader(nullptr, nullptr, 0);
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		if (o->getSunShadow())
 		{
@@ -801,22 +752,6 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 			deviceContext->Draw(vertexCount, 0);
 		}
 	}
-
-	
-	/*for (GameObject* o : objects)
-	{
-		AABB boundingBox = o->getAABB();
-		UINT vertexCount = o->mesh->getVertexCount();
-		UINT stride = sizeof(Vertex3D);
-		UINT offset = 0;
-		SimpleMath::Matrix world = o->getTransform().Transpose();
-		SimpleMath::Matrix worldTr = world;
-		shadowMap.setWorld(worldTr);
-		deviceContext->PSSetShader(nullptr, nullptr, 0);
-		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-
-		
-	}*/
 }
 
 bool Graphics::createShaders()
