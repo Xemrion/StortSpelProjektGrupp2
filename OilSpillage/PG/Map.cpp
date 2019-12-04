@@ -95,8 +95,9 @@ static U8  constexpr pred4Way { 0b0101'0101 };
 
 static F32 constexpr baseOffsetY       { -1.50f };
 static F32 constexpr markerOffsetY     { -1.49f };
-static F32 constexpr transitionOffsetY { -1.48f };
-static F32 constexpr sidewalkOffsetY   { -1.47f };
+static F32 constexpr zebraOffsetY      { -1.48f };
+static F32 constexpr transitionOffsetY { -1.47f };
+static F32 constexpr sidewalkOffsetY   { -1.46f };
 
 
 // 
@@ -220,6 +221,55 @@ void Map::generateBorder()
 	                                     .0f );
 	tmp3->setFriction(0);
 	border.bounds[3].setRigidBody( tmp3, physics );
+}
+
+void Map::generateZebraCrossings()
+{
+	F32_Dist  generateSelection { .0f, 1.0f };
+	crossingTiles.reserve( 24 );
+
+	auto instantiateCrossing = [&]( Vector3 const &pos, F32 deg=.0f ) {
+		crossingTiles.push_back( std::make_unique<GameObject>() );
+      auto &obj     =  *crossingTiles.back();
+		obj.mesh      =   graphics.getMeshPointer( "Tiles/Quad_SS" );
+		obj.setTexture(   graphics.getTexturePointer("Tiles/zebra_crossing") );
+		// obj.setNormalMap( graphics.getTexturePointer("Tiles/zebra_crossing_nor") );
+		if ( deg > 1.0f )
+			obj.setRotation({ .0f, util::degToRad(deg), .0f });
+		obj.setPosition( pos + Vector3{.0f, zebraOffsetY, .0f} );
+		obj.setColor({ .0f, .0f, .0f, .0f });
+		obj.setScale({ tilemap->config.tileSideScaleFactor, 1.0f, tilemap->config.tileSideScaleFactor });
+		obj.setSpotShadow( false );
+		obj.setSunShadow(  false );
+	};
+
+	for ( auto x = 0;  x < (tilemap->width);  x+=2 ) {
+		for ( auto y = 0;  y < (tilemap->height);  y+=2 ) {
+			if ( (tilemap->tileAt(x,y) == Tile::road)
+				and (districtAt(x,y) != &District::park)
+				and (districtAt(x,y) != &District::suburban) )
+			{
+				bool isVertical   = tilemap->neighbourIsRoad( Direction::north, x, y )
+									 and tilemap->neighbourIsRoad( Direction::south, x, y );
+
+				bool isHorizontal = tilemap->neighbourIsRoad( Direction::west, x, y )
+									 and tilemap->neighbourIsRoad( Direction::east, x, y );
+
+				auto connections  = (tilemap->neighbourIsRoad( Direction::north, x, y )? 1:0)
+										+ (tilemap->neighbourIsRoad( Direction::east,  x, y )? 1:0)
+										+ (tilemap->neighbourIsRoad( Direction::south, x, y )? 1:0)
+										+ (tilemap->neighbourIsRoad( Direction::west,  x, y )? 1:0);
+				if ( (connections == 2) and (generateSelection(rng) <= 30.0f) ) {
+					if ( isVertical )
+						instantiateCrossing( tilemap->convertTilePositionToWorldPosition(x,y), 180.0f );
+					else if ( isHorizontal )
+						instantiateCrossing( tilemap->convertTilePositionToWorldPosition(x,y), .0f );
+				}
+			}
+		}
+	}
+	for ( auto &e : crossingTiles ) 
+		graphics.addToDrawStatic( e.get() );
 }
 
 void Map::generateStreetlights()
@@ -373,9 +423,9 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	generateBuildings();
 	generateBorder();
 	generateStreetlights();
-	groundTiles = instantiateTilesAsModels();
-	for ( auto &e : groundTiles ) 
-		graphics.addToDrawStatic( e.get() );
+	generateZebraCrossings();
+	instantiateTilesAsModels();
+
 }
 
 Map::~Map() noexcept
@@ -1594,15 +1644,14 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 }
 
 
-Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
+void Map::instantiateTilesAsModels() noexcept
 {
 	auto biome = info.environment.getBiome();
 
-	Vector<UPtr<GameObject>> models;
-	models.reserve( tilemap->data.size() * 3 );// TODO: use worst case scenario: 6 quads per tile?
+	groundTiles.reserve( tilemap->data.size() * 3 );// TODO: use worst case scenario: 6 quads per tile?
 	auto instantiatePart = [&]( std::string_view name, Vector3 const &pos, F32 deg=.0f, F32 yOffset=baseOffsetY, Bool hasNormal=true, Bool noShadowcasting=false ) {
-		models.push_back( std::make_unique<GameObject>() );
-      auto &model     =  *models.back();
+		groundTiles.push_back( std::make_unique<GameObject>() );
+      auto &model     =  *groundTiles.back();
 		model.mesh      =   graphics.getMeshPointer( "Tiles/Quad_SS" );
 		model.setTexture(   graphics.getTexturePointer(name.data()) );
 		if ( hasNormal )
@@ -1743,7 +1792,8 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 			}
 		}
 	}
-	return models;
+	for ( auto &e : groundTiles ) 
+		graphics.addToDrawStatic( e.get() );
 }
 
 HouseGenData const& Map::getHouseData() const noexcept

@@ -134,6 +134,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadTexture("Tiles/road_marker_4way");
 	graphics.loadTexture("Tiles/concrete");
 	graphics.loadTexture("Tiles/concrete_nor");
+	graphics.loadTexture("Tiles/zebra_crossing");
 
 	graphics.loadTexture("Tiles/road_2file_deadend_n");
 	graphics.loadTexture("Tiles/road_2file_deadend_n_nor");
