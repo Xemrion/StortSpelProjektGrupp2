@@ -47,6 +47,7 @@ struct Weapon
 	float timeSinceLastShot = 0.0f;
 	bool flameBool = false;
 	bool doesDoT = false;
+	bool doesKnockBack = false;
 	int soundHandle = 0;
 	Vector3 lightColor = Vector3(0, 0, 0);
 	Light* light = nullptr;
@@ -199,6 +200,7 @@ public:
 	float getDamage() const;
 	bool getMelee() const;
 	bool getFlame() const;
+	bool getKnockback() const;
 	void shoot(Weapon& weapon, const Vector3& position, const Vector3& normalizedDir,const Vector3& additionalVelocity, float deltaTime);
 	void update(float deltaTime);
 	float getTimeLeft() const;

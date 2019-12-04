@@ -11,6 +11,7 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
 		stream << "Max Spread: " << weapon.maxSpread << "\n";
 		stream << "DoT: " << weapon.doesDoT << "\n";
+		stream << "Knockback: " << weapon.doesKnockBack << "\n";
 	}
 	else if(weapon.type == WeaponType::Laser){
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
@@ -88,6 +89,10 @@ void ItemWeapon::randomize()
 		{
 			weapon.doesDoT = true;
 		}
+		else if(chance > 10 && chance < 20)
+		{
+			weapon.doesKnockBack = true;
+		}
 	}
 	else if (weapon.type == WeaponType::Laser) 
 	{
@@ -121,6 +126,10 @@ void ItemWeapon::randomize()
 		if (chance <= 10)
 		{
 			weapon.doesDoT = true;
+		}
+		else if (chance > 10 && chance <= 20)
+		{
+			weapon.doesKnockBack = true;
 		}
 		/*this->weapon.bulletSpeed = this->weapon.bulletSpeed * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));
 		this->weapon.bulletLifetime = this->weapon.bulletLifetime * (((rand() % 1000 + 1) / 100) + (1 * Game::getLocalScale()));

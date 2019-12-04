@@ -98,6 +98,10 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
+						if (bulletArray[j].getFlame())
+						{
+							turrets[i]->setFire();
+						}
 						this->turrets[i]->changeHealth(-bulletArray[j].getDamage());
 					}
 				}
@@ -118,6 +122,10 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 					if (soundTimer > 0.05f) {
 						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
+					}
+					if (bulletArray[j].getFlame())
+					{
+						turrets[i]->setFire();
 					}
 					this->turrets[i]->changeHealth(-bulletArray[j].getDamage());
 					bulletArray[j].destroy();

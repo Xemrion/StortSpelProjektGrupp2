@@ -340,6 +340,11 @@ bool Bullet::getFlame() const
 	return weapon.doesDoT;
 }
 
+bool Bullet::getKnockback() const
+{
+	return weapon.doesKnockBack;
+}
+
 GameObject* Bullet::getGameObject()
 {
 	return obj;

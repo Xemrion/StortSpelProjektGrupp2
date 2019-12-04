@@ -7,7 +7,7 @@
 #include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
-#define SPAWN_ENEMIES 0
+#define SPAWN_ENEMIES 1
 ActorManager::ActorManager()
 {
 }
@@ -181,6 +181,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
+						if (bulletArray[j].getFlame())
+						{
+							actors[i]->setFire();
+						}
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
 					}
 				}
@@ -194,6 +198,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					{
 						actors[i]->setFire();
 					}
+					if(bulletArray[i].getKnockback())
+					{
+						actors[i]->knockBack(bulletArray[i].getDirection());
+					}
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					bulletArray[j].destroy();
 				}
@@ -202,6 +210,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (soundTimer > 0.05f) {
 						Sound::play("data/sound/HitSound.wav");
 						soundTimer = 0;
+					}
+					if (bulletArray[j].getFlame())
+					{
+						actors[i]->setFire();
 					}
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					// dont remove the melee weapon
@@ -231,6 +243,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 								Sound::play("./data/sound/HitSound.wav");
 								soundTimer = 0;
 							}
+							if (bulletArray[j].getFlame())
+							{
+								bosses[i]->setFire();
+							}
 							this->bosses[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
 						}
 					}
@@ -252,6 +268,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						if (soundTimer > 0.05f) {
 							Sound::play("data/sound/HitSound.wav");
 							soundTimer = 0;
+						}
+						if (bulletArray[j].getFlame())
+						{
+							bosses[i]->setFire();
 						}
 						this->bosses[i]->changeHealth(-bulletArray[j].getDamage());
 						// dont remove the melee weapon
