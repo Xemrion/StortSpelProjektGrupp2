@@ -89,7 +89,7 @@ float4 main(PSInput input) : SV_Target
     //float3 tangent = input.TangentWS.xyz;
     //float3 bitangent = input.BitangentWS.xyz;
     //float3 normalMap = NormalMap.Sample(SampSt, input.Tex).xyz;
-    float4 specularColor = float4(0.4f,0.4f,0.4f,1.0f);
+    float4 specularColor = float4(0.0f,0.0f,0.0f,1.0f);
     float gloss = 0;
     //gloss = exp2(10 * gloss + 1);
 
@@ -176,9 +176,8 @@ float4 main(PSInput input) : SV_Target
     }
     float4 setColor = input.color;
     setColor.w = 0.0f;
-    float4 outColor = (texColor ) * (diffuseLight + ambient);
-    outColor += (specularColor ) * specularLight;
-    
+    float4 outColor = (texColor ) * (diffuseLight + ambient*0.1f);
+    //outColor += (specularColor ) * specularLight;
     return outColor;
     //float4 texColor = Texture.Sample(Sampler, input.uv);
    // float4 finCol = float4(texColor.xyz,texColor.w);

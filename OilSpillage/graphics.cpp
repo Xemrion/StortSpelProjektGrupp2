@@ -458,8 +458,8 @@ bool Graphics::init(Window* window)
 	this->particleTrail->setCapacity(512 * 20);
 	this->particleTrail->setOnlyAdd(true);
 	this->particleTrail->setBufferType(D3D11_BUFFER_UAV_FLAG_COUNTER);
-	loadTexture("trail");
-	this->particleTrail->setTexture(getTexturePointer("trail"));
+	loadTexture("ParticleTextures/trail");
+	this->particleTrail->setTexture(getTexturePointer("ParticleTextures/trail"));
 	Vector4 testTC[4] = { Vector4(0.6f,0.6f,0.6f,0.1f) };
 	this->particleTrail->setColor(testTC, 1);
 
