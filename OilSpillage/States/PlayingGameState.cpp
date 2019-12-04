@@ -707,7 +707,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 	
-	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
@@ -718,8 +718,7 @@ void PlayingGameState::update(float deltaTime)
 		ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	#endif // !_DEBUG
-
+	//#endif // !_DEBUG
 	graphics.presentScene();
 }
 
