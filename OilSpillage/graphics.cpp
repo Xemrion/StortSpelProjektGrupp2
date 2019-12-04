@@ -1584,10 +1584,14 @@ void Graphics::addToDraw(GameObject* o)
 void Graphics::removeFromDraw(GameObject* o)
 {
 	auto obj = std::find(drawableObjects.begin(), drawableObjects.end(), o);
-
+	int index = std::distance(drawableObjects.begin(), obj);
 	if (obj != drawableObjects.end())
 	{
-		drawableObjects.erase(obj);
+		GameObject* temp = drawableObjects[index];
+		drawableObjects[index] = drawableObjects[drawableObjects.size() - 1];
+		drawableObjects[drawableObjects.size() - 1] = temp;
+		drawableObjects.pop_back();
+		//drawableObjects.erase(obj);
 	}
 }
 
