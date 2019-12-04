@@ -698,9 +698,18 @@ void  Map::generateBuildings( )
 					++currentArea;
 				}
 			}
+			
+			
 		}
 	}
-
+	CompositeHouse skyscraper = instantiateSkyscraper();
+	skyscraper.walls.setPosition(Vector3(15.0f, 0.0f, -15.0f));
+	skyscraper.roof.setPosition(Vector3(15.0f, 0.0f, -15.0f));
+	skyscraper.windows.setPosition(Vector3(15.0f, 0.0f, -15.0f));
+	skyscraper.walls.setTexture(Game::getGraphics().getTexturePointer("brickwall"));
+	skyscraper.roof.setTexture(Game::getGraphics().getTexturePointer("brickwall"));
+	skyscraper.windows.setTexture(Game::getGraphics().getTexturePointer("brickwall"));
+	houses.composites.push_back(skyscraper);
 	// adding all the tiles to draw:
 	for ( auto &e : houses.composites ) {
 		graphics.addToDrawStatic( &e.walls   );
@@ -1589,9 +1598,9 @@ CompositeHouse Map::instantiateSkyscraper()
 	CompositeHouse temp;
 	temp.skyscraperMeshIndex = skyscraperName;
 
-	skyscraperGenerator->setRoofMesh(skyscraperName, &temp.roof);
-	skyscraperGenerator->setWallMesh(skyscraperName, &temp.walls);
-	skyscraperGenerator->setWindowMesh(skyscraperName, &temp.windows);
+	skyscraperGenerator->setRoofMesh(temp.skyscraperMeshIndex, &temp.roof);
+	skyscraperGenerator->setWallMesh(temp.skyscraperMeshIndex, &temp.walls);
+	skyscraperGenerator->setWindowMesh(temp.skyscraperMeshIndex, &temp.windows);
 	temp.roof.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.walls.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.windows.setScale(Vector3(2.0f, 1.0f, 2.0f));
@@ -1601,7 +1610,7 @@ CompositeHouse Map::instantiateSkyscraper()
 	tempVec.z *= 2;
 	temp.bounds.x = (tempVec.x / config.tileSideScaleFactor) + 1;
 	temp.bounds.y = (tempVec.z / config.tileSideScaleFactor) + 1;
-	
+
 	return temp;
 }
 

@@ -87,7 +87,6 @@ private:
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
 	std::unique_ptr<Lsystem>		testSystem;
-	std::unique_ptr<Skyscraper>		testSkyscraper;
 	std::vector<CinematicPos>       points;
 	std::vector<std::unique_ptr<PowerUp>> powerUps;
 	SpotLight                      *playerLight;
