@@ -24,15 +24,16 @@ public:
 	void scale(Vector3 scaleBy);
 	void regenerateShape(int edges);
 
-	void testDrawLines() const; //Lines
-	void getTriangleIndices();
+	bool getTriangleIndices();
+	std::vector<Vertex3D> getWindowVertices(Vector3 otherCenter);
 	std::vector<Vertex3D> getWallVertices(Vector3 otherCenter);
 	std::vector<Vertex3D> getRoofVertices();
-	void testDrawTriangles(std::string name, Vector4 colour);
+	std::vector<Vertex3D> getDifferenceAsRoofVerticies(const SkyscraperFloor& other);
 private:
 	std::vector<Vector3> verticies;
 	std::vector<int> indices;
 	int nrOfEdges;
+	bool triangleGenFail = false;
 	Vector3 center;
 	GameObject* roof;
 
@@ -40,38 +41,7 @@ private:
 
 
 	void generateShape(int edges);
-	Vector3 intersectingLines(Vector3& pointA1, Vector3& pointA2, Vector3& pointB1, Vector3& pointB2) const;
+	Vector3 intersectingLines(Vector3 pointA1, Vector3 pointA2, Vector3 pointB1, Vector3 pointB2) const;
 	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA) const;
+	bool evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 pointA, Vector3 pointTowards) const;
 };
-
-/*	Display a complex shape with triangles
-
-	pick a point
-	make a line between neighboors
-		if a neighboor is unavailable, move one step further away from start point in the neighboors direction
-		repeat until both neighboor are available
-	make a line from one neighboor to all other points
-	cross product to check the side the start point is one
-	cross product with the other ones, if any other is on the same side as the start point, it cannot be
-	if yes, change start point and repeat
-		if (point - unavailable points) is two or lower, end loop
-	if no, make triangle, set start point to unavailable
-*/
-
-/*
-	Get a lower roof.
-
-	Compare two vectors of points
-	if a point doesn't exist in both, add to a new vector of points
-	save index of the points, compare one below the lowest index, if it exists in both, add it
-	repeat for one after the highest index
-	this vector is the lower roof
-*/
-
-/*
-	Making sides
-
-	compare bottom to top
-	if the point doesn't exist, compare to a lower floor
-	it the point exists, save index of both and the roof it is on
-*/
