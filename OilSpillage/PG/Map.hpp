@@ -7,6 +7,7 @@
 #include "RoadGenerator.hpp"
 #include "Voronoi.hpp"
 #include "District.hpp"
+#include "Skyscraper.h"
 #include "../UI/Playing/UIPlaying.h"
 #include "Environment.hpp"
 #include "../Lights.h"
@@ -103,8 +104,8 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum, RNG & ) noexcep
 
 struct CompositeHouse {
 	GameObject          walls, windows, roof;
-	Vector<GameObject>  hitboxes;
 	V2u                 dimensions;
+	String				skyscraperMeshIndex;
 };
 
 struct SingleTileHouse {
@@ -166,27 +167,30 @@ public:
 	District::Enum             districtAt( U32 x, U32 y ) const noexcept;
 	HouseGenData const &       getHouseData() const noexcept;
 	Info const &               getInfo() const noexcept;
+	Vector<F32> const &        getRoadDistanceMap() const noexcept;
 private:
 	void                       placeStreetlight( Vector3 const &worldPosition, Vector3 const &rotation={.0f,.0f,.0f} ) noexcept;
 	void                       generateDistricts();
 	void                       generateRoads();
 	void                       generateBuildings();
 	void                       generateBorder();
+	void                       generateZebraCrossings();
 	void                       generateStreetlights();
 	Opt<Lot>                   findRandomLot( U16 districtId ) noexcept;
 	Opt<Lot>                   findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
-	Vector<UPtr<GameObject>>   instantiateTilesAsModels() noexcept;
-	void                       instantiateHousesAsModels() noexcept;
+	void                       instantiateTilesAsModels() noexcept;
 	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout &&, HouseTileset const & ) const noexcept;
-	//void                       generateTransitions() noexcept;
+	CompositeHouse			   instantiateSkyscraper();
 	Graphics &                 graphics;
 	V2u                        startPositionInTileSpace;
 	UPtr<TileMap>              tilemap;
 	UPtr<Voronoi>              districtMap;
 	Vector<District::Enum>     districtLookupTable;
 	Vector<UPtr<GameObject>>   groundTiles;
+	Vector<UPtr<GameObject>>   crossingTiles;
 	Physics * const            physics;
 	LightList &                lights;
+	UPtr<Skyscraper>		   skyscraperGenerator;
 	// TODO: refactor out:
 	using DistrictID = U16;
 	using BuildingID = U16;                         // 0 = unused tile
@@ -198,7 +202,7 @@ private:
 	Vector<UPtr<Streetlight>>  streetlights;
 	Vector<Opt<V2u>>           hospitalTable;
 	HouseGenData               houses;
-	RNG                        rng; // TODO, instantiate in ctor
+	RNG                        rng;
 	Border                     border;
 	Info                       info;
 };

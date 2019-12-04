@@ -12,11 +12,11 @@ static auto constexpr scanlineInterval {  4U  }; // lines between scanlines
 static auto constexpr scanlineStrength { .03f }; // brightening/darkening impact of scanlines; 0 = disabled
 static auto constexpr multitileBorder  {  1U  }; // thickness of border around multitile houses (in pixels)
 static auto constexpr roadBorder       {  1U  }; // thickness of sidewalk around roads          (in pixels)
+static auto constexpr districtBlendFac { .1f };
 
 #pragma warning( disable : 4715 ) 
 String createMinimapTexture( Map const &map, Bool isDistrictColoured )
 {
-	static auto constexpr districtBlendFac { .05f };
 	auto numDistricts = District::Type::size();
 	Vector<RGBA> districtColors( numDistricts );
 					 districtColors[District::residential  .index] = 0xFF'00FFFF;
@@ -339,4 +339,38 @@ String createFogOfWarTexture( Map const &map )
                    static_cast<I32>(TEX_HEIGHT),
                    4, pixels.data() );
 	return String("map/fog");
+}
+
+#pragma warning( disable : 4715 ) 
+String createDistanceTexture( Map const &map )
+{
+   Size const    TEX_WIDTH   { map.getTileMap().width  },
+                 TEX_HEIGHT  { map.getTileMap().height };
+   Vector<RGBA>  pixels( TEX_WIDTH * TEX_HEIGHT );
+
+	auto const &tilemap     = map.getTileMap();
+	auto const &distanceMap = map.getRoadDistanceMap();
+
+	float furthest = .0f;
+	for ( auto x=0;  x < tilemap.width; ++x )
+		for ( auto y=0;  y < tilemap.height; ++y ) {
+			auto dist = distanceMap[tilemap.index(x,y)];
+			if ( dist > furthest )
+				furthest = dist;
+			}
+
+	for ( auto x=0;  x < tilemap.width; ++x )
+		for ( auto y=0;  y < tilemap.height; ++y ) {
+			auto dist = distanceMap[tilemap.index(x,y)];
+			pixels[y*TEX_WIDTH+x] = I32(dist/furthest*255)         // RR
+                              + (I32(dist/furthest*255) <<  8)  // GG
+                              + (I32(dist/furthest*255) << 16)  // BB
+                              + (I32(255)               << 24); // AA
+		}
+
+	stbi_write_tga( "data/textures/map/distance.tga",
+                   static_cast<I32>(TEX_WIDTH),
+                   static_cast<I32>(TEX_HEIGHT),
+                   4, pixels.data() );
+	return String("map/distance");
 }

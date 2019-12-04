@@ -59,6 +59,7 @@ void PlayingGameState::initAI()
 	actorManager = nullptr;
 	actorManager = std::make_unique<ActorManager>( aStar.get(), physics.get(), map.get(), &rng );
 	aStar->generateTileData(map->getTileMap());
+	/*
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
@@ -66,6 +67,7 @@ void PlayingGameState::initAI()
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+	*/
 
 }
 
@@ -105,10 +107,12 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadModel("Tiles/Quad_SS"); // single-sided
 	graphics.loadTexture("Tiles/asphalt");
 	graphics.loadTexture("Tiles/asphalt_nor");
-	graphics.loadTexture("Tiles/grass");
-	graphics.loadTexture("Tiles/grass_nor");
-	graphics.loadTexture("Tiles/snow");
-	graphics.loadTexture("Tiles/snow_nor");
+	graphics.loadTexture("Tiles/grasslands");
+	graphics.loadTexture("Tiles/grasslands_nor");
+	graphics.loadTexture("Tiles/ashlands");
+	graphics.loadTexture("Tiles/ashlands_nor");
+	graphics.loadTexture("Tiles/arctic");
+	graphics.loadTexture("Tiles/arctic_nor");
 	graphics.loadTexture("Tiles/desert");
 	graphics.loadTexture("Tiles/desert_nor");
 	graphics.loadTexture("Tiles/road_trans_2file2metro");
@@ -130,6 +134,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadTexture("Tiles/road_marker_4way");
 	graphics.loadTexture("Tiles/concrete");
 	graphics.loadTexture("Tiles/concrete_nor");
+	graphics.loadTexture("Tiles/zebra_crossing");
 
 	graphics.loadTexture("Tiles/road_2file_deadend_n");
 	graphics.loadTexture("Tiles/road_2file_deadend_n_nor");
@@ -186,6 +191,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	minimap = createMinimapTexture(*map);
 	generateMapPowerUps();
 	createFogOfWarTexture(*map);
+	createDistanceTexture(*map);
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
@@ -606,13 +612,13 @@ void PlayingGameState::update(float deltaTime)
 			this->player->setHealth(0);
 		}
 
-		actorManager->update(deltaTime, player->getPosition());
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount, deltaTime);
+		actorManager->update(deltaTime, player->getPosition());
 		accelForce = Vector3(player->getRigidBody()->getLinearVelocity().getX(), player->getRigidBody()->getLinearVelocity().getY(), player->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation(deltaTime);
 		camera->update(deltaTime);
-		objectives.update(player->getPosition());
+		objectives.update(player->getPosition(), physics.get());
 		Bullet::updateSoundTimer(deltaTime);
 		player->updateWeapon(deltaTime);
 		timer += deltaTime;
@@ -1034,7 +1040,7 @@ void PlayingGameState::generateMapPowerUps()
 
 void PlayingGameState::generateObjectives()
 {
-	if (Game::getNrOfStagesDone() % 3 == 0) //nrOfStagesBEGUN
+	if (Game::getNrOfStagesDone() % 3 == 0)
 	{
 		//difficulty scale
 		float scalingNr = Game::getNrOfStagesDone() / 3; // /3
