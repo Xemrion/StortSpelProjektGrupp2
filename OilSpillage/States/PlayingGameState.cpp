@@ -59,6 +59,7 @@ void PlayingGameState::initAI()
 	actorManager = nullptr;
 	actorManager = std::make_unique<ActorManager>( aStar.get(), physics.get(), map.get(), &rng );
 	aStar->generateTileData(map->getTileMap());
+	/*
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
@@ -66,6 +67,7 @@ void PlayingGameState::initAI()
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+	*/
 
 }
 
