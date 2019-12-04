@@ -35,32 +35,15 @@ void Sniper::setUpActor()
 {
 	this->root = &bt.getSelector();
 	Sequence& sequence = bt.getSequence();
-	Selector& selector = bt.getSelector();
-	Sequence& seq2 = bt.getSequence();
 
 	Behavior& inRange = bt.getAction();
 	inRange.addAction(std::bind(&Sniper::inAttackRange, std::ref(*this)));
-	Behavior& chase = bt.getAction();
-	chase.addAction(std::bind(&Sniper::setChaseState, std::ref(*this)));
-	Behavior& roam = bt.getAction();
-	roam.addAction(std::bind(&Sniper::setIdleState, std::ref(*this)));
 	Behavior& shoot = bt.getAction();
 	shoot.addAction(std::bind(&Sniper::shoot, std::ref(*this)));
-	Behavior& inAggroRange = bt.getAction();
-	inAggroRange.addAction(std::bind(&Sniper::inAggroRange, std::ref(*this)));
 
 	root->addChildren(sequence);
-	root->addChildren(roam);
-
-	sequence.addChildren(inAggroRange);
-	sequence.addChildren(selector);
-
-	selector.addChildren(seq2);
-	selector.addChildren(chase);
-
-	seq2.addChildren(inRange);
-
-	seq2.addChildren(shoot);
+	sequence.addChildren(inRange);
+	sequence.addChildren(shoot);
 }
 
 Vector3 Sniper::calculateVelocity()

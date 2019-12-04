@@ -18,14 +18,8 @@ protected:
 	Vector3 destination;
 	Vector3 velocity;
 
-	
-	enum class State { Idle, Chasing };
-	//State state;
-
 	virtual void move();
 	virtual Vector3 calculateVelocity();
 	virtual void followPath();
-	Status setChaseState();
 	Status inAggroRange();
-	Status setIdleState();
 };

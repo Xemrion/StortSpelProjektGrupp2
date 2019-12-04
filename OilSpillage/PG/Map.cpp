@@ -3,7 +3,6 @@
 #include "Map.hpp"
 #include "Profiler.hpp"
 
-
 std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Pleasant", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset" };
 
 std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "polis", "heim", " Meadows", " Creek", " Base", " Metropolis" };
@@ -139,7 +138,7 @@ static F32 constexpr sidewalkOffsetY   { -1.47f };
 
 void Map::generateBorder() {
 	auto constexpr borderThickness = 4;
-
+	auto biome = info.environment.getBiome();
 	for ( I32 x = -borderThickness;  x <= I32(tilemap->width)+borderThickness;  ++x ) {
 		for ( I32 y = -borderThickness;  y <= I32(tilemap->height)+borderThickness;  ++y ) {
 			if ( (x < 0) or (x >= I32(tilemap->width)) or (y < 0) or (y >= I32(tilemap->height)) ) {
@@ -362,16 +361,14 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	rng             ( RD()()                                                                                        )
 {
 	DBG_PROBE(Map::Map);
-	U32_Dist genBiome { 0, 3 };
+
 	if ( config.seed != -1 )  
 		rng.seed( config.seed );
 
-	biome = static_cast<Biome>( genBiome(rng) % 3 );
-
-	info.name    = generateCityName(rng);
-	info.width   = config.dimensions.x;
-	info.length  = config.dimensions.y;
-	info.biome   = biome;
+	info.environment = {rng};
+	info.width       = config.dimensions.x;
+	info.length      = config.dimensions.y;
+	info.name        = generateCityName(rng);
 
 	// TODO: generate water etc
 	generateRoads();
@@ -1504,7 +1501,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 
 
 						house.hitboxes.emplace_back();
-						auto    &hitboxB = house.hitboxes.back();
+						auto  &hitboxB = house.hitboxes.back();
 
 					// DEBUG
 						//	hitboxB.setColor({1.0f, 0.0f, 1.0f, 1.0f}); // magenta
@@ -1519,7 +1516,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						hitboxB.setRigidBody( tmpB, physics );
 					#endif
 
-					instantiateTilePart(    "r_ic", basePosition, 90.0f*q, floorCount-1, tileset.floorHeight );
+					instantiateTilePart( "r_ic", basePosition, 90.0f*q, floorCount-1, tileset.floorHeight );
 				}
 				else if ( (quadmask & 0b00000'101) == 0b00000'100 ) { // 100 or 110 => side A
 					instantiateTilePart( "f_sa", basePosition, 90.0f*q, .0f );
@@ -1598,6 +1595,8 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 
 Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 {
+	auto biome = info.environment.getBiome();
+
 	Vector<UPtr<GameObject>> models;
 	models.reserve( tilemap->data.size() * 3 );// TODO: use worst case scenario: 6 quads per tile?
 	auto instantiatePart = [&]( std::string_view name, Vector3 const &pos, F32 deg=.0f, F32 yOffset=baseOffsetY, Bool hasNormal=true, Bool noShadowcasting=false ) {
@@ -1744,11 +1743,6 @@ Vector<UPtr<GameObject>> Map::instantiateTilesAsModels() noexcept
 		}
 	}
 	return models;
-}
-
-Biome Map::getBiome() const noexcept
-{
-	return biome;
 }
 
 HouseGenData const& Map::getHouseData() const noexcept

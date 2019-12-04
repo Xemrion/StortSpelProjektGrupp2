@@ -345,7 +345,7 @@ void ActorManager::updateActors(float dt, const Vector3& targetPos)
 			if (normalizedRandom >= 0.995)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-					PowerUp(actors[i]->getPosition(),
+					PowerUp(actors[i]->getPosition(), physics, 
 						PowerUpType::Health)
 				);
 			}

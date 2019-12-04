@@ -1,5 +1,7 @@
 #include "Item.h"
 #include "ItemWeapon.h"
+#include "ItemChassi.h"
+#include "ItemWheel.h"
 #include "../game.h"
 #include "../PG/defs.hpp"
 
@@ -26,6 +28,8 @@ void Item::init()
 	graphics.loadModel("Entities/FlameThrower");
 	graphics.loadModel("Entities/Lazer");
 	graphics.loadModel("Entities/Spike");
+	graphics.loadModel("Entities/Player_Car_Parts/Chassi1");
+	graphics.loadModel("Entities/Player_Car_Parts/Wheel1");
 
 	GameObject* machineGun = new GameObject();
 	machineGun->mesh = graphics.getMeshPointer("Entities/Minigun");
@@ -51,11 +55,25 @@ void Item::init()
 	spike->setScale(Vector3(0.05f));
 	spike->setPosition(lazer->mesh->getAABB().scale(lazer->getScale()).maxPos * Vector3(0, 1, 0));
 
+	GameObject* chassi1 = new GameObject();
+	chassi1->mesh = graphics.getMeshPointer("Entities/Player_Car_Parts/Chassi1");
+	chassi1->setMaterial(graphics.getMaterial("Entities/Player_Car_Parts/Chassi1"));
+	chassi1->setScale(Vector3(0.05f));
+	chassi1->setPosition(chassi1->mesh->getAABB().scale(chassi1->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0,0.1f,0));
+
+	GameObject* wheel1 = new GameObject();
+	wheel1->mesh = graphics.getMeshPointer("Entities/Player_Car_Parts/Wheel1");
+	wheel1->setMaterial(graphics.getMaterial("Entities/Player_Car_Parts/Wheel1"));
+	wheel1->setScale(Vector3(0.21f));
+	wheel1->setPosition(wheel1->mesh->getAABB().scale(wheel1->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.1f, 0));
+
 	Item::premadeItems = {
 		std::make_shared<ItemWeapon>("Machinegun", WeaponHandler::getWeapon(WeaponType::MachineGun), machineGun),
 		std::make_shared<ItemWeapon>("Flamethrower", WeaponHandler::getWeapon(WeaponType::Flamethrower), flameThrower),
 		std::make_shared<ItemWeapon>("Lazer", WeaponHandler::getWeapon(WeaponType::Laser), lazer),
-		std::make_shared<ItemWeapon>("Spikes", WeaponHandler::getWeapon(WeaponType::Spikes), spike)
+		std::make_shared<ItemWeapon>("Spikes", WeaponHandler::getWeapon(WeaponType::Spikes), spike),
+		std::make_shared<ItemChassi>("Muscle Chassi", chassi1),
+		std::make_shared<ItemWheel>("Muscle Tires", wheel1)
 	};
 
 }

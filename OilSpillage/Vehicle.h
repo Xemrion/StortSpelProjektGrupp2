@@ -180,6 +180,8 @@ private:
 	bool flameBool;
 	bool dmg;
 	Vector2 tempCurDir;
+	std::string curChassi;
+	std::string curWheel;
 	
 	int soundHandle = 0;
 	int driftHandle = 0;
@@ -225,6 +227,9 @@ public:
 	Vector3 getCameraDistance(float deltaTime);
 	void setAccelForce(Vector3 accelForce, float deltaTime);
 	void setWheelRotation(float deltaTime);
+	void setChassi(GameObject* newChassi, Stats stats);
+	void setWheels(GameObject* newWheel, Stats stats);
+	GameObject* getWheel();
 	//void onCollision(Vector2 direction);
 
 	const int& getHealthRef() const;

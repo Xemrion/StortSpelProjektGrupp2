@@ -168,6 +168,8 @@
     <ClCompile Include="UI\Playing\UIBeforePlaying.cpp" />
     <ClCompile Include="SaveSystem.cpp" />
     <ClCompile Include="UI\Menu\UILoad.cpp" />
+    <ClCompile Include="Inventory\ItemChassi.cpp" />
+    <ClCompile Include="Inventory\ItemWheel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -186,7 +188,6 @@
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="fog.h" />
     <ClInclude Include="Particle\ParticleHandler.h" />
-    <ClInclude Include="PG\Biome.hpp" />
     <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="Inventory\Container.h" />
     <ClInclude Include="Inventory\ItemWeapon.h" />
@@ -384,6 +385,9 @@
     <ClInclude Include="UI\Playing\UIBeforePlaying.h" />
     <ClInclude Include="SaveSystem.h" />
     <ClInclude Include="UI\Menu\UILoad.h" />
+    <ClInclude Include="Inventory\ItemChassi.h" />
+    <ClInclude Include="Inventory\ItemWheel.h" />
+    <ClInclude Include="PG\Environment.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

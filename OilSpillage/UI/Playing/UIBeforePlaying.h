@@ -4,7 +4,6 @@
 #include "../UserInterface.h"
 #include "../Elements/ButtonPromtBar.h"
 #include "../../Texture.h"
-#include "../../PG/Biome.hpp"
 #include "../Elements/AnimatedText.h"
 
 class UIBeforePlaying : public UserInterface

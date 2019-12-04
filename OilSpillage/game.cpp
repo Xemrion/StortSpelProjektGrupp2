@@ -149,6 +149,9 @@ void Game::createCurrentState()
 {
 	VehicleSlots* transfer = nullptr;
 	VehicleSlots* newSlots = nullptr;
+	GameObject* wheelTemp = nullptr;
+	GameObject* chassiTemp = nullptr;
+	Stats tempStats;
 	Vehicle*temp = nullptr;
 	if (oldState == STATE_PLAYING)
 	{
@@ -171,6 +174,13 @@ void Game::createCurrentState()
 			transfer = static_cast<UpgradingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
 			temp = static_cast<UpgradingGameState*>(state.get())->getPlayer().get();
+			if (temp->getVehicleBody1() != nullptr) {
+				chassiTemp = new GameObject(*temp->getVehicleBody1());
+			}
+			if (temp->getWheel() != nullptr) {
+				wheelTemp = new GameObject(*temp->getWheel());
+			}
+			tempStats = temp->getStats();
 			temp->stopEngineSound();
 			
 			Sound::stopAllLoops();
@@ -192,6 +202,16 @@ void Game::createCurrentState()
 		if (oldState == STATE_UPGRADING)
 		{	
 			static_cast<PlayingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
+			if (chassiTemp != nullptr) {
+				static_cast<PlayingGameState*>(state.get())->getPlayer()->setChassi(chassiTemp, tempStats);
+			}
+			if (wheelTemp != nullptr) {
+				static_cast<PlayingGameState*>(state.get())->getPlayer()->setWheels(wheelTemp, tempStats);
+			}
+
+			delete wheelTemp;
+			delete chassiTemp;
+
 			Sound::stopAllLoops();
 			static_cast<PlayingGameState*>(state.get())->getPlayer()->startEngineSound();
 		}
@@ -205,6 +225,13 @@ void Game::createCurrentState()
 			transfer = static_cast<PlayingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
 			temp = static_cast<PlayingGameState*>(state.get())->getPlayer().get();
+			if (chassiTemp != nullptr) {
+				chassiTemp = temp->getVehicleBody1();
+			}
+			if (chassiTemp != nullptr) {
+				wheelTemp = temp->getWheel();
+			}
+			tempStats = temp->getStats();
 			temp->stopEngineSound();
 			Sound::stopAllLoops();
 		}

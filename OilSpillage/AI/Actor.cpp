@@ -3,8 +3,6 @@
 
 Actor::Actor()
 {
-	this->setUpActor();
-
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(0, 0.0f, 0);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
