@@ -12,6 +12,8 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 		stream << "Max Spread: " << weapon.maxSpread << "\n";
 		stream << "DoT: " << weapon.doesDoT << "\n";
 		stream << "Knockback: " << weapon.doesKnockBack << "\n";
+		stream << "Splash: " << weapon.doesSplashDmg << "\n";
+		stream << "SplashRange: " << weapon.splashRange << "\n";
 	}
 	else if(weapon.type == WeaponType::Laser){
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
@@ -89,10 +91,16 @@ void ItemWeapon::randomize()
 		{
 			weapon.doesDoT = true;
 		}
-		else if(chance > 10 && chance < 20)
+		else if(chance > 10 && chance <= 20)
 		{
 			weapon.doesKnockBack = true;
 		}
+		else if (chance > 20 && chance <= 30)
+		{
+			weapon.doesSplashDmg = true;
+			weapon.splashRange = 100;
+		}
+
 	}
 	else if (weapon.type == WeaponType::Laser) 
 	{
