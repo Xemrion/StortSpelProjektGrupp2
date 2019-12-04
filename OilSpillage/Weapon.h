@@ -43,6 +43,8 @@ struct Weapon
 	float remainingCooldown = 0.0;
 	WeaponType type = WeaponType::Default;
 	bool melee = false;
+	bool doesSplashDmg = false;
+	float splashRange = 0.0;
 	float soundTimer = 0.0f;
 	float timeSinceLastShot = 0.0f;
 	bool flameBool = false;
@@ -201,6 +203,8 @@ public:
 	bool getMelee() const;
 	bool getFlame() const;
 	bool getKnockback() const;
+	bool getSplashBool() const;
+	float getSplashRange() const;
 	void shoot(Weapon& weapon, const Vector3& position, const Vector3& normalizedDir,const Vector3& additionalVelocity, float deltaTime);
 	void update(float deltaTime);
 	float getTimeLeft() const;

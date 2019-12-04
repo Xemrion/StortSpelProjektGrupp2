@@ -345,6 +345,16 @@ bool Bullet::getKnockback() const
 	return weapon.doesKnockBack;
 }
 
+bool Bullet::getSplashBool() const
+{
+	return weapon.doesSplashDmg;
+}
+
+float Bullet::getSplashRange() const
+{
+	return weapon.splashRange;
+}
+
 GameObject* Bullet::getGameObject()
 {
 	return obj;
