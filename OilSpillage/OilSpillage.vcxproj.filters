@@ -29,6 +29,9 @@
     <FxCompile Include="Particle\DebrisUpdateCS.hlsl" />
     <FxCompile Include="Particle\DebrisCreateCS.hlsl" />
     <FxCompile Include="Particle\ElectroUpdateCS.hlsl" />
+    <FxCompile Include="Particle\SnowCreateCS.hlsl" />
+    <FxCompile Include="Particle\SnowUpdateCS.hlsl" />
+    <FxCompile Include="Particle\SnowParticleGS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI\AIGroup.cpp" />
@@ -354,7 +357,6 @@
     <ClInclude Include="AI\Sniper.h" />
     <ClInclude Include="AI\ChaseCar.h" />
     <ClInclude Include="fog.h" />
-    <ClInclude Include="PG\Biome.hpp" />
     <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="AI\ShootCar.h" />
     <ClInclude Include="Inventory\Container.h" />
