@@ -1643,6 +1643,11 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 	return std::move( house );
 }
 
+CompositeHouse Map::instantiateSkyscraper()
+{
+	return CompositeHouse();
+}
+
 
 void Map::instantiateTilesAsModels() noexcept
 {

@@ -179,6 +179,7 @@ private:
 	Opt<Lot>                   findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
 	void                       instantiateTilesAsModels() noexcept;
 	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout &&, HouseTileset const & ) const noexcept;
+	CompositeHouse			   instantiateSkyscraper();
 	Graphics &                 graphics;
 	V2u                        startPositionInTileSpace;
 	UPtr<TileMap>              tilemap;
