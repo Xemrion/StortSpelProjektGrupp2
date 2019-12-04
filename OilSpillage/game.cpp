@@ -177,7 +177,7 @@ void Game::createCurrentState()
 		
 		if (gameInfo.nrOfClearedStages <= 0)
 		{
-			state = std::make_unique<PlayingGameState>(1231,7.0f*60.0f);
+			state = std::make_unique<PlayingGameState>(-1,7.0f*60.0f);
 		}
 		else
 		{
