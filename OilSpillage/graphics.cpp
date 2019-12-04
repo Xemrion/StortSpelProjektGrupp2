@@ -38,7 +38,8 @@ Graphics::Graphics()
 
 	this->particleHandler->addParticleSystem(this->particleSystem,  "fire");
 	this->particleHandler->addParticleSystem(this->particleSystem2, "smoke");
-	this->particleHandler->addParticleSystem(this->particleTrail,   "trail");
+	//this->particleHandler->addParticleSystem(this->particleTrail,   "trail");
+	this->particleTrail->setNameofSystem("trail");
 	Vector4 colors[4] = {
 		Vector4(0.0f,0.0f,1.0f,1.0f)
 	};
@@ -84,6 +85,9 @@ Graphics::Graphics()
 
 
 	this->particleHandler->getParticleSystem("rain")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
+	this->particleTrail->loadSystem();
+	this->particleHandler->getParticleSystem("electro")->setUpdateShader("ElectroUpdateCS.cso");
+	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 
 }
@@ -100,6 +104,7 @@ Graphics::~Graphics()
 		i->second->Shutdown();
 		delete i->second;
 	}
+	delete this->particleTrail;
 	delete this->particleHandler;
 	delete this->lightBufferContents;
 	swapChain->SetFullscreenState(false, NULL);
@@ -228,7 +233,6 @@ bool Graphics::init(Window* window)
 	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-
 	// Create depth stencil state
 	result = device->CreateDepthStencilState(&depthStencilDesc, depthStencilState.ReleaseAndGetAddressOf());
 	if (FAILED(result))
@@ -236,6 +240,12 @@ bool Graphics::init(Window* window)
 		return false;
 	}
 
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ZERO;
+	result = device->CreateDepthStencilState(&depthStencilDesc, readOnlyDST.ReleaseAndGetAddressOf());
+	if (FAILED(result))
+	{
+		return false;
+	}
 	this->vp.Width = (float)this->window->width;
 	this->vp.Height = (float)this->window->height;
 	this->vp.MinDepth = 0.0f;
@@ -472,6 +482,14 @@ bool Graphics::init(Window* window)
 
 	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleSystem2->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleTrail->setCapacity(512 * 20);
+	this->particleTrail->setOnlyAdd(true);
+	this->particleTrail->setBufferType(D3D11_BUFFER_UAV_FLAG_COUNTER);
+	loadTexture("ParticleTextures/trail");
+	this->particleTrail->setTexture(getTexturePointer("ParticleTextures/trail"));
+	Vector4 testTC[4] = { Vector4(0.6f,0.6f,0.6f,0.1f) };
+	this->particleTrail->setColor(testTC, 1);
+
 	this->particleTrail->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
@@ -576,28 +594,6 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	this->particleHandler->renderParticleSystems(camera);
 
-
-	/*this->particleSystem->updateParticles(deltaTime, viewProj);
-
-	this->particleSystem->drawAll(camera);
-
-	this->particleSystem2->updateParticles(deltaTime, viewProj);
-
-	this->particleSystem2->drawAll(camera);
-
-	this->particleHandler->getParticleSystem("electro")->updateParticles(deltaTime, viewProj);
-
-	this->particleHandler->getParticleSystem("electro")->drawAll(camera);
-
-	this->particleHandler->getParticleSystem("explosion")->updateParticles(deltaTime, viewProj);
-
-	this->particleHandler->getParticleSystem("explosion")->drawAll(camera);
-
-	this->particleTrail->updateParticles(deltaTime, viewProj);
-
-	
-
-	this->particleTrail->drawAll(camera);*/
 	
 	//set up Shaders
 
@@ -684,6 +680,31 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	
 	drawStaticGameObjects(camera, frustum, 15.0);
 	
+	
+	this->particleTrail->updateParticles(deltaTime, viewProj);
+
+	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
+	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
+	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
+
+	deviceContext->OMSetDepthStencilState(readOnlyDST.Get(), 0);
+
+
+	deviceContext->PSSetConstantBuffers(1, 1, this->lightBuffer.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(2, 1, this->sunBuffer.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(3, 1, this->indexSpot.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(4, 1, this->cameraBuffer.GetAddressOf());
+	deviceContext->PSSetShaderResources(2, 1, this->culledLightBufferSRV.GetAddressOf());
+
+	this->particleTrail->drawAll(camera);
+	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+
+	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
+	deviceContext->VSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->VSSetConstantBuffers(3, 1, this->shadowMap.getViewProjSpot().GetAddressOf());
+	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
+
 	if (fogActive)
 	{
 		drawFog(camera, deltaTime);
@@ -711,19 +732,19 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	Frustum frustum = shadowMap.getSunFrustum();
 	Frustum spotFrustum = shadowMap.getSpotFrustum();
 
-	
+	deviceContext->PSSetShader(nullptr, nullptr, 0);
+	UINT stride = sizeof(Vertex3D);
+	UINT offset = 0;
 	for (GameObject* object : drawableObjects)
 	{
 		AABB boundingBox = object->getAABB();
 		if (frustum.intersect(boundingBox, 0.0f))
 		{
 			UINT vertexCount = object->mesh->getVertexCount();
-			UINT stride = sizeof(Vertex3D);
-			UINT offset = 0;
+			
 			SimpleMath::Matrix world = object->getTransform();
 			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 			shadowMap.setWorld(worldTr);
-			deviceContext->PSSetShader(nullptr, nullptr, 0);
 			deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 			
 			if (object->getSunShadow())
@@ -741,28 +762,6 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 		}
 	}
 
-	
-	/*for (GameObject* object : drawableObjects)
-	{
-		AABB boundingBox = object->getAABB();
-		if (frustum.intersect(boundingBox, 0.0f))
-		{
-			UINT vertexCount = object->mesh->getVertexCount();
-			UINT stride = sizeof(Vertex3D);
-			UINT offset = 0;
-			SimpleMath::Matrix world = object->getTransform();
-			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-			shadowMap.setWorld(worldTr);
-			deviceContext->PSSetShader(nullptr, nullptr, 0);
-			deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-
-			if (object->getSpotShadow() && spotFrustum.intersect(boundingBox, 5.0f, false))
-			{
-				deviceContext->Draw(vertexCount, 0);
-			}
-		}
-	}*/
-
 	std::vector<GameObject*> objects;
 	quadTree->getGameObjects(objects, frustum, 0.0f);
 	
@@ -770,12 +769,9 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	{
 		AABB boundingBox = o->getAABB();
 		UINT vertexCount = o->mesh->getVertexCount();
-		UINT stride = sizeof(Vertex3D);
-		UINT offset = 0;
 		SimpleMath::Matrix world = o->getTransform().Transpose();
 		SimpleMath::Matrix worldTr = world;
 		shadowMap.setWorld(worldTr);
-		deviceContext->PSSetShader(nullptr, nullptr, 0);
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		if (o->getSunShadow())
 		{
@@ -789,22 +785,6 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 			deviceContext->Draw(vertexCount, 0);
 		}
 	}
-
-	
-	/*for (GameObject* o : objects)
-	{
-		AABB boundingBox = o->getAABB();
-		UINT vertexCount = o->mesh->getVertexCount();
-		UINT stride = sizeof(Vertex3D);
-		UINT offset = 0;
-		SimpleMath::Matrix world = o->getTransform().Transpose();
-		SimpleMath::Matrix worldTr = world;
-		shadowMap.setWorld(worldTr);
-		deviceContext->PSSetShader(nullptr, nullptr, 0);
-		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-
-		
-	}*/
 }
 
 bool Graphics::createShaders()

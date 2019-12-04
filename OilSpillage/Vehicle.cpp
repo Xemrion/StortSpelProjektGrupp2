@@ -1238,6 +1238,7 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 
 	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionRnoMouse().x * Input::getStrengthRnoMouse() * 3, Input::getDirectionRnoMouse().y * Input::getStrengthRnoMouse() * 3), deltaTime*10.0f);
 
+
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime * 1.2f + cameraDistance;
 	cameraDistanceX = ((this->getRigidBody()->getLinearVelocity().getX() * 0.5f + aimLerp.x) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
 	cameraDistanceZ = ((this->getRigidBody()->getLinearVelocity().getZ() * 0.40f + aimLerp.y) - cameraDistanceZ) * deltaTime * 12.2f + cameraDistanceZ;

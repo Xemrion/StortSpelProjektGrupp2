@@ -59,7 +59,7 @@ void PlayingGameState::initAI()
 	actorManager = nullptr;
 	actorManager = std::make_unique<ActorManager>( aStar.get(), physics.get(), map.get(), &rng );
 	aStar->generateTileData(map->getTileMap());
-	/*
+	
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
@@ -67,7 +67,7 @@ void PlayingGameState::initAI()
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
-	*/
+	
 
 }
 
@@ -617,7 +617,6 @@ void PlayingGameState::update(float deltaTime)
 		accelForce = Vector3(player->getRigidBody()->getLinearVelocity().getX(), player->getRigidBody()->getLinearVelocity().getY(), player->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation(deltaTime);
-		camera->update(deltaTime);
 		objectives.update(player->getPosition(), physics.get());
 		Bullet::updateSoundTimer(deltaTime);
 		player->updateWeapon(deltaTime);
@@ -707,7 +706,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 	
-	//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
@@ -718,7 +717,7 @@ void PlayingGameState::update(float deltaTime)
 		ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	//#endif // !_DEBUG
+	#endif // !_DEBUG
 	graphics.presentScene();
 }
 
@@ -843,6 +842,8 @@ void PlayingGameState::moveObjects()
 	if (object->getPosition().x > (player->getPosition().x + 50) ||
 		object->getPosition().x < (player->getPosition().x - 50) ||
 		object->getPosition().z >(player->getPosition().z + 35) ||
+
+
 		object->getPosition().z < (player->getPosition().z - 35)) {
 		if (object->getRigidBody() != nullptr) {
 			object->getRigidBody()->setActivationState(0);
