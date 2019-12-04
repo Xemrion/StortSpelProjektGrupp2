@@ -59,6 +59,14 @@ void PlayingGameState::initAI()
 	actorManager = nullptr;
 	actorManager = std::make_unique<ActorManager>( aStar.get(), physics.get(), map.get(), &rng );
 	aStar->generateTileData(map->getTileMap());
+	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+
 }
 
 PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_BEFORE_PLAYING)
@@ -580,7 +588,7 @@ void PlayingGameState::update(float deltaTime)
 
 		for (std::unique_ptr<PowerUp>& p : powerUps)
 		{
-			p->update(deltaTime);
+			p->update(deltaTime, player->getPosition());
 			if (p->isActive() && !player->isDead())
 			{
 				if (p->getAABB().intersectXZ(player->getAABB()))
@@ -1015,7 +1023,7 @@ void PlayingGameState::generateMapPowerUps()
 			}
 		}
 		position.y += 2.0;
-		PowerUp p(position, (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
+		PowerUp p(position, physics.get(), (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
 
 		addPowerUp(p);
 

@@ -4,6 +4,7 @@
 #include "MinimapTextureGenerator.hpp"
 #include "MapConfig.hpp"
 #include "District.hpp"
+#include "Environment.hpp"
 
 // Tweak these to alter minimap generation:
 static auto constexpr tileSide         {  5U  }; // e.g. 5 => 5x5 pixel tiles
@@ -64,7 +65,7 @@ String createMinimapTexture( Map const &map, Bool isDistrictColoured )
 	auto constexpr buildingColorBase = RGBA(0xFF'39456B);
 	auto constexpr asphaltColorBase  = RGBA(0xFF'222222);
 
-	auto biome = map.getBiome();
+	auto biome = map.getInfo().environment.getBiome();
 
 	auto maybeDistrictShade = [isDistrictColoured]( RGBA &targetColor, RGBA districtColor ) {
 		 if ( isDistrictColoured ) targetColor = util::blendColor(districtColor, targetColor, districtBlendFac );
@@ -78,9 +79,10 @@ String createMinimapTexture( Map const &map, Bool isDistrictColoured )
 			if ( district == &District::metropolitan )
 				groundColor = concreteColorBase;
 			else switch (biome) {
-				case Biome::desert: groundColor = 0xFF'99BBFF; break;
-				case Biome::grass:  groundColor = 0xFF'3EADA4; break;
-				case Biome::snow:   groundColor = 0xFF'DDCCCC; break;
+				case Biome::sandy: groundColor = 0xFF'99BBFF; break;
+				case Biome::grass: groundColor = 0xFF'3EADA4; break;
+				case Biome::snowy: groundColor = 0xFF'DDCCCC; break;
+				case Biome::burnt: groundColor = 0xFF'282020; break;
 				default: assert(false and "Unaccounted for biome type!");
 			}
 			// add noise

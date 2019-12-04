@@ -8,16 +8,20 @@ PowerUp::PowerUp()
 	this->currentRespawnTimer = 10000000.0;
 	this->respawnTime = currentRespawnTimer;
 	this->time = 0.0;
+	this->acceleration = 0.0f;
 	loadModel();
 }
 
-PowerUp::PowerUp(Vector3 position, PowerUpType type, float respawnTime)
+PowerUp::PowerUp(Vector3 position, Physics* physics, PowerUpType type, float respawnTime)
 {
 	this->type = type;
 	this->setPosition(position);
 	this->currentRespawnTimer = 10000000.0;
 	this->respawnTime = respawnTime;
 	this->time = 0.0;
+	this->physics = physics;
+	this->acceleration = 0.0f;
+	this->initRigidBody();
 	loadModel();
 }
 
@@ -54,6 +58,9 @@ void PowerUp::clone(const PowerUp& p)
 	this->currentRespawnTimer = p.currentRespawnTimer;
 	this->respawnTime = p.respawnTime;
 	this->time = 0.0;
+	this->physics = p.physics;
+	this->acceleration = p.acceleration;
+	this->initRigidBody();
 }
 
 void PowerUp::loadModel()
@@ -80,12 +87,22 @@ void PowerUp::loadModel()
 	}
 }
 
+void PowerUp::initRigidBody()
+{
+	btRigidBody* tempo = this->physics->addSphere(1.5f, btVector3(position.x, position.y, position.z), 1.5f, this);
+	setRigidBody(tempo, this->physics);
+	getRigidBody()->activate();
+	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+	getRigidBody()->setFriction(0);
+	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+}
+
 PowerUp::~PowerUp()
 {
 	Game::getGraphics().removeFromDraw(this);
 }
 
-void PowerUp::update(float deltaTime)
+void PowerUp::update(float deltaTime, Vector3 playerPos)
 {
 	this->time += deltaTime;
 	if (this->currentRespawnTimer > 0.0)
@@ -109,6 +126,27 @@ void PowerUp::update(float deltaTime)
 			this->setScale(Vector3(sin(time * 3.0) * 0.05 + 0.8, sin(time * 3.0) * 0.05 + 0.8, sin(time * 3.0) * 0.05 + 0.8));
 		}
 	}
+
+	Vector3 towardsPlayer = playerPos - this->position;
+	towardsPlayer.Normalize(); //so not faster if closer
+	float velocityIncrease = 6;
+	float accelerationChange = 0.125;
+	float distanceFromPlayerToPowerup = 
+		  sqrtf((this->position.x - playerPos.x) * (this->position.x - playerPos.x) +
+				(this->position.y - playerPos.y) * (this->position.y - playerPos.y) +
+				(this->position.z - playerPos.z) * (this->position.z - playerPos.z));
+	if (distanceFromPlayerToPowerup <= 17.5) //increases when player dead, do another check for player hp?, send in here then check
+	{
+		this->acceleration += accelerationChange;
+	}
+	else
+	{
+		if (this->acceleration > 0)
+			this->acceleration -= accelerationChange;
+		else if (this->acceleration < 0)
+			this->acceleration = 0;
+	}
+	this->getRigidBody()->setLinearVelocity(btVector3(towardsPlayer.x * velocityIncrease * this->acceleration, 0.0f, towardsPlayer.z * velocityIncrease * this->acceleration));
 }
 
 PowerUpType PowerUp::getPowerUpType() const
