@@ -446,9 +446,6 @@ bool Graphics::init(Window* window)
 
 	this->particleSystem->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleSystem2->initiateParticles(device.Get(), deviceContext.Get());
-	this->particleTrail->setCapacity(512 * 20);
-	this->particleTrail->setOnlyAdd(true);
-
 	this->particleTrail->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
@@ -473,7 +470,7 @@ bool Graphics::init(Window* window)
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
 
-	fog->initialize(device, deviceContext, 3, 2.25, fogMaterial);
+	fog->initialize(device, deviceContext, 15, 2.25/5, fogMaterial);
 	fog->setWindSpeed(Vector2(4.0f / 1024.f, 4.0f / 1024.f));
 	ID3D11RenderTargetView* renderTargetViews[2] = { renderTargetView.Get(), depthCopyRTV.Get() };
 	deviceContext->OMSetRenderTargets(2, renderTargetViews, depthStencilView.Get());

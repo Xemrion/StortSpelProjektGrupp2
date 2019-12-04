@@ -62,8 +62,6 @@ class ParticleSystem
 public:
 	ParticleSystem();
 	~ParticleSystem();
-	void setCapacity(int cap);
-	void setOnlyAdd(bool arg);
 	void setNameofSystem(std::string name);
 	std::string getName();
 	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
@@ -108,23 +106,23 @@ private:
 		std::copy(s.begin(), s.end(), temp.begin());
 		return temp;
 	};
-	int frameID;
-	int capParticle;//100*512
+	int frameID = 0.0f;
+	const int capParticle = 51200 * 2;//100*512
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
-	int nrOfParticles;
-	float otherFrame;
+	int nrOfParticles = 0;
+	float otherFrame = 1.0f;
 	int lastUsedParticle;
-	int firstAdd;
-	float deltaTime;
-	float sinMovement;
+	int firstAdd = 0;
+	float deltaTime = 0.0f;
+	float sinMovement = 0.0f;
 	IndirDraw indDraw;
 	ParticleRenderParams colorNSize;
 	ParticleParams pParams;
 	SimulationParams sP;
 	ParticleShaders particleShaders;
 	ParticleSData systemData;
-	bool onlyAdd;
+
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw

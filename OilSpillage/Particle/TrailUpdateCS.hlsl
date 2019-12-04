@@ -28,13 +28,12 @@ void main(uint3 DTid : SV_DispatchThreadID)
 	if (myID < NumParticles.x && NumParticles.x > 0)
 	{
 		Particle p = CurrentSimulationState.Consume();
-        NewSimulationState.Append(p);
-       
-		//p.time.x = p.time.x + TimeFactors.x;
-		//if (p.time.x < p.time.y)
-		//{
-		//	NewSimulationState.Append(p);
-		//}
+
+		p.time.x = p.time.x + TimeFactors.x;
+		if (p.time.x < p.time.y)
+		{
+			NewSimulationState.Append(p);
+		}
 
 	}
 
