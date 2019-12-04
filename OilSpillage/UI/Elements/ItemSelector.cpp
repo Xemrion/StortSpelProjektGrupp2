@@ -12,7 +12,7 @@ void ItemSelector::addTextbox()
 	this->textBox->setPosition(this->position + Vector2(145.0f + 96.0f * selectedIndex - this->textBox->getSize().x * 0.5f, -this->textBox->getSize().y + 40.0f));
 }
 
-ItemSelector::ItemSelector(Vector2 position) : Element(position), used(nullptr), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimers{ 0 }
+ItemSelector::ItemSelector(Vector2 position) : Element(position), drawTextBox(true), used(nullptr), selectedTypeLastDraw(-1), selectedIndexLastDraw(-1), startIndexLastDraw(-1), selectedType(0), selectedIndex{ 0 }, startIndex{ 0 }, transforms{ Matrix() }, rotationTimers{ 0 }
 {
 	Game::getGraphics().loadTexture("UI/itemSelectorBG");
 	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
@@ -45,7 +45,7 @@ void ItemSelector::draw(bool selected)
 		}
 	}
 
-	if (this->textBox)
+	if (this->textBox && this->drawTextBox)
 	{
 		this->textBox->draw(false);
 	}
@@ -119,6 +119,11 @@ void ItemSelector::update(float deltaTime)
 	this->selectedTypeLastDraw = this->selectedType;
 	this->selectedIndexLastDraw = this->selectedIndex[this->selectedType];
 	this->startIndexLastDraw = this->startIndex[this->selectedType];
+}
+
+void ItemSelector::setDrawTextBox(bool value)
+{
+	this->drawTextBox = value;
 }
 
 void ItemSelector::changeSelectedType(bool down)
