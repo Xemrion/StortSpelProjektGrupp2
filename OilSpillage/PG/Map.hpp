@@ -138,7 +138,6 @@ public:
 	struct Info {
 		Environment environment;
 		Size        width,length;
-		String      name;
 	};
 
 	Map( Graphics &, MapConfig const &, Physics *, LightList &lights );
