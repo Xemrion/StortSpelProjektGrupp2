@@ -122,11 +122,14 @@ public:
 	Debug* getdebugger();
 	Window* getWindow();
 	void loadMesh(     std::string const &path, Vector3 rotation={.0f,.0f,.0f} );
+	void loadMesh(     std::string const& path, std::vector<Vertex3D>& toMesh, Vector3 rotation = { .0f,.0f,.0f });
+	void unloadMesh(std::string const& name);
 	void loadMaterial( std::string const &path );
 	void loadModel(    std::string const &path, Vector3 rotation={.0f,.0f,.0f} );
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
 	bool loadTexture(std::string fileName, bool overridePath = false, bool cpuOnly = false);
 	bool reloadTexture( std::string fileName, bool overridePath=false );
+	const Mesh* getPGMeshPointer(const char* path);
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path, bool tga = true);
 	Material getMaterial(const char* modelPath);

@@ -1127,6 +1127,115 @@ void Graphics::loadMesh( std::string const &fileName, Vector3 rotation )
 	else assert( false and "Failed to load mesh!" );
 }
 
+void Graphics::loadMesh(std::string const& fileName, std::vector<Vertex3D>& toMesh, Vector3 rotation)
+{
+	Mesh newMesh;
+
+	
+	if (meshes.find(fileName) == meshes.end())
+	{
+		meshes[fileName] = newMesh;
+		Vertex3D vertex;
+		Vector3 max;
+		Vector3 min;
+
+		max.x = toMesh[0].position.x;
+		max.x = toMesh[0].position.y;
+		max.x = toMesh[0].position.z;
+
+		min.x = toMesh[0].position.x;
+		min.y = toMesh[0].position.y;
+		min.z = toMesh[0].position.z;
+
+		for (int i = 0; i < toMesh.size(); i++)
+		{
+			
+			Vector4 tempPos = Vector4::Transform(Vector4(toMesh[i].position.x, toMesh[i].position.y, toMesh[i].position.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+			toMesh[i].position.x = tempPos.x;
+			toMesh[i].position.y = tempPos.y;
+			toMesh[i].position.z = tempPos.z;
+
+			tempPos = Vector4::Transform(Vector4(toMesh[i].normal.x, toMesh[i].normal.y, toMesh[i].normal.z, 0.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+			toMesh[i].normal.x = tempPos.x;
+			toMesh[i].normal.y = tempPos.y;
+			toMesh[i].normal.z = tempPos.z;
+
+			tempPos = Vector4::Transform(Vector4(toMesh[i].tangent.x, toMesh[i].tangent.y, toMesh[i].tangent.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+			toMesh[i].tangent.x = tempPos.x;
+			toMesh[i].tangent.y = tempPos.y;
+			toMesh[i].tangent.z = tempPos.z;
+
+			tempPos = Vector4::Transform(Vector4(toMesh[i].bitangent.x, toMesh[i].bitangent.y, toMesh[i].bitangent.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
+			toMesh[i].bitangent.x = tempPos.x;
+			toMesh[i].bitangent.y = tempPos.y;
+			toMesh[i].bitangent.z = tempPos.z;
+
+			if (max.x < toMesh[i].position.x)
+			{
+				max.x = toMesh[i].position.x;
+			}
+			if (max.y < toMesh[i].position.y)
+			{
+				max.y = toMesh[i].position.y;
+			}
+			if (max.z < toMesh[i].position.z)
+			{
+				max.z = toMesh[i].position.z;
+			}
+
+			if (min.x > toMesh[i].position.x)
+			{
+				min.x = toMesh[i].position.x;
+			}
+			if (min.y > toMesh[i].position.y)
+			{
+				min.y = toMesh[i].position.y;
+			}
+			if (min.z > toMesh[i].position.z)
+			{
+				min.z = toMesh[i].position.z;
+			}
+
+		}
+
+		meshes[fileName].insertDataToMesh(toMesh);
+		AABB aabb;
+		
+		//Calc aabb
+		aabb.minPos = min;
+		aabb.maxPos = max;
+
+		meshes[fileName].setAABB(aabb);
+		int bufferSize = static_cast<int>(meshes[fileName].vertices.size()) * sizeof(Vertex3D);
+		UINT stride = sizeof(Vertex3D);
+
+		D3D11_BUFFER_DESC vBufferDesc;
+		ZeroMemory(&vBufferDesc, sizeof(vBufferDesc));
+
+		vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vBufferDesc.ByteWidth = bufferSize;
+		vBufferDesc.CPUAccessFlags = 0;
+		vBufferDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA subData;
+		ZeroMemory(&subData, sizeof(subData));
+		subData.pSysMem = meshes[fileName].vertices.data();
+
+		HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[fileName].vertexBuffer.GetAddressOf());
+		meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+			
+	}
+	else assert(false and "Failed to load mesh!");
+}
+
+void Graphics::unloadMesh(std::string const& name)
+{
+	if (meshes.find(name) != meshes.end()) {
+		meshes.erase(name);
+	}
+}
+
 void Graphics::loadModel( std::string const &path, Vector3 rotation )
 {
    std::string  modelDir {MODEL_ROOT_DIR};
@@ -1380,6 +1489,21 @@ const Mesh* Graphics::getMeshPointer(const char* localPath)
    }
 
    return &meshes[meshPath];
+}
+
+const Mesh* Graphics::getPGMeshPointer(const char* path)
+{
+	std::string meshPath;
+
+	if (path != nullptr) {
+		meshPath = std::string(path);
+	}
+
+	if (meshes.find(meshPath) == meshes.end())
+	{
+		return nullptr;
+	}
+	return &meshes[meshPath];
 }
 
 Texture* Graphics::getTexturePointer(const char* path, bool tga)
