@@ -146,6 +146,7 @@ private:
 	float respawnTimer;
 	float totalRespawnTime;
 	float powerUpTimers[(int)PowerUpType::Length];
+	float particleTimer = 0.0f;
 
 	VehicleSlots* vehicleSlots;
 

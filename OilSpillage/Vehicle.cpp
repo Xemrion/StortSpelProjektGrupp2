@@ -1495,9 +1495,13 @@ void Vehicle::onFire(float dt)
 	{
 		changeHealth(-(2 * dt));
 		fireTimer -= dt;
-		for (int i = 0; i < 10; i++)
+		if (particleTimer <= 0.0f)
 		{
-			Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+			for (int i = 0; i < 10; i++)
+			{
+				Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+			}
+			particleTimer = 0.1f;
 		}
 	}
 }
