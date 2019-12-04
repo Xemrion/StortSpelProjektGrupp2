@@ -107,10 +107,12 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadModel("Tiles/Quad_SS"); // single-sided
 	graphics.loadTexture("Tiles/asphalt");
 	graphics.loadTexture("Tiles/asphalt_nor");
-	graphics.loadTexture("Tiles/grass");
-	graphics.loadTexture("Tiles/grass_nor");
-	graphics.loadTexture("Tiles/snow");
-	graphics.loadTexture("Tiles/snow_nor");
+	graphics.loadTexture("Tiles/grasslands");
+	graphics.loadTexture("Tiles/grasslands_nor");
+	graphics.loadTexture("Tiles/ashlands");
+	graphics.loadTexture("Tiles/ashlands_nor");
+	graphics.loadTexture("Tiles/arctic");
+	graphics.loadTexture("Tiles/arctic_nor");
 	graphics.loadTexture("Tiles/desert");
 	graphics.loadTexture("Tiles/desert_nor");
 	graphics.loadTexture("Tiles/road_trans_2file2metro");
@@ -188,6 +190,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	minimap = createMinimapTexture(*map);
 	generateMapPowerUps();
 	createFogOfWarTexture(*map);
+	createDistanceTexture(*map);
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
