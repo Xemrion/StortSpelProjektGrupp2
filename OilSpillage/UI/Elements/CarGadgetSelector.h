@@ -25,8 +25,9 @@ public:
 	void update(bool selected, float deltaTime);
 	void init();
 
+	void setSlot(Slots slots, Container::Slot* slot);
 	void setSlotOfSelected(Container::Slot* slot);
-	void removeSlotOfSelected(Container::Slot* slot);
+	void removeSlot(Container::Slot* slot);
 	Container::Slot** getUsed();
 };
 

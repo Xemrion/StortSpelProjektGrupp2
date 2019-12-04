@@ -188,6 +188,7 @@
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="QuadTree.cpp" />
+    <ClCompile Include="SaveSystem.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\speech\darray.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\speech\klatt.cpp" />
@@ -269,6 +270,7 @@
     <ClCompile Include="UI\Menu\UIControls.cpp" />
     <ClCompile Include="UI\Menu\UICredits.cpp" />
     <ClCompile Include="UI\Menu\UIHighscore.cpp" />
+    <ClCompile Include="UI\Menu\UILoad.cpp" />
     <ClCompile Include="UI\Menu\UIMainMenu.cpp" />
     <ClCompile Include="UI\Menu\UIOptions.cpp" />
     <ClCompile Include="UI\Highscore\UIBeforeHighscore.cpp" />
@@ -317,6 +319,7 @@
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
+    <ClInclude Include="SaveSystem.h" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
     <ClInclude Include="AI\Turret.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />
@@ -425,6 +428,7 @@
     <ClInclude Include="UI\Menu\UIControls.h" />
     <ClInclude Include="UI\Menu\UICredits.h" />
     <ClInclude Include="UI\Menu\UIHighscore.h" />
+    <ClInclude Include="UI\Menu\UILoad.h" />
     <ClInclude Include="UI\Menu\UIMainMenu.h" />
     <ClInclude Include="UI\Menu\UIOptions.h" />
     <ClInclude Include="UI\Highscore\UIBeforeHighscore.h" />

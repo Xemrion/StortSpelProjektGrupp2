@@ -1,18 +1,19 @@
 #include "ItemWheel.h"
 #include <sstream>
 #include "../game.h"
-std::string ItemWheel::generateDescription(Stats wheel)
+
+std::string ItemWheel::generateDescription(float accelerationRate, float handlingRate)
 {
 	std::stringstream stream;
-	stream << "Acceleration: " << wheel.accelerationRate << "\n";
-	stream << "Handling: " << wheel.handlingRate << "\n";
+	stream << "Acceleration: " << accelerationRate << "\n";
+	stream << "Handling: " << handlingRate << "\n";
 
 	return stream.str();
 }
 
-ItemWheel::ItemWheel(std::string name, GameObject* object) : Item(name, generateDescription(stats), ItemType::WHEEL, object)
+ItemWheel::ItemWheel(std::string name, float accelerationRate, float handlingRate, GameObject* object) 
+	: Item(name, generateDescription(accelerationRate, handlingRate), ItemType::TYPE_WHEEL, object), accelerationRate(accelerationRate), handlingRate(handlingRate)
 {
-	this->stats = stats;
 }
 
 ItemWheel::~ItemWheel()
@@ -21,7 +22,8 @@ ItemWheel::~ItemWheel()
 
 ItemWheel::ItemWheel(const ItemWheel& obj) : Item(obj)
 {
-	this->stats = obj.stats;
+	this->accelerationRate = obj.accelerationRate;
+	this->handlingRate = obj.handlingRate;
 }
 
 Item* ItemWheel::clone() const
@@ -29,28 +31,21 @@ Item* ItemWheel::clone() const
 	return new ItemWheel(*this);
 }
 
-bool ItemWheel::operator==(const ItemWheel& other) const
-{
-	return Item::operator==(other) /*&& this->weapon == other.weapon*/;
-}
-
 void ItemWheel::randomize()
 {
+	this->accelerationRate = this->accelerationRate * ((rand() % 100 + 1) * 0.01f) + (1 * Game::getLocalScale());
+	this->handlingRate = this->handlingRate * ((rand() % 100 + 1) * 0.01f) + (1 * Game::getLocalScale());
 
-	this->stats.handlingRate = ((rand() % 100 + 1) * 0.01f) + (1 * Game::getLocalScale());
-	this->stats.accelerationRate = ((rand() % 100 + 1) * 0.01f) + (1 * Game::getLocalScale());
-
-
-	this->description = generateDescription(this->stats);
+	this->description = this->generateDescription(this->accelerationRate, this->handlingRate);
 	Item::randomize();
 }
 
-Stats& ItemWheel::getWheel()
+float ItemWheel::getAccelerationRate() const
 {
-	return this->stats;
+	return this->accelerationRate;
 }
 
-Stats ItemWheel::getStats()
+float ItemWheel::getHandlingRate() const
 {
-	return this->stats;
+	return this->handlingRate;
 }

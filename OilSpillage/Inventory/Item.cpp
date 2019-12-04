@@ -7,6 +7,19 @@
 #include "../PG/defs.hpp"
 std::vector<std::shared_ptr<Item>> Item::premadeItems;
 
+GameObject* Item::getObjectByName(std::string name)
+{
+	for (int i = 0; i < Item::premadeItems.size(); i++)
+	{
+		if (Item::premadeItems[i]->name == name)
+		{
+			return Item::premadeItems[i]->object;
+		}
+	}
+
+	return nullptr;
+}
+
 void Item::init()
 {
 	Graphics& graphics = Game::getGraphics();
@@ -72,10 +85,10 @@ void Item::init()
 		std::make_shared<ItemWeapon>("Flamethrower", WeaponHandler::getWeapon(WeaponType::Flamethrower), flameThrower),
 		std::make_shared<ItemWeapon>("Lazer", WeaponHandler::getWeapon(WeaponType::Laser), lazer),
 		std::make_shared<ItemWeapon>("Spikes", WeaponHandler::getWeapon(WeaponType::Spikes), spike),
-		std::make_shared<ItemChassi>("Muscle Chassi", chassi1),
-		std::make_shared<ItemWheel>("Muscle Tires", wheel1),
 		std::make_shared<ItemGadget>("Nitro",Gadget  ,nitro),
 		std::make_shared<ItemGadget>("emp", emp)
+		std::make_shared<ItemChassi>("Muscle Chassi", 100, 1.0f, chassi1),
+		std::make_shared<ItemWheel>("Muscle Tires", 1.0f, 1.0f, wheel1)
 	};
 
 }
@@ -101,10 +114,13 @@ Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 sc
 Item::Item(std::string name, std::string description, ItemType type, GameObject* object)
 	: name(name), description(description), type(type), object(object)
 {
-	this->baseColor = Vector4(0.0, 0.0, 0.0, 0.0);
-	if (this->object != nullptr)
+	if (!this->object)
 	{
-		this->object->setColor(baseColor);
+		this->baseColor = Vector4(0.0, 0.0, 0.0, 0.0);
+	}
+	else
+	{
+		this->baseColor = this->object->getColor();
 	}
 }
 
@@ -123,7 +139,6 @@ Item::Item(const Item& obj)
 	if (obj.object != nullptr)
 	{
 		this->object = new GameObject(*obj.object);
-		this->object->setColor(baseColor);
 	}
 	else
 	{
@@ -134,11 +149,6 @@ Item::Item(const Item& obj)
 Item* Item::clone() const
 {
 	return new Item(*this);
-}
-
-bool Item::operator==(const Item& other) const
-{
-	return this->name == other.name && this->description == other.description && this->type == other.type && this->baseColor == other.baseColor;
 }
 
 void Item::randomize()
