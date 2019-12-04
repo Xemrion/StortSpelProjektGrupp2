@@ -611,7 +611,7 @@ void PlayingGameState::update(float deltaTime)
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation(deltaTime);
 		camera->update(deltaTime);
-		objectives.update(player->getPosition());
+		objectives.update(player->getPosition(), physics.get());
 		Bullet::updateSoundTimer(deltaTime);
 		player->updateWeapon(deltaTime);
 		timer += deltaTime;
