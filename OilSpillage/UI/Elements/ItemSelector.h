@@ -17,6 +17,7 @@ private:
 	Texture* textureBG;
 	Texture* textureIndicator;
 	std::unique_ptr<TextBox> textBox;
+	bool drawTextBox;
 
 	float rotationTimers[tileLength];
 	Quaternion rotation[tileLength];
@@ -26,8 +27,8 @@ private:
 	int selectedIndexLastDraw;
 	int startIndexLastDraw;
 	int selectedType;
-	int selectedIndex[ItemType::TYPES_SIZE];
-	int startIndex[ItemType::TYPES_SIZE];
+	int selectedIndex[ItemType::TYPES_SIZEOF];
+	int startIndex[ItemType::TYPES_SIZEOF];
 public:
 	static Vector2 size;
 
@@ -37,6 +38,7 @@ public:
 	void draw(bool selected);
 	void update(float deltaTime);
 
+	void setDrawTextBox(bool value);
 	void changeSelectedType(bool down);
 	void changeSelectedIndex(bool right);
 	ItemType getSelectedType() const;

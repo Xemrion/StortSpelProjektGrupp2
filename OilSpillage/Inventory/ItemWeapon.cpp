@@ -95,9 +95,8 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 	return stream.str();
 }
 
-ItemWeapon::ItemWeapon(std::string name, Weapon weapon, GameObject * object) : Item(name, generateDescription(weapon), ItemType::WEAPON, object), weapon(weapon)
+ItemWeapon::ItemWeapon(std::string name, Weapon weapon, GameObject * object) : Item(name, generateDescription(weapon), ItemType::TYPE_WEAPON, object), weapon(weapon)
 {
-
 }
 
 ItemWeapon::~ItemWeapon()
@@ -112,11 +111,6 @@ ItemWeapon::ItemWeapon(const ItemWeapon& obj) : Item(obj)
 Item* ItemWeapon::clone() const
 {
 	return new ItemWeapon(*this);
-}
-
-bool ItemWeapon::operator==(const ItemWeapon& other) const
-{
-	return Item::operator==(other) /*&& this->weapon == other.weapon*/;
 }
 
 void ItemWeapon::randomize()
@@ -202,7 +196,6 @@ void ItemWeapon::randomize()
 			weapon.doesSplashDmg = true;
 			weapon.splashRange = 20;
 		}
-		weapon.doTTimer = 2;
 	}
 	else if (weapon.type == WeaponType::Spikes) 
 	{
