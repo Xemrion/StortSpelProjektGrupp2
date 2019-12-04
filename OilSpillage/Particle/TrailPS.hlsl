@@ -53,7 +53,6 @@ float shadowVisible(float4 shadowPosition, Texture2D shadowMap, float bias)
     shadowCoord.xyz /= shadowCoord.w;
     shadowCoord.xy = shadowCoord.xy * float2(0.5f, -0.5f) + 0.5f;
     float visibility = 0.0f;
-
     float4 pcfDepth = shadowMap.Gather(ShadowSamp, shadowCoord.xy, int2(0, 0)).r;
     visibility += shadowCoord.z - bias > pcfDepth.r ? 1.0f : 0.0;
     visibility += shadowCoord.z - bias > pcfDepth.g ? 1.0f : 0.0;
@@ -177,8 +176,8 @@ float4 main(PSInput input) : SV_Target
     }
     float4 setColor = input.color;
     setColor.w = 0.0f;
-    float4 outColor = (texColor + setColor) * (diffuseLight + ambient);
-    outColor += (specularColor + setColor) * specularLight;
+    float4 outColor = (texColor ) * (diffuseLight + ambient);
+    outColor += (specularColor ) * specularLight;
     
     return outColor;
     //float4 texColor = Texture.Sample(Sampler, input.uv);

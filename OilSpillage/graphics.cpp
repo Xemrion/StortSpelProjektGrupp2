@@ -60,6 +60,7 @@ Graphics::Graphics()
 
 	this->particleHandler->loadParticleSystems();
 	this->particleTrail->loadSystem();
+	this->particleHandler->getParticleSystem("electro")->setUpdateShader("ElectroUpdateCS.cso");
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 }
@@ -76,6 +77,7 @@ Graphics::~Graphics()
 		i->second->Shutdown();
 		delete i->second;
 	}
+	delete this->particleTrail;
 	delete this->particleHandler;
 	delete this->lightBufferContents;
 	swapChain->SetFullscreenState(false, NULL);
@@ -675,7 +677,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	this->particleTrail->updateParticles(deltaTime, viewProj);
 
 	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
-	deviceContext->PSSetSamplers(0, 1, &this->sampler);
+	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
 	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
 	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
 
