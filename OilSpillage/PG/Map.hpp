@@ -7,6 +7,7 @@
 #include "RoadGenerator.hpp"
 #include "Voronoi.hpp"
 #include "District.hpp"
+#include "Skyscraper.h"
 #include "../UI/Playing/UIPlaying.h"
 #include "Environment.hpp"
 #include "../Lights.h"
@@ -103,8 +104,8 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum, RNG & ) noexcep
 
 struct CompositeHouse {
 	GameObject          walls, windows, roof;
-	Vector<GameObject>  hitboxes;
 	V2u                 dimensions;
+	String				skyscraperMeshIndex;
 };
 
 struct SingleTileHouse {
@@ -178,6 +179,7 @@ private:
 	Opt<Lot>                   findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
 	void                       instantiateTilesAsModels() noexcept;
 	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout &&, HouseTileset const & ) const noexcept;
+	CompositeHouse			   instantiateSkyscraper();
 	Graphics &                 graphics;
 	V2u                        startPositionInTileSpace;
 	UPtr<TileMap>              tilemap;
@@ -187,6 +189,7 @@ private:
 	Vector<UPtr<GameObject>>   crossingTiles;
 	Physics * const            physics;
 	LightList &                lights;
+	UPtr<Skyscraper>		   skyscraperGenerator;
 	// TODO: refactor out:
 	using DistrictID = U16;
 	using BuildingID = U16;                         // 0 = unused tile

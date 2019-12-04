@@ -32,6 +32,7 @@ struct GSInput
 struct GSOutput
 {
     float4 pos : SV_POSITION;
+    float4 wPos : WORLDPOS;
     float4 shadowPos : SHADOWPOS;
     float4 color : COLOR;
     float2 uv : UV;
@@ -106,9 +107,11 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 	for (int i = 0; i < 4; i++)
 	{
 		output.pos = mul(float4(vert[i], 1.0f), viewProj);
+        output.wPos = float4(vert[i], 1.0f);
         output.shadowPos = mul(float4(vert[i], 1.0f), viewProjShadow);
 		output.uv = texCoord[i];
 		output.color = testColor;
+        output.color.w = totalLifeTime;
 		theOutput.Append(output);
 	}
 }

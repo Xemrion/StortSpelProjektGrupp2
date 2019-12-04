@@ -62,6 +62,8 @@ class ParticleSystem
 public:
 	ParticleSystem();
 	~ParticleSystem();
+	void setCapacity(int cap);
+	void setOnlyAdd(bool arg);
 	void setNameofSystem(std::string name);
 	std::string getName();
 	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
@@ -70,7 +72,9 @@ public:
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setSize(float startSize, float endSize);
+	void setColor(Vector4 colors[4], int nrOfColors);
 	void setMass(float mass);
+	void setTexture(Texture* texture);
 	//gravity = -1 means -1 * 9.82
 	void setGravity(float gravity);
 	void changeVectorField(float vectorFieldPower, float vectorFieldSize);
@@ -80,6 +84,7 @@ public:
 	void setCreateShader(std::string csCreate);
 	void setGeometryShader(std::string gsPrimitive);
 	void setPixelShader(std::string pixelShader);
+	void setBufferType(D3D11_BUFFER_UAV_FLAG flag);
 
 	void drawAll(DynamicCamera* camera);
 	bool loadSystem();
@@ -106,16 +111,16 @@ private:
 		std::copy(s.begin(), s.end(), temp.begin());
 		return temp;
 	};
-	int frameID = 0.0f;
-	const int capParticle = 51200 * 2;//100*512
+	int frameID;
+	int capParticle;//100*512
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
-	int nrOfParticles = 0;
-	float otherFrame = 1.0f;
+	int nrOfParticles;
+	float otherFrame;
 	int lastUsedParticle;
-	int firstAdd = 0;
-	float deltaTime = 0.0f;
-	float sinMovement = 0.0f;
+	int firstAdd;
+	float deltaTime;
+	float sinMovement;
 	IndirDraw indDraw;
 	ParticleRenderParams colorNSize;
 	ParticleParams pParams;
@@ -123,7 +128,10 @@ private:
 	ParticleShaders particleShaders;
 	ParticleSData systemData;
 
-
+	bool onlyAdd;
+	D3D11_BUFFER_UAV_FLAG bufferType;
+	int indexForTrail;
+	Texture* texture;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
