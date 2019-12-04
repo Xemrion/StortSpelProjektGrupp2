@@ -1,10 +1,10 @@
 #include "Item.h"
 #include "ItemWeapon.h"
 #include "ItemChassi.h"
+#include "ItemGadget.h"
 #include "ItemWheel.h"
 #include "../game.h"
 #include "../PG/defs.hpp"
-
 std::vector<std::shared_ptr<Item>> Item::premadeItems;
 
 void Item::init()
@@ -42,6 +42,19 @@ void Item::init()
 	spike->setScale(Vector3(0.05f));
 	spike->setPosition(lazer->mesh->getAABB().scale(lazer->getScale()).maxPos * Vector3(0, 1, 0));
 
+	GameObject* nitro = new GameObject();
+	nitro->mesh = graphics.getMeshPointer("Entities/Spike");
+	nitro->setMaterial(graphics.getMaterial("Entities/Spike"));
+	nitro->setScale(Vector3(0.05f));
+	//nitro->setPosition(lazer->mesh->getAABB().scale(lazer->getScale()).maxPos * Vector3(0, 1, 0));
+
+	GameObject* emp = new GameObject();
+	emp->mesh = graphics.getMeshPointer("Entities/Spike");
+	emp->setMaterial(graphics.getMaterial("Entities/Spike"));
+	emp->setScale(Vector3(0.05f));
+	//nitro->setPosition(lazer->mesh->getAABB().scale(lazer->getScale()).maxPos * Vector3(0, 1, 0));
+
+
 	GameObject* chassi1 = new GameObject();
 	chassi1->mesh = graphics.getMeshPointer("Entities/Player_Car_Parts/Chassi1");
 	chassi1->setMaterial(graphics.getMaterial("Entities/Player_Car_Parts/Chassi1"));
@@ -60,7 +73,9 @@ void Item::init()
 		std::make_shared<ItemWeapon>("Lazer", WeaponHandler::getWeapon(WeaponType::Laser), lazer),
 		std::make_shared<ItemWeapon>("Spikes", WeaponHandler::getWeapon(WeaponType::Spikes), spike),
 		std::make_shared<ItemChassi>("Muscle Chassi", chassi1),
-		std::make_shared<ItemWheel>("Muscle Tires", wheel1)
+		std::make_shared<ItemWheel>("Muscle Tires", wheel1),
+		std::make_shared<ItemGadget>("Nitro",Gadget  ,nitro),
+		std::make_shared<ItemGadget>("emp", emp)
 	};
 
 }
@@ -71,6 +86,7 @@ Item* Item::getRandom()
 	item->randomize();
 
 	return item;
+
 }
 
 Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale, Quaternion rotation, bool ignoreObjectRotation)

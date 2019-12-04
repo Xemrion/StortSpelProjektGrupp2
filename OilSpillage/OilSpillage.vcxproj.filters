@@ -168,6 +168,8 @@
     <ClCompile Include="UI\Playing\UIBeforePlaying.cpp" />
     <ClCompile Include="Inventory\ItemChassi.cpp" />
     <ClCompile Include="Inventory\ItemWheel.cpp" />
+    <ClCompile Include="Inventory\ItemGadget.cpp" />
+    <ClCompile Include="Inventory\Gadget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -354,7 +356,6 @@
     <ClInclude Include="AI\Sniper.h" />
     <ClInclude Include="AI\ChaseCar.h" />
     <ClInclude Include="fog.h" />
-    <ClInclude Include="PG\Biome.hpp" />
     <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="AI\ShootCar.h" />
     <ClInclude Include="Inventory\Container.h" />
@@ -384,6 +385,8 @@
     <ClInclude Include="Inventory\ItemChassi.h" />
     <ClInclude Include="Inventory\ItemWheel.h" />
     <ClInclude Include="PG\Environment.hpp" />
+    <ClInclude Include="Inventory\ItemGadget.h" />
+    <ClInclude Include="Inventory\Gadget.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
