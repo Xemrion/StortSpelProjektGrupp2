@@ -156,7 +156,6 @@ void Vehicle::updatePlayer(float deltaTime)
 void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)
 {
 
-
 	PlayingGameState* playing = dynamic_cast<PlayingGameState*>(Game::getCurrentState());
 
 	if (playing != nullptr)
@@ -1238,6 +1237,7 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 	vehicleDistance = min(vehicleDistance, 30.0f);
 
 	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionRnoMouse().x * Input::getStrengthRnoMouse() * 3, Input::getDirectionRnoMouse().y * Input::getStrengthRnoMouse() * 3), deltaTime*10.0f);
+
 
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime * 1.2f + cameraDistance;
 	cameraDistanceX = ((this->getRigidBody()->getLinearVelocity().getX() * 0.5f + aimLerp.x) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;

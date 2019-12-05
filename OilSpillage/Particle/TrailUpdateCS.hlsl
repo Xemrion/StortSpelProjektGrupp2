@@ -4,8 +4,9 @@ struct Particle
 	float4 velocity;
 	float2 time;//.x = time, .y = totalTime
 };
-AppendStructuredBuffer<Particle> NewSimulationState : register(u0);
-ConsumeStructuredBuffer<Particle> CurrentSimulationState : register(u1);
+globallycoherent RWStructuredBuffer<Particle> DeadList : register(u0);
+
+
 Texture2D DepthTexture : register(t0);
 SamplerState Sampler: register(s0);
 cbuffer SimulationParams : register(b0)
@@ -16,7 +17,7 @@ cbuffer SimulationParams : register(b0)
 };
 cbuffer ParticleCount : register(b1)
 {
-	uint4 NumParticles;
+	uint4 NumParticles;//in dead list
 };
 
 
@@ -27,14 +28,18 @@ void main(uint3 DTid : SV_DispatchThreadID)
 	uint myID = DTid.x + DTid.y * 512 + DTid.z * 512 * 512;
 	if (myID < NumParticles.x && NumParticles.x > 0)
 	{
-		Particle p = CurrentSimulationState.Consume();
-
-		p.time.x = p.time.x + TimeFactors.x;
-		if (p.time.x < p.time.y)
-		{
-			NewSimulationState.Append(p);
-		}
-
+        Particle p = DeadList[myID];
+        
+       
+        p.time.x = p.time.x + TimeFactors.x;
+        if (p.time.x < p.time.y)
+        {
+            DeadList[myID] = p;
+        }
+        else
+        {
+            //kill it by setting DeadList[myID] to the last one.  *
+            DeadList[myID] = DeadList[DeadList.DecrementCounter()];
+        }
 	}
-
 }

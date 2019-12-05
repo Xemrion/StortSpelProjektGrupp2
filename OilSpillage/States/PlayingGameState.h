@@ -14,6 +14,7 @@
 #include "../Powerup.h"
 
 #include"..////Objectives/ObjectiveHandler.h"
+using namespace DirectX::SimpleMath;
 class PlayingGameState : public GameState {
 	friend class Game;
 public:
@@ -57,6 +58,7 @@ public:
 	void generateMapPowerUps();
 	void clearPowerUps();
 	void generateObjectives();
+	void updateWeather(float deltaTime, Vector3 cameraPos);
 
 	Vector3 getCameraPos();
 
@@ -93,6 +95,7 @@ private:
 	GameObject*		testObjective2; //Test
 	GameObject*		cameraObject;
 	float			cameraTimer;
+	float			snowTimer;
 
 	GameObject* objTestPickUp;
 	GameObject* objTestPickUp2;
