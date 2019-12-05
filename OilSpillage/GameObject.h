@@ -62,12 +62,12 @@ public:
 	void setMaterial(Material);
 	void     setColor(Vector4 aColor);
 	Vector4  getColor()    const;
-	Vector3  getPosition();
+	Vector3 & getPosition();
 	const Vector3& getPositionRef();
 	Vector3  getRotation();
 	Quaternion getRotationQuaternion() const;
 	Vector3  getScale()    const;
-	AABB     getAABB();
+	AABB&     getAABB();
 	btRigidBody* getRigidBody() const;
 	void setRigidBody(btRigidBody* body, Physics* physics);
 	void setVelocity(Vector3 velocity);

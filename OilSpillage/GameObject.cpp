@@ -276,7 +276,7 @@ Vector4 GameObject::getColor()const
 	return this->color;
 }
 
-Vector3 GameObject::getPosition()
+Vector3& GameObject::getPosition()
 {
 	if (this->rigidBody)
 	{
@@ -320,7 +320,7 @@ Vector3 GameObject::getScale() const
 	return this->scale;
 }
 
-AABB GameObject::getAABB()
+AABB& GameObject::getAABB()
 {
 	AABB boundingBox = this->mesh->getAABB().scale(this->scale);
 	Vector3 position = this->getPosition();
