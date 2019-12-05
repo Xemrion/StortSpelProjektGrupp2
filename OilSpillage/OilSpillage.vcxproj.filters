@@ -29,6 +29,9 @@
     <FxCompile Include="Particle\DebrisUpdateCS.hlsl" />
     <FxCompile Include="Particle\DebrisCreateCS.hlsl" />
     <FxCompile Include="Particle\ElectroUpdateCS.hlsl" />
+    <FxCompile Include="Particle\SnowCreateCS.hlsl" />
+    <FxCompile Include="Particle\SnowUpdateCS.hlsl" />
+    <FxCompile Include="Particle\SnowParticleGS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI\AIGroup.cpp" />
@@ -60,6 +63,9 @@
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
+    <ClCompile Include="PG\TileMap.cpp" />
+    <ClCompile Include="PG\Voronoi.cpp" />
+    <ClCompile Include="PG\SkyscraperFloor.cpp" />
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
@@ -126,8 +132,6 @@
     <ClCompile Include="lights.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="PG\TileMap.cpp" />
-    <ClCompile Include="PG\Voronoi.cpp" />
     <ClCompile Include="Resources\Debug.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Road Network\RoadNet.cpp" />
@@ -159,7 +163,21 @@
     <ClCompile Include="UI\Menu\UIHighscore.cpp" />
     <ClCompile Include="MyClient.cpp" />
     <ClCompile Include="BulletSDK\include\LinearMath\btThreads.cpp" />
+    <ClCompile Include="PowerUp.cpp" />
+    <ClCompile Include="UI\ObjectiveBox.cpp" />
+    <ClCompile Include="AI\AIGroup.cpp" />
+    <ClCompile Include="UI\UIControls.cpp" />
+    <ClCompile Include="AI\TurretHandler.cpp" />
+    <ClCompile Include="AI\Swarm.cpp" />
+    <ClCompile Include="AI\Car_Spitfire.cpp" />
+    <ClCompile Include="fog.cpp" />
+    <ClCompile Include="AI\Ranged.cpp" />
+    <ClCompile Include="AI\Melee.cpp" />
+    <ClCompile Include="AI\DynamicActor.cpp" />
     <ClCompile Include="AI\Boss.cpp" />
+    <ClCompile Include="AI\ChaseCar.cpp" />
+    <ClCompile Include="AI\Sniper.cpp" />
+    <ClCompile Include="PG\Skyscraper.cpp" />
     <ClCompile Include="AI\BossAbilities.cpp" />
     <ClCompile Include="AI\Weakspot.cpp" />
     <ClCompile Include="States\HighscoreGameState.cpp" />
@@ -285,6 +303,8 @@
     <ClInclude Include="PG\utils.hpp" />
     <ClInclude Include="PG\Voronoi.hpp" />
     <ClInclude Include="PG\RoadGenerator.hpp" />
+    <ClInclude Include="PG\Skyscraper.h" />
+    <ClInclude Include="PG\SkyscraperFloor.h" />
     <ClInclude Include="Resources\Debug.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Road Network\RoadNet.h" />

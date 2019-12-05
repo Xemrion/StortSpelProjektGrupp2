@@ -177,10 +177,12 @@ void Game::createCurrentState()
 		
 		if (gameInfo.nrOfClearedStages <= 0)
 		{
-			state = std::make_unique<PlayingGameState>(1231,7.0f*60.0f);
+			// TODO: generate seed
+			state = std::make_unique<PlayingGameState>(-1,7.0f*60.0f);
 		}
 		else
 		{
+			// TODO: use RNG with seed from above to generate subsequent map seeds
 			state = std::make_unique<PlayingGameState>(-1,gameInfo.time);
 		}
 
