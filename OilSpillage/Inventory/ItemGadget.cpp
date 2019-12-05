@@ -1,6 +1,7 @@
 #include "ItemGadget.h"
 #include <sstream>
 #include "../game.h"
+
 std::string ItemGadget::generateDescription(Gadget gadget)
 {
 	std::stringstream stream;
@@ -22,7 +23,7 @@ std::string ItemGadget::generateDescription(Gadget gadget)
 }
 
 ItemGadget::ItemGadget(std::string name, Gadget gadget, GameObject* object)
-	:Item(name, generateDescription(gadget), ItemType::GADGET, object)
+	:Item(name, generateDescription(gadget), ItemType::TYPE_GADGET, object)
 {
 
 }
@@ -41,10 +42,10 @@ Item* ItemGadget::clone() const
 	return new ItemGadget(*this);
 }
 
-bool ItemGadget::operator==(const ItemGadget& other) const
-{
-	return Item::operator==(other);
-}
+//bool ItemGadget::operator==(const ItemGadget& other) const
+//{
+//	return Item::operator==(other);
+//}
 
 void ItemGadget::randomize()
 {
