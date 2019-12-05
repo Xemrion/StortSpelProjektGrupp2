@@ -255,7 +255,39 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.getParticleSystem("smoke")->setSize(0.055f, 0.065f);
 	graphics.getParticleSystem("smoke")->changeVectorField(1.75f, 0.09f);
 
-	
+	if (map->getInfo().environment.getWeather() == Weather::snow) {
+		Vector4 snowColor[4] = {
+		Vector4(1.0f,1.0f,1.0f,1.0f),
+		Vector4(1.0f,1.0f,1.0f,1.0f),
+		Vector4(1.0f,1.0f,1.0f,1.0f),
+		Vector4(1.0f,1.0f,1.0f,1.0f)
+		};
+		graphics.getParticleSystem("snow")->setGravity(0.5f);
+		graphics.getParticleSystem("snow")->changeVectorField(1.75f, 0.5f);
+		graphics.getParticleSystem("snow")->changeColornSize(snowColor,4, 0.0f, 0.047f);
+	}
+	if (map->getInfo().environment.getWeather() == Weather::rain || map->getInfo().environment.getWeather() == Weather::thunderstorm) {
+		Vector4 rainColor[4] = {
+		Vector4(0.4f,0.6f,1.0f,1.0f),
+		Vector4(0.4f,0.6f,1.0f,1.0f),
+		Vector4(0.4f,0.6f,1.0f,1.0f),
+		Vector4(0.4f,0.6f,1.0f,1.0f)
+		};
+		graphics.getParticleSystem("snow")->setGravity(10.0f);
+		graphics.getParticleSystem("snow")->changeVectorField(1.75f, 0.5f);
+		graphics.getParticleSystem("snow")->changeColornSize(rainColor, 4, 0.0f, 0.047f);
+	}
+	if (map->getInfo().environment.getWeather() == Weather::ashfall) {
+		Vector4 ashColor[4] = {
+		Vector4(0.9f,0.3f,0.0f,1.0f),
+		Vector4(0.27f,0.27f,0.27f,1.0f),
+		Vector4(0.27f,0.27f,0.27f,1.0f),
+		Vector4(0.27f,0.27f,0.27f,1.0f)
+		};
+		graphics.getParticleSystem("snow")->setGravity(0.1f);
+		graphics.getParticleSystem("snow")->changeVectorField(0.75f, 3.0f);
+		graphics.getParticleSystem("snow")->changeColornSize(ashColor, 4, 0.0f, 0.047f);
+	}
 
 #ifndef _DEBUG
 	spawnObjects();
@@ -839,12 +871,12 @@ void PlayingGameState::moveObjects()
 {
 	GameObject* object = physicsObjects.at(physicsObjID).get();
 	auto tilemap = map->getTileMap();
-	if (object->getPosition().x > (player->getPosition().x + 50) ||
-		object->getPosition().x < (player->getPosition().x - 50) ||
-		object->getPosition().z >(player->getPosition().z + 35) ||
+	if (object->getPosition().x > (player->getPosition().x + 80) ||
+		object->getPosition().x < (player->getPosition().x - 80) ||
+		object->getPosition().z >(player->getPosition().z + 50) ||
 
 
-		object->getPosition().z < (player->getPosition().z - 35)) {
+		object->getPosition().z < (player->getPosition().z - 50)) {
 		if (object->getRigidBody() != nullptr) {
 			object->getRigidBody()->setActivationState(0);
 		}
@@ -853,24 +885,24 @@ void PlayingGameState::moveObjects()
 			if (player->getRigidBody()->getLinearVelocity().getZ() > 0) {
 				//Top
 				randomValue = rand() % 100 + 1 - 50;
-				object->setPosition(Vector3(player->getPosition().x + randomValue, -1.5f, player->getPosition().z + 35));
+				object->setPosition(Vector3(player->getPosition().x + randomValue, -1.5f, player->getPosition().z + 50));
 			}
 			else {
 				//Bottom
 				randomValue = rand() % 100 + 1 - 50;
-				object->setPosition(Vector3(player->getPosition().x + randomValue, -1.5f, player->getPosition().z - 35));
+				object->setPosition(Vector3(player->getPosition().x + randomValue, -1.5f, player->getPosition().z - 50));
 			}
 		}
 		else if (randomValue == 2) {
 			if (player->getRigidBody()->getLinearVelocity().getX() < 0) {
 				//Left
 				randomValue = rand() % 50 + 1 - 25;
-				object->setPosition(Vector3(player->getPosition().x - 50, -1.5f, player->getPosition().z + randomValue));
+				object->setPosition(Vector3(player->getPosition().x - 80, -1.5f, player->getPosition().z + randomValue));
 			}
 			else {
 				//Right
 				randomValue = rand() % 50 + 1 - 25;
-				object->setPosition(Vector3(player->getPosition().x + 50, -1.5f, player->getPosition().z + randomValue));
+				object->setPosition(Vector3(player->getPosition().x + 80, -1.5f, player->getPosition().z + randomValue));
 			}
 		}
 		randomValue = rand() % 360 + 1;
@@ -1079,7 +1111,7 @@ void PlayingGameState::generateObjectives()
 
 void PlayingGameState::updateWeather(float deltaTime, Vector3 cameraPos)
 {
-	/*if (map->getInfo().environment.getWeather() == Weather::snow) {
+	if (map->getInfo().environment.getWeather() == Weather::snow) {
 		snowTimer += deltaTime;
 		if (snowTimer > 0.05f) {
 			for (int i = 0; i < std::clamp((int)player->getVelocitySpeed() * 2, 25, 50); i++) {
@@ -1095,12 +1127,12 @@ void PlayingGameState::updateWeather(float deltaTime, Vector3 cameraPos)
 			}
 			snowTimer = 0;
 		}
-	}*/
+	}
 	if (map->getInfo().environment.getWeather() == Weather::rain || map->getInfo().environment.getWeather() == Weather::thunderstorm) {
 		snowTimer += deltaTime;
 		if (snowTimer > 0.05f) {
 			for (int i = 0; i < std::clamp((int)player->getVelocitySpeed() * 2, 25, 50); i++) {
-				Game::getGraphics().addParticle("rain", 1, 2,
+				Game::getGraphics().addParticle("snow", 1, 2,
 					Vector3(cameraPos.x, cameraPos.y, cameraPos.z) +
 					Vector3(0, -10.0f, 0) +
 					Vector3(player->getRigidBody()->getLinearVelocity().getX(),
@@ -1117,7 +1149,7 @@ void PlayingGameState::updateWeather(float deltaTime, Vector3 cameraPos)
 		snowTimer += deltaTime;
 		if (snowTimer > 0.05f) {
 			for (int i = 0; i < std::clamp((int)player->getVelocitySpeed() * 2, 25, 50); i++) {
-				Game::getGraphics().addParticle("ash", 1, 7,
+				Game::getGraphics().addParticle("snow", 1, 7,
 					Vector3(cameraPos.x, cameraPos.y, cameraPos.z) +
 					Vector3(0, -10.0f, 0) +
 					Vector3(player->getRigidBody()->getLinearVelocity().getX(),
