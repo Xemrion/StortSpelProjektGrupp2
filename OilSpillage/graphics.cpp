@@ -64,9 +64,9 @@ Graphics::Graphics()
 		Vector4(1.0f,1.0f,1.0f,1.0f),
 		Vector4(0.8f,0.8f,1.0f,1.0f)
 	};
-	this->particleHandler->addParticleSystem("snow", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
+	/*this->particleHandler->addParticleSystem("snow", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 	this->particleHandler->getParticleSystem("snow")->setGravity(-0.25f);
-	this->particleHandler->getParticleSystem("snow")->changeVectorField(2.5f,3.0f);
+	this->particleHandler->getParticleSystem("snow")->changeVectorField(2.5f,3.0f);*/
 	this->particleHandler->addParticleSystem("ash", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 	this->particleHandler->getParticleSystem("ash")->setGravity(-0.25f);
 	this->particleHandler->getParticleSystem("ash")->changeVectorField(0.75f, 3.0f);
@@ -80,7 +80,7 @@ Graphics::Graphics()
 
 	this->particleHandler->loadParticleSystems();
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso", "DebrisCreateCS.cso", "ParticleGS.cso");
-	this->particleHandler->getParticleSystem("snow")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
+	//this->particleHandler->getParticleSystem("snow")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 	this->particleHandler->getParticleSystem("ash")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 
 
@@ -494,7 +494,7 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("debris")->initiateParticles(device.Get(), deviceContext.Get());
-	this->particleHandler->getParticleSystem("snow")->initiateParticles(device.Get(), deviceContext.Get());
+	//this->particleHandler->getParticleSystem("snow")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("ash")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("rain")->initiateParticles(device.Get(), deviceContext.Get());
 
@@ -505,6 +505,13 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("electro")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("explosion")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("debris")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	//this->particleHandler->getParticleSystem("snow")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+
+	
+	this->particleHandler->getParticleSystem("ash")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("rain")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+
+
 
 	this->particleHandler->getParticleSystem("ash")->setGravity(0.1f);
 	this->particleHandler->getParticleSystem("ash")->setMass(0.5f);
