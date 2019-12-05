@@ -11,7 +11,8 @@ struct Frustum {
 
 	inline static float pointToPlaneDistance(Vector4 plane, Vector3 point)
 	{
-		return point.Dot(Vector3(plane)) + plane.w;
+		//return XMVector3Dot(plane, point);
+		return (plane.x * point.x + plane.y * point.y + plane.z * point.z) + plane.w;//point.Dot(Vector3(plane)) + plane.w;
 	}
 
 	bool intersect(AABB box, float bias = 0.0, bool partialFrustum = true)

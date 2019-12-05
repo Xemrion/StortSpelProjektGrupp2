@@ -4,7 +4,15 @@
 ParticleSystem::ParticleSystem()
 {
 	this->lastUsedParticle = 0;
-	
+	this->depthSRV = nullptr;
+	this->device = nullptr;
+	this->deviceContext = nullptr;
+	this->indDraw.instanceCount = 1;
+	strcpy(this->particleShaders.csUpdate, "");
+	strcpy(this->particleShaders.csCreate, "");
+	strcpy(this->particleShaders.gsPrimitive, "");
+	strcpy(this->particleShaders.pixelShader, "");
+	strcpy(this->particleShaders.vertexShader, "");
 	//default
 	colorNSize.colors[0] = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	colorNSize.config = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
