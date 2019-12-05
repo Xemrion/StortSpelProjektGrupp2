@@ -51,6 +51,7 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	
 	graphics.getParticleSystem("fire")->setSize(0.03f,0.02f);
 	graphics.getParticleSystem("fire")->changeVectorField(0.75f,0.09f);
+	graphics.createFrustumBuffer(camera.get());
 
 
 	graphics.addToDraw(barrels.get());
