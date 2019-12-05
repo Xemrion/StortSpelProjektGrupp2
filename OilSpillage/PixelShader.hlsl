@@ -114,7 +114,7 @@ PS_OUT main(VS_OUT input) : SV_Target
 	float3 normalMap = NormalMap.Sample(SampSt, input.Tex).xyz;
 	float4 specularColor = SpecularMap.Sample(SampSt, input.Tex);
 	float gloss = GlossMap.Sample(SampSt, input.Tex).x;
-	gloss = exp2(10 * gloss + 1);
+	gloss = exp2(2 * gloss + 1);
 
 	if (length(normalMap) > 0.f)
 	{
@@ -129,9 +129,11 @@ PS_OUT main(VS_OUT input) : SV_Target
 	float4 ambient = max(-dot(sunDir, normal) * sunShadow, float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
 
 	float shadowSpotVisible = 1.0f;
+	float3 cameraVector = normalize(cameraPos.xyz - input.wPos.xyz);
 
 	float4 diffuseLight = float4(0.0, 0.0, 0.0, 1.0);
-	float4 specularLight = float4(0.0, 0.0, 0.0, 0.0);
+	float4 specularLight = float4(0.0, 0.0, 0.0, 1.0);
+	specularLight.rgb += sunColor * pow(max(dot(normal, normalize(normalize(-sunDir) + cameraVector)), 0.0) * sunShadow, gloss);
 	for (int i = 0; i < lightTileData.numLights; ++i)
 	{
 		Light l = lights[lightTileData.indices[i]];
@@ -191,14 +193,12 @@ PS_OUT main(VS_OUT input) : SV_Target
 
 		diffuseLight.rgb += max(l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible, 0.0);
 		
-		float3 cameraVector = normalize(cameraPos.xyz - input.wPos.xyz);
 		float3 halfway = normalize(normalize(lightVector) + cameraVector);
 		specularLight.rgb += l.color.rgb * pow(max(dot(normal, halfway), 0.0), gloss) * attenuation * directional * shadowSpotVisible;
 	}
 
 	float4 outColor = (texColor + color) * (diffuseLight + ambient);
 	outColor += (specularColor + color) * specularLight;
-
 
 	output.color = outColor;
 	output.depth = float4(input.Pos.z, 0.0, 0.0, 1.0);

@@ -1,6 +1,7 @@
 #include "fog.h"
 #include "States/PlayingGameState.h"
 #include "PG/MapConfig.hpp"
+#include <random>
 
 using namespace DirectX::SimpleMath;
 
@@ -73,6 +74,7 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 	this->vp.MaxDepth = 1.0f;
 	this->vp.TopLeftX = 0;
 	this->vp.TopLeftY = 0;
+
 	
 	generateTextures(device, deviceContext, material);
 
@@ -119,7 +121,7 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 
 	Microsoft::WRL::ComPtr <ID3D11SamplerState> sampler;
 	D3D11_SAMPLER_DESC samplerDesc;
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -132,8 +134,45 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 	samplerDesc.BorderColor[3] = 0;
 	samplerDesc.MinLOD = 0;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	device->CreateSamplerState(&samplerDesc, &sampler);
+	deviceContext->PSSetSamplers(0, 1, sampler.GetAddressOf());
 
+	D3D11_TEXTURE2D_DESC textureDesc;
+	textureDesc.Width = textureWidth;
+	textureDesc.Height = textureHeight;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = 0;
 
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> dis(-1.0, 1.0);
+	float* randomNumbers = new float[textureDesc.Height * textureDesc.Width * 2];
+	for (int i = 0; i < textureDesc.Width * textureDesc.Height * 2; ++i) randomNumbers[i] = dis(gen);
+
+	D3D11_SUBRESOURCE_DATA initData;
+	initData.pSysMem = randomNumbers;
+	initData.SysMemPitch = textureDesc.Width * sizeof(float) * 2;
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> randomLookUpTexture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> randomLookUpTextureView;
+
+	device->CreateTexture2D(&textureDesc, &initData, &randomLookUpTexture);
+	delete[] randomNumbers;
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = textureDesc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = 1;
+
+	device->CreateShaderResourceView(randomLookUpTexture.Get(), &srvDesc, &randomLookUpTextureView);
 
 	SimpleMath::Matrix viewProj = Matrix(
 		Vector4(1.0, 0.0, 0.0, 0.0),
@@ -166,6 +205,10 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 
 	device->CreateSamplerState(&samplerDesc, sampler.GetAddressOf());
 	deviceContext->OMSetDepthStencilState(NULL, 0);
+
+	float scale = material.scale;
+	float density = material.density;
+
 	for (UINT i = 0; i < quads.size(); ++i)
 	{
 		GameObject* object = quads[i];
@@ -185,6 +228,8 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		CopyMemory(mappedResource.pData, &material, sizeof(FogMaterial));
 		deviceContext->Unmap(materialBuffer.Get(), 0);
 		object->setColor(Vector4(material.color.x, material.color.z, material.color.z, 0.0));
+		material.scale = scale * (1.0 + quads[i]->getPosition().y) + dis(gen) * 0.05;
+		material.density = density / (1.0 + quads[i]->getPosition().y) + dis(gen) * 0.05;
 
 		Texture* diffuseTexture = new Texture();
 		diffuseTexture->Initialize(device.Get(), deviceContext.Get(), textureWidth, textureHeight);
@@ -195,6 +240,7 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		deviceContext->VSSetConstantBuffers(0, 1, viewProjBuffer.GetAddressOf());
 		deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
 		deviceContext->PSSetConstantBuffers(0, 1, materialBuffer.GetAddressOf());
+		deviceContext->PSSetShaderResources(0, 1, randomLookUpTextureView.GetAddressOf());
 		deviceContext->Draw(vertexCount, 0);
 
 		fogTextures.push_back(diffuseTexture);

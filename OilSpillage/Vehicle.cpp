@@ -749,6 +749,7 @@ void Vehicle::updateWeapon(float deltaTime)
 					if (this->vehicleSlots->getItem(Slots::BACK)->getObject() != nullptr)
 					{
 						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem(Slots::BACK));
+						ItemGadget* temp2 = dynamic_cast<ItemGadget*>(this->vehicleSlots->getItem(Slots::BACK));
 						if (this->vehicleSlots->getItem(Slots::BACK)->getType() == ItemType::TYPE_WEAPON && temp != nullptr)
 						{
 							if (Input::checkButton(Keys::CONFIRM, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
@@ -773,6 +774,7 @@ void Vehicle::updateWeapon(float deltaTime)
 									}
 								}
 							}
+
 							else if (temp->getWeapon().type == WeaponType::Spikes) {
 								if (temp->getWeapon().updateFireRate())
 								{
@@ -797,6 +799,42 @@ void Vehicle::updateWeapon(float deltaTime)
 								WeaponHandler::weaponEndSound(temp->getWeapon());
 							}
 						}
+						//else if (this->vehicleSlots->getItem(Slots::BACK)->getType() == ItemType::TYPE_GADGET && temp2 != nullptr)
+						//{
+						//		////test nitro
+						//	if (Input::checkButton(Keys::ACTION_1, States::HELD) &&
+						//		(temp2->getGadget().type == GadgetType::NITRO))
+						//	{
+
+						//		if (temp2->getGadget().type == GadgetType::NITRO &&
+						//			temp2->getGadget().currentLifeTime > 0) // its alive!
+						//		{
+						//			// spawn particles 
+						//			// accelerate the car
+						//			this->getRigidBody()->applyCentralForce(btVector3(0, 0, 40));
+						//			temp2->getGadget().currentLifeTime -= deltaTime;
+						//		}
+						//		else if (temp2->getGadget().type == GadgetType::EMP &&
+						//			temp2->getGadget().currentLifeTime > 0) // its alive!
+						//		{
+						//			//drop
+						//			//wait 1 sec
+						//			//particle
+						//				temp2->getGadget().currentLifeTime -= deltaTime;
+						//		}
+						//		else
+						//		{
+						//			temp2->getGadget().currentTime += deltaTime;
+						//			if (temp2->getGadget().currentTime >= temp2->getGadget().cooldown)
+						//			{
+						//				temp2->getGadget().currentTime = 0.0f;
+						//				temp2->getGadget().currentLifeTime = temp2->getGadget().lifeTime;
+						//			}
+						//		}
+
+						//	}
+						//	////
+						//}
 					}
 				}
 				if (this->vehicleSlots->getItem(Slots::RIGHT) != nullptr)
