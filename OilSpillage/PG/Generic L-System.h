@@ -47,7 +47,7 @@ public:
 	void setAngleRadians(float radians);
 	void setRecursions(int recursions);
 	void setStartPosition(Vector3 startPos);
-	void setForwardDirection(Vector3 direction); //Will be normalized.
+	void setForwardDirection(Vector3 direction); 
 	void setForwardDistance(float distance);
 	void setAxiom(String axiom);
 	void updateLSystem();
@@ -59,6 +59,7 @@ public:
 	void setupSierpinskiArrowheadSystem();
 	void setupDragonCurveSystem();
 	void setupFractalPlantSystem();
+	Vector<LSegment>& getResultingLSystem();
 private:
 	Vector<Constant> constants;
 	Vector<Variable> variables;
