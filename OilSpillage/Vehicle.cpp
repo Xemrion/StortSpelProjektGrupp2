@@ -156,7 +156,6 @@ void Vehicle::updatePlayer(float deltaTime)
 void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)
 {
 
-
 	PlayingGameState* playing = dynamic_cast<PlayingGameState*>(Game::getCurrentState());
 
 	if (playing != nullptr)
@@ -1277,6 +1276,7 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 
 	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionRnoMouse().x * Input::getStrengthRnoMouse() * 3, Input::getDirectionRnoMouse().y * Input::getStrengthRnoMouse() * 3), deltaTime*10.0f);
 
+
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime * 1.2f + cameraDistance;
 	cameraDistanceX = ((this->getRigidBody()->getLinearVelocity().getX() * 0.5f + aimLerp.x) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
 	cameraDistanceZ = ((this->getRigidBody()->getLinearVelocity().getZ() * 0.40f + aimLerp.y) - cameraDistanceZ) * deltaTime * 12.2f + cameraDistanceZ;
@@ -1533,9 +1533,13 @@ void Vehicle::onFire(float dt)
 	{
 		changeHealth(-(2 * dt));
 		fireTimer -= dt;
-		for (int i = 0; i < 10; i++)
+		if (particleTimer <= 0.0f)
 		{
-			Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+			for (int i = 0; i < 10; i++)
+			{
+				Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+			}
+			particleTimer = 0.1f;
 		}
 	}
 }

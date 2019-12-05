@@ -1,4 +1,5 @@
 #include "AIGroup.h"
+#include <algorithm>
 
 AIGroup::AIGroup()
 {
@@ -59,12 +60,10 @@ const float AIGroup::getGroupRadius() const
 
 void AIGroup::removeDeadActors()
 {
-	int size = actors.size() - 1;
-	for (int i = size; i >= 0; i--)
-	{
-		if (actors[i]->isDead())
-		{
-			actors.erase(actors.begin() + i);
-		}
-	}
+	actors.erase( std::remove_if( actors.begin(),
+		                           actors.end(),
+		                           []( DynamicActor const *e ) {
+		                                 return e->isDead();
+		                           } ),
+		           actors.end() );
 }

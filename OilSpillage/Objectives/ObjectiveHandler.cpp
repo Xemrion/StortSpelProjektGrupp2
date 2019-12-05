@@ -127,7 +127,7 @@ bool ObjectiveHandler::isAllDone()
 
 void ObjectiveHandler::update(Vector3 playerPos, Physics* physics)
 {
-	//------------------IF THIS BOTTNECKS FIX BETTER RIGIDBODY FOR THIS-----------------
+	//------------------IF THIS BOTTNECKS FIX BETTER RIGIDBODY FOR THIS / NO RIGIDBODY-----------------
 
 	//check which pickUpArrs item is closest to player
 	if (this->objectiveVec.size() != 0)
@@ -179,7 +179,7 @@ void ObjectiveHandler::update(Vector3 playerPos, Physics* physics)
 			if (this->pickUpArrs.at(0)[shortestDistObj]->getRigidBody() != nullptr)
 				physics->DeleteRigidBody(this->pickUpArrs.at(0)[shortestDistObj]->getRigidBody());
 
-			btRigidBody* tempo = physics->addSphere(1.0f, btVector3
+			btRigidBody* tempo = physics->addSphere(0.5f, btVector3
 			(this->pickUpArrs.at(0)[shortestDistObj]->getPosition().x,
 				this->pickUpArrs.at(0)[shortestDistObj]->getPosition().y,
 				this->pickUpArrs.at(0)[shortestDistObj]->getPosition().z),

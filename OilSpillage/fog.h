@@ -33,6 +33,7 @@ private:
 	ShaderClass generateTextureShader;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> textureRTV;
 
+
 	void generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, FogMaterial& material);
 public:
 	Fog() {};
