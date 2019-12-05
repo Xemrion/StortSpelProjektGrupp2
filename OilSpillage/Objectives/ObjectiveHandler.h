@@ -26,7 +26,7 @@ public:
 	~ObjectiveHandler();
 	void addObjective(TypeOfMission type, int rewardTime, int nrOfTargets, std::string info, TypeOfTarget targetType=TypeOfTarget::Size, Vector3 getToPos=Vector3(0.0f), GameObject** target = nullptr, Boss* boss = nullptr);
 	bool isAllDone();
-	void update(Vector3 playerPos);
+	void update(Vector3 playerPos, Physics* physics);
 	Type getTypes()const;
 	void reset();
 	Objective* getObjective(int id)const;

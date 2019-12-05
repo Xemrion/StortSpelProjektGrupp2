@@ -98,6 +98,23 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 							Sound::play("./data/sound/HitSound.wav");
 							soundTimer = 0;
 						}
+						if (bulletArray[j].getFlame())// Damage over Time
+						{
+							turrets[i]->setFire(bulletArray[j].getFlameTimer());
+						}
+						if (bulletArray[j].getSplashBool())
+						{
+							for (int k = 0; k < turrets.size(); k++)
+							{
+								float deltaX = turrets[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
+								float deltaZ = turrets[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
+								float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+								if (k != i && distance < bulletArray[j].getSplashRange() && !turrets[k]->isDead())
+								{
+									turrets[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+								}
+							}
+						}
 						this->turrets[i]->changeHealth(-bulletArray[j].getDamage());
 					}
 				}
@@ -107,9 +124,22 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 						Sound::play("data/sound/HitSound.wav");
 						soundTimer = 0;
 					}
-					if(bulletArray[j].getFlame())
+					if (bulletArray[j].getFlame())// Damage over Time
 					{
-						turrets[i]->setFire();
+						turrets[i]->setFire(bulletArray[j].getFlameTimer());
+					}
+					if (bulletArray[j].getSplashBool())
+					{
+						for (int k = 0; k < turrets.size(); k++)
+						{
+							float deltaX = turrets[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
+							float deltaZ = turrets[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
+							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+							if (k != i && distance < bulletArray[j].getSplashRange() && !turrets[k]->isDead())
+							{
+								turrets[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+							}
+						}
 					}
 					this->turrets[i]->changeHealth(-bulletArray[j].getDamage());
 				}
@@ -118,6 +148,23 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 					if (soundTimer > 0.05f) {
 						Sound::play("./data/sound/HitSound.wav");
 						soundTimer = 0;
+					}
+					if (bulletArray[j].getFlame())// Damage over Time
+					{
+						turrets[i]->setFire(bulletArray[j].getFlameTimer());
+					}
+					if (bulletArray[j].getSplashBool())
+					{
+						for (int k = 0; k < turrets.size(); k++)
+						{
+							float deltaX = turrets[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
+							float deltaZ = turrets[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
+							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+							if (k != i && distance < bulletArray[j].getSplashRange() && !turrets[k]->isDead())
+							{
+								turrets[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+							}
+						}
 					}
 					this->turrets[i]->changeHealth(-bulletArray[j].getDamage());
 					bulletArray[j].destroy();

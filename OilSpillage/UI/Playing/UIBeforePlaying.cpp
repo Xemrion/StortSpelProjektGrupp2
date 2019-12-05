@@ -49,7 +49,7 @@ void UIBeforePlaying::init()
 	int stage = Game::getGameInfo().nrOfClearedStages;
 	Map::Info info = static_cast<PlayingGameState*>(Game::getCurrentState())->getMapInfo();
 
-	this->textStage = std::make_unique<AnimatedText>("Stage " + std::to_string((stage - 1) % 3 + 1) + " - Act " + std::to_string(((stage - 1) / 3) + 1), Color(Colors::LightGreen), 1.0f, Animation::FADE_IN);
+	this->textStage = std::make_unique<AnimatedText>("Act " + std::to_string(((stage - 1) / 3) + 1) + " - Stage " + std::to_string((stage - 1) % 3 + 1), Color(Colors::LightGreen), 1.0f, Animation::FADE_IN);
 	this->textStage->setPosition(Vector2(SCREEN_WIDTH / 2 - this->textStage->getSize().x / 2, 100));
 	this->textStage->beginAnimation();
 	this->textName = std::make_unique<AnimatedText>(info.name, Color(Colors::YellowGreen), 0.75f, Animation::SHAKING_FADE_IN_STOP);

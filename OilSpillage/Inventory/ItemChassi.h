@@ -2,25 +2,24 @@
 #define ITEM_CHASSI_H
 
 #include "Item.h"
-#include "../VehicleStats.h"
-#include "../Weapon.h"
 
 class ItemChassi : public Item
 {
 private:
-	static std::string generateDescription(Stats chassi);
-	Stats stats;
+	static std::string generateDescription(float maxHealth, float speed);
+
+	float maxHealth;
+	float speed;
 public:
-	ItemChassi(std::string name, GameObject* object);
+	ItemChassi(std::string name, float maxHealth, float speed, GameObject* object);
 	virtual ~ItemChassi();
 	ItemChassi(const ItemChassi& obj);
-	Item* clone()const;
-	bool operator==(const ItemChassi& other) const;
+	Item* clone() const;
 
 	virtual void randomize();
 
-	Stats& getChassi();
-	Stats getStats();
+	float getMaxHealth() const;
+	float getSpeed() const;
 };
 
 #endif // !ITEM_WEAPON_H

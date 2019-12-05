@@ -149,10 +149,7 @@ void Game::createCurrentState()
 {
 	VehicleSlots* transfer = nullptr;
 	VehicleSlots* newSlots = nullptr;
-	GameObject* wheelTemp = nullptr;
-	GameObject* chassiTemp = nullptr;
-	Stats tempStats;
-	Vehicle*temp = nullptr;
+
 	if (oldState == STATE_PLAYING)
 	{
 		this->gameInfo.time = static_cast<PlayingGameState*>(state.get())->getTime();
@@ -173,47 +170,31 @@ void Game::createCurrentState()
 		{
 			transfer = static_cast<UpgradingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
-			temp = static_cast<UpgradingGameState*>(state.get())->getPlayer().get();
-			if (temp->getVehicleBody1() != nullptr) {
-				chassiTemp = new GameObject(*temp->getVehicleBody1());
-			}
-			if (temp->getWheel() != nullptr) {
-				wheelTemp = new GameObject(*temp->getWheel());
-			}
-			tempStats = temp->getStats();
-			temp->stopEngineSound();
-			
+
+			static_cast<UpgradingGameState*>(state.get())->getPlayer()->stopEngineSound();
 			Sound::stopAllLoops();
-			 // increase everytime a new stage is created
-			
 		}
 		
 		if (gameInfo.nrOfClearedStages <= 0)
 		{
-			state = std::make_unique<PlayingGameState>(1231,7.0f*60.0f);
+			// TODO: generate seed
+			state = std::make_unique<PlayingGameState>(-1,7.0f*60.0f);
 		}
 		else
 		{
+			// TODO: use RNG with seed from above to generate subsequent map seeds
 			state = std::make_unique<PlayingGameState>(-1,gameInfo.time);
 		}
+
 		gameInfo.nrOfClearedStages++;
 		static_cast<PlayingGameState*>(state.get())->setCurrentMenu(PlayingGameState::MENU_BEFORE_PLAYING);
 		static_cast<PlayingGameState*>(state.get())->generateObjectives();
+
 		if (oldState == STATE_UPGRADING)
 		{	
-			static_cast<PlayingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
-			if (chassiTemp != nullptr) {
-				static_cast<PlayingGameState*>(state.get())->getPlayer()->setChassi(chassiTemp, tempStats);
-			}
-			if (wheelTemp != nullptr) {
-				static_cast<PlayingGameState*>(state.get())->getPlayer()->setWheels(wheelTemp, tempStats);
-			}
-
-			delete wheelTemp;
-			delete chassiTemp;
-
 			Sound::stopAllLoops();
 			static_cast<PlayingGameState*>(state.get())->getPlayer()->startEngineSound();
+			static_cast<PlayingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
 		}
 	}
 	else if (currentState == STATE_UPGRADING)
@@ -224,16 +205,14 @@ void Game::createCurrentState()
 			localScale += 0.05f;
 			transfer = static_cast<PlayingGameState*>(state.get())->getPlayer()->getSlots();
 			newSlots = new VehicleSlots(*transfer);
-			temp = static_cast<PlayingGameState*>(state.get())->getPlayer().get();
-			if (chassiTemp != nullptr) {
-				chassiTemp = temp->getVehicleBody1();
-			}
-			if (chassiTemp != nullptr) {
-				wheelTemp = temp->getWheel();
-			}
-			tempStats = temp->getStats();
-			temp->stopEngineSound();
+
+			static_cast<PlayingGameState*>(state.get())->getPlayer()->stopEngineSound();
 			Sound::stopAllLoops();
+		}
+		else if (oldState == STATE_MENU)
+		{
+			transfer = static_cast<MenuGameState*>(state.get())->getSlots();
+			newSlots = new VehicleSlots(*transfer);
 		}
 
 		state = std::make_unique<UpgradingGameState>();
@@ -242,7 +221,10 @@ void Game::createCurrentState()
 		{
 			Sound::stopAllLoops();
 			static_cast<UpgradingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
-			
+		}
+		else if (oldState == STATE_MENU)
+		{
+			static_cast<UpgradingGameState*>(state.get())->getPlayer()->setVehicleSlots(newSlots);
 		}
 	}
 	else if (currentState == STATE_HIGHSCORE)

@@ -184,8 +184,10 @@
     <ClCompile Include="PG\MinimapTextureGenerator.cpp" />
     <ClCompile Include="PG\Profiler.cpp" />
     <ClCompile Include="PG\RoadGenerator.cpp" />
+    <ClCompile Include="PG\Skyscraper.cpp" />
     <ClCompile Include="PowerUp.cpp" />
     <ClCompile Include="QuadTree.cpp" />
+    <ClCompile Include="SaveSystem.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\speech\darray.cpp" />
     <ClCompile Include="SoLoud\src\audiosource\speech\klatt.cpp" />
@@ -235,6 +237,7 @@
     <ClCompile Include="UI\Elements\CarGadgetSelector.cpp" />
     <ClCompile Include="UI\Elements\CheckBox.cpp" />
     <ClCompile Include="UI\Elements\Element.cpp" />
+    <ClCompile Include="PG\SkyscraperFloor.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -267,6 +270,7 @@
     <ClCompile Include="UI\Menu\UIControls.cpp" />
     <ClCompile Include="UI\Menu\UICredits.cpp" />
     <ClCompile Include="UI\Menu\UIHighscore.cpp" />
+    <ClCompile Include="UI\Menu\UILoad.cpp" />
     <ClCompile Include="UI\Menu\UIMainMenu.cpp" />
     <ClCompile Include="UI\Menu\UIOptions.cpp" />
     <ClCompile Include="UI\Highscore\UIBeforeHighscore.cpp" />
@@ -313,6 +317,7 @@
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
+    <ClInclude Include="SaveSystem.h" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
     <ClInclude Include="AI\Turret.h" />
     <ClInclude Include="Particle\ParticleSystem.h" />
@@ -401,6 +406,8 @@
     <ClInclude Include="PG\Direction.hpp" />
     <ClInclude Include="PG\TileMap.hpp" />
     <ClInclude Include="PG\RandomSegments.hpp" />
+    <ClInclude Include="PG\Skyscraper.h" />
+    <ClInclude Include="PG\SkyscraperFloor.h" />
     <ClInclude Include="PG\Tile.hpp" />
     <ClInclude Include="PG\utils.hpp" />
     <ClInclude Include="PG\Voronoi.hpp" />
@@ -421,6 +428,7 @@
     <ClInclude Include="UI\Menu\UIControls.h" />
     <ClInclude Include="UI\Menu\UICredits.h" />
     <ClInclude Include="UI\Menu\UIHighscore.h" />
+    <ClInclude Include="UI\Menu\UILoad.h" />
     <ClInclude Include="UI\Menu\UIMainMenu.h" />
     <ClInclude Include="UI\Menu\UIOptions.h" />
     <ClInclude Include="UI\Highscore\UIBeforeHighscore.h" />
@@ -581,6 +589,36 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Particle\SnowCreateCS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Particle\SnowParticleGS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Particle\SnowUpdateCS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Particle\TrailCreateCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

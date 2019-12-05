@@ -59,6 +59,7 @@ void PlayingGameState::initAI()
 	actorManager = nullptr;
 	actorManager = std::make_unique<ActorManager>( aStar.get(), physics.get(), map.get(), &rng );
 	aStar->generateTileData(map->getTileMap());
+	
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
@@ -66,6 +67,7 @@ void PlayingGameState::initAI()
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
 	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
+	
 
 }
 
@@ -105,10 +107,12 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadModel("Tiles/Quad_SS"); // single-sided
 	graphics.loadTexture("Tiles/asphalt");
 	graphics.loadTexture("Tiles/asphalt_nor");
-	graphics.loadTexture("Tiles/grass");
-	graphics.loadTexture("Tiles/grass_nor");
-	graphics.loadTexture("Tiles/snow");
-	graphics.loadTexture("Tiles/snow_nor");
+	graphics.loadTexture("Tiles/grasslands");
+	graphics.loadTexture("Tiles/grasslands_nor");
+	graphics.loadTexture("Tiles/ashlands");
+	graphics.loadTexture("Tiles/ashlands_nor");
+	graphics.loadTexture("Tiles/arctic");
+	graphics.loadTexture("Tiles/arctic_nor");
 	graphics.loadTexture("Tiles/desert");
 	graphics.loadTexture("Tiles/desert_nor");
 	graphics.loadTexture("Tiles/road_trans_2file2metro");
@@ -130,6 +134,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadTexture("Tiles/road_marker_4way");
 	graphics.loadTexture("Tiles/concrete");
 	graphics.loadTexture("Tiles/concrete_nor");
+	graphics.loadTexture("Tiles/zebra_crossing");
 
 	graphics.loadTexture("Tiles/road_2file_deadend_n");
 	graphics.loadTexture("Tiles/road_2file_deadend_n_nor");
@@ -186,6 +191,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	minimap = createMinimapTexture(*map);
 	generateMapPowerUps();
 	createFogOfWarTexture(*map);
+	createDistanceTexture(*map);
 
 	menues[MENU_PLAYING] = std::make_unique<UIPlaying>();
 	menues[MENU_PLAYING]->init();
@@ -577,6 +583,7 @@ void PlayingGameState::update(float deltaTime)
 		cameraObject->getRigidBody()->applyForce(btVector3(directionCam.x, directionCam.y, directionCam.z) * 10,btVector3(0,0,0));
 		camera->setPosition(Vector3(currentCamPos.x, currentCamPos.y, currentCamPos.z));
 		camera->update(deltaTime);
+		updateWeather(deltaTime, currentCamPos);
 
 		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
 		Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
@@ -605,13 +612,12 @@ void PlayingGameState::update(float deltaTime)
 			this->player->setHealth(0);
 		}
 
-		actorManager->update(deltaTime, player->getPosition());
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount, deltaTime);
+		actorManager->update(deltaTime, player->getPosition());
 		accelForce = Vector3(player->getRigidBody()->getLinearVelocity().getX(), player->getRigidBody()->getLinearVelocity().getY(), player->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation(deltaTime);
-		camera->update(deltaTime);
-		objectives.update(player->getPosition());
+		objectives.update(player->getPosition(), physics.get());
 		Bullet::updateSoundTimer(deltaTime);
 		player->updateWeapon(deltaTime);
 		timer += deltaTime;
@@ -707,12 +713,11 @@ void PlayingGameState::update(float deltaTime)
 		//ImGui_Driving();
 		ImGui_ProcGen();
 		//ImGui_AI();
-		//ImGui_Particles();
+		ImGui_Particles();
 		ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	#endif // !_DEBUG
-
 	graphics.presentScene();
 }
 
@@ -837,6 +842,8 @@ void PlayingGameState::moveObjects()
 	if (object->getPosition().x > (player->getPosition().x + 50) ||
 		object->getPosition().x < (player->getPosition().x - 50) ||
 		object->getPosition().z >(player->getPosition().z + 35) ||
+
+
 		object->getPosition().z < (player->getPosition().z - 35)) {
 		if (object->getRigidBody() != nullptr) {
 			object->getRigidBody()->setActivationState(0);
@@ -1033,7 +1040,7 @@ void PlayingGameState::generateMapPowerUps()
 
 void PlayingGameState::generateObjectives()
 {
-	if (Game::getNrOfStagesDone() % 3 == 0) //nrOfStagesBEGUN
+	if (Game::getNrOfStagesDone() % 3 == 0)
 	{
 		//difficulty scale
 		float scalingNr = Game::getNrOfStagesDone() / 3; // /3
@@ -1067,6 +1074,61 @@ void PlayingGameState::generateObjectives()
 			prob[1] = std::fminf(prob[1], 1.0f);
 		}
 		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, player->getPosition());// ->getStartPositionInWorldSpace());
+	}
+}
+
+void PlayingGameState::updateWeather(float deltaTime, Vector3 cameraPos)
+{
+	if (map->getInfo().environment.getWeather() == Weather::snow) {
+		snowTimer += deltaTime;
+		if (snowTimer > 0.05f) {
+			for (int i = 0; i < std::clamp((int)player->getVelocitySpeed() * 2, 25, 50); i++) {
+				Game::getGraphics().addParticle("snow", 1, 5,
+					Vector3(cameraPos.x, cameraPos.y, cameraPos.z) +
+					Vector3(0, -10.0f, 0) +
+					Vector3(player->getRigidBody()->getLinearVelocity().getX(),
+						player->getRigidBody()->getLinearVelocity().getY(),
+						player->getRigidBody()->getLinearVelocity().getZ()) * 3.0f,
+					Vector4(0.0f, 0.0f, 0.0f, 0.0f),
+					20.5f + cameraPos.y,
+					Vector3(1, 0, 1));
+			}
+			snowTimer = 0;
+		}
+	}
+	if (map->getInfo().environment.getWeather() == Weather::rain || map->getInfo().environment.getWeather() == Weather::thunderstorm) {
+		snowTimer += deltaTime;
+		if (snowTimer > 0.05f) {
+			for (int i = 0; i < std::clamp((int)player->getVelocitySpeed() * 2, 25, 50); i++) {
+				Game::getGraphics().addParticle("rain", 1, 2,
+					Vector3(cameraPos.x, cameraPos.y, cameraPos.z) +
+					Vector3(0, -10.0f, 0) +
+					Vector3(player->getRigidBody()->getLinearVelocity().getX(),
+						player->getRigidBody()->getLinearVelocity().getY(),
+						player->getRigidBody()->getLinearVelocity().getZ()) * 3.0f,
+					Vector4(0.0f, 0.0f, 0.0f, 0.0f),
+					20.5f + cameraPos.y,
+					Vector3(1, 0, 1));
+			}
+			snowTimer = 0;
+		}
+	}
+	if (map->getInfo().environment.getWeather() == Weather::ashfall) {
+		snowTimer += deltaTime;
+		if (snowTimer > 0.05f) {
+			for (int i = 0; i < std::clamp((int)player->getVelocitySpeed() * 2, 25, 50); i++) {
+				Game::getGraphics().addParticle("ash", 1, 7,
+					Vector3(cameraPos.x, cameraPos.y, cameraPos.z) +
+					Vector3(0, -10.0f, 0) +
+					Vector3(player->getRigidBody()->getLinearVelocity().getX(),
+						player->getRigidBody()->getLinearVelocity().getY(),
+						player->getRigidBody()->getLinearVelocity().getZ()) * 3.0f,
+					Vector4(0.0f, 0.0f, 0.0f, 0.0f),
+					20.5f + cameraPos.y,
+					Vector3(1, 0, 1));
+			}
+			snowTimer = 0;
+		}
 	}
 }
 

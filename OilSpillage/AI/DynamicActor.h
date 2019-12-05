@@ -8,6 +8,7 @@ public:
 	virtual ~DynamicActor();
 	void setPath(Vector3* path);
 	virtual void update(float dt, const Vector3& targetPos);
+	virtual void knockBack(Vector3 direction, float force);
 
 	int duty;
 	int pathSize;
@@ -21,4 +22,5 @@ protected:
 	virtual Vector3 calculateVelocity();
 	virtual void followPath();
 	Status inAggroRange();
+
 };

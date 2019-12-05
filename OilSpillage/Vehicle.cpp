@@ -87,14 +87,8 @@ void Vehicle::init(Physics* physics)
 	vehicleBody1->setScale(Vector3(0.35f, 0.35f, 0.35f));	
 	//vehicleBody1->setPosition(Vector3(0.0f, 0.65f, 0.0f));
 	//vehicleBody1->setScale(Vector3(0.5f, 0.22f, 0.9f));
-	if (curChassi == "") {
-		vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Chassi1");
-		vehicleBody1->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Chassi1"));
-	}
-	else {
-		vehicleBody1->mesh = Game::getGraphics().getMeshPointer(curChassi.c_str());
-		vehicleBody1->setMaterial(Game::getGraphics().getMaterial(curChassi.c_str()));
-	}
+	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Chassi1");
+	vehicleBody1->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Chassi1"));
 
 	Game::getGraphics().loadModel("Entities/Player_Car_Parts/Wheel1");
 	this->wheel1 = new GameObject;
@@ -113,27 +107,14 @@ void Vehicle::init(Physics* physics)
 	wheel2->setScale(Vector3(0.38f, 0.38f, 0.38f));
 	wheel3->setScale(Vector3(0.38f, 0.38f, 0.38f));
 	wheel4->setScale(Vector3(0.38f, 0.38f, 0.38f));
-
-	if (curWheel == "") {
-		wheel1->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
-		wheel2->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
-		wheel3->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
-		wheel4->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
-		wheel1->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
-		wheel2->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
-		wheel3->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
-		wheel4->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
-	}
-	else {
-		wheel1->mesh = Game::getGraphics().getMeshPointer(curWheel.c_str());
-		wheel2->mesh = Game::getGraphics().getMeshPointer(curWheel.c_str());
-		wheel3->mesh = Game::getGraphics().getMeshPointer(curWheel.c_str());
-		wheel4->mesh = Game::getGraphics().getMeshPointer(curWheel.c_str());
-		wheel1->setMaterial(Game::getGraphics().getMaterial(curWheel.c_str()));
-		wheel2->setMaterial(Game::getGraphics().getMaterial(curWheel.c_str()));
-		wheel3->setMaterial(Game::getGraphics().getMaterial(curWheel.c_str()));
-		wheel4->setMaterial(Game::getGraphics().getMaterial(curWheel.c_str()));
-	}
+	wheel1->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
+	wheel2->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
+	wheel3->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
+	wheel4->mesh = Game::getGraphics().getMeshPointer("Entities/Player_Car_Parts/Wheel1");
+	wheel1->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
+	wheel2->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
+	wheel3->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
+	wheel4->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
 
 	//btRigidBody* tempo = physics->addBox(btVector3(getPosition().x, getPosition().y, getPosition().z), btVector3(getScale().x, getScale().y, getScale().z), 10.0f);
 	btRigidBody* tempo = physics->addCapsule(getScale().x,btVector3(getPosition().x, getPosition().y, getPosition().z), getScale().z, 10.0f);
@@ -174,7 +155,6 @@ void Vehicle::updatePlayer(float deltaTime)
 
 void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)
 {
-
 
 	PlayingGameState* playing = dynamic_cast<PlayingGameState*>(Game::getCurrentState());
 
@@ -456,10 +436,10 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 	for (int i = 0; i < Slots::SIZEOF; i++)
 	{
-		Item* temp = this->vehicleSlots->getSlot(Slots(i));
+		Item* temp = this->vehicleSlots->getItem(Slots(i));
 		if (temp != nullptr)
 		{
-			if (temp->getType() == ItemType::WEAPON)
+			if (temp->getType() == ItemType::TYPE_WEAPON)
 			{
 				ItemWeapon* tempWeapon = dynamic_cast<ItemWeapon*>(temp);
 				if (tempWeapon != nullptr)
@@ -478,8 +458,10 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 			dmg = false;
 		}
 	}*/
-	vehicleBody1->setColor(Vector4(vehicleBody1->getColor().x / (1 + 5.0f * deltaTime), vehicleBody1->getColor().y / (1 + 5.0f * deltaTime), vehicleBody1->getColor().z / (1 + 5.0f * deltaTime), 1));
-
+	//vehicleBody1->setColor(Vector4(vehicleBody1->getColor().x / (1 + 5.0f * deltaTime), vehicleBody1->getColor().y / (1 + 5.0f * deltaTime), vehicleBody1->getColor().z / (1 + 5.0f * deltaTime), 1));
+	
+	Vector4 color = this->vehicleSlots->getItem(Slots::CHASSI) ? this->vehicleSlots->getItem(Slots::CHASSI)->getBaseColor() : Vector4(0, 0, 0, 1);
+	vehicleBody1->setColor(Vector4::Lerp(vehicleBody1->getColor(), color, deltaTime * 8));
 
 
 	//Engine sound
@@ -559,42 +541,42 @@ void Vehicle::updateWeapon(float deltaTime)
 		tempDirYawPtich.Normalize();
 		float angleWP = tempDirYawPtich.Dot(Vector3(0, 0, 1));
 		/*MOUNTED*/
-		if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
+		if (this->vehicleSlots->getItem(Slots::MOUNTED) != nullptr)
 		{
-			if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
+			if (this->vehicleSlots->getItem(Slots::MOUNTED)->getObject() != nullptr)
 			{
 				if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) == nullptr)
 				{
 					//in upgradingstate 
-					this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y, 0));// acos(angleWP)));
+					this->vehicleSlots->getItem(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y, 0));// acos(angleWP)));
 				}
-				this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setPosition(vehicleBody1->getPosition()+Vector3(0,0.5f,0));
-				this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setScale(Vector3(0.2f, 0.2f, 0.2f));
+				this->vehicleSlots->getItem(Slots::MOUNTED)->getObject()->setPosition(vehicleBody1->getPosition()+Vector3(0,0.5f,0));
+				this->vehicleSlots->getItem(Slots::MOUNTED)->getObject()->setScale(Vector3(0.2f, 0.2f, 0.2f));
 			}
 		}
 
 		/*END*/
 
 		/*FRONT*/
-		if (this->vehicleSlots->getSlot(Slots::FRONT) != nullptr)
+		if (this->vehicleSlots->getItem(Slots::FRONT) != nullptr)
 		{
-			if (this->vehicleSlots->getSlot(Slots::FRONT)->getObject() != nullptr)
+			if (this->vehicleSlots->getItem(Slots::FRONT)->getObject() != nullptr)
 			{
-				this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y, acos(angleWP) - 3.14 / 2));
-				this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setPosition(this->vehicleBody1->getPosition() + 0.65f * frontTempDir - Vector3(0.0f, 0.25f, 0.0f));
-				this->vehicleSlots->getSlot(Slots::FRONT)->getObject()->setScale(Vector3(0.15f, 0.15f, 0.15f));
+				this->vehicleSlots->getItem(Slots::FRONT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y, acos(angleWP) - 3.14 / 2));
+				this->vehicleSlots->getItem(Slots::FRONT)->getObject()->setPosition(this->vehicleBody1->getPosition() + 0.65f * frontTempDir - Vector3(0.0f, 0.25f, 0.0f));
+				this->vehicleSlots->getItem(Slots::FRONT)->getObject()->setScale(Vector3(0.15f, 0.15f, 0.15f));
 			}
 		}
 		/*END*/
 
 		/*BACK*/
-		if (this->vehicleSlots->getSlot(Slots::BACK) != nullptr)
+		if (this->vehicleSlots->getItem(Slots::BACK) != nullptr)
 		{
-			if (this->vehicleSlots->getSlot(Slots::BACK)->getObject() != nullptr)
+			if (this->vehicleSlots->getItem(Slots::BACK)->getObject() != nullptr)
 			{
-				this->vehicleSlots->getSlot(Slots::BACK)->getObject()->setPosition(this->vehicleBody1->getPosition() - 0.65f * frontTempDir - Vector3(0.0f, 0.25f, 0.0f));
-				this->vehicleSlots->getSlot(Slots::BACK)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14f, acos(angleWP) - 3.14 / 2));
-				this->vehicleSlots->getSlot(Slots::BACK)->getObject()->setScale(Vector3(0.15f, 0.15f, 0.15f));
+				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setPosition(this->vehicleBody1->getPosition() - 0.65f * frontTempDir - Vector3(0.0f, 0.25f, 0.0f));
+				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14f, acos(angleWP) - 3.14 / 2));
+				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setScale(Vector3(0.15f, 0.15f, 0.15f));
 			}
 		}
 		/*END*/
@@ -603,25 +585,25 @@ void Vehicle::updateWeapon(float deltaTime)
 
 		Vector3 upp(0, 1, 0);
 		Vector3 right = upp.Cross(frontTempDir);
-		if (this->vehicleSlots->getSlot(Slots::RIGHT) != nullptr)
+		if (this->vehicleSlots->getItem(Slots::RIGHT) != nullptr)
 		{
-			if (this->vehicleSlots->getSlot(Slots::RIGHT)->getObject() != nullptr)
+			if (this->vehicleSlots->getItem(Slots::RIGHT)->getObject() != nullptr)
 			{
-				this->vehicleSlots->getSlot(Slots::RIGHT)->getObject()->setPosition(this->vehicleBody1->getPosition() - 0.35f * right - Vector3(0.0f, 0.25f, 0.0f));
-				this->vehicleSlots->getSlot(Slots::RIGHT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y - 3.14 / 2, acos(angleWP) - 3.14 / 2));
-				this->vehicleSlots->getSlot(Slots::RIGHT)->getObject()->setScale(Vector3(0.15f,0.15f,0.15f));
+				this->vehicleSlots->getItem(Slots::RIGHT)->getObject()->setPosition(this->vehicleBody1->getPosition() - 0.35f * right - Vector3(0.0f, 0.25f, 0.0f));
+				this->vehicleSlots->getItem(Slots::RIGHT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y - 3.14 / 2, acos(angleWP) - 3.14 / 2));
+				this->vehicleSlots->getItem(Slots::RIGHT)->getObject()->setScale(Vector3(0.15f,0.15f,0.15f));
 			}
 		}
 		/*END*/
 
 		/*LEFT*/
-		if (this->vehicleSlots->getSlot(Slots::LEFT) != nullptr)
+		if (this->vehicleSlots->getItem(Slots::LEFT) != nullptr)
 		{
-			if (this->vehicleSlots->getSlot(Slots::LEFT)->getObject() != nullptr)
+			if (this->vehicleSlots->getItem(Slots::LEFT)->getObject() != nullptr)
 			{
-				this->vehicleSlots->getSlot(Slots::LEFT)->getObject()->setPosition(this->vehicleBody1->getPosition() + 0.35f * right - Vector3(0.0f, 0.25f, 0.0f));
-				this->vehicleSlots->getSlot(Slots::LEFT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14 / 2, acos(angleWP) - 3.14 / 2));
-				this->vehicleSlots->getSlot(Slots::LEFT)->getObject()->setScale(Vector3(0.15f, 0.15f, 0.15f));
+				this->vehicleSlots->getItem(Slots::LEFT)->getObject()->setPosition(this->vehicleBody1->getPosition() + 0.35f * right - Vector3(0.0f, 0.25f, 0.0f));
+				this->vehicleSlots->getItem(Slots::LEFT)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14 / 2, acos(angleWP) - 3.14 / 2));
+				this->vehicleSlots->getItem(Slots::LEFT)->getObject()->setScale(Vector3(0.15f, 0.15f, 0.15f));
 			}
 		}
 		/*END*/
@@ -655,12 +637,12 @@ void Vehicle::updateWeapon(float deltaTime)
 				float newRot = atan2(curDir.x, curDir.y);
 				this->gunRotation = newRot;
 
-				if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
+				if (this->vehicleSlots->getItem(Slots::MOUNTED) != nullptr)
 				{
-					if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
+					if (this->vehicleSlots->getItem(Slots::MOUNTED)->getObject() != nullptr)
 					{
-						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::MOUNTED));
-						this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, newRot, 0));
+						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem(Slots::MOUNTED));
+						this->vehicleSlots->getItem(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, newRot, 0));
 
 						if (/*Input::checkButton(Keys::R_SHOULDER, States::HELD) ||*/ Input::getStrengthRnoMouse() > 0.01f || Input::checkButtonMouse(MouseKeys::LEFT,States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 						{
@@ -707,12 +689,12 @@ void Vehicle::updateWeapon(float deltaTime)
 						}
 					}
 				}
-				if (this->vehicleSlots->getSlot(Slots::FRONT) != nullptr)
+				if (this->vehicleSlots->getItem(Slots::FRONT) != nullptr)
 				{
-					if (this->vehicleSlots->getSlot(Slots::FRONT)->getObject() != nullptr)
+					if (this->vehicleSlots->getItem(Slots::FRONT)->getObject() != nullptr)
 					{
-						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::FRONT));
-						if (this->vehicleSlots->getSlot(Slots::FRONT)->getType() == ItemType::WEAPON && temp!=nullptr)
+						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem(Slots::FRONT));
+						if (this->vehicleSlots->getItem(Slots::FRONT)->getType() == ItemType::TYPE_WEAPON && temp!=nullptr)
 						{
 							if (Input::checkButton(Keys::R_SHOULDER, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 							{
@@ -762,12 +744,12 @@ void Vehicle::updateWeapon(float deltaTime)
 						}
 					}
 				}
-				if (this->vehicleSlots->getSlot(Slots::BACK) != nullptr)
+				if (this->vehicleSlots->getItem(Slots::BACK) != nullptr)
 				{
-					if (this->vehicleSlots->getSlot(Slots::BACK)->getObject() != nullptr)
+					if (this->vehicleSlots->getItem(Slots::BACK)->getObject() != nullptr)
 					{
-						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::BACK));
-						if (this->vehicleSlots->getSlot(Slots::BACK)->getType() == ItemType::WEAPON && temp != nullptr)
+						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem(Slots::BACK));
+						if (this->vehicleSlots->getItem(Slots::BACK)->getType() == ItemType::TYPE_WEAPON && temp != nullptr)
 						{
 							if (Input::checkButton(Keys::CONFIRM, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 							{
@@ -817,12 +799,12 @@ void Vehicle::updateWeapon(float deltaTime)
 						}
 					}
 				}
-				if (this->vehicleSlots->getSlot(Slots::RIGHT) != nullptr)
+				if (this->vehicleSlots->getItem(Slots::RIGHT) != nullptr)
 				{
-					if (this->vehicleSlots->getSlot(Slots::RIGHT)->getObject() != nullptr)
+					if (this->vehicleSlots->getItem(Slots::RIGHT)->getObject() != nullptr)
 					{
-						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::RIGHT));
-						if (this->vehicleSlots->getSlot(Slots::RIGHT)->getType() == ItemType::WEAPON && temp != nullptr)
+						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem(Slots::RIGHT));
+						if (this->vehicleSlots->getItem(Slots::RIGHT)->getType() == ItemType::TYPE_WEAPON && temp != nullptr)
 						{
 							if (Input::checkButton(Keys::L_SHOULDER, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 							{
@@ -872,12 +854,12 @@ void Vehicle::updateWeapon(float deltaTime)
 						}
 					}
 				}
-				if (this->vehicleSlots->getSlot(Slots::LEFT) != nullptr)
+				if (this->vehicleSlots->getItem(Slots::LEFT) != nullptr)
 				{
-					if (this->vehicleSlots->getSlot(Slots::LEFT)->getObject() != nullptr)
+					if (this->vehicleSlots->getItem(Slots::LEFT)->getObject() != nullptr)
 					{
-						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot(Slots::LEFT));
-						if (this->vehicleSlots->getSlot(Slots::LEFT)->getType() == ItemType::WEAPON && temp != nullptr)
+						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem(Slots::LEFT));
+						if (this->vehicleSlots->getItem(Slots::LEFT)->getType() == ItemType::TYPE_WEAPON && temp != nullptr)
 						{
 							if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
 							{
@@ -937,11 +919,11 @@ void Vehicle::updateWeapon(float deltaTime)
 			{
 				bullets[i].update(deltaTime);
 			}
-			if (this->vehicleSlots->getSlot(Slots::MOUNTED) != nullptr)
+			if (this->vehicleSlots->getItem(Slots::MOUNTED) != nullptr)
 			{
-				if (this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject() != nullptr)
+				if (this->vehicleSlots->getItem(Slots::MOUNTED)->getObject() != nullptr)
 				{
-					this->spotLight->setPos(this->vehicleSlots->getSlot(Slots::MOUNTED)->getObject()->getPosition() - Vector3(curDir.x, -1, curDir.y));
+					this->spotLight->setPos(this->vehicleSlots->getItem(Slots::MOUNTED)->getObject()->getPosition() - Vector3(curDir.x, -1, curDir.y));
 					this->spotLight->setDirection(Vector3(curDir.x, 0, curDir.y));
 				}
 			}
@@ -949,7 +931,7 @@ void Vehicle::updateWeapon(float deltaTime)
 
 			for (int i = 0; i < Slots::SIZEOF; ++i)
 			{
-				ItemWeapon* itemWeapon = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getSlot((Slots)i));
+				ItemWeapon* itemWeapon = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem((Slots)i));
 				if (itemWeapon != nullptr)
 				{
 					GameObject* weaponObject = itemWeapon->getObject();
@@ -1038,8 +1020,17 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 	this->vehicleSlots = slots;
 	for (int i = 0; i < Slots::SIZEOF; i++)
 	{
-		Item* item = this->vehicleSlots->getSlot(Slots(i));
-		if (item != nullptr)
+		Item* item = this->vehicleSlots->getItem(Slots(i));
+
+		if (i == Slots::WHEEL)
+		{
+			this->setWheels(dynamic_cast<ItemWheel*>(item));
+		}
+		else if (i == Slots::CHASSI)
+		{
+			this->setChassi(dynamic_cast<ItemChassi*>(item));
+		}
+		else if (item != nullptr)
 		{
 			GameObject* temp = item->getObject();
 			if (temp != nullptr)
@@ -1077,10 +1068,6 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 							itemWeapon->getWeapon().light = (Light*)static_cast<PlayingGameState*>(Game::getCurrentState())->addLight(flash);
 						}
 					}
-					else if (itemWeapon->getWeapon().type == WeaponType::Flamethrower)
-					{
-						itemWeapon->getWeapon().doesDoT = true;
-					}
 				}
 			}
 		}
@@ -1089,17 +1076,29 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 
 void Vehicle::setSpecSlot(Slots slot, Item* item, Container::Slot* inventorySlot)
 {
-	if (this->vehicleSlots->getSlot(slot) != nullptr)
+	if (slot == Slots::WHEEL)
 	{
-		Game::getGraphics().removeFromDraw(this->vehicleSlots->getSlot(slot)->getObject());
+		this->setWheels(dynamic_cast<ItemWheel*>(item));
 	}
-	if (item!=nullptr)
+	else if (slot == Slots::CHASSI)
 	{
-		if (item->getObject() != nullptr)
+		this->setChassi(dynamic_cast<ItemChassi*>(item));
+	}
+	else
+	{
+		if (this->vehicleSlots->getItem(slot) != nullptr)
 		{
-			Game::getGraphics().addToDraw(item->getObject());
+			Game::getGraphics().removeFromDraw(this->vehicleSlots->getItem(slot)->getObject());
+		}
+		if (item != nullptr)
+		{
+			if (item->getObject() != nullptr)
+			{
+				Game::getGraphics().addToDraw(item->getObject());
+			}
 		}
 	}
+
 	this->vehicleSlots->setSlot(slot, item, inventorySlot);
 }
 
@@ -1239,6 +1238,7 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 
 	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionRnoMouse().x * Input::getStrengthRnoMouse() * 3, Input::getDirectionRnoMouse().y * Input::getStrengthRnoMouse() * 3), deltaTime*10.0f);
 
+
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime * 1.2f + cameraDistance;
 	cameraDistanceX = ((this->getRigidBody()->getLinearVelocity().getX() * 0.5f + aimLerp.x) - cameraDistanceX) * deltaTime * 12.2f + cameraDistanceX;
 	cameraDistanceZ = ((this->getRigidBody()->getLinearVelocity().getZ() * 0.40f + aimLerp.y) - cameraDistanceZ) * deltaTime * 12.2f + cameraDistanceZ;
@@ -1332,13 +1332,16 @@ void Vehicle::setWheelRotation(float deltaTime)
 	wheel4->setRotation(Vector3(0, vehicleBody1->getRotation().y + XM_PI, 0));
 }
 
-void Vehicle::setWheels(GameObject* newWheel, Stats stats)
+void Vehicle::setWheels(ItemWheel* wheel)
 {
-	this->updatedStats.accelerationRate = stats.accelerationRate;
-	this->updatedStats.handlingRate = stats.handlingRate;
-	this->defaultStats.accelerationRate = stats.accelerationRate;
-	this->defaultStats.handlingRate = stats.handlingRate;
+	if (!wheel) return;
 
+	this->updatedStats.accelerationRate = wheel->getAccelerationRate();
+	this->updatedStats.handlingRate = wheel->getHandlingRate();
+	this->defaultStats.accelerationRate = wheel->getAccelerationRate();
+	this->defaultStats.handlingRate = wheel->getHandlingRate();
+
+	GameObject* newWheel = wheel->getObject();
 	this->wheel1->mesh = newWheel->mesh;
 	this->wheel2->mesh = newWheel->mesh;
 	this->wheel3->mesh = newWheel->mesh;
@@ -1347,27 +1350,25 @@ void Vehicle::setWheels(GameObject* newWheel, Stats stats)
 	this->wheel2->setMaterial(newWheel->getMaterial());
 	this->wheel3->setMaterial(newWheel->getMaterial());
 	this->wheel4->setMaterial(newWheel->getMaterial());
-	this->wheel1->setColor(newWheel->getColor());
-	this->wheel2->setColor(newWheel->getColor());
-	this->wheel3->setColor(newWheel->getColor());
-	this->wheel4->setColor(newWheel->getColor());
+	this->wheel1->setColor(wheel->getBaseColor());
+	this->wheel2->setColor(wheel->getBaseColor());
+	this->wheel3->setColor(wheel->getBaseColor());
+	this->wheel4->setColor(wheel->getBaseColor());
 }
 
-GameObject* Vehicle::getWheel()
+void Vehicle::setChassi(ItemChassi* chassi)
 {
-	return this->wheel1;
-}
+	if (!chassi) return;
 
-void Vehicle::setChassi(GameObject* newChassi, Stats stats)
-{
-	this->updatedStats.maxHealth = stats.maxHealth;
-	this->updatedStats.speed = stats.speed;
-	this->defaultStats.maxHealth = stats.maxHealth;
-	this->defaultStats.speed = stats.speed;
-	
+	this->updatedStats.maxHealth = chassi->getMaxHealth();
+	this->updatedStats.speed = chassi->getSpeed();
+	this->defaultStats.maxHealth = chassi->getMaxHealth();
+	this->defaultStats.speed = chassi->getSpeed();
+
+	GameObject* newChassi = chassi->getObject();
 	this->vehicleBody1->mesh = newChassi->mesh;
 	this->vehicleBody1->setMaterial(newChassi->getMaterial());
-	this->vehicleBody1->setColor(newChassi->getColor());
+	this->vehicleBody1->setColor(chassi->getBaseColor());
 }
 
 float Vehicle::getPitch(DirectX::XMVECTOR Quaternion)
@@ -1494,9 +1495,13 @@ void Vehicle::onFire(float dt)
 	{
 		changeHealth(-(2 * dt));
 		fireTimer -= dt;
-		for (int i = 0; i < 10; i++)
+		if (particleTimer <= 0.0f)
 		{
-			Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+			for (int i = 0; i < 10; i++)
+			{
+				Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+			}
+			particleTimer = 0.1f;
 		}
 	}
 }

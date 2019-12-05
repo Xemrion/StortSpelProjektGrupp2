@@ -8,11 +8,11 @@
 
 enum ItemType
 {
-	WEAPON,
-	GADGET,
-	CHASSI,
-	WHEEL,
-	TYPES_SIZE
+	TYPE_WEAPON,
+	TYPE_GADGET,
+	TYPE_CHASSI,
+	TYPE_WHEEL,
+	TYPES_SIZEOF
 };
 
 class Item
@@ -26,6 +26,7 @@ protected:
 	Vector4 baseColor;
 	GameObject* object;
 public:
+	static GameObject* getObjectByName(std::string name);
 	static void init();
 	static Item* getRandom();
 	static Matrix generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale = Vector3::One, Quaternion rotation = Quaternion::Identity, bool ignoreObjectRotation = false);
@@ -34,7 +35,6 @@ public:
 	virtual ~Item();
 	Item(const Item& obj);
 	virtual Item* clone()const;
-	virtual bool operator==(const Item& other) const;
 
 	virtual void randomize();
 
