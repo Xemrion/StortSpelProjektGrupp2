@@ -276,7 +276,7 @@ Vector4 GameObject::getColor()const
 	return this->color;
 }
 
-Vector3& GameObject::getPosition()
+const Vector3& GameObject::getPosition() 
 {
 	if (this->rigidBody)
 	{

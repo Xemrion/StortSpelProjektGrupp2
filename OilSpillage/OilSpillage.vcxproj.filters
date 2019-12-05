@@ -164,9 +164,7 @@
     <ClCompile Include="MyClient.cpp" />
     <ClCompile Include="BulletSDK\include\LinearMath\btThreads.cpp" />
     <ClCompile Include="PowerUp.cpp" />
-    <ClCompile Include="UI\ObjectiveBox.cpp" />
     <ClCompile Include="AI\AIGroup.cpp" />
-    <ClCompile Include="UI\UIControls.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />

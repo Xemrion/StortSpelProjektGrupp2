@@ -62,7 +62,7 @@ public:
 	void setMaterial(Material);
 	void     setColor(Vector4 aColor);
 	Vector4  getColor()    const;
-	Vector3 & getPosition();
+	const Vector3 & getPosition();
 	const Vector3& getPositionRef();
 	Vector3  getRotation();
 	Quaternion getRotationQuaternion() const;

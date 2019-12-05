@@ -10,7 +10,6 @@ StructuredBuffer<Particle> SimulationState;
 struct VS_INPUT
 {
 	uint vertexId  : SV_VertexID;
-    uint instanceID : SV_InstanceID;
 };
 
 struct VS_OUT
