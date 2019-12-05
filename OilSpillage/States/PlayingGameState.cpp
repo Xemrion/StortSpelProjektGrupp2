@@ -1079,7 +1079,7 @@ void PlayingGameState::generateObjectives()
 
 void PlayingGameState::updateWeather(float deltaTime, Vector3 cameraPos)
 {
-	if (map->getInfo().environment.getWeather() == Weather::snow) {
+	/*if (map->getInfo().environment.getWeather() == Weather::snow) {
 		snowTimer += deltaTime;
 		if (snowTimer > 0.05f) {
 			for (int i = 0; i < std::clamp((int)player->getVelocitySpeed() * 2, 25, 50); i++) {
@@ -1095,7 +1095,7 @@ void PlayingGameState::updateWeather(float deltaTime, Vector3 cameraPos)
 			}
 			snowTimer = 0;
 		}
-	}
+	}*/
 	if (map->getInfo().environment.getWeather() == Weather::rain || map->getInfo().environment.getWeather() == Weather::thunderstorm) {
 		snowTimer += deltaTime;
 		if (snowTimer > 0.05f) {
