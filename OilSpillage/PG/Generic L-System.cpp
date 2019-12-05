@@ -128,7 +128,7 @@ void Lsystem::setStartPosition(Vector3 startPos)
 	moveLSystem(difference);
 }
 
-//Set direction of the start forward
+//Set direction of the start forward. Will be normalized.
 void Lsystem::setForwardDirection(Vector3 direction)
 { 
 	this->forwardDirection = direction;
@@ -258,6 +258,15 @@ void Lsystem::setupFractalPlantSystem()
 	setAngleDegrees(25);
 	setAxiom("X");
 	setRecursions(6);
+}
+
+//Get a vector of LSegments (Vector3 from, Vector3 towards) created from the Lindermayer System
+Vector<LSegment>& Lsystem::getResultingLSystem()
+{
+	if (rulesModified || valuesModified) {
+		updateLSystem();
+	}
+	return this->resultingLSystem;
 }
 
 void Lsystem::clearSegments()
