@@ -9,11 +9,10 @@ public:
 	void setPath(Vector3* path);
 	virtual void update(float dt, const Vector3& targetPos);
 
-	int duty; 
-	bool vActive;
-	Vector3* path;
+	int duty;
 	int pathSize;
 protected:	
+	Vector3* path;
 	int aggroRange;
 	Vector3 destination;
 	Vector3 velocity;

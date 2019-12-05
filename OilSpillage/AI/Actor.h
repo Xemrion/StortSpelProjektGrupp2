@@ -31,8 +31,8 @@ public:
 private:
 	float health;
 	int points;
-protected:
 	float fireTimer;
+protected:
 	bool isHit = false;
 	float deltaTime;
 	Vector3 targetPos;

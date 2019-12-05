@@ -34,11 +34,6 @@ void AIGroup::updateAveragePos()
 	}
 }
 
-std::vector<Vector3>* AIGroup::getPathPtr()
-{
-	return &this->path;
-}
-
 void AIGroup::setPath(std::vector<Vector3> path)
 {
 	this->path = path;

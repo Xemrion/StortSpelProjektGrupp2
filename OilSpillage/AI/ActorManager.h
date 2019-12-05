@@ -15,7 +15,6 @@ public:
 	enum Radius { CLOSE, MIDDLE, OUTER };
 	void update(float dt, const Vector3& targetPos);
 	void createAttacker(float x, float z, int weaponType = 0);
-	void createSniper(float x, float z, int weaponType = 0);
 	void createTurret(float x, float z, int weaponType = 0);
 	void createSwarm(float x, float z);
 	Boss* createBoss(float x, float z, int weaponType, float scalingNr);
@@ -26,7 +25,6 @@ public:
 	float distanceToPlayer(const Vector3& position);
 	const std::vector<AIGroup>& getGroups() const;
 	void spawnAttackers(const Vector3& originPos);
-	void spawnSnipers(const Vector3& originPos);
 	void spawnChaseCars(const Vector3& originPos);
 	void spawnShootCars(const Vector3& originPos);
 	void spawnSwarm(const Vector3& originPos);
@@ -60,6 +58,5 @@ private:
 	std::vector<DynamicActor*> actors;
 	std::vector<Boss*> bosses;
 	TurretHandler turretHandler;
-	std::vector<DynamicActor*> sendToPlayer;
 	AStar* aStar;
 };

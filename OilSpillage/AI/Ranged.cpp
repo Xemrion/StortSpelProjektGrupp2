@@ -84,47 +84,44 @@ Status Ranged::shoot()
 		float predictionFactor = 0.4f;
 		offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
 	}
-	if ((*positionPtr - *targetPosPtr).Length() < 23)
+	if (this->timeSinceLastShot >= this->weapon.fireRate)
 	{
-		if (this->timeSinceLastShot >= this->weapon.fireRate)
+		this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
+
+		for (int i = 0; i < Ranged::bulletCount; i++)
 		{
-			this->timeSinceLastShot = fmod(this->timeSinceLastShot, this->weapon.fireRate);
-
-			for (int i = 0; i < Ranged::bulletCount; i++)
+			if (bullets[i].getTimeLeft() == 0.0)
 			{
-				if (bullets[i].getTimeLeft() == 0.0)
+				if (weapon.type != WeaponType::aiLaser)
 				{
-					if (weapon.type != WeaponType::aiLaser)
-					{
-						Vector3 dir = (offsetPos - *this->positionPtr);
-						dir.Normalize();
-						Vector3 bulletOrigin = *this->positionPtr + dir;
+					Vector3 dir = (offsetPos - *this->positionPtr);
+					dir.Normalize();
+					Vector3 bulletOrigin = *this->positionPtr + dir;
 
-						this->bullets[i].shoot(
-							weapon,
-							bulletOrigin,
-							dir,
-							*velocityPtr,
-							*deltaTimePtr
-						);
-					}
-					else
-					{
-						Vector3 dir = (*targetPosPtr - *this->positionPtr);
-						dir.Normalize();
-						Vector3 bulletOrigin = *this->positionPtr + dir;
-
-						this->bullets[i].shoot(
-							weapon,
-							bulletOrigin,
-							dir,
-							Vector3(),
-							*deltaTimePtr
-						);
-					}
-
-					break;
+					this->bullets[i].shoot(
+						weapon,
+						bulletOrigin,
+						dir,
+						*velocityPtr,
+						*deltaTimePtr
+					);
 				}
+				else
+				{
+					Vector3 dir = (*targetPosPtr - *this->positionPtr);
+					dir.Normalize();
+					Vector3 bulletOrigin = *this->positionPtr + dir;
+
+					this->bullets[i].shoot(
+						weapon,
+						bulletOrigin,
+						dir,
+						Vector3(),
+						*deltaTimePtr
+					);
+				}
+
+				break;
 			}
 		}
 	}

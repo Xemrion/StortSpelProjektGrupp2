@@ -7,7 +7,7 @@
 #include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
-#define SPAWN_ENEMIES 0
+#define SPAWN_ENEMIES 1
 ActorManager::ActorManager()
 {
 }
@@ -93,12 +93,6 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 void ActorManager::createAttacker(float x, float z, int weaponType)
 {
 	this->actors.push_back(new Attacker(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
-}
-
-void ActorManager::createSniper(float x, float z, int weaponType)
-{
-	this->actors.push_back(new Sniper(x, z, weaponType, physics));
 	initGroupForActor(actors.at(actors.size() - 1));
 }
 
@@ -270,15 +264,6 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 		createAttacker(originPos.x + i, originPos.z, (rand() % 8) + 1);
 		createAttacker(originPos.x, originPos.z + i, (rand() % 8) + 1);
 		createAttacker(originPos.x - i, originPos.z, (rand() % 8) + 1);
-	}
-}
-void ActorManager::spawnSnipers(const Vector3& originPos)
-{
-	for (int i = 0; i < 2; i++)
-	{
-		createSniper(originPos.x + i, originPos.z, (rand() % 8) + 1);
-		createSniper(originPos.x, originPos.z + i, (rand() % 8) + 1);
-		createSniper(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
 void ActorManager::spawnChaseCars(const Vector3& originPos)
