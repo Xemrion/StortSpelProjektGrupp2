@@ -156,7 +156,6 @@ void Vehicle::updatePlayer(float deltaTime)
 void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)
 {
 
-
 	PlayingGameState* playing = dynamic_cast<PlayingGameState*>(Game::getCurrentState());
 
 	if (playing != nullptr)

@@ -58,11 +58,38 @@ Graphics::Graphics()
 	this->particleHandler->addParticleSystem("explosion","ParticleUpdateCS.cso", "ExplosionCreateCS.cso");
 	this->particleHandler->addParticleSystem("debris", debrisColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 
+	Vector4 snowColor[4] = {
+		Vector4(1.0f,1.0f,1.0f,1.0f),
+		Vector4(1.0f,1.0f,1.0f,1.0f),
+		Vector4(1.0f,1.0f,1.0f,1.0f),
+		Vector4(0.8f,0.8f,1.0f,1.0f)
+	};
+	this->particleHandler->addParticleSystem("snow", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
+	this->particleHandler->getParticleSystem("snow")->setGravity(-0.25f);
+	this->particleHandler->getParticleSystem("snow")->changeVectorField(2.5f,3.0f);
+	this->particleHandler->addParticleSystem("ash", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
+	this->particleHandler->getParticleSystem("ash")->setGravity(-0.25f);
+	this->particleHandler->getParticleSystem("ash")->changeVectorField(0.75f, 3.0f);
+	Vector4 rainColor[4] = {
+		Vector4(0.0f,0.0f,1.0f,1.0f),
+		Vector4(0.0f,0.0f,1.0f,1.0f),
+		Vector4(0.0f,0.0f,1.0f,1.0f),
+		Vector4(0.0f,0.0f,1.0f,1.0f)
+	};
+	this->particleHandler->addParticleSystem("rain", rainColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
+
 	this->particleHandler->loadParticleSystems();
+	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso", "DebrisCreateCS.cso", "ParticleGS.cso");
+	this->particleHandler->getParticleSystem("snow")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
+	this->particleHandler->getParticleSystem("ash")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
+
+
+	this->particleHandler->getParticleSystem("rain")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 	this->particleTrail->loadSystem();
 	this->particleHandler->getParticleSystem("electro")->setUpdateShader("ElectroUpdateCS.cso");
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
+
 }
 
 Graphics::~Graphics()
@@ -467,6 +494,9 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("debris")->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleHandler->getParticleSystem("snow")->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleHandler->getParticleSystem("ash")->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleHandler->getParticleSystem("rain")->initiateParticles(device.Get(), deviceContext.Get());
 
 
 	this->particleSystem->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
@@ -476,7 +506,10 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("explosion")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("debris")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 
-	
+	this->particleHandler->getParticleSystem("ash")->setGravity(0.1f);
+	this->particleHandler->getParticleSystem("ash")->setMass(0.5f);
+	this->particleHandler->getParticleSystem("rain")->setGravity(10.0f);
+	this->particleHandler->getParticleSystem("rain")->setMass(0.5f);
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
 	fogMaterial.color = Vector3(1.0, 1.0, 1.0);
@@ -842,10 +875,13 @@ void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfPartic
 	this->particleHandler->getParticleSystem("fire")->addParticle(nrOfParticles, lifeTime, randomPos,initialDirection);
 }
 
-void Graphics::addParticle(std::string particleSystem, int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection, float randomPower)
+void Graphics::addParticle(std::string particleSystem, int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection, float randomPower,Vector3 randomSpace)
 {
 	Vector3 randomPos = randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
 	Vector3 randomPos2 = -1.0f * randomPower * Vector3(float(rand()), float(rand()), float(rand())) / RAND_MAX;
+
+	randomPos *= randomSpace;
+	randomPos2 *= randomSpace;
 
 	randomPos += position;
 	randomPos += randomPos2;
