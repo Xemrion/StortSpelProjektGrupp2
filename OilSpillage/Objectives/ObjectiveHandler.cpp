@@ -125,8 +125,78 @@ bool ObjectiveHandler::isAllDone()
 	return allDone;
 }
 
-void ObjectiveHandler::update(Vector3 playerPos)
+void ObjectiveHandler::update(Vector3 playerPos, Physics* physics)
 {
+	//------------------IF THIS BOTTNECKS FIX BETTER RIGIDBODY FOR THIS / NO RIGIDBODY-----------------
+
+	//check which pickUpArrs item is closest to player
+	if (this->objectiveVec.size() != 0)
+	{
+		if (this->objectiveVec.at(0)->getType() == TypeOfMission::FindAndCollect)
+		{
+			int shortestDistObj = 0;
+			float distanceFromPlayerToPickup = 0.0f;
+			float distanceFromPlayerToPickupShortest = 0.0f;
+
+			for (int i = 0; i < this->objectiveVec.at(0)->getNrOfMax(); i++) // 5
+			{
+				Vector3 pos = this->pickUpArrs.at(0)[i]->getPosition();
+				Vector3 posShortest = this->pickUpArrs.at(0)[shortestDistObj]->getPosition();
+				int stop = 1;
+
+				distanceFromPlayerToPickup =
+					sqrtf((pos.x - playerPos.x) * (pos.x - playerPos.x) +
+					(pos.y - playerPos.y) * (pos.y - playerPos.y) +
+						(pos.z - playerPos.z) * (pos.z - playerPos.z));
+
+				distanceFromPlayerToPickupShortest =
+					sqrtf((posShortest.x - playerPos.x) * (posShortest.x - playerPos.x) +
+					(posShortest.y - playerPos.y) * (posShortest.y - playerPos.y) +
+						(posShortest.z - playerPos.z) * (posShortest.z - playerPos.z));
+
+				if (distanceFromPlayerToPickup <= distanceFromPlayerToPickupShortest)
+				{
+					shortestDistObj = i;
+					distanceFromPlayerToPickupShortest = distanceFromPlayerToPickup;
+				}
+			}
+
+			//calculate vector towards player and speed
+			Vector3 towardsPlayer = playerPos - this->pickUpArrs.at(0)[shortestDistObj]->getPosition();
+			towardsPlayer.Normalize(); //so not faster if closer
+			float velocityIncrease = 0;
+
+			if (distanceFromPlayerToPickupShortest <= 17.5) //do another check for player hp
+			{
+				velocityIncrease = 10; //speed if close
+			}
+			else
+			{
+				velocityIncrease = 0; //no speed not close
+			}
+
+			//remove last rigidbody so we dont get too many
+			if (this->pickUpArrs.at(0)[shortestDistObj]->getRigidBody() != nullptr)
+				physics->DeleteRigidBody(this->pickUpArrs.at(0)[shortestDistObj]->getRigidBody());
+
+			btRigidBody* tempo = physics->addSphere(0.5f, btVector3
+			(this->pickUpArrs.at(0)[shortestDistObj]->getPosition().x,
+				this->pickUpArrs.at(0)[shortestDistObj]->getPosition().y,
+				this->pickUpArrs.at(0)[shortestDistObj]->getPosition().z),
+				1.5f, this->pickUpArrs.at(0)[shortestDistObj]);
+
+			this->pickUpArrs.at(0)[shortestDistObj]->setRigidBody(tempo, physics);
+			this->pickUpArrs.at(0)[shortestDistObj]->getRigidBody()->activate();
+			this->pickUpArrs.at(0)[shortestDistObj]->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+			this->pickUpArrs.at(0)[shortestDistObj]->getRigidBody()->setFriction(0);
+			this->pickUpArrs.at(0)[shortestDistObj]->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+
+			//set speed
+			this->pickUpArrs.at(0)[shortestDistObj]->getRigidBody()->setLinearVelocity(btVector3(towardsPlayer.x * velocityIncrease, 0.0f, towardsPlayer.z * velocityIncrease));
+		}
+	}
+
+
 	if (this->objectiveVec.size() != 0)
 	{
 		this->objectiveVec.at(0)->update(playerPos);

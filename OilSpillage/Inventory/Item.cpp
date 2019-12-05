@@ -1,9 +1,24 @@
 #include "Item.h"
 #include "ItemWeapon.h"
+#include "ItemChassi.h"
+#include "ItemWheel.h"
 #include "../game.h"
 #include "../PG/defs.hpp"
 
 std::vector<std::shared_ptr<Item>> Item::premadeItems;
+
+GameObject* Item::getObjectByName(std::string name)
+{
+	for (int i = 0; i < Item::premadeItems.size(); i++)
+	{
+		if (Item::premadeItems[i]->name == name)
+		{
+			return Item::premadeItems[i]->object;
+		}
+	}
+
+	return nullptr;
+}
 
 void Item::init()
 {
@@ -13,6 +28,8 @@ void Item::init()
 	graphics.loadModel("Entities/FlameThrower");
 	graphics.loadModel("Entities/Lazer");
 	graphics.loadModel("Entities/Spike");
+	graphics.loadModel("Entities/Player_Car_Parts/Chassi1");
+	graphics.loadModel("Entities/Player_Car_Parts/Wheel1");
 
 	GameObject* machineGun = new GameObject();
 	machineGun->mesh = graphics.getMeshPointer("Entities/Minigun");
@@ -38,11 +55,25 @@ void Item::init()
 	spike->setScale(Vector3(0.05f));
 	spike->setPosition(lazer->mesh->getAABB().scale(lazer->getScale()).maxPos * Vector3(0, 1, 0));
 
+	GameObject* chassi1 = new GameObject();
+	chassi1->mesh = graphics.getMeshPointer("Entities/Player_Car_Parts/Chassi1");
+	chassi1->setMaterial(graphics.getMaterial("Entities/Player_Car_Parts/Chassi1"));
+	chassi1->setScale(Vector3(0.05f));
+	chassi1->setPosition(chassi1->mesh->getAABB().scale(chassi1->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0,0.1f,0));
+
+	GameObject* wheel1 = new GameObject();
+	wheel1->mesh = graphics.getMeshPointer("Entities/Player_Car_Parts/Wheel1");
+	wheel1->setMaterial(graphics.getMaterial("Entities/Player_Car_Parts/Wheel1"));
+	wheel1->setScale(Vector3(0.21f));
+	wheel1->setPosition(wheel1->mesh->getAABB().scale(wheel1->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.1f, 0));
+
 	Item::premadeItems = {
 		std::make_shared<ItemWeapon>("Machinegun", WeaponHandler::getWeapon(WeaponType::MachineGun), machineGun),
 		std::make_shared<ItemWeapon>("Flamethrower", WeaponHandler::getWeapon(WeaponType::Flamethrower), flameThrower),
 		std::make_shared<ItemWeapon>("Lazer", WeaponHandler::getWeapon(WeaponType::Laser), lazer),
-		std::make_shared<ItemWeapon>("Spikes", WeaponHandler::getWeapon(WeaponType::Spikes), spike)
+		std::make_shared<ItemWeapon>("Spikes", WeaponHandler::getWeapon(WeaponType::Spikes), spike),
+		std::make_shared<ItemChassi>("Muscle Chassi", 100, 1.0f, chassi1),
+		std::make_shared<ItemWheel>("Muscle Tires", 1.0f, 1.0f, wheel1)
 	};
 
 }
@@ -67,10 +98,13 @@ Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 sc
 Item::Item(std::string name, std::string description, ItemType type, GameObject* object)
 	: name(name), description(description), type(type), object(object)
 {
-	this->baseColor = Vector4(0.0, 0.0, 0.0, 0.0);
-	if (this->object != nullptr)
+	if (!this->object)
 	{
-		this->object->setColor(baseColor);
+		this->baseColor = Vector4(0.0, 0.0, 0.0, 0.0);
+	}
+	else
+	{
+		this->baseColor = this->object->getColor();
 	}
 }
 
@@ -89,7 +123,6 @@ Item::Item(const Item& obj)
 	if (obj.object != nullptr)
 	{
 		this->object = new GameObject(*obj.object);
-		this->object->setColor(baseColor);
 	}
 	else
 	{
@@ -100,11 +133,6 @@ Item::Item(const Item& obj)
 Item* Item::clone() const
 {
 	return new Item(*this);
-}
-
-bool Item::operator==(const Item& other) const
-{
-	return this->name == other.name && this->description == other.description && this->type == other.type && this->baseColor == other.baseColor;
 }
 
 void Item::randomize()

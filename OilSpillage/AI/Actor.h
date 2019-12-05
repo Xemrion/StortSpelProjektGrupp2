@@ -26,10 +26,11 @@ public:
 	void setPoints(int amount);
 	void scaling(float& stat, float ratio);
 	void onFire();
-	void setFire();
+	void setFire(float timer);
 
 private:
 	float health;
+	float particleTimer = 0.0f;
 	int points;
 protected:
 	float fireTimer;

@@ -38,6 +38,7 @@ public:
 	virtual ~Button();
 
 	virtual void draw(bool selected);
+	void setText(std::string text);
 };
 
 #endif // !BUTTON_H
