@@ -52,7 +52,7 @@ void UIBeforePlaying::init()
 	this->textStage = std::make_unique<AnimatedText>("Act " + std::to_string(((stage - 1) / 3) + 1) + " - Stage " + std::to_string((stage - 1) % 3 + 1), Color(Colors::LightGreen), 1.0f, Animation::FADE_IN);
 	this->textStage->setPosition(Vector2(SCREEN_WIDTH / 2 - this->textStage->getSize().x / 2, 100));
 	this->textStage->beginAnimation();
-	this->textName = std::make_unique<AnimatedText>(info.environment.getName(), Color(Colors::YellowGreen), 0.75f, Animation::SHAKING_FADE_IN_STOP);
+	this->textName = std::make_unique<AnimatedText>(info.name, Color(Colors::YellowGreen), 0.75f, Animation::SHAKING_FADE_IN_STOP);
 	this->textName->setPosition(Vector2(SCREEN_WIDTH / 2 - this->textName->getSize().x / 2, 200));
 	this->textName->beginAnimation();
 	this->textSize = std::make_unique<AnimatedText>("Size: " + std::to_string(info.width) + "x" + std::to_string(info.length), Color(Colors::White), 0.5f, Animation::SHAKING_FADE_IN_STOP);
