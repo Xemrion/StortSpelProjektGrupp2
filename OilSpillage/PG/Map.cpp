@@ -3,9 +3,9 @@
 #include "Map.hpp"
 #include "Profiler.hpp"
 
-std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Pleasant", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset", "Chrome", "Graveyard", "Pleasant" };
+std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset", "Chrome", "Graveyard", "Pleasant" };
 
-std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "opolis", "heim", " Meadows", " Creek", " Base", " Metropolis" };
+std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "opolis", "heim", " Meadows", " Creek", " Base", " Metropolis", " Zone", "field", "point", "corner" };
 
 auto generateCityName( RNG &rng ) noexcept {
 	return std::string(util::randomElementOf(cityPrefix, rng)) + util::randomElementOf(citySuffix, rng);
@@ -1658,6 +1658,9 @@ CompositeHouse Map::instantiateSkyscraper()
 	temp.roof.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.walls.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.windows.setScale(Vector3(2.0f, 1.0f, 2.0f));
+	temp.roof.setTexture(graphics.getTexturePointer("brickwall"));
+	temp.walls.setTexture(graphics.getTexturePointer("brickwall"));
+	temp.windows.setTexture(graphics.getTexturePointer("brickwall"));
 
 	Vector3 tempVec = temp.walls.getAABB().maxPos - temp.walls.getAABB().minPos;
 	tempVec.x *= 2;
