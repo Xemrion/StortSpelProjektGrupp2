@@ -90,6 +90,8 @@ public:
 	bool loadSystem();
 	bool saveSystem();
 
+	void setShaders();
+
 	float getStartSize()const;
 	float getEndSize()const;
 	float getVectorFieldPower()const;

@@ -44,7 +44,7 @@ Graphics::Graphics()
 		Vector4(0.0f,0.0f,1.0f,1.0f)
 	};
 	this->particleHandler->addParticleSystem("electro", colors, 1, 0.1f, 0.1f, 0.0f, 0.0f,"TrailUpdateCS.cso","ElectroCreateCS.cso","TrailGS.cso");
-	this->particleHandler->getParticleSystem("electro")->setParticleShaders("TrailUpdateCS.cso", "ElectroCreateCS.cso", "ElectroGS.cso", "ElectroPS.cso");
+	//this->particleHandler->getParticleSystem("electro")->setParticleShaders("TrailUpdateCS.cso", "ElectroCreateCS.cso", "ElectroGS.cso", "ElectroPS.cso");
 	Vector4 fireX[4] = {
 		Vector4(1.0f,0.0f,1.0f,1.0f)
 	};
@@ -64,9 +64,9 @@ Graphics::Graphics()
 		Vector4(1.0f,1.0f,1.0f,1.0f),
 		Vector4(0.8f,0.8f,1.0f,1.0f)
 	};
-	this->particleHandler->addParticleSystem("snow", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
+	/*this->particleHandler->addParticleSystem("snow", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 	this->particleHandler->getParticleSystem("snow")->setGravity(-0.25f);
-	this->particleHandler->getParticleSystem("snow")->changeVectorField(2.5f,3.0f);
+	this->particleHandler->getParticleSystem("snow")->changeVectorField(2.5f,3.0f);*/
 	this->particleHandler->addParticleSystem("ash", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 	this->particleHandler->getParticleSystem("ash")->setGravity(-0.25f);
 	this->particleHandler->getParticleSystem("ash")->changeVectorField(0.75f, 3.0f);
@@ -80,14 +80,14 @@ Graphics::Graphics()
 
 	this->particleHandler->loadParticleSystems();
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso", "DebrisCreateCS.cso", "ParticleGS.cso");
-	this->particleHandler->getParticleSystem("snow")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
+	//this->particleHandler->getParticleSystem("snow")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 	this->particleHandler->getParticleSystem("ash")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 
 
 	this->particleHandler->getParticleSystem("rain")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 	this->particleTrail->loadSystem();
 	this->particleHandler->getParticleSystem("electro")->setUpdateShader("ElectroUpdateCS.cso");
-	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
+	//this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 
 }
@@ -241,7 +241,7 @@ bool Graphics::init(Window* window)
 	}
 
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ZERO;
-	result = device->CreateDepthStencilState(&depthStencilDesc, readOnlyDST.ReleaseAndGetAddressOf());
+	result = device->CreateDepthStencilState(&depthStencilDesc, readOnlyDST.GetAddressOf());
 	if (FAILED(result))
 	{
 		return false;
@@ -494,7 +494,7 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("debris")->initiateParticles(device.Get(), deviceContext.Get());
-	this->particleHandler->getParticleSystem("snow")->initiateParticles(device.Get(), deviceContext.Get());
+	//this->particleHandler->getParticleSystem("snow")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("ash")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("rain")->initiateParticles(device.Get(), deviceContext.Get());
 
@@ -505,6 +505,13 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("electro")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("explosion")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("debris")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	//this->particleHandler->getParticleSystem("snow")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+
+	
+	this->particleHandler->getParticleSystem("ash")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("rain")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+
+
 
 	this->particleHandler->getParticleSystem("ash")->setGravity(0.1f);
 	this->particleHandler->getParticleSystem("ash")->setMass(0.5f);
@@ -680,9 +687,11 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	
 	drawStaticGameObjects(camera, frustum, 15.0);
 	
-	
+	this->deviceContext->PSSetShader(nullptr, nullptr, 0);
+
 	this->particleTrail->updateParticles(deltaTime, viewProj);
 
+	this->particleTrail->setShaders();
 	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
 	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
 	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
@@ -1620,10 +1629,13 @@ void Graphics::addToDraw(GameObject* o)
 void Graphics::removeFromDraw(GameObject* o)
 {
 	auto obj = std::find(drawableObjects.begin(), drawableObjects.end(), o);
-
+	int index = std::distance(drawableObjects.begin(), obj);
 	if (obj != drawableObjects.end())
 	{
-		drawableObjects.erase(obj);
+		GameObject* temp = drawableObjects[index];
+		drawableObjects[index] = drawableObjects[drawableObjects.size() - 1];
+		drawableObjects[drawableObjects.size() - 1] = temp;
+		drawableObjects.pop_back();
 	}
 }
 
