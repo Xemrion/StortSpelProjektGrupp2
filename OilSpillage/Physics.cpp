@@ -314,7 +314,7 @@ bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* 
 
 	if (((Vehicle*)playerPtr)->getPowerUpTimer(PowerUpType::Star) > 0.0)
 	{
-		Sound::play("./data/sound/StarPowerupHit.mp3", 0.75f);
+		Sound2::play("./data/sound/StarPowerupHit.mp3", 0.75f); //Does this play every frame sometimes? BAD!
 		((Actor*)enemyPtr)->changeHealth(-200);
 
 		return true;

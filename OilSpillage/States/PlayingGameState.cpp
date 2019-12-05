@@ -585,8 +585,8 @@ void PlayingGameState::update(float deltaTime)
 		camera->update(deltaTime);
 		updateWeather(deltaTime, currentCamPos);
 
-		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
-		Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
+		//Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
+		//Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
 
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
@@ -661,16 +661,16 @@ void PlayingGameState::update(float deltaTime)
 
 		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 25.0f || this->time <= 20.0f)
 		{
-			Sound::fadeSoundtrack(true, 1.0f);
+			//Sound::fadeSoundtrack(true, 1.0f);
 		}
 		else
 		{
-			Sound::fadeSoundtrack(false, 3.0f);
+			//Sound::fadeSoundtrack(false, 3.0f);
 		}
 
 		if (this->objectives.isAllDone())
 		{
-			Sound::stopAllLoops();
+			Sound2::stopAllLoops();
 			this->setCurrentMenu(MENU_COMPLETED_STAGE);
 		}
 	}
