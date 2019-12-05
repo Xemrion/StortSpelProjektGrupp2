@@ -378,8 +378,7 @@ void Bullet::updateSoundTimer(float deltaTime)
 void Bullet::destroy()
 {
 	setWeapon(WeaponHandler::getWeapon(WeaponType::None));
-	obj->setPosition(Vector3(1000, 1000, 1000));
-	//Game::getGraphics().removeFromDraw(obj);
+	Game::getGraphics().removeFromDraw(obj);
 }
 
 Vector3 Bullet::getDirection() const
