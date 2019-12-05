@@ -22,6 +22,7 @@ void Sound::init()
 	}
 
 	instance->soloud.setMaxActiveVoiceCount(64);
+	Sound2::init();
 }
 
 void Sound::deinit()
@@ -33,6 +34,7 @@ void Sound::deinit()
 
 void Sound::update(float deltaTime)
 {
+	Sound2::update(deltaTime);
 	instance->soloud.update3dAudio();
 }
 
@@ -44,6 +46,7 @@ void Sound::stopAll()
 
 void Sound::load(const std::string& fileName)
 {
+	Sound2::load(fileName);
 	if (instance->sounds.find(fileName) == instance->sounds.end())
 	{
 		instance->sounds[fileName] = std::make_unique<SoLoud::Wav>();
@@ -69,7 +72,8 @@ void Sound::sayText(const std::string& text)
 
 void Sound::play(const std::string& fileName, float volume, float pitch)
 {
-	if (instance->sounds.find(fileName) == instance->sounds.end())
+	Sound2::play(fileName, volume, pitch);
+	/*if (instance->sounds.find(fileName) == instance->sounds.end())
 	{
 		instance->sounds[fileName] = std::make_unique<SoLoud::Wav>();
 		instance->sounds[fileName]->load(fileName.c_str());
@@ -80,7 +84,7 @@ void Sound::play(const std::string& fileName, float volume, float pitch)
 	if (pitch != 1.0f)
 	{
 		instance->soloud.setRelativePlaySpeed(handle, pitch);
-	}
+	}*/
 }
 
 void Sound::play3d(const std::string& fileName, Vector3 position, Vector3 velocity, float volume, float pitch)
@@ -275,4 +279,83 @@ void Sound::stopAllLoops()
 void Sound::updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity)
 {
 	instance->soloud.set3dListenerParameters(position.x, position.y, position.z, lookAt.x, lookAt.y, lookAt.z, up.x, up.y, up.z, velocity.x, velocity.y, velocity.z);
+}
+
+std::unique_ptr<Sound2> Sound2::instance;
+
+Sound2::Sound2()
+{
+	FMOD_RESULT result = FMOD::System_Create(&this->system); // Create the main system object.
+	if (result != FMOD_OK)
+	{
+		assert(true && "Could not create the sound system!");
+	}
+
+	result = this->system->init(512, FMOD_INIT_NORMAL, nullptr); // Initialize FMOD.
+	if (result != FMOD_OK)
+	{
+		assert(true && "Could not init the sound system!");
+	}
+}
+
+Sound2::~Sound2()
+{
+	for (auto entry : this->sounds)
+	{
+		entry.second->release();
+	}
+
+	this->system->release();
+}
+
+void Sound2::init()
+{
+	Sound2::instance = std::make_unique<Sound2>();
+}
+
+void Sound2::update(float deltaTime)
+{
+	instance->system->update();
+}
+
+void Sound2::load(const std::string& fileName)
+{
+	//If that sound is already loaded then don't do anything
+	if (instance->sounds.find(fileName) != instance->sounds.end()) return;
+
+	FMOD_CREATESOUNDEXINFO exinfo = {};
+	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+	FMOD::Sound* sound = nullptr;
+
+	FMOD_RESULT result = instance->system->createSound(fileName.c_str(), FMOD_DEFAULT, &exinfo, &sound);
+	if (result != FMOD_OK)
+	{
+		assert(true && ("The sound '" + fileName + "' could not be loaded!").c_str());
+	}
+	else
+	{
+		instance->sounds[fileName] = sound;
+	}
+}
+
+void Sound2::play(const std::string& fileName, float volume, float pitch)
+{
+	if (instance->sounds.find(fileName) == instance->sounds.end())
+	{
+		assert(true && ("Tried to play the sound '" + fileName + "' that hasn't been loaded yet!").c_str());
+	}
+	else
+	{
+		FMOD::Channel* channel = nullptr;
+		FMOD_RESULT result = instance->system->playSound(instance->sounds[fileName], nullptr, false, &channel);
+		if (result != FMOD_OK)
+		{
+			assert(true && ("The sound '" + fileName + "' could not be played!").c_str());
+		}
+		else
+		{
+			channel->setVolume(volume);
+			channel->setPitch(pitch);
+		}
+	}
 }

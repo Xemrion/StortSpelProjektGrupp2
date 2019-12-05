@@ -69,4 +69,22 @@ public:
 	static void updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity);
 };
 
+#include <fmod.hpp>
+
+class Sound2
+{
+private:
+	static std::unique_ptr<Sound2> instance;
+	FMOD::System* system;
+	std::unordered_map<std::string, FMOD::Sound*> sounds;
+public:
+	Sound2();
+	virtual ~Sound2();
+
+	static void init();
+	static void update(float deltaTime);
+	static void load(const std::string& fileName);
+	static void play(const std::string& fileName, float volume = 1.0f, float pitch = 1.0f);
+};
+
 #endif // !SOUND_H

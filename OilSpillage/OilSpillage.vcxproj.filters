@@ -356,7 +356,6 @@
     <ClInclude Include="AI\Sniper.h" />
     <ClInclude Include="AI\ChaseCar.h" />
     <ClInclude Include="fog.h" />
-    <ClInclude Include="PG\Biome.hpp" />
     <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="AI\ShootCar.h" />
     <ClInclude Include="Inventory\Container.h" />
