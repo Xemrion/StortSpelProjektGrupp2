@@ -426,6 +426,7 @@ Map::~Map() noexcept
 		physics->DeleteRigidBody( e.walls.getRigidBody() );
 		physics->DeleteRigidBody( e.windows.getRigidBody() );
 		physics->DeleteRigidBody( e.roof.getRigidBody() );
+		skyscraperGenerator->unloadASkyscraper(e.skyscraperMeshIndex);
 	}
 
 	for ( auto &e : houses.singles )
@@ -685,18 +686,24 @@ void  Map::generateBuildings( )
 			while ( (tilesets.size() != 0) and (++currentTries < maxTries)
 			       and (computeCurrentDistrictCoverage() < multitileCoveragePercentage ) )
 			{
-				// if ( (district == &District::metropolitan) and (generateSelection(rng) < .80f) ) {
-				// 	auto house    = generateCompositeHouse();
-				// 	auto maybeLot = findFixedLot( cellId, house.width, house.length, { house.width * house.length, true } );
-				// 	if ( maybeLot ) {
-				// 		// set affected tiles and discard lot since we won't remove houses dynamically
-				// 		currentTries = 0; // reset counter
-				// 		currentArea += maybeLot.value().getCoverage();
-				// 		tilemap->applyLot( maybeLot.value(), Tile::building );
-				// 		houses.composites.push_back( std::move(house) ); 
-				// 	}
-				// }
-				// else
+				 //if ( (district == &District::metropolitan) and (generateSelection(rng) < .80f) ) {
+				 //	auto house    = instantiateSkyscraper();
+				 //	auto maybeLot = findFixedLot( cellId, house.dimensions.x, house.dimensions.y, Vector<Bool>(house.dimensions.x * house.dimensions.y, true));
+				 //	if ( maybeLot ) {
+				 //		// set affected tiles and discard lot since we won't remove houses dynamically
+				 //		currentTries = 0; // reset counter
+				 //		currentArea += maybeLot.value().getCoverage();
+					//	Vector3 worldPosition = tilemap->convertTilePositionToWorldPosition(maybeLot->nw);
+					//	worldPosition.x += house.dimensions.x * config.tileSideScaleFactor * 0.5f;
+					//	worldPosition.z += house.dimensions.y * config.tileSideScaleFactor * 0.5f;
+					//	house.roof.setPosition(worldPosition);
+					//	house.walls.setPosition(worldPosition);
+					//	house.windows.setPosition(worldPosition);
+				 //		tilemap->applyLot( maybeLot.value(), Tile::building );
+				 //		houses.composites.push_back( house ); 
+				 //	}
+				 //}
+				 //else 
 				if ( (tilesets.size() != 0) and (generateSelection(rng) < .30f ) ) {
 					auto maybeLayout = getMultitileLayout(district,rng);
 					if ( maybeLayout ) {
@@ -769,7 +776,11 @@ void  Map::generateBuildings( )
 			}
 		}
 	}
-
+	/*auto house = instantiateSkyscraper();
+	house.roof.setPosition(Vector3(20.0f, 0.0f, -20.0f));
+	house.walls.setPosition(Vector3(20.0f, 0.0f, -20.0f));
+	house.windows.setPosition(Vector3(20.0f, 0.0f, -20.0f));
+	houses.composites.push_back(house);*/
 	// adding all the tiles to draw:
 	for ( auto &e : houses.composites ) {
 		graphics.addToDrawStatic( &e.walls   );
@@ -1687,15 +1698,15 @@ CompositeHouse Map::instantiateSkyscraper()
 	temp.roof.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.walls.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.windows.setScale(Vector3(2.0f, 1.0f, 2.0f));
-	temp.roof.setTexture(graphics.getTexturePointer("brickwall"));
-	temp.walls.setTexture(graphics.getTexturePointer("brickwall"));
-	temp.windows.setTexture(graphics.getTexturePointer("brickwall"));
+	temp.roof.setTexture(graphics.getTexturePointer("skyscraper-wall02"));
+	temp.walls.setTexture(graphics.getTexturePointer("skyscraper-wall01"));
+	temp.windows.setTexture(graphics.getTexturePointer("skyscraper-window01"));
 
 	Vector3 tempVec = temp.walls.getAABB().maxPos - temp.walls.getAABB().minPos;
 	tempVec.x *= 2;
 	tempVec.z *= 2;
-	temp.dimensions.x = (tempVec.x / config.tileSideScaleFactor) + 1;
-	temp.dimensions.y = (tempVec.z / config.tileSideScaleFactor) + 1;
+	temp.dimensions.x = (tempVec.x / config.tileSideScaleFactor);
+	temp.dimensions.y = (tempVec.z / config.tileSideScaleFactor);
 
 	return temp;
 }
