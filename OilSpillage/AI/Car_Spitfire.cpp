@@ -111,7 +111,6 @@ void Spitfire::init(Physics* physics)
 	mesh = Game::getGraphics().getMeshPointer("Cube");
 	setPosition(Vector3(0.0f, 10.0f, 0.0f));
 	setScale(Vector3(0.5f, 0.14f, 0.9f));
-	Game::getGraphics().loadTexture("CarTemp");
 	setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 
 

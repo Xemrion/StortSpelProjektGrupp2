@@ -140,9 +140,10 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 			graphics.loadModel( "Houses/tilesets/" + tileset.name + "/" + part );
 
 	loadMultitileLayouts("data/layouts/multitilePrefabs.dat");
+	graphics.loadModel("Entities/Drone");
 
 	graphics.loadModel("Hospital");
-
+	graphics.loadModel("Entities/Roller_Melee");
 	graphics.loadModel("Houses/testHouse");
 	graphics.loadModel("Houses/testHouse2");
 	graphics.loadModel("Houses/testHouse3");

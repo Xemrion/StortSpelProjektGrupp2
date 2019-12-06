@@ -20,8 +20,8 @@ Physics::Physics() :broadphase(new btDbvtBroadphase())
 	btDefaultCollisionConstructionInfo cci;
 	collisionConfig = new btDefaultCollisionConfiguration(cci);
 	dispatcherMt = new btCollisionDispatcherMt(collisionConfig, 40);
-	btConstraintSolverPoolMt* solverPool = new btConstraintSolverPoolMt(BT_MAX_THREAD_COUNT);
-	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver();
+	solverPool = new btConstraintSolverPoolMt(BT_MAX_THREAD_COUNT);
+	solver = new btSequentialImpulseConstraintSolver();
 	world = new btDiscreteDynamicsWorldMt(dispatcherMt, broadphase, solverPool, solver, collisionConfig);
 	world->getSolverInfo().m_solverMode = gSolverMode;
 	world->getSolverInfo().m_numIterations = 10;
@@ -72,7 +72,9 @@ Physics::~Physics()
 	{
 		delete pointJoints[i];
 	}
+	delete solverPool;
 	delete dispatcher;
+	delete dispatcherMt;
 	delete collisionConfig;
 	delete solver;
 	delete broadphase;
