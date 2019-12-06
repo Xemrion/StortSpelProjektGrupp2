@@ -7,7 +7,7 @@
 #include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
-#define SPAWN_ENEMIES 0
+#define SPAWN_ENEMIES 1
 ActorManager::ActorManager()
 {
 }
@@ -46,7 +46,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	if (spawnTimer <= 0)
 	{
 		spawnEnemies(targetPos);
-		
+
 		spawnTimer = spawnCooldown;
 	}
 #endif
@@ -70,10 +70,9 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
 				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
 
-				
 				if (j % 5 == 0)
 				{
-					newPos = findTeleportPos(targetPos, 50, 100);
+					//newPos = findTeleportPos(targetPos, 50, 100);
 				}
 			}
 		}
@@ -174,7 +173,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 					{
 						if (soundTimer > 0.05f) {
-							Sound::play("./data/sound/HitSound.wav");
+							Sound::play("HitSound.wav");
 							soundTimer = 0;
 						}
 						if (bulletArray[j].getFlame())// Damage over Time
@@ -206,32 +205,32 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (soundTimer > 0.05f) {
 						if (bulletArray[j].getWeaponType() == WeaponType::Star)
 						{
-							Sound::play("./data/sound/StarPowerupHit.mp3", 0.75f);
+							Sound::play("StarPowerupHit.mp3", 0.75f);
 						}
 						else
 						{
-							Sound::play("data/sound/HitSound.wav");
+							Sound::play("HitSound.wav");
 						}
 						soundTimer = 0;
 					}
-					if(bulletArray[j].getFlame())// Damage over Time
+					if (bulletArray[j].getFlame())// Damage over Time
 					{
 						actors[i]->setFire(bulletArray[j].getFlameTimer());
 					}
-					if(bulletArray[j].getKnockback())// Knockback
+					if (bulletArray[j].getKnockback())// Knockback
 					{
 						actors[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
 					}
-					if(bulletArray[j].getSplashBool())
+					if (bulletArray[j].getSplashBool())
 					{
-						for(int k = 0; k < actors.size(); k++)
+						for (int k = 0; k < actors.size(); k++)
 						{
 							float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
 							float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
 							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-							if(k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
+							if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
 							{
-								actors[k]->changeHealth(-bulletArray[j].getDamage()/(20-Game::getGameInfo().nrOfClearedStages));
+								actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
 							}
 						}
 					}
@@ -262,7 +261,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						if (this->bosses[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 						{
 							if (soundTimer > 0.05f) {
-								Sound::play("./data/sound/HitSound.wav");
+								Sound::play("HitSound.wav");
 								soundTimer = 0;
 							}
 							if (bulletArray[j].getFlame())// Damage over Time
@@ -292,7 +291,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
 					{
 						if (soundTimer > 0.05f) {
-							Sound::play("./data/sound/HitSound.wav");
+							Sound::play("HitSound.wav");
 							soundTimer = 0;
 						}
 						if (bulletArray[j].getFlame())// Damage over Time
@@ -322,7 +321,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
 					{
 						if (soundTimer > 0.05f) {
-							Sound::play("data/sound/HitSound.wav");
+							Sound::play("HitSound.wav");
 							soundTimer = 0;
 						}
 						if (bulletArray[j].getFlame())// Damage over Time
@@ -429,7 +428,7 @@ void ActorManager::updateActors(float dt, const Vector3& targetPos)
 			if (normalizedRandom >= 0.995)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-					PowerUp(actors[i]->getPosition(), physics, 
+					PowerUp(actors[i]->getPosition(), physics,
 						PowerUpType::Health)
 				);
 			}
@@ -607,7 +606,7 @@ void ActorManager::updateGroups()
 					}
 					//create its own group
 					else
-					{	
+					{
 						leaveGroup(i, k);
 						createGroup(current);
 					}
@@ -685,7 +684,7 @@ Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 	targetVelocity.Normalize();
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
-} 
+}
 Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
@@ -696,15 +695,15 @@ Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistanc
 		{
 			return position;
 		}
-	/*	else
-		{
-			position = map->generateGroundPositionInWorldSpace(*rng);
-			float distance = (position - targetPos).Length();
-			if ((distance <= maxDistance + i) && (distance >= minDistance))
+		/*	else
 			{
-				return position;
-			}
-		}*/
+				position = map->generateGroundPositionInWorldSpace(*rng);
+				float distance = (position - targetPos).Length();
+				if ((distance <= maxDistance + i) && (distance >= minDistance))
+				{
+					return position;
+				}
+			}*/
 	}
 	assert(false and "BUG: Shouldn't be possible!");
 	return { -1.0f, -1.0f, -1.0f }; //  silences a warning

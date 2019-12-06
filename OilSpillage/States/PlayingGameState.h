@@ -116,7 +116,7 @@ private:
 	Vector3 accelForce;
 
 	int								spawnTimer = 0;
-	float							soundAggro;
+	float							soundAggro = 0.0f;
 	const char* current_item;
 	void fillTestParticle();
 	const char* items;

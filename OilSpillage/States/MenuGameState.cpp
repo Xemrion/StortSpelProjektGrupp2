@@ -58,7 +58,9 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 
 }
 
-MenuGameState::~MenuGameState() {}
+MenuGameState::~MenuGameState() {
+	
+}
 
 void MenuGameState::update(float deltaTime)
 {

@@ -43,14 +43,14 @@ private:
 
 	inline static const std::unordered_map<Biome, std::vector<StringView>> biomeNamePrefix {{
 		// key: Biome      // value: list of Weathers valid for the Biome
-		{ Biome::grass,     { "Pleasant", "Green", "Oak", "Plain", "Grass", "Bush", "Wood", "Forest", "Farm",  }},
-		{ Biome::sandy,     { "Sandy", "Dry", "Oasis", "Sand", "Desert", "Sun", "Dry" }},
+		{ Biome::grass,     { "Happy", "Pleasant", "Green", "Oak", "Plain", "Grass", "Bush", "Wood", "Forest", "Farm"  }},
+		{ Biome::sandy,     { "Sandy", "Dry", "Oasis", "Sand", "Desert", "Sun", "Dry", "Beach", "Pyramid" }},
 		{ Biome::snowy,     { "Snowy", "Arctic", "Icy", "Cold", "Frozen", "Santa", "Christmas", "White" }},
 		{ Biome::burnt,     { "Hell", "Ash", "Pyro", "Ruin", "Black", "Grey", "Apocalypse" }}
 	}};
 
-	static std::array constexpr genericCityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset", "Chrome", "Graveyard" };
-	static std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "opolis", "heim", " Meadows", " Creek", " Base", " Metropolis", "land", "lands" };
+	static std::array constexpr genericCityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset", "Chrome", "Graveyard", "Omega", "Tera", "Terror", "Scream", "Corpse", "Rock" };
+	static std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "opolis", "heim", " Meadows", " Creek", " Base", " Metropolis", "land", "lands", " Space", " Zone", " Point" };
 
 	std::string generateCityName( RNG &rng ) noexcept {
 		F32_Dist generateSelection { .0, 1.0f };

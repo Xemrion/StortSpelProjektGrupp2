@@ -53,7 +53,7 @@ struct Weapon
 	float soundTimer = 0.0f;
 	float timeSinceLastShot = 0.0f;
 	bool flameBool = false;
-	int soundHandle = 0;
+	std::intptr_t soundHandle = -1;
 	Vector3 lightColor = Vector3(0, 0, 0);
 	Light* light = nullptr;
 
@@ -119,9 +119,9 @@ public:
 			if (weapon.soundTimer > 4.0f) {
 				int randomSound = rand() % 6 + 1;
 				int rand2 = rand() % 2;
-				std::string soundEffect = "./data/sound/MachineGunSound" + std::to_string(randomSound) + ".wav";
+				std::string soundEffect = "MachineGunSound" + std::to_string(randomSound) + ".wav";
 				if (rand2 < 1) {
-					soundEffect = "./data/sound/MachineGunSound1.wav";
+					soundEffect = "MachineGunSound1.wav";
 				}
 				Sound::play(soundEffect,0.5f);
 				weapon.soundTimer = 0;
@@ -131,10 +131,10 @@ public:
 		{
 			if (weapon.flameBool == true) {
 				int randomSound = rand() % 2 + 1;
-				std::string soundEffect = "./data/sound/FlameLoop" + std::to_string(randomSound) + ".wav";
+				std::string soundEffect = "FlameLoop" + std::to_string(randomSound) + ".wav";
 				Sound::stopLooping(weapon.soundHandle);
 				weapon.soundHandle = Sound::playLooping(soundEffect);
-				Sound::play("./data/sound/FlameStart.wav");
+				Sound::play("FlameStart.wav");
 				weapon.flameBool = false;
 			}
 		}
@@ -142,10 +142,10 @@ public:
 		{
 			if (weapon.remainingCooldown <= 0) {
 				int randomSound = rand() % 4 + 1;
-				std::string soundEffect = "./data/sound/Lazer" + std::to_string(randomSound) + ".mp3";
+				std::string soundEffect = "Lazer" + std::to_string(randomSound) + ".mp3";
 				Sound::stopLooping(weapon.soundHandle);
 				weapon.soundHandle = Sound::playLooping(soundEffect, 0.5f);
-				Sound::play("./data/sound/LazerImpact.mp3", 0.75f);
+				Sound::play("LazerImpact.mp3", 0.75f);
 				weapon.flameBool = false;
 			}
 			else {
@@ -164,13 +164,13 @@ public:
 		{
 			weapon.flameBool = true;
 			Sound::stopLooping(weapon.soundHandle);
-			weapon.soundHandle = 0;
+			weapon.soundHandle = -1;
 		}
 		else if (weapon.type == WeaponType::Laser) 
 		{
 			weapon.flameBool = true;
 			Sound::stopLooping(weapon.soundHandle);
-			weapon.soundHandle = 0;
+			weapon.soundHandle = -1;
 		}
 	};
 
