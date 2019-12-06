@@ -69,7 +69,8 @@ void UpgradingGameState::update(float deltaTime)
 
 	this->graphics.clearScreen(Vector4(Colors::Red));
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2());
+	RECT rc = SimpleMath::Rectangle();
+	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2(SCREEN_WIDTH/2,SCREEN_HEIGHT/2), NULL , Colors::White, 0, Vector2(textureBG->getWidth()/2,textureBG->getHeight()/2),2.0f);
 	UserInterface::getSpriteBatch()->End();
 
 	this->graphics.render(this->camera.get(), deltaTime);

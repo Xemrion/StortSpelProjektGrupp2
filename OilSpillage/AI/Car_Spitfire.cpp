@@ -414,3 +414,8 @@ float Spitfire::getHeading(Quaternion qt)
 	}
 	return heading;
 }
+
+GameObject* Spitfire::getVehicleBody1()
+{
+	return this->vehicleBody1;
+}

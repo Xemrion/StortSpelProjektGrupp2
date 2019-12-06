@@ -68,8 +68,16 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 			{
 				Actor* current = groups[i].actors[j];
 				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-
+				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+				Spitfire* ptr = dynamic_cast<Spitfire*>(current);
+				if (ptr != nullptr) {
+					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
+					ptr->getVehicleBody1()->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y+0.55f, newPos.z));
+				}
+				else {
+					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
+				}
+				
 				if (j % 5 == 0)
 				{
 					//newPos = findTeleportPos(targetPos, 50, 100);

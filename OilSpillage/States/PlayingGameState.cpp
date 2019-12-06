@@ -209,7 +209,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	cameraObject->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	cameraObject->getRigidBody()->setFriction(0);
 	cameraObject->getRigidBody()->setGravity(btVector3(0, 0, 0));
-	cameraObject->getRigidBody()->setDamping(10,0);
+	//cameraObject->getRigidBody()->setDamping(10,0);
 	cameraTimer = 0;
 
 	initAI();
@@ -599,7 +599,8 @@ void PlayingGameState::update(float deltaTime)
 			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z);
 		Vector3 currentCamPos = Vector3(cameraObject->getRigidBody()->getWorldTransform().getOrigin().getX(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getY(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getZ());
 		Vector3 directionCam =  destinationCamPos- currentCamPos;
-		cameraObject->getRigidBody()->applyForce(btVector3(directionCam.x, directionCam.y, directionCam.z) * 10,btVector3(0,0,0));
+		//cameraObject->getRigidBody()->applyForce(btVector3(directionCam.x, directionCam.y, directionCam.z) * 10,btVector3(0,0,0));
+		cameraObject->getRigidBody()->setLinearVelocity(btVector3(std::clamp(directionCam.x,-10.0f,10.0f), std::clamp(directionCam.y, -10.0f, 10.0f), std::clamp(directionCam.z, -10.0f, 10.0f)) * 10);
 		camera->setPosition(Vector3(currentCamPos.x, currentCamPos.y, currentCamPos.z));
 		camera->update(deltaTime);
 		updateWeather(deltaTime, currentCamPos);
