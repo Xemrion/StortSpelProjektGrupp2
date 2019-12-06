@@ -68,7 +68,11 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 			{
 				Actor* current = groups[i].actors[j];
 				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+				current->setPosition(Vector3(newPos.x, current->getPosition().y, newPos.z));
+				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+				//player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
+				//player->getVehicleBody1()->setPosition(startPos + Vector3(.0f, 0.65f - 1.2f, .0f));
+				
 				if (j % 5 == 0)
 				{
 					newPos = findTeleportPos(targetPos, 50, 100);
@@ -93,13 +97,13 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 void ActorManager::createAttacker(float x, float z, int weaponType)
 {
 	this->actors.push_back(new Attacker(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createSniper(float x, float z, int weaponType)
 {
 	this->actors.push_back(new Sniper(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createTurret(float x, float z, int weaponType)
@@ -110,19 +114,19 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 void ActorManager::createChaseCar(float x, float z)
 {
 	this->actors.push_back(new ChaseCar(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createShootCar(float x, float z, int weaponType)
 {
 	this->actors.push_back(new ShootCar(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createSwarm(float x, float z)
 {
 	this->actors.push_back(new Swarm(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 Boss* ActorManager::createBoss(float x, float z, int weaponType, float scalingNr)
@@ -549,7 +553,7 @@ int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 
 void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 {
-	groups.at(groupIndex).actors.push_back(actor);
+	groups[groupIndex].actors.push_back(actor);
 	groups[groupIndex].updateDuty();
 }
 
