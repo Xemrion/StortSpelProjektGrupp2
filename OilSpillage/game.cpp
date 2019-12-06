@@ -122,6 +122,10 @@ float Game::getLocalScale()
 {
 	return instance->localScale;
 }
+void Game::setLocalScale(float localScale)
+{
+	instance->localScale = localScale;
+}
 GameInfo& Game::getGameInfo() noexcept
 {
 	return instance->gameInfo;

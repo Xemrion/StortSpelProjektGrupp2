@@ -180,6 +180,9 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 	info.nrOfObjectives = saveSystem.getInteger("GameObjectives");
 	info.highScoreTotal = saveSystem.getInteger("GameScore");
 	info.time = saveSystem.getFloat("GameTime");
+	Game::setLocalScale(saveSystem.getFloat("GameLocalScale"));
+
+	if (saveSystem.getFloat("GameLocalScale") < 1.0f) Game::setLocalScale(1.0f + info.nrOfClearedStages * 0.05f); //Fix for old save files
 
 	int itemSlots[] = { -1, -1, -1, -1, -1, -1, -1 };
 	for (int i = 0; i < Slots::SIZEOF; i++)
@@ -282,6 +285,7 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 	saveSystem.set("GameObjectives", info.nrOfObjectives);
 	saveSystem.set("GameScore", info.highScoreTotal);
 	saveSystem.set("GameTime", static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
+	saveSystem.set("GameLocalScale", Game::getLocalScale());
 
 	for (int i = 0; i < ItemType::TYPES_SIZEOF; i++)
 	{

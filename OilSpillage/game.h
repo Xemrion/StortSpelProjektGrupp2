@@ -48,6 +48,7 @@ public:
 	static float						lerp(float v0, float v1, float t);
 	static float						getDeltaTime();
 	static float						getLocalScale();
+	static void 						setLocalScale(float localScale);
 	static int							getNrOfStagesDone();
 	static GameInfo                    &getGameInfo() noexcept;
 	static bool						    getDrivingMode();
