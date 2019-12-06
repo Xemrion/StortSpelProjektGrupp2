@@ -64,27 +64,21 @@ Graphics::Graphics()
 		Vector4(1.0f,1.0f,1.0f,1.0f),
 		Vector4(0.8f,0.8f,1.0f,1.0f)
 	};
-	/*this->particleHandler->addParticleSystem("snow", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
+	this->particleHandler->addParticleSystem("snow", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 	this->particleHandler->getParticleSystem("snow")->setGravity(-0.25f);
-	this->particleHandler->getParticleSystem("snow")->changeVectorField(2.5f,3.0f);*/
-	this->particleHandler->addParticleSystem("ash", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
-	this->particleHandler->getParticleSystem("ash")->setGravity(-0.25f);
-	this->particleHandler->getParticleSystem("ash")->changeVectorField(0.75f, 3.0f);
-	Vector4 rainColor[4] = {
-		Vector4(0.0f,0.0f,1.0f,1.0f),
-		Vector4(0.0f,0.0f,1.0f,1.0f),
-		Vector4(0.0f,0.0f,1.0f,1.0f),
-		Vector4(0.0f,0.0f,1.0f,1.0f)
-	};
-	this->particleHandler->addParticleSystem("rain", rainColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
+	this->particleHandler->getParticleSystem("snow")->changeVectorField(2.5f,3.0f);
+	//this->particleHandler->addParticleSystem("ash", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
+	//this->particleHandler->getParticleSystem("ash")->setGravity(-0.25f);
+	//this->particleHandler->getParticleSystem("ash")->changeVectorField(0.75f, 3.0f);
+	//this->particleHandler->addParticleSystem("rain", rainColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 
 	this->particleHandler->loadParticleSystems();
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso", "DebrisCreateCS.cso", "ParticleGS.cso");
-	//this->particleHandler->getParticleSystem("snow")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
-	this->particleHandler->getParticleSystem("ash")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
+	this->particleHandler->getParticleSystem("snow")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
+	//this->particleHandler->getParticleSystem("ash")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 
 
-	this->particleHandler->getParticleSystem("rain")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
+	//this->particleHandler->getParticleSystem("rain")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 	this->particleTrail->loadSystem();
 	this->particleHandler->getParticleSystem("electro")->setUpdateShader("ElectroUpdateCS.cso");
 	//this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
@@ -494,9 +488,9 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("debris")->initiateParticles(device.Get(), deviceContext.Get());
-	//this->particleHandler->getParticleSystem("snow")->initiateParticles(device.Get(), deviceContext.Get());
-	this->particleHandler->getParticleSystem("ash")->initiateParticles(device.Get(), deviceContext.Get());
-	this->particleHandler->getParticleSystem("rain")->initiateParticles(device.Get(), deviceContext.Get());
+	this->particleHandler->getParticleSystem("snow")->initiateParticles(device.Get(), deviceContext.Get());
+	//this->particleHandler->getParticleSystem("ash")->initiateParticles(device.Get(), deviceContext.Get());
+	//this->particleHandler->getParticleSystem("rain")->initiateParticles(device.Get(), deviceContext.Get());
 
 
 	this->particleSystem->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
@@ -505,25 +499,25 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("electro")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("explosion")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 	this->particleHandler->getParticleSystem("debris")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	//this->particleHandler->getParticleSystem("snow")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	this->particleHandler->getParticleSystem("snow")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 
 	
-	this->particleHandler->getParticleSystem("ash")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleHandler->getParticleSystem("rain")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	//this->particleHandler->getParticleSystem("ash")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	//this->particleHandler->getParticleSystem("rain")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 
 
 
-	this->particleHandler->getParticleSystem("ash")->setGravity(0.1f);
-	this->particleHandler->getParticleSystem("ash")->setMass(0.5f);
-	this->particleHandler->getParticleSystem("rain")->setGravity(10.0f);
-	this->particleHandler->getParticleSystem("rain")->setMass(0.5f);
+	//this->particleHandler->getParticleSystem("ash")->setGravity(0.1f);
+	//this->particleHandler->getParticleSystem("ash")->setMass(0.5f);
+	//this->particleHandler->getParticleSystem("rain")->setGravity(10.0f);
+	//this->particleHandler->getParticleSystem("rain")->setMass(0.5f);
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
 	fogMaterial.color = Vector3(1.0, 1.0, 1.0);
-	fogMaterial.scale = 15.0;
-	fogMaterial.density = 0.1;
+	fogMaterial.scale = 5.0;
+	fogMaterial.density = 0.01;
 	fogMaterial.ambientDensity = 0.0;
-	fogMaterial.densityThreshold = 0.5;
+	fogMaterial.densityThreshold = 0.15;
 
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
@@ -1061,7 +1055,7 @@ void Graphics::loadMesh( std::string const &fileName, Vector3 rotation )
 				Meshformat::Vertex* vertices = imp.getVertices(j);
 				Vector3 max;
 				Vector3 min;
-				
+
 				max.x = vertices[0].x;
 				max.x = vertices[0].y;
 				max.x = vertices[0].z;
@@ -1104,7 +1098,7 @@ void Graphics::loadMesh( std::string const &fileName, Vector3 rotation )
 					vertex.tangent.x = tempPos.x;
 					vertex.tangent.y = tempPos.y;
 					vertex.tangent.z = tempPos.z;
-					tempPos = Vector4::Transform(Vector4(vertex.bitangent.x, vertex.bitangent.y, vertex.bitangent.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x,rotation.y,rotation.z));
+					tempPos = Vector4::Transform(Vector4(vertex.bitangent.x, vertex.bitangent.y, vertex.bitangent.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
 					vertex.bitangent.x = tempPos.x;
 					vertex.bitangent.y = tempPos.y;
 					vertex.bitangent.z = tempPos.z;
@@ -1133,19 +1127,19 @@ void Graphics::loadMesh( std::string const &fileName, Vector3 rotation )
 					{
 						min.z = vertex.position.z;
 					}
-					
+
 					tempVec.push_back(vertex);
 				}
 
 				meshes[meshName].insertDataToMesh(tempVec);
 				AABB aabb;
-				imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z,j);
-				imp.getMinBBox(aabb.minPos.x, aabb.minPos.y, aabb.minPos.z,j);
+				imp.getMaxBBox(aabb.maxPos.x, aabb.maxPos.y, aabb.maxPos.z, j);
+				imp.getMinBBox(aabb.minPos.x, aabb.minPos.y, aabb.minPos.z, j);
 
 				//Calc aabb
 				aabb.minPos = min;
 				aabb.maxPos = max;
-				
+
 				meshes[meshName].setAABB(aabb);
 				int bufferSize = static_cast<int>(meshes[meshName].vertices.size()) * sizeof(Vertex3D);
 				UINT stride = sizeof(Vertex3D);
@@ -1165,6 +1159,7 @@ void Graphics::loadMesh( std::string const &fileName, Vector3 rotation )
 
 				HRESULT hr = device->CreateBuffer(&vBufferDesc, &subData, meshes[meshName].vertexBuffer.GetAddressOf());
 				meshes[fileName].vertices.clear();//Either save vertex data or not. Depends if we want to use it for picking or something else
+				meshes[fileName].vertices.shrink_to_fit();
 			}
 		}
 
@@ -1642,6 +1637,7 @@ void Graphics::removeFromDraw(GameObject* o)
 void Graphics::clearDraw()
 {
 	drawableObjects.clear();
+	drawableObjects.shrink_to_fit();
 	quadTree->clearGameObjects();
 }
 
@@ -1671,6 +1667,7 @@ void Graphics::removeFromUIDraw(GameObject* obj, Matrix* world)
 void Graphics::removeAllUIDraw()
 {
 	uiObjects.clear();
+	uiObjects.shrink_to_fit();
 }
 
 void Graphics::setUISun(Vector3 direction, Vector4 color)
@@ -2034,7 +2031,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 	deviceContext->OMSetBlendState(alphaEnableBlendingState.Get(), blendFactor, 0xffffffff);
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	int i = 1;
+	int i = 0;
 	for (GameObject* object : fog->getQuads())
 	{
 		SimpleMath::Matrix world = object->getTransform();
@@ -2072,7 +2069,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
 		const Vector2 windSpeed = fog->getWindSpeed();
-		Vector4 t = Vector4(time, windSpeed.x + (i % 3) * 0.00001, windSpeed.y + (i % 3) * 0.000015, 0.0);
+		Vector4 t = Vector4(time, windSpeed.x + (i % 3) * 0.00001, windSpeed.y + (i % 3) * 0.000015, 0.0) * (1 / (1 + object->getPosition().y * 0.25));
 		deviceContext->Map(fogAnimationBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &t, sizeof(Vector4));
 		deviceContext->Unmap(fogAnimationBuffer.Get(), 0);

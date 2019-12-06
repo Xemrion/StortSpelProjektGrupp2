@@ -123,5 +123,6 @@ void QuadTree::Node::clearGameObjects()
 	else
 	{
 		objects.clear();
+		objects.shrink_to_fit();
 	}
 }

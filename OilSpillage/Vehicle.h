@@ -12,6 +12,8 @@
 #include "Inventory/ItemWheel.h"
 #include "Inventory/ItemChassi.h"
 #include "Inventory/Container.h"
+#include "Inventory/ItemGadget.h"
+
 using namespace DirectX::SimpleMath;
 enum Slots
 {

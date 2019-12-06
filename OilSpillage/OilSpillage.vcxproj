@@ -85,6 +85,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -101,6 +102,7 @@
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>PNet\include;SoLoud\include;BulletSDK\include;FMOD\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -121,6 +123,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +143,7 @@
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>FMOD\include;Pnet\include;SoLoud\include;BulletSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -174,8 +178,10 @@
     <ClCompile Include="BulletSDK\include\LinearMath\btThreads.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
     <ClCompile Include="Inventory\Container.cpp" />
+    <ClCompile Include="Inventory\Gadget.cpp" />
     <ClCompile Include="Inventory\Item.cpp" />
     <ClCompile Include="Inventory\ItemChassi.cpp" />
+    <ClCompile Include="Inventory\ItemGadget.cpp" />
     <ClCompile Include="Inventory\ItemWeapon.cpp" />
     <ClCompile Include="fog.cpp" />
     <ClCompile Include="Inventory\ItemWheel.cpp" />
@@ -311,7 +317,9 @@
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="AI\Weakspot.h" />
     <ClInclude Include="fog.h" />
+    <ClInclude Include="Inventory\Gadget.h" />
     <ClInclude Include="Inventory\ItemChassi.h" />
+    <ClInclude Include="Inventory\ItemGadget.h" />
     <ClInclude Include="Inventory\ItemWheel.h" />
     <ClInclude Include="MyClient.h" />
     <ClInclude Include="Particle\ParticleHandler.h" />
