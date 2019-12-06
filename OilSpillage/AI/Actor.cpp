@@ -15,6 +15,7 @@ Actor::Actor(float x, float z, Physics* physics)
 	this->position = Vector3(x, -1.0f, z);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	this->points = 0;
+	this->fireTimer = 0;
 }
 Actor::~Actor()
 {
@@ -109,13 +110,13 @@ void Actor::onFire()
 {
 	if(fireTimer > 0.0 && !isDead())
 	{
-		changeHealth(2*deltaTime);
+		changeHealth(-10*deltaTime);
 		fireTimer -= deltaTime;
 		if(particleTimer <= 0.0f)
 		{
 			for (int i = 0; i < 10; i++)
 			{
-				Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+				Game::getGraphics().addParticle("fire", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
 			}
 			particleTimer = 0.1f;
 		}
