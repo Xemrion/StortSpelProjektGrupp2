@@ -9,7 +9,7 @@ SOLVER_USE_WARMSTARTING |
 0;
 Physics::Physics() :broadphase(new btDbvtBroadphase())
 {
-#ifdef _DEBUG
+#ifndef _DEBUG
 	collisionConfig = new btDefaultCollisionConfiguration();
 	solver = new btSequentialImpulseConstraintSolver();
 	dispatcher = new btCollisionDispatcher(collisionConfig);
@@ -267,28 +267,6 @@ bool Physics::deletePointJoint(btPoint2PointConstraint* pointJoint)
 bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1,
 	int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
-	GameObject* playerPtr = obj1->getCollisionObject()->getUserPointer();
-	GameObject* enemyPtr = obj2->getCollisionObject()->getUserPointer();
-	if (playerPtr == nullptr || enemyPtr == nullptr) return false;
-
-	if (!playerPtr->isPlayer())
-	{
-		std::swap(playerPtr, enemyPtr);
-
-		if (!playerPtr->isPlayer())
-		{
-			return false;
-		}
-	}
-
-	if (((Vehicle*)playerPtr)->getPowerUpTimer(PowerUpType::Star) > 0.0)
-	{
-		Sound::play("./data/sound/StarPowerupHit.mp3", 0.75f);
-		((Actor*)enemyPtr)->changeHealth(-200);
-
-		return true;
-	}
-
 	return false;
 }
 

@@ -7,7 +7,7 @@
 #include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
-#define SPAWN_ENEMIES 1
+#define SPAWN_ENEMIES 0
 ActorManager::ActorManager()
 {
 }
@@ -69,6 +69,8 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 				Actor* current = groups[i].actors[j];
 				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
 				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+
+				
 				if (j % 5 == 0)
 				{
 					newPos = findTeleportPos(targetPos, 50, 100);
@@ -93,7 +95,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 void ActorManager::createAttacker(float x, float z, int weaponType)
 {
 	this->actors.push_back(new Attacker(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createTurret(float x, float z, int weaponType)
@@ -104,19 +106,19 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 void ActorManager::createChaseCar(float x, float z)
 {
 	this->actors.push_back(new ChaseCar(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createShootCar(float x, float z, int weaponType)
 {
 	this->actors.push_back(new ShootCar(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createSwarm(float x, float z)
 {
 	this->actors.push_back(new Swarm(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 Boss* ActorManager::createBoss(float x, float z, int weaponType, float scalingNr)
@@ -202,7 +204,14 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						Sound::play("./data/sound/HitSound.wav");
+						if (bulletArray[j].getWeaponType() == WeaponType::Star)
+						{
+							Sound::play("./data/sound/StarPowerupHit.mp3", 0.75f);
+						}
+						else
+						{
+							Sound::play("data/sound/HitSound.wav");
+						}
 						soundTimer = 0;
 					}
 					if(bulletArray[j].getFlame())// Damage over Time
@@ -228,37 +237,8 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					}
 
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
-					bulletArray[j].destroy();
-				}
-				if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
-				{
-					if (soundTimer > 0.05f) {
-						Sound::play("data/sound/HitSound.wav");
-						soundTimer = 0;
-					}
-					if (bulletArray[j].getFlame())// Damage over Time
-					{
-						actors[i]->setFire(bulletArray[j].getFlameTimer());
-					}
-					if (bulletArray[j].getKnockback())// Knockback
-					{
-						actors[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
-					}
-					if (bulletArray[j].getSplashBool())
-					{
-						for (int k = 0; k < actors.size(); k++)
-						{
-							float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
-							float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-							if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
-							{
-								actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
-							}
-						}
-					}
-					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
-					// dont remove the melee weapon
+					if (!bulletArray[j].getMelee())
+						bulletArray[j].destroy();
 				}
 			}
 		}
@@ -534,7 +514,7 @@ int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 
 void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 {
-	groups.at(groupIndex).actors.push_back(actor);
+	groups[groupIndex].actors.push_back(actor);
 	groups[groupIndex].updateDuty();
 }
 
@@ -710,13 +690,13 @@ Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistanc
 {
 
 	for (float i = 0;; i += 1.0) {
-		Vector3 position = map->generateRoadPositionInWorldSpace(*rng);
+		Vector3 position = map->generateNonBuildingPositionInWorldSpace(*rng);
 		float distance = (position - targetPos).Length();
 		if ((distance <= maxDistance + i) && (distance >= minDistance))
 		{
 			return position;
 		}
-		else
+	/*	else
 		{
 			position = map->generateGroundPositionInWorldSpace(*rng);
 			float distance = (position - targetPos).Length();
@@ -724,7 +704,7 @@ Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistanc
 			{
 				return position;
 			}
-		}
+		}*/
 	}
 	assert(false and "BUG: Shouldn't be possible!");
 	return { -1.0f, -1.0f, -1.0f }; //  silences a warning
