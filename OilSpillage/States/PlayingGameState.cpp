@@ -301,7 +301,6 @@ PlayingGameState::~PlayingGameState()
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
 	delete this->objTestPickUp3;
-
 	delete[] this->objArray;
 }
 

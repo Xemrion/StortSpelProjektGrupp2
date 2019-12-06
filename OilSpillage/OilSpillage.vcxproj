@@ -233,6 +233,7 @@
     <ClCompile Include="SoLoud\src\filter\soloud_lofifilter.cpp" />
     <ClCompile Include="SoLoud\src\filter\soloud_robotizefilter.cpp" />
     <ClCompile Include="SoLoud\src\filter\soloud_waveshaperfilter.cpp" />
+    <ClCompile Include="States\GameState.cpp" />
     <ClCompile Include="States\HighscoreGameState.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
     <ClCompile Include="States\PlayingGameState.cpp" />

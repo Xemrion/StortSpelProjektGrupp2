@@ -188,6 +188,7 @@
     <ClCompile Include="Inventory\ItemWheel.cpp" />
     <ClCompile Include="Inventory\ItemGadget.cpp" />
     <ClCompile Include="Inventory\Gadget.cpp" />
+    <ClCompile Include="States\GameState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
