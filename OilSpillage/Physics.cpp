@@ -1,43 +1,12 @@
 #include "Physics.h"
 #include "Vehicle.h"
 #include "AI/Actor.h"
-static SolverType gSolverType = SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT;
 static int gSolverMode = SOLVER_SIMD |
 SOLVER_USE_WARMSTARTING |
  SOLVER_RANDMIZE_ORDER |
  SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS |
 // SOLVER_USE_2_FRICTION_DIRECTIONS |
 0;
-btConstraintSolver* createSolverByType(SolverType t)
-{
-	btMLCPSolverInterface* mlcpSolver = NULL;
-	switch (t)
-	{
-	case SOLVER_TYPE_SEQUENTIAL_IMPULSE:
-		return new btSequentialImpulseConstraintSolver();
-	case SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT:
-		return new btSequentialImpulseConstraintSolverMt();
-	case SOLVER_TYPE_NNCG:
-		return new btNNCGConstraintSolver();
-	case SOLVER_TYPE_MLCP_PGS:
-		mlcpSolver = new btSolveProjectedGaussSeidel();
-		break;
-	case SOLVER_TYPE_MLCP_DANTZIG:
-		mlcpSolver = new btDantzigSolver();
-		break;
-	case SOLVER_TYPE_MLCP_LEMKE:
-		mlcpSolver = new btLemkeSolver();
-		break;
-	default:
-	{
-	}
-	}
-	if (mlcpSolver)
-	{
-		return new btMLCPSolver(mlcpSolver);
-	}
-	return NULL;
-}
 Physics::Physics() :broadphase(new btDbvtBroadphase())
 {
 #ifdef _DEBUG
