@@ -399,7 +399,7 @@ void Boss::checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTime
 			{
 				if (soundTimer > 0.05f)
 				{
-					Sound::play("data/sound/HitSound.wav");
+					Sound::play("HitSound.wav");
 					soundTimer = 0;
 				}
 
