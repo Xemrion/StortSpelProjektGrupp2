@@ -18,16 +18,10 @@ std::unique_ptr<Sound2> Sound2::instance;
 Sound2::Sound2()
 {
 	FMOD_RESULT result = FMOD::System_Create(&this->system); // Create the main system object.
-	if (result != FMOD_OK)
-	{
-		assert(true && "Could not create the sound system!");
-	}
-
+	assert(result == FMOD_OK && "Could not create the sound system!");
+	
 	result = this->system->init(512, FMOD_INIT_NORMAL, nullptr); // Initialize FMOD.
-	if (result != FMOD_OK)
-	{
-		assert(true && "Could not init the sound system!");
-	}
+	assert(result == FMOD_OK && "Could not init the sound system!");
 }
 
 Sound2::~Sound2()
@@ -53,10 +47,10 @@ void Sound2::update(float deltaTime)
 void Sound2::load(std::string fileName, bool stream)
 {
 	//Remove potential copies
-	if ((fileName[0] == '.' && (fileName[1] == '/' || fileName[1] == '\\')))
-		fileName = fileName.substr(2);
-	else if (fileName[0] == '/' || fileName[0] == '\\')
-		fileName = fileName.substr(1);
+	if ((fileName[0] == '.' && (fileName[1] == '/' || fileName[1] == '\\')) || fileName[0] == '/' || fileName[0] == '\\' || fileName.find('\\') != std::string::npos)
+	{
+		assert(false && "Don't use './' or '.\' when specifying the sound path! Don't use '\' at all either!");
+	}
 
 	//If that sound is already loaded then don't do anything
 	if (instance->sounds.find(fileName) != instance->sounds.end()) return;
@@ -65,12 +59,10 @@ void Sound2::load(std::string fileName, bool stream)
 	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
 	FMOD::Sound* sound = nullptr;
 
-	FMOD_RESULT result = instance->system->createSound(fileName.c_str(), stream ? FMOD_CREATESTREAM : FMOD_DEFAULT, &exinfo, &sound);
-	if (result != FMOD_OK)
-	{
-		assert(true && ("The sound '" + fileName + "' could not be loaded!").c_str());
-	}
-	else
+	FMOD_RESULT result = instance->system->createSound((SOUND_PATH + fileName).c_str(), stream ? FMOD_CREATESTREAM : FMOD_DEFAULT, &exinfo, &sound);
+	assert(result == FMOD_OK && "The sound could not be loaded!");
+
+	if (result == FMOD_OK)
 	{
 		instance->sounds[fileName] = sound;
 	}
@@ -112,13 +104,11 @@ void Sound2::play(const std::string& fileName, float volume, float pitch)
 
 	FMOD::Channel* channel = nullptr;
 	FMOD_RESULT result = instance->system->playSound(instance->sounds[fileName], nullptr, false, &channel);
-	if (result != FMOD_OK)
+	assert(result == FMOD_OK && "The sound could not be played!");
+
+	if (result == FMOD_OK)
 	{
-		assert(true && ("The sound '" + fileName + "' could not be played!").c_str());
-	}
-	else
-	{
-		OutputDebugString(("Played " + fileName + "\n").c_str());
+		OutputDebugString(("Played '" + fileName + "'\n").c_str());
 		channel->setLoopCount(0);
 		channel->setVolume(volume);
 		channel->setPitch(pitch);
@@ -134,12 +124,12 @@ std::intptr_t Sound2::playLooping(const std::string& fileName, float volume, flo
 
 	FMOD::Channel* channel = nullptr;
 	FMOD_RESULT result = instance->system->playSound(instance->sounds[fileName], nullptr, false, &channel);
-	if (result != FMOD_OK)
+	assert(result == FMOD_OK && "The sound could not be played!");
+	
+	if (result == FMOD_OK)
 	{
-		assert(true && ("The sound '" + fileName + "' could not be played!").c_str());
-	}
-	else
-	{
+		OutputDebugString(("Played loop '" + fileName + "'\n").c_str());
+		channel->setLoopCount(-1);
 		channel->setVolume(volume);
 		channel->setPitch(pitch);
 
@@ -210,21 +200,17 @@ void Sound2::playSoundtrack(std::string fileNameCalm, std::string fileNameAggres
 		Sound2::load(fileNameAggressive, true);
 
 	FMOD_RESULT result = instance->system->createChannelGroup("Soundtrack", &instance->soundtrack.handleGroup);
-	if (result != FMOD_OK)
-		assert(true && "Falied to create a ChannelGroup for the soundtrack!");
+	assert(result == FMOD_OK && "Falied to create a ChannelGroup for the soundtrack!");
+
 	result = instance->system->playSound(instance->sounds[fileNameCalm], instance->soundtrack.handleGroup, true, &instance->soundtrack.handleCalm);
-	if (result != FMOD_OK)
-		assert(true && ("The sound '" + fileNameCalm + "' could not be played!").c_str());
+	assert(result == FMOD_OK && "The sound could not be played!");
 	result = instance->system->playSound(instance->sounds[fileNameAggressive], instance->soundtrack.handleGroup, true, &instance->soundtrack.handleAggressive);
-	if (result != FMOD_OK)
-		assert(true && ("The sound '" + fileNameAggressive + "' could not be played!").c_str());
+	assert(result == FMOD_OK && "The sound could not be played!");
 
 	result = instance->soundtrack.handleGroup->setVolume(volume);
-	if (result != FMOD_OK)
-		assert(true && "Falied to create a ChannelGroup for the soundtrack!");
+	assert(result == FMOD_OK && "Falied to create a ChannelGroup for the soundtrack!");
 	result = instance->soundtrack.handleGroup->setPaused(false);
-	if (result != FMOD_OK)
-		assert(true && "Falied to create a ChannelGroup for the soundtrack!");
+	assert(result == FMOD_OK && "Falied to create a ChannelGroup for the soundtrack!");
 }
 
 void Sound2::stopSoundtrack()

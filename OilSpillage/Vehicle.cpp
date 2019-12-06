@@ -471,7 +471,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		engineGears = ((rand() % 11)-5)*0.1f;
 		if (abs(driftForce) < 15.0f) {
 			int randomSound = rand() % 4 + 1;
-			std::string soundEffect = "./data/sound/CarExhaust" + std::to_string(randomSound) + ".mp3";
+			std::string soundEffect = "CarExhaust" + std::to_string(randomSound) + ".mp3";
 			Sound2::play(soundEffect,0.6f);
 		}
 	}
@@ -487,7 +487,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	else {
 		driftVolume = 0.2f;
 		int randomSound = rand() % 2 + 1;
-		std::string soundEffect = "./data/sound/Drift" + std::to_string(randomSound) + ".mp3";
+		std::string soundEffect = "Drift" + std::to_string(randomSound) + ".mp3";
 		if (driftBool == false) {
 			Sound2::stopLooping(driftHandle);
 			driftHandle = Sound2::playLooping(soundEffect, 0.2f);
@@ -1115,7 +1115,7 @@ float Vehicle::getAcceleratorX()
 void Vehicle::startEngineSound()
 {
 	Sound2::stopLooping(soundHandle);
-	soundHandle = Sound2::playLooping("./data/sound/CarEngine4.mp3",0.5f);
+	soundHandle = Sound2::playLooping("CarEngine4.mp3",0.5f);
 }
 
 void Vehicle::stopEngineSound()
@@ -1252,15 +1252,15 @@ void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 	//AccelForce
 	if ((max(abs(accelForce.x), abs(accelForce.z)) > 5.0f)) {
 		int randomSound = rand() % 3 + 1;
-		std::string soundEffect = "./data/sound/CarImpact" + std::to_string(randomSound) + ".wav";
+		std::string soundEffect = "CarImpact" + std::to_string(randomSound) + ".wav";
 		int randomSound2 = rand() % 3 + 1;
-		std::string soundEffect2 = "./data/sound/MetalImpactPitched" + std::to_string(randomSound) + ".wav";
+		std::string soundEffect2 = "MetalImpactPitched" + std::to_string(randomSound) + ".wav";
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
 			for (int i = 0; i < 10; i++) {
 				Game::getGraphics().getParticleSystem("debris")->addParticle(1, 10.5f, this->getPosition() + Vector3(0, 2, 0), Vector4(this->getRigidBody()->getLinearVelocity().getX(), 1.0f, this->getRigidBody()->getLinearVelocity().getZ(), 1));
 			}
 			changeHealth(-20.0f);
-			Sound2::play("./data/sound/CarCrash.wav");
+			Sound2::play("CarCrash.wav");
 			Sound2::play(soundEffect2);
 		}
 		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
@@ -1275,7 +1275,7 @@ void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 			for (int i = 0; i < 2; i++) {
 				Game::getGraphics().getParticleSystem("debris")->addParticle(1, 10.5f, this->getPosition() + Vector3(0, 2, 0), Vector4(this->getRigidBody()->getLinearVelocity().getX(), 1.0f, this->getRigidBody()->getLinearVelocity().getZ(), 1));
 			}
-			Sound2::play("./data/sound/CarImpactSoft.wav");
+			Sound2::play("CarImpactSoft.wav");
 			Sound2::play(soundEffect2);
 		}
 	}
@@ -1438,7 +1438,7 @@ void Vehicle::addPowerUp(PowerUpType type)
 	{
 		Sound2::changeSoundtrackVolume(0);
 		Sound2::stopLooping(starPowerHandle);
-		starPowerHandle = Sound2::playLooping("./data/sound/StarPowerup.mp3", 0.75f);
+		starPowerHandle = Sound2::playLooping("StarPowerup.mp3", 0.75f);
 		this->powerUpTimers[(int)PowerUpType::Star] += 30.0;
 	}
 }

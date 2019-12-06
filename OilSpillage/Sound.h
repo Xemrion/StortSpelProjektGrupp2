@@ -11,6 +11,7 @@
 class Sound2
 {
 private:
+	static constexpr const char* SOUND_PATH = "data/sound/";
 	static std::unique_ptr<Sound2> instance;
 
 	struct Soundtrack

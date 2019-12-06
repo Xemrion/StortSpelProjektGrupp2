@@ -47,22 +47,22 @@ void UIUpgrading::updateUI(float deltaTime)
 		else if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 		{
 			this->itemSelector->changeSelectedIndex(false);
-			Sound2::play("./data/sound/MenuMove.wav");
+			Sound2::play("MenuMove.wav");
 		}
 		else if (Input::checkButton(Keys::L_RIGHT, States::PRESSED))
 		{
 			this->itemSelector->changeSelectedIndex(true);
-			Sound2::play("./data/sound/MenuMove.wav");
+			Sound2::play("MenuMove.wav");
 		}
 		else if (Input::checkButton(Keys::L_UP, States::PRESSED))
 		{
 			this->itemSelector->changeSelectedType(false);
-			Sound2::play("./data/sound/MenuMove.wav");
+			Sound2::play("MenuMove.wav");
 		}
 		else if (Input::checkButton(Keys::L_DOWN, States::PRESSED))
 		{
 			this->itemSelector->changeSelectedType(true);
-			Sound2::play("./data/sound/MenuMove.wav");
+			Sound2::play("MenuMove.wav");
 		}
 	}
 	else
