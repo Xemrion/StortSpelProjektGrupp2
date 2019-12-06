@@ -287,10 +287,6 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 PlayingGameState::~PlayingGameState()
 {
 	delete this->cameraObject;
-	delete this->objTestPickUp;
-	delete this->objTestPickUp2;
-	delete this->objTestPickUp3;
-	delete[] this->objArray;
 }
 
 void  PlayingGameState::ImGui_Driving()
