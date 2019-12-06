@@ -16,7 +16,7 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	scaling(newHealth, 1.3);
 	setMaxHealth(newHealth);
 	setHealth(newHealth);
-	Game::getGraphics().loadModel("Entities/Roller_Melee");
+
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 	this->attackRange = 12;

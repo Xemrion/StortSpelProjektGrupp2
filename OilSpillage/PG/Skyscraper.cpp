@@ -57,6 +57,15 @@ void Skyscraper::unloadSkyscrapers(std::vector<std::string>& names)
 	names.clear();
 }
 
+void Skyscraper::unloadASkyscraper(std::string names)
+{
+	unloadRoof(names);
+	unloadWall(names);
+	unloadWindow(names);
+	
+	names.clear();
+}
+
 void Skyscraper::unloadRoof(std::string name)
 {
 	std::string meshName = name + "-roof";
