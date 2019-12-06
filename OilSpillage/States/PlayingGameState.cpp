@@ -698,8 +698,6 @@ void PlayingGameState::update(float deltaTime)
 			soundAggro = std::max(Game::lerp(soundAggro, 0.0f, deltaTime * 2), 0.0f);
 		}
 
-		Sound2::fadeSoundtrack(soundAggro);
-
 		if (this->objectives.isAllDone())
 		{
 			Sound2::stopAllLoops();
@@ -721,6 +719,8 @@ void PlayingGameState::update(float deltaTime)
 	// render UI
 	if (currentMenu != MENU_PLAYING)
 	{
+		soundAggro = std::max(Game::lerp(soundAggro, 0.0f, deltaTime * 8), 0.0f);
+
 		if (currentMenu != MENU_BEFORE_PLAYING)
 		{
 			menues[MENU_PLAYING]->update(0);
@@ -737,6 +737,8 @@ void PlayingGameState::update(float deltaTime)
 			setCurrentMenu(PlayingGameState::MENU_PAUSED);
 		}
 	}
+
+	Sound2::fadeSoundtrack(soundAggro);
 	
 	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 		ImGui_ImplDX11_NewFrame();
