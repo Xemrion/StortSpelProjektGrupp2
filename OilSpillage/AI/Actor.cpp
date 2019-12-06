@@ -110,7 +110,7 @@ void Actor::onFire()
 {
 	if(fireTimer > 0.0 && !isDead())
 	{
-		changeHealth(2*deltaTime);
+		changeHealth(-2*deltaTime);
 		fireTimer -= deltaTime;
 		if(particleTimer <= 0.0f)
 		{
