@@ -78,7 +78,6 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
-	graphics.loadTexture("grass3");
 	graphics.loadModel("Entities/Turret");
 	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
 
@@ -291,7 +290,6 @@ PlayingGameState::~PlayingGameState()
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
 	delete this->objTestPickUp3;
-
 	delete[] this->objArray;
 }
 
