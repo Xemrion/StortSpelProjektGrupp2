@@ -69,14 +69,20 @@ Vector3 Attacker::calculateVelocity()
 	//Move away from player if within 11, move towards it if further than 12, stand still if between the two
 
 	Vector3 desiredDirection = destination - position;
+	if (destination == targetPos)
+	{
+		float deltaZ = destination.z - position.z;
+		float deltaX = destination.x - position.x;
+		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+		if (distance <= 11 * 11)
+		{
+			desiredDirection = -desiredDirection;
+		}
+		else if (distance < 12 * 12)
+		{
+			desiredDirection = Vector3();
+		}
 
-	if (desiredDirection.Length() <= 11)
-	{
-		desiredDirection = -desiredDirection;
-	}
-	else if (desiredDirection.Length() < 12)
-	{
-		desiredDirection = Vector3();
 	}
 	return desiredDirection;
 }
