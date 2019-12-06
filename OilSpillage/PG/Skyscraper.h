@@ -27,6 +27,7 @@ public:
 	void setWallMesh(std::string name, GameObject* roof);
 	void setWindowMesh(std::string name, GameObject* roof);
 	void unloadSkyscrapers(std::vector<std::string>& names);
+	void unloadASkyscraper(std::string names);
 };
 
 /* Pseudocode
