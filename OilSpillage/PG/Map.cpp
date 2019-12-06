@@ -393,7 +393,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	lights          ( lights                                                                                        ),
 	config          ( config                                                                                        ),
 	tilemap         ( nullptr                                                                                       ),
-   roadDistanceMap ( config.dimensions.x * config.dimensions.y                                                     ),
+   roadDistanceMap ( config.dimensions.x * config.dimensions.y, 99999.9f                                           ),
 	buildingIDs     ( config.dimensions.x * config.dimensions.y                                                     ),
 	hospitalTable   ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide ),
 	rng             ( RD()()                                                                                        )
@@ -821,7 +821,7 @@ Opt<Lot>  Map::findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool>
 					}
 				}
 			}
-			if ( closestRoad >= districtLookupTable[districtId]->maxDistFromRoad )
+			if ( closestRoad <= districtLookupTable[districtId]->maxDistFromRoad )
 				return lot; // found match!
 		}
 		end: eliminatedPositions.push_back(lot.nw);		
@@ -846,7 +846,7 @@ Opt<Lot>  Map::findRandomLot( U16 cellId ) noexcept
 	auto isValidPosition { [&](V2u const &tilePosition ) -> Bool {
 	                          return (districtMap->idAt(tilePosition) != cellId)
 	                              or (tilemap->tileAt(tilePosition) != Tile::ground)
-                                 or (roadDistanceMap[tilemap->index(tilePosition)] < district->maxDistFromRoad );
+                                 or (roadDistanceMap[tilemap->index(tilePosition)] > district->maxDistFromRoad );
 	                       } };
 
 	U16_Dist   generateTargetSize { district->minArea, district->maxArea };
@@ -942,15 +942,12 @@ void Map::generateRoadDistanceMap() noexcept
 {
 	DBG_PROBE(Map::generateRoadDistanceMap);
 
-	U32 searchRadius = config.distanceMapSearchRadius;
+	U32 const searchRadius = config.distanceMapSearchRadius;
 
 	struct  TileDistanceEntry {
 		F32   distance;
 		V2u   position;
 	};
-
-	auto  candidates { Vector<TileDistanceEntry>( (Size(searchRadius)*2+1) * (Size(searchRadius)*2+1) ) };
-
 	auto manhattanDistance = []( V2u const &a, V2u const &b ) {
 		return F32( util::abs<I32>( I32(a.x) - b.x )  +  util::abs<I32>( I32(a.y)- b.y ) );
 	};
@@ -963,8 +960,29 @@ void Map::generateRoadDistanceMap() noexcept
 		return std::sqrt( F32(a.x) * a.x * b.x * b.x * a.y * a.y * b.y * b.y);
 	};
 
-	auto &distance_f = euclideanDistance;
+	auto &distance_f = manhattanDistance;
 
+	V2u center, nearby;
+	for ( center.x = 0;  center.x < tilemap->width;  ++center.x ) {
+		for ( center.y = 0;  center.y < tilemap->height;  ++center.y ) {
+			if ( tilemap->tileAt(center.x,center.y) == Tile::road ) {
+				Bounds bounds;
+				bounds.min.x = util::minValue(0U, center.x-searchRadius);
+				bounds.min.y = util::minValue(0U, center.y-searchRadius);
+				bounds.max.x = util::minValue(center.x+searchRadius, (U32)tilemap->width);
+				bounds.max.y = util::minValue(center.y+searchRadius, (U32)tilemap->height);
+				for ( nearby.x = bounds.min.x;  nearby.x < bounds.max.x;  ++nearby.x ) {
+					for ( nearby.y = bounds.min.y;  nearby.y < bounds.max.y;  ++nearby.y ) {
+						if ( tilemap->tileAt(nearby.x, nearby.y) == Tile::ground ) {
+							roadDistanceMap[tilemap->index(nearby.x,nearby.y)] = util::minValue(roadDistanceMap[tilemap->index(nearby.x, nearby.y)], distance_f(center, nearby));
+						}
+					}
+				}
+			}
+		}
+	}
+		
+/*
 	V2u centerPos;
 	for ( centerPos.x = 0;  centerPos.x < tilemap->width;  ++centerPos.x ) {
 		for ( centerPos.y = 0;  centerPos.y < tilemap->height;  ++centerPos.y ) {
@@ -1008,7 +1026,7 @@ void Map::generateRoadDistanceMap() noexcept
 				}
 			}
 		}
-	}
+	}*/
 }
 
 Vector<F32> const& Map::getRoadDistanceMap() const noexcept
