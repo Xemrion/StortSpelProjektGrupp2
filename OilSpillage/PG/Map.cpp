@@ -674,18 +674,24 @@ void  Map::generateBuildings( )
 			while ( (tilesets.size() != 0) and (++currentTries < maxTries)
 			       and (computeCurrentDistrictCoverage() < multitileCoveragePercentage ) )
 			{
-				// if ( (district == &District::metropolitan) and (generateSelection(rng) < .80f) ) {
-				// 	auto house    = generateCompositeHouse();
-				// 	auto maybeLot = findFixedLot( cellId, house.width, house.length, { house.width * house.length, true } );
-				// 	if ( maybeLot ) {
-				// 		// set affected tiles and discard lot since we won't remove houses dynamically
-				// 		currentTries = 0; // reset counter
-				// 		currentArea += maybeLot.value().getCoverage();
-				// 		tilemap->applyLot( maybeLot.value(), Tile::building );
-				// 		houses.composites.push_back( std::move(house) ); 
-				// 	}
-				// }
-				// else
+				 //if ( (district == &District::metropolitan) and (generateSelection(rng) < .80f) ) {
+				 //	auto house    = instantiateSkyscraper();
+				 //	auto maybeLot = findFixedLot( cellId, house.dimensions.x, house.dimensions.y, Vector<Bool>(house.dimensions.x * house.dimensions.y, true));
+				 //	if ( maybeLot ) {
+				 //		// set affected tiles and discard lot since we won't remove houses dynamically
+				 //		currentTries = 0; // reset counter
+				 //		currentArea += maybeLot.value().getCoverage();
+					//	Vector3 worldPosition = tilemap->convertTilePositionToWorldPosition(maybeLot->nw);
+					//	worldPosition.x += house.dimensions.x * config.tileSideScaleFactor * 0.5f;
+					//	worldPosition.z += house.dimensions.y * config.tileSideScaleFactor * 0.5f;
+					//	house.roof.setPosition(worldPosition);
+					//	house.walls.setPosition(worldPosition);
+					//	house.windows.setPosition(worldPosition);
+				 //		tilemap->applyLot( maybeLot.value(), Tile::building );
+				 //		houses.composites.push_back( house ); 
+				 //	}
+				 //}
+				 //else
 				if ( (tilesets.size() != 0) and (generateSelection(rng) < .30f ) ) {
 					auto maybeLayout = getMultitileLayout(district,rng);
 					if ( maybeLayout ) {
@@ -1665,8 +1671,8 @@ CompositeHouse Map::instantiateSkyscraper()
 	Vector3 tempVec = temp.walls.getAABB().maxPos - temp.walls.getAABB().minPos;
 	tempVec.x *= 2;
 	tempVec.z *= 2;
-	temp.dimensions.x = (tempVec.x / config.tileSideScaleFactor) + 1;
-	temp.dimensions.y = (tempVec.z / config.tileSideScaleFactor) + 1;
+	temp.dimensions.x = (tempVec.x / config.tileSideScaleFactor);
+	temp.dimensions.y = (tempVec.z / config.tileSideScaleFactor);
 
 	return temp;
 }
