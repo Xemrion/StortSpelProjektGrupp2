@@ -690,7 +690,7 @@ void PlayingGameState::update(float deltaTime)
 
 		if (this->objectives.isAllDone())
 		{
-			Sound2::stopAllLoops();
+			Sound::stopAllLoops();
 			this->setCurrentMenu(MENU_COMPLETED_STAGE);
 		}
 	}
@@ -728,7 +728,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 
-	Sound2::fadeSoundtrack(soundAggro);
+	Sound::fadeSoundtrack(soundAggro);
 	
 	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 		ImGui_ImplDX11_NewFrame();

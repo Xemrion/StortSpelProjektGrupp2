@@ -472,16 +472,16 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		if (abs(driftForce) < 15.0f) {
 			int randomSound = rand() % 4 + 1;
 			std::string soundEffect = "CarExhaust" + std::to_string(randomSound) + ".mp3";
-			Sound2::play(soundEffect,0.6f);
+			Sound::play(soundEffect,0.6f);
 		}
 	}
 	enginePitch = enginePitch + deltaTime*2 * ((Input::getStrengthL()) - enginePitch);
 	time += deltaTime;
 	if (abs(driftForce) < 15.0f) {
-		Sound2::changeLoopingPitch(soundHandle, 1.0f + enginePitch + (engineGears * Input::getStrengthL() * min(abs(velocitySpeed * 0.045f), 1)));
-		Sound2::changeLoopingVolume(soundHandle, 0.7f);
+		Sound::changeLoopingPitch(soundHandle, 1.0f + enginePitch + (engineGears * Input::getStrengthL() * min(abs(velocitySpeed * 0.045f), 1)));
+		Sound::changeLoopingVolume(soundHandle, 0.7f);
 		driftVolume -= 1 * deltaTime;
-		Sound2::changeLoopingVolume(driftHandle,driftVolume);
+		Sound::changeLoopingVolume(driftHandle,driftVolume);
 		driftBool = false;
 	}
 	else {
@@ -489,12 +489,12 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		int randomSound = rand() % 2 + 1;
 		std::string soundEffect = "Drift" + std::to_string(randomSound) + ".mp3";
 		if (driftBool == false) {
-			Sound2::stopLooping(driftHandle);
-			driftHandle = Sound2::playLooping(soundEffect, 0.2f);
+			Sound::stopLooping(driftHandle);
+			driftHandle = Sound::playLooping(soundEffect, 0.2f);
 			driftBool = true;
 		}
-		Sound2::changeLoopingPitch(soundHandle, 3);
-		Sound2::changeLoopingVolume(soundHandle, min(20 * sin((time - 1) / 0.0095f) + 0, 0.7f));
+		Sound::changeLoopingPitch(soundHandle, 3);
+		Sound::changeLoopingVolume(soundHandle, min(20 * sin((time - 1) / 0.0095f) + 0, 0.7f));
 	}
 
 	if (this->immortal)
@@ -1175,13 +1175,13 @@ float Vehicle::getAcceleratorX()
 
 void Vehicle::startEngineSound()
 {
-	Sound2::stopLooping(soundHandle);
-	soundHandle = Sound2::playLooping("CarEngine4.mp3",0.5f);
+	Sound::stopLooping(soundHandle);
+	soundHandle = Sound::playLooping("CarEngine4.mp3",0.5f);
 }
 
 void Vehicle::stopEngineSound()
 {
-	Sound2::stopLooping(soundHandle);
+	Sound::stopLooping(soundHandle);
 	soundHandle = -1;
 }
 
@@ -1321,23 +1321,23 @@ void Vehicle::setAccelForce(Vector3 accelForce, float deltaTime)
 				Game::getGraphics().getParticleSystem("debris")->addParticle(1, 10.5f, this->getPosition() + Vector3(0, 2, 0), Vector4(this->getRigidBody()->getLinearVelocity().getX(), 1.0f, this->getRigidBody()->getLinearVelocity().getZ(), 1));
 			}
 			changeHealth(-20.0f);
-			Sound2::play("CarCrash.wav");
-			Sound2::play(soundEffect2);
+			Sound::play("CarCrash.wav");
+			Sound::play(soundEffect2);
 		}
 		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
 			for (int i = 0; i < 5; i++) {
 				Game::getGraphics().getParticleSystem("debris")->addParticle(1, 10.5f, this->getPosition() + Vector3(0, 2, 0), Vector4(this->getRigidBody()->getLinearVelocity().getX(), 1.0f, this->getRigidBody()->getLinearVelocity().getZ(), 1));
 			}
 			changeHealth(-10.0f);
-			Sound2::play(soundEffect);
-			Sound2::play(soundEffect2);
+			Sound::play(soundEffect);
+			Sound::play(soundEffect2);
 		}
 		else {
 			for (int i = 0; i < 2; i++) {
 				Game::getGraphics().getParticleSystem("debris")->addParticle(1, 10.5f, this->getPosition() + Vector3(0, 2, 0), Vector4(this->getRigidBody()->getLinearVelocity().getX(), 1.0f, this->getRigidBody()->getLinearVelocity().getZ(), 1));
 			}
-			Sound2::play("CarImpactSoft.wav");
-			Sound2::play(soundEffect2);
+			Sound::play("CarImpactSoft.wav");
+			Sound::play(soundEffect2);
 		}
 	}
 	/*else {
@@ -1497,9 +1497,9 @@ void Vehicle::addPowerUp(PowerUpType type)
 	}
 	else if (type == PowerUpType::Star)
 	{
-		Sound2::pauseSoundtrack(true);
-		Sound2::stopLooping(starPowerHandle);
-		starPowerHandle = Sound2::playLooping("StarPowerup.mp3", 0.75f);
+		Sound::pauseSoundtrack(true);
+		Sound::stopLooping(starPowerHandle);
+		starPowerHandle = Sound::playLooping("StarPowerup.mp3", 0.75f);
 		this->powerUpTimers[(int)PowerUpType::Star] += 30.0;
 	}
 }
@@ -1535,8 +1535,8 @@ void Vehicle::updatePowerUpEffects(float deltaTime)
 		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate;
 		this->updatedStats.handlingRate = this->defaultStats.handlingRate;
 		//this->vehicleBody1->setColor(Vector4(0.0, 0.0, 0.0, 1.0));
-		Sound2::pauseSoundtrack(false);
-		Sound2::stopLooping(starPowerHandle);
+		Sound::pauseSoundtrack(false);
+		Sound::stopLooping(starPowerHandle);
 		starPowerHandle = -1;
 	}
 

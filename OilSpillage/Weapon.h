@@ -123,7 +123,7 @@ public:
 				if (rand2 < 1) {
 					soundEffect = "MachineGunSound1.wav";
 				}
-				Sound2::play(soundEffect,0.5f);
+				Sound::play(soundEffect,0.5f);
 				weapon.soundTimer = 0;
 			}
 		}
@@ -132,9 +132,9 @@ public:
 			if (weapon.flameBool == true) {
 				int randomSound = rand() % 2 + 1;
 				std::string soundEffect = "FlameLoop" + std::to_string(randomSound) + ".wav";
-				Sound2::stopLooping(weapon.soundHandle);
-				weapon.soundHandle = Sound2::playLooping(soundEffect);
-				Sound2::play("FlameStart.wav");
+				Sound::stopLooping(weapon.soundHandle);
+				weapon.soundHandle = Sound::playLooping(soundEffect);
+				Sound::play("FlameStart.wav");
 				weapon.flameBool = false;
 			}
 		}
@@ -143,9 +143,9 @@ public:
 			if (weapon.remainingCooldown <= 0) {
 				int randomSound = rand() % 4 + 1;
 				std::string soundEffect = "Lazer" + std::to_string(randomSound) + ".mp3";
-				Sound2::stopLooping(weapon.soundHandle);
-				weapon.soundHandle = Sound2::playLooping(soundEffect, 0.5f);
-				Sound2::play("LazerImpact.mp3", 0.75f);
+				Sound::stopLooping(weapon.soundHandle);
+				weapon.soundHandle = Sound::playLooping(soundEffect, 0.5f);
+				Sound::play("LazerImpact.mp3", 0.75f);
 				weapon.flameBool = false;
 			}
 			else {
@@ -163,13 +163,13 @@ public:
 		else if (weapon.type == WeaponType::Flamethrower)
 		{
 			weapon.flameBool = true;
-			Sound2::stopLooping(weapon.soundHandle);
+			Sound::stopLooping(weapon.soundHandle);
 			weapon.soundHandle = -1;
 		}
 		else if (weapon.type == WeaponType::Laser) 
 		{
 			weapon.flameBool = true;
-			Sound2::stopLooping(weapon.soundHandle);
+			Sound::stopLooping(weapon.soundHandle);
 			weapon.soundHandle = -1;
 		}
 	};

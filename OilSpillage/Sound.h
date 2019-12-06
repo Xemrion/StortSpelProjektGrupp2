@@ -8,11 +8,11 @@
 //#include <SimpleMath.h>
 #include <fmod.hpp>
 
-class Sound2
+class Sound
 {
 private:
 	static constexpr const char* SOUND_PATH = "data/sound/";
-	static std::unique_ptr<Sound2> instance;
+	static std::unique_ptr<Sound> instance;
 
 	struct Soundtrack
 	{
@@ -28,8 +28,8 @@ private:
 	std::unordered_map<std::string, FMOD::Sound*> sounds;
 	std::vector<FMOD::Channel*> loopingSounds;
 public:
-	Sound2();
-	virtual ~Sound2();
+	Sound();
+	virtual ~Sound();
 
 	static void init();
 	static void update(float deltaTime);

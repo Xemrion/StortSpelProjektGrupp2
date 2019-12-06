@@ -350,18 +350,18 @@ void Spitfire::setAccelForce(Vector3 accelForce, float deltaTime)
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
 			Game::getGraphics().addParticle2(getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-20.0f);
-			Sound2::play("CarCrash.wav");
-			Sound2::play(soundEffect2);
+			Sound::play("CarCrash.wav");
+			Sound::play(soundEffect2);
 		}
 		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
 			Game::getGraphics().addParticle2(getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-10.0f);
-			Sound2::play(soundEffect);
-			Sound2::play(soundEffect2);
+			Sound::play(soundEffect);
+			Sound::play(soundEffect2);
 		}
 		else {
-			Sound2::play("CarImpactSoft.wav");
-			Sound2::play(soundEffect2);
+			Sound::play("CarImpactSoft.wav");
+			Sound::play(soundEffect2);
 		}
 	}
 	/*else {

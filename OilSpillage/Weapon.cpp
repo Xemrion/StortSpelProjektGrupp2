@@ -212,8 +212,8 @@ void Bullet::defaultEnemyUpdate(float& deltaTime)
 			if (soundTimer > 0.05f) {
 				int randomSound = rand() % 3 + 1;
 				std::string soundEffect = "CarGlass" + std::to_string(randomSound) + ".wav";
-				Sound2::play(soundEffect);
-				Sound2::play("MetalImpact1.wav");
+				Sound::play(soundEffect);
+				Sound::play("MetalImpact1.wav");
 				soundTimer = 0;
 			}
 			if(weapon.doesDoT)
@@ -236,8 +236,8 @@ void Bullet::enemyMeleeUpdate()
 		if (soundTimer > 0.05f) {
 			int randomSound = rand() % 3 + 1;
 			std::string soundEffect = "CarGlass" + std::to_string(randomSound) + ".wav";
-			Sound2::play(soundEffect);
-			Sound2::play("MetalImpact1.wav");
+			Sound::play(soundEffect);
+			Sound::play("MetalImpact1.wav");
 			soundTimer = 0;
 		}
 		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-weapon.damage);
@@ -256,7 +256,7 @@ void Bullet::laserEnemyUpdate(float& deltaTime)
 		{
 			int randomSound = rand() % 6 + 1;
 			std::string soundEffect = "RobotBullet" + std::to_string(randomSound) + ".mp3";
-			Sound2::play(soundEffect);
+			Sound::play(soundEffect);
 			soundTimer = 0;
 		}
 		static_cast<PlayingGameState*>(Game::getCurrentState())->getPlayer()->changeHealth(-this->getDamage() * deltaTime);

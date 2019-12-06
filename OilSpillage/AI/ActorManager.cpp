@@ -173,7 +173,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 					{
 						if (soundTimer > 0.05f) {
-							Sound2::play("HitSound.wav");
+							Sound::play("HitSound.wav");
 							soundTimer = 0;
 						}
 						if (bulletArray[j].getFlame())// Damage over Time
@@ -209,7 +209,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						}
 						else
 						{
-							Sound2::play("HitSound.wav");
+							Sound::play("HitSound.wav");
 						}
 						soundTimer = 0;
 					}
@@ -261,7 +261,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						if (this->bosses[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 						{
 							if (soundTimer > 0.05f) {
-								Sound2::play("HitSound.wav");
+								Sound::play("HitSound.wav");
 								soundTimer = 0;
 							}
 							if (bulletArray[j].getFlame())// Damage over Time
@@ -291,7 +291,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
 					{
 						if (soundTimer > 0.05f) {
-							Sound2::play("HitSound.wav");
+							Sound::play("HitSound.wav");
 							soundTimer = 0;
 						}
 						if (bulletArray[j].getFlame())// Damage over Time
@@ -321,7 +321,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
 					{
 						if (soundTimer > 0.05f) {
-							Sound2::play("HitSound.wav");
+							Sound::play("HitSound.wav");
 							soundTimer = 0;
 						}
 						if (bulletArray[j].getFlame())// Damage over Time

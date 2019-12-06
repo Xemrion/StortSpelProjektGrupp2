@@ -3,9 +3,9 @@
 #include <Windows.h>
 
 
-std::unique_ptr<Sound2> Sound2::instance;
+std::unique_ptr<Sound> Sound::instance;
 
-Sound2::Sound2()
+Sound::Sound()
 {
 	FMOD_RESULT result = FMOD::System_Create(&this->system); // Create the main system object.
 	assert(result == FMOD_OK && "Could not create the sound system!");
@@ -17,7 +17,7 @@ Sound2::Sound2()
 	assert(result == FMOD_OK && "Could not init the effects sound group!");
 }
 
-Sound2::~Sound2()
+Sound::~Sound()
 {
 	for (auto entry : this->sounds)
 	{
@@ -38,17 +38,17 @@ Sound2::~Sound2()
 	this->system->release();
 }
 
-void Sound2::init()
+void Sound::init()
 {
-	Sound2::instance = std::make_unique<Sound2>();
+	Sound::instance = std::make_unique<Sound>();
 }
 
-void Sound2::update(float deltaTime)
+void Sound::update(float deltaTime)
 {
 	instance->system->update();
 }
 
-void Sound2::load(std::string fileName, bool stream)
+void Sound::load(std::string fileName, bool stream)
 {
 	//Remove potential copies
 	if ((fileName[0] == '.' && (fileName[1] == '/' || fileName[1] == '\\')) || fileName[0] == '/' || fileName[0] == '\\' || fileName.find('\\') != std::string::npos)
@@ -72,17 +72,17 @@ void Sound2::load(std::string fileName, bool stream)
 	}
 }
 
-void Sound2::stopAll()
+void Sound::stopAll()
 {
 	FMOD::ChannelGroup* master = nullptr;
 	instance->system->getMasterChannelGroup(&master);
 	master->stop();
 
 	instance->loopingSounds.clear();
-	Sound2::stopSoundtrack();
+	Sound::stopSoundtrack();
 }
 
-float Sound2::getVolumeMaster()
+float Sound::getVolumeMaster()
 {
 	FMOD::ChannelGroup* master = nullptr;
 	instance->system->getMasterChannelGroup(&master);
@@ -92,7 +92,7 @@ float Sound2::getVolumeMaster()
 	return volume;
 }
 
-void Sound2::setVolumeMaster(float volume)
+void Sound::setVolumeMaster(float volume)
 {
 	FMOD::ChannelGroup* master = nullptr;
 	instance->system->getMasterChannelGroup(&master);
@@ -100,23 +100,23 @@ void Sound2::setVolumeMaster(float volume)
 	master->setVolume(volume);
 }
 
-float Sound2::getVolumeEffects()
+float Sound::getVolumeEffects()
 {
 	float volume = 0.0f;
 	instance->handleGroupEffects->getVolume(&volume);
 	return volume;
 }
 
-void Sound2::setVolumeEffects(float volume)
+void Sound::setVolumeEffects(float volume)
 {
 	instance->handleGroupEffects->setVolume(volume);
 }
 
-void Sound2::play(const std::string& fileName, float volume, float pitch)
+void Sound::play(const std::string& fileName, float volume, float pitch)
 {
 	if (instance->sounds.find(fileName) == instance->sounds.end())
 	{
-		Sound2::load(fileName);
+		Sound::load(fileName);
 	}
 
 	FMOD::Channel* channel = nullptr;
@@ -132,11 +132,11 @@ void Sound2::play(const std::string& fileName, float volume, float pitch)
 	}
 }
 
-std::intptr_t Sound2::playLooping(const std::string& fileName, float volume, float pitch)
+std::intptr_t Sound::playLooping(const std::string& fileName, float volume, float pitch)
 {
 	if (instance->sounds.find(fileName) == instance->sounds.end())
 	{
-		Sound2::load(fileName);
+		Sound::load(fileName);
 	}
 
 	FMOD::Channel* channel = nullptr;
@@ -157,7 +157,7 @@ std::intptr_t Sound2::playLooping(const std::string& fileName, float volume, flo
 	return -1;
 }
 
-bool Sound2::changeLoopingVolume(std::intptr_t handle, float volume)
+bool Sound::changeLoopingVolume(std::intptr_t handle, float volume)
 {
 	FMOD::Channel* channel = reinterpret_cast<FMOD::Channel*>(handle);
 	auto found = std::find(instance->loopingSounds.begin(), instance->loopingSounds.end(), channel);
@@ -171,7 +171,7 @@ bool Sound2::changeLoopingVolume(std::intptr_t handle, float volume)
 	return false;
 }
 
-bool Sound2::changeLoopingPitch(std::intptr_t handle, float pitch)
+bool Sound::changeLoopingPitch(std::intptr_t handle, float pitch)
 {
 	FMOD::Channel* channel = reinterpret_cast<FMOD::Channel*>(handle);
 	auto found = std::find(instance->loopingSounds.begin(), instance->loopingSounds.end(), channel);
@@ -185,7 +185,7 @@ bool Sound2::changeLoopingPitch(std::intptr_t handle, float pitch)
 	return false;
 }
 
-bool Sound2::stopLooping(std::intptr_t handle)
+bool Sound::stopLooping(std::intptr_t handle)
 {
 	FMOD::Channel* channel = reinterpret_cast<FMOD::Channel*>(handle);
 	auto found = std::find(instance->loopingSounds.begin(), instance->loopingSounds.end(), channel);
@@ -200,7 +200,7 @@ bool Sound2::stopLooping(std::intptr_t handle)
 	return false;
 }
 
-void Sound2::playSoundtrack(std::string fileNameCalm, std::string fileNameAggressive, float volume)
+void Sound::playSoundtrack(std::string fileNameCalm, std::string fileNameAggressive, float volume)
 {
 	if (instance->soundtrack.handleCalm)
 		instance->soundtrack.handleCalm->stop();
@@ -213,9 +213,9 @@ void Sound2::playSoundtrack(std::string fileNameCalm, std::string fileNameAggres
 	}
 
 	if (instance->sounds.find(fileNameCalm) == instance->sounds.end())
-		Sound2::load(fileNameCalm, true);
+		Sound::load(fileNameCalm, true);
 	if (instance->sounds.find(fileNameAggressive) == instance->sounds.end())
-		Sound2::load(fileNameAggressive, true);
+		Sound::load(fileNameAggressive, true);
 
 	FMOD_RESULT result = instance->system->createChannelGroup("Soundtrack", &instance->soundtrack.handleGroup);
 	assert(result == FMOD_OK && "Falied to create a ChannelGroup for the soundtrack!");
@@ -239,7 +239,7 @@ void Sound2::playSoundtrack(std::string fileNameCalm, std::string fileNameAggres
 	instance->soundtrack.handleAggressive->setPaused(false);
 }
 
-void Sound2::stopSoundtrack()
+void Sound::stopSoundtrack()
 {
 	if (instance->soundtrack.handleCalm)
 	{
@@ -264,13 +264,13 @@ void Sound2::stopSoundtrack()
 	}
 }
 
-void Sound2::fadeSoundtrack(float aggressiveAmount)
+void Sound::fadeSoundtrack(float aggressiveAmount)
 {
 	if (instance->soundtrack.filter)
 		instance->soundtrack.filter->setParameterFloat(FMOD_DSP_LOWPASS_SIMPLE_CUTOFF, 10.0f + aggressiveAmount * (20000.f - 10.0f));
 }
 
-void Sound2::setVolumeSoundtrack(float volume)
+void Sound::setVolumeSoundtrack(float volume)
 {
 	instance->soundtrack.volume = volume;
 
@@ -278,18 +278,18 @@ void Sound2::setVolumeSoundtrack(float volume)
 		instance->soundtrack.handleGroup->setVolume(volume);
 }
 
-float Sound2::getVolumeSoundtrack()
+float Sound::getVolumeSoundtrack()
 {
 	return instance->soundtrack.volume;
 }
 
-void Sound2::pauseSoundtrack(bool paused)
+void Sound::pauseSoundtrack(bool paused)
 {
 	if (instance->soundtrack.handleGroup)
 		instance->soundtrack.handleGroup->setPaused(paused);
 }
 
-void Sound2::stopAllLoops()
+void Sound::stopAllLoops()
 {
 	for (auto entry : instance->loopingSounds)
 	{

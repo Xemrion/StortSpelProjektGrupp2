@@ -18,56 +18,56 @@ void Game::start(Window* window)
 	instance->graphics.init(window);
 
 	Input::init(instance->window);
-	Sound2::init();
+	Sound::init();
 	UserInterface::initStaticVariables();
 	Container::playerInventory = std::make_unique<Container>();
 	Item::init();
 
-	Sound2::load("CarCrash.wav");
-	Sound2::load("CarGlass1.wav");
-	Sound2::load("CarGlass2.wav");
-	Sound2::load("CarGlass3.wav");
-	Sound2::load("CarGlass4.wav");
-	Sound2::load("CarImpact1.wav");
-	Sound2::load("CarImpact2.wav");
-	Sound2::load("CarImpact3.wav");
-	Sound2::load("CarImpact4.wav");
-	Sound2::load("CarImpactSoft.wav");
-	Sound2::load("FlameLoop1.wav");
-	Sound2::load("FlameLoop2.wav");
-	Sound2::load("HitSound.wav");
-	Sound2::load("MachineGunSound1.wav");
-	Sound2::load("MachineGunSound2.wav");
-	Sound2::load("MachineGunSound3.wav");
-	Sound2::load("MachineGunSound4.wav");
-	Sound2::load("MachineGunSound5.wav");
-	Sound2::load("MachineGunSound6.wav");
-	Sound2::load("MetalImpact1.wav");
-	Sound2::load("MetalImpact2.wav");
-	Sound2::load("MetalImpact3.wav");
-	Sound2::load("MetalImpactPitched1.wav");
-	Sound2::load("MetalImpactPitched2.wav");
-	Sound2::load("MetalImpactPitched3.wav");
+	Sound::load("CarCrash.wav");
+	Sound::load("CarGlass1.wav");
+	Sound::load("CarGlass2.wav");
+	Sound::load("CarGlass3.wav");
+	Sound::load("CarGlass4.wav");
+	Sound::load("CarImpact1.wav");
+	Sound::load("CarImpact2.wav");
+	Sound::load("CarImpact3.wav");
+	Sound::load("CarImpact4.wav");
+	Sound::load("CarImpactSoft.wav");
+	Sound::load("FlameLoop1.wav");
+	Sound::load("FlameLoop2.wav");
+	Sound::load("HitSound.wav");
+	Sound::load("MachineGunSound1.wav");
+	Sound::load("MachineGunSound2.wav");
+	Sound::load("MachineGunSound3.wav");
+	Sound::load("MachineGunSound4.wav");
+	Sound::load("MachineGunSound5.wav");
+	Sound::load("MachineGunSound6.wav");
+	Sound::load("MetalImpact1.wav");
+	Sound::load("MetalImpact2.wav");
+	Sound::load("MetalImpact3.wav");
+	Sound::load("MetalImpactPitched1.wav");
+	Sound::load("MetalImpactPitched2.wav");
+	Sound::load("MetalImpactPitched3.wav");
 		 
-	Sound2::load("Drift2.mp3");
-	Sound2::load("Drift1.mp3");
-	Sound2::load("CarEngine1.mp3");
-	Sound2::load("CarEngine2.mp3");
-	Sound2::load("CarExhaust1.mp3");
-	Sound2::load("CarExhaust2.mp3");
-	Sound2::load("CarExhaust3.mp3");
-	Sound2::load("CarExhaust4.mp3");
-	Sound2::load("RobotBullet1.mp3");
-	Sound2::load("RobotBullet2.mp3");
-	Sound2::load("RobotBullet3.mp3");
-	Sound2::load("RobotBullet4.mp3");
-	Sound2::load("RobotBullet5.mp3");
-	Sound2::load("RobotBullet6.mp3");
-	Sound2::load("Lazer1.mp3");
-	Sound2::load("Lazer2.mp3");
-	Sound2::load("Lazer3.mp3");
-	Sound2::load("Lazer4.mp3");
-	Sound2::load("LazerImpact.mp3");
+	Sound::load("Drift2.mp3");
+	Sound::load("Drift1.mp3");
+	Sound::load("CarEngine1.mp3");
+	Sound::load("CarEngine2.mp3");
+	Sound::load("CarExhaust1.mp3");
+	Sound::load("CarExhaust2.mp3");
+	Sound::load("CarExhaust3.mp3");
+	Sound::load("CarExhaust4.mp3");
+	Sound::load("RobotBullet1.mp3");
+	Sound::load("RobotBullet2.mp3");
+	Sound::load("RobotBullet3.mp3");
+	Sound::load("RobotBullet4.mp3");
+	Sound::load("RobotBullet5.mp3");
+	Sound::load("RobotBullet6.mp3");
+	Sound::load("Lazer1.mp3");
+	Sound::load("Lazer2.mp3");
+	Sound::load("Lazer3.mp3");
+	Sound::load("Lazer4.mp3");
+	Sound::load("LazerImpact.mp3");
 
 
 	
@@ -156,8 +156,8 @@ void Game::createCurrentState()
 
 	if (currentState == STATE_MENU)
 	{
-		Sound2::stopAll();
-		Sound2::playSoundtrack("OilSpillageSoundtrack1_Calm.mp3", "OilSpillageSoundtrack1_Aggressive.mp3");
+		Sound::stopAll();
+		Sound::playSoundtrack("OilSpillageSoundtrack1_Calm.mp3", "OilSpillageSoundtrack1_Aggressive.mp3");
 		
 		Container::playerInventory = std::make_unique<Container>();
 		this->gameInfo = GameInfo();
@@ -167,8 +167,8 @@ void Game::createCurrentState()
 	}
 	else if (currentState == STATE_PLAYING)
 	{
-		Sound2::stopAllLoops();
-		Sound2::fadeSoundtrack(0.0f);
+		Sound::stopAllLoops();
+		Sound::fadeSoundtrack(0.0f);
 		gameInfo.highScoreStage = 0;
 
 		if (oldState == STATE_UPGRADING)
@@ -199,8 +199,8 @@ void Game::createCurrentState()
 	}
 	else if (currentState == STATE_UPGRADING)
 	{
-		Sound2::stopAllLoops();
-		Sound2::fadeSoundtrack(0.0f);
+		Sound::stopAllLoops();
+		Sound::fadeSoundtrack(0.0f);
 		graphics.removeAllUIDraw();
 
 		if (oldState == STATE_PLAYING)
@@ -222,8 +222,8 @@ void Game::createCurrentState()
 	}
 	else if (currentState == STATE_HIGHSCORE)
 	{
-		Sound2::stopAllLoops();
-		Sound2::fadeSoundtrack(0.0f);
+		Sound::stopAllLoops();
+		Sound::fadeSoundtrack(0.0f);
 
 		state = std::make_unique<HighscoreGameState>();
 	}
@@ -249,7 +249,7 @@ void Game::run()
 		deltaTime = (curTime - prevTime) * secPerCount;
 
 		Input::update(deltaTime);
-		Sound2::update(deltaTime);
+		Sound::update(deltaTime);
 		state->update(deltaTime);
 
 		if (oldState != -1) {

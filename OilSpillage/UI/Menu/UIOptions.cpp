@@ -58,14 +58,14 @@ void UIOptions::updateUI(float deltaTime)
 		if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 		{
 			this->sliderMaster->setAmount(this->sliderMaster->getAmount() - 0.05f);
-			Sound2::setVolumeMaster(this->sliderMaster->getAmount());
-			Sound2::play("MenuMove.wav");
+			Sound::setVolumeMaster(this->sliderMaster->getAmount());
+			Sound::play("MenuMove.wav");
 		}
 		else if (Input::checkButton(Keys::L_RIGHT, States::PRESSED))
 		{
 			this->sliderMaster->setAmount(this->sliderMaster->getAmount() + 0.05f);
-			Sound2::setVolumeMaster(this->sliderMaster->getAmount());
-			Sound2::play("MenuMove.wav");
+			Sound::setVolumeMaster(this->sliderMaster->getAmount());
+			Sound::play("MenuMove.wav");
 		}
 	}
 	else if (this->selected == this->sliderMusic.get())
@@ -73,14 +73,14 @@ void UIOptions::updateUI(float deltaTime)
 		if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 		{
 			this->sliderMusic->setAmount(this->sliderMusic->getAmount() - 0.05f);
-			Sound2::setVolumeSoundtrack(this->sliderMusic->getAmount());
-			Sound2::play("MenuMove.wav");
+			Sound::setVolumeSoundtrack(this->sliderMusic->getAmount());
+			Sound::play("MenuMove.wav");
 		}
 		else if (Input::checkButton(Keys::L_RIGHT, States::PRESSED))
 		{
 			this->sliderMusic->setAmount(this->sliderMusic->getAmount() + 0.05f);
-			Sound2::setVolumeSoundtrack(this->sliderMusic->getAmount());
-			Sound2::play("MenuMove.wav");
+			Sound::setVolumeSoundtrack(this->sliderMusic->getAmount());
+			Sound::play("MenuMove.wav");
 		}
 	}
 	else if (this->selected == this->sliderEffects.get())
@@ -88,14 +88,14 @@ void UIOptions::updateUI(float deltaTime)
 		if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 		{
 			this->sliderEffects->setAmount(this->sliderEffects->getAmount() - 0.05f);
-			Sound2::setVolumeEffects(this->sliderEffects->getAmount());
-			Sound2::play("MenuMove.wav");
+			Sound::setVolumeEffects(this->sliderEffects->getAmount());
+			Sound::play("MenuMove.wav");
 		}
 		else if (Input::checkButton(Keys::L_RIGHT, States::PRESSED))
 		{
 			this->sliderEffects->setAmount(this->sliderEffects->getAmount() + 0.05f);
-			Sound2::setVolumeEffects(this->sliderEffects->getAmount());
-			Sound2::play("MenuMove.wav");
+			Sound::setVolumeEffects(this->sliderEffects->getAmount());
+			Sound::play("MenuMove.wav");
 		}
 	}
 }
@@ -138,9 +138,9 @@ void UIOptions::init()
 	this->buttonBack->setNeighbours(nullptr, nullptr, this->sliderEffects.get(), this->checkBoxDrivingMode.get());
 
 	this->checkBoxDrivingMode->setActivated(Game::getDrivingMode());
-	this->sliderMaster->setAmount(Sound2::getVolumeMaster());
-	this->sliderMusic->setAmount(Sound2::getVolumeSoundtrack());
-	this->sliderEffects->setAmount(Sound2::getVolumeEffects());
+	this->sliderMaster->setAmount(Sound::getVolumeMaster());
+	this->sliderMusic->setAmount(Sound::getVolumeSoundtrack());
+	this->sliderEffects->setAmount(Sound::getVolumeEffects());
 
 	this->selected = this->checkBoxDrivingMode.get();
 
