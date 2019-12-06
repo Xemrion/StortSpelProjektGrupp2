@@ -3,14 +3,6 @@
 #include "Map.hpp"
 #include "Profiler.hpp"
 
-std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset", "Chrome", "Graveyard", "Pleasant" };
-
-std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "opolis", "heim", " Meadows", " Creek", " Base", " Metropolis", " Zone", "field", "point", "corner" };
-
-auto generateCityName( RNG &rng ) noexcept {
-	return std::string(util::randomElementOf(cityPrefix, rng)) + util::randomElementOf(citySuffix, rng);
-}
-
 
 // NE "outer corner":
 //     map     mask    predicate
@@ -226,7 +218,7 @@ void Map::generateBorder()
 void Map::generateZebraCrossings()
 {
 	F32_Dist  generateSelection { .0f, 1.0f };
-	crossingTiles.reserve( 24 );
+	crossingTiles.reserve( 64 );
 
 	auto instantiateCrossing = [&]( Vector3 const &pos, F32 deg=.0f ) {
 		crossingTiles.push_back( std::make_unique<GameObject>() );
@@ -414,7 +406,6 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	info.environment = {rng};
 	info.width       = config.dimensions.x;
 	info.length      = config.dimensions.y;
-	info.name        = generateCityName(rng);
 
 	// TODO: generate water etc
 	generateRoads();
