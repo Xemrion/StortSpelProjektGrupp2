@@ -242,7 +242,7 @@ void UIPlaying::drawUI()
 		}
 	}
 
-	this->healthBar->draw(false);
+	this->healthBar->draw(true);
 	objectiveBox->draw(false);
 	this->minimap->draw(false);
 	this->timerText->draw(false);

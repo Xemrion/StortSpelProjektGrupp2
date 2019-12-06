@@ -239,8 +239,8 @@ Status BossAbilities::shoot()
 					{
 						if (bullets[i].getTimeLeft() == 0.0)
 						{
-							float flameXDirRad = ((this->flameXDirDegree * M_PI) / 180); //degree to radians
-							float flameZDirRad = ((this->flameZDirDegree * M_PI) / 180);
+							float flameXDirRad = ((this->flameXDirDegree * XM_PI) / 180); //degree to radians
+							float flameZDirRad = ((this->flameZDirDegree * XM_PI) / 180);
 
 							float xCos = cos(flameXDirRad);
 							float zSin = sin(flameZDirRad);
@@ -368,8 +368,8 @@ Status BossAbilities::shoot()
 					{
 						if (bullets[i].getTimeLeft() == 0.0)
 						{
-							float flameXDirRad = ((this->flameXDirDegree * M_PI) / 180); //degree to radians
-							float flameZDirRad = ((this->flameZDirDegree * M_PI) / 180);
+							float flameXDirRad = ((this->flameXDirDegree * XM_PI) / 180); //degree to radians
+							float flameZDirRad = ((this->flameZDirDegree * XM_PI) / 180);
 								
 							float xCos = cos(flameXDirRad);
 							float zSin = sin(flameZDirRad);

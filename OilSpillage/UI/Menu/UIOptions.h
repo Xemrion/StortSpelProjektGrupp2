@@ -15,7 +15,9 @@ private:
 
 	std::unique_ptr<Button> buttonBack;
 	std::unique_ptr<CheckBox> checkBoxDrivingMode;
-	std::unique_ptr<Slider> sliderTest;
+	std::unique_ptr<Slider> sliderMaster;
+	std::unique_ptr<Slider> sliderMusic;
+	std::unique_ptr<Slider> sliderEffects;
 	std::unique_ptr<ButtonPromptBar> promptBar;
 	Element* selected;
 

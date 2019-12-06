@@ -603,8 +603,8 @@ void PlayingGameState::update(float deltaTime)
 		camera->update(deltaTime);
 		updateWeather(deltaTime, currentCamPos);
 
-		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
-		Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
+		//Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
+		//Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
 
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
@@ -679,11 +679,11 @@ void PlayingGameState::update(float deltaTime)
 
 		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 25.0f || this->time <= 20.0f)
 		{
-			Sound::fadeSoundtrack(true, 1.0f);
+			soundAggro = min(Game::lerp(soundAggro, 1.0f, deltaTime * 2), 1.0f);
 		}
 		else
 		{
-			Sound::fadeSoundtrack(false, 3.0f);
+			soundAggro = std::max(Game::lerp(soundAggro, 0.0f, deltaTime * 2), 0.0f);
 		}
 
 		if (this->objectives.isAllDone())
@@ -707,6 +707,8 @@ void PlayingGameState::update(float deltaTime)
 	// render UI
 	if (currentMenu != MENU_PLAYING)
 	{
+		soundAggro = std::max(Game::lerp(soundAggro, 0.0f, deltaTime * 8), 0.0f);
+
 		if (currentMenu != MENU_BEFORE_PLAYING)
 		{
 			menues[MENU_PLAYING]->update(0);
@@ -723,6 +725,8 @@ void PlayingGameState::update(float deltaTime)
 			setCurrentMenu(PlayingGameState::MENU_PAUSED);
 		}
 	}
+
+	Sound::fadeSoundtrack(soundAggro);
 	
 	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 		ImGui_ImplDX11_NewFrame();

@@ -344,13 +344,13 @@ void Spitfire::setAccelForce(Vector3 accelForce, float deltaTime)
 	//AccelForce
 	if ((max(abs(accelForce.x), abs(accelForce.z)) > 5.0f)) {
 		int randomSound = rand() % 3 + 1;
-		std::string soundEffect = "data/sound/CarImpact" + std::to_string(randomSound) + ".wav";
+		std::string soundEffect = "CarImpact" + std::to_string(randomSound) + ".wav";
 		int randomSound2 = rand() % 3 + 1;
-		std::string soundEffect2 = "data/sound/MetalImpactPitched" + std::to_string(randomSound) + ".wav";
+		std::string soundEffect2 = "MetalImpactPitched" + std::to_string(randomSound) + ".wav";
 		if (max(abs(accelForce.x), abs(accelForce.z)) > 25.0f) {
 			Game::getGraphics().addParticle2(getPosition(), Vector3(0, 0, 0), 2, 1);
 			changeHealth(-20.0f);
-			Sound::play("data/sound/CarCrash.wav");
+			Sound::play("CarCrash.wav");
 			Sound::play(soundEffect2);
 		}
 		else if (max(abs(accelForce.x), abs(accelForce.z)) > 15.0f) {
@@ -360,7 +360,7 @@ void Spitfire::setAccelForce(Vector3 accelForce, float deltaTime)
 			Sound::play(soundEffect2);
 		}
 		else {
-			Sound::play("data/sound/CarImpactSoft.wav");
+			Sound::play("CarImpactSoft.wav");
 			Sound::play(soundEffect2);
 		}
 	}
