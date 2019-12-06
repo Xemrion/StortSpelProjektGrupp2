@@ -35,6 +35,7 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 
 UpgradingGameState::~UpgradingGameState()
 {
+	
 }
 
 Vehicle* UpgradingGameState::getVehicle()

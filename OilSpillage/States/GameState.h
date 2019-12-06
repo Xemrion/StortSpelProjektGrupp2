@@ -6,7 +6,7 @@ class GameState
 public:
 	GameState() {};
 	virtual ~GameState() {};
-
+	void clearDraw();
 	virtual void update(float deltaTime) = 0;
 };
 

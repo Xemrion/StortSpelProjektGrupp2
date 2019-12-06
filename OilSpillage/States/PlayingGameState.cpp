@@ -78,7 +78,6 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
-	graphics.loadTexture("grass3");
 	graphics.loadModel("Entities/Turret");
 	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
 
@@ -141,9 +140,10 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 			graphics.loadModel( "Houses/tilesets/" + tileset.name + "/" + part );
 
 	loadMultitileLayouts("data/layouts/multitilePrefabs.dat");
+	graphics.loadModel("Entities/Drone");
 
 	graphics.loadModel("Hospital");
-
+	graphics.loadModel("Entities/Roller_Melee");
 	graphics.loadModel("Houses/testHouse");
 	graphics.loadModel("Houses/testHouse2");
 	graphics.loadModel("Houses/testHouse3");
@@ -290,7 +290,6 @@ PlayingGameState::~PlayingGameState()
 	delete this->objTestPickUp;
 	delete this->objTestPickUp2;
 	delete this->objTestPickUp3;
-
 	delete[] this->objArray;
 }
 
