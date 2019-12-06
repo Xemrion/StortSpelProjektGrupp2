@@ -69,9 +69,6 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 				Actor* current = groups[i].actors[j];
 				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
 				current->setPosition(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-				//player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
-				//player->getVehicleBody1()->setPosition(startPos + Vector3(.0f, 0.65f - 1.2f, .0f));
 				
 				if (j % 5 == 0)
 				{

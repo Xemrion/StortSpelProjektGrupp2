@@ -33,7 +33,7 @@ public:
 
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size, float deltaTime);
 private:
-	const int maxNrOfEnemies = 25;
+	const int maxNrOfEnemies = 24;
 	const int spawnCooldown = 2;
 	float spawnTimer = 0;
 	float soundTimer = 0;
