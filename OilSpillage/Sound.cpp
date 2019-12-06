@@ -2,16 +2,6 @@
 #include <cassert>
 #include <Windows.h>
 
-/*
-void Sound::fadeSoundtrack(bool toAgressive, float fadeTime)
-{
-	//Get the aggressive factor (the time of the fade that is left) so this function can be called every frame if needed.
-	float aggressiveFactor = (instance->soloud.getFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY) - 10.0f) / 10000.0f;
-	if (toAgressive) aggressiveFactor = 1 - aggressiveFactor;
-
-	instance->soloud.fadeFilterParameter(instance->soundtrack.handleAggressive, 0, SoLoud::BiquadResonantFilter::FREQUENCY, toAgressive ? 10000.0f : 10.0f, fadeTime * aggressiveFactor);
-}
-*/
 
 std::unique_ptr<Sound2> Sound2::instance;
 
@@ -22,6 +12,9 @@ Sound2::Sound2()
 	
 	result = this->system->init(512, FMOD_INIT_NORMAL, nullptr); // Initialize FMOD.
 	assert(result == FMOD_OK && "Could not init the sound system!");
+
+	result = this->system->createChannelGroup("Effects", &this->handleGroupEffects);
+	assert(result == FMOD_OK && "Could not init the effects sound group!");
 }
 
 Sound2::~Sound2()
@@ -31,6 +24,17 @@ Sound2::~Sound2()
 		entry.second->release();
 	}
 
+	if (instance->soundtrack.filter)
+	{
+		instance->soundtrack.filter->release();
+	}
+
+	if (instance->soundtrack.handleGroup)
+	{
+		instance->soundtrack.handleGroup->release();
+	}
+
+	this->handleGroupEffects->release();
 	this->system->release();
 }
 
@@ -59,7 +63,7 @@ void Sound2::load(std::string fileName, bool stream)
 	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
 	FMOD::Sound* sound = nullptr;
 
-	FMOD_RESULT result = instance->system->createSound((SOUND_PATH + fileName).c_str(), stream ? FMOD_CREATESTREAM : FMOD_DEFAULT, &exinfo, &sound);
+	FMOD_RESULT result = instance->system->createSound((SOUND_PATH + fileName).c_str(), (stream ? FMOD_CREATESTREAM : FMOD_DEFAULT) | FMOD_LOOP_NORMAL, &exinfo, &sound);
 	assert(result == FMOD_OK && "The sound could not be loaded!");
 
 	if (result == FMOD_OK)
@@ -75,9 +79,10 @@ void Sound2::stopAll()
 	master->stop();
 
 	instance->loopingSounds.clear();
+	Sound2::stopSoundtrack();
 }
 
-float Sound2::getMasterVolume()
+float Sound2::getVolumeMaster()
 {
 	FMOD::ChannelGroup* master = nullptr;
 	instance->system->getMasterChannelGroup(&master);
@@ -87,12 +92,24 @@ float Sound2::getMasterVolume()
 	return volume;
 }
 
-void Sound2::setMasterVolume(float volume)
+void Sound2::setVolumeMaster(float volume)
 {
 	FMOD::ChannelGroup* master = nullptr;
 	instance->system->getMasterChannelGroup(&master);
 
 	master->setVolume(volume);
+}
+
+float Sound2::getVolumeEffects()
+{
+	float volume = 0.0f;
+	instance->handleGroupEffects->getVolume(&volume);
+	return volume;
+}
+
+void Sound2::setVolumeEffects(float volume)
+{
+	instance->handleGroupEffects->setVolume(volume);
 }
 
 void Sound2::play(const std::string& fileName, float volume, float pitch)
@@ -103,15 +120,15 @@ void Sound2::play(const std::string& fileName, float volume, float pitch)
 	}
 
 	FMOD::Channel* channel = nullptr;
-	FMOD_RESULT result = instance->system->playSound(instance->sounds[fileName], nullptr, false, &channel);
+	FMOD_RESULT result = instance->system->playSound(instance->sounds[fileName], instance->handleGroupEffects, true, &channel);
 	assert(result == FMOD_OK && "The sound could not be played!");
 
 	if (result == FMOD_OK)
 	{
-		OutputDebugString(("Played '" + fileName + "'\n").c_str());
 		channel->setLoopCount(0);
 		channel->setVolume(volume);
 		channel->setPitch(pitch);
+		channel->setPaused(false);
 	}
 }
 
@@ -123,15 +140,15 @@ std::intptr_t Sound2::playLooping(const std::string& fileName, float volume, flo
 	}
 
 	FMOD::Channel* channel = nullptr;
-	FMOD_RESULT result = instance->system->playSound(instance->sounds[fileName], nullptr, false, &channel);
+	FMOD_RESULT result = instance->system->playSound(instance->sounds[fileName], instance->handleGroupEffects, true, &channel);
 	assert(result == FMOD_OK && "The sound could not be played!");
 	
 	if (result == FMOD_OK)
 	{
-		OutputDebugString(("Played loop '" + fileName + "'\n").c_str());
 		channel->setLoopCount(-1);
 		channel->setVolume(volume);
 		channel->setPitch(pitch);
+		channel->setPaused(false);
 
 		instance->loopingSounds.push_back(channel);
 		return reinterpret_cast<intptr_t>(channel);
@@ -147,7 +164,7 @@ bool Sound2::changeLoopingVolume(std::intptr_t handle, float volume)
 	
 	if (found != instance->loopingSounds.end())
 	{
-		channel->setVolume(volume);
+		channel->setVolume(max(volume, 0.0f));
 		return true;
 	}
 
@@ -175,6 +192,7 @@ bool Sound2::stopLooping(std::intptr_t handle)
 
 	if (found != instance->loopingSounds.end())
 	{
+		channel->stop();
 		instance->loopingSounds.erase(found);
 		return true;
 	}
@@ -207,10 +225,18 @@ void Sound2::playSoundtrack(std::string fileNameCalm, std::string fileNameAggres
 	result = instance->system->playSound(instance->sounds[fileNameAggressive], instance->soundtrack.handleGroup, true, &instance->soundtrack.handleAggressive);
 	assert(result == FMOD_OK && "The sound could not be played!");
 
-	result = instance->soundtrack.handleGroup->setVolume(volume);
-	assert(result == FMOD_OK && "Falied to create a ChannelGroup for the soundtrack!");
-	result = instance->soundtrack.handleGroup->setPaused(false);
-	assert(result == FMOD_OK && "Falied to create a ChannelGroup for the soundtrack!");
+	instance->soundtrack.handleCalm->setVolume(1.0f);
+	instance->soundtrack.handleAggressive->setVolume(1.0f);
+	instance->soundtrack.handleGroup->setVolume(instance->soundtrack.volume);
+
+	result = instance->system->createDSPByType(FMOD_DSP_TYPE_LOWPASS_SIMPLE, &instance->soundtrack.filter);
+	assert(result == FMOD_OK && "The sound could not be played!");
+
+	instance->soundtrack.filter->setParameterFloat(FMOD_DSP_LOWPASS_SIMPLE_CUTOFF, 10.0f);
+	instance->soundtrack.handleAggressive->addDSP(0, instance->soundtrack.filter);
+
+	instance->soundtrack.handleCalm->setPaused(false);
+	instance->soundtrack.handleAggressive->setPaused(false);
 }
 
 void Sound2::stopSoundtrack()
@@ -225,6 +251,11 @@ void Sound2::stopSoundtrack()
 		instance->soundtrack.handleAggressive->stop();
 		instance->soundtrack.handleAggressive = nullptr;
 	}
+	if (instance->soundtrack.filter)
+	{
+		instance->soundtrack.filter->release();
+		instance->soundtrack.filter = nullptr;
+	}
 	if (instance->soundtrack.handleGroup)
 	{
 		instance->soundtrack.handleGroup->stop();
@@ -233,10 +264,29 @@ void Sound2::stopSoundtrack()
 	}
 }
 
-void Sound2::changeSoundtrackVolume(float volume)
+void Sound2::fadeSoundtrack(float aggressiveAmount)
 {
+	if (instance->soundtrack.filter)
+		instance->soundtrack.filter->setParameterFloat(FMOD_DSP_LOWPASS_SIMPLE_CUTOFF, 10.0f + aggressiveAmount * (20000.f - 10.0f));
+}
+
+void Sound2::setVolumeSoundtrack(float volume)
+{
+	instance->soundtrack.volume = volume;
+
 	if (instance->soundtrack.handleGroup)
 		instance->soundtrack.handleGroup->setVolume(volume);
+}
+
+float Sound2::getVolumeSoundtrack()
+{
+	return instance->soundtrack.volume;
+}
+
+void Sound2::pauseSoundtrack(bool paused)
+{
+	if (instance->soundtrack.handleGroup)
+		instance->soundtrack.handleGroup->setPaused(paused);
 }
 
 void Sound2::stopAllLoops()

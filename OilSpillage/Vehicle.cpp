@@ -1474,7 +1474,7 @@ void Vehicle::addPowerUp(PowerUpType type)
 	}
 	else if (type == PowerUpType::Star)
 	{
-		Sound2::changeSoundtrackVolume(0);
+		Sound2::pauseSoundtrack(true);
 		Sound2::stopLooping(starPowerHandle);
 		starPowerHandle = Sound2::playLooping("StarPowerup.mp3", 0.75f);
 		this->powerUpTimers[(int)PowerUpType::Star] += 30.0;
@@ -1512,7 +1512,7 @@ void Vehicle::updatePowerUpEffects(float deltaTime)
 		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate;
 		this->updatedStats.handlingRate = this->defaultStats.handlingRate;
 		//this->vehicleBody1->setColor(Vector4(0.0, 0.0, 0.0, 1.0));
-		Sound2::changeSoundtrackVolume(1);
+		Sound2::pauseSoundtrack(false);
 		Sound2::stopLooping(starPowerHandle);
 		starPowerHandle = -1;
 	}

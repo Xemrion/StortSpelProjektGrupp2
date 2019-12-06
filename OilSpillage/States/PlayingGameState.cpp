@@ -691,12 +691,14 @@ void PlayingGameState::update(float deltaTime)
 
 		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 25.0f || this->time <= 20.0f)
 		{
-			//Sound::fadeSoundtrack(true, 1.0f);
+			soundAggro = min(Game::lerp(soundAggro, 1.0f, deltaTime * 2), 1.0f);
 		}
 		else
 		{
-			//Sound::fadeSoundtrack(false, 3.0f);
+			soundAggro = std::max(Game::lerp(soundAggro, 0.0f, deltaTime * 2), 0.0f);
 		}
+
+		Sound2::fadeSoundtrack(soundAggro);
 
 		if (this->objectives.isAllDone())
 		{

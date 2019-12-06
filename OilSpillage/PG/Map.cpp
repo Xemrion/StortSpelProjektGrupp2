@@ -650,7 +650,7 @@ void  Map::generateBuildings( )
 						                        .048f * config.tileSideScaleFactor,
 						                        .048f * config.tileSideScaleFactor });
 						house.object.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePos) } );
-						#ifndef _DEBUG
+						/*#ifndef _DEBUG
 							btRigidBody *tmp = physics->addBox( btVector3( house.object.getPosition().x,
 							                                               house.object.getPosition().y,
 							                                               house.object.getPosition().z ),
@@ -660,7 +660,7 @@ void  Map::generateBuildings( )
 							                                    .0f );
 							tmp->setFriction(0);
 							house.object.setRigidBody( tmp, physics );
-						#endif
+						#endif*/
 						tilemap->applyLot( maybeLot.value(), Tile::building );
 						++currentArea;
 						houses.singles.push_back( std::move(house) );
@@ -740,7 +740,7 @@ void  Map::generateBuildings( )
 					house.object.setScale({ .0322f * config.tileSideScaleFactor,
 						                     .0322f * config.tileSideScaleFactor,
 						                     .0322f * config.tileSideScaleFactor });
-					#ifndef _DEBUG
+					/*#ifndef _DEBUG
 						btRigidBody *tmp = physics->addBox( btVector3( house.object.getPosition().x,
 						                                               house.object.getPosition().y,
 						                                               house.object.getPosition().z ),
@@ -750,7 +750,7 @@ void  Map::generateBuildings( )
 						                                    .0f );
 						tmp->setFriction(0);
 						house.object.setRigidBody( tmp, physics );
-					#endif
+					#endif*/
 					tilemap->applyLot( maybeLot.value(), Tile::building );
 					houses.singles.push_back( std::move(house) );
 					++currentArea;
@@ -1487,32 +1487,32 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 				quadmask = util::cycleRight(quadmask, 2);
 				if      ( (quadmask & 0b00000'101) == 0x00000'000 ) { // 000 or 010 => outer corner
 					instantiateTilePart( "f_oc", basePosition, 90.0f*q, .0f );
-					#ifndef _DEBUG // add rigid body to quadrant
-						house.hitboxes.emplace_back();
-						auto &hitbox = house.hitboxes.back();
-						auto     sca = Vector3 { fracSide*2.5f, 10.0f, fracSide*2.5f };
-						auto     pos = basePosition;
-						if ( (q == quadrant_northeast) or (q == quadrant_northwest) )
-							pos.z += (2.5*fracSide);
-						else // south
-							pos.z -= (2.5*fracSide);
-						if ( (q == quadrant_northwest) or (q == quadrant_southwest) )
-							pos.x -= (2.5*fracSide);
-						else // south
-							pos.x += (2.5*fracSide);
+					//#ifndef _DEBUG // add rigid body to quadrant
+					//	house.hitboxes.emplace_back();
+					//	auto &hitbox = house.hitboxes.back();
+					//	auto     sca = Vector3 { fracSide*2.5f, 10.0f, fracSide*2.5f };
+					//	auto     pos = basePosition;
+					//	if ( (q == quadrant_northeast) or (q == quadrant_northwest) )
+					//		pos.z += (2.5*fracSide);
+					//	else // south
+					//		pos.z -= (2.5*fracSide);
+					//	if ( (q == quadrant_northwest) or (q == quadrant_southwest) )
+					//		pos.x -= (2.5*fracSide);
+					//	else // south
+					//		pos.x += (2.5*fracSide);
 
-					// DEBUG
-						// hitbox.setColor({1.0f, .0f, .0f, 1.0f}); // red
-						// hitbox.setPosition(pos);
-						// hitbox.mesh = graphics.getMeshPointer("Cube");
-						// hitbox.setScale(sca);
+					//// DEBUG
+					//	// hitbox.setColor({1.0f, .0f, .0f, 1.0f}); // red
+					//	// hitbox.setPosition(pos);
+					//	// hitbox.mesh = graphics.getMeshPointer("Cube");
+					//	// hitbox.setScale(sca);
 
-						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
-						                                    btVector3( sca.x, sca.y, sca.z ),
-						                                   .0f );
-						tmp->setFriction(0);
-						hitbox.setRigidBody( tmp, physics );
-					#endif
+					//	btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
+					//	                                    btVector3( sca.x, sca.y, sca.z ),
+					//	                                   .0f );
+					//	tmp->setFriction(0);
+					//	hitbox.setRigidBody( tmp, physics );
+					//#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
 						instantiateTilePart( "w_oc", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
 					instantiateTilePart(    "r_oc", basePosition, 90.0f*q, floorCount-1, tileset.floorHeight );
@@ -1522,111 +1522,111 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor ) 
 						instantiateTilePart( "w_ic", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
 
-					#ifndef _DEBUG // add rigid body to quadrant
-						bool  isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        scaB = Vector3 { isVertical? halfSide:fracSide, 10.0f, isVertical? fracSide:halfSide };
-						auto        posA = basePosition;
-						auto        scaA = Vector3 { isVertical? fracSide:halfSide, 10.0f, isVertical? halfSide:fracSide };
-						auto        posB = basePosition;
-						switch (q) {
-							case quadrant_southeast: posA.z -= halfSide; posA.x += halfSide;   posB.x += halfSide; posB.z -= halfSide;  break;
-							case quadrant_southwest: posA.x -= halfSide; posA.z -= halfSide;   posB.z -= halfSide; posB.x -= halfSide;  break;
-							case quadrant_northwest: posA.z += halfSide; posA.x -= halfSide;   posB.x -= halfSide; posB.z += halfSide;  break;
-							case quadrant_northeast: posA.x += halfSide; posA.z += halfSide;   posB.z += halfSide; posB.x += halfSide;  break;
-						}
+					//#ifndef _DEBUG // add rigid body to quadrant
+					//	bool  isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
+					//	auto        scaB = Vector3 { isVertical? halfSide:fracSide, 10.0f, isVertical? fracSide:halfSide };
+					//	auto        posA = basePosition;
+					//	auto        scaA = Vector3 { isVertical? fracSide:halfSide, 10.0f, isVertical? halfSide:fracSide };
+					//	auto        posB = basePosition;
+					//	switch (q) {
+					//		case quadrant_southeast: posA.z -= halfSide; posA.x += halfSide;   posB.x += halfSide; posB.z -= halfSide;  break;
+					//		case quadrant_southwest: posA.x -= halfSide; posA.z -= halfSide;   posB.z -= halfSide; posB.x -= halfSide;  break;
+					//		case quadrant_northwest: posA.z += halfSide; posA.x -= halfSide;   posB.x -= halfSide; posB.z += halfSide;  break;
+					//		case quadrant_northeast: posA.x += halfSide; posA.z += halfSide;   posB.z += halfSide; posB.x += halfSide;  break;
+					//	}
 
-						house.hitboxes.emplace_back();
-						auto    &hitboxA = house.hitboxes.back();
+					//	house.hitboxes.emplace_back();
+					//	auto    &hitboxA = house.hitboxes.back();
 
-					// DEBUG
-						// hitboxA.setColor({1.0f, 1.0f, .0f, 1.0f}); // yellow
-						// hitboxA.setPosition(posA);
-						// hitboxA.mesh = graphics.getMeshPointer("Cube");
-						// hitboxA.setScale(scaA);
+					//// DEBUG
+					//	// hitboxA.setColor({1.0f, 1.0f, .0f, 1.0f}); // yellow
+					//	// hitboxA.setPosition(posA);
+					//	// hitboxA.mesh = graphics.getMeshPointer("Cube");
+					//	// hitboxA.setScale(scaA);
 
-						btRigidBody *tmpA = physics->addBox( btVector3( posA.x, posA.y, posA.z ),
-						                                     btVector3( scaA.x, scaA.y, scaA.z ),
-						                                    .0f );
-						tmpA->setFriction(0);
-						hitboxA.setRigidBody( tmpA, physics );
+					//	btRigidBody *tmpA = physics->addBox( btVector3( posA.x, posA.y, posA.z ),
+					//	                                     btVector3( scaA.x, scaA.y, scaA.z ),
+					//	                                    .0f );
+					//	tmpA->setFriction(0);
+					//	hitboxA.setRigidBody( tmpA, physics );
 
 
-						house.hitboxes.emplace_back();
-						auto  &hitboxB = house.hitboxes.back();
+					//	house.hitboxes.emplace_back();
+					//	auto  &hitboxB = house.hitboxes.back();
 
-					// DEBUG
-						//	hitboxB.setColor({1.0f, 0.0f, 1.0f, 1.0f}); // magenta
-						//	hitboxB.setPosition(posB);
-						//	hitboxB.mesh = graphics.getMeshPointer("Cube");
-						//	hitboxB.setScale(scaB);
+					//// DEBUG
+					//	//	hitboxB.setColor({1.0f, 0.0f, 1.0f, 1.0f}); // magenta
+					//	//	hitboxB.setPosition(posB);
+					//	//	hitboxB.mesh = graphics.getMeshPointer("Cube");
+					//	//	hitboxB.setScale(scaB);
 
-						btRigidBody *tmpB = physics->addBox( btVector3( posB.x, posB.y, posB.z ),
-						                                     btVector3( scaB.x, scaB.y, scaB.z ),
-						                                    .0f );
-						tmpB->setFriction(0);
-						hitboxB.setRigidBody( tmpB, physics );
-					#endif
+					//	btRigidBody *tmpB = physics->addBox( btVector3( posB.x, posB.y, posB.z ),
+					//	                                     btVector3( scaB.x, scaB.y, scaB.z ),
+					//	                                    .0f );
+					//	tmpB->setFriction(0);
+					//	hitboxB.setRigidBody( tmpB, physics );
+					//#endif
 
 					instantiateTilePart( "r_ic", basePosition, 90.0f*q, floorCount-1, tileset.floorHeight );
 				}
 				else if ( (quadmask & 0b00000'101) == 0b00000'100 ) { // 100 or 110 => side A
 					instantiateTilePart( "f_sa", basePosition, 90.0f*q, .0f );
-					#ifndef _DEBUG // add rigid body to quadrant
-						house.hitboxes.emplace_back();
-						auto    &hitbox = house.hitboxes.back();
-						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        sca = Vector3 { isVertical? fracSide:halfSide, 10.0f, isVertical? halfSide:fracSide };
-						auto        pos = basePosition;
-						switch (q) {
-							case quadrant_southeast: pos.x += halfSide;  pos.z -= halfSide;  break;
-							case quadrant_southwest: pos.z -= halfSide;  pos.x -= halfSide;  break;
-							case quadrant_northwest: pos.x -= halfSide;  pos.z += halfSide;  break;
-							case quadrant_northeast: pos.z += halfSide;  pos.x += halfSide;  break;
-						}
+					//#ifndef _DEBUG // add rigid body to quadrant
+					//	house.hitboxes.emplace_back();
+					//	auto    &hitbox = house.hitboxes.back();
+					//	bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
+					//	auto        sca = Vector3 { isVertical? fracSide:halfSide, 10.0f, isVertical? halfSide:fracSide };
+					//	auto        pos = basePosition;
+					//	switch (q) {
+					//		case quadrant_southeast: pos.x += halfSide;  pos.z -= halfSide;  break;
+					//		case quadrant_southwest: pos.z -= halfSide;  pos.x -= halfSide;  break;
+					//		case quadrant_northwest: pos.x -= halfSide;  pos.z += halfSide;  break;
+					//		case quadrant_northeast: pos.z += halfSide;  pos.x += halfSide;  break;
+					//	}
 
-					// DEBUG
-						//	hitbox.setColor({.0f, 1.0f, .0f, 1.0f}); // green
-						//	hitbox.setPosition(pos);
-						//	hitbox.mesh = graphics.getMeshPointer("Cube");
-						//	hitbox.setScale(sca);
+					//// DEBUG
+					//	//	hitbox.setColor({.0f, 1.0f, .0f, 1.0f}); // green
+					//	//	hitbox.setPosition(pos);
+					//	//	hitbox.mesh = graphics.getMeshPointer("Cube");
+					//	//	hitbox.setScale(sca);
 
-						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
-						                                    btVector3( sca.x, sca.y, sca.z ),
-						                                   .0f );
-						tmp->setFriction(0);
-						hitbox.setRigidBody( tmp, physics );
-					#endif
+					//	btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
+					//	                                    btVector3( sca.x, sca.y, sca.z ),
+					//	                                   .0f );
+					//	tmp->setFriction(0);
+					//	hitbox.setRigidBody( tmp, physics );
+					//#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
 						instantiateTilePart( "w_sa", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
 					instantiateTilePart(    "r_sa", basePosition, 90.0f*q, floorCount-1, tileset.floorHeight );
 				}
 				else if ( (quadmask & 0b00000'101) == 0b00000'001 ) { // 001 or 011 => side B
 					instantiateTilePart(    "f_sb", basePosition, 90.0f*q, .0f );
-					#ifndef _DEBUG // add rigid body to quadrant
-						house.hitboxes.emplace_back();
-						auto    &hitbox = house.hitboxes.back();
-						bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
-						auto        sca = Vector3 { isVertical? halfSide:fracSide, 10.0f, isVertical? fracSide:halfSide };
-						auto        pos = basePosition;
-						switch (q) {
-							case quadrant_southeast: pos.z -= halfSide;  pos.x += halfSide;  break;
-							case quadrant_southwest: pos.x -= halfSide;  pos.z -= halfSide;  break;
-							case quadrant_northwest: pos.z += halfSide;  pos.x -= halfSide;  break;
-							case quadrant_northeast: pos.x += halfSide;  pos.z += halfSide;  break;
-						}
+					//#ifndef _DEBUG // add rigid body to quadrant
+					//	house.hitboxes.emplace_back();
+					//	auto    &hitbox = house.hitboxes.back();
+					//	bool isVertical = (q==quadrant_southeast) or (q==quadrant_northwest);
+					//	auto        sca = Vector3 { isVertical? halfSide:fracSide, 10.0f, isVertical? fracSide:halfSide };
+					//	auto        pos = basePosition;
+					//	switch (q) {
+					//		case quadrant_southeast: pos.z -= halfSide;  pos.x += halfSide;  break;
+					//		case quadrant_southwest: pos.x -= halfSide;  pos.z -= halfSide;  break;
+					//		case quadrant_northwest: pos.z += halfSide;  pos.x -= halfSide;  break;
+					//		case quadrant_northeast: pos.x += halfSide;  pos.z += halfSide;  break;
+					//	}
 
-					// DEBUG
-						// hitbox.setColor({.0f, 0.0f, 1.0f, 1.0f}); // blues
-						// hitbox.setPosition(pos);
-						// hitbox.mesh = graphics.getMeshPointer("Cube");
-						// hitbox.setScale(sca);
+					//// DEBUG
+					//	// hitbox.setColor({.0f, 0.0f, 1.0f, 1.0f}); // blues
+					//	// hitbox.setPosition(pos);
+					//	// hitbox.mesh = graphics.getMeshPointer("Cube");
+					//	// hitbox.setScale(sca);
 
-						btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
-						                                    btVector3( sca.x, sca.y, sca.z ),
-						                                   .0f );
-						tmp->setFriction(0);
-						hitbox.setRigidBody( tmp, physics );
-					#endif
+					//	btRigidBody *tmp = physics->addBox( btVector3( pos.x, pos.y, pos.z ),
+					//	                                    btVector3( sca.x, sca.y, sca.z ),
+					//	                                   .0f );
+					//	tmp->setFriction(0);
+					//	hitbox.setRigidBody( tmp, physics );
+					//#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
 						instantiateTilePart( "w_sb", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
 					instantiateTilePart(    "r_sb", basePosition, 90.0f*q, floorCount-1, tileset.floorHeight );

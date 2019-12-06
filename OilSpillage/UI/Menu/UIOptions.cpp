@@ -44,7 +44,7 @@ void UIOptions::updateUI(float deltaTime)
 				this->sliderTest->setAmount(this->sliderTest->getAmount() + 0.1f);
 			}
 
-			Sound2::setMasterVolume(this->sliderTest->getAmount());
+			Sound2::setVolumeMaster(this->sliderTest->getAmount());
 		}
 	}
 	else if (Input::checkButton(Keys::CANCEL, States::PRESSED))
@@ -96,7 +96,7 @@ void UIOptions::init()
 	this->sliderTest->setNeighbours(nullptr, nullptr, this->checkBoxDrivingMode.get(), this->buttonBack.get());
 
 	this->checkBoxDrivingMode->setActivated(Game::getDrivingMode());
-	this->sliderTest->setAmount(Sound2::getMasterVolume());
+	this->sliderTest->setAmount(Sound2::getVolumeMaster());
 
 	this->selected = this->checkBoxDrivingMode.get();
 

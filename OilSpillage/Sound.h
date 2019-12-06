@@ -16,14 +16,15 @@ private:
 
 	struct Soundtrack
 	{
-		FMOD::Sound* soundCalm = nullptr;
-		FMOD::Sound* soundAggressive = nullptr;
+		FMOD::DSP* filter = nullptr;
 		FMOD::Channel* handleCalm = nullptr;
 		FMOD::Channel* handleAggressive = nullptr;
 		FMOD::ChannelGroup* handleGroup = nullptr;
+		float volume = 1.0f;
 	} soundtrack;
 
 	FMOD::System* system;
+	FMOD::ChannelGroup* handleGroupEffects = nullptr;
 	std::unordered_map<std::string, FMOD::Sound*> sounds;
 	std::vector<FMOD::Channel*> loopingSounds;
 public:
@@ -34,8 +35,11 @@ public:
 	static void update(float deltaTime);
 	static void load(std::string fileName, bool stream = false);
 	static void stopAll();
-	static float getMasterVolume();
-	static void setMasterVolume(float volume);
+
+	static float getVolumeMaster();
+	static void setVolumeMaster(float volume);
+	static float getVolumeEffects();
+	static void setVolumeEffects(float volume);
 
 	static void play(const std::string& fileName, float volume = 1.0f, float pitch = 1.0f);
 
@@ -46,7 +50,10 @@ public:
 
 	static void playSoundtrack(std::string fileNameCalm, std::string fileNameAggressive, float volume = 1.0f);
 	static void stopSoundtrack();
-	static void changeSoundtrackVolume(float volume);
+	static void fadeSoundtrack(float aggressiveAmount);
+	static void setVolumeSoundtrack(float volume);
+	static float getVolumeSoundtrack();
+	static void pauseSoundtrack(bool paused);
 	static void stopAllLoops();
 
 	//static void updateListener(Vector3 position, Vector3 lookAt, Vector3 up, Vector3 velocity);
