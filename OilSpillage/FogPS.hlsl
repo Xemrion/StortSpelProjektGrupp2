@@ -19,13 +19,15 @@ cbuffer MaterialBuffer : register(b0)
 	float scale;
 }
 
+Texture2D randomLUT : register(t0);
+SamplerState samplerState : register(s0);
+
 float2 hash(float2 p)
 {
-	p = fmod(p, scale);
-	p = float2(dot(p, float2(127.1, 311.7)),
-		dot(p, float2(269.5, 183.3)));
-
-	return -1.0 + 2.0 * frac(sin(p) * 43758.5453123);
+	p *= 1.1;
+	uint3 dim;
+	randomLUT.GetDimensions(0, dim.x, dim.y, dim.z);
+	return randomLUT.Load(int3(fmod(p.xy, dim.xy), 0));
 }
 
 float noise(in float2 x)
@@ -42,9 +44,15 @@ float noise(in float2 x)
 
 PS_OUT main(VS_OUT input) : SV_TARGET
 {
-	float n = noise(input.Tex.xy * scale) * 0.5 + 0.5;
-	n = max(n - densityThreshold, 0.0) * (1 / densityThreshold);
+	float n = (noise(input.Tex.xy * scale)* (1.0   - 0.0)/* +
+		noise(input.Tex.xy * scale * 2.0) * (0.5   + 0.01) +
+		noise(input.Tex.xy * scale * 4.0) * (0.25  - 0.01) +
+		noise(input.Tex.xy * scale * 8.0) * (0.125 + 0.01)*/) *
+		0.5 + 0.5;
+	n = max(n - densityThreshold, 0.0) * (1.0 / (1.0 - densityThreshold));
+
 	PS_OUT output;
 	output.color = float4(color.r, color.g, color.b, max(n * density, ambientDensity));
+	//output.color.a += randomLUT.Sample(samplerState, input.Tex.xy) * 0.005;
 	return output;
 }

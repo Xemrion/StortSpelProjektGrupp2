@@ -4,10 +4,15 @@
 ParticleSystem::ParticleSystem()
 {
 	this->lastUsedParticle = 0;
-	this->computeShader = nullptr;
-	this->geometryShader = nullptr;
-	this->pixelShader = nullptr;
-	this->vertexShader = nullptr;
+	this->depthSRV = nullptr;
+	this->device = nullptr;
+	this->deviceContext = nullptr;
+	this->indDraw.instanceCount = 1;
+	strcpy(this->particleShaders.csUpdate, "");
+	strcpy(this->particleShaders.csCreate, "");
+	strcpy(this->particleShaders.gsPrimitive, "");
+	strcpy(this->particleShaders.pixelShader, "");
+	strcpy(this->particleShaders.vertexShader, "");
 	//default
 	colorNSize.colors[0] = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	colorNSize.config = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -298,7 +303,7 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	UINT initialCount;
 	if (firstAdd == 0)
 	{
-		initialCount = -1;
+		initialCount = 0;
 		firstAdd = 1;
 	}
 	else
@@ -401,7 +406,6 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 		this->deviceContext->CSSetShader(this->computeShader.Get(), nullptr, 0);
 		this->deviceContext->Dispatch(capParticle / 512, 1, 1);
 	}
-	
 	else
 	{
 		this->frameID++;
@@ -685,6 +689,15 @@ bool ParticleSystem::saveSystem()
 		return false;
 	}
 	return true;
+}
+
+void ParticleSystem::setShaders()
+{
+	this->deviceContext->PSSetShader(nullptr, nullptr, 0);
+
+	this->deviceContext->PSSetShader(this->pixelShader.Get(), nullptr, 0);
+	this->deviceContext->VSSetShader(this->vertexShader.Get(), nullptr, 0);
+	this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
 }
 
 float ParticleSystem::getStartSize() const

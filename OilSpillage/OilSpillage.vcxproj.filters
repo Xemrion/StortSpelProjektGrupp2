@@ -164,9 +164,7 @@
     <ClCompile Include="MyClient.cpp" />
     <ClCompile Include="BulletSDK\include\LinearMath\btThreads.cpp" />
     <ClCompile Include="PowerUp.cpp" />
-    <ClCompile Include="UI\ObjectiveBox.cpp" />
     <ClCompile Include="AI\AIGroup.cpp" />
-    <ClCompile Include="UI\UIControls.cpp" />
     <ClCompile Include="AI\TurretHandler.cpp" />
     <ClCompile Include="AI\Swarm.cpp" />
     <ClCompile Include="AI\Car_Spitfire.cpp" />
@@ -188,6 +186,8 @@
     <ClCompile Include="UI\Menu\UILoad.cpp" />
     <ClCompile Include="Inventory\ItemChassi.cpp" />
     <ClCompile Include="Inventory\ItemWheel.cpp" />
+    <ClCompile Include="Inventory\ItemGadget.cpp" />
+    <ClCompile Include="Inventory\Gadget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -407,6 +407,8 @@
     <ClInclude Include="Inventory\ItemChassi.h" />
     <ClInclude Include="Inventory\ItemWheel.h" />
     <ClInclude Include="PG\Environment.hpp" />
+    <ClInclude Include="Inventory\ItemGadget.h" />
+    <ClInclude Include="Inventory\Gadget.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

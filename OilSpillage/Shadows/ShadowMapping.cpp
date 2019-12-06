@@ -263,6 +263,10 @@ void ShadowMapping::prepareSpot()
 
 void ShadowMapping::setDSun()
 {
+
+	ID3D11ShaderResourceView* nSRV = nullptr;
+	deviceContext->PSSetShaderResources(1, 1, &nSRV);
+
 	deviceContext->OMSetRenderTargets(0, nullptr, this->depthStencilView.Get());
 	deviceContext->VSSetConstantBuffers(0, 1, this->perFrameCB.GetAddressOf());
 
@@ -270,6 +274,9 @@ void ShadowMapping::setDSun()
 
 void ShadowMapping::setDSpot()
 {
+
+	ID3D11ShaderResourceView* nSRV = nullptr;
+	deviceContext->PSSetShaderResources(1, 1, &nSRV);
 	deviceContext->OMSetRenderTargets(0, nullptr, this->depthStencilViewSpot.Get());
 	deviceContext->VSSetConstantBuffers(0, 1, this->perFrameCBSpot.GetAddressOf());
 }
