@@ -32,7 +32,7 @@ struct SimulationParams
 {
 	Vector4 timeFactors;
 	Vector4 vectorField;
-	Vector4 physicsConfig; //.x = mass, .y = gravity69
+	Vector4 physicsConfig; //.x = mass, .y = gravity
 };
 struct IndirDraw
 {
