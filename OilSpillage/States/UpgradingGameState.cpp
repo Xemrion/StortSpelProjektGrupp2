@@ -35,6 +35,8 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 
 UpgradingGameState::~UpgradingGameState()
 {
+	Game::getGraphics().unloadTexture("UI/garageThing");
+
 }
 
 Vehicle* UpgradingGameState::getVehicle()

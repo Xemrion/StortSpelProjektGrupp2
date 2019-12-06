@@ -129,6 +129,7 @@ public:
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
 	bool loadTexture(std::string fileName, bool overridePath = false, bool cpuOnly = false);
 	bool reloadTexture( std::string fileName, bool overridePath=false );
+	bool unloadTexture(const char* path, bool tga = true);
 	const Mesh* getPGMeshPointer(const char* path);
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path, bool tga = true);
