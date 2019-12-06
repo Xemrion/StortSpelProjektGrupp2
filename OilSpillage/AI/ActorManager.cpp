@@ -7,7 +7,7 @@
 #include "ShootCar.h"
 #include "Boss.h"
 #include "Sniper.h"
-#define SPAWN_ENEMIES 1
+#define SPAWN_ENEMIES 0
 ActorManager::ActorManager()
 {
 }
@@ -69,6 +69,8 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 				Actor* current = groups[i].actors[j];
 				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
 				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+
+				
 				if (j % 5 == 0)
 				{
 					newPos = findTeleportPos(targetPos, 50, 100);
@@ -93,7 +95,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 void ActorManager::createAttacker(float x, float z, int weaponType)
 {
 	this->actors.push_back(new Attacker(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createTurret(float x, float z, int weaponType)
@@ -104,19 +106,19 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 void ActorManager::createChaseCar(float x, float z)
 {
 	this->actors.push_back(new ChaseCar(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createShootCar(float x, float z, int weaponType)
 {
 	this->actors.push_back(new ShootCar(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createSwarm(float x, float z)
 {
 	this->actors.push_back(new Swarm(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 Boss* ActorManager::createBoss(float x, float z, int weaponType, float scalingNr)
@@ -512,7 +514,7 @@ int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 
 void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 {
-	groups.at(groupIndex).actors.push_back(actor);
+	groups[groupIndex].actors.push_back(actor);
 	groups[groupIndex].updateDuty();
 }
 
@@ -688,13 +690,13 @@ Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistanc
 {
 
 	for (float i = 0;; i += 1.0) {
-		Vector3 position = map->generateRoadPositionInWorldSpace(*rng);
+		Vector3 position = map->generateNonBuildingPositionInWorldSpace(*rng);
 		float distance = (position - targetPos).Length();
 		if ((distance <= maxDistance + i) && (distance >= minDistance))
 		{
 			return position;
 		}
-		else
+	/*	else
 		{
 			position = map->generateGroundPositionInWorldSpace(*rng);
 			float distance = (position - targetPos).Length();
@@ -702,7 +704,7 @@ Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistanc
 			{
 				return position;
 			}
-		}
+		}*/
 	}
 	assert(false and "BUG: Shouldn't be possible!");
 	return { -1.0f, -1.0f, -1.0f }; //  silences a warning

@@ -51,7 +51,13 @@ void ParticleHandler::addParticleSystem(std::string name, Vector4 colors[4], int
 
 ParticleSystem* ParticleHandler::getParticleSystem(std::string name) const
 {
-	return this->particleSystems.at(name) != nullptr ? this->particleSystems.at(name) : nullptr;
+	ParticleSystem* result = nullptr;
+	if (this->particleSystems.find(name) != this->particleSystems.end())
+	{
+		result = this->particleSystems.at(name);
+	}
+
+	return result;
 }
 
 const std::vector<std::string>& ParticleHandler::getNames()const

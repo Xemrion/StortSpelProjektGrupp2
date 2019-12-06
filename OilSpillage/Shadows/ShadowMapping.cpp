@@ -145,7 +145,7 @@ void ShadowMapping::setWorld(const Matrix& world)
 	HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	CopyMemory(mappedResource.pData, &worldTemp, sizeof(Matrix));
 	deviceContext->Unmap(worldBuffer.Get(), 0);
-	deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
+	
 
 }
 
@@ -251,6 +251,7 @@ void ShadowMapping::prepare()
 	ID3D11ShaderResourceView* s = NULL;
 	deviceContext->PSSetShaderResources(4, 1, &s);
 	deviceContext->VSSetShader(this->simpleVertexShader.Get(), nullptr, 0);
+	deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 }
 
 void ShadowMapping::prepareSpot()
