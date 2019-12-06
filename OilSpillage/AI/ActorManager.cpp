@@ -710,13 +710,13 @@ Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistanc
 {
 
 	for (float i = 0;; i += 1.0) {
-		Vector3 position = map->generateRoadPositionInWorldSpace(*rng);
+		Vector3 position = map->generateNonBuildingPositionInWorldSpace(*rng);
 		float distance = (position - targetPos).Length();
 		if ((distance <= maxDistance + i) && (distance >= minDistance))
 		{
 			return position;
 		}
-		else
+	/*	else
 		{
 			position = map->generateGroundPositionInWorldSpace(*rng);
 			float distance = (position - targetPos).Length();
@@ -724,7 +724,7 @@ Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistanc
 			{
 				return position;
 			}
-		}
+		}*/
 	}
 	assert(false and "BUG: Shouldn't be possible!");
 	return { -1.0f, -1.0f, -1.0f }; //  silences a warning

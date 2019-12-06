@@ -153,7 +153,9 @@ public:
 
 	V2u                        generateRoadPositionInTileSpace(  RNG & ) const noexcept;
 	Vector3                    generateRoadPositionInWorldSpace( RNG & ) const noexcept;
+	V2u                        generateNonBuildingPositionInTileSpace(  RNG & ) const noexcept;
 	V2u                        generateGroundPositionInTileSpace(  RNG & ) const noexcept;
+	Vector3                    generateNonBuildingPositionInWorldSpace( RNG & ) const noexcept;
 	Vector3                    generateGroundPositionInWorldSpace( RNG & ) const noexcept;
 	V2u                        getStartPositionInTileSpace()  const noexcept;
 	Vector3                    getStartPositionInWorldSpace() const noexcept;

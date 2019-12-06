@@ -10,34 +10,11 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 		stream << "Fire Rate: " << weapon.fireRate << "\n";
 		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
 		stream << "Max Spread: " << weapon.maxSpread << "\n";
-		if(weapon.doesDoT)
-		{
-			stream << "DoT duration: " << weapon.doTTimer << "\n";
-		}
-		if (weapon.doesKnockBack)
-		{
-			stream << "Knockback force: " << weapon.knockbackForce << "\n";
-		}
-		if (weapon.doesSplashDmg)
-		{
-			stream << "Splash damage range: " << weapon.splashRange << "\n";
-		}
 	}
 	else if(weapon.type == WeaponType::Laser){
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
 		stream << "Overheat : " << weapon.maxSpread << "\n";
-		if (weapon.doesDoT)
-		{
-			stream << "DoT duration: " << weapon.doTTimer << "\n";
-		}
-		if (weapon.doesKnockBack)
-		{
-			stream << "Knockback force: " << weapon.knockbackForce << "\n";
-		}
-		if (weapon.doesSplashDmg)
-		{
-			stream << "Splash damage range: " << weapon.splashRange << "\n";
-		}
+
 
 	}
 	else if(weapon.type == WeaponType::Flamethrower) {
@@ -45,53 +22,30 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 		stream << "Fire Rate: " << weapon.fireRate << "\n";
 		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
 		stream << "Max Spread: " << weapon.maxSpread << "\n";
-		if (weapon.doesDoT)
-		{
-			stream << "DoT duration: " << weapon.doTTimer << "\n";
-		}
-		if (weapon.doesKnockBack)
-		{
-			stream << "Knockback force: " << weapon.knockbackForce << "\n";
-		}
-		if (weapon.doesSplashDmg)
-		{
-			stream << "Splash damage range: " << weapon.splashRange << "\n";
-		}
 	}
 	else if(weapon.type == WeaponType::Spikes){
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
-		if (weapon.doesDoT)
-		{
-			stream << "DoT duration: " << weapon.doTTimer << "\n";
-		}
-		if (weapon.doesKnockBack)
-		{
-			stream << "Knockback force: " << weapon.knockbackForce << "\n";
-		}
-		if (weapon.doesSplashDmg)
-		{
-			stream << "Splash damage range: " << weapon.splashRange << "\n";
-		}
+
 	}
 	else {
 		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
 		stream << "Fire Rate: " << weapon.fireRate << "\n";
 		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
 		stream << "Max Spread: " << weapon.maxSpread << "\n";
-		if (weapon.doesDoT)
-		{
-			stream << "DoT duration: " << weapon.doTTimer << "\n";
-		}
-		if (weapon.doesKnockBack)
-		{
-			stream << "Knockback force: " << weapon.knockbackForce << "\n";
-		}
-		if (weapon.doesSplashDmg)
-		{
-			stream << "Splash damage range: " << weapon.splashRange << "\n";
-		}
+
 	}
-	
+	if (weapon.doesDoT)
+	{
+		stream << "DoT duration: " << weapon.doTTimer << "\n";
+	}
+	if (weapon.doesKnockBack)
+	{
+		stream << "Knockback force: " << weapon.knockbackForce << "\n";
+	}
+	if (weapon.doesSplashDmg)
+	{
+		stream << "Splash damage range: " << weapon.splashRange << "\n";
+	}
 	return stream.str();
 }
 
