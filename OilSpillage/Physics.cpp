@@ -1,46 +1,15 @@
 #include "Physics.h"
 #include "Vehicle.h"
 #include "AI/Actor.h"
-static SolverType gSolverType = SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT;
 static int gSolverMode = SOLVER_SIMD |
 SOLVER_USE_WARMSTARTING |
  SOLVER_RANDMIZE_ORDER |
  SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS |
 // SOLVER_USE_2_FRICTION_DIRECTIONS |
 0;
-btConstraintSolver* createSolverByType(SolverType t)
-{
-	btMLCPSolverInterface* mlcpSolver = NULL;
-	switch (t)
-	{
-	case SOLVER_TYPE_SEQUENTIAL_IMPULSE:
-		return new btSequentialImpulseConstraintSolver();
-	case SOLVER_TYPE_SEQUENTIAL_IMPULSE_MT:
-		return new btSequentialImpulseConstraintSolverMt();
-	case SOLVER_TYPE_NNCG:
-		return new btNNCGConstraintSolver();
-	case SOLVER_TYPE_MLCP_PGS:
-		mlcpSolver = new btSolveProjectedGaussSeidel();
-		break;
-	case SOLVER_TYPE_MLCP_DANTZIG:
-		mlcpSolver = new btDantzigSolver();
-		break;
-	case SOLVER_TYPE_MLCP_LEMKE:
-		mlcpSolver = new btLemkeSolver();
-		break;
-	default:
-	{
-	}
-	}
-	if (mlcpSolver)
-	{
-		return new btMLCPSolver(mlcpSolver);
-	}
-	return NULL;
-}
 Physics::Physics() :broadphase(new btDbvtBroadphase())
 {
-#ifdef _DEBUG
+#ifndef _DEBUG
 	collisionConfig = new btDefaultCollisionConfiguration();
 	solver = new btSequentialImpulseConstraintSolver();
 	dispatcher = new btCollisionDispatcher(collisionConfig);
@@ -51,8 +20,8 @@ Physics::Physics() :broadphase(new btDbvtBroadphase())
 	btDefaultCollisionConstructionInfo cci;
 	collisionConfig = new btDefaultCollisionConfiguration(cci);
 	dispatcherMt = new btCollisionDispatcherMt(collisionConfig, 40);
-	btConstraintSolverPoolMt* solverPool = new btConstraintSolverPoolMt(BT_MAX_THREAD_COUNT);
-	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver();
+	solverPool = new btConstraintSolverPoolMt(BT_MAX_THREAD_COUNT);
+	solver = new btSequentialImpulseConstraintSolver();
 	world = new btDiscreteDynamicsWorldMt(dispatcherMt, broadphase, solverPool, solver, collisionConfig);
 	world->getSolverInfo().m_solverMode = gSolverMode;
 	world->getSolverInfo().m_numIterations = 10;
@@ -103,7 +72,9 @@ Physics::~Physics()
 	{
 		delete pointJoints[i];
 	}
+	delete solverPool;
 	delete dispatcher;
+	delete dispatcherMt;
 	delete collisionConfig;
 	delete solver;
 	delete broadphase;
@@ -298,28 +269,6 @@ bool Physics::deletePointJoint(btPoint2PointConstraint* pointJoint)
 bool Physics::callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1,
 	int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
-	GameObject* playerPtr = obj1->getCollisionObject()->getUserPointer();
-	GameObject* enemyPtr = obj2->getCollisionObject()->getUserPointer();
-	if (playerPtr == nullptr || enemyPtr == nullptr) return false;
-
-	if (!playerPtr->isPlayer())
-	{
-		std::swap(playerPtr, enemyPtr);
-
-		if (!playerPtr->isPlayer())
-		{
-			return false;
-		}
-	}
-
-	if (((Vehicle*)playerPtr)->getPowerUpTimer(PowerUpType::Star) > 0.0)
-	{
-		Sound2::play("StarPowerupHit.mp3", 0.75f); //Does this play every frame sometimes? BAD!
-		((Actor*)enemyPtr)->changeHealth(-200);
-
-		return true;
-	}
-
 	return false;
 }
 

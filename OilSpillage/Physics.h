@@ -41,13 +41,14 @@ enum SolverType
 class Physics
 {
 private:
+	btConstraintSolverPoolMt* solverPool;
+	btSequentialImpulseConstraintSolver* solver;
 	btConstraintSolver* m_solver;
 	SolverType m_solverType;
 	btCollisionDispatcherMt* dispatcherMt;
 	btDiscreteDynamicsWorld* world;
 	btCollisionDispatcher* dispatcher;
 	btBroadphaseInterface* broadphase;
-	btConstraintSolver* solver;
 	btCollisionConfiguration* collisionConfig;
 	std::vector<btRigidBody*> bodies;
 	std::vector<btGeneric6DofSpring2Constraint*> springs;

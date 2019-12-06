@@ -46,7 +46,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	if (spawnTimer <= 0)
 	{
 		spawnEnemies(targetPos);
-		
+
 		spawnTimer = spawnCooldown;
 	}
 #endif
@@ -69,9 +69,10 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 				Actor* current = groups[i].actors[j];
 				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
 				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+
 				if (j % 5 == 0)
 				{
-					newPos = findTeleportPos(targetPos, 50, 100);
+					//newPos = findTeleportPos(targetPos, 50, 100);
 				}
 			}
 		}
@@ -93,13 +94,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 void ActorManager::createAttacker(float x, float z, int weaponType)
 {
 	this->actors.push_back(new Attacker(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
-}
-
-void ActorManager::createSniper(float x, float z, int weaponType)
-{
-	this->actors.push_back(new Sniper(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createTurret(float x, float z, int weaponType)
@@ -110,19 +105,19 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 void ActorManager::createChaseCar(float x, float z)
 {
 	this->actors.push_back(new ChaseCar(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createShootCar(float x, float z, int weaponType)
 {
 	this->actors.push_back(new ShootCar(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createSwarm(float x, float z)
 {
 	this->actors.push_back(new Swarm(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 Boss* ActorManager::createBoss(float x, float z, int weaponType, float scalingNr)
@@ -208,38 +203,14 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						Sound2::play("HitSound.wav");
-						soundTimer = 0;
-					}
-					if(bulletArray[j].getFlame())// Damage over Time
-					{
-						actors[i]->setFire(bulletArray[j].getFlameTimer());
-					}
-					if(bulletArray[j].getKnockback())// Knockback
-					{
-						actors[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
-					}
-					if(bulletArray[j].getSplashBool())
-					{
-						for(int k = 0; k < actors.size(); k++)
+						if (bulletArray[j].getWeaponType() == WeaponType::Star)
 						{
-							float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
-							float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-							if(k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
-							{
-								actors[k]->changeHealth(-bulletArray[j].getDamage()/(20-Game::getGameInfo().nrOfClearedStages));
-							}
+							Sound::play("StarPowerupHit.mp3", 0.75f);
 						}
-					}
-
-					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
-					bulletArray[j].destroy();
-				}
-				if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
-				{
-					if (soundTimer > 0.05f) {
-						Sound2::play("HitSound.wav");
+						else
+						{
+							Sound2::play("HitSound.wav");
+						}
 						soundTimer = 0;
 					}
 					if (bulletArray[j].getFlame())// Damage over Time
@@ -263,8 +234,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 							}
 						}
 					}
+
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
-					// dont remove the melee weapon
+					if (!bulletArray[j].getMelee())
+						bulletArray[j].destroy();
 				}
 			}
 		}
@@ -391,15 +364,6 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 		createAttacker(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
-void ActorManager::spawnSnipers(const Vector3& originPos)
-{
-	for (int i = 0; i < 2; i++)
-	{
-		createSniper(originPos.x + i, originPos.z, (rand() % 8) + 1);
-		createSniper(originPos.x, originPos.z + i, (rand() % 8) + 1);
-		createSniper(originPos.x - i, originPos.z, (rand() % 8) + 1);
-	}
-}
 void ActorManager::spawnChaseCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
@@ -464,7 +428,7 @@ void ActorManager::updateActors(float dt, const Vector3& targetPos)
 			if (normalizedRandom >= 0.995)
 			{
 				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-					PowerUp(actors[i]->getPosition(), physics, 
+					PowerUp(actors[i]->getPosition(), physics,
 						PowerUpType::Health)
 				);
 			}
@@ -549,7 +513,7 @@ int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 
 void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 {
-	groups.at(groupIndex).actors.push_back(actor);
+	groups[groupIndex].actors.push_back(actor);
 	groups[groupIndex].updateDuty();
 }
 
@@ -642,7 +606,7 @@ void ActorManager::updateGroups()
 					}
 					//create its own group
 					else
-					{	
+					{
 						leaveGroup(i, k);
 						createGroup(current);
 					}
@@ -720,26 +684,26 @@ Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 	targetVelocity.Normalize();
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
-} 
+}
 Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
 	for (float i = 0;; i += 1.0) {
-		Vector3 position = map->generateRoadPositionInWorldSpace(*rng);
+		Vector3 position = map->generateNonBuildingPositionInWorldSpace(*rng);
 		float distance = (position - targetPos).Length();
 		if ((distance <= maxDistance + i) && (distance >= minDistance))
 		{
 			return position;
 		}
-		else
-		{
-			position = map->generateGroundPositionInWorldSpace(*rng);
-			float distance = (position - targetPos).Length();
-			if ((distance <= maxDistance + i) && (distance >= minDistance))
+		/*	else
 			{
-				return position;
-			}
-		}
+				position = map->generateGroundPositionInWorldSpace(*rng);
+				float distance = (position - targetPos).Length();
+				if ((distance <= maxDistance + i) && (distance >= minDistance))
+				{
+					return position;
+				}
+			}*/
 	}
 	assert(false and "BUG: Shouldn't be possible!");
 	return { -1.0f, -1.0f, -1.0f }; //  silences a warning

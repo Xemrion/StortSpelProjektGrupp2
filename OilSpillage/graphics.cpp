@@ -56,6 +56,7 @@ Graphics::Graphics()
 		Vector4(0.0f,0.0f,0.0f,1.0f)
 	};
 	this->particleHandler->addParticleSystem("explosion","ParticleUpdateCS.cso", "ExplosionCreateCS.cso");
+
 	this->particleHandler->addParticleSystem("debris", debrisColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 
 	Vector4 snowColor[4] = {
@@ -489,6 +490,7 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("debris")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("snow")->initiateParticles(device.Get(), deviceContext.Get());
+
 	//this->particleHandler->getParticleSystem("ash")->initiateParticles(device.Get(), deviceContext.Get());
 	//this->particleHandler->getParticleSystem("rain")->initiateParticles(device.Get(), deviceContext.Get());
 
@@ -617,7 +619,8 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->PSSetConstantBuffers(3, 1, this->indexSpot.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(4, 1, this->cameraBuffer.GetAddressOf());
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
+	deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 	for (GameObject* object : drawableObjects)
 	{
 		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
@@ -665,14 +668,14 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 				CopyMemory(mappedResource.pData, &modColor, static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16))));
 				deviceContext->Unmap(colorBuffer.Get(), 0);
 
-				deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
+				
 				deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 				deviceContext->PSSetShaderResources(0, 1, &textureSRV);
 				deviceContext->PSSetShaderResources(1, 1, &normalSRV);
 				deviceContext->PSSetShaderResources(5, 1, &specularSRV);
 				deviceContext->PSSetShaderResources(6, 1, &glossSRV);
-				deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
+				
 
 				deviceContext->Draw(vertexCount, 0);
 			}

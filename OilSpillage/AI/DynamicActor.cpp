@@ -37,7 +37,8 @@ void DynamicActor::move()
 	Vector3 targetToSelf = (nextPos - position);
 
 	//Rotate
-	if ((targetToSelf).Dot(vecForward) < 0.8)
+	//(targetToSelf).Dot(vecForward)
+	if ( ((targetToSelf.x * vecForward.x) + (targetToSelf.z * vecForward.z)) < 0.8)
 	{
 		vecForward -= (targetToSelf * deltaTime) / 0.02f;
 		vecForward.Normalize();
@@ -56,6 +57,7 @@ void DynamicActor::setPath(Vector3* path)
 void DynamicActor::update(float dt, const Vector3& targetPos)
 {
 	Actor::update(dt, targetPos);
+
 
 	followPath();
 	move();

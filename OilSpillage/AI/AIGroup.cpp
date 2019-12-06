@@ -35,11 +35,6 @@ void AIGroup::updateAveragePos()
 	}
 }
 
-std::vector<Vector3>* AIGroup::getPathPtr()
-{
-	return &this->path;
-}
-
 void AIGroup::setPath(std::vector<Vector3> path)
 {
 	this->path = path;
@@ -63,7 +58,9 @@ void AIGroup::removeDeadActors()
 	actors.erase( std::remove_if( actors.begin(),
 		                           actors.end(),
 		                           []( DynamicActor const *e ) {
-		                                 return e->isDead();
+										if (e != nullptr)
+											return e->isDead();
+										else return true;
 		                           } ),
 		           actors.end() );
 }
