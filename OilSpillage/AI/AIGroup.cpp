@@ -58,7 +58,9 @@ void AIGroup::removeDeadActors()
 	actors.erase( std::remove_if( actors.begin(),
 		                           actors.end(),
 		                           []( DynamicActor const *e ) {
-		                                 return e->isDead();
+										if (e != nullptr)
+											return e->isDead();
+										else return true;
 		                           } ),
 		           actors.end() );
 }
