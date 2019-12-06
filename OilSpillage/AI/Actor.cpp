@@ -15,6 +15,7 @@ Actor::Actor(float x, float z, Physics* physics)
 	this->position = Vector3(x, -1.0f, z);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	this->points = 0;
+	this->fireTimer = 0;
 }
 Actor::~Actor()
 {
@@ -109,7 +110,7 @@ void Actor::onFire()
 {
 	if(fireTimer > 0.0 && !isDead())
 	{
-		changeHealth(2*deltaTime);
+		changeHealth(-2*deltaTime);
 		fireTimer -= deltaTime;
 		if(particleTimer <= 0.0f)
 		{

@@ -12,12 +12,12 @@ private:
 	LaserLight* laser;
 
 	void assignWeapon(int weaponType);
+	bool predicting = false;
 protected:
+	Weapon weapon;
 	static const int bulletCount = 32;
 	Bullet bullets[bulletCount];
 	float timeSinceLastShot;
-	bool predicting = false;
-	Weapon weapon;
 	int attackRange;
 	void updateBullets(float deltaTime);
 	virtual Status shoot();
