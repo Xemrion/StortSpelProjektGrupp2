@@ -97,12 +97,6 @@ void ActorManager::createAttacker(float x, float z, int weaponType)
 	initGroupForActor(actors[actors.size() - 1]);
 }
 
-void ActorManager::createSniper(float x, float z, int weaponType)
-{
-	this->actors.push_back(new Sniper(x, z, weaponType, physics));
-	initGroupForActor(actors[actors.size() - 1]);
-}
-
 void ActorManager::createTurret(float x, float z, int weaponType)
 {
 	turretHandler.createTurret(x, z, weaponType, physics);
@@ -390,15 +384,6 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 		createAttacker(originPos.x + i, originPos.z, (rand() % 8) + 1);
 		createAttacker(originPos.x, originPos.z + i, (rand() % 8) + 1);
 		createAttacker(originPos.x - i, originPos.z, (rand() % 8) + 1);
-	}
-}
-void ActorManager::spawnSnipers(const Vector3& originPos)
-{
-	for (int i = 0; i < 2; i++)
-	{
-		createSniper(originPos.x + i, originPos.z, (rand() % 8) + 1);
-		createSniper(originPos.x, originPos.z + i, (rand() % 8) + 1);
-		createSniper(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
 void ActorManager::spawnChaseCars(const Vector3& originPos)

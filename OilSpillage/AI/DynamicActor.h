@@ -10,11 +10,10 @@ public:
 	virtual void update(float dt, const Vector3& targetPos);
 	virtual void knockBack(Vector3 direction, float force);
 
-	int duty; 
-	bool vActive;
-	Vector3* path;
+	int duty;
 	int pathSize;
 protected:	
+	Vector3* path;
 	int aggroRange;
 	Vector3 destination;
 	Vector3 velocity;
