@@ -950,6 +950,29 @@ void Vehicle::updateWeapon(float deltaTime)
 			}
 		}
 
+		/* star power up */
+		if (this->powerUpTimers[(int)PowerUpType::Star] > 0.0f)
+		{
+			for (int i = 0; i < Vehicle::bulletCount; ++i)
+			{
+				if (bullets[i].getWeaponType() == WeaponType::None)
+				{
+					auto playerVelocity = this->getRigidBody()->getLinearVelocity();
+
+					Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
+					Weapon starWeapon = WeaponHandler::getWeapon(WeaponType::Star);
+					starWeapon.damage *= deltaTime;
+
+					this->bullets[i].shoot(starWeapon,
+						this->vehicleBody1->getPosition(),
+						Vector3(0, 1, 0),
+						Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()),
+						deltaTime);
+					break;
+				}
+			}
+		}
+
 		if (dynamic_cast<PlayingGameState*>(Game::getCurrentState()) != nullptr)
 		{
 

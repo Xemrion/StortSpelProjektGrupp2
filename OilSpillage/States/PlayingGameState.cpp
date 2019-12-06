@@ -6,7 +6,6 @@
 #include "../UI/Menu/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
-#include <future>
 #include "../UI/Playing/UICompletedStage.h"
 #include "../UI/Playing/UIBeforePlaying.h"
 
@@ -730,11 +729,11 @@ void PlayingGameState::update(float deltaTime)
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-		//ImGui_Driving();
-		ImGui_ProcGen();
+		ImGui_Driving();
+		//ImGui_ProcGen();
 		//ImGui_AI();
-		ImGui_Particles();
-		ImGui_Camera();
+		//ImGui_Particles();
+		//ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	#endif // !_DEBUG

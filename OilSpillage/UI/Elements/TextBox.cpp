@@ -1,6 +1,7 @@
 #include "TextBox.h"
 #include "../../game.h"
 #include "../UserInterface.h"
+#include <sstream>
 
 TextBox::TextBox(std::string text, Color textColor, Vector2 position, ArrowPlacement arrowPlacement, float textScale)
 	: TextBox(text, textColor, UserInterface::getFontArial()->MeasureString(text.c_str()) * textScale, position, arrowPlacement, textScale)
@@ -76,7 +77,22 @@ void TextBox::draw(bool selected)
 
 		sb->Draw(this->textureArrow->getShaderResView(), this->position + arrowPos, nullptr, Colors::White, arrowRot, this->textureArrow->getCenter());
 	}
+	
+	//-----EXPERIMENTAL COLOR CHANGER-----
 
+	/*std::vector<std::string> words;
+	std::istringstream iss(this->text.c_str());
+	copy(std::istream_iterator<std::string>(iss),
+		std::istream_iterator<std::string>(),
+		std::back_inserter(words));
+
+	for (int i = 0; i < words.size(); i++)
+	{
+		UserInterface::getFontArial()->DrawString(sb, words[i].c_str(), this->position + this->textureCorner->getSize(), this->textColor, 0, Vector2::Zero, this->textScale);
+	}*/
+
+
+	//Original
 	UserInterface::getFontArial()->DrawString(sb, this->text.c_str(), this->position + this->textureCorner->getSize(), this->textColor, 0, Vector2::Zero, this->textScale);
 }
 
