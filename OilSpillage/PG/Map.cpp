@@ -426,6 +426,7 @@ Map::~Map() noexcept
 		physics->DeleteRigidBody( e.walls.getRigidBody() );
 		physics->DeleteRigidBody( e.windows.getRigidBody() );
 		physics->DeleteRigidBody( e.roof.getRigidBody() );
+		skyscraperGenerator->unloadASkyscraper(e.skyscraperMeshIndex);
 	}
 
 	for ( auto &e : houses.singles )
@@ -775,7 +776,11 @@ void  Map::generateBuildings( )
 			}
 		}
 	}
-
+	/*auto house = instantiateSkyscraper();
+	house.roof.setPosition(Vector3(20.0f, 0.0f, -20.0f));
+	house.walls.setPosition(Vector3(20.0f, 0.0f, -20.0f));
+	house.windows.setPosition(Vector3(20.0f, 0.0f, -20.0f));
+	houses.composites.push_back(house);*/
 	// adding all the tiles to draw:
 	for ( auto &e : houses.composites ) {
 		graphics.addToDrawStatic( &e.walls   );
@@ -1693,9 +1698,9 @@ CompositeHouse Map::instantiateSkyscraper()
 	temp.roof.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.walls.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.windows.setScale(Vector3(2.0f, 1.0f, 2.0f));
-	temp.roof.setTexture(graphics.getTexturePointer("brickwall"));
-	temp.walls.setTexture(graphics.getTexturePointer("brickwall"));
-	temp.windows.setTexture(graphics.getTexturePointer("brickwall"));
+	temp.roof.setTexture(graphics.getTexturePointer("skyscraper-wall02"));
+	temp.walls.setTexture(graphics.getTexturePointer("skyscraper-wall01"));
+	temp.windows.setTexture(graphics.getTexturePointer("skyscraper-window01"));
 
 	Vector3 tempVec = temp.walls.getAABB().maxPos - temp.walls.getAABB().minPos;
 	tempVec.x *= 2;
