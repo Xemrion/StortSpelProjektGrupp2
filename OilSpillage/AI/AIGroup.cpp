@@ -64,7 +64,7 @@ void AIGroup::removeDeadActors()
 										}
 										else
 										{
-											return e->isDead();
+											return false;
 										}
 		                           } ),
 		           actors.end() );
