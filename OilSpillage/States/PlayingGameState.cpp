@@ -8,6 +8,7 @@
 #include "../PG/Profiler.hpp"
 #include "../UI/Playing/UICompletedStage.h"
 #include "../UI/Playing/UIBeforePlaying.h"
+#include "../UI/Menu/UIControls.h"
 
 void PlayingGameState::fillTestParticle()
 {
@@ -192,6 +193,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_COMPLETED_STAGE] = std::make_unique<UICompletedStage>();
 	menues[MENU_BEFORE_PLAYING] = std::make_unique<UIBeforePlaying>();
+	menues[MENU_CONTROLS] = std::make_unique<UIControls>();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
@@ -768,8 +770,15 @@ void PlayingGameState::changeTime(float timeDiff) noexcept {
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
+	if (currentMenu == Menu::MENU_CONTROLS) {
+		menues[MENU_CONTROLS] = std::make_unique<UIControls>();
+	}
+
 	currentMenu = static_cast<int>(menu);
-	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING) menues[currentMenu]->init();
+
+	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING || menu == Menu::MENU_CONTROLS) { 
+		menues[currentMenu]->init();
+	}
 }
 
 Map::Info PlayingGameState::getMapInfo() const
