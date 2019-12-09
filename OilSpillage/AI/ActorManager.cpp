@@ -57,6 +57,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 		groups[i].update();
 	}
 	updateGroups();
+	teleportActorsToPlayer(targetPos);
 	turretHandler.update(dt, targetPos);
 	if (frameCount % 20 == 0)
 	{
@@ -339,6 +340,7 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 		createAttacker(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
+
 void ActorManager::spawnChaseCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
@@ -418,7 +420,6 @@ void ActorManager::updateActors(float dt, const Vector3& targetPos)
 		}
 		actors[i]->update(dt, targetPos);
 	}
-	teleportActorsToPlayer(targetPos);
 }
 
 void ActorManager::updateBosses(float dt, const Vector3& targetPos)
