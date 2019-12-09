@@ -57,9 +57,9 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.SampleDesc.Quality = 0;
 		textureDesc.Usage = D3D11_USAGE_DEFAULT;
-		textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+		textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		textureDesc.CPUAccessFlags = 0;
-		textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+		textureDesc.MiscFlags = 0;
 
 		if (this->bpp == 1)
 		{
@@ -76,7 +76,7 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 		{
 			return false;
 		}
-
+		
 		// Set the row pitch of the targa image data.
 		unsigned int rowPitch = (width * 4) * sizeof(unsigned char);
 
@@ -88,7 +88,7 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 		srvDesc.Format = textureDesc.Format;
 		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MostDetailedMip = 0;
-		srvDesc.Texture2D.MipLevels = mipLevels;//Miplevels in parameter
+		srvDesc.Texture2D.MipLevels = 1;//Miplevels in parameter
 
 		hResult = device->CreateShaderResourceView(texture, &srvDesc, &textureView);
 		if (FAILED(hResult))
@@ -96,7 +96,7 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 			return false;
 		}
 
-		deviceContext->GenerateMips(textureView);
+		//deviceContext->GenerateMips(textureView);
 
 		stbi_image_free(targaData);
 	}

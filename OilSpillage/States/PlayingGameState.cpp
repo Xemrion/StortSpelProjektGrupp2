@@ -148,6 +148,10 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadModel("Entities/Drone");
 
 	graphics.loadModel("Hospital");
+	std::string modelPath = MODEL_ROOT_DIR;
+	modelPath += "Entities/Roller_Melee";
+	graphics.loadMesh(modelPath);
+	graphics.loadMaterial(modelPath, true);
 	graphics.loadModel("Entities/Roller_Melee");
 	graphics.loadModel("Houses/testHouse");
 	graphics.loadModel("Houses/testHouse2");
@@ -291,6 +295,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 PlayingGameState::~PlayingGameState()
 {
+	actorManager.reset();
 	delete this->cameraObject;
 }
 

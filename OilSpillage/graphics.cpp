@@ -516,9 +516,9 @@ bool Graphics::init(Window* window)
 	fog = std::make_unique<Fog>();
 	fogMaterial.color = Vector3(1.0, 1.0, 1.0);
 	fogMaterial.scale = 5.0;
-	fogMaterial.density = 0.01;
+	fogMaterial.density = 0.5;
 	fogMaterial.ambientDensity = 0.0;
-	fogMaterial.densityThreshold = 0.15;
+	fogMaterial.densityThreshold = 0.5;
 
 	uiCamera= DynamicCamera(20, 0.1f, 1000);
 	uiCamera.setPosition(Vector3(0, 0, -10));
@@ -1287,14 +1287,15 @@ void Graphics::loadModel( std::string const &path, Vector3 rotation )
 }
 
 
-void Graphics::loadMaterial( std::string const &path )
+void Graphics::loadMaterial( std::string const &path , bool tga)
 {
 	std::string  modelDir {MODEL_ROOT_DIR};
                 modelDir += path;
-	loadTexture( modelDir + "/_diffuse.tga",  true );
-	loadTexture( modelDir + "/_specular.tga", true );
-	loadTexture( modelDir + "/_normal.tga",   true );
-	loadTexture( modelDir + "/_gloss.tga",    true );
+	std::string fileSuffix = tga ? ".tga" : ".dds";
+	loadTexture( modelDir + "/_diffuse" + fileSuffix,  true );
+	loadTexture( modelDir + "/_specular" + fileSuffix, true );
+	loadTexture( modelDir + "/_normal" + fileSuffix,   true );
+	loadTexture( modelDir + "/_gloss" + fileSuffix,    true );
 }
 
 void Graphics::loadShape(Shapes shape, Vector3 normalForQuad)
