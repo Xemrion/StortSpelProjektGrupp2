@@ -42,6 +42,7 @@ UIBeforePlaying::UIBeforePlaying()
 
 UIBeforePlaying::~UIBeforePlaying()
 {
+	Game::getGraphics().unloadTexture("UI/menuBG");
 }
 
 void UIBeforePlaying::init()

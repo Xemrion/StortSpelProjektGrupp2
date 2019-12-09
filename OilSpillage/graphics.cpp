@@ -1511,6 +1511,29 @@ bool Graphics::reloadTexture(std::string path, bool overridePath)
 	return false;
 }
 
+bool Graphics::unloadTexture(const char* path, bool tga)
+{
+	std::string texturePath;
+	texturePath += TEXTURE_ROOT_DIR;
+	texturePath += path;
+	if (tga)
+	{
+		texturePath += ".tga";
+	}
+	else
+	{
+		texturePath += ".dds";
+	}
+
+	if (textures.find(texturePath) != textures.end()) {
+		textures[texturePath]->Shutdown();
+		delete textures[texturePath];
+		textures.erase(texturePath);
+		return true;
+	}
+	return false;
+}
+
 const Mesh* Graphics::getMeshPointer(const char* localPath)
 {
    std::string meshPath;
