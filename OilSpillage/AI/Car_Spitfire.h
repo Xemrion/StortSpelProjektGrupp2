@@ -43,6 +43,7 @@ public:
 
 	float getYaw(DirectX::XMVECTOR Quaternion);
 	float getHeading(Quaternion qt);
+	GameObject* getVehicleBody1();
 
 	void move();
 	virtual void update(float dt, const Vector3& targetPos);

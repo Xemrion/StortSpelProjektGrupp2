@@ -93,7 +93,6 @@ Graphics::~Graphics()
 		debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY | D3D11_RLDO_DETAIL);
 
 	delete this->debugger;
-
 	for (auto i = textures.begin(); i != textures.end(); i++)
 	{
 		i->second->Shutdown();

@@ -6,7 +6,6 @@ ParticleHandler::ParticleHandler()
 
 ParticleHandler::~ParticleHandler()
 {
-	bool result = false;
 	for (auto i = this->particleSystems.begin(); i != this->particleSystems.end(); i++)
 	{
 		delete i->second;
