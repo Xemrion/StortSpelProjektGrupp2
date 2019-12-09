@@ -619,10 +619,10 @@ void  Map::generateBuildings( )
 
 	// for each cell:
 	for ( U16 cellId = 0;  cellId < districtMap->noise.size();  ++cellId ) {
-		District::Enum district     { districtLookupTable[cellId] };
-		Size           currentArea  { 0 };
-		Size const     cellArea     { districtMap->computeCellRealEstateArea(cellId,*tilemap) };
-		U16_Dist       genNumFloors { district->minFloors, district->maxFloors };
+		District::Enum const district     { districtLookupTable[cellId] };
+		Size                 currentArea  { 0 };
+		Size const           cellArea     { districtMap->computeCellRealEstateArea(cellId,*tilemap) };
+		U16_Dist             genNumFloors { district->minFloors, district->maxFloors };
 
 		if ( cellArea != 0 ) { //and (districtType != District::park) ) {
 			F32  const  targetDistrictCoverage         { district->buildingDensity };
@@ -683,10 +683,11 @@ void  Map::generateBuildings( )
 
 
 			// place multi-tile houses:
+			float probability = generateSelection(rng);
 			while ( (tilesets.size() != 0) and (++currentTries < maxTries)
 			       and (computeCurrentDistrictCoverage() < multitileCoveragePercentage ) )
 			{
-				 //if ( (district == &District::metropolitan) and (generateSelection(rng) < .80f) ) {
+				 //if ( (district == &District::metropolitan) and probability < .80f) ) {
 				 //	auto house    = instantiateSkyscraper();
 				 //	auto maybeLot = findFixedLot( cellId, house.dimensions.x, house.dimensions.y, Vector<Bool>(house.dimensions.x * house.dimensions.y, true));
 				 //	if ( maybeLot ) {
