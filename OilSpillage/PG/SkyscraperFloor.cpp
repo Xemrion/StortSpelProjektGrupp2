@@ -229,9 +229,20 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 				}
 			}
 		}
+		//Maybe sort depending on first being zero or not, fix for uneven amount of intersections.
+		int lowestFirst = 0;
+		for (int i = 0; i < indicesOfIntersections.size(); i++) {
+			lowestFirst = i;
+			for (int j = i + 1; j < indicesOfIntersections.size(); j++) {
+				if (indicesOfIntersections[lowestFirst].first > indicesOfIntersections[j].first) {
+					lowestFirst = j;
+				}
+			}
+			std::swap(indicesOfIntersections[i].first, indicesOfIntersections[lowestFirst].first);
+		}
 		if (indicesOfIntersections[0].first == 0) { //If first is 0, then it is connected to second
 			for (int i = 0; i < indicesOfIntersections.size(); i+=2) {
-				this->verticies.insert(
+				this->verticies.insert( //Fix uneven intersections
 						this->verticies.begin() + indicesOfIntersections[i].second + 1,
 						toUnion.verticies.begin() + indicesOfIntersections[i].first + 1,
 						toUnion.verticies.begin() + size_t(indicesOfIntersections[size_t(i) + 1].first));

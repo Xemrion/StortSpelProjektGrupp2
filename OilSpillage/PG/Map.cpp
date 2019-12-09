@@ -619,7 +619,7 @@ void  Map::generateBuildings( )
 
 	// for each cell:
 	for ( U16 cellId = 0;  cellId < districtMap->noise.size();  ++cellId ) {
-		District::Enum district     { districtLookupTable[cellId] };
+		District::Enum const district     { districtLookupTable[cellId] };
 		Size           currentArea  { 0 };
 		Size const     cellArea     { districtMap->computeCellRealEstateArea(cellId,*tilemap) };
 		U16_Dist       genNumFloors { district->minFloors, district->maxFloors };
@@ -631,7 +631,7 @@ void  Map::generateBuildings( )
 			                                             } };
          U16 currentTries { 0U };
 			auto tilesets = getCompatibleTilesets(district);
-			auto multitileCoveragePercentage = district->multitilePercentage * district->buildingDensity;
+			auto targetCoverage = district->buildingDensity;
 
 			// place hospital:
 			for ( U32 attempt = 0;  attempt < maxTries;  ++attempt ) {
@@ -683,28 +683,26 @@ void  Map::generateBuildings( )
 
 
 			// place multi-tile houses:
-			while ( (tilesets.size() != 0) and (++currentTries < maxTries)
-			       and (computeCurrentDistrictCoverage() < multitileCoveragePercentage ) )
+			while ( (++currentTries < maxTries)  and (computeCurrentDistrictCoverage() < targetCoverage) )
 			{
-				 //if ( (district == &District::metropolitan) and (generateSelection(rng) < .80f) ) {
-				 //	auto house    = instantiateSkyscraper();
-				 //	auto maybeLot = findFixedLot( cellId, house.dimensions.x, house.dimensions.y, Vector<Bool>(house.dimensions.x * house.dimensions.y, true));
-				 //	if ( maybeLot ) {
-				 //		// set affected tiles and discard lot since we won't remove houses dynamically
-				 //		currentTries = 0; // reset counter
-				 //		currentArea += maybeLot.value().getCoverage();
-					//	Vector3 worldPosition = tilemap->convertTilePositionToWorldPosition(maybeLot->nw);
-					//	worldPosition.x += house.dimensions.x * config.tileSideScaleFactor * 0.5f;
-					//	worldPosition.z += house.dimensions.y * config.tileSideScaleFactor * 0.5f;
-					//	house.roof.setPosition(worldPosition);
-					//	house.walls.setPosition(worldPosition);
-					//	house.windows.setPosition(worldPosition);
-				 //		tilemap->applyLot( maybeLot.value(), Tile::building );
-				 //		houses.composites.push_back( house ); 
-				 //	}
-				 //}
-				 //else 
-				if ( (tilesets.size() != 0) and (generateSelection(rng) < .30f ) ) {
+				 if ( (district == &District::metropolitan) ) {
+				 	auto house    = instantiateSkyscraper();
+				 	auto maybeLot = findFixedLot( cellId, house.dimensions.x, house.dimensions.y, Vector<Bool>(house.dimensions.x * house.dimensions.y, true));
+				 	if ( maybeLot ) {
+				 		// set affected tiles and discard lot since we won't remove houses dynamically
+				 		currentTries = 0; // reset counter
+				 		currentArea += maybeLot.value().getCoverage();
+						Vector3 worldPosition = tilemap->convertTilePositionToWorldPosition(maybeLot->nw);
+						worldPosition.x += house.dimensions.x * config.tileSideScaleFactor * 0.5f;
+						worldPosition.z += house.dimensions.y * config.tileSideScaleFactor * 0.5f;
+						house.roof.setPosition(worldPosition);
+						house.walls.setPosition(worldPosition);
+						house.windows.setPosition(worldPosition);
+				 		tilemap->applyLot( maybeLot.value(), Tile::building );
+				 		houses.composites.push_back( house ); 
+				 	}
+				 }
+				 else if ( (tilesets.size() != 0) and (generateSelection(rng) < .30f ) ) {
 					auto maybeLayout = getMultitileLayout(district,rng);
 					if ( maybeLayout ) {
 						auto  buildingLayout = maybeLayout.value();
@@ -722,7 +720,7 @@ void  Map::generateBuildings( )
 						}
 					}
 				}
-				else { // random shape:
+				else if((tilesets.size() != 0)){ // random shape:
 					auto maybeLot = findRandomLot( cellId );
 					if ( maybeLot ) {
 						currentTries = 0; // reset counter
