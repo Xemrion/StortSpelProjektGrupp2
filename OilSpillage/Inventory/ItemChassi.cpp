@@ -1,12 +1,15 @@
 #include "ItemChassi.h"
 #include <sstream>
 #include "../game.h"
+#include <iomanip>
 
 std::string ItemChassi::generateDescription(float maxHealth, float speed)
 {
 	std::stringstream stream;
-	stream << "Max Health: " << maxHealth << "\n";
-	stream << "Top Speed: " << speed << "\n";
+	stream << std::boolalpha;
+
+	stream << "Max Health: " << Item::fixedDecimals(maxHealth, 2) << "\n";
+	stream << "Top Speed: " << Item::fixedDecimals(speed, 2) << "\n";
 
 	return stream.str();
 }

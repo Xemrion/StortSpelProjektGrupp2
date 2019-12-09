@@ -7,6 +7,11 @@
 #include "../PG/defs.hpp"
 std::vector<std::shared_ptr<Item>> Item::premadeItems;
 
+float Item::fixedDecimals(float number, int decimals)
+{
+	return static_cast<int>(number * std::powf(10, decimals)) / std::powf(10, decimals);
+}
+
 GameObject* Item::getObjectByName(std::string name)
 {
 	for (int i = 0; i < Item::premadeItems.size(); i++)
