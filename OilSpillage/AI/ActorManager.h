@@ -48,7 +48,7 @@ private:
 	void leaveGroup(int groupIndex, int where);
 	void assignPathsToGroups(const Vector3& targetPos);
 	void updateGroups();
-	void destroyActor(int index);
+	void actorDied(int index);
 	void destroyBoss(int index);
 	void initGroupForActor(DynamicActor* actor);
 	void createGroup(DynamicActor* actor);

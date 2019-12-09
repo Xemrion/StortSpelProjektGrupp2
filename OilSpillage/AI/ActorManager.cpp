@@ -72,12 +72,12 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 				Spitfire* ptr = dynamic_cast<Spitfire*>(current);
 				if (ptr != nullptr) {
 					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
-					ptr->getVehicleBody1()->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y+0.55f, newPos.z));
+					ptr->getVehicleBody1()->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y + 0.55f, newPos.z));
 				}
 				else {
 					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
 				}
-				
+
 				if (j % 5 == 0)
 				{
 					//newPos = findTeleportPos(targetPos, 50, 100);
@@ -404,48 +404,14 @@ void ActorManager::spawnSwarm(const Vector3& originPos)
 
 void ActorManager::updateActors(float dt, const Vector3& targetPos)
 {
-	bool hasDied = false;
-	for (int i = 0; i < this->groups.size(); i++)
+	for (int i = this->actors.size() - 1; i >= 0; i--)
 	{
-		for (int j = 0; j < groups[i].actors.size(); j++)
+		if (actors[i]->isDead())
 		{
-			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
-			{
-
-				groups[i].actors[j]->update(dt, targetPos);
-			}
-			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
-			{
-				Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
-				if (ptr != nullptr)
-				{
-					if (ptr->getType() == TypeOfMission::KillingSpree)
-					{
-						ptr->killEnemy();
-					}
-				}
-				hasDied = true;
-			}
+			actorDied(i);
+			continue;
 		}
-	}
-	if (hasDied)
-	{
-		for (int i = this->actors.size() - 1; i >= 0; i--)
-		{
-			float normalizedRandom = float(rand()) / RAND_MAX;
-			if (normalizedRandom >= 0.995)
-			{
-				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-					PowerUp(actors[i]->getPosition(), physics,
-						PowerUpType::Health)
-				);
-			}
-			if (actors[i]->isDead())
-			{
-				Game::getGameInfo().addHighScore(actors[i]->getPoints());
-				destroyActor(i);
-			}
-		}
+		actors[i]->update(dt, targetPos);
 	}
 }
 
@@ -641,8 +607,25 @@ void ActorManager::updateGroups()
 	}
 }
 
-void ActorManager::destroyActor(int index)
+void ActorManager::actorDied(int index)
 {
+	Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+	if (ptr != nullptr)
+	{
+		if (ptr->getType() == TypeOfMission::KillingSpree)
+		{
+			ptr->killEnemy();
+		}
+	}
+	float normalizedRandom = float(rand()) / RAND_MAX;
+	if (normalizedRandom >= 0.950)
+	{
+		static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
+			PowerUp(actors[index]->getPosition(), physics,
+				PowerUpType::Health)
+		);
+	}
+	Game::getGameInfo().addHighScore(actors[index]->getPoints());
 	if (actors[index]->getRigidBody() != nullptr)
 	{
 		physics->DeleteRigidBody(actors[index]->getRigidBody());
