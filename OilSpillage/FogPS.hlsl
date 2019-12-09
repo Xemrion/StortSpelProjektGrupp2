@@ -24,10 +24,7 @@ SamplerState samplerState : register(s0);
 
 float2 hash(float2 p)
 {
-	p *= 1.1;
-	uint3 dim;
-	randomLUT.GetDimensions(0, dim.x, dim.y, dim.z);
-	return randomLUT.Load(int3(fmod(p.xy, dim.xy), 0));
+	return randomLUT.Sample(samplerState, p / scale);
 }
 
 float noise(in float2 x)

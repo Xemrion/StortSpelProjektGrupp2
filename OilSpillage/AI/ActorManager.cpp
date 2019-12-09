@@ -55,7 +55,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	updateGroups();
 	for (int i = 0; i < groups.size(); i++)
 	{
-		groups[i].update(targetPos);
+		groups[i].update();
 	}
 	teleportActorsToPlayer(targetPos);
 	turretHandler.update(dt, targetPos);
