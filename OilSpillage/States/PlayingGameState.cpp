@@ -587,7 +587,8 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else {
 			cameraTimer += deltaTime;
-			if (cameraTimer > 0.5f) {
+			float distance = (Vector2(player->getPosition().x,player->getPosition().z) - Vector2(cameraObject->getPosition().x,cameraObject->getPosition().z)).Length();
+			if (cameraTimer > 10.5f || distance < 2.5f ) {
 				cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 				cameraTimer = 0;
 			}
