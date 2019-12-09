@@ -54,7 +54,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 
 	for (int i = 0; i < groups.size(); i++)
 	{
-		groups[i].update(targetPos);
+		groups[i].update();
 	}
 	updateGroups();
 	turretHandler.update(dt, targetPos);

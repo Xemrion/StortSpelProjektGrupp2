@@ -5,7 +5,7 @@ class AIGroup
 public:
 	AIGroup();
 	~AIGroup();
-	void update(const Vector3& targetPos);
+	void update();
 	const Vector3& getAveragePos() const;
 	void updateAveragePos();
 	void setPath(std::vector<Vector3> path);

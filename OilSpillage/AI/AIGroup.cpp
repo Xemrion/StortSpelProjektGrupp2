@@ -10,7 +10,7 @@ AIGroup::~AIGroup()
 {
 }
 
-void AIGroup::update(const Vector3& targetPos)
+void AIGroup::update()
 {
 	removeDeadActors();
 	updateAveragePos();
