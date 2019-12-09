@@ -51,45 +51,13 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	}
 #endif
 
-	Vector3 newPos;
-	float deltaX;
-	float deltaZ;
-	float distance;
-	for (int i = 0; i < groups.size(); i++)
-	{
-		deltaX = groups[i].averagePos.x - targetPos.x;
-		deltaZ = groups[i].averagePos.z - targetPos.z;
-		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-		//(TileSize * nrOfTiles)^2
-		if (distance > (20 * 10) * (20 * 10))
-		{
-			newPos = findTeleportPos(targetPos, 50, 100);
-			for (int j = 0; j < groups[i].actors.size(); j++)
-			{
-				Actor* current = groups[i].actors[j];
-				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-				Spitfire* ptr = dynamic_cast<Spitfire*>(current);
-				if (ptr != nullptr) {
-					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
-					ptr->getVehicleBody1()->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y + 0.55f, newPos.z));
-				}
-				else {
-					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
-				}
 
-				if (j % 5 == 0)
-				{
-					//newPos = findTeleportPos(targetPos, 50, 100);
-				}
-			}
-		}
-	}
+	updateGroups();
 	for (int i = 0; i < groups.size(); i++)
 	{
-		groups[i].update(targetPos);
+		groups[i].update();
 	}
-	updateGroups();
+	teleportActorsToPlayer(targetPos);
 	turretHandler.update(dt, targetPos);
 	if (frameCount % 20 == 0)
 	{
@@ -372,6 +340,7 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 		createAttacker(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
+
 void ActorManager::spawnChaseCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
@@ -402,6 +371,44 @@ void ActorManager::spawnSwarm(const Vector3& originPos)
 	}
 }
 
+void ActorManager::teleportActorsToPlayer(const Vector3& targetPos)
+{
+	Vector3 newPos;
+	float deltaX;
+	float deltaZ;
+	float distance;
+	for (int i = 0; i < groups.size(); i++)
+	{
+		deltaX = groups[i].averagePos.x - targetPos.x;
+		deltaZ = groups[i].averagePos.z - targetPos.z;
+		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+		//(TileSize * nrOfTiles)^2
+		if (distance > (20 * 10) * (20 * 10))
+		{
+			newPos = findTeleportPos(targetPos, 50, 100);
+			for (int j = 0; j < groups[i].actors.size(); j++)
+			{
+				Actor* current = groups[i].actors[j];
+				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+				Spitfire* ptr = dynamic_cast<Spitfire*>(current);
+				if (ptr != nullptr) {
+					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
+					ptr->getVehicleBody1()->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y + 0.55f, newPos.z));
+				}
+				else {
+					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
+				}
+
+				if (j % 5 == 0)
+				{
+					//newPos = findTeleportPos(targetPos, 50, 100);
+				}
+			}
+		}
+	}
+}
+
 void ActorManager::updateActors(float dt, const Vector3& targetPos)
 {
 	for (int i = this->actors.size() - 1; i >= 0; i--)
@@ -417,28 +424,7 @@ void ActorManager::updateActors(float dt, const Vector3& targetPos)
 
 void ActorManager::updateBosses(float dt, const Vector3& targetPos)
 {
-	//gives a new pos if too far away from player
-	//for (int i = 0; i < this->bosses.size(); i++)
-	//{
-	//	float deltaX = this->bosses[i]->getPosition().x - targetPos.x;
-	//	float deltaZ = this->bosses[i]->getPosition().z - targetPos.z;
-	//	float distanceToPlayer = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
-	//	//(TileSize * nrOfTiles)^2
-	//	if (distanceToPlayer > (100))
-	//	{
-	//		Vector3 newPos = generateObjectivePos(targetPos, 50, 150);
-
-	//		Boss* current = this->bosses[i];
-	//		current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-	//		physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-	//	}
-	//}
-
-	/*Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
-	createAttacker(originPos.x + i, originPos.z, (rand() % 8) + 1);*/
-
 	bool hasDied = false;
-
 	for (int i = 0; i < this->bosses.size(); i++)
 	{
 		if (!bosses[i]->isDead() && bosses[i] != nullptr)
@@ -555,7 +541,7 @@ void ActorManager::updateGroups()
 		for (int k = 0; k < groups[i].actors.size(); k++)
 		{
 			DynamicActor* current = groups[i].actors[k];
-			if (current == nullptr || current->isDead())
+			if (groups[i].actors[k] == nullptr || groups[i].actors[k]->isDead())
 			{
 				leaveGroup(i, k);
 			}

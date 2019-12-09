@@ -27,7 +27,7 @@ TurretHandler::~TurretHandler()
 }
 void TurretHandler::update(float dt,const Vector3& targetPos)
 {
-	bool turretDied = false;
+	/*bool turretDied = false;
 	for (int i = 0; i < this->turrets.size(); i++)
 	{
 		if (!turrets[i]->isDead() && turrets[i] != nullptr)
@@ -46,17 +46,16 @@ void TurretHandler::update(float dt,const Vector3& targetPos)
 			}
 			turretDied = true;
 		}
-	}
-	if (turretDied)
+	}*/
+	for (int i = this->turrets.size() - 1; i >= 0; i--)
 	{
-		for (int i = this->turrets.size() - 1; i >= 0; i--)
+		if (turrets[i]->isDead())
 		{
-			if (turrets[i]->isDead())
-			{
-				Game::getGameInfo().addHighScore(turrets[i]->getPoints());
-				destroyTurret(i);
-			}
+			Game::getGameInfo().addHighScore(turrets[i]->getPoints());
+			destroyTurret(i);
+			continue;
 		}
+		turrets[i]->update(dt, targetPos);
 	}
 }
 
