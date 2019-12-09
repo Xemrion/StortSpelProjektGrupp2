@@ -16,7 +16,7 @@ void UIUpgrading::updateUI(float deltaTime)
 
 	if (this->selectingItem)
 	{
-		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
+		if (Input::checkButton(Keys::R_SHOULDER, States::PRESSED))
 		{
 			Game::setState(Game::STATE_PLAYING);
 		}
@@ -142,7 +142,7 @@ void UIUpgrading::init()
 		{ Keys::CONFIRM, "Select Item", Color(Colors::White) },
 		{ Keys::CANCEL, "Remove From Car", Color(Colors::White) },
 		{ Keys::R_PRESS, "Rotate Car", Color(Colors::White) },
-		{ Keys::ACTION_1, "Confirm Upgrading", Color(Colors::White) }
+		{ Keys::R_SHOULDER, "Confirm Upgrading", Color(Colors::White) }
 	};
 
 	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 5);
