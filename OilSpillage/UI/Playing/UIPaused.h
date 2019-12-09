@@ -14,6 +14,7 @@ private:
 	Element* selected;
 
 	std::unique_ptr<Button> buttonUnpause;
+	std::unique_ptr<Button> buttonControls;
 	std::unique_ptr<Button> buttonOptions;
 	std::unique_ptr<Button> buttonMainMenu;
 	std::unique_ptr<ButtonPromptBar> promptBar;

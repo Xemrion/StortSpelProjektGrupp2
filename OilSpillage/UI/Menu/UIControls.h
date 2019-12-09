@@ -13,6 +13,7 @@ private:
 
 	Texture* textureControls;
 	std::unique_ptr<ButtonPromptBar> promptBar;
+	std::unique_ptr<ButtonPromptBar> promptBar2;
 public:
 	UIControls();
 	virtual ~UIControls();
