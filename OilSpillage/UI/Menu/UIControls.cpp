@@ -24,7 +24,7 @@ void UIControls::updateUI(float deltaTime)
 void UIControls::drawUI()
 {
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	UserInterface::getSpriteBatch()->Draw(this->textureControls->getShaderResView(), Vector2());
+	UserInterface::getSpriteBatch()->Draw(this->textureControls->getShaderResView(), Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), nullptr, Colors::White, 0.0f, this->textureControls->getCenter());
 	this->promptBar->draw(false);
 	this->promptBar2->draw(false);
 	UserInterface::getSpriteBatch()->End();
@@ -36,14 +36,13 @@ UIControls::UIControls() : textureControls(nullptr)
 
 UIControls::~UIControls()
 {
-	Game::getGraphics().unloadTexture("UI/controls", false);
+	Game::getGraphics().unloadTexture("UI/controls");
 }
 
 void UIControls::init()
 {
-	std::string path = std::string(TEXTURE_ROOT_DIR) + std::string("UI/controls") + std::string(".dds");
-	Game::getGraphics().loadTexture(path, true);
-	this->textureControls = Game::getGraphics().getTexturePointer("UI/controls", false);
+	Game::getGraphics().loadTexture("UI/controls");
+	this->textureControls = Game::getGraphics().getTexturePointer("UI/controls");
 	assert(textureControls && "Texture not loaded correctly!");
 
 	Prompt prompts[] = {

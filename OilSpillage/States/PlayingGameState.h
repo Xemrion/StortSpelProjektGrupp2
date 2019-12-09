@@ -75,6 +75,7 @@ private:
 	std::string                     minimap;
 	Vector3                         topLeft;
 	Vector3                         bottomRight;
+	int                             oldMenu;
 	int                             currentMenu;
 	bool                            isUsingManhattanDistance { true };
 	float                           cameraDistance           { 25   };

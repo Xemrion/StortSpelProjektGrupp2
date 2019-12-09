@@ -740,6 +740,13 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 
+	if (oldMenu == MENU_CONTROLS)
+	{
+		menues[MENU_CONTROLS] = std::make_unique<UIControls>();
+	}
+
+	oldMenu = -1;
+
 	Sound::fadeSoundtrack(soundAggro);
 	
 	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
@@ -775,10 +782,7 @@ void PlayingGameState::changeTime(float timeDiff) noexcept {
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
-	if (currentMenu == Menu::MENU_CONTROLS) {
-		menues[MENU_CONTROLS] = std::make_unique<UIControls>();
-	}
-
+	oldMenu = currentMenu;
 	currentMenu = static_cast<int>(menu);
 
 	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING || menu == Menu::MENU_CONTROLS) { 
