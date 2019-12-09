@@ -12,7 +12,7 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 		stream << "Max Spread: " << weapon.maxSpread << "\n";
 	}
 	else if(weapon.type == WeaponType::Laser){
-		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
+		stream << "Damage/S: " << weapon.damage << "\n";
 		stream << "Overheat : " << weapon.maxSpread << "\n";
 
 
