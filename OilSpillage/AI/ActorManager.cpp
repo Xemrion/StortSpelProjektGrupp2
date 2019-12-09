@@ -52,11 +52,11 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 #endif
 
 
+	updateGroups();
 	for (int i = 0; i < groups.size(); i++)
 	{
 		groups[i].update(targetPos);
 	}
-	updateGroups();
 	teleportActorsToPlayer(targetPos);
 	turretHandler.update(dt, targetPos);
 	if (frameCount % 20 == 0)
@@ -541,7 +541,7 @@ void ActorManager::updateGroups()
 		for (int k = 0; k < groups[i].actors.size(); k++)
 		{
 			DynamicActor* current = groups[i].actors[k];
-			if (current == nullptr)
+			if (groups[i].actors[k] == nullptr || groups[i].actors[k]->isDead())
 			{
 				leaveGroup(i, k);
 			}
