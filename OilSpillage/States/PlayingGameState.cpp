@@ -62,12 +62,12 @@ void PlayingGameState::initAI()
 
 PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_BEFORE_PLAYING)
 {
-
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	pausedTime = false;
 #endif // _DEBUG
-	this->current_item = NULL;
+	
 
+	this->current_item = NULL;
 	config.seed = seed;
 	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
@@ -545,7 +545,6 @@ void PlayingGameState::setPlayer(Vehicle* theVehicle)
 
 void PlayingGameState::update(float deltaTime)
 {
-
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{

@@ -166,7 +166,6 @@ void Game::createCurrentState()
 		Container::playerInventory = std::make_unique<Container>();
 		this->gameInfo = GameInfo();
 		localScale = 1.0f;
-		state->clearDraw();
 
 		state = std::make_unique<MenuGameState>();
 	}
@@ -184,14 +183,12 @@ void Game::createCurrentState()
 		if (gameInfo.nrOfClearedStages <= 0)
 		{
 			// TODO: generate seed
-			state->clearDraw();
 
 			state = std::make_unique<PlayingGameState>(-1,7.0f*60.0f);
 		}
 		else
 		{
 			// TODO: use RNG with seed from above to generate subsequent map seeds
-			state->clearDraw();
 
 			state = std::make_unique<PlayingGameState>(-1,gameInfo.time);
 		}
@@ -221,7 +218,6 @@ void Game::createCurrentState()
 		{
 			newSlots = new VehicleSlots(*static_cast<MenuGameState*>(state.get())->getSlots());
 		}
-		state->clearDraw();
 
 		state = std::make_unique<UpgradingGameState>();
 
@@ -234,7 +230,6 @@ void Game::createCurrentState()
 	{
 		Sound::stopAllLoops();
 		Sound::fadeSoundtrack(0.0f);
-		state->clearDraw();
 
 		state = std::make_unique<HighscoreGameState>();
 	}

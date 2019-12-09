@@ -91,16 +91,10 @@ private:
 	std::vector<CinematicPos>       points;
 	std::vector<std::unique_ptr<PowerUp>> powerUps;
 	SpotLight                      *playerLight;
-	GameObject*						testObjective; //Test
-	GameObject*		testObjective2; //Test
 	GameObject*		cameraObject;
 	float			cameraTimer;
 	float			snowTimer;
 
-	GameObject* objTestPickUp;
-	GameObject* objTestPickUp2;
-	GameObject* objTestPickUp3;
-	GameObject** objArray = new GameObject * [3];
 	ObjectiveHandler objectives;
 	RNG rng{ RD()() };        // gör privat klassmedlem istället
 	int frameCount = 0;

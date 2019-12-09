@@ -68,8 +68,8 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 
-	depthStencilDesc.Width = 2048;
-	depthStencilDesc.Height = 2048;
+	depthStencilDesc.Width = 1536;
+	depthStencilDesc.Height = 1536;
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.ArraySize = 1;
 	depthStencilDesc.Format = DXGI_FORMAT_R32_TYPELESS;
