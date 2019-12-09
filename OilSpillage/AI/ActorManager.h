@@ -39,6 +39,7 @@ private:
 	Physics* physics;
 	Map* map;
 	std::mt19937* rng;
+	void teleportActorsToPlayer(const Vector3& targetPos);
 	void updateActors(float dt, const Vector3& targetPos);
 	void updateBosses(float dt, const Vector3& targetPos);
 	//Returns index for the group within the radius with the most members
