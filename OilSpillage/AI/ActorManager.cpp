@@ -423,11 +423,11 @@ void ActorManager::updateBosses(float dt, const Vector3& targetPos)
 	bool hasDied = false;
 	for (int i = 0; i < this->bosses.size(); i++)
 	{
-		if (!bosses[i]->isDead() && bosses[i] != nullptr)
+		if (bosses[i] != nullptr && !bosses[i]->isDead())
 		{
 			bosses[i]->update(dt, targetPos); //creash
 		}
-		else if (bosses[i]->isDead() && bosses[i] != nullptr)
+		else if (bosses[i] != nullptr && bosses[i]->isDead())
 		{
 			hasDied = true;
 		}
