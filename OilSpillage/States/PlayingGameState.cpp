@@ -8,6 +8,7 @@
 #include "../PG/Profiler.hpp"
 #include "../UI/Playing/UICompletedStage.h"
 #include "../UI/Playing/UIBeforePlaying.h"
+#include "../UI/Menu/UIControls.h"
 
 void PlayingGameState::fillTestParticle()
 {
@@ -62,12 +63,12 @@ void PlayingGameState::initAI()
 
 PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_BEFORE_PLAYING)
 {
-
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	pausedTime = false;
 #endif // _DEBUG
-	this->current_item = NULL;
+	
 
+	this->current_item = NULL;
 	config.seed = seed;
 	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
@@ -196,6 +197,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_COMPLETED_STAGE] = std::make_unique<UICompletedStage>();
 	menues[MENU_BEFORE_PLAYING] = std::make_unique<UIBeforePlaying>();
+	menues[MENU_CONTROLS] = std::make_unique<UIControls>();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
@@ -550,7 +552,6 @@ void PlayingGameState::setPlayer(Vehicle* theVehicle)
 
 void PlayingGameState::update(float deltaTime)
 {
-
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{
@@ -738,6 +739,13 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 
+	if (oldMenu == MENU_CONTROLS)
+	{
+		menues[MENU_CONTROLS] = std::make_unique<UIControls>();
+	}
+
+	oldMenu = -1;
+
 	Sound::fadeSoundtrack(soundAggro);
 	
 	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
@@ -773,8 +781,12 @@ void PlayingGameState::changeTime(float timeDiff) noexcept {
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
+	oldMenu = currentMenu;
 	currentMenu = static_cast<int>(menu);
-	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING) menues[currentMenu]->init();
+
+	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING || menu == Menu::MENU_CONTROLS) { 
+		menues[currentMenu]->init();
+	}
 }
 
 Map::Info PlayingGameState::getMapInfo() const
