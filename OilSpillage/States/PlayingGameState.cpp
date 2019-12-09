@@ -592,7 +592,8 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else {
 			cameraTimer += deltaTime;
-			if (cameraTimer > 0.5f) {
+			float distance = (Vector2(player->getPosition().x,player->getPosition().z) - Vector2(cameraObject->getPosition().x,cameraObject->getPosition().z)).Length();
+			if (cameraTimer > 10.5f || distance < 2.5f ) {
 				cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 				cameraTimer = 0;
 			}
@@ -645,7 +646,9 @@ void PlayingGameState::update(float deltaTime)
 		objectives.update(player->getPosition(), physics.get());
 		Bullet::updateSoundTimer(deltaTime);
 		player->updateWeapon(deltaTime);
+#ifdef _DEBUG
 		timer += deltaTime;
+
 		if (Input::checkButton(Keys::R_LEFT, States::PRESSED))
 		{
 			timerEMP = 4.0f;
@@ -657,7 +660,9 @@ void PlayingGameState::update(float deltaTime)
 		if (timer > 0.1f&&timerEMP>0.0f)
 		{
 			timer = 0.0f;
+			this->graphics.addTestParticle(this->player->getPosition() + Vector3(0, 1, 0), Vector4(0, 0, 0, 10.0f), addNrOfParticles, lifeTime, randomPosPower);
 		}
+#endif
 
 
 #ifndef _DEBUG
@@ -742,7 +747,7 @@ void PlayingGameState::update(float deltaTime)
 		ImGui_Driving();
 		//ImGui_ProcGen();
 		//ImGui_AI();
-		//ImGui_Particles();
+		ImGui_Particles();
 		//ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
