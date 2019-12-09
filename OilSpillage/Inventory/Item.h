@@ -26,6 +26,7 @@ protected:
 	Vector4 baseColor;
 	GameObject* object;
 public:
+	static float fixedDecimals(float number, int decimals);
 	static GameObject* getObjectByName(std::string name);
 	static void init();
 	static Item* getRandom();

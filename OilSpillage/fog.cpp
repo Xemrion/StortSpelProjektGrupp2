@@ -26,7 +26,7 @@ void Fog::initialize(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL
 	Game::getGraphics().loadMesh("Quad");
 	Game::getGraphics().loadShape(SHAPE_QUAD);
 	Game::getGraphics().loadTexture("white1x1");
-
+	this->spacing = spacing;
 	for (UINT i = 1; i <= slices; ++i)
 	{
 		GameObject* q = new GameObject();
@@ -224,12 +224,13 @@ void Fog::generateTextures(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsof
 		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
 		deviceContext->Unmap(worldBuffer.Get(), 0);
 
+		material.scale = scale * (1.0f + spacing * i * 1.0f);
+		material.density = density / (1.0f + spacing * i * 1.0f);
 		hr = deviceContext->Map(materialBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &material, sizeof(FogMaterial));
 		deviceContext->Unmap(materialBuffer.Get(), 0);
 		object->setColor(Vector4(material.color.x, material.color.z, material.color.z, 0.0));
-		material.scale = scale * (1.0 + quads[i]->getPosition().y) + dis(gen) * 0.05;
-		material.density = density / (1.0 + quads[i]->getPosition().y) + dis(gen) * 0.05;
+
 
 		Texture* diffuseTexture = new Texture();
 		diffuseTexture->Initialize(device.Get(), deviceContext.Get(), textureWidth, textureHeight);

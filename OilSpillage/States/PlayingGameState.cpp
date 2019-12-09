@@ -8,6 +8,7 @@
 #include "../PG/Profiler.hpp"
 #include "../UI/Playing/UICompletedStage.h"
 #include "../UI/Playing/UIBeforePlaying.h"
+#include "../UI/Menu/UIControls.h"
 
 void PlayingGameState::fillTestParticle()
 {
@@ -62,12 +63,12 @@ void PlayingGameState::initAI()
 
 PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_BEFORE_PLAYING)
 {
-
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 	pausedTime = false;
 #endif // _DEBUG
-	this->current_item = NULL;
+	
 
+	this->current_item = NULL;
 	config.seed = seed;
 	rng.seed(config.seed); // gör i konstruktorn
 	lightList = std::make_unique<LightList>();
@@ -148,6 +149,10 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadModel("Entities/Drone");
 
 	graphics.loadModel("Hospital");
+	std::string modelPath = MODEL_ROOT_DIR;
+	modelPath += "Entities/Roller_Melee";
+	graphics.loadMesh(modelPath);
+	graphics.loadMaterial(modelPath, true);
 	graphics.loadModel("Entities/Roller_Melee");
 	graphics.loadModel("Houses/testHouse");
 	graphics.loadModel("Houses/testHouse2");
@@ -192,6 +197,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_COMPLETED_STAGE] = std::make_unique<UICompletedStage>();
 	menues[MENU_BEFORE_PLAYING] = std::make_unique<UIBeforePlaying>();
+	menues[MENU_CONTROLS] = std::make_unique<UIControls>();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
@@ -291,6 +297,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 PlayingGameState::~PlayingGameState()
 {
+	actorManager.reset();
 	delete this->cameraObject;
 }
 
@@ -545,7 +552,6 @@ void PlayingGameState::setPlayer(Vehicle* theVehicle)
 
 void PlayingGameState::update(float deltaTime)
 {
-
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{
@@ -641,7 +647,9 @@ void PlayingGameState::update(float deltaTime)
 		objectives.update(player->getPosition(), physics.get());
 		Bullet::updateSoundTimer(deltaTime);
 		player->updateWeapon(deltaTime);
+#ifdef _DEBUG
 		timer += deltaTime;
+
 		if (Input::checkButton(Keys::R_LEFT, States::PRESSED))
 		{
 			timerEMP = 4.0f;
@@ -653,7 +661,9 @@ void PlayingGameState::update(float deltaTime)
 		if (timer > 0.1f&&timerEMP>0.0f)
 		{
 			timer = 0.0f;
+			this->graphics.addTestParticle(this->player->getPosition() + Vector3(0, 1, 0), Vector4(0, 0, 0, 10.0f), addNrOfParticles, lifeTime, randomPosPower);
 		}
+#endif
 
 
 #ifndef _DEBUG
@@ -729,6 +739,13 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 
+	if (oldMenu == MENU_CONTROLS)
+	{
+		menues[MENU_CONTROLS] = std::make_unique<UIControls>();
+	}
+
+	oldMenu = -1;
+
 	Sound::fadeSoundtrack(soundAggro);
 	
 	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
@@ -738,7 +755,7 @@ void PlayingGameState::update(float deltaTime)
 		ImGui_Driving();
 		//ImGui_ProcGen();
 		//ImGui_AI();
-		//ImGui_Particles();
+		ImGui_Particles();
 		//ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -764,8 +781,12 @@ void PlayingGameState::changeTime(float timeDiff) noexcept {
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
+	oldMenu = currentMenu;
 	currentMenu = static_cast<int>(menu);
-	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING) menues[currentMenu]->init();
+
+	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING || menu == Menu::MENU_CONTROLS) { 
+		menues[currentMenu]->init();
+	}
 }
 
 Map::Info PlayingGameState::getMapInfo() const

@@ -11,7 +11,7 @@ protected:
 public:
 	ShootCar();
 	ShootCar(float x, float z, int weaponType, Physics* physics);
-	~ShootCar();
+	virtual ~ShootCar();
 	void update(float dt, const Vector3& targetPos);
 	Status shoot();
 };
