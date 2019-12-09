@@ -10,7 +10,7 @@ AIGroup::~AIGroup()
 {
 }
 
-void AIGroup::update(const Vector3& targetPos)
+void AIGroup::update()
 {
 	removeDeadActors();
 	updateAveragePos();
@@ -58,9 +58,14 @@ void AIGroup::removeDeadActors()
 	actors.erase( std::remove_if( actors.begin(),
 		                           actors.end(),
 		                           []( DynamicActor const *e ) {
-										if (e != nullptr)
+										if (e == nullptr)
+										{
+											return true;
+										}
+										else
+										{
 											return e->isDead();
-										else return true;
+										}
 		                           } ),
 		           actors.end() );
 }

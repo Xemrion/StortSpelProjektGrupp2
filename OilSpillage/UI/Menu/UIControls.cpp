@@ -26,6 +26,7 @@ UIControls::UIControls() : textureControls(nullptr)
 
 UIControls::~UIControls()
 {
+	Game::getGraphics().unloadTexture("UI/controls", false);
 }
 
 void UIControls::init()

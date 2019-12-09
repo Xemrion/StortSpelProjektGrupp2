@@ -607,9 +607,9 @@ void Vehicle::updateWeapon(float deltaTime)
 			}
 		}
 		/*END*/
-		Vector2 dir = Input::getDirectionRnoMouse();
+		Vector2 dir = Input::getDirectionR();
 		
-		if (Input::getStrengthRnoMouse() > 0.1f) {
+		if (Input::getStrengthR() > 0.1f) {
 			tempCurDir = dir;
 		}
 		dir.Normalize();
@@ -644,7 +644,7 @@ void Vehicle::updateWeapon(float deltaTime)
 						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem(Slots::MOUNTED));
 						this->vehicleSlots->getItem(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, newRot, 0));
 
-						if (/*Input::checkButton(Keys::R_SHOULDER, States::HELD) ||*/ Input::getStrengthRnoMouse() > 0.01f || Input::checkButtonMouse(MouseKeys::LEFT,States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
+						if (/*Input::checkButton(Keys::R_SHOULDER, States::HELD) ||*/ Input::getStrengthR() > 0.01f || Input::checkButtonMouse(MouseKeys::LEFT,States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 						{
 							if (temp->getWeapon().updateFireRate())
 							{
@@ -1297,7 +1297,7 @@ Vector3 Vehicle::getCameraDistance(float deltaTime)
 	}
 	vehicleDistance = min(vehicleDistance, 30.0f);
 
-	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionRnoMouse().x * Input::getStrengthRnoMouse() * 3, Input::getDirectionRnoMouse().y * Input::getStrengthRnoMouse() * 3), deltaTime*10.0f);
+	aimLerp = Vector2::Lerp(aimLerp, Vector2(Input::getDirectionR().x * Input::getStrengthR() * 3, Input::getDirectionR().y * Input::getStrengthR() * 3), deltaTime*10.0f);
 
 
 	cameraDistance = (vehicleDistance - cameraDistance) * deltaTime * 1.2f + cameraDistance;
