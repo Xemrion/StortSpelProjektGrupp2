@@ -555,7 +555,7 @@ void ActorManager::updateGroups()
 		for (int k = 0; k < groups[i].actors.size(); k++)
 		{
 			DynamicActor* current = groups[i].actors[k];
-			if (current->isDead() || current == nullptr)
+			if (current == nullptr || current->isDead())
 			{
 				leaveGroup(i, k);
 			}
