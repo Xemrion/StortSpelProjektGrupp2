@@ -227,6 +227,8 @@ btRaycastVehicle* Physics::addVehicle(btRaycastVehicle* vehicle)
 
 bool Physics::deleteRigidBody(btRigidBody* rb)
 {
+	if (!rb) return false;
+
 	for (int i = 0; i < this->bodies.size(); i++)
 	{
 		if (bodies[i] == rb)
