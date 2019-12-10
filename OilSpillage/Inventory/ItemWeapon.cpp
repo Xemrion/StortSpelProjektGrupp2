@@ -248,3 +248,11 @@ Weapon& ItemWeapon::getWeapon()
 {
 	return this->weapon;
 }
+
+void ItemWeapon::update(float dt)
+{
+	if (weapon.type == WeaponType::Spikes)
+	{
+
+	}
+}

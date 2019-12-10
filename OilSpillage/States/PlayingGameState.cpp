@@ -643,7 +643,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount, deltaTime);
-		actorManager->update(deltaTime, player->getPosition());
+		//actorManager->update(deltaTime, player->getPosition());
 		accelForce = Vector3(player->getRigidBody()->getLinearVelocity().getX(), player->getRigidBody()->getLinearVelocity().getY(), player->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation(deltaTime);
@@ -662,6 +662,7 @@ void PlayingGameState::update(float deltaTime)
 		if (timer > 0.1f&&timerEMP>0.0f)
 		{
 			timer = 0.0f;
+			
 		}
 
 

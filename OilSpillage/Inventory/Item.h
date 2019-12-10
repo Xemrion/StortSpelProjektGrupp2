@@ -35,7 +35,6 @@ public:
 	virtual ~Item();
 	Item(const Item& obj);
 	virtual Item* clone()const;
-
 	virtual void randomize();
 
 	std::string getName() const;
@@ -43,6 +42,7 @@ public:
 	ItemType getType() const;
 	GameObject* getObject() const;
 	Vector4 getBaseColor() const;
+
 };
 
 #endif // !ITEM_H
