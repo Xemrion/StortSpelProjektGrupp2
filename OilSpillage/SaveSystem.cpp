@@ -253,6 +253,17 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 
 			Container::playerInventory->addItem(new ItemChassi(name, maxHealth, topSpeed, object));
 		}
+		else if (className == "ItemGadget")
+		{
+			Gadget gadget;
+			gadget.lifeTime = saveSystem.getFloat("Item" + std::to_string(i) + "Lifetime");
+			gadget.type = static_cast<GadgetType>(saveSystem.getInteger("Item" + std::to_string(i) + "Type"));
+			gadget.radius = saveSystem.getFloat("Item" + std::to_string(i) + "Radius");
+			gadget.cooldown = saveSystem.getFloat("Item" + std::to_string(i) + "Cooldown");
+			gadget.power = saveSystem.getFloat("Item" + std::to_string(i) + "Power");
+
+			Container::playerInventory->addItem(new ItemGadget(name, gadget, object));
+		}
 		else
 		{
 			std::string description = saveSystem.getString("Item" + std::to_string(i) + "Desc");
@@ -307,6 +318,7 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 			ItemWeapon* itemWeapon = dynamic_cast<ItemWeapon*>(item);
 			ItemWheel* itemWheel = dynamic_cast<ItemWheel*>(item);
 			ItemChassi* itemChassi = dynamic_cast<ItemChassi*>(item);
+			ItemGadget* itemGadget = dynamic_cast<ItemGadget*>(item);
 			if (itemWeapon)
 			{
 				Weapon weapon = itemWeapon->getWeapon();
@@ -348,6 +360,17 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 				saveSystem.set("Item" + std::to_string(itemId) + "TopSpeed", itemChassi->getSpeed());
 
 				saveSystem.set("Item" + std::to_string(itemId) + "Class", "ItemChassi");
+			}
+			else if (itemGadget)
+			{
+				Gadget gadget = itemGadget->getGadget();
+				saveSystem.set("Item" + std::to_string(itemId) + "Lifetime", gadget.lifeTime);
+				saveSystem.set("Item" + std::to_string(itemId) + "Type", gadget.type);
+				saveSystem.set("Item" + std::to_string(itemId) + "Radius", gadget.radius);
+				saveSystem.set("Item" + std::to_string(itemId) + "Cooldown", gadget.cooldown);
+				saveSystem.set("Item" + std::to_string(itemId) + "Power", gadget.power);
+
+				saveSystem.set("Item" + std::to_string(itemId) + "Class", "ItemGadget");
 			}
 			else
 			{
