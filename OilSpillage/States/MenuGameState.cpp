@@ -16,7 +16,6 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 	this->menues[MENU_CREDITS] = std::make_unique<UICredits>();
 	this->menues[MENU_CREDITS]->init();
 	this->menues[MENU_CONTROLS] = std::make_unique<UIControls>();
-	this->menues[MENU_CONTROLS]->init();
 	this->menues[MENU_HIGHSCORE] = std::make_unique<UIHighscore>();
 	this->menues[MENU_LOAD] = std::make_unique<UILoad>();
 
@@ -80,18 +79,25 @@ void MenuGameState::update(float deltaTime)
 	UserInterface::getSpriteBatch()->End();
 
 	this->menues[this->currentMenu]->update(deltaTime);
+
+	if (this->oldMenu == MENU_CONTROLS)
+	{
+		this->menues[MENU_CONTROLS] = std::make_unique<UIControls>();
+	}
+
 	this->graphics.presentScene();
 }
 
 void MenuGameState::setCurrentMenu(Menu menu)
 {
+	this->oldMenu = this->currentMenu;
 	this->currentMenu = static_cast<int>(menu);
 
 	if (menu == MENU_HIGHSCORE)
 	{
 		static_cast<UIHighscore*>(this->menues[MENU_HIGHSCORE].get())->init(false, "");
 	}
-	else if (menu == MENU_LOAD)
+	else if (menu == MENU_LOAD || menu == MENU_CONTROLS)
 	{
 		this->menues[menu]->init();
 	}

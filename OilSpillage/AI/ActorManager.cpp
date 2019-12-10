@@ -537,11 +537,7 @@ void ActorManager::updateGroups()
 		for (int k = 0; k < groups[i].actors.size(); k++)
 		{
 			DynamicActor* current = groups[i].actors[k];
-			if (groups[i].actors[k] == nullptr || groups[i].actors[k]->isDead())
-			{
-				leaveGroup(i, k);
-			}
-			else
+			if (current != nullptr && !current->isDead())
 			{
 				Vector3 curAveragePos = groups[i].getAveragePos();
 				Vector3 actorPos = current->getPosition();
@@ -578,6 +574,10 @@ void ActorManager::updateGroups()
 						joinGroup(current, groupIndex);
 					}
 				}
+			}
+			else
+			{
+				leaveGroup(i, k);
 			}
 
 		}
