@@ -32,6 +32,8 @@ Vehicle::Vehicle()
 	this->reverseTimer = 0;
 	this->reverseTimer2 = 0;
 
+	//gadget 
+	nitroTrue = false;
 	
 	this->curDir = Vector2(0.0f, 1.0f);//UP
 
@@ -40,6 +42,8 @@ Vehicle::Vehicle()
 	this->health = this->updatedStats.maxHealth;
 
 	this->vehicleSlots = new VehicleSlots;
+
+
 	
 }
 
@@ -54,6 +58,7 @@ Vehicle::~Vehicle()
 	//delete spring1;
 	//delete pointJoint;
 	delete this->vehicleSlots;
+	delete empplaced;
 }
 
 void Vehicle::init(Physics* physics)
@@ -150,7 +155,7 @@ void Vehicle::init(Physics* physics)
 
 void Vehicle::updatePlayer(float deltaTime)
 {
-	this->update(deltaTime, Input::getStrengthL(),Input::checkButton(Keys::R_TRIGGER,States::HELD) || Input::isKeyDown_DEBUG(Keyboard::W), Input::checkButton(Keys::L_TRIGGER,States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S),Input::getDirectionL());
+	this->update(deltaTime, Input::getStrengthL(), Input::checkButton(Keys::R_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::W), Input::checkButton(Keys::L_TRIGGER, States::HELD) || Input::isKeyDown_DEBUG(Keyboard::S), Input::getDirectionL());
 }
 
 void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttleInputTrigger, bool reverseInputTrigger, Vector2 directionInput)
@@ -233,7 +238,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	//Direction of Vehicle in dx & dy
 	float dx = sin((DirectX::XM_PI / 180) * vehicleRotation);
 	float dy = -cos((DirectX::XM_PI / 180) * vehicleRotation);
-
+	vehicleDirection = Vector2(dx,dy);
 
 	targetRotation = (atan2(-directionInput.x, -directionInput.y) * 180 / DirectX::XM_PI) + 180;
 	velocitySpeed = (this->getRigidBody()->getLinearVelocity().getX() * (dx)) + (-this->getRigidBody()->getLinearVelocity().getZ() * (dy));
@@ -248,7 +253,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 
 	//Driving mode: Throttle and turning, realistic
 	if (Game::getDrivingMode()) {
-		if ((throttleInputTrigger) && this->health > 0) {
+		if (((throttleInputTrigger) && this->health > 0) || nitroTrue) {
 			if (velocitySpeed < (40 * updatedStats.speed)) {
 				this->getRigidBody()->applyImpulse(btVector3(dx * deltaTime * 160.0f * updatedStats.accelerationRate, 0, -(dy * deltaTime * 160.0f * updatedStats.accelerationRate)), btVector3(0, 0, 0));
 			}
@@ -329,8 +334,11 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		Vector3 steering3 = Vector3(getRigidBody()->getAngularVelocity().getX(),
 			/*deltaTime*/0.035f * updatedStats.handlingRate * 80 * min(velocitySpeed * 0.25f, 1),
 			getRigidBody()->getAngularVelocity().getZ());
+		if(nitroTrue){
+			throttleInputStrength = 1.0f;
+		}
 
-		if (throttleInputStrength > 0 && this->health > 0) {
+		if ((throttleInputStrength > 0 && this->health > 0)) {
 			if (velocitySpeed < 0.5f) {
 				reverseTimer += 10.0f * deltaTime;
 			}
@@ -348,7 +356,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 			}
 			else {
 				reverseTimer2 = 0;
-				if (velocitySpeed < (40 * updatedStats.speed)) {
+				if ((velocitySpeed < (40 * updatedStats.speed))) {
 					this->getRigidBody()->applyImpulse(btVector3(dx * deltaTime * 160.0f * updatedStats.accelerationRate, 0, -(dy * deltaTime * 160.0f * updatedStats.accelerationRate)) * throttleInputStrength, btVector3(0, 0, 0));
 				}
 			}
@@ -361,7 +369,9 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 			}
 
 			float difference2 = min((180 - abs(abs(vehicleRotation - targetRotation) - 180)) * 0.05f, 1.0f);
-
+			if (nitroTrue) {
+				targetRotation = bodyHeading;
+			}
 			if (vehicleRotation < targetRotation) {
 				if (abs(vehicleRotation - targetRotation) < 180) {
 					getRigidBody()->setAngularVelocity(btVector3(0, steering3.y * difference2, 0));
@@ -574,14 +584,14 @@ void Vehicle::updateWeapon(float deltaTime)
 		{
 			if (this->vehicleSlots->getItem(Slots::BACK)->getObject() != nullptr)
 			{
-				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setPosition(this->vehicleBody1->getPosition() - 0.65f * frontTempDir - Vector3(0.0f, 0.25f, 0.0f));
+				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setPosition(this->vehicleBody1->getPosition() - 1.25f * frontTempDir - Vector3(0.0f, 0.25f, 0.0f));
 				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14f, acos(angleWP) - 3.14 / 2));
-				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setScale(Vector3(0.15f, 0.15f, 0.15f));
+				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setScale(Vector3(0.15f, 0.15f,0.15f));
 			}
 		}
 		/*END*/
 
-		/*RIGHT*/
+		/*RIGHT*/ 
 
 		Vector3 upp(0, 1, 0);
 		Vector3 right = upp.Cross(frontTempDir);
@@ -799,42 +809,97 @@ void Vehicle::updateWeapon(float deltaTime)
 								WeaponHandler::weaponEndSound(temp->getWeapon());
 							}
 						}
-						//else if (this->vehicleSlots->getItem(Slots::BACK)->getType() == ItemType::TYPE_GADGET && temp2 != nullptr)
-						//{
-						//		////test nitro
-						//	if (Input::checkButton(Keys::ACTION_1, States::HELD) &&
-						//		(temp2->getGadget().type == GadgetType::NITRO))
-						//	{
+						else if (this->vehicleSlots->getItem(Slots::BACK)->getType() == ItemType::TYPE_GADGET && temp2 != nullptr)
+						{
+								////test nitro
+							if (temp2->getGadget().type == GadgetType::NITRO )
+							{
+								if (Input::checkButton(Keys::ACTION_1, States::HELD) && temp2->getGadget().currentLifeTime > 0) // its alive!
+								{
+									if (temp2->getGadget().enable != true)
+									{
+										temp2->getGadget().currentLifeTime = temp2->getGadget().lifeTime;
+									}
+									temp2->getGadget().enable = true;
+									// spawn particles 
 
-						//		if (temp2->getGadget().type == GadgetType::NITRO &&
-						//			temp2->getGadget().currentLifeTime > 0) // its alive!
-						//		{
-						//			// spawn particles 
-						//			// accelerate the car
-						//			this->getRigidBody()->applyCentralForce(btVector3(0, 0, 40));
-						//			temp2->getGadget().currentLifeTime -= deltaTime;
-						//		}
-						//		else if (temp2->getGadget().type == GadgetType::EMP &&
-						//			temp2->getGadget().currentLifeTime > 0) // its alive!
-						//		{
-						//			//drop
-						//			//wait 1 sec
-						//			//particle
-						//				temp2->getGadget().currentLifeTime -= deltaTime;
-						//		}
-						//		else
-						//		{
-						//			temp2->getGadget().currentTime += deltaTime;
-						//			if (temp2->getGadget().currentTime >= temp2->getGadget().cooldown)
-						//			{
-						//				temp2->getGadget().currentTime = 0.0f;
-						//				temp2->getGadget().currentLifeTime = temp2->getGadget().lifeTime;
-						//			}
-						//		}
-
-						//	}
-						//	////
-						//}
+									temp2->getGadget().currentTime += deltaTime;
+									if (temp2->getGadget().currentTime > 0.1f)
+									{
+										Game::getGraphics().addParticle("fire", 1, 3, temp2->getObject()->getPosition(), Vector4(0.0, 1.0, 0.0, 0.0), 1.5);
+										Game::getGraphics().addParticle("fire", 1, 3, temp2->getObject()->getPosition(), Vector4(0.0, 1.0, 0.0, 0.0), 1.5);
+										Game::getGraphics().addParticle("fire", 1, 3, temp2->getObject()->getPosition(), Vector4(0.0, 1.0, 0.0, 0.0), 1.5);
+										temp2->getGadget().currentTime = 0;
+									}
+									temp2->getGadget().currentLifeTime -= deltaTime;
+									updatedStats.accelerationRate = defaultStats.accelerationRate + temp2->getGadget().power * 0.1f;
+									updatedStats.speed = defaultStats.speed + temp2->getGadget().power * 0.05f;
+									nitroTrue = true;
+								}
+								else if (temp2->getGadget().currentLifeTime <= 0)
+								{
+									updatedStats.accelerationRate = defaultStats.accelerationRate;
+									updatedStats.speed = defaultStats.speed;
+									nitroTrue = false;
+									temp2->getGadget().currentTime += deltaTime;
+									if (temp2->getGadget().currentTime >= temp2->getGadget().cooldown)
+									{
+										temp2->getGadget().enable = false;
+										temp2->getGadget().currentTime = 0.0f;
+										temp2->getGadget().currentLifeTime = temp2->getGadget().lifeTime;
+									}
+								}
+								else
+								{
+									updatedStats.accelerationRate = defaultStats.accelerationRate;
+									updatedStats.speed = defaultStats.speed;
+									nitroTrue = false;
+								}
+							}
+							else if(temp2->getGadget().type == GadgetType::EMP)
+							{
+								if (Input::checkButton(Keys::ACTION_1, States::RELEASED) && temp2->getGadget().enable != true) // its alive!
+								{	
+									if (empplaced == nullptr)
+									{
+										empplaced = new GameObject(*temp2->getObject());
+										Game::getGraphics().addToDraw(empplaced);
+									}
+									//drop it
+									empplaced->setPosition(this->getPosition());
+									temp2->getGadget().enable = true;
+									temp2->getGadget().currentLifeTime = temp2->getGadget().lifeTime;
+									Game::getGraphics().addParticle("electro", 1, 1, empplaced->getPosition(), Vector4(0.0, 1.0, 0.0, 0.0), 0.1);
+								}
+								else if (temp2->getGadget().currentLifeTime > 0 && temp2->getGadget().enable == true)
+								{
+									//reset timer every 0.1 to add particle "electro" til lifetimes is over
+									temp2->getGadget().currentTime += deltaTime;
+									temp2->getGadget().currentLifeTime -= deltaTime;
+									if (temp2->getGadget().currentTime > 0.1f)
+									{
+										Game::getGraphics().addParticle("electro", 1, 1, empplaced->getPosition(), Vector4(0.0, 1.0, 0.0, 0.0), 0.1);
+										temp2->getGadget().currentTime = 0;
+									}
+								}
+								if (temp2->getGadget().currentLifeTime <= 0 && temp2->getGadget().enable == true)
+								{
+									temp2->getGadget().currentTime += deltaTime;
+									
+									if (temp2->getGadget().currentTime >= temp2->getGadget().lifeTime && 
+										temp2->getGadget().type == GadgetType::EMP)
+									{
+										empplaced->setPosition(Vector3(0,-100,-100));
+									}
+									if (temp2->getGadget().currentTime >= temp2->getGadget().cooldown)
+									{
+										temp2->getGadget().currentTime = 0.0f;
+										temp2->getGadget().currentLifeTime = temp2->getGadget().lifeTime;
+										temp2->getGadget().enable = false;//reset
+									}
+								}
+							}						
+						}
 					}
 				}
 				if (this->vehicleSlots->getItem(Slots::RIGHT) != nullptr)
@@ -1530,7 +1595,7 @@ void Vehicle::updatePowerUpEffects(float deltaTime)
 		this->vehicleBody1->setColor(Vector4(0.0, 1.0, 0.0, 1.0));
 	}
 	// reset stats if no power up
-	else
+	else if(!nitroTrue)
 	{
 		this->updatedStats.accelerationRate = this->defaultStats.accelerationRate;
 		this->updatedStats.handlingRate = this->defaultStats.handlingRate;
