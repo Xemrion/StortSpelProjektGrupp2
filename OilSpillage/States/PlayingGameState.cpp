@@ -9,6 +9,82 @@
 #include "../UI/Playing/UICompletedStage.h"
 #include "../UI/Playing/UIBeforePlaying.h"
 
+#include <d3d11_4.h>
+#include <dxgi1_6.h>
+
+#pragma comment(lib, "dxgi.lib")
+
+#include <psapi.h>
+
+#include <string>
+
+#define RELEASE_DEBUG
+
+std::string vramUsage(bool messageBox)
+{
+	IDXGIFactory* dxgifactory = nullptr;
+	HRESULT ret_code = ::CreateDXGIFactory(
+		__uuidof(IDXGIFactory),
+		reinterpret_cast<void**>(&dxgifactory));
+
+	char msg[100] = { 0 };
+	if (SUCCEEDED(ret_code))
+	{
+		IDXGIAdapter* dxgiAdapter = nullptr;
+		
+		if (SUCCEEDED(dxgifactory->EnumAdapters(0, &dxgiAdapter)))
+		{
+			IDXGIAdapter4* dxgiAdapter4 = NULL;
+			if (SUCCEEDED(dxgiAdapter->QueryInterface(__uuidof(IDXGIAdapter4), (void**)&dxgiAdapter4)))
+			{
+				DXGI_QUERY_VIDEO_MEMORY_INFO info;
+
+				if (SUCCEEDED(dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
+				{
+					float memoryUsage = float(info.CurrentUsage / 1024.0 / 1024.0); //MiB
+
+					sprintf_s(msg, "%.2f MiB VRAM used", memoryUsage);
+					if (messageBox)
+						MessageBoxA(0, msg, "VRAM", 0);
+				};
+
+				dxgiAdapter4->Release();
+			}
+			dxgiAdapter->Release();
+		}
+		dxgifactory->Release();
+	}
+
+	return std::string(msg);
+}
+
+std::string ramUsage(bool messageBox)
+{
+	//src: https://docs.microsoft.com/en-us/windows/desktop/api/psapi/ns-psapi-_process_memory_counters
+
+	DWORD currentProcessID = GetCurrentProcessId();
+
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, currentProcessID);
+	char msg[100] = { 0 };
+
+	PROCESS_MEMORY_COUNTERS pmc{};
+	if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
+	{
+		//PagefileUsage is the:
+			//The Commit Charge value in bytes for this process.
+			//Commit Charge is the total amount of memory that the memory manager has committed for a running process.
+
+		float memoryUsage = float(pmc.PagefileUsage / 1024.0 / 1024.0); //MiB
+
+		sprintf_s(msg, "%.2f MiB committed RAM", memoryUsage);
+		if (messageBox)
+			MessageBoxA(0, msg, "RAM", 0);
+	}
+
+	CloseHandle(hProcess);
+	return std::string(msg);
+}
+
 void PlayingGameState::fillTestParticle()
 {
 	this->colors[0] = this->graphics.getTestParticleSystem()->getColor(0).x;
@@ -63,9 +139,6 @@ void PlayingGameState::initAI()
 PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_BEFORE_PLAYING)
 {
 
-#if defined(_DEBUG) || defined(RELEASE_DEBUG)
-	pausedTime = false;
-#endif // _DEBUG
 	this->current_item = NULL;
 
 	config.seed = seed;
@@ -146,13 +219,14 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 	loadMultitileLayouts("data/layouts/multitilePrefabs.dat");
 	graphics.loadModel("Entities/Drone");
-
-	graphics.loadModel("Hospital");
-	std::string modelPath = MODEL_ROOT_DIR;
+	
+	std::string modelPath;
+	modelPath = MODEL_ROOT_DIR;
 	modelPath += "Entities/Roller_Melee";
 	graphics.loadMesh(modelPath);
-	graphics.loadMaterial(modelPath, true);
-	graphics.loadModel("Entities/Roller_Melee");
+	graphics.loadMaterial("Entities/Roller_Melee");
+	graphics.loadModel("Hospital");
+	//graphics.loadModel("Entities/Roller_Melee");
 	graphics.loadModel("Houses/testHouse");
 	graphics.loadModel("Houses/testHouse2");
 	graphics.loadModel("Houses/testHouse3");
@@ -304,6 +378,8 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
+	ImGui::Text("%s", ramUsage(false).c_str());
+	ImGui::Text("%s", vramUsage(false).c_str());
 	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
 	
 
@@ -559,19 +635,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
-		if (Input::isKeyPressed(Keyboard::LeftAlt))
-		{
-			pausedTime = !pausedTime;
-		}
 
-		if (!pausedTime && time > 0.0f)
-		{
-			time = std::max(time - deltaTime, 0.0f);
-		}
-		else if (time <= 0.0f)
-		{
-			Game::setState(Game::STATE_HIGHSCORE);
-		}
 #else
 		if (time > 0.0f)
 		{
@@ -747,7 +811,7 @@ void PlayingGameState::update(float deltaTime)
 		ImGui_Driving();
 		//ImGui_ProcGen();
 		//ImGui_AI();
-		ImGui_Particles();
+		//ImGui_Particles();
 		//ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -1170,3 +1234,4 @@ Vector3 PlayingGameState::getCameraPos()
 {
 	return this->camera->getPosition();
 }
+
