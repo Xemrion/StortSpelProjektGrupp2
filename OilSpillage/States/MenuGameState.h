@@ -23,6 +23,7 @@ private:
 	Graphics& graphics;
 	std::unique_ptr<UserInterface> menues[MENUCOUNT];
 	int currentMenu;
+	int oldMenu;
 	Texture* textureLogo;
 	
 	std::unique_ptr<VehicleSlots> slots;
