@@ -5,7 +5,7 @@ void TurretHandler::destroyTurret(int index)
 {
 	if (turrets[index]->getRigidBody() != nullptr)
 	{
-		physics->DeleteRigidBody(turrets[index]->getRigidBody());
+		physics->deleteRigidBody(turrets[index]->getRigidBody());
 	}
 	delete turrets[index];
 	turrets.erase(turrets.begin() + index);
