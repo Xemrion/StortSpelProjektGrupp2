@@ -368,7 +368,7 @@ void PlayingGameState::ImGui_Particles()
 	ImGui::SliderFloat("First size", &size1, 0.0f, 1.0f);
 	ImGui::SliderFloat("Second size", &size2, 0.0f, 1.0f);
 	ImGui::SliderFloat("Init.w (size for electro)", &elSize, 0.0f, 20.0f);
-	ImGui::SliderFloat("Init.z (spacing for electro)", &elSpacing, 0.0f, 20.0f);
+	ImGui::SliderFloat("Init.z (spacing for electro)", &elSpacing, 0.0f, 1.0f);
 	ImGui::SliderInt("Nr of particles times 8", &addNrOfParticles, 1, 10);
 	ImGui::SliderFloat("LifeTime", &lifeTime, 0.0f, 20.0f);
 	ImGui::SliderFloat("Vectorfield size", &vectorFieldSize, 0.0f, 10.0f);
