@@ -129,7 +129,6 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass, GameO
 	t.setOrigin(btVector3(Origin));
 	btBoxShape* box = new btBoxShape(size);
 
-
 	btVector3 inertia(0, 0, 0);
 	if (mass != 0.0f) {
 		box->calculateLocalInertia(mass, inertia);
@@ -228,13 +227,17 @@ btRaycastVehicle* Physics::addVehicle(btRaycastVehicle* vehicle)
 
 bool Physics::deleteRigidBody(btRigidBody* rb)
 {
-
 	for (int i = 0; i < this->bodies.size(); i++)
 	{
 		if (bodies[i] == rb)
 		{
 			this->world->removeRigidBody(rb);
 			bodies.erase(bodies.begin() + i);
+
+			btMotionState* motionState = rb->getMotionState();
+			btCollisionShape* shape = rb->getCollisionShape();
+			delete shape;
+			delete motionState;
 			delete rb;
 			return true;
 		}
