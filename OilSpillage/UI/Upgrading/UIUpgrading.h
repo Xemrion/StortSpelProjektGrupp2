@@ -25,7 +25,7 @@ private:
 public:
 	UIUpgrading();
 	virtual ~UIUpgrading();
-
+	virtual void unloadTextures();
 	void init();
 };
 

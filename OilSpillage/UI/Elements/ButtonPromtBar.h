@@ -28,6 +28,8 @@ public:
 	void draw(bool selected);
 	void setPositon(Vector2 position);
 	Vector2 getSize() const;
+
+	void unloadTextures();
 };
 
 #endif // !BUTTON_PROMPT_BAR_H

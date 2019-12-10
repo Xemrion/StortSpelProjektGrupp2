@@ -23,6 +23,8 @@ public:
 	virtual ~UIRandomItem();
 
 	void init();
+
+	virtual void unloadTextures();
 };
 
 #endif // !UI_RANDOM_ITEM_H

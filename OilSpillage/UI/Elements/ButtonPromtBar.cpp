@@ -118,3 +118,28 @@ Vector2 ButtonPromptBar::getSize() const
 {
 	return this->size;
 }
+
+void ButtonPromptBar::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/stick_left");
+	Game::getGraphics().unloadTexture("UI/stick_right");
+	Game::getGraphics().unloadTexture("UI/button_confirm");
+	Game::getGraphics().unloadTexture("UI/button_cancel");
+	Game::getGraphics().unloadTexture("UI/button_action_1");
+	Game::getGraphics().unloadTexture("UI/button_action_2");
+	Game::getGraphics().unloadTexture("UI/button_menu");
+	Game::getGraphics().unloadTexture("UI/stick_ps_left");
+	Game::getGraphics().unloadTexture("UI/stick_ps_right");
+	Game::getGraphics().unloadTexture("UI/button_ps_confirm");
+	Game::getGraphics().unloadTexture("UI/button_ps_cancel");
+	Game::getGraphics().unloadTexture("UI/button_ps_action_1");
+	Game::getGraphics().unloadTexture("UI/button_ps_action_2");
+	Game::getGraphics().unloadTexture("UI/button_ps_menu");
+	Game::getGraphics().unloadTexture("UI/stick_kb_left");
+	Game::getGraphics().unloadTexture("UI/stick_kb_right");
+	Game::getGraphics().unloadTexture("UI/button_kb_confirm");
+	Game::getGraphics().unloadTexture("UI/button_kb_cancel");
+	Game::getGraphics().unloadTexture("UI/button_kb_action_1");
+	Game::getGraphics().unloadTexture("UI/button_kb_action_2");
+	Game::getGraphics().unloadTexture("UI/button_kb_menu");
+}

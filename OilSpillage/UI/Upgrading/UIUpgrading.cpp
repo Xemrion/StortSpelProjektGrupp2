@@ -125,6 +125,14 @@ UIUpgrading::~UIUpgrading()
 {
 }
 
+void UIUpgrading::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/itemSelectorTitleBG");
+	this->itemSelector->unloadTextures();
+	this->gadgetSelector->unloadTextures();
+	this->statBox->unloadTextures();
+}
+
 void UIUpgrading::init()
 {
 	Game::getGraphics().loadTexture("UI/itemSelectorTitleBG");

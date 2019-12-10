@@ -23,6 +23,8 @@ public:
 	virtual ~UICredits();
 
 	void init();
+
+	virtual void unloadTextures();
 };
 
 #endif // !UI_CREDITS_H

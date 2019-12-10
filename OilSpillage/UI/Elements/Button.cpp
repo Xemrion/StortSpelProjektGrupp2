@@ -61,3 +61,8 @@ void Button::setText(std::string text)
 {
 	this->text.text = text;
 }
+
+void Button::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/button");
+}

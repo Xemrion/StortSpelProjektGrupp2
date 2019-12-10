@@ -36,6 +36,9 @@ public:
 
 	std::unique_ptr<Vehicle> & getPlayer();
 	void setPlayer(Vehicle* theVehicle);
+
+	virtual void unloadTextures();
+
 };
 
 #endif // !UPGRADING_GAME_STATE_H

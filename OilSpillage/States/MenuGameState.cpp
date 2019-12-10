@@ -59,7 +59,8 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 }
 
 MenuGameState::~MenuGameState() {
-	
+	Game::getGraphics().unloadTexture("UI/image2");
+
 }
 
 void MenuGameState::update(float deltaTime)

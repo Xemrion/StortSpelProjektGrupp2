@@ -36,7 +36,6 @@ UIControls::UIControls() : textureControls(nullptr)
 
 UIControls::~UIControls()
 {
-	Game::getGraphics().unloadTexture("UI/controls");
 }
 
 void UIControls::init()
@@ -64,4 +63,10 @@ void UIControls::init()
 
 	this->promptBar2 = std::make_unique<ButtonPromptBar>(prompts2, Game::getDrivingMode() ? 7 : 5);
 	this->promptBar2->setPositon(Vector2(SCREEN_WIDTH / 2 - this->promptBar2->getSize().x / 2, SCREEN_HEIGHT - this->promptBar2->getSize().y - 16.0f - this->promptBar->getSize().y - 8.0f));
+}
+
+void UIControls::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/controls");
+	this->promptBar->unloadTextures();
 }
