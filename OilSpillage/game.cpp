@@ -166,7 +166,8 @@ void Game::createCurrentState()
 		Container::playerInventory = std::make_unique<Container>();
 		this->gameInfo = GameInfo();
 		localScale = 1.0f;
-
+		if(state.get()!=nullptr)
+			state->unloadTextures();
 		state = std::make_unique<MenuGameState>();
 	}
 	else if (currentState == STATE_PLAYING)

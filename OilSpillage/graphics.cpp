@@ -1869,7 +1869,7 @@ void Graphics::presentScene()
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBufferPtr;
 	swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	deviceContext->ResolveSubresource(backBufferPtr.Get(), 0, renderTarget.Get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
-	swapChain->Present(0, 0);
+	swapChain->Present(1, 0);
 }
 
 void Graphics::fillLightBuffers()
