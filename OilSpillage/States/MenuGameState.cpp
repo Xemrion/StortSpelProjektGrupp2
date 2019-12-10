@@ -58,7 +58,6 @@ MenuGameState::MenuGameState() : graphics(Game::getGraphics()), currentMenu(MENU
 }
 
 MenuGameState::~MenuGameState() {
-	Game::getGraphics().unloadTexture("UI/image2");
 
 }
 
@@ -106,4 +105,15 @@ void MenuGameState::setCurrentMenu(Menu menu)
 VehicleSlots* MenuGameState::getSlots()
 {
 	return this->slots.get();
+}
+
+void MenuGameState::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/image2");
+	this->menues[MENU_MAIN]->unloadTextures();
+	this->menues[MENU_OPTIONS]->unloadTextures();
+	this->menues[MENU_CREDITS]->unloadTextures();
+	this->menues[MENU_CONTROLS]->unloadTextures();
+	this->menues[MENU_HIGHSCORE]->unloadTextures();
+	this->menues[MENU_LOAD]->unloadTextures();
 }
