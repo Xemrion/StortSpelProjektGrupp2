@@ -51,7 +51,7 @@ Physics::Physics() :broadphase(new btDbvtBroadphase())
 
 	bodies.push_back(body);
 
-	gContactAddedCallback = callbackFunc;
+	/*gContactAddedCallback = callbackFunc;*/
 }
 
 

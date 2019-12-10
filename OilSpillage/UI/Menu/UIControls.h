@@ -19,6 +19,8 @@ public:
 	virtual ~UIControls();
 
 	void init();
+
+	virtual void unloadTextures();
 };
 
 #endif // !UI_CONTROLS_H

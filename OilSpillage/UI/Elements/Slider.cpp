@@ -39,3 +39,9 @@ float Slider::getAmount() const
 {
 	return this->amount;
 }
+
+void Slider::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/sliderBG");
+	Game::getGraphics().unloadTexture("UI/sliderFG");
+}

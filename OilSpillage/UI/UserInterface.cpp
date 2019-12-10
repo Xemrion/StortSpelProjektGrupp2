@@ -95,3 +95,7 @@ void UserInterface::update(float deltaTime)
 	//this->resetShaders();
 	this->drawUI();
 }
+
+void UserInterface::unloadTextures()
+{
+}

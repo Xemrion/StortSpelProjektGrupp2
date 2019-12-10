@@ -100,6 +100,11 @@ void UIHighscore::init(bool send, std::string name)
 	this->sendHighscore = std::thread(&UIHighscore::loadHighscore, this, send, name);
 }
 
+void UIHighscore::unloadTextures()
+{
+	this->promptBar->unloadTextures();
+}
+
 void UIHighscore::loadHighscore(UIHighscore* ui, bool send, std::string name)
 {
 	while (!ui->loadingMutex.try_lock()) {}
