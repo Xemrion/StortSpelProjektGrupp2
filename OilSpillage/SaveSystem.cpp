@@ -221,6 +221,7 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 			weapon.bulletScale.x = saveSystem.getFloat("Item" + std::to_string(i) + "BulletScaleX");
 			weapon.bulletScale.y = saveSystem.getFloat("Item" + std::to_string(i) + "BulletScaleY");
 			weapon.bulletScale.z = saveSystem.getFloat("Item" + std::to_string(i) + "BulletScaleZ");
+			weapon.spreadRadians = saveSystem.getFloat("Item" + std::to_string(i) + "SpreadRadians");
 			weapon.maxSpread = saveSystem.getFloat("Item" + std::to_string(i) + "MaxSpread");
 			weapon.spreadIncreasePerSecond = saveSystem.getFloat("Item" + std::to_string(i) + "SpreadIncrease");
 			weapon.spreadDecreasePerSecond = saveSystem.getFloat("Item" + std::to_string(i) + "SpreadDecrease");
@@ -316,6 +317,7 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 				saveSystem.set("Item" + std::to_string(itemId) + "BulletScaleX", weapon.bulletScale.x);
 				saveSystem.set("Item" + std::to_string(itemId) + "BulletScaleY", weapon.bulletScale.y);
 				saveSystem.set("Item" + std::to_string(itemId) + "BulletScaleZ", weapon.bulletScale.z);
+				saveSystem.set("Item" + std::to_string(itemId) + "SpreadRadians", weapon.spreadRadians);
 				saveSystem.set("Item" + std::to_string(itemId) + "MaxSpread", weapon.maxSpread);
 				saveSystem.set("Item" + std::to_string(itemId) + "SpreadIncrease", weapon.spreadIncreasePerSecond);
 				saveSystem.set("Item" + std::to_string(itemId) + "SpreadDecrease", weapon.spreadDecreasePerSecond);
