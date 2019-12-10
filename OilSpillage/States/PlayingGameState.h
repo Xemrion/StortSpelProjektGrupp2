@@ -120,6 +120,8 @@ private:
 	int                             addNrOfParticles  {     1 };
 	float                             lifeTime          {     1 };
 	float                           timerForParticle  {   .0f };
+	float							elSize			  { 0.0f };
+	float							elSpacing         { 0.0f };
 	float                           vectorFieldPower  {  4.0f };
 	float                           vectorFieldSize   {  2.2f };
 	float                           randomPosPower    {  0.0f };
