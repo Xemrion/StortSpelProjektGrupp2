@@ -1076,7 +1076,7 @@ void PlayingGameState::generateMapPowerUps()
 			}
 		}
 		position.y += 2.0;
-		PowerUp p(position, physics.get(), (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
+		PowerUp p(position, (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
 
 		addPowerUp(p);
 

@@ -603,7 +603,7 @@ void ActorManager::actorDied(int index)
 	if (normalizedRandom >= 0.950)
 	{
 		static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-			PowerUp(actors[index]->getPosition(), physics,
+			PowerUp(actors[index]->getPosition(),
 				PowerUpType::Health)
 		);
 	}
