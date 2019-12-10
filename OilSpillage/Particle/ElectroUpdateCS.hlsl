@@ -57,18 +57,18 @@ void main(uint3 DTid : SV_DispatchThreadID)
     if (myID < NumParticles.x && NumParticles.x > 0)
     {
         Particle p = CurrentSimulationState.Consume();
-        float moveSine = 0.0f;
-        float fieldPower = 1.0f;
-        float fieldSize = 1.0f;
-        float3 acceleration = 0.0f;
-        float xSin = sin((sin(-5.8f * moveSine - 1) + p.position.x) * (1 / fieldSize) - (moveSine * 8.2f));
-        float ySin = 0.0f;
-        float zSin = sin((sin(-4.8f * moveSine - 2) + p.position.z) * (1 / fieldSize) - (moveSine * 7.7f));
-        acceleration += ((2.85f * fieldPower * normalize(float3(xSin, ySin, zSin)))) * TimeFactors.x;
+        //float moveSine = 0.0f;
+        //float fieldPower = 1.0f;
+        //float fieldSize = 1.0f;
+        //float3 acceleration = 0.0f;
+        //float xSin = sin((sin(-5.8f * moveSine - 1) + p.position.x) * (1 / fieldSize) - (moveSine * 8.2f));
+        //float ySin = 0.0f;
+        //float zSin = sin((sin(-4.8f * moveSine - 2) + p.position.z) * (1 / fieldSize) - (moveSine * 7.7f));
+        //acceleration += ((2.85f * fieldPower * normalize(float3(xSin, ySin, zSin)))) * TimeFactors.x;
 
-        p.velocity.xyz = p.velocity.xyz + acceleration;
+        //p.velocity.xyz = p.velocity.xyz + acceleration;
      
-        p.position.xyz = p.position.xyz + p.velocity.xyz * TimeFactors.x;
+        //p.position.xyz = p.position.xyz + p.velocity.xyz * TimeFactors.x;
         p.time.x = p.time.x + TimeFactors.x;
         if (p.time.x < p.time.y)
         {
