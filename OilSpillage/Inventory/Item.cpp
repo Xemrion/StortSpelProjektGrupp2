@@ -7,6 +7,11 @@
 #include "../PG/defs.hpp"
 std::vector<std::shared_ptr<Item>> Item::premadeItems;
 
+float Item::fixedDecimals(float number, int decimals)
+{
+	return static_cast<int>(number * std::powf(10, decimals)) / std::powf(10, decimals);
+}
+
 GameObject* Item::getObjectByName(std::string name)
 {
 	for (int i = 0; i < Item::premadeItems.size(); i++)
@@ -57,7 +62,7 @@ void Item::init()
 	spike->setScale(Vector3(0.05f));
 	spike->setPosition(spike->mesh->getAABB().scale(spike->getScale()).maxPos * Vector3(0, 1, 0));
 
-	GameObject* nitro = new GameObject();
+	/*GameObject* nitro = new GameObject();
 	nitro->mesh = graphics.getMeshPointer("Entities/Nitro");
 	nitro->setMaterial(graphics.getMaterial("Entities/Nitro"));
 	nitro->setScale(Vector3(0.05f));

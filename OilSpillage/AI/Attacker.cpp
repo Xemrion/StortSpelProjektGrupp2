@@ -16,7 +16,7 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	scaling(newHealth, 1.3);
 	setMaxHealth(newHealth);
 	setHealth(newHealth);
-	Game::getGraphics().loadModel("Entities/Roller_Melee");
+
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 	this->attackRange = 12;
@@ -69,14 +69,20 @@ Vector3 Attacker::calculateVelocity()
 	//Move away from player if within 11, move towards it if further than 12, stand still if between the two
 
 	Vector3 desiredDirection = destination - position;
+	if (destination == targetPos)
+	{
+		float deltaZ = destination.z - position.z;
+		float deltaX = destination.x - position.x;
+		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+		if (distance <= 11 * 11)
+		{
+			desiredDirection = -desiredDirection;
+		}
+		else if (distance < 12 * 12)
+		{
+			desiredDirection = Vector3();
+		}
 
-	if (desiredDirection.Length() <= 11)
-	{
-		desiredDirection = -desiredDirection;
-	}
-	else if (desiredDirection.Length() < 12)
-	{
-		desiredDirection = Vector3();
 	}
 	return desiredDirection;
 }

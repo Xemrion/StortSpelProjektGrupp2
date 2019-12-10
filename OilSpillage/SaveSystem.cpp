@@ -180,6 +180,9 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 	info.nrOfObjectives = saveSystem.getInteger("GameObjectives");
 	info.highScoreTotal = saveSystem.getInteger("GameScore");
 	info.time = saveSystem.getFloat("GameTime");
+	Game::setLocalScale(saveSystem.getFloat("GameLocalScale"));
+
+	if (saveSystem.getFloat("GameLocalScale") < 1.0f) Game::setLocalScale(1.0f + info.nrOfClearedStages * 0.05f); //Fix for old save files
 
 	int itemSlots[] = { -1, -1, -1, -1, -1, -1, -1 };
 	for (int i = 0; i < Slots::SIZEOF; i++)
@@ -218,6 +221,7 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 			weapon.bulletScale.x = saveSystem.getFloat("Item" + std::to_string(i) + "BulletScaleX");
 			weapon.bulletScale.y = saveSystem.getFloat("Item" + std::to_string(i) + "BulletScaleY");
 			weapon.bulletScale.z = saveSystem.getFloat("Item" + std::to_string(i) + "BulletScaleZ");
+			weapon.spreadRadians = saveSystem.getFloat("Item" + std::to_string(i) + "SpreadRadians");
 			weapon.maxSpread = saveSystem.getFloat("Item" + std::to_string(i) + "MaxSpread");
 			weapon.spreadIncreasePerSecond = saveSystem.getFloat("Item" + std::to_string(i) + "SpreadIncrease");
 			weapon.spreadDecreasePerSecond = saveSystem.getFloat("Item" + std::to_string(i) + "SpreadDecrease");
@@ -248,6 +252,17 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 			float topSpeed = saveSystem.getFloat("Item" + std::to_string(i) + "TopSpeed");
 
 			Container::playerInventory->addItem(new ItemChassi(name, maxHealth, topSpeed, object));
+		}
+		else if (className == "ItemGadget")
+		{
+			Gadget gadget;
+			gadget.lifeTime = saveSystem.getFloat("Item" + std::to_string(i) + "Lifetime");
+			gadget.type = static_cast<GadgetType>(saveSystem.getInteger("Item" + std::to_string(i) + "Type"));
+			gadget.radius = saveSystem.getFloat("Item" + std::to_string(i) + "Radius");
+			gadget.cooldown = saveSystem.getFloat("Item" + std::to_string(i) + "Cooldown");
+			gadget.power = saveSystem.getFloat("Item" + std::to_string(i) + "Power");
+
+			Container::playerInventory->addItem(new ItemGadget(name, gadget, object));
 		}
 		else
 		{
@@ -282,6 +297,7 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 	saveSystem.set("GameObjectives", info.nrOfObjectives);
 	saveSystem.set("GameScore", info.highScoreTotal);
 	saveSystem.set("GameTime", static_cast<PlayingGameState*>(Game::getCurrentState())->getTime());
+	saveSystem.set("GameLocalScale", Game::getLocalScale());
 
 	for (int i = 0; i < ItemType::TYPES_SIZEOF; i++)
 	{
@@ -302,6 +318,7 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 			ItemWeapon* itemWeapon = dynamic_cast<ItemWeapon*>(item);
 			ItemWheel* itemWheel = dynamic_cast<ItemWheel*>(item);
 			ItemChassi* itemChassi = dynamic_cast<ItemChassi*>(item);
+			ItemGadget* itemGadget = dynamic_cast<ItemGadget*>(item);
 			if (itemWeapon)
 			{
 				Weapon weapon = itemWeapon->getWeapon();
@@ -312,6 +329,7 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 				saveSystem.set("Item" + std::to_string(itemId) + "BulletScaleX", weapon.bulletScale.x);
 				saveSystem.set("Item" + std::to_string(itemId) + "BulletScaleY", weapon.bulletScale.y);
 				saveSystem.set("Item" + std::to_string(itemId) + "BulletScaleZ", weapon.bulletScale.z);
+				saveSystem.set("Item" + std::to_string(itemId) + "SpreadRadians", weapon.spreadRadians);
 				saveSystem.set("Item" + std::to_string(itemId) + "MaxSpread", weapon.maxSpread);
 				saveSystem.set("Item" + std::to_string(itemId) + "SpreadIncrease", weapon.spreadIncreasePerSecond);
 				saveSystem.set("Item" + std::to_string(itemId) + "SpreadDecrease", weapon.spreadDecreasePerSecond);
@@ -342,6 +360,17 @@ void SaveSystem::saveGame(VehicleSlots* slots)
 				saveSystem.set("Item" + std::to_string(itemId) + "TopSpeed", itemChassi->getSpeed());
 
 				saveSystem.set("Item" + std::to_string(itemId) + "Class", "ItemChassi");
+			}
+			else if (itemGadget)
+			{
+				Gadget gadget = itemGadget->getGadget();
+				saveSystem.set("Item" + std::to_string(itemId) + "Lifetime", gadget.lifeTime);
+				saveSystem.set("Item" + std::to_string(itemId) + "Type", gadget.type);
+				saveSystem.set("Item" + std::to_string(itemId) + "Radius", gadget.radius);
+				saveSystem.set("Item" + std::to_string(itemId) + "Cooldown", gadget.cooldown);
+				saveSystem.set("Item" + std::to_string(itemId) + "Power", gadget.power);
+
+				saveSystem.set("Item" + std::to_string(itemId) + "Class", "ItemGadget");
 			}
 			else
 			{

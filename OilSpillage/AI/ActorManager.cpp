@@ -46,41 +46,18 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	if (spawnTimer <= 0)
 	{
 		spawnEnemies(targetPos);
-		
+
 		spawnTimer = spawnCooldown;
 	}
 #endif
 
-	Vector3 newPos;
-	float deltaX;
-	float deltaZ;
-	float distance;
-	for (int i = 0; i < groups.size(); i++)
-	{
-		deltaX = groups[i].averagePos.x - targetPos.x;
-		deltaZ = groups[i].averagePos.z - targetPos.z;
-		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-		//(TileSize * nrOfTiles)^2
-		if (distance > (20 * 10) * (20 * 10))
-		{
-			newPos = findTeleportPos(targetPos, 50, 100);
-			for (int j = 0; j < groups[i].actors.size(); j++)
-			{
-				Actor* current = groups[i].actors[j];
-				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-				physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-				if (j % 5 == 0)
-				{
-					newPos = findTeleportPos(targetPos, 50, 100);
-				}
-			}
-		}
-	}
-	for (int i = 0; i < groups.size(); i++)
-	{
-		groups[i].update(targetPos);
-	}
+
 	updateGroups();
+	for (int i = 0; i < groups.size(); i++)
+	{
+		groups[i].update();
+	}
+	teleportActorsToPlayer(targetPos);
 	turretHandler.update(dt, targetPos);
 	if (frameCount % 20 == 0)
 	{
@@ -93,13 +70,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 void ActorManager::createAttacker(float x, float z, int weaponType)
 {
 	this->actors.push_back(new Attacker(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
-}
-
-void ActorManager::createSniper(float x, float z, int weaponType)
-{
-	this->actors.push_back(new Sniper(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createTurret(float x, float z, int weaponType)
@@ -110,19 +81,19 @@ void ActorManager::createTurret(float x, float z, int weaponType)
 void ActorManager::createChaseCar(float x, float z)
 {
 	this->actors.push_back(new ChaseCar(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createShootCar(float x, float z, int weaponType)
 {
 	this->actors.push_back(new ShootCar(x, z, weaponType, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 void ActorManager::createSwarm(float x, float z)
 {
 	this->actors.push_back(new Swarm(x, z, physics));
-	initGroupForActor(actors.at(actors.size() - 1));
+	initGroupForActor(actors[actors.size() - 1]);
 }
 
 Boss* ActorManager::createBoss(float x, float z, int weaponType, float scalingNr)
@@ -178,7 +149,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 					{
 						if (soundTimer > 0.05f) {
-							Sound::play("./data/sound/HitSound.wav");
+							Sound::play("HitSound.wav");
 							soundTimer = 0;
 						}
 						if (bulletArray[j].getFlame())// Damage over Time
@@ -205,41 +176,17 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
 					}
 				}
-				else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
+				else if (/*bulletArray[j].getTimeLeft() > 0 && */bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						Sound::play("./data/sound/HitSound.wav");
-						soundTimer = 0;
-					}
-					if(bulletArray[j].getFlame())// Damage over Time
-					{
-						actors[i]->setFire(bulletArray[j].getFlameTimer());
-					}
-					if(bulletArray[j].getKnockback())// Knockback
-					{
-						actors[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
-					}
-					if(bulletArray[j].getSplashBool())
-					{
-						for(int k = 0; k < actors.size(); k++)
+						if (bulletArray[j].getWeaponType() == WeaponType::Star)
 						{
-							float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
-							float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-							if(k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
-							{
-								actors[k]->changeHealth(-bulletArray[j].getDamage()/(20-Game::getGameInfo().nrOfClearedStages));
-							}
+							Sound::play("StarPowerupHit.mp3", 0.75f);
 						}
-					}
-
-					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
-					bulletArray[j].destroy();
-				}
-				if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
-				{
-					if (soundTimer > 0.05f) {
-						Sound::play("data/sound/HitSound.wav");
+						else
+						{
+							Sound::play("HitSound.wav");
+						}
 						soundTimer = 0;
 					}
 					if (bulletArray[j].getFlame())// Damage over Time
@@ -263,8 +210,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 							}
 						}
 					}
+
 					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
-					// dont remove the melee weapon
+					if (!bulletArray[j].getMelee())
+						bulletArray[j].destroy();
 				}
 			}
 		}
@@ -288,7 +237,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						if (this->bosses[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 						{
 							if (soundTimer > 0.05f) {
-								Sound::play("./data/sound/HitSound.wav");
+								Sound::play("HitSound.wav");
 								soundTimer = 0;
 							}
 							if (bulletArray[j].getFlame())// Damage over Time
@@ -318,7 +267,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
 					{
 						if (soundTimer > 0.05f) {
-							Sound::play("./data/sound/HitSound.wav");
+							Sound::play("HitSound.wav");
 							soundTimer = 0;
 						}
 						if (bulletArray[j].getFlame())// Damage over Time
@@ -348,7 +297,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
 					{
 						if (soundTimer > 0.05f) {
-							Sound::play("data/sound/HitSound.wav");
+							Sound::play("HitSound.wav");
 							soundTimer = 0;
 						}
 						if (bulletArray[j].getFlame())// Damage over Time
@@ -391,22 +340,12 @@ void ActorManager::spawnAttackers(const Vector3& originPos)
 		createAttacker(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
-void ActorManager::spawnSnipers(const Vector3& originPos)
-{
-	for (int i = 0; i < 2; i++)
-	{
-		createSniper(originPos.x + i, originPos.z, (rand() % 8) + 1);
-		createSniper(originPos.x, originPos.z + i, (rand() % 8) + 1);
-		createSniper(originPos.x - i, originPos.z, (rand() % 8) + 1);
-	}
-}
+
 void ActorManager::spawnChaseCars(const Vector3& originPos)
 {
 	for (int i = 0; i < 2; i++)
 	{
 		createChaseCar(originPos.x + i, originPos.z);
-		createChaseCar(originPos.x, originPos.z + i);
-		createChaseCar(originPos.x - i, originPos.z);
 	}
 }
 
@@ -415,8 +354,6 @@ void ActorManager::spawnShootCars(const Vector3& originPos)
 	for (int i = 0; i < 2; i++)
 	{
 		createShootCar(originPos.x + i, originPos.z, (rand() % 8) + 1);
-		createShootCar(originPos.x, originPos.z + i, (rand() % 8) + 1);
-		createShootCar(originPos.x - i, originPos.z, (rand() % 8) + 1);
 	}
 }
 
@@ -430,84 +367,67 @@ void ActorManager::spawnSwarm(const Vector3& originPos)
 	}
 }
 
-void ActorManager::updateActors(float dt, const Vector3& targetPos)
+void ActorManager::teleportActorsToPlayer(const Vector3& targetPos)
 {
-	bool hasDied = false;
-	for (int i = 0; i < this->groups.size(); i++)
+	Vector3 newPos;
+	float deltaX;
+	float deltaZ;
+	float distance;
+	for (int i = 0; i < groups.size(); i++)
 	{
-		for (int j = 0; j < groups[i].actors.size(); j++)
+		deltaX = groups[i].averagePos.x - targetPos.x;
+		deltaZ = groups[i].averagePos.z - targetPos.z;
+		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+		//(TileSize * nrOfTiles)^2
+		if (distance > (20 * 10) * (20 * 10))
 		{
-			if (!groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
+			newPos = findTeleportPos(targetPos, 50, 100);
+			for (int j = 0; j < groups[i].actors.size(); j++)
 			{
-
-				groups[i].actors[j]->update(dt, targetPos);
-			}
-			else if (groups[i].actors[j]->isDead() && groups[i].actors[j] != nullptr)
-			{
-				Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
-				if (ptr != nullptr)
-				{
-					if (ptr->getType() == TypeOfMission::KillingSpree)
-					{
-						ptr->killEnemy();
-					}
+				Actor* current = groups[i].actors[j];
+				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
+				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
+				Spitfire* ptr = dynamic_cast<Spitfire*>(current);
+				if (ptr != nullptr) {
+					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
+					ptr->getVehicleBody1()->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y + 0.55f, newPos.z));
 				}
-				hasDied = true;
-			}
-		}
-	}
-	if (hasDied)
-	{
-		for (int i = this->actors.size() - 1; i >= 0; i--)
-		{
-			float normalizedRandom = float(rand()) / RAND_MAX;
-			if (normalizedRandom >= 0.995)
-			{
-				static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-					PowerUp(actors[i]->getPosition(), physics, 
-						PowerUpType::Health)
-				);
-			}
-			if (actors[i]->isDead())
-			{
-				Game::getGameInfo().addHighScore(actors[i]->getPoints());
-				destroyActor(i);
+				else {
+					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
+				}
+
+				if (j % 5 == 0)
+				{
+					//newPos = findTeleportPos(targetPos, 50, 100);
+				}
 			}
 		}
 	}
 }
 
+void ActorManager::updateActors(float dt, const Vector3& targetPos)
+{
+	for (int i = this->actors.size() - 1; i >= 0; i--)
+	{
+		if (actors[i]->isDead())
+		{
+			actorDied(i);
+			continue;
+		}
+		actors[i]->update(dt, targetPos);
+	}
+}
+
 void ActorManager::updateBosses(float dt, const Vector3& targetPos)
 {
-	//gives a new pos if too far away from player
-	//for (int i = 0; i < this->bosses.size(); i++)
-	//{
-	//	float deltaX = this->bosses[i]->getPosition().x - targetPos.x;
-	//	float deltaZ = this->bosses[i]->getPosition().z - targetPos.z;
-	//	float distanceToPlayer = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
-	//	//(TileSize * nrOfTiles)^2
-	//	if (distanceToPlayer > (100))
-	//	{
-	//		Vector3 newPos = generateObjectivePos(targetPos, 50, 150);
-
-	//		Boss* current = this->bosses[i];
-	//		current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
-	//		physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
-	//	}
-	//}
-
-	/*Vector3 newPos = generateObjectivePos(targetPos, 50, 100);
-	createAttacker(originPos.x + i, originPos.z, (rand() % 8) + 1);*/
-
 	bool hasDied = false;
-
 	for (int i = 0; i < this->bosses.size(); i++)
 	{
-		if (!bosses[i]->isDead() && bosses[i] != nullptr)
+		if (bosses[i] != nullptr && !bosses[i]->isDead())
 		{
 			bosses[i]->update(dt, targetPos); //creash
 		}
-		else if (bosses[i]->isDead() && bosses[i] != nullptr)
+		else if (bosses[i] != nullptr && bosses[i]->isDead())
 		{
 			hasDied = true;
 		}
@@ -549,7 +469,7 @@ int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 
 void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 {
-	groups.at(groupIndex).actors.push_back(actor);
+	groups[groupIndex].actors.push_back(actor);
 	groups[groupIndex].updateDuty();
 }
 
@@ -617,11 +537,7 @@ void ActorManager::updateGroups()
 		for (int k = 0; k < groups[i].actors.size(); k++)
 		{
 			DynamicActor* current = groups[i].actors[k];
-			if (current->isDead() || current == nullptr)
-			{
-				leaveGroup(i, k);
-			}
-			else
+			if (current != nullptr && !current->isDead())
 			{
 				Vector3 curAveragePos = groups[i].getAveragePos();
 				Vector3 actorPos = current->getPosition();
@@ -642,7 +558,7 @@ void ActorManager::updateGroups()
 					}
 					//create its own group
 					else
-					{	
+					{
 						leaveGroup(i, k);
 						createGroup(current);
 					}
@@ -659,6 +575,10 @@ void ActorManager::updateGroups()
 					}
 				}
 			}
+			else
+			{
+				leaveGroup(i, k);
+			}
 
 		}
 		if (groups[i].actors.empty())
@@ -669,12 +589,35 @@ void ActorManager::updateGroups()
 	}
 }
 
-void ActorManager::destroyActor(int index)
+void ActorManager::actorDied(int index)
 {
+	Objective* ptr = static_cast<PlayingGameState*>(Game::getCurrentState())->getObjHandler().getObjective(0);
+	if (ptr != nullptr)
+	{
+		if (ptr->getType() == TypeOfMission::KillingSpree)
+		{
+			ptr->killEnemy();
+		}
+	}
+	float normalizedRandom = float(rand()) / RAND_MAX;
+	if (normalizedRandom >= 0.950)
+	{
+		static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
+			PowerUp(actors[index]->getPosition(),
+				PowerUpType::Health)
+		);
+	}
+	Game::getGameInfo().addHighScore(actors[index]->getPoints());
 	if (actors[index]->getRigidBody() != nullptr)
 	{
-		physics->DeleteRigidBody(actors[index]->getRigidBody());
+		physics->deleteRigidBody(actors[index]->getRigidBody());
 	}
+
+	if (dynamic_cast<Spitfire*>(actors[index]))
+	{
+		physics->deleteRigidBody(dynamic_cast<Spitfire*>(actors[index])->getVehicleBody1()->getRigidBody());
+	}
+
 	delete actors[index];
 	actors.erase(actors.begin() + index);
 }
@@ -683,7 +626,7 @@ void ActorManager::destroyBoss(int index)
 {
 	if (bosses[index]->getRigidBody() != nullptr)
 	{
-		physics->DeleteRigidBody(bosses[index]->getRigidBody());
+		physics->deleteRigidBody(bosses[index]->getRigidBody());
 	}
 	delete bosses[index];
 	bosses.erase(bosses.begin() + index);
@@ -720,26 +663,26 @@ Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)
 	targetVelocity.Normalize();
 	Vector3 predictedPos = targetPos + targetVelocity * 20;
 	return predictedPos;
-} 
+}
 Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept
 {
 
 	for (float i = 0;; i += 1.0) {
-		Vector3 position = map->generateRoadPositionInWorldSpace(*rng);
+		Vector3 position = map->generateNonBuildingPositionInWorldSpace(*rng);
 		float distance = (position - targetPos).Length();
 		if ((distance <= maxDistance + i) && (distance >= minDistance))
 		{
 			return position;
 		}
-		else
-		{
-			position = map->generateGroundPositionInWorldSpace(*rng);
-			float distance = (position - targetPos).Length();
-			if ((distance <= maxDistance + i) && (distance >= minDistance))
+		/*	else
 			{
-				return position;
-			}
-		}
+				position = map->generateGroundPositionInWorldSpace(*rng);
+				float distance = (position - targetPos).Length();
+				if ((distance <= maxDistance + i) && (distance >= minDistance))
+				{
+					return position;
+				}
+			}*/
 	}
 	assert(false and "BUG: Shouldn't be possible!");
 	return { -1.0f, -1.0f, -1.0f }; //  silences a warning

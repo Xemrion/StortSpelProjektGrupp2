@@ -30,10 +30,10 @@ public:
 
 private:
 	float health;
-	float particleTimer = 0.0f;
+	float particleTimer;
 	int points;
-protected:
 	float fireTimer;
+protected:
 	bool isHit = false;
 	float deltaTime;
 	Vector3 targetPos;

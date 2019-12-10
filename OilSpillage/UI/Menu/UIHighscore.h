@@ -29,6 +29,8 @@ public:
 
 	void init() {}
 	void init(bool send, std::string name);
+
+	virtual void unloadTextures();
 };
 
 #endif // !UI_HIGHSCORE_H

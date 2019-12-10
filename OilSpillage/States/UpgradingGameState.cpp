@@ -35,6 +35,8 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 
 UpgradingGameState::~UpgradingGameState()
 {
+
+
 }
 
 Vehicle* UpgradingGameState::getVehicle()
@@ -50,10 +52,10 @@ void UpgradingGameState::update(float deltaTime)
 	this->theVehicle->updateWeapon(deltaTime);
 	this->theVehicle->update(deltaTime, 0, 0, 0, Vector2(0, 0));
 
-	if (Input::getStrengthRnoMouse() > 0.0f)
+	if (Input::getStrengthR() > 0.0f)
 	{
 		Quaternion rotationNow = this->theVehicle->getRotationQuaternion();
-		Quaternion rotationDest = Quaternion::Lerp(rotationNow, Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), std::atan2f(Input::getDirectionRnoMouse().x, Input::getDirectionRnoMouse().y)), deltaTime * 4);
+		Quaternion rotationDest = Quaternion::Lerp(rotationNow, Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), std::atan2f(Input::getDirectionR().x, Input::getDirectionR().y)), deltaTime * 4);
 
 		btQuaternion trams(rotationDest.x, rotationDest.y, rotationDest.z, rotationDest.w);
 		this->theVehicle->getRigidBody()->getWorldTransform().setRotation(trams);
@@ -68,7 +70,8 @@ void UpgradingGameState::update(float deltaTime)
 
 	this->graphics.clearScreen(Vector4(Colors::Red));
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
-	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2());
+	RECT rc = SimpleMath::Rectangle();
+	UserInterface::getSpriteBatch()->Draw(this->textureBG->getShaderResView(), Vector2(SCREEN_WIDTH/2,SCREEN_HEIGHT/2), NULL , Colors::White, 0, Vector2(textureBG->getWidth()/2,textureBG->getHeight()/2),2.0f);
 	UserInterface::getSpriteBatch()->End();
 
 	this->graphics.render(this->camera.get(), deltaTime);
@@ -92,4 +95,11 @@ std::unique_ptr<Vehicle>& UpgradingGameState::getPlayer()
 void UpgradingGameState::setPlayer(Vehicle* theVehicle)
 {
 	this->theVehicle.reset(theVehicle);// = std::make_unique<Vehicle>(theVehicle);
+}
+
+void UpgradingGameState::unloadTextures()
+{
+	this->menues[MENU_UPGRADING]->unloadTextures();
+	this->menues[MENU_RANDOMITEM]->unloadTextures();
+	Game::getGraphics().unloadTexture("UI/garageThing");
 }

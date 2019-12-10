@@ -6,9 +6,85 @@
 #include "../UI/Menu/UIOptions.h"
 #include "../PG/MinimapTextureGenerator.hpp"
 #include "../PG/Profiler.hpp"
-#include <future>
 #include "../UI/Playing/UICompletedStage.h"
 #include "../UI/Playing/UIBeforePlaying.h"
+#include "../UI/Menu/UIControls.h"
+
+#include <d3d11_4.h>
+#include <dxgi1_6.h>
+
+#pragma comment(lib, "dxgi.lib")
+
+#include <psapi.h>
+
+#include <string>
+
+#define RELEASE_DEBUG
+
+std::string vramUsage(bool messageBox)
+{
+	IDXGIFactory* dxgifactory = nullptr;
+	HRESULT ret_code = ::CreateDXGIFactory(
+		__uuidof(IDXGIFactory),
+		reinterpret_cast<void**>(&dxgifactory));
+
+	char msg[100] = { 0 };
+	if (SUCCEEDED(ret_code))
+	{
+		IDXGIAdapter* dxgiAdapter = nullptr;
+		
+		if (SUCCEEDED(dxgifactory->EnumAdapters(0, &dxgiAdapter)))
+		{
+			IDXGIAdapter4* dxgiAdapter4 = NULL;
+			if (SUCCEEDED(dxgiAdapter->QueryInterface(__uuidof(IDXGIAdapter4), (void**)&dxgiAdapter4)))
+			{
+				DXGI_QUERY_VIDEO_MEMORY_INFO info;
+
+				if (SUCCEEDED(dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
+				{
+					float memoryUsage = float(info.CurrentUsage / 1024.0 / 1024.0); //MiB
+
+					sprintf_s(msg, "%.2f MiB VRAM used", memoryUsage);
+					if (messageBox)
+						MessageBoxA(0, msg, "VRAM", 0);
+				};
+
+				dxgiAdapter4->Release();
+			}
+			dxgiAdapter->Release();
+		}
+		dxgifactory->Release();
+	}
+
+	return std::string(msg);
+}
+
+std::string ramUsage(bool messageBox)
+{
+	//src: https://docs.microsoft.com/en-us/windows/desktop/api/psapi/ns-psapi-_process_memory_counters
+
+	DWORD currentProcessID = GetCurrentProcessId();
+
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, currentProcessID);
+	char msg[100] = { 0 };
+
+	PROCESS_MEMORY_COUNTERS pmc{};
+	if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
+	{
+		//PagefileUsage is the:
+			//The Commit Charge value in bytes for this process.
+			//Commit Charge is the total amount of memory that the memory manager has committed for a running process.
+
+		float memoryUsage = float(pmc.PagefileUsage / 1024.0 / 1024.0); //MiB
+
+		sprintf_s(msg, "%.2f MiB committed RAM", memoryUsage);
+		if (messageBox)
+			MessageBoxA(0, msg, "RAM", 0);
+	}
+
+	CloseHandle(hProcess);
+	return std::string(msg);
+}
 
 void PlayingGameState::fillTestParticle()
 {
@@ -59,24 +135,11 @@ void PlayingGameState::initAI()
 	actorManager = nullptr;
 	actorManager = std::make_unique<ActorManager>( aStar.get(), physics.get(), map.get(), &rng );
 	aStar->generateTileData(map->getTileMap());
-	
-	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
-	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
-	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
-	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
-	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
-	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
-	actorManager->createSwarm(map->getStartPositionInWorldSpace().x + 10, map->getStartPositionInWorldSpace().z + 10);
-	
-
 }
 
 PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_BEFORE_PLAYING)
 {
 
-#if defined(_DEBUG) || defined(RELEASE_DEBUG)
-	pausedTime = false;
-#endif // _DEBUG
 	this->current_item = NULL;
 
 	config.seed = seed;
@@ -89,7 +152,6 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 	graphics.loadMesh("Cube");
 	graphics.loadShape(SHAPE_CUBE);
-	graphics.loadTexture("grass3");
 	graphics.loadModel("Entities/Turret");
 	graphics.loadModel("Entities/Player", Vector3(3.14f / 2, 0, 0));
 
@@ -98,6 +160,11 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadModel("Entities/Garbage_Bag");
 	graphics.loadModel("Entities/Quad");
 	graphics.loadTexture("brownPaperCardboard");
+
+	//Skyscraper Textures
+	graphics.loadTexture("Skyscrapers/wall01");
+	graphics.loadTexture("Skyscrapers/window01");
+	graphics.loadTexture("Skyscrapers/wall02");
 
 	graphics.loadModel("Entities/Star");
 	graphics.loadModel("Entities/Streetlight");
@@ -152,9 +219,15 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 			graphics.loadModel( "Houses/tilesets/" + tileset.name + "/" + part );
 
 	loadMultitileLayouts("data/layouts/multitilePrefabs.dat");
-
+	graphics.loadModel("Entities/Drone");
+	
+	std::string modelPath;
+	modelPath = MODEL_ROOT_DIR;
+	modelPath += "Entities/Roller_Melee";
+	graphics.loadMesh(modelPath);
+	graphics.loadMaterial("Entities/Roller_Melee");
 	graphics.loadModel("Hospital");
-
+	//graphics.loadModel("Entities/Roller_Melee");
 	graphics.loadModel("Houses/testHouse");
 	graphics.loadModel("Houses/testHouse2");
 	graphics.loadModel("Houses/testHouse3");
@@ -198,6 +271,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_COMPLETED_STAGE] = std::make_unique<UICompletedStage>();
 	menues[MENU_BEFORE_PLAYING] = std::make_unique<UIBeforePlaying>();
+	menues[MENU_CONTROLS] = std::make_unique<UIControls>();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
@@ -215,7 +289,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	cameraObject->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	cameraObject->getRigidBody()->setFriction(0);
 	cameraObject->getRigidBody()->setGravity(btVector3(0, 0, 0));
-	cameraObject->getRigidBody()->setDamping(10,0);
+	//cameraObject->getRigidBody()->setDamping(10,0);
 	cameraTimer = 0;
 
 	initAI();
@@ -297,12 +371,8 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 PlayingGameState::~PlayingGameState()
 {
+	actorManager.reset();
 	delete this->cameraObject;
-	delete this->objTestPickUp;
-	delete this->objTestPickUp2;
-	delete this->objTestPickUp3;
-
-	delete[] this->objArray;
 }
 
 void  PlayingGameState::ImGui_Driving()
@@ -310,6 +380,8 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
+	ImGui::Text("%s", ramUsage(false).c_str());
+	ImGui::Text("%s", vramUsage(false).c_str());
 	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
 	
 
@@ -371,6 +443,8 @@ void PlayingGameState::ImGui_Particles()
 	ImGui::ColorPicker4("Color 3 Slider", colors4);
 	ImGui::SliderFloat("First size", &size1, 0.0f, 1.0f);
 	ImGui::SliderFloat("Second size", &size2, 0.0f, 1.0f);
+	ImGui::SliderFloat("Init.w (size for electro)", &elSize, 0.0f, 20.0f);
+	ImGui::SliderFloat("Init.z (spacing for electro)", &elSpacing, 0.0f, 1.0f);
 	ImGui::SliderInt("Nr of particles times 8", &addNrOfParticles, 1, 10);
 	ImGui::SliderFloat("LifeTime", &lifeTime, 0.0f, 20.0f);
 	ImGui::SliderFloat("Vectorfield size", &vectorFieldSize, 0.0f, 10.0f);
@@ -556,7 +630,6 @@ void PlayingGameState::setPlayer(Vehicle* theVehicle)
 
 void PlayingGameState::update(float deltaTime)
 {
-
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{
@@ -565,19 +638,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
-		if (Input::isKeyPressed(Keyboard::LeftAlt))
-		{
-			pausedTime = !pausedTime;
-		}
 
-		if (!pausedTime && time > 0.0f)
-		{
-			time = std::max(time - deltaTime, 0.0f);
-		}
-		else if (time <= 0.0f)
-		{
-			Game::setState(Game::STATE_HIGHSCORE);
-		}
 #else
 		if (time > 0.0f)
 		{
@@ -598,7 +659,8 @@ void PlayingGameState::update(float deltaTime)
 		}
 		else {
 			cameraTimer += deltaTime;
-			if (cameraTimer > 0.5f) {
+			float distance = (Vector2(player->getPosition().x,player->getPosition().z) - Vector2(cameraObject->getPosition().x,cameraObject->getPosition().z)).Length();
+			if (cameraTimer > 10.5f || distance < 2.5f ) {
 				cameraObject->getRigidBody()->setCollisionFlags(cameraObject->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 				cameraTimer = 0;
 			}
@@ -610,13 +672,14 @@ void PlayingGameState::update(float deltaTime)
 			positionCam.getZ()) + Vector3(cameraMovement.x, cameraMovement.y + cameraDistance, cameraMovement.z);
 		Vector3 currentCamPos = Vector3(cameraObject->getRigidBody()->getWorldTransform().getOrigin().getX(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getY(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getZ());
 		Vector3 directionCam =  destinationCamPos- currentCamPos;
-		cameraObject->getRigidBody()->applyForce(btVector3(directionCam.x, directionCam.y, directionCam.z) * 10,btVector3(0,0,0));
+		//cameraObject->getRigidBody()->applyForce(btVector3(directionCam.x, directionCam.y, directionCam.z) * 10,btVector3(0,0,0));
+		cameraObject->getRigidBody()->setLinearVelocity(btVector3(std::clamp(directionCam.x,-10.0f,10.0f), std::clamp(directionCam.y, -10.0f, 10.0f), std::clamp(directionCam.z, -10.0f, 10.0f)) * 10);
 		camera->setPosition(Vector3(currentCamPos.x, currentCamPos.y, currentCamPos.z));
 		camera->update(deltaTime);
 		updateWeather(deltaTime, currentCamPos);
 
-		Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
-		Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
+		//Vector3 tempCamPos = camera->getPosition() * Vector3(1.0f, 0.0f, 1.0f) + Vector3(0.0f, positionCam.getY() / 3 + cameraMovement.y, 0.0f);
+		//Sound::updateListener(tempCamPos, tempCamPos + Vector3(0.0f, 1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f), prevAccelForce);
 
 		size_t playerBulletCount;
 		Bullet* playerBullets = player->getBulletArray(playerBulletCount);
@@ -650,7 +713,9 @@ void PlayingGameState::update(float deltaTime)
 		objectives.update(player->getPosition(), physics.get());
 		Bullet::updateSoundTimer(deltaTime);
 		player->updateWeapon(deltaTime);
+#ifdef _DEBUG
 		timer += deltaTime;
+
 		if (Input::checkButton(Keys::R_LEFT, States::PRESSED))
 		{
 			timerEMP = 4.0f;
@@ -662,8 +727,9 @@ void PlayingGameState::update(float deltaTime)
 		if (timer > 0.1f&&timerEMP>0.0f)
 		{
 			timer = 0.0f;
-			
+			this->graphics.addTestParticle(this->player->getPosition() + Vector3(0, 1, 0), Vector4(0, 0, elSpacing, elSize), addNrOfParticles, lifeTime, randomPosPower);
 		}
+#endif
 
 
 #ifndef _DEBUG
@@ -692,11 +758,11 @@ void PlayingGameState::update(float deltaTime)
 
 		if (actorManager->distanceToPlayer(Vector3(positionCam)) < 25.0f || this->time <= 20.0f)
 		{
-			Sound::fadeSoundtrack(true, 1.0f);
+			soundAggro = min(Game::lerp(soundAggro, 1.0f, deltaTime * 2), 1.0f);
 		}
 		else
 		{
-			Sound::fadeSoundtrack(false, 3.0f);
+			soundAggro = std::max(Game::lerp(soundAggro, 0.0f, deltaTime * 2), 0.0f);
 		}
 
 		if (this->objectives.isAllDone())
@@ -720,6 +786,8 @@ void PlayingGameState::update(float deltaTime)
 	// render UI
 	if (currentMenu != MENU_PLAYING)
 	{
+		soundAggro = std::max(Game::lerp(soundAggro, 0.0f, deltaTime * 8), 0.0f);
+
 		if (currentMenu != MENU_BEFORE_PLAYING)
 		{
 			menues[MENU_PLAYING]->update(0);
@@ -736,16 +804,25 @@ void PlayingGameState::update(float deltaTime)
 			setCurrentMenu(PlayingGameState::MENU_PAUSED);
 		}
 	}
+
+	if (oldMenu == MENU_CONTROLS)
+	{
+		menues[MENU_CONTROLS] = std::make_unique<UIControls>();
+	}
+
+	oldMenu = -1;
+
+	Sound::fadeSoundtrack(soundAggro);
 	
 	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-		//ImGui_Driving();
-		ImGui_ProcGen();
+		ImGui_Driving();
+		//ImGui_ProcGen();
 		//ImGui_AI();
-		ImGui_Particles();
-		ImGui_Camera();
+		//ImGui_Particles();
+		//ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	#endif // !_DEBUG
@@ -770,8 +847,12 @@ void PlayingGameState::changeTime(float timeDiff) noexcept {
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
+	oldMenu = currentMenu;
 	currentMenu = static_cast<int>(menu);
-	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING) menues[currentMenu]->init();
+
+	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING || menu == Menu::MENU_CONTROLS) { 
+		menues[currentMenu]->init();
+	}
 }
 
 Map::Info PlayingGameState::getMapInfo() const
@@ -1061,7 +1142,7 @@ void PlayingGameState::generateMapPowerUps()
 			}
 		}
 		position.y += 2.0;
-		PowerUp p(position, physics.get(), (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
+		PowerUp p(position, (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
 
 		addPowerUp(p);
 
@@ -1167,3 +1248,4 @@ Vector3 PlayingGameState::getCameraPos()
 {
 	return this->camera->getPosition();
 }
+

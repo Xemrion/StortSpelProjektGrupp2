@@ -9,7 +9,7 @@ void ItemSlot::addTextbox()
 {
 	if (this->showTextBox)
 	{
-		this->textBox = std::make_unique<TextBox>("-- " + this->slot->getItem()->getName() + " --\n" + this->slot->getItem()->getDescription(), Color(Colors::Black), Vector2(), ArrowPlacement::TOP);
+		this->textBox = std::make_unique<TextBox>("-- " + this->slot->getItem()->getName() + " --\n" + this->slot->getItem()->getDescription(), Color(Colors::White), Vector2(), ArrowPlacement::TOP);
 		this->textBox->setPosition(this->position + Vector2(ItemSlot::size.x * 0.5f - this->textBox->getSize().x * 0.5f, ItemSlot::size.y + 10.0f));
 	}
 }
@@ -91,4 +91,9 @@ void ItemSlot::setSlot(Container::Slot* slot)
 
 		this->addTextbox();
 	}
+}
+
+void ItemSlot::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/itemSlot");
 }

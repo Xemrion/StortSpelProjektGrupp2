@@ -11,5 +11,5 @@ public:
 
 private:
 	void setUpActor();
-	Vector3 calculateVelocity();
+	//Vector3 calculateVelocity();
 };

@@ -15,7 +15,6 @@ public:
 	enum Radius { CLOSE, MIDDLE, OUTER };
 	void update(float dt, const Vector3& targetPos);
 	void createAttacker(float x, float z, int weaponType = 0);
-	void createSniper(float x, float z, int weaponType = 0);
 	void createTurret(float x, float z, int weaponType = 0);
 	void createSwarm(float x, float z);
 	Boss* createBoss(float x, float z, int weaponType, float scalingNr);
@@ -26,14 +25,13 @@ public:
 	float distanceToPlayer(const Vector3& position);
 	const std::vector<AIGroup>& getGroups() const;
 	void spawnAttackers(const Vector3& originPos);
-	void spawnSnipers(const Vector3& originPos);
 	void spawnChaseCars(const Vector3& originPos);
 	void spawnShootCars(const Vector3& originPos);
 	void spawnSwarm(const Vector3& originPos);
 
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size, float deltaTime);
 private:
-	const int maxNrOfEnemies = 25;
+	const int maxNrOfEnemies = 24;
 	const int spawnCooldown = 2;
 	float spawnTimer = 0;
 	float soundTimer = 0;
@@ -41,6 +39,7 @@ private:
 	Physics* physics;
 	Map* map;
 	std::mt19937* rng;
+	void teleportActorsToPlayer(const Vector3& targetPos);
 	void updateActors(float dt, const Vector3& targetPos);
 	void updateBosses(float dt, const Vector3& targetPos);
 	//Returns index for the group within the radius with the most members
@@ -50,7 +49,7 @@ private:
 	void leaveGroup(int groupIndex, int where);
 	void assignPathsToGroups(const Vector3& targetPos);
 	void updateGroups();
-	void destroyActor(int index);
+	void actorDied(int index);
 	void destroyBoss(int index);
 	void initGroupForActor(DynamicActor* actor);
 	void createGroup(DynamicActor* actor);
@@ -60,6 +59,5 @@ private:
 	std::vector<DynamicActor*> actors;
 	std::vector<Boss*> bosses;
 	TurretHandler turretHandler;
-	std::vector<DynamicActor*> sendToPlayer;
 	AStar* aStar;
 };

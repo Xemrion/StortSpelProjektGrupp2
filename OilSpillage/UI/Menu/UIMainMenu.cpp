@@ -76,3 +76,9 @@ void UIMainMenu::init()
 	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 2);
 	this->promptBar->setPositon(Vector2(SCREEN_WIDTH / 2 - this->promptBar->getSize().x / 2, SCREEN_HEIGHT - this->promptBar->getSize().y - 8.0f));
 }
+
+void UIMainMenu::unloadTextures()
+{
+	this->promptBar->unloadTextures();
+	this->buttonCredits->unloadTextures();//has the same textures so only one button needs to be unloaded
+}

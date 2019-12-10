@@ -16,7 +16,7 @@ void UIUpgrading::updateUI(float deltaTime)
 
 	if (this->selectingItem)
 	{
-		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
+		if (Input::checkButton(Keys::R_SHOULDER, States::PRESSED))
 		{
 			Game::setState(Game::STATE_PLAYING);
 		}
@@ -47,22 +47,22 @@ void UIUpgrading::updateUI(float deltaTime)
 		else if (Input::checkButton(Keys::L_LEFT, States::PRESSED))
 		{
 			this->itemSelector->changeSelectedIndex(false);
-			Sound::play("./data/sound/MenuMove.wav");
+			Sound::play("MenuMove.wav");
 		}
 		else if (Input::checkButton(Keys::L_RIGHT, States::PRESSED))
 		{
 			this->itemSelector->changeSelectedIndex(true);
-			Sound::play("./data/sound/MenuMove.wav");
+			Sound::play("MenuMove.wav");
 		}
 		else if (Input::checkButton(Keys::L_UP, States::PRESSED))
 		{
 			this->itemSelector->changeSelectedType(false);
-			Sound::play("./data/sound/MenuMove.wav");
+			Sound::play("MenuMove.wav");
 		}
 		else if (Input::checkButton(Keys::L_DOWN, States::PRESSED))
 		{
 			this->itemSelector->changeSelectedType(true);
-			Sound::play("./data/sound/MenuMove.wav");
+			Sound::play("MenuMove.wav");
 		}
 	}
 	else
@@ -125,6 +125,14 @@ UIUpgrading::~UIUpgrading()
 {
 }
 
+void UIUpgrading::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/itemSelectorTitleBG");
+	this->itemSelector->unloadTextures();
+	this->gadgetSelector->unloadTextures();
+	this->statBox->unloadTextures();
+}
+
 void UIUpgrading::init()
 {
 	Game::getGraphics().loadTexture("UI/itemSelectorTitleBG");
@@ -142,7 +150,7 @@ void UIUpgrading::init()
 		{ Keys::CONFIRM, "Select Item", Color(Colors::White) },
 		{ Keys::CANCEL, "Remove From Car", Color(Colors::White) },
 		{ Keys::R_PRESS, "Rotate Car", Color(Colors::White) },
-		{ Keys::ACTION_1, "Confirm Upgrading", Color(Colors::White) }
+		{ Keys::R_SHOULDER, "Confirm Upgrading", Color(Colors::White) }
 	};
 
 	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 5);

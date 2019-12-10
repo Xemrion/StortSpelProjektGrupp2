@@ -23,6 +23,8 @@ public:
 
 	void setAmount(float amount);
 	float getAmount() const;
+
+	void unloadTextures();
 };
 
 #endif // !SLIDER_H

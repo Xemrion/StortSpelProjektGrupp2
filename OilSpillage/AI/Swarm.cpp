@@ -21,11 +21,9 @@ Swarm::Swarm(float x, float z, Physics* physics)
 
 	scaling(stats.speed, 1.1);
 
-	Game::getGraphics().loadModel("Entities/Drone");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Drone");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Drone"));
 	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMelee);
-
 	this->aggroRange = 40;
 	createRigidbody(physics);
 	this->setPoints(50 * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages)));

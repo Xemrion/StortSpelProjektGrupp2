@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <cassert>
 
+
 enum class Time    : U8 { sunrise, noon, sunset, night,                                       /* end */ size };
 enum class Biome   : U8 { grass, sandy, snowy, burnt,                                         /* end */ size };
 enum class Weather : U8 { clear, overcast, fog, rain, thunderstorm, snow, sandstorm, ashfall, /* end */ size };
@@ -15,7 +16,8 @@ public:
   Environment( RNG &rng ):
     time    ( util::randomEnumOf< Time>( rng )                     ),
     biome   ( util::randomEnumOf<Biome>( rng )                     ),
-    weather ( util::randomElementOf( weatherTable.at(biome), rng ) )
+    weather ( util::randomElementOf( weatherTable.at(biome), rng ) ),
+    name    ( generateCityName(rng)                                )
   {}
 
 	Environment():
@@ -24,22 +26,43 @@ public:
 		weather ( Weather::clear )
 	{}
   
-  inline static const std::unordered_map<Biome, std::vector<Weather>> weatherTable {{
-     // key: Biome      // value: list of Weathers valid for the Biome
-     { Biome::grass,     { Weather::clear, Weather::overcast, Weather::fog, Weather::rain    }},
-     { Biome::sandy,     { Weather::clear, Weather::overcast, Weather::sandstorm             }},
-     { Biome::snowy,     { Weather::clear, Weather::overcast, Weather::fog, Weather::snow    }},
-     { Biome::burnt,     { Weather::clear, Weather::overcast, Weather::fog, Weather::ashfall }}
-  }};
-  
-  inline Time    getTime()    const noexcept { return time;    }
-  inline Biome   getBiome()   const noexcept { return biome;   }
-  inline Weather getWeather() const noexcept { return weather; }
+  inline String   getName()    const noexcept { return name;    }
+  inline Time     getTime()    const noexcept { return time;    }
+  inline Biome    getBiome()   const noexcept { return biome;   }
+  inline Weather  getWeather() const noexcept { return weather; }
   
 private:
-  Time     time;
-  Biome    biome;
-  Weather  weather;
+
+	inline static const std::unordered_map<Biome, std::vector<Weather>> weatherTable {{
+		// key: Biome      // value: list of Weathers valid for the Biome
+		{ Biome::grass,     { Weather::clear, Weather::overcast, Weather::fog, Weather::rain    }},
+		{ Biome::sandy,     { Weather::clear, Weather::overcast, Weather::sandstorm             }},
+		{ Biome::snowy,     { Weather::clear, Weather::overcast, Weather::fog, Weather::snow    }},
+		{ Biome::burnt,     { Weather::clear, Weather::overcast, Weather::fog, Weather::ashfall }}
+	}};
+
+	inline static const std::unordered_map<Biome, std::vector<StringView>> biomeNamePrefix {{
+		// key: Biome      // value: list of Weathers valid for the Biome
+		{ Biome::grass,     { "Happy", "Pleasant", "Green", "Oak", "Plain", "Grass", "Bush", "Wood", "Forest", "Farm"  }},
+		{ Biome::sandy,     { "Sandy", "Dry", "Oasis", "Sand", "Desert", "Sun", "Dry", "Beach", "Pyramid" }},
+		{ Biome::snowy,     { "Snowy", "Arctic", "Icy", "Cold", "Frozen", "Santa", "Christmas", "White" }},
+		{ Biome::burnt,     { "Hell", "Ash", "Pyro", "Ruin", "Black", "Grey", "Apocalypse" }}
+	}};
+
+	static std::array constexpr genericCityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset", "Chrome", "Graveyard", "Omega", "Tera", "Terror", "Scream", "Corpse", "Rock" };
+	static std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "opolis", "heim", " Meadows", " Creek", " Base", " Metropolis", "land", "lands", " Space", " Zone", " Point" };
+
+	std::string generateCityName( RNG &rng ) noexcept {
+		F32_Dist generateSelection { .0, 1.0f };
+		if ( generateSelection(rng) < 75.0f )
+			return std::string(util::randomElementOf(biomeNamePrefix.at(biome), rng)) + util::randomElementOf(citySuffix, rng);
+		else return std::string(util::randomElementOf(genericCityPrefix, rng)) + util::randomElementOf(citySuffix, rng);
+	}
+
+	Time     time;
+	Biome    biome;
+	Weather  weather;
+	String   name;
 };
 
 inline auto stringify( Biome b ) noexcept {

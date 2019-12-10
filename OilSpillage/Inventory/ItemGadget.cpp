@@ -1,23 +1,24 @@
 #include "ItemGadget.h"
 #include <sstream>
 #include "../game.h"
+#include <iomanip>
 
 std::string ItemGadget::generateDescription(Gadget gadget)
 {
 	std::stringstream stream;
 	stream << std::boolalpha;
+
 	if (gadget.type == GadgetType::EMP)
 	{
-		stream << "lifeTime: " << gadget.lifeTime	<<	"\n";
-		stream << "radius: " << gadget.radius	<<	"\n";
-		stream << "cooldown: " << gadget.cooldown	<<	"\n";
+		stream << "lifeTime: " << Item::fixedDecimals(gadget.lifeTime, 2) << "\n";
+		stream << "radius: " << Item::fixedDecimals(gadget.radius, 2) << "\n";
+		stream << "cooldown: " << Item::fixedDecimals(gadget.cooldown, 2) << "\n";
 	}
 	else if (gadget.type == GadgetType::NITRO)
 	{
-		stream << "lifeTime: " << gadget.lifeTime << "\n";
-	//	stream << "radius: " << gadget.radius << "\n";
-		stream << "cooldown: " << gadget.cooldown << "\n";
-		stream << "power: " << gadget.power << "\n";
+		stream << "lifeTime: " << Item::fixedDecimals(gadget.lifeTime, 2) << "\n";
+		stream << "cooldown: " << Item::fixedDecimals(gadget.cooldown, 2) << "\n";
+		stream << "power: " << Item::fixedDecimals(gadget.power, 2) << "\n";
 	}
 	return stream.str();
 }

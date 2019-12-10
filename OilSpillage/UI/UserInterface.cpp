@@ -35,7 +35,7 @@ Element* UserInterface::changeSelected(Element* selected)
 		if (selected->getDown() != nullptr)
 		{
 			selected = selected->getDown();
-			Sound::play("./data/sound/MenuMove.wav");
+			Sound::play("MenuMove.wav");
 		}
 	}
 
@@ -44,7 +44,7 @@ Element* UserInterface::changeSelected(Element* selected)
 		if (selected->getUp() != nullptr)
 		{
 			selected = selected->getUp();
-			Sound::play("./data/sound/MenuMove.wav");
+			Sound::play("MenuMove.wav");
 		}
 	}
 
@@ -53,7 +53,7 @@ Element* UserInterface::changeSelected(Element* selected)
 		if (selected->getLeft() != nullptr)
 		{
 			selected = selected->getLeft();
-			Sound::play("./data/sound/MenuMove.wav");
+			Sound::play("MenuMove.wav");
 		}
 	}
 
@@ -62,7 +62,7 @@ Element* UserInterface::changeSelected(Element* selected)
 		if (selected->getRight() != nullptr)
 		{
 			selected = selected->getRight();
-			Sound::play("./data/sound/MenuMove.wav");
+			Sound::play("MenuMove.wav");
 		}
 	}
 
@@ -94,4 +94,8 @@ void UserInterface::update(float deltaTime)
 
 	//this->resetShaders();
 	this->drawUI();
+}
+
+void UserInterface::unloadTextures()
+{
 }

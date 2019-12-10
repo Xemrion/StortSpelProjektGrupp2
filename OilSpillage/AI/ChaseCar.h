@@ -10,7 +10,7 @@ protected:
 public:
 	ChaseCar();
 	ChaseCar(float x, float z,Physics* physics);
-	~ChaseCar();
+	virtual ~ChaseCar();
 	void update(float dt, const Vector3& targetPos);
 
 };

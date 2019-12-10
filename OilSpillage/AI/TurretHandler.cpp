@@ -5,7 +5,7 @@ void TurretHandler::destroyTurret(int index)
 {
 	if (turrets[index]->getRigidBody() != nullptr)
 	{
-		physics->DeleteRigidBody(turrets[index]->getRigidBody());
+		physics->deleteRigidBody(turrets[index]->getRigidBody());
 	}
 	delete turrets[index];
 	turrets.erase(turrets.begin() + index);
@@ -27,7 +27,7 @@ TurretHandler::~TurretHandler()
 }
 void TurretHandler::update(float dt,const Vector3& targetPos)
 {
-	bool turretDied = false;
+	/*bool turretDied = false;
 	for (int i = 0; i < this->turrets.size(); i++)
 	{
 		if (!turrets[i]->isDead() && turrets[i] != nullptr)
@@ -46,17 +46,16 @@ void TurretHandler::update(float dt,const Vector3& targetPos)
 			}
 			turretDied = true;
 		}
-	}
-	if (turretDied)
+	}*/
+	for (int i = this->turrets.size() - 1; i >= 0; i--)
 	{
-		for (int i = this->turrets.size() - 1; i >= 0; i--)
+		if (turrets[i]->isDead())
 		{
-			if (turrets[i]->isDead())
-			{
-				Game::getGameInfo().addHighScore(turrets[i]->getPoints());
-				destroyTurret(i);
-			}
+			Game::getGameInfo().addHighScore(turrets[i]->getPoints());
+			destroyTurret(i);
+			continue;
 		}
+		turrets[i]->update(dt, targetPos);
 	}
 }
 
@@ -95,7 +94,7 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 					if (this->turrets[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 					{
 						if (soundTimer > 0.05f) {
-							Sound::play("./data/sound/HitSound.wav");
+							Sound::play("HitSound.wav");
 							soundTimer = 0;
 						}
 						if (bulletArray[j].getFlame())// Damage over Time
@@ -121,7 +120,7 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 				else if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->turrets[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						Sound::play("data/sound/HitSound.wav");
+						Sound::play("HitSound.wav");
 						soundTimer = 0;
 					}
 					if (bulletArray[j].getFlame())// Damage over Time
@@ -146,7 +145,7 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 				else if (bulletArray[j].getGameObject()->getAABB().intersectXZ(this->turrets[i]->getAABB()))
 				{
 					if (soundTimer > 0.05f) {
-						Sound::play("./data/sound/HitSound.wav");
+						Sound::play("HitSound.wav");
 						soundTimer = 0;
 					}
 					if (bulletArray[j].getFlame())// Damage over Time

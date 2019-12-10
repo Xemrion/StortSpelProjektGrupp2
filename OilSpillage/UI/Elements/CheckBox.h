@@ -21,6 +21,8 @@ public:
 
 	void setActivated(bool activated);
 	bool isActivated() const;
+
+	void unloadTextures();
 };
 
 #endif // !CHECKBOX_H

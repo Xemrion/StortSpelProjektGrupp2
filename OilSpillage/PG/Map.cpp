@@ -3,14 +3,6 @@
 #include "Map.hpp"
 #include "Profiler.hpp"
 
-std::array constexpr cityPrefix { "Murder", "Mega", "Necro", "Mayhem", "Death", "Techno", "Techno", "Metal", "Rot", "Doom", "Happy", "Joy", "Oil", "Bone", "Car", "Auto", "Capitol", "Liberty", "Massacre", "Hell", "Carnage", "Gas", "Robo", "Robot", "Car", "Tesla", "Giga", "Splatter", "Bloodbath", "Factory", "Electro", "Skull", "Kill", "Hobo", "Junk", "Gear", "Bunker", "Silo", "Gearbox", "Petrol", "Torture", "Sunset", "Chrome", "Graveyard", "Pleasant" };
-
-std::array constexpr citySuffix { "town", " Town", " City", " Village", "ville", "burg", "stadt", "opolis", "heim", " Meadows", " Creek", " Base", " Metropolis", " Zone", "field", "point", "corner" };
-
-auto generateCityName( RNG &rng ) noexcept {
-	return std::string(util::randomElementOf(cityPrefix, rng)) + util::randomElementOf(citySuffix, rng);
-}
-
 
 // NE "outer corner":
 //     map     mask    predicate
@@ -226,7 +218,7 @@ void Map::generateBorder()
 void Map::generateZebraCrossings()
 {
 	F32_Dist  generateSelection { .0f, 1.0f };
-	crossingTiles.reserve( 24 );
+	crossingTiles.reserve( 64 );
 
 	auto instantiateCrossing = [&]( Vector3 const &pos, F32 deg=.0f ) {
 		crossingTiles.push_back( std::make_unique<GameObject>() );
@@ -401,7 +393,7 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	lights          ( lights                                                                                        ),
 	config          ( config                                                                                        ),
 	tilemap         ( nullptr                                                                                       ),
-   roadDistanceMap ( config.dimensions.x * config.dimensions.y                                                     ),
+   roadDistanceMap ( config.dimensions.x * config.dimensions.y, 99999.9f                                           ),
 	buildingIDs     ( config.dimensions.x * config.dimensions.y                                                     ),
 	hospitalTable   ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide ),
 	rng             ( RD()()                                                                                        )
@@ -414,7 +406,6 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	info.environment = {rng};
 	info.width       = config.dimensions.x;
 	info.length      = config.dimensions.y;
-	info.name        = generateCityName(rng);
 
 	// TODO: generate water etc
 	generateRoads();
@@ -432,20 +423,21 @@ Map::~Map() noexcept
 {
 	graphics.clearStaticObjects();
 	for ( auto &e : houses.composites ) {
-		physics->DeleteRigidBody( e.walls.getRigidBody() );
-		physics->DeleteRigidBody( e.windows.getRigidBody() );
-		physics->DeleteRigidBody( e.roof.getRigidBody() );
+		physics->deleteRigidBody( e.walls.getRigidBody() );
+		physics->deleteRigidBody( e.windows.getRigidBody() );
+		physics->deleteRigidBody( e.roof.getRigidBody() );
+		skyscraperGenerator->unloadASkyscraper(e.skyscraperMeshIndex);
 	}
 
 	for ( auto &e : houses.singles )
-		physics->DeleteRigidBody( e.object.getRigidBody() );
+		physics->deleteRigidBody( e.object.getRigidBody() );
 
 	for ( auto &e : houses.multis )
 		for ( auto &p : e.parts )
-			physics->DeleteRigidBody( p.getRigidBody() );
+			physics->deleteRigidBody( p.getRigidBody() );
 
 	for ( auto &e : border.bounds )
-		physics->DeleteRigidBody( e.getRigidBody() );
+		physics->deleteRigidBody( e.getRigidBody() );
 
    #ifdef _DEBUG_MAP
 		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?
@@ -567,6 +559,26 @@ V2u Map::generateGroundPositionInTileSpace(RNG& rng) const noexcept
 	return { x, y };
 }
 
+V2u Map::generateNonBuildingPositionInTileSpace(RNG& rng) const noexcept
+{
+	static constexpr U16  MAX_TRIES{ 1024 };
+	static U16_Dist       generateX(0, config.dimensions.x - 1);
+	static U16_Dist       generateY(0, config.dimensions.y - 1);
+	U16                   x, y, counter{ 0 };
+	do {
+		x = generateX(rng);
+		y = generateY(rng);
+		if (++counter > MAX_TRIES)
+			assert(false and "No road tile found!");
+	} while (tilemap->tileAt(x, y) == Tile::building);
+	return { x, y };
+}
+
+Vector3 Map::generateNonBuildingPositionInWorldSpace(RNG& rng) const noexcept
+{
+	auto  positionInTileSpace{ generateNonBuildingPositionInTileSpace(rng) };
+	return tilemap->convertTilePositionToWorldPosition(positionInTileSpace);
+}
 Vector3 Map::generateGroundPositionInWorldSpace(RNG& rng) const noexcept
 {
 	auto  positionInTileSpace{ generateGroundPositionInTileSpace(rng) };
@@ -674,18 +686,24 @@ void  Map::generateBuildings( )
 			while ( (tilesets.size() != 0) and (++currentTries < maxTries)
 			       and (computeCurrentDistrictCoverage() < multitileCoveragePercentage ) )
 			{
-				// if ( (district == &District::metropolitan) and (generateSelection(rng) < .80f) ) {
-				// 	auto house    = generateCompositeHouse();
-				// 	auto maybeLot = findFixedLot( cellId, house.width, house.length, { house.width * house.length, true } );
-				// 	if ( maybeLot ) {
-				// 		// set affected tiles and discard lot since we won't remove houses dynamically
-				// 		currentTries = 0; // reset counter
-				// 		currentArea += maybeLot.value().getCoverage();
-				// 		tilemap->applyLot( maybeLot.value(), Tile::building );
-				// 		houses.composites.push_back( std::move(house) ); 
-				// 	}
-				// }
-				// else
+				 //if ( (district == &District::metropolitan) and (generateSelection(rng) < .80f) ) {
+				 //	auto house    = instantiateSkyscraper();
+				 //	auto maybeLot = findFixedLot( cellId, house.dimensions.x, house.dimensions.y, Vector<Bool>(house.dimensions.x * house.dimensions.y, true));
+				 //	if ( maybeLot ) {
+				 //		// set affected tiles and discard lot since we won't remove houses dynamically
+				 //		currentTries = 0; // reset counter
+				 //		currentArea += maybeLot.value().getCoverage();
+					//	Vector3 worldPosition = tilemap->convertTilePositionToWorldPosition(maybeLot->nw);
+					//	worldPosition.x += house.dimensions.x * config.tileSideScaleFactor * 0.5f;
+					//	worldPosition.z += house.dimensions.y * config.tileSideScaleFactor * 0.5f;
+					//	house.roof.setPosition(worldPosition);
+					//	house.walls.setPosition(worldPosition);
+					//	house.windows.setPosition(worldPosition);
+				 //		tilemap->applyLot( maybeLot.value(), Tile::building );
+				 //		houses.composites.push_back( house ); 
+				 //	}
+				 //}
+				 //else 
 				if ( (tilesets.size() != 0) and (generateSelection(rng) < .30f ) ) {
 					auto maybeLayout = getMultitileLayout(district,rng);
 					if ( maybeLayout ) {
@@ -758,7 +776,11 @@ void  Map::generateBuildings( )
 			}
 		}
 	}
-
+	/*auto house = instantiateSkyscraper();
+	house.roof.setPosition(Vector3(20.0f, 0.0f, -20.0f));
+	house.walls.setPosition(Vector3(20.0f, 0.0f, -20.0f));
+	house.windows.setPosition(Vector3(20.0f, 0.0f, -20.0f));
+	houses.composites.push_back(house);*/
 	// adding all the tiles to draw:
 	for ( auto &e : houses.composites ) {
 		graphics.addToDrawStatic( &e.walls   );
@@ -810,7 +832,7 @@ Opt<Lot>  Map::findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool>
 					}
 				}
 			}
-			if ( closestRoad >= districtLookupTable[districtId]->maxDistFromRoad )
+			if ( closestRoad <= districtLookupTable[districtId]->maxDistFromRoad )
 				return lot; // found match!
 		}
 		end: eliminatedPositions.push_back(lot.nw);		
@@ -835,7 +857,7 @@ Opt<Lot>  Map::findRandomLot( U16 cellId ) noexcept
 	auto isValidPosition { [&](V2u const &tilePosition ) -> Bool {
 	                          return (districtMap->idAt(tilePosition) != cellId)
 	                              or (tilemap->tileAt(tilePosition) != Tile::ground)
-                                 or (roadDistanceMap[tilemap->index(tilePosition)] < district->maxDistFromRoad );
+                                 or (roadDistanceMap[tilemap->index(tilePosition)] > district->maxDistFromRoad );
 	                       } };
 
 	U16_Dist   generateTargetSize { district->minArea, district->maxArea };
@@ -931,15 +953,12 @@ void Map::generateRoadDistanceMap() noexcept
 {
 	DBG_PROBE(Map::generateRoadDistanceMap);
 
-	U32 searchRadius = config.distanceMapSearchRadius;
+	U32 const searchRadius = config.distanceMapSearchRadius;
 
 	struct  TileDistanceEntry {
 		F32   distance;
 		V2u   position;
 	};
-
-	auto  candidates { Vector<TileDistanceEntry>( (Size(searchRadius)*2+1) * (Size(searchRadius)*2+1) ) };
-
 	auto manhattanDistance = []( V2u const &a, V2u const &b ) {
 		return F32( util::abs<I32>( I32(a.x) - b.x )  +  util::abs<I32>( I32(a.y)- b.y ) );
 	};
@@ -952,8 +971,29 @@ void Map::generateRoadDistanceMap() noexcept
 		return std::sqrt( F32(a.x) * a.x * b.x * b.x * a.y * a.y * b.y * b.y);
 	};
 
-	auto &distance_f = euclideanDistance;
+	auto &distance_f = manhattanDistance;
 
+	V2u center, nearby;
+	for ( center.x = 0;  center.x < tilemap->width;  ++center.x ) {
+		for ( center.y = 0;  center.y < tilemap->height;  ++center.y ) {
+			if ( tilemap->tileAt(center.x,center.y) == Tile::road ) {
+				Bounds bounds;
+				bounds.min.x = util::minValue(0U, center.x-searchRadius);
+				bounds.min.y = util::minValue(0U, center.y-searchRadius);
+				bounds.max.x = util::minValue(center.x+searchRadius, (U32)tilemap->width);
+				bounds.max.y = util::minValue(center.y+searchRadius, (U32)tilemap->height);
+				for ( nearby.x = bounds.min.x;  nearby.x < bounds.max.x;  ++nearby.x ) {
+					for ( nearby.y = bounds.min.y;  nearby.y < bounds.max.y;  ++nearby.y ) {
+						if ( tilemap->tileAt(nearby.x, nearby.y) == Tile::ground ) {
+							roadDistanceMap[tilemap->index(nearby.x,nearby.y)] = util::minValue(roadDistanceMap[tilemap->index(nearby.x, nearby.y)], distance_f(center, nearby));
+						}
+					}
+				}
+			}
+		}
+	}
+		
+/*
 	V2u centerPos;
 	for ( centerPos.x = 0;  centerPos.x < tilemap->width;  ++centerPos.x ) {
 		for ( centerPos.y = 0;  centerPos.y < tilemap->height;  ++centerPos.y ) {
@@ -997,7 +1037,7 @@ void Map::generateRoadDistanceMap() noexcept
 				}
 			}
 		}
-	}
+	}*/
 }
 
 Vector<F32> const& Map::getRoadDistanceMap() const noexcept
@@ -1658,15 +1698,15 @@ CompositeHouse Map::instantiateSkyscraper()
 	temp.roof.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.walls.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.windows.setScale(Vector3(2.0f, 1.0f, 2.0f));
-	temp.roof.setTexture(graphics.getTexturePointer("brickwall"));
-	temp.walls.setTexture(graphics.getTexturePointer("brickwall"));
-	temp.windows.setTexture(graphics.getTexturePointer("brickwall"));
+	temp.roof.setTexture(graphics.getTexturePointer("skyscraper-wall02"));
+	temp.walls.setTexture(graphics.getTexturePointer("skyscraper-wall01"));
+	temp.windows.setTexture(graphics.getTexturePointer("skyscraper-window01"));
 
 	Vector3 tempVec = temp.walls.getAABB().maxPos - temp.walls.getAABB().minPos;
 	tempVec.x *= 2;
 	tempVec.z *= 2;
-	temp.dimensions.x = (tempVec.x / config.tileSideScaleFactor) + 1;
-	temp.dimensions.y = (tempVec.z / config.tileSideScaleFactor) + 1;
+	temp.dimensions.x = (tempVec.x / config.tileSideScaleFactor);
+	temp.dimensions.y = (tempVec.z / config.tileSideScaleFactor);
 
 	return temp;
 }
