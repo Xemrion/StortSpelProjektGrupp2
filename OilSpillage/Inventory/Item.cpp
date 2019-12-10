@@ -62,7 +62,7 @@ void Item::init()
 	spike->setScale(Vector3(0.05f));
 	spike->setPosition(spike->mesh->getAABB().scale(spike->getScale()).maxPos * Vector3(0, 1, 0));
 
-	/*GameObject* nitro = new GameObject();
+	GameObject* nitro = new GameObject();
 	nitro->mesh = graphics.getMeshPointer("Entities/Nitro");
 	nitro->setMaterial(graphics.getMaterial("Entities/Nitro"));
 	nitro->setScale(Vector3(0.05f));
