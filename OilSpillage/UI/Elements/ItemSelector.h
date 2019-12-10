@@ -45,6 +45,8 @@ public:
 	Container::Slot* getSelectedSlot() const;
 	bool isSelectedValid() const;
 	void setUsed(Container::Slot** used);
+
+	virtual void unloadTextures();
 };
 
 

@@ -423,21 +423,21 @@ Map::~Map() noexcept
 {
 	graphics.clearStaticObjects();
 	for ( auto &e : houses.composites ) {
-		physics->DeleteRigidBody( e.walls.getRigidBody() );
-		physics->DeleteRigidBody( e.windows.getRigidBody() );
-		physics->DeleteRigidBody( e.roof.getRigidBody() );
+		physics->deleteRigidBody( e.walls.getRigidBody() );
+		physics->deleteRigidBody( e.windows.getRigidBody() );
+		physics->deleteRigidBody( e.roof.getRigidBody() );
 		skyscraperGenerator->unloadASkyscraper(e.skyscraperMeshIndex);
 	}
 
 	for ( auto &e : houses.singles )
-		physics->DeleteRigidBody( e.object.getRigidBody() );
+		physics->deleteRigidBody( e.object.getRigidBody() );
 
 	for ( auto &e : houses.multis )
 		for ( auto &p : e.parts )
-			physics->DeleteRigidBody( p.getRigidBody() );
+			physics->deleteRigidBody( p.getRigidBody() );
 
 	for ( auto &e : border.bounds )
-		physics->DeleteRigidBody( e.getRigidBody() );
+		physics->deleteRigidBody( e.getRigidBody() );
 
    #ifdef _DEBUG_MAP
 		std::ofstream profilerLogs { String("data/logs/profiler/") + mapConfigToFilename(config, ".txt") }; // TODO: append timestamp?

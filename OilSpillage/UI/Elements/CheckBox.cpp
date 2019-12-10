@@ -35,3 +35,9 @@ bool CheckBox::isActivated() const
 {
 	return this->activated;
 }
+
+void CheckBox::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/boxChecked");
+	Game::getGraphics().unloadTexture("UI/boxUnchecked");
+}

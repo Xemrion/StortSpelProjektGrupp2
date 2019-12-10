@@ -39,6 +39,8 @@ public:
 	void update(float deltaTime);
 	void setCurrentMenu(Menu menu);
 	VehicleSlots* getSlots();
+
+	virtual void unloadTextures();
 };
 
 #endif // !MENU_GAME_STATE_H

@@ -600,14 +600,19 @@ void ActorManager::actorDied(int index)
 	if (normalizedRandom >= 0.950)
 	{
 		static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-			PowerUp(actors[index]->getPosition(), physics,
+			PowerUp(actors[index]->getPosition(),
 				PowerUpType::Health)
 		);
 	}
 	Game::getGameInfo().addHighScore(actors[index]->getPoints());
 	if (actors[index]->getRigidBody() != nullptr)
 	{
-		physics->DeleteRigidBody(actors[index]->getRigidBody());
+		physics->deleteRigidBody(actors[index]->getRigidBody());
+	}
+
+	if (dynamic_cast<Spitfire*>(actors[index]))
+	{
+		physics->deleteRigidBody(dynamic_cast<Spitfire*>(actors[index])->getVehicleBody1()->getRigidBody());
 	}
 	void* grpPtr = actors[index]->getGroup();
 	int grpIndex = -1;
@@ -636,7 +641,7 @@ void ActorManager::destroyBoss(int index)
 {
 	if (bosses[index]->getRigidBody() != nullptr)
 	{
-		physics->DeleteRigidBody(bosses[index]->getRigidBody());
+		physics->deleteRigidBody(bosses[index]->getRigidBody());
 	}
 	delete bosses[index];
 	bosses.erase(bosses.begin() + index);

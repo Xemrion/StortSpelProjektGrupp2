@@ -36,6 +36,7 @@ CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position), used
 
 CarGadgetSelector::~CarGadgetSelector()
 {
+
 }
 
 void CarGadgetSelector::draw(bool selected)
@@ -136,4 +137,11 @@ void CarGadgetSelector::removeSlot(Container::Slot* slot)
 Container::Slot** CarGadgetSelector::getUsed()
 {
 	return this->used;
+}
+
+void CarGadgetSelector::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/statBG");
+	Game::getGraphics().unloadTexture("UI/carTopdown");
+	Game::getGraphics().unloadTexture("UI/itemSelectorIndicator");
 }

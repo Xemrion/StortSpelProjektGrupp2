@@ -84,25 +84,13 @@ Physics::~Physics()
 
 }
 
-void Physics::teleportRigidbody(Vector3 newPos, btRigidBody* body)
-{
-	btTransform transform = body->getCenterOfMassTransform();
-	//Delete
-	DeleteRigidBody(body);
-
-	//Move
-	transform.setOrigin(btVector3(newPos.x, newPos.y, newPos.z));
-	body->setWorldTransform(transform);
-	body->getMotionState()->setWorldTransform(transform);
-	//Add
-	world->addRigidBody(body);
-	body->setLinearVelocity(btVector3(0,0,0));
-	body->setAngularVelocity(btVector3());
-	body->clearForces();
-}
-
 void Physics::update(float deltaTime)
 {	
+#ifdef _DEBUG
+	OutputDebugString(("Rigidbodys in the world: " + std::to_string(this->bodies.size()) + "\n").c_str());
+	OutputDebugString(("Joints in the world: " + std::to_string(this->pointJoints.size()) + "\n").c_str());
+#endif // _DEBUG
+
 	this->world->stepSimulation(deltaTime, 6, 1. / 120.);
 }
 
@@ -140,7 +128,6 @@ btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass, GameO
 	t.setIdentity();
 	t.setOrigin(btVector3(Origin));
 	btBoxShape* box = new btBoxShape(size);
-
 
 	btVector3 inertia(0, 0, 0);
 	if (mass != 0.0f) {
@@ -238,15 +225,22 @@ btRaycastVehicle* Physics::addVehicle(btRaycastVehicle* vehicle)
 	return vehicle;
 }
 
-bool Physics::DeleteRigidBody(btRigidBody* rb)
+bool Physics::deleteRigidBody(btRigidBody* rb)
 {
+	if (!rb) return false;
 
 	for (int i = 0; i < this->bodies.size(); i++)
 	{
 		if (bodies[i] == rb)
 		{
-			this->world->removeRigidBody(bodies[i]);
+			this->world->removeRigidBody(rb);
+			bodies.erase(bodies.begin() + i);
 
+			btMotionState* motionState = rb->getMotionState();
+			btCollisionShape* shape = rb->getCollisionShape();
+			delete shape;
+			delete motionState;
+			delete rb;
 			return true;
 		}
 	}
@@ -259,6 +253,8 @@ bool Physics::deletePointJoint(btPoint2PointConstraint* pointJoint)
 		if (pointJoints[i] == pointJoint)
 		{
 			this->world->removeConstraint(pointJoint);
+			pointJoints.erase(pointJoints.begin() + i);
+			delete pointJoint;
 
 			return true;
 		}

@@ -114,7 +114,7 @@ PS_OUT main(VS_OUT input) : SV_Target
 	float3 normalMap = NormalMap.Sample(SampSt, input.Tex).xyz;
 	float4 specularColor = SpecularMap.Sample(SampSt, input.Tex);
 	float gloss = GlossMap.Sample(SampSt, input.Tex).x;
-	gloss = exp2(2 * gloss + 1);
+	gloss = exp2(10.0 * gloss + 1);
 
 	if (length(normalMap) > 0.f)
 	{
@@ -126,20 +126,30 @@ PS_OUT main(VS_OUT input) : SV_Target
 	uint2 lightTileIndex = uint2(input.Pos.x * 0.0625f, input.Pos.y * 0.0625f);
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
 	float sunShadow = (1 - shadowVisible(input.shadowPos, ShadowMap, 0.0005f));
-	float4 ambient = max(-dot(sunDir, normal) * sunShadow, float4(0.2f, 0.2f, 0.2f, 1.0)) * sunColor;
+	float4 ambient = float4(float3(0.2f, 0.2f, 0.2f) * sunColor.rgb, 1.0);
 
 	float shadowSpotVisible = 1.0f;
 	float3 cameraVector = normalize(cameraPos.xyz - input.wPos.xyz);
 
 	float4 diffuseLight = float4(0.0, 0.0, 0.0, 1.0);
+	diffuseLight.rgb += -dot(sunDir, normal) * sunShadow * sunColor.rgb;
+
 	float4 specularLight = float4(0.0, 0.0, 0.0, 1.0);
-	specularLight.rgb += sunColor * pow(max(dot(normal, normalize(normalize(-sunDir) + cameraVector)), 0.0) * sunShadow, gloss);
+
+	{
+		float3 halfway = normalize(normalize(-sunDir) + cameraVector);
+		float nDotH = saturate(dot(normal, halfway));
+		float glossTerm = ((gloss + 2) / 8) * pow(nDotH, gloss);
+		float3 fresnelTerm = specularColor + (1.0f - specularColor) * pow(1.0f - nDotH, 5);
+		specularLight.rgb += max(sunColor * sunShadow, ambient) * fresnelTerm * glossTerm * saturate(dot(normal, -sunDir));
+	}
+
 	for (int i = 0; i < lightTileData.numLights; ++i)
 	{
 		Light l = lights[lightTileData.indices[i]];
 		float3 lightVector = l.pos.xyz - input.wPos.xyz;
 		float attenuation;
-		float nDotL = max(dot(normal, normalize(lightVector)), 0.0);
+		float nDotL = saturate(dot(normal, normalize(lightVector)));
 		float directional = 1.0;
 		shadowSpotVisible = 1.0f;
 		//if the light is a spot light
@@ -159,29 +169,30 @@ PS_OUT main(VS_OUT input) : SV_Target
 				shadowSpotVisible = 1 - shadowSpotVisible * texColor.a;
 			}
 		}
+		//if the light is a laser
 		if (l.pos.w == 2.0)
 		{
 			float3 rayPointVector = (l.pos.xyz - input.wPos.xyz) - dot(l.pos.xyz - input.wPos.xyz, l.directionWidth.xyz) * l.directionWidth.xyz;
 			float dist = dot(rayPointVector, rayPointVector);
-			
+
 			float startDist = dot(lightVector, lightVector);
 			float3 endVector = (l.pos.xyz + l.directionWidth.xyz * l.directionWidth.w) - input.wPos.xyz;
 			float endDist = dot(endVector, endVector);
-			
+
 			if (startDist < l.directionWidth.w * l.directionWidth.w && endDist < l.directionWidth.w * l.directionWidth.w)
 			{
 				attenuation = l.color.w / (dist * dist);
-				nDotL = max(dot(normal, normalize(rayPointVector)), 0.0);
+				nDotL = saturate(dot(normal, normalize(rayPointVector)));
 			}
 			else
 			{
 				attenuation = l.color.w / (min(startDist, endDist) * min(startDist, endDist));
 				if (startDist < endDist)
 				{
-					nDotL = max(dot(normal, normalize(lightVector)), 0.0);
+					nDotL = saturate(dot(normal, normalize(lightVector)));
 				}
 				else {
-					nDotL = max(dot(normal, normalize(endVector.xyz)), 0.0);
+					nDotL = saturate(dot(normal, normalize(endVector.xyz)));
 				}
 			}
 		}
@@ -191,17 +202,23 @@ PS_OUT main(VS_OUT input) : SV_Target
 			nDotL = max(dot(normal, normalize(lightVector)), 0.0);
 		}
 
-		diffuseLight.rgb += max(l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible, 0.0);
-		
+		diffuseLight.rgb += saturate(l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible);
+
 		float3 halfway = normalize(normalize(lightVector) + cameraVector);
-		specularLight.rgb += l.color.rgb * pow(max(dot(normal, halfway), 0.0), gloss) * attenuation * directional * shadowSpotVisible;
+		float nDotH = saturate(dot(normal, halfway));
+		float glossTerm = ((gloss + 2) / 8) * pow(nDotH, gloss);
+		float3 fresnelTerm = (specularColor + color) + (1.0f - specularColor + color) * pow(1.0f - nDotH, 5);
+
+		specularLight.rgb += glossTerm * fresnelTerm * l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible;
 	}
 
 	float4 outColor = (texColor + color) * (diffuseLight + ambient);
-	outColor += (specularColor + color) * specularLight;
+	outColor += specularLight;
 
 	output.color = outColor;
+	output.color.a = texColor.a + color.a;
 	output.depth = float4(input.Pos.z, 0.0, 0.0, 1.0);
 	
+
 	return output;
 }

@@ -34,6 +34,7 @@ public:
 
 	virtual void init() = 0;
 	void update(float deltaTime);
+	virtual void unloadTextures();
 };
 
 #endif // !USER_INTERFACE_H

@@ -1467,7 +1467,10 @@ bool Graphics::loadTexture(std::string path, bool overridePath, bool cpuOnly)
 			delete newTexture;
 			return false;
 		}
-		textures[texturePath] = newTexture;
+		else 
+		{
+			textures[texturePath] = newTexture;
+		}
 	}
 	return true;
 }
@@ -1599,37 +1602,56 @@ Material Graphics::getMaterial(const char* modelPath)
 	std::string texturePath;
 	texturePath = MODEL_ROOT_DIR + std::string(modelPath);
 
-	if (textures.find(texturePath + "/_diffuse.tga") == textures.end())
-	{
-		material.diffuse = nullptr;
-	}
-	else
+	if (textures.find(texturePath + "/_diffuse.tga") != textures.end())
 	{
 		material.diffuse = textures[texturePath + "/_diffuse.tga"];
 	}
-
-	if (textures.find(texturePath + "/_normal.tga") == textures.end()) {
-		material.normal = nullptr;
+	else if (textures.find(texturePath + "/_diffuse.dds") != textures.end())
+	{
+		material.diffuse = textures[texturePath + "/_diffuse.dds"];
 	}
 	else
+	{
+		material.diffuse = nullptr;
+	}
+
+	if (textures.find(texturePath + "/_normal.tga") != textures.end())
 	{
 		material.normal = textures[texturePath + "/_normal.tga"];
 	}
-
-	if (textures.find(texturePath + "/_specular.tga") == textures.end()) {
-		material.specular = nullptr;
+	else if (textures.find(texturePath + "/_normal.dds") != textures.end())
+	{
+		material.normal = textures[texturePath + "/_normal.dds"];
 	}
 	else
+	{
+		material.normal = nullptr;
+	}
+
+	if (textures.find(texturePath + "/_specular.tga") != textures.end())
 	{
 		material.specular = textures[texturePath + "/_specular.tga"];
 	}
-
-	if (textures.find(texturePath + "/_gloss.tga") == textures.end()) {
-		material.gloss = nullptr;
+	else if (textures.find(texturePath + "/_specular.dds") != textures.end())
+	{
+		material.specular = textures[texturePath + "/_specular.dds"];
 	}
 	else
 	{
+		material.specular = nullptr;
+	}
+
+	if (textures.find(texturePath + "/_gloss.tga") != textures.end())
+	{
 		material.gloss = textures[texturePath + "/_gloss.tga"];
+	}
+	else if (textures.find(texturePath + "/_gloss.dds") != textures.end())
+	{
+		material.gloss = textures[texturePath + "/_gloss.dds"];
+	}
+	else
+	{
+		material.gloss = nullptr;
 	}
 
 	return material;
@@ -1847,7 +1869,7 @@ void Graphics::presentScene()
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBufferPtr;
 	swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	deviceContext->ResolveSubresource(backBufferPtr.Get(), 0, renderTarget.Get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
-	swapChain->Present(0, 0);
+	swapChain->Present(1, 0);
 }
 
 void Graphics::fillLightBuffers()
