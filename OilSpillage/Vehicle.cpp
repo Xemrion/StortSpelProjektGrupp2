@@ -814,7 +814,7 @@ void Vehicle::updateWeapon(float deltaTime)
 								////test nitro
 							if (temp2->getGadget().type == GadgetType::NITRO )
 							{
-								if (Input::checkButton(Keys::ACTION_1, States::HELD) && temp2->getGadget().currentLifeTime > 0) // its alive!
+								if (Input::checkButton(Keys::R_SHOULDER, States::HELD) && temp2->getGadget().currentLifeTime > 0) // its alive!
 								{
 									if (temp2->getGadget().enable != true)
 									{
@@ -858,7 +858,7 @@ void Vehicle::updateWeapon(float deltaTime)
 							}
 							else if(temp2->getGadget().type == GadgetType::EMP)
 							{
-								if (Input::checkButton(Keys::ACTION_1, States::RELEASED) && temp2->getGadget().enable != true) // its alive!
+								if (Input::checkButton(Keys::R_SHOULDER, States::RELEASED) && temp2->getGadget().enable != true) // its alive!
 								{	
 									if (empplaced == nullptr)
 									{
