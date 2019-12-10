@@ -86,7 +86,11 @@ Physics::~Physics()
 
 void Physics::update(float deltaTime)
 {	
-	OutputDebugString(("Rigidbodys in world: " + std::to_string(this->bodies.size()) + "\n").c_str());
+#ifdef _DEBUG
+	OutputDebugString(("Rigidbodys in the world: " + std::to_string(this->bodies.size()) + "\n").c_str());
+	OutputDebugString(("Jointsw in the world: " + std::to_string(this->pointJoints.size()) + "\n").c_str());
+#endif // _DEBUG
+
 	this->world->stepSimulation(deltaTime, 6, 1. / 120.);
 }
 
