@@ -8,7 +8,6 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 	:Actor(x, z, physics)
 {
 	this->pathSize = -1;
-	this->aggroRange = 1000;
 }
 
 DynamicActor::~DynamicActor()
@@ -84,20 +83,6 @@ void DynamicActor::followPath()
 			pathSize--;
 		}
 	}
-}
-Status DynamicActor::inAggroRange()
-{
-	Status status;
-
-	if ((getPosition() - targetPos).Length() > aggroRange)
-	{
-		status = Status::FAILURE;
-	}
-	else
-	{
-		status = Status::SUCCESS;
-	}
-	return status;
 }
 
 void DynamicActor::knockBack(Vector3 direction, float force)
