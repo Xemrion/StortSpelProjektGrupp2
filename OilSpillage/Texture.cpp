@@ -135,6 +135,8 @@ bool Texture::Initialize(ID3D11Device * device, ID3D11DeviceContext* deviceConte
 		//	&textureView,
 		//	(DirectX::DDS_ALPHA_MODE*) nullptr
 		//);
+
+		if (hr != S_OK) return false;
 	}
 	return true;
 }
