@@ -78,7 +78,7 @@ float TurretHandler::distanceToPlayer(const Vector3& position)
 	return minDistance;
 }
 
-void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,float soundTimer)
+void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,float &soundTimer)
 {
 	for (int i = 0; i < this->turrets.size(); i++)
 	{

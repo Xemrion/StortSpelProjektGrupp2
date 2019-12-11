@@ -9,7 +9,7 @@ SOLVER_USE_WARMSTARTING |
 0;
 Physics::Physics() :broadphase(new btDbvtBroadphase())
 {
-#ifndef _DEBUG
+#ifdef _DEBUG
 	collisionConfig = new btDefaultCollisionConfiguration();
 	solver = new btSequentialImpulseConstraintSolver();
 	dispatcher = new btCollisionDispatcher(collisionConfig);
