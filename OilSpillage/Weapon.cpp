@@ -12,6 +12,7 @@ Bullet::Bullet()
 	this->obj->mesh = Game::getGraphics().getMeshPointer("Cube");
 	this->obj->setScale(Vector3(0.05f, 0.25f, 0.35f));
 	this->obj->setColor(Vector4(1.2f, 1.2f, 0, 1));
+	this->obj->setPosition(Vector3(1000, 100, 1000));
 	this->weapon.type = WeaponType::None;
 }
 
@@ -85,8 +86,6 @@ void Bullet::defaultShoot(Weapon& vehicleWeapon, const Vector3& position, const 
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-	if (!vehicleWeapon.melee)
-		Game::getGraphics().addToDraw(this->obj);
 }
 
 void Bullet::defaultShootEnemy(Weapon& vehicleWeapon, const Vector3& position, const Vector3& direction, const Vector3& additionalVelocity, float deltaTime)
@@ -107,8 +106,6 @@ void Bullet::defaultShootEnemy(Weapon& vehicleWeapon, const Vector3& position, c
 
 	float newRot = atan2(direction.x, direction.z);
 	this->obj->setRotation(Vector3(0, newRot, 0));
-	if (!vehicleWeapon.melee)
-		Game::getGraphics().addToDraw(this->obj);
 }
 
 void Bullet::meleeShoot(const Vector3& position, const Vector3& direction)
@@ -378,7 +375,7 @@ void Bullet::updateSoundTimer(float deltaTime)
 void Bullet::destroy()
 {
 	setWeapon(WeaponHandler::getWeapon(WeaponType::None));
-	Game::getGraphics().removeFromDraw(obj);
+	this->obj->setPosition(Vector3(1000, 100, 1000));
 }
 
 Vector3 Bullet::getDirection() const
@@ -389,4 +386,12 @@ Vector3 Bullet::getDirection() const
 void Bullet::setDirection(Vector3 newDir)
 {
 	dir = newDir;
+}
+
+void Bullet::setDraw()
+{
+	if (obj->mesh != nullptr)
+	{
+		Game::getGraphics().addToDraw(obj);
+	}
 }

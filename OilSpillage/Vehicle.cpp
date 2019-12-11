@@ -74,6 +74,10 @@ void Vehicle::init(Physics* physics)
 	setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 	Game::getGraphics().loadModel("Entities/Turret");
 	
+	for (int i = 0; i < bulletCount; i++)
+	{
+		this->bullets[i].setDraw();
+	}
 
 	//this->vehicleBody1 = new GameObject;
 	//vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player1");
@@ -661,10 +665,10 @@ void Vehicle::updateWeapon(float deltaTime)
 						
 								for (int i = 0; i < Vehicle::bulletCount; ++i)
 								{
-									if (bullets[i].getWeaponType() == WeaponType::None)
+									if (bulletSlots[Slots::MOUNTED][i].getWeaponType() == WeaponType::None)
 									{
 										auto playerVelocity = this->getRigidBody()->getLinearVelocity();
-										this->bullets[i].shoot(temp->getWeapon(),
+										this->bulletSlots[Slots::MOUNTED][i].shoot(temp->getWeapon(),
 											this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
 											Vector3(curDir.x, 0.0, curDir.y),
 											Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 1.0f, deltaTime);
@@ -681,10 +685,10 @@ void Vehicle::updateWeapon(float deltaTime)
 							{
 								for (int i = 0; i < Vehicle::bulletCount; ++i)
 								{
-									if (bullets[i].getWeaponType() == WeaponType::None)
+									if (bulletInvis[i].getWeaponType() == WeaponType::None)
 									{
 										auto playerVelocity = this->getRigidBody()->getLinearVelocity();
-										this->bullets[i].shoot(temp->getWeapon(),
+										this->bulletInvis[i].shoot(temp->getWeapon(),
 											this->vehicleBody1->getPosition() + Vector3(curDir.x, 0, curDir.y),
 											Vector3(curDir.x, 0.0, curDir.y),
 											Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()) * 1.0f, deltaTime);
@@ -714,12 +718,12 @@ void Vehicle::updateWeapon(float deltaTime)
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
 									{
-										if (bullets[i].getWeaponType() == WeaponType::None)
+										if (bulletSlots[Slots::FRONT][i].getWeaponType() == WeaponType::None)
 										{
 											auto playerVelocity = this->getRigidBody()->getLinearVelocity();
 
 											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-											this->bullets[i].shoot(temp->getWeapon(),
+											this->bulletSlots[Slots::FRONT][i].shoot(temp->getWeapon(),
 												this->vehicleBody1->getPosition() + Vector3(tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 												tempDir,
 												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
@@ -733,12 +737,12 @@ void Vehicle::updateWeapon(float deltaTime)
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
 									{
-										if (bullets[i].getWeaponType() == WeaponType::None)
+										if (bulletInvis[i].getWeaponType() == WeaponType::None)
 										{
 											auto playerVelocity = this->getRigidBody()->getLinearVelocity();
 
 											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-											this->bullets[i].shoot(temp->getWeapon(),
+											this->bulletInvis[i].shoot(temp->getWeapon(),
 												this->vehicleBody1->getPosition() + Vector3(tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 												tempDir,
 												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
@@ -770,12 +774,12 @@ void Vehicle::updateWeapon(float deltaTime)
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
 									{
-										if (bullets[i].getWeaponType() == WeaponType::None)
+										if (this->bulletSlots[Slots::BACK][i].getWeaponType() == WeaponType::None)
 										{
 											auto playerVelocity = this->getRigidBody()->getLinearVelocity();
 
 											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-											this->bullets[i].shoot(temp->getWeapon(),
+											this->bulletSlots[Slots::BACK][i].shoot(temp->getWeapon(),
 												this->vehicleBody1->getPosition() + Vector3(-tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 												-tempDir,
 												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
@@ -790,12 +794,12 @@ void Vehicle::updateWeapon(float deltaTime)
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
 									{
-										if (bullets[i].getWeaponType() == WeaponType::None)
+										if (bulletInvis[i].getWeaponType() == WeaponType::None)
 										{
 											auto playerVelocity = this->getRigidBody()->getLinearVelocity();
 
 											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-											this->bullets[i].shoot(temp->getWeapon(),
+											this->bulletInvis[i].shoot(temp->getWeapon(),
 												this->vehicleBody1->getPosition() + Vector3(-tempDir * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 												-tempDir,
 												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
@@ -917,12 +921,12 @@ void Vehicle::updateWeapon(float deltaTime)
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
 									{
-										if (bullets[i].getWeaponType() == WeaponType::None)
+										if (bulletSlots[Slots::RIGHT][i].getWeaponType() == WeaponType::None)
 										{
 											auto playerVelocity = this->getRigidBody()->getLinearVelocity();
 
 											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-											this->bullets[i].shoot(temp->getWeapon(),
+											this->bulletSlots[Slots::RIGHT][i].shoot(temp->getWeapon(),
 												this->vehicleBody1->getPosition() + Vector3(right * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 												right,
 												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
@@ -936,12 +940,12 @@ void Vehicle::updateWeapon(float deltaTime)
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
 									{
-										if (bullets[i].getWeaponType() == WeaponType::None)
+										if (bulletInvis[i].getWeaponType() == WeaponType::None)
 										{
 											auto playerVelocity = this->getRigidBody()->getLinearVelocity();
 
 											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-											this->bullets[i].shoot(temp->getWeapon(),
+											this->bulletInvis[i].shoot(temp->getWeapon(),
 												this->vehicleBody1->getPosition() + Vector3(right * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 												right,
 												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
@@ -972,12 +976,12 @@ void Vehicle::updateWeapon(float deltaTime)
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
 									{
-										if (bullets[i].getWeaponType() == WeaponType::None)
+										if (bulletSlots[Slots::LEFT][i].getWeaponType() == WeaponType::None)
 										{
 											auto playerVelocity = this->getRigidBody()->getLinearVelocity();
 
 											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-											this->bullets[i].shoot(temp->getWeapon(), 
+											this->bulletSlots[Slots::LEFT][i].shoot(temp->getWeapon(), 
 												this->vehicleBody1->getPosition() + Vector3(-right * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 												-right,
 												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
@@ -991,12 +995,12 @@ void Vehicle::updateWeapon(float deltaTime)
 								{
 									for (int i = 0; i < Vehicle::bulletCount; ++i)
 									{
-										if (bullets[i].getWeaponType() == WeaponType::None)
+										if (bulletInvis[i].getWeaponType() == WeaponType::None)
 										{
 											auto playerVelocity = this->getRigidBody()->getLinearVelocity();
 
 											Vector3 tempDir = Vector3(cos(this->vehicleBody1->getRotation().y - 3.14 / 2), 0, -sin(this->vehicleBody1->getRotation().y - 3.14 / 2));
-											this->bullets[i].shoot(temp->getWeapon(),
+											this->bulletInvis[i].shoot(temp->getWeapon(),
 												this->vehicleBody1->getPosition() + Vector3(-right * 1.5f) + Vector3(0.0f, -0.5f, 0.0f),
 												-right,
 												Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()), deltaTime);
@@ -1020,7 +1024,7 @@ void Vehicle::updateWeapon(float deltaTime)
 		{
 			for (int i = 0; i < Vehicle::bulletCount; ++i)
 			{
-				if (bullets[i].getWeaponType() == WeaponType::None)
+				if (bulletInvis[i].getWeaponType() == WeaponType::None)
 				{
 					auto playerVelocity = this->getRigidBody()->getLinearVelocity();
 
@@ -1028,7 +1032,7 @@ void Vehicle::updateWeapon(float deltaTime)
 					Weapon starWeapon = WeaponHandler::getWeapon(WeaponType::Star);
 					starWeapon.damage *= deltaTime;
 
-					this->bullets[i].shoot(starWeapon,
+					this->bulletInvis[i].shoot(starWeapon,
 						this->vehicleBody1->getPosition(),
 						Vector3(0, 1, 0),
 						Vector3(playerVelocity.getX(), playerVelocity.getY(), playerVelocity.getZ()),
@@ -1044,6 +1048,7 @@ void Vehicle::updateWeapon(float deltaTime)
 			for (int i = 0; i < Vehicle::bulletCount; i++)
 			{
 				bullets[i].update(deltaTime);
+				bulletInvis[i].update(deltaTime);
 			}
 			if (this->vehicleSlots->getItem(Slots::MOUNTED) != nullptr)
 			{
@@ -1197,6 +1202,29 @@ void Vehicle::setVehicleSlots(VehicleSlots* slots)
 				}
 			}
 		}
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		if (this->vehicleSlots->getInventorySlot(Slots(i)) != nullptr)
+		{
+			ItemWeapon* ptr = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getInventorySlot(Slots(i))->getItem());
+			if (ptr != nullptr)
+			{
+				if (ptr->getWeapon().type == WeaponType::MachineGun)
+				{
+					this->bulletSlots[i] = this->bullets;
+				}
+				else
+				{
+					this->bulletSlots[i] = this->bulletInvis;
+				}
+			}
+			else
+			{
+				this->bulletSlots[i] = this->bulletInvis;
+			}
+		}
+
 	}
 }
 

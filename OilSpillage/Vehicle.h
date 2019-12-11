@@ -158,8 +158,10 @@ private:
 	Stats defaultStats;
 	Stats updatedStats;
 
-	static const int bulletCount = 512;
+	static const int bulletCount = 256;
 	Bullet bullets[bulletCount];
+	Bullet bulletInvis[bulletCount];
+	Bullet* bulletSlots[5];
 
 	float gunRotation;
 	DirectX::XMFLOAT2 velocity;

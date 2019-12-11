@@ -219,6 +219,7 @@ public:
 	static void updateSoundTimer(float deltaTime);
 	Vector3 getDirection() const;
 	void setDirection(Vector3 newDir);
+	void setDraw();
 };
 
 #endif // !WEAPON_H
