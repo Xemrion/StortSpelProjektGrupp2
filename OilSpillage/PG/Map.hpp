@@ -24,7 +24,7 @@ public:
 		model->setScale({ .25f, .25f, .25f });
 		model->setColor({ .75f, .7f, .7f, 1.0f });
 		//model->setSpotShadow( false );
-		graphics.addToDrawStatic( model.get() );
+		graphics.addToDraw( model.get() );
 
 		//model->mesh       = graphics.getMeshPointer( "Streetlight"   );
 		//model->setMaterial( graphics.getMaterial(    "Streetlight" ) );
