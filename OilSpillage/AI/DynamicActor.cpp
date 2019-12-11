@@ -19,7 +19,7 @@ void DynamicActor::move()
 	Vector3 newVelocity = calculateVelocity();
 	if (newVelocity != Vector3())
 	{
-		velocity = calculateVelocity();
+		velocity = newVelocity;
 		velocity.Normalize();
 	}
 	//If newVelocity is 0, slow down the velocity instead
@@ -35,7 +35,6 @@ void DynamicActor::move()
 	Vector3 targetToSelf = (nextPos - position);
 
 	//Rotate
-	//(targetToSelf).Dot(vecForward)
 	if ( ((targetToSelf.x * vecForward.x) + (targetToSelf.z * vecForward.z)) < 0.8)
 	{
 		vecForward -= (targetToSelf * deltaTime) / 0.02f;
@@ -54,18 +53,19 @@ void DynamicActor::setPath(Vector3* path)
 
 void DynamicActor::update(float dt, const Vector3& targetPos)
 {
-	Actor::update(dt, targetPos);
-
-
-	followPath();
-	move();
+	if(stunnedTimer <= 0)
+	{
+		Actor::update(dt, targetPos);
+		followPath();
+		move();
+	}
+	stunnedTimer -= dt;
 	onFire();
 }
 
 Vector3 DynamicActor::calculateVelocity()
 {
-	Vector3 desiredDirection = destination - position;
-	return desiredDirection - velocity;
+	return destination - position;
 }
 
 void DynamicActor::followPath()
@@ -99,4 +99,10 @@ void DynamicActor::setGroup(void* newGroup)
 void* DynamicActor::getGroup() const
 {
 	return this->curGroup;
+}
+
+void DynamicActor::setStun(float timer)
+{
+	stunnedTimer = timer;
+	getRigidBody()->setLinearVelocity(btVector3(0.0f, 0.0f, 0.0f));
 }
