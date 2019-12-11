@@ -11,6 +11,7 @@ private:
 	Texture* textureBG;
 	Texture* textureCar;
 	Texture* textureIndicator;
+	Texture* textureIndicatorError;
 
 	Element* selected;
 	std::unique_ptr<ItemSlot> slots[Slots::SIZEOF];

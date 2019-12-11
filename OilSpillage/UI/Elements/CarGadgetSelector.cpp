@@ -11,12 +11,15 @@ CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position), used
 	Game::getGraphics().loadTexture("UI/statBG");
 	Game::getGraphics().loadTexture("UI/carTopdown");
 	Game::getGraphics().loadTexture("UI/itemSelectorIndicator");
+	Game::getGraphics().loadTexture("UI/itemSelectorIndicatorError");
 	this->textureBG = Game::getGraphics().getTexturePointer("UI/statBG");
 	this->textureCar = Game::getGraphics().getTexturePointer("UI/carTopdown");
 	this->textureIndicator = Game::getGraphics().getTexturePointer("UI/itemSelectorIndicator");
+	this->textureIndicatorError = Game::getGraphics().getTexturePointer("UI/itemSelectorIndicatorError");
 	assert(textureBG && "Texture failed to load!");
 	assert(textureCar && "Texture failed to load!");
 	assert(textureIndicator && "Texture failed to load!");
+	assert(textureIndicatorError && "Texture failed to load!");
 
 	this->slots[Slots::FRONT] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x / 2 - ItemSlot::size.x / 2, 32.0f), false);
 	this->slots[Slots::MOUNTED] = std::make_unique<ItemSlot>(position + Vector2(CarGadgetSelector::size.x / 2 - ItemSlot::size.x / 2, CarGadgetSelector::size.y / 2 - ItemSlot::size.y / 2), false);
@@ -51,7 +54,14 @@ void CarGadgetSelector::draw(bool selected)
 
 	if (selected)
 	{
-		UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->selected->getPosition());
+		if (this->selected == this->slots[Slots::BACK].get())
+		{
+			UserInterface::getSpriteBatch()->Draw(this->textureIndicatorError->getShaderResView(), this->selected->getPosition());
+		}
+		else
+		{
+			UserInterface::getSpriteBatch()->Draw(this->textureIndicator->getShaderResView(), this->selected->getPosition());
+		}
 	}
 }
 
