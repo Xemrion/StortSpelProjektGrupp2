@@ -164,15 +164,24 @@ void SaveSystem::clear()
 void SaveSystem::loadGame(int id, VehicleSlots* slots)
 {
 	GameInfo& info = Game::getGameInfo();
+	Container::playerInventory = std::make_unique<Container>();
+	Container::Slot* slot = nullptr;
 
 	if (!std::filesystem::exists("file" + std::to_string(id) + ".sav"))
 	{
+		Container::playerInventory->addItem(Item::getDefaultChassi());
+		slot = Container::playerInventory->getLatestAdded();
+		slots->setSlot(Slots::CHASSI, slot->getItem()->clone(), slot);
+
+		Container::playerInventory->addItem(Item::getDefaultWheels());
+		slot = Container::playerInventory->getLatestAdded();
+		slots->setSlot(Slots::WHEEL, slot->getItem()->clone(), slot);
+
 		info.saveFileID = id;
 		return;
 	}
 
 	SaveSystem saveSystem;
-	Container::playerInventory = std::make_unique<Container>();
 
 	saveSystem.read("file" + std::to_string(id) + ".sav");
 	info.saveFileID = id;
@@ -279,7 +288,7 @@ void SaveSystem::loadGame(int id, VehicleSlots* slots)
 		{
 			if (itemSlots[j] == i)
 			{
-				Container::Slot* slot = Container::playerInventory->getLatestAdded();
+				slot = Container::playerInventory->getLatestAdded();
 				slots->setSlot(static_cast<Slots>(j), slot->getItem()->clone(), slot);
 			}
 		}

@@ -205,6 +205,11 @@ private:
 	float velocitySpeed;
 	class Physics* physics;
 	float angleBetween;
+	Vector2 vehicleDirection;
+	GameObject* empplaced;
+	//Gadget
+	bool nitroTrue;
+	Vector2 targetRotation2;
 public:
 	float fireTimer;
 	Vehicle();
@@ -263,6 +268,8 @@ public:
 
 	void onFire(float dt);
 	void setFire();
+
+
 };
 
 #endif // !VEHICLE_H

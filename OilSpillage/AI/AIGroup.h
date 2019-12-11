@@ -9,6 +9,7 @@ public:
 	const Vector3& getAveragePos() const;
 	void updateAveragePos();
 	void setPath(std::vector<Vector3> path);
+	void removeActor(DynamicActor* actor);
 	void updateDuty();
 	const float getGroupRadius() const;
 private:

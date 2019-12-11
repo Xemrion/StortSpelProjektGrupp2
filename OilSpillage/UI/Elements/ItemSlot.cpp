@@ -92,3 +92,8 @@ void ItemSlot::setSlot(Container::Slot* slot)
 		this->addTextbox();
 	}
 }
+
+void ItemSlot::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/itemSlot");
+}

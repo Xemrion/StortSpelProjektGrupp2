@@ -8,20 +8,18 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 	:Actor(x, z, physics)
 {
 	this->pathSize = -1;
-	this->aggroRange = 1000;
 }
 
 DynamicActor::~DynamicActor()
 {
-
 }
 
 void DynamicActor::move()
 {
 	Vector3 newVelocity = calculateVelocity();
-	if (newVelocity != Vector3())
+	if (newVelocity != Vector3() && stunnedTimer <= 0)
 	{
-		velocity = calculateVelocity();
+		velocity = newVelocity;
 		velocity.Normalize();
 	}
 	//If newVelocity is 0, slow down the velocity instead
@@ -37,8 +35,7 @@ void DynamicActor::move()
 	Vector3 targetToSelf = (nextPos - position);
 
 	//Rotate
-	//(targetToSelf).Dot(vecForward)
-	if ( ((targetToSelf.x * vecForward.x) + (targetToSelf.z * vecForward.z)) < 0.8)
+	if (((targetToSelf.x * vecForward.x) + (targetToSelf.z * vecForward.z)) < 0.8)
 	{
 		vecForward -= (targetToSelf * deltaTime) / 0.02f;
 		vecForward.Normalize();
@@ -57,8 +54,6 @@ void DynamicActor::setPath(Vector3* path)
 void DynamicActor::update(float dt, const Vector3& targetPos)
 {
 	Actor::update(dt, targetPos);
-
-
 	followPath();
 	move();
 	onFire();
@@ -66,8 +61,7 @@ void DynamicActor::update(float dt, const Vector3& targetPos)
 
 Vector3 DynamicActor::calculateVelocity()
 {
-	Vector3 desiredDirection = destination - position;
-	return desiredDirection - velocity;
+	return destination - position;
 }
 
 void DynamicActor::followPath()
@@ -86,23 +80,24 @@ void DynamicActor::followPath()
 		}
 	}
 }
-Status DynamicActor::inAggroRange()
-{
-	Status status;
-
-	if ((getPosition() - targetPos).Length() > aggroRange)
-	{
-		status = Status::FAILURE;
-	}
-	else
-	{
-		status = Status::SUCCESS;
-	}
-	return status;
-}
 
 void DynamicActor::knockBack(Vector3 direction, float force)
 {
 	direction.Normalize();
 	this->getRigidBody()->setLinearVelocity(-btVector3(direction.x, 0.0f, direction.z) * force);
+}
+
+void DynamicActor::setGroup(void* newGroup)
+{
+	this->curGroup = newGroup;
+}
+
+void* DynamicActor::getGroup() const
+{
+	return this->curGroup;
+}
+
+void DynamicActor::setStun(float timer)
+{
+	stunnedTimer = timer;
 }

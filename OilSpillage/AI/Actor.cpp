@@ -15,6 +15,7 @@ Actor::Actor(float x, float z, Physics* physics)
 	this->position = Vector3(x, -1.0f, z);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	this->points = 0;
+	this->stunnedTimer = 0;
 	this->fireTimer = 0;
 }
 Actor::~Actor()
@@ -37,7 +38,7 @@ void Actor::update(float dt, const Vector3& targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
-	if (root != nullptr)
+	if (root != nullptr && stunnedTimer <= 0)
 	{
 		this->root->func();
 	}
@@ -49,6 +50,7 @@ void Actor::update(float dt, const Vector3& targetPos)
 			isHit = false;
 		}
 	}
+	stunnedTimer -= deltaTime;
 	particleTimer -= deltaTime;
 }
 
@@ -126,4 +128,9 @@ void Actor::onFire()
 void Actor::setFire(float timer)
 {
 	fireTimer = timer;
+}
+
+void Actor::setStun(float timer)
+{
+	stunnedTimer = timer;
 }

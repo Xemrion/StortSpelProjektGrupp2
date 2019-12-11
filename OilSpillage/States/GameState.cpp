@@ -4,3 +4,7 @@ void GameState::clearDraw()
 {
 	Game::getGraphics().clearDraw();
 }
+
+void GameState::unloadTextures()
+{
+}

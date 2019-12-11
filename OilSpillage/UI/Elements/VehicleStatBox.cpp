@@ -24,6 +24,7 @@ VehicleStatBox::VehicleStatBox(Vector2 position) : Element(position), amounts{ 0
 
 VehicleStatBox::~VehicleStatBox()
 {
+	
 }
 
 void VehicleStatBox::draw(bool selected)
@@ -63,4 +64,11 @@ void VehicleStatBox::update(const Stats& stats)
 	this->amounts[3] = stats.accelerationRate / (VehicleStats::defaultStats.accelerationRate * 10.0f);
 	this->amounts[4] = stats.speed / (VehicleStats::defaultStats.speed * 10.0f);
 	this->amounts[5] = stats.handlingRate / (VehicleStats::defaultStats.handlingRate * 10.0f);
+}
+
+void VehicleStatBox::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/statBG");
+	Game::getGraphics().unloadTexture("UI/sliderBG");
+	Game::getGraphics().unloadTexture("UI/statFG");
 }

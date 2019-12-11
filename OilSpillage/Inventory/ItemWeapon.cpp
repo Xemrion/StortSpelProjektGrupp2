@@ -27,7 +27,7 @@ std::string ItemWeapon::generateDescription(Weapon weapon)
 		stream << "Max Spread: " << Item::fixedDecimals(weapon.maxSpread, 2) << "\n";
 	}
 	else if(weapon.type == WeaponType::Spikes){
-		stream << "Damage/S: " << Item::fixedDecimals(weapon.damage / weapon.fireRate, 2) << "\n";
+		stream << "Damage/S: " << Item::fixedDecimals(weapon.damage, 2) << "\n";
 
 	}
 	else {
@@ -204,4 +204,12 @@ void ItemWeapon::randomize()
 Weapon& ItemWeapon::getWeapon()
 {
 	return this->weapon;
+}
+
+void ItemWeapon::update(float dt)
+{
+	if (weapon.type == WeaponType::Spikes)
+	{
+
+	}
 }
