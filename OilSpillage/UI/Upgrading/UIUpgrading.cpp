@@ -32,6 +32,10 @@ void UIUpgrading::updateUI(float deltaTime)
 				this->gadgetSelector->setSlot(Slots::WHEEL, this->itemSelector->getSelectedSlot());
 				this->statBox->update(static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getStats());
 			}
+			else if (this->itemSelector->getSelectedType() == ItemType::TYPE_GADGET)
+			{
+				this->gadgetSelector->setSlot(Slots::BACK, this->itemSelector->getSelectedSlot());
+			}
 			else
 			{
 				this->selectingItem = false;
