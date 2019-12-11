@@ -79,7 +79,7 @@ void  Branch::walk( MapConfig const &config ) {
          }
          if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road) ) {
             // if we can't walk forward in that direction, try the other
-            currentDirection = turn_around(currentDirection);
+            currentDirection = turnAround(currentDirection);
             if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road) ) {
                currentDirection = turned_left ? turnRight(currentDirection) : turnLeft(currentDirection);
                if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road) ) {

@@ -105,6 +105,10 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum, RNG & ) noexcep
 struct CompositeHouse {
 	GameObject          walls, windows, roof;
 	V2u                 dimensions;
+
+   std::array<GameObject,4> fences;
+   GameObject               boundingBox;
+
 	String				skyscraperMeshIndex;
 };
 
@@ -166,6 +170,7 @@ public:
 	Direction                  getHospitalOrientation(   V2u const hospitalTilePos ) const noexcept;
 	Vector3                    getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept;
 	District::Enum             districtAt( U32 x, U32 y ) const noexcept;
+	District::Enum             districtAt( U32 idx ) const noexcept;
 	HouseGenData const &       getHouseData() const noexcept;
 	Info const &               getInfo() const noexcept;
 	Vector<F32> const &        getRoadDistanceMap() const noexcept;
@@ -181,7 +186,7 @@ private:
 	Opt<Lot>                   findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
 	void                       instantiateTilesAsModels() noexcept;
 	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout &&, HouseTileset const & ) const noexcept;
-	CompositeHouse			   instantiateSkyscraper();
+	CompositeHouse             instantiateSkyscraper();
 	Graphics &                 graphics;
 	V2u                        startPositionInTileSpace;
 	UPtr<TileMap>              tilemap;
@@ -191,7 +196,7 @@ private:
 	Vector<UPtr<GameObject>>   crossingTiles;
 	Physics * const            physics;
 	LightList &                lights;
-	UPtr<Skyscraper>		   skyscraperGenerator;
+	UPtr<Skyscraper>           skyscraperGenerator;
 	// TODO: refactor out:
 	using DistrictID = U16;
 	using BuildingID = U16;                         // 0 = unused tile

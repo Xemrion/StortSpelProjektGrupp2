@@ -215,6 +215,12 @@ void Map::generateBorder()
 	border.bounds[3].setRigidBody( tmp3, physics );
 }
 
+//void Map::generateFireHydrants() {
+	// for every tile
+	// if tile is straight road and selection says yes
+	// random select a side and place a fire hydrant
+//}
+
 void Map::generateZebraCrossings()
 {
 	F32_Dist  generateSelection { .0f, 1.0f };
@@ -416,7 +422,6 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	generateStreetlights();
 	generateZebraCrossings();
 	instantiateTilesAsModels();
-
 }
 
 Map::~Map() noexcept
@@ -1115,6 +1120,12 @@ District::Enum  Map::districtAt( U32 x, U32 y ) const noexcept {
 	return districtLookupTable[ cellIdx ];
 }
 
+District::Enum  Map::districtAt(U32 idx) const noexcept
+{
+	assert( idx < districtMap->diagram.size() );
+	return districtLookupTable[idx];
+}
+
 
 
 
@@ -1255,6 +1266,150 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 			}
 		}
 	}
+/*
+	auto const w        = tilemap.width,
+				  h        = tilemap.height,
+				  stride   = w * 2 + 1;
+	Size const numEdges = 2*w*h + w + h;
+	Size const numFaces = w*h;
+	auto       edges    = std::vector<bool>( numEdges, false );
+	auto       faces    = std::vector<bool>( numFaces, false );
+
+	auto edge           = [&edges,w,stride]( U32 x, U32 y, Direction d ) -> bool& {
+									if      ( d==Direction::north ) return edges[((y+0)*stride) + x        ];
+									else if ( d==Direction::east  ) return edges[((y+0)*stride) + x + w + 1];
+									else if ( d==Direction::south ) return edges[((y+1)*stride) + x        ];
+									else if ( d==Direction::west  ) return edges[((y+0)*stride) + x + w    ];
+									else assert( false and "Invalid direction!" );
+								 };
+
+	auto face     = [&faces,w]( U32 x, U32 y ) -> bool& {
+									 return faces[y*w+x]; 
+								 };
+
+	auto const getIndexOf = [w]( U32 x, U32 y, Direction d ) {
+									 auto i = y * w + x;
+									 if      ( d==Direction::north ) i-=w;
+									 else if ( d==Direction::east  ) ++i;
+									 else if ( d==Direction::south ) i+=w;
+									 else if ( d==Direction::west  ) --i;
+									 return i;
+								 };
+	auto const isInBounds = [w,h]( Size i ) {
+									 return i < (w*h);
+								 };
+
+	for ( U16 y = 0;  y < h;  ++y ) {
+		for ( U16 x = 0;  x < w;  ++x ) {
+			auto const tile                = tilemap.tileAt(x,y);
+			auto const district            = map.districtAt(x,y);
+			auto const isFullPavedDistrict = district==&District::metropolitan;
+			auto const isHalfPavedDistrict = district==&District::downtown or district==&District::residential;
+			auto const isPavedDistrict     = isFullPavedDistrict or isHalfPavedDistrict;
+
+			if ( isFullPavedDistrict )
+				face(x,y) = true;
+
+			if ( isPavedDistrict and tile==Tile::road ) {
+				for ( auto const &direction : directions )
+					if ( tileInDirection(direction)!=Tile::road )
+						edge(x,y,direction) = true;
+			}
+			else if ( isHalfPavedDistrict and tile==Tile::ground ) {
+				for ( auto const &direction : directions )
+					if ( tileInDirection(direction)==Tile::road )
+						edge(x,y,direction) = true;
+			}
+			else if ( not isPavedDistrict ) {
+				for ( auto const &direction : directions ) {
+			   auto const index = getIndexOf(x,y,direction);
+					if ( isInBounds(index) ) {
+						auto neighbourTile     =   tilemap.tileAt(index);
+						auto neighbourDistrict =   map.districtAt(index);
+						if ( neighbourDistrict != &District::park
+						 and neighbourDistrict != &District::suburban
+						 and neighbourTile     !=      Tile::road ) {
+							edge(x,y,direction) = true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for ( auto y = 0;  y < h;  ++y ) {
+		for ( auto x = 0;  x < w;  ++x ) {
+			if ( not face(x,y) ) {
+				auto origin = tilemap.convertTilePositionToWorldPosition(x,y);
+				// corners..
+
+				// NE corner!
+				if ( ( edge(index(x,y)+N, Direction::east ).value_or(false) and edge(index(x,y)+E,   Direction::north).value_or(false) )
+				  or ( edge(index(x,y)+N, Direction::east ).value_or(false) and edge(index(x,y)+E+N, Direction::west ).value_or(false) )
+				  or ( edge(index(x,y)+E, Direction::north).value_or(false) and edge(index(x,y)+E+N, Direction::south).value_or(false) ) )
+				{
+					instantiatePart( "Tiles/sidewalk_corner_outer_ne", origin, .0f, sidewalkOffsetY ); // TODO: origin
+				}
+
+				// SE corner!
+				if ( ( edge(index(x,y)+S, Direction::east ).value_or(false) and edge(index(x,y)+E,   Direction::south).value_or(false) )
+				  or ( edge(index(x,y)+S, Direction::east ).value_or(false) and edge(index(x,y)+E+S, Direction::west ).value_or(false) )
+				  or ( edge(index(x,y)+E, Direction::south).value_or(false) and edge(index(x,y)+E+S, Direction::north).value_or(false) ) )
+				{
+					instantiatePart( "Tiles/sidewalk_corner_outer_se", origin, 90.0f, sidewalkOffsetY ); // TODO: origin
+				}
+
+				// SW corner!
+				if ( ( edge(index(x,y)+S, Direction::west ).value_or(false) and edge(index(x,y)+W,   Direction::south).value_or(false) )
+				  or ( edge(index(x,y)+S, Direction::west ).value_or(false) and edge(index(x,y)+W+S, Direction::east ).value_or(false) )
+				  or ( edge(index(x,y)+W, Direction::south).value_or(false) and edge(index(x,y)+W+S, Direction::north).value_or(false) ) )
+				{
+					instantiatePart( "Tiles/sidewalk_corner_outer_sw", origin, 180.0f, sidewalkOffsetY ); // TODO: origin
+				}
+
+				// NW corner!
+				if ( ( edge(index(x,y)+N, Direction::west ).value_or(false) and edge(index(x,y)+W,   Direction::north).value_or(false) )
+				  or ( edge(index(x,y)+N, Direction::west ).value_or(false) and edge(index(x,y)+W+N, Direction::east ).value_or(false) )
+				  or ( edge(index(x,y)+W, Direction::north).value_or(false) and edge(index(x,y)+W+N, Direction::south).value_or(false) ) )
+				{
+					instantiatePart( "Tiles/sidewalk_corner_outer_nw", origin, 270.0f, sidewalkOffsetY ); // TODO: origin
+				}
+
+				// check if "hole"
+				int internalEdgeCount = 0;
+				for ( auto direction : directions )
+					if ( edge(index(x,y), direction) )
+						++internalEdgeCount;
+				if ( internalEdgeCount == 4 ) // 1 at most
+					instantiatePart( "Tiles/sidewalk_hole", origin, sidewalkOffsetY ); // TODO: origin
+				else if ( internalEdgeCount == 3 ) { // 1 at most
+					F32 rotation = .0f;
+					for ( auto direction : directions ) {
+						if ( not edge(index(x,y), direction) )
+							instantiatePart( "Tiles/sidewalk_u_n", origin, rotation, sidewalkOffsetY ); // TODO: origin
+						else rotation += 90.0f;
+					}
+				}     
+				else if ( internalEdgeCount == 2 ) {
+					F32 rotation = .0f;
+					for ( auto direction : directions ) { // 2 at most
+						if ( edge(index(x,y), direction) and edge(index(x,y), turnRight(direction)) ) {
+							instantiatePart( "Tiles/sidewalk_corner_inner_ne", origin, rotation, sidewalkOffsetY ); // TODO: origin
+							continue;
+						}
+						else rotation += 90.0f;
+					}
+				}
+				for ( auto direction : directions ) { // 2 at most
+					F32 rotation = .0f;
+					if ( edge(index(x,y), direction) and not edge(index(x,y), turnRight(direction)) and not edge(index(x,y), turn_right(direction)) )
+						instantiatePart( "Tiles/sidewalk_side_n", origin, rotation, sidewalkOffsetY ); // TODO : origin
+					else rotation += 90.0f;
+				}
+			}
+		}
+	}*/
+
 	return results;
 }
 
