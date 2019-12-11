@@ -289,8 +289,6 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 		graphics.getParticleSystem("snow")->changeColornSize(ashColor, 4, 0.0f, 0.047f);
 	}
 
-	ramUsage(true);
-	vramUsage(true);
 	if (map->getInfo().environment.getBiome() == Biome::burnt)
 	{
 		graphics.unloadTexture("Tiles/grasslands");
@@ -327,9 +325,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 		graphics.unloadTexture("Tiles/desert");
 		graphics.unloadTexture("Tiles/desert_nor");
 	}
-	ramUsage(true);
-	ramUsage(true);
-	vramUsage(true);
+
 #ifndef _DEBUG
 	spawnObjects();
 #endif
