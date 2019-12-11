@@ -275,6 +275,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 		graphics.getParticleSystem("snow")->setGravity(10.0f);
 		graphics.getParticleSystem("snow")->changeVectorField(1.75f, 0.5f);
 		graphics.getParticleSystem("snow")->changeColornSize(rainColor, 4, 0.0f, 0.047f);
+
 	}
 	if (map->getInfo().environment.getWeather() == Weather::ashfall) {
 		Vector4 ashColor[4] = {
@@ -288,6 +289,47 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 		graphics.getParticleSystem("snow")->changeColornSize(ashColor, 4, 0.0f, 0.047f);
 	}
 
+	ramUsage(true);
+	vramUsage(true);
+	if (map->getInfo().environment.getBiome() == Biome::burnt)
+	{
+		graphics.unloadTexture("Tiles/grasslands");
+		graphics.unloadTexture("Tiles/grasslands_nor");
+		graphics.unloadTexture("Tiles/arctic");
+		graphics.unloadTexture("Tiles/arctic_nor");
+		graphics.unloadTexture("Tiles/desert");
+		graphics.unloadTexture("Tiles/desert_nor");
+	}
+	else if (map->getInfo().environment.getBiome() == Biome::grass)
+	{
+		graphics.unloadTexture("Tiles/ashlands");
+		graphics.unloadTexture("Tiles/ashlands_nor");
+		graphics.unloadTexture("Tiles/arctic");
+		graphics.unloadTexture("Tiles/arctic_nor");
+		graphics.unloadTexture("Tiles/desert");
+		graphics.unloadTexture("Tiles/desert_nor");
+	}
+	else if (map->getInfo().environment.getBiome() == Biome::sandy)
+	{
+		graphics.unloadTexture("Tiles/grasslands");
+		graphics.unloadTexture("Tiles/grasslands_nor");
+		graphics.unloadTexture("Tiles/ashlands");
+		graphics.unloadTexture("Tiles/ashlands_nor");
+		graphics.unloadTexture("Tiles/arctic");
+		graphics.unloadTexture("Tiles/arctic_nor");
+	}
+	else if (map->getInfo().environment.getBiome() == Biome::snowy)
+	{
+		graphics.unloadTexture("Tiles/grasslands");
+		graphics.unloadTexture("Tiles/grasslands_nor");
+		graphics.unloadTexture("Tiles/ashlands");
+		graphics.unloadTexture("Tiles/ashlands_nor");
+		graphics.unloadTexture("Tiles/desert");
+		graphics.unloadTexture("Tiles/desert_nor");
+	}
+	ramUsage(true);
+	ramUsage(true);
+	vramUsage(true);
 #ifndef _DEBUG
 	spawnObjects();
 #endif
