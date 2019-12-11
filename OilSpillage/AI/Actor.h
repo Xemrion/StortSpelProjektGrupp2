@@ -36,7 +36,7 @@ private:
 	float fireTimer;
 protected:
 	bool isHit = false;
-	float stunnedTimer = 0.0f;
+	float stunnedTimer;
 	float deltaTime;
 	Vector3 targetPos;
 
