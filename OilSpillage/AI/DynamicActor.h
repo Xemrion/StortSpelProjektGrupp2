@@ -13,6 +13,7 @@ public:
 	void* getGroup()const;
 	int duty;
 	int pathSize;
+	void setStun(float timer);
 protected:
 	void* curGroup;
 	Vector3* path;

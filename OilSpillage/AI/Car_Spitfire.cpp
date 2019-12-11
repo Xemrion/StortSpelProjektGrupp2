@@ -25,7 +25,6 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	setMaxHealth(newHealth);
 	setHealth(newHealth);
 
-	this->aggroRange = 500; //TODO: Find better aggro range
 	this->setPoints(150 * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages)));
 	this->trailTimer = 0.0f;
 }
