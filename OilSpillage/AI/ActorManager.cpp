@@ -55,7 +55,7 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	updateGroups();
 	for (int i = 0; i < groups.size(); i++)
 	{
-		groups[i].update();
+		groups[i]->update();
 	}
 	teleportActorsToPlayer(targetPos);
 	turretHandler.update(dt, targetPos);
@@ -128,7 +128,7 @@ float ActorManager::distanceToPlayer(const Vector3& position)
 	}
 }
 
-const std::vector<AIGroup>& ActorManager::getGroups() const
+const std::vector<AIGroup*>& ActorManager::getGroups() const
 {
 	return this->groups;
 }
@@ -375,16 +375,16 @@ void ActorManager::teleportActorsToPlayer(const Vector3& targetPos)
 	float distance;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		deltaX = groups[i].averagePos.x - targetPos.x;
-		deltaZ = groups[i].averagePos.z - targetPos.z;
+		deltaX = groups[i]->averagePos.x - targetPos.x;
+		deltaZ = groups[i]->averagePos.z - targetPos.z;
 		distance = (deltaX * deltaX) + (deltaZ * deltaZ);
 		//(TileSize * nrOfTiles)^2
 		if (distance > (20 * 10) * (20 * 10))
 		{
 			newPos = findTeleportPos(targetPos, 50, 100);
-			for (int j = 0; j < groups[i].actors.size(); j++)
+			for (int j = 0; j < groups[i]->actors.size(); j++)
 			{
-				Actor* current = groups[i].actors[j];
+				Actor* current = groups[i]->actors[j];
 				current->setGameObjectPos(Vector3(newPos.x, current->getPosition().y, newPos.z));
 				//physics->teleportRigidbody(Vector3(newPos.x, current->getPosition().y, newPos.z), current->getRigidBody());
 				Spitfire* ptr = dynamic_cast<Spitfire*>(current);
@@ -452,15 +452,15 @@ int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 	int returnIndex = -1;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		Vector3 curAveragePos = groups[i].getAveragePos();
+		Vector3 curAveragePos = groups[i]->getAveragePos();
 		float deltaX = actorPos.x - curAveragePos.x;
 		float deltaZ = actorPos.z - curAveragePos.z;
 		float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
-		bool isInRange = distance <= groups[i].getGroupRadius();
-		bool isBiggerGroup = groups[i].actors.size() >= biggestGroupSize;
+		bool isInRange = distance <= groups[i]->getGroupRadius();
+		bool isBiggerGroup = groups[i]->actors.size() >= biggestGroupSize;
 		if (isInRange && isBiggerGroup)
 		{
-			biggestGroupSize = groups[i].actors.size();
+			biggestGroupSize = groups[i]->actors.size();
 			returnIndex = i;
 		}
 	}
@@ -469,8 +469,9 @@ int ActorManager::groupInRange(const Vector3& actorPos, int currentGroupSize)
 
 void ActorManager::joinGroup(DynamicActor* actor, int groupIndex)
 {
-	groups[groupIndex].actors.push_back(actor);
-	groups[groupIndex].updateDuty();
+	actor->setGroup(groups[groupIndex]);
+	groups[groupIndex]->actors.push_back(actor);
+	groups[groupIndex]->updateDuty();
 }
 
 void ActorManager::spawnEnemies(const Vector3& targetPos)
@@ -500,7 +501,7 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 
 void ActorManager::leaveGroup(int groupIndex, int where)
 {
-	groups[groupIndex].actors.erase(groups[groupIndex].actors.begin() + where);
+	groups[groupIndex]->actors.erase(groups[groupIndex]->actors.begin() + where);
 }
 
 void ActorManager::assignPathsToGroups(const Vector3& targetPos)
@@ -510,8 +511,8 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 	std::vector<Vector3>* pathToUse;
 	for (int i = 0; i < groups.size(); i++)
 	{
-		aStar->algorithm(groups[i].getAveragePos(), targetPos, pathToPlayer);
-		aStar->algorithm(groups[i].getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
+		aStar->algorithm(groups[i]->getAveragePos(), targetPos, pathToPlayer);
+		aStar->algorithm(groups[i]->getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
 
 		if (pathToPlayer.size() < pathToPredicted.size())
 		{
@@ -521,11 +522,11 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 		{
 			pathToUse = &pathToPredicted;
 		}
-		groups[i].setPath(*pathToUse);
-		for (int j = 0; j < groups[i].actors.size(); j++)
+		groups[i]->setPath(*pathToUse);
+		for (int j = 0; j < groups[i]->actors.size(); j++)
 		{
-			groups[i].actors[j]->setPath(groups[i].path.data() + groups[i].path.size() - 1);
-			groups[i].actors[j]->pathSize = groups[i].path.size() - 1;
+			groups[i]->actors[j]->setPath(groups[i]->path.data() + groups[i]->path.size() - 1);
+			groups[i]->actors[j]->pathSize = groups[i]->path.size() - 1;
 		}
 	}
 }
@@ -534,20 +535,20 @@ void ActorManager::updateGroups()
 {
 	for (int i = 0; i < groups.size(); i++)
 	{
-		for (int k = 0; k < groups[i].actors.size(); k++)
+		for (int k = 0; k < groups[i]->actors.size(); k++)
 		{
-			DynamicActor* current = groups[i].actors[k];
+			DynamicActor* current = groups[i]->actors[k];
 			if (current != nullptr && !current->isDead())
 			{
-				Vector3 curAveragePos = groups[i].getAveragePos();
+				Vector3 curAveragePos = groups[i]->getAveragePos();
 				Vector3 actorPos = current->getPosition();
 				float deltaX = actorPos.x - curAveragePos.x;
 				float deltaZ = actorPos.z - curAveragePos.z;
 				float distanceToOwnGroup = (deltaX * deltaX) + (deltaZ * deltaZ);
-				bool isInRange = distanceToOwnGroup <= groups[i].getGroupRadius();
+				bool isInRange = distanceToOwnGroup <= groups[i]->getGroupRadius();
 
 				//Actor is outside its own groupRadius, check for other groups or create its own
-				if (distanceToOwnGroup > groups[i].getGroupRadius())
+				if (distanceToOwnGroup > groups[i]->getGroupRadius())
 				{
 					int groupIndex = groupInRange(current->getPosition(), 0);
 					//Found a group within the groupRadius
@@ -566,7 +567,7 @@ void ActorManager::updateGroups()
 				//If actor is inside its own group radius but is also inside another one that has more actors(encourage bigger groups)
 				else
 				{
-					int groupIndex = groupInRange(current->getPosition(), groups[i].actors.size());
+					int groupIndex = groupInRange(current->getPosition(), groups[i]->actors.size());
 
 					if (groupIndex != -1 && groupIndex != i)
 					{
@@ -581,11 +582,7 @@ void ActorManager::updateGroups()
 			}
 
 		}
-		if (groups[i].actors.empty())
-		{
-			groups.erase(groups.begin() + i);
-			i = 0;
-		}
+
 	}
 }
 
@@ -603,24 +600,48 @@ void ActorManager::actorDied(int index)
 	if (normalizedRandom >= 0.950)
 	{
 		static_cast<PlayingGameState*>(Game::getCurrentState())->addPowerUp(
-			PowerUp(actors[index]->getPosition(), physics,
+			PowerUp(actors[index]->getPosition(),
 				PowerUpType::Health)
 		);
 	}
 	Game::getGameInfo().addHighScore(actors[index]->getPoints());
 	if (actors[index]->getRigidBody() != nullptr)
 	{
-		physics->DeleteRigidBody(actors[index]->getRigidBody());
+		physics->deleteRigidBody(actors[index]->getRigidBody());
 	}
+
+	if (dynamic_cast<Spitfire*>(actors[index]))
+	{
+		physics->deleteRigidBody(dynamic_cast<Spitfire*>(actors[index])->getVehicleBody1()->getRigidBody());
+	}
+	void* grpPtr = actors[index]->getGroup();
+	int grpIndex = -1;
+	for (int i = 0; i < groups.size(); i++)
+	{
+		void* temp = groups[i];
+		if (temp== grpPtr)
+		{
+			grpIndex = i;
+		}
+	}	
+
+	groups[grpIndex]->removeActor(actors[index]);
 	delete actors[index];
 	actors.erase(actors.begin() + index);
+	if (groups[grpIndex]->actors.empty())
+	{
+		AIGroup* temp = groups[grpIndex];
+		groups[grpIndex] = groups[groups.size() -1];
+		groups[groups.size() - 1] = temp;
+		groups.pop_back();
+	}
 }
 
 void ActorManager::destroyBoss(int index)
 {
 	if (bosses[index]->getRigidBody() != nullptr)
 	{
-		physics->DeleteRigidBody(bosses[index]->getRigidBody());
+		physics->deleteRigidBody(bosses[index]->getRigidBody());
 	}
 	delete bosses[index];
 	bosses.erase(bosses.begin() + index);
@@ -644,11 +665,13 @@ void ActorManager::initGroupForActor(DynamicActor* actor)
 
 void ActorManager::createGroup(DynamicActor* actor)
 {
-	AIGroup temp;
-	temp.actors.push_back(actor);
-	temp.averagePos = actor->getPosition();
+	AIGroup* temp = new AIGroup();
+	ptr = temp;
+	temp->actors.push_back(actor);
+	temp->averagePos = actor->getPosition();
 	groups.push_back(temp);
-	groups[groups.size() - 1].updateDuty();
+	groups[groups.size() - 1]->updateDuty();
+	actor->setGroup(groups[groups.size() -1]);
 }
 
 Vector3 ActorManager::predictPlayerPos(const Vector3& targetPos)

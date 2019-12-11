@@ -438,7 +438,7 @@ void Boss::changeHealth(float amount)
 	}
 }
 
-const std::vector<Weakspot>& Boss::getWeakspots()
+std::vector<Weakspot>& Boss::getWeakspots()
 {
 	return this->weakSpots;
 }

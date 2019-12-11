@@ -13,7 +13,6 @@ DynamicActor::DynamicActor(float x, float z, Physics* physics)
 
 DynamicActor::~DynamicActor()
 {
-
 }
 
 void DynamicActor::move()
@@ -105,4 +104,14 @@ void DynamicActor::knockBack(Vector3 direction, float force)
 {
 	direction.Normalize();
 	this->getRigidBody()->setLinearVelocity(-btVector3(direction.x, 0.0f, direction.z) * force);
+}
+
+void DynamicActor::setGroup(void* newGroup)
+{
+	this->curGroup = newGroup;
+}
+
+void* DynamicActor::getGroup() const
+{
+	return this->curGroup;
 }

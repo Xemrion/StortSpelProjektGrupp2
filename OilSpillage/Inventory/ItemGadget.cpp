@@ -24,7 +24,7 @@ std::string ItemGadget::generateDescription(Gadget gadget)
 }
 
 ItemGadget::ItemGadget(std::string name, Gadget gadget, GameObject* object)
-	:Item(name, generateDescription(gadget), ItemType::TYPE_GADGET, object)
+	:Item(name, generateDescription(gadget), ItemType::TYPE_GADGET, object), gadget(gadget)
 {
 
 }
@@ -64,7 +64,6 @@ void ItemGadget::randomize()
 		gadget.power = random(50, 5) - (1 * Game::getLocalScale());
 	}
 }
-
 Gadget& ItemGadget::getGadget()
 {
 	return gadget;
