@@ -53,10 +53,13 @@ void DynamicActor::setPath(Vector3* path)
 
 void DynamicActor::update(float dt, const Vector3& targetPos)
 {
-	Actor::update(dt, targetPos);
-
-	followPath();
-	move();
+	if(stunnedTimer <= 0)
+	{
+		Actor::update(dt, targetPos);
+		followPath();
+		move();
+	}
+	stunnedTimer -= dt;
 	onFire();
 }
 
@@ -96,4 +99,10 @@ void DynamicActor::setGroup(void* newGroup)
 void* DynamicActor::getGroup() const
 {
 	return this->curGroup;
+}
+
+void DynamicActor::setStun(float timer)
+{
+	stunnedTimer = timer;
+	getRigidBody()->setLinearVelocity(btVector3(0.0f, 0.0f, 0.0f));
 }
