@@ -182,7 +182,7 @@ PS_OUT main(VS_OUT input) : SV_Target
 			if (startDist < l.directionWidth.w * l.directionWidth.w && endDist < l.directionWidth.w * l.directionWidth.w)
 			{
 				attenuation = l.color.w / (dist * dist);
-				nDotL = saturate(dot(normal, normalize(rayPointVector)));
+				nDotL = 1.0;
 			}
 			else
 			{
@@ -202,7 +202,7 @@ PS_OUT main(VS_OUT input) : SV_Target
 			nDotL = max(dot(normal, normalize(lightVector)), 0.0);
 		}
 
-		diffuseLight.rgb += saturate(l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible);
+		diffuseLight.rgb += max(l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible, 0.0);
 
 		float3 halfway = normalize(normalize(lightVector) + cameraVector);
 		float nDotH = saturate(dot(normal, halfway));
