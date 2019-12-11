@@ -16,13 +16,11 @@ public:
 protected:
 	void* curGroup;
 	Vector3* path;
-	int aggroRange;
 	Vector3 destination;
 	Vector3 velocity;
 
 	virtual void move();
 	virtual Vector3 calculateVelocity();
 	virtual void followPath();
-	Status inAggroRange();
 
 };
