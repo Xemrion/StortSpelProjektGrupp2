@@ -306,7 +306,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
-	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
+	ImGui::Text(("Angle between: " + std::to_string(player->getAngleBetween())).c_str());
 	
 
 
@@ -607,7 +607,7 @@ void PlayingGameState::update(float deltaTime)
 		Vector3 currentCamPos = Vector3(cameraObject->getRigidBody()->getWorldTransform().getOrigin().getX(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getY(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getZ());
 		Vector3 directionCam =  destinationCamPos- currentCamPos;
 		//cameraObject->getRigidBody()->applyForce(btVector3(directionCam.x, directionCam.y, directionCam.z) * 10,btVector3(0,0,0));
-		cameraObject->getRigidBody()->setLinearVelocity(btVector3(std::clamp(directionCam.x,-10.0f,10.0f), std::clamp(directionCam.y, -10.0f, 10.0f), std::clamp(directionCam.z, -10.0f, 10.0f)) * 10);
+		cameraObject->getRigidBody()->setLinearVelocity(btVector3(std::clamp(directionCam.x,-20.0f,20.0f), std::clamp(directionCam.y, -20.0f, 20.0f), std::clamp(directionCam.z, -20.0f, 20.0f)) * 5);
 		camera->setPosition(Vector3(currentCamPos.x, currentCamPos.y, currentCamPos.z));
 		camera->update(deltaTime);
 		updateWeather(deltaTime, currentCamPos);
