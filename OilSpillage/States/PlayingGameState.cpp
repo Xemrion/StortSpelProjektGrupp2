@@ -211,7 +211,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	cameraObject->setScale(Vector3(1.5f, 1.5f, 1.5f));
 	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x, btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 0.01f);
 	//btRigidBody* tempo = physics->addBox(btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), btVector3(0.5f, 0.5f, 0.5f), 10.0f);
-	cameraObject->setRigidBody(tempo, physics.get());
+	cameraObject->setRigidBody(tempo);
 	cameraObject->getRigidBody()->activate();
 	cameraObject->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	cameraObject->getRigidBody()->setFriction(0);
@@ -840,7 +840,7 @@ void PlayingGameState::spawnObjects()
 		objPtr->setColor(Vector4(randomValue, randomValue2, 0, 1));
 
 		tempo2 = physics->addCylinder(btVector3(-200, 0.2f + i, -200), btVector3(size, size, size), 0.01f);
-		objPtr->setRigidBody(tempo2, physics.get());
+		objPtr->setRigidBody(tempo2);
 		objPtr->getRigidBody()->setFriction(0.7f);
 		objPtr->getRigidBody()->setActivationState(0);
 		objPtr->getRigidBody()->setDeactivationTime(0.1f);

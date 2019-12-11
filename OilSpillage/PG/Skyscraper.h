@@ -23,9 +23,9 @@ public:
 	~Skyscraper();
 
 	void generateASkyscraper(std::string name);
-	void setRoofMesh(std::string name, GameObject* roof);
-	void setWallMesh(std::string name, GameObject* roof);
-	void setWindowMesh(std::string name, GameObject* roof);
+	void setRoofMesh(std::string name, SimpleGameObject* roof);
+	void setWallMesh(std::string name, SimpleGameObject* roof);
+	void setWindowMesh(std::string name, SimpleGameObject* roof);
 	void unloadSkyscrapers(std::vector<std::string>& names);
 	void unloadASkyscraper(std::string names);
 };

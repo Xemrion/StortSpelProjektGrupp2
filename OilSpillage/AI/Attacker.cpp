@@ -34,7 +34,7 @@ void Attacker::update(float dt, const Vector3& targetPos)
 void Attacker::createRigidbody(Physics* physics)
 {
 	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(position.x, position.y, position.z), 0.5f, this);
-	setRigidBody(tempo, physics);
+	setRigidBody(tempo);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);

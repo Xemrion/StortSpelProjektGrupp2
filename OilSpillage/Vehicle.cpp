@@ -123,7 +123,7 @@ void Vehicle::init(Physics* physics)
 
 	//btRigidBody* tempo = physics->addBox(btVector3(getPosition().x, getPosition().y, getPosition().z), btVector3(getScale().x, getScale().y, getScale().z), 10.0f);
 	btRigidBody* tempo = physics->addCapsule(getScale().x,btVector3(getPosition().x, getPosition().y, getPosition().z), getScale().z, 10.0f);
-	this->setRigidBody(tempo, physics);
+	this->setRigidBody(tempo);
 	this->getRigidBody()->activate();
 	this->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	this->getRigidBody()->setFriction(0);
@@ -135,7 +135,7 @@ void Vehicle::init(Physics* physics)
 		-btVector3(this->vehicleBody1->getAABB().minPos.x - this->vehicleBody1->getAABB().maxPos.x, (this->vehicleBody1->getAABB().minPos.y - this->vehicleBody1->getAABB().maxPos.y) * 0.2f, this->vehicleBody1->getAABB().minPos.z - this->vehicleBody1->getAABB().maxPos.z) * 0.5f,
 		1.0f,
 		this);
-	vehicleBody1->setRigidBody(tempo, physics);
+	vehicleBody1->setRigidBody(tempo);
 	vehicleBody1->getRigidBody()->activate();
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicleBody1->getRigidBody()->setCollisionFlags(vehicleBody1->getRigidBody()->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);

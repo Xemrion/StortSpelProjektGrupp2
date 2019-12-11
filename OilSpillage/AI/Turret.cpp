@@ -52,7 +52,7 @@ void Turret::update(float dt, const Vector3& targetPos)
 void Turret::createRigidbody(Physics* physics)
 {
 	btRigidBody* tempo = physics->addSphere(0.5f, btVector3(position.x, position.y, position.z), 0, this);
-	setRigidBody(tempo, physics);
+	setRigidBody(tempo);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);

@@ -182,7 +182,7 @@ void Map::generateBorder()
 	                                     btVector3( sca0 ),
 	                                     .0f );
 	tmp0->setFriction(0);
-	border.bounds[0].setRigidBody( tmp0, physics );
+	border.bounds[0].setRigidBody( tmp0 );
 
 	// east
 	border.bounds[1].setPosition({ tilemap->convertTilePositionToWorldPosition(tilemap->width,tilemap->height/2)});
@@ -192,7 +192,7 @@ void Map::generateBorder()
 	                                     btVector3( sca1 ),
 	                                     .0f );
 	tmp1->setFriction(0);
-	border.bounds[1].setRigidBody( tmp1, physics );
+	border.bounds[1].setRigidBody( tmp1 );
 
 	// north
 	border.bounds[2].setPosition({ tilemap->convertTilePositionToWorldPosition(tilemap->width/2,-1)});
@@ -202,7 +202,7 @@ void Map::generateBorder()
 	                                     btVector3( sca2 ),
 	                                     .0f );
 	tmp2->setFriction(0);
-	border.bounds[2].setRigidBody( tmp2, physics );
+	border.bounds[2].setRigidBody( tmp2 );
 
 	// south
 	border.bounds[3].setPosition({ tilemap->convertTilePositionToWorldPosition(tilemap->width/2,tilemap->height)});
@@ -212,7 +212,7 @@ void Map::generateBorder()
 	                                     btVector3( sca3 ),
 	                                     .0f );
 	tmp3->setFriction(0);
-	border.bounds[3].setRigidBody( tmp3, physics );
+	border.bounds[3].setRigidBody( tmp3 );
 }
 
 void Map::generateZebraCrossings()
@@ -671,7 +671,7 @@ void  Map::generateBuildings( )
 							                                               10.5f  * house.object.getScale().z ),
 							                                    .0f );
 							tmp->setFriction(0);
-							house.object.setRigidBody( tmp, physics );
+							house.object.setRigidBody( tmp );
 						#endif
 						tilemap->applyLot( maybeLot.value(), Tile::building );
 						++currentArea;
@@ -767,7 +767,7 @@ void  Map::generateBuildings( )
 						                                               15.5f * house.object.getScale().z ),
 						                                    .0f );
 						tmp->setFriction(0);
-						house.object.setRigidBody( tmp, physics );
+						house.object.setRigidBody( tmp );
 					#endif
 					tilemap->applyLot( maybeLot.value(), Tile::building );
 					houses.singles.push_back( std::move(house) );
@@ -1551,7 +1551,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						                                    btVector3( sca.x, sca.y, sca.z ),
 						                                   .0f );
 						tmp->setFriction(0);
-						hitbox.setRigidBody( tmp, physics );
+						hitbox.setRigidBody( tmp );
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
 						instantiateTilePart( "w_oc", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
@@ -1588,7 +1588,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						                                     btVector3( scaA.x, scaA.y, scaA.z ),
 						                                    .0f );
 						tmpA->setFriction(0);
-						hitboxA.setRigidBody( tmpA, physics );
+						hitboxA.setRigidBody( tmpA );
 
 
 						house.hitboxes.emplace_back();
@@ -1604,7 +1604,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						                                     btVector3( scaB.x, scaB.y, scaB.z ),
 						                                    .0f );
 						tmpB->setFriction(0);
-						hitboxB.setRigidBody( tmpB, physics );
+						hitboxB.setRigidBody( tmpB );
 					#endif
 
 					instantiateTilePart( "r_ic", basePosition, 90.0f*q, floorCount-1, tileset.floorHeight );
@@ -1634,7 +1634,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						                                    btVector3( sca.x, sca.y, sca.z ),
 						                                   .0f );
 						tmp->setFriction(0);
-						hitbox.setRigidBody( tmp, physics );
+						hitbox.setRigidBody( tmp );
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
 						instantiateTilePart( "w_sa", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );
@@ -1665,7 +1665,7 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 						                                    btVector3( sca.x, sca.y, sca.z ),
 						                                   .0f );
 						tmp->setFriction(0);
-						hitbox.setRigidBody( tmp, physics );
+						hitbox.setRigidBody( tmp );
 					#endif
 					for ( auto currFloor = 0; currFloor < floorCount; ++currFloor )
 						instantiateTilePart( "w_sb", basePosition, 90.0f*q, currFloor,  tileset.floorHeight );

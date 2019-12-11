@@ -620,7 +620,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
-	for (GameObject* object : drawableObjects)
+	for (SimpleGameObject* object : drawableObjects)
 	{
 		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
 		{
@@ -662,7 +662,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 				MaterialColor modColor;
 				modColor.color = object->getColor();
-				modColor.shading.x = object->getShading();
+				modColor.shading.x = true; //object->getShading();
 				hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 				CopyMemory(mappedResource.pData, &modColor, static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16))));
 				deviceContext->Unmap(colorBuffer.Get(), 0);
@@ -740,7 +740,7 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	deviceContext->PSSetShader(nullptr, nullptr, 0);
 	UINT stride = sizeof(Vertex3D);
 	UINT offset = 0;
-	for (GameObject* object : drawableObjects)
+	for (SimpleGameObject* object : drawableObjects)
 	{
 		AABB boundingBox = object->getAABB();
 		if (frustum.intersect(boundingBox, 0.0f))
@@ -767,10 +767,10 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 		}
 	}
 
-	std::vector<GameObject*> objects;
+	std::vector<SimpleGameObject*> objects;
 	quadTree->getGameObjects(objects, frustum, 0.0f);
 	
-	for (GameObject* o : objects)
+	for (SimpleGameObject* o : objects)
 	{
 		AABB boundingBox = o->getAABB();
 		UINT vertexCount = o->mesh->getVertexCount();
@@ -1657,25 +1657,25 @@ Material Graphics::getMaterial(const char* modelPath)
 	return material;
 }
 
-void Graphics::addToDrawStatic(GameObject* o)
+void Graphics::addToDrawStatic(SimpleGameObject* o)
 {
 	assert( o != nullptr );
 	quadTree->insert(o);
 }
 
-void Graphics::addToDraw(GameObject* o)
+void Graphics::addToDraw(SimpleGameObject* o)
 {
 	assert( o != nullptr );
 	drawableObjects.push_back(o);
 }
 
-void Graphics::removeFromDraw(GameObject* o)
+void Graphics::removeFromDraw(SimpleGameObject* o)
 {
 	auto obj = std::find(drawableObjects.begin(), drawableObjects.end(), o);
 	int index = std::distance(drawableObjects.begin(), obj);
 	if (obj != drawableObjects.end())
 	{
-		GameObject* temp = drawableObjects[index];
+		SimpleGameObject* temp = drawableObjects[index];
 		drawableObjects[index] = drawableObjects[drawableObjects.size() - 1];
 		drawableObjects[drawableObjects.size() - 1] = temp;
 		drawableObjects.pop_back();
@@ -1694,13 +1694,13 @@ void Graphics::clearStaticObjects()
 	quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 }
 
-void Graphics::addToUIDraw(GameObject* obj, Matrix* world)
+void Graphics::addToUIDraw(SimpleGameObject* obj, Matrix* world)
 {
 	assert(obj != nullptr);
-	uiObjects.push_back(std::pair<GameObject*, Matrix*>(obj, world));
+	uiObjects.push_back(std::pair<SimpleGameObject*, Matrix*>(obj, world));
 }
 
-void Graphics::removeFromUIDraw(GameObject* obj, Matrix* world)
+void Graphics::removeFromUIDraw(SimpleGameObject* obj, Matrix* world)
 {
 	for (auto pair = uiObjects.begin(); pair != uiObjects.end(); pair++)
 	{
@@ -1782,7 +1782,7 @@ void Graphics::renderUI(float deltaTime)
 		}
 	}
 	int index = 0;
-	for (std::pair<GameObject*,Matrix*> object : this->uiObjects)
+	for (std::pair<SimpleGameObject*,Matrix*> object : this->uiObjects)
 	{
 		if (object == this->uiObjects.back() && this->selectedObjUI.first!=nullptr)
 		{
@@ -1847,7 +1847,7 @@ void Graphics::renderUI(float deltaTime)
 	deviceContext->VSSetShader(this->shaderDebug.vs.getShader(), nullptr, 0);
 }
 
-void Graphics::setSelectedUI(GameObject* obj, Matrix* mat)
+void Graphics::setSelectedUI(SimpleGameObject* obj, Matrix* mat)
 {
 	this->selectedObjUI.first = obj;
 	this->selectedObjUI.second = mat;
@@ -2006,10 +2006,10 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 	UINT offset = 0;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-	std::vector<GameObject*> objects;
+	std::vector<SimpleGameObject*> objects;
 	quadTree->getGameObjects(objects, frustum, frustumBias );
 
-	for (GameObject* object : objects)
+	for (SimpleGameObject* object : objects)
 	{
 		SimpleMath::Matrix world = object->getTransform();
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
@@ -2045,7 +2045,7 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 
 		MaterialColor modColor;
 		modColor.color = object->getColor();
-		modColor.shading.x = object->getShading();
+		modColor.shading.x = true; //object->getShading();
 		hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &modColor, static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16))));
 		deviceContext->Unmap(colorBuffer.Get(), 0);
@@ -2087,7 +2087,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	int i = 0;
-	for (GameObject* object : fog->getQuads())
+	for (SimpleGameObject* object : fog->getQuads())
 	{
 		SimpleMath::Matrix world = object->getTransform();
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);

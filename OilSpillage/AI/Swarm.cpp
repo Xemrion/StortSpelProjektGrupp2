@@ -41,7 +41,7 @@ void Swarm::update(float dt, const Vector3& targetPos)
 void Swarm::createRigidbody(Physics* physics)
 {
 	btRigidBody* tempo = physics->addSphere(0.7f, btVector3(position.x, position.y, position.z), 0.5f, this);
-	setRigidBody(tempo, physics);
+	setRigidBody(tempo);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);

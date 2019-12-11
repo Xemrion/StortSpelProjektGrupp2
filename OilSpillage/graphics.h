@@ -77,7 +77,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
 	std::unordered_map<std::string, Mesh> meshes;
 	std::unordered_map<std::string, Texture*> textures;
-	std::vector<GameObject*> drawableObjects;
+	std::vector<SimpleGameObject*> drawableObjects;
 	LightList* lightList;
 	float cullingDistance = 150.f;
 	
@@ -108,8 +108,8 @@ class Graphics {
 	VertexShader uiVertexShader;
 	Sun uiSun;
 	Vector3 uiSunDir = Vector3(0.0, 1.0, 0.0);
-	std::vector<std::pair<GameObject*,Matrix*>> uiObjects;
-	std::pair<GameObject*,Matrix*> selectedObjUI;
+	std::vector<std::pair<SimpleGameObject*,Matrix*>> uiObjects;
+	std::pair<SimpleGameObject*,Matrix*> selectedObjUI;
 
 	void cullLights(Matrix view);
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
@@ -134,18 +134,18 @@ public:
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path, bool tga = true);
 	Material getMaterial(const char* modelPath);
-	void addToDraw(GameObject* o);
-	void addToDrawStatic(GameObject* o);
-	void removeFromDraw(GameObject* o);
+	void addToDraw(SimpleGameObject* o);
+	void addToDrawStatic(SimpleGameObject* o);
+	void removeFromDraw(SimpleGameObject* o);
 	void clearDraw();
 	void clearStaticObjects();
 
-	void addToUIDraw(GameObject* obj, Matrix* world);
-	void removeFromUIDraw(GameObject* obj, Matrix* world);
+	void addToUIDraw(SimpleGameObject* obj, Matrix* world);
+	void removeFromUIDraw(SimpleGameObject* obj, Matrix* world);
 	void removeAllUIDraw();
 	void setUISun(Vector3 direction, Vector4 color);
 	void renderUI(float deltaTime);
-	void setSelectedUI(GameObject* obj, Matrix* mat);
+	void setSelectedUI(SimpleGameObject* obj, Matrix* mat);
 
 
 	void setLightList(LightList* lightList);

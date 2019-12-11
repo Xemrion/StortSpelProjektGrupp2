@@ -103,18 +103,18 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum, RNG & ) noexcep
 // };
 
 struct CompositeHouse {
-	GameObject          walls, windows, roof;
+	SimpleGameObject          walls, windows, roof;
 	V2u                 dimensions;
 	String				skyscraperMeshIndex;
 };
 
 struct SingleTileHouse {
-	GameObject   object;
+	SimpleGameObject   object;
 };
 
 struct MultiTileHouse {
-	Vector<GameObject> parts;
-	Vector<GameObject> hitboxes;
+	Vector<SimpleGameObject> parts;
+	Vector<SimpleGameObject> hitboxes;
 	Bounds             bounds; // refactor remove?
 	V2u                nw;
 	MultitileLayout    layout;
@@ -127,8 +127,8 @@ struct HouseGenData {
 };
 
 struct Border {
-	Vector<GameObject>  meshes;
-	Vector<GameObject>  bounds { Size(4) };
+	Vector<SimpleGameObject>  meshes;
+	Vector<SimpleGameObject>  bounds { Size(4) };
 };
 
 
@@ -187,8 +187,8 @@ private:
 	UPtr<TileMap>              tilemap;
 	UPtr<Voronoi>              districtMap;
 	Vector<District::Enum>     districtLookupTable;
-	Vector<UPtr<GameObject>>   groundTiles;
-	Vector<UPtr<GameObject>>   crossingTiles;
+	Vector<UPtr<SimpleGameObject>>   groundTiles;
+	Vector<UPtr<SimpleGameObject>>   crossingTiles;
 	Physics * const            physics;
 	LightList &                lights;
 	UPtr<Skyscraper>		   skyscraperGenerator;

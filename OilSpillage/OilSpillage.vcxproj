@@ -202,6 +202,7 @@
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="SaveSystem.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
+    <ClCompile Include="SimpleGameObject.cpp" />
     <ClCompile Include="States\GameState.cpp" />
     <ClCompile Include="States\HighscoreGameState.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
@@ -305,6 +306,7 @@
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="PG\Profiler.hpp" />
+    <ClInclude Include="SimpleGameObject.h" />
     <ClInclude Include="States\GameState.h" />
     <ClInclude Include="States\HighscoreGameState.h" />
     <ClInclude Include="States\MenuGameState.h" />

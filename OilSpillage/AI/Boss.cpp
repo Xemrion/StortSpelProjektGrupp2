@@ -90,7 +90,7 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics, float scalingNr)
 	this->initiateWeakPoints();
 
 	btRigidBody* tempo = physics->addSphere(3.5f, btVector3(position.x, position.y, position.z), 1.5f, this);
-	setRigidBody(tempo, physics);
+	setRigidBody(tempo);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);

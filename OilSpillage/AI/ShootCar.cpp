@@ -37,7 +37,7 @@ void ShootCar::createRigidbody(Physics* physics)
 		btVector3(getScale().x, getScale().y, getScale().z),
 		10.0f,
 		this);
-	setRigidBody(tempo, physics);
+	setRigidBody(tempo);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);
@@ -48,7 +48,7 @@ void ShootCar::createRigidbody(Physics* physics)
 		(vehicleBodyAABB.maxPos.y - vehicleBodyAABB.minPos.y) * 0.2f,
 		vehicleBodyAABB.maxPos.z - vehicleBodyAABB.minPos.z) * 0.5f;
 	tempo = physics->addBox(origin, size, 1.0f, this);
-	vehicleBody1->setRigidBody(tempo, physics);
+	vehicleBody1->setRigidBody(tempo);
 	vehicleBody1->getRigidBody()->activate();
 	vehicleBody1->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	vehicleBody1->getRigidBody()->setFriction(1);
