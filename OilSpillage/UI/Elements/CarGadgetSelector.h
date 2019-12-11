@@ -11,6 +11,7 @@ private:
 	Texture* textureBG;
 	Texture* textureCar;
 	Texture* textureIndicator;
+	Texture* textureIndicatorError;
 
 	Element* selected;
 	std::unique_ptr<ItemSlot> slots[Slots::SIZEOF];
@@ -25,6 +26,7 @@ public:
 	void update(bool selected, float deltaTime);
 	void init();
 
+	bool isBackSlot();
 	void setSlot(Slots slots, Container::Slot* slot);
 	void setSlotOfSelected(Container::Slot* slot);
 	void removeSlot(Container::Slot* slot);

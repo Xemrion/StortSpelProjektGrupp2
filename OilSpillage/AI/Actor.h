@@ -27,6 +27,7 @@ public:
 	void scaling(float& stat, float ratio);
 	void onFire();
 	void setFire(float timer);
+	virtual void setStun(float timer);
 
 private:
 	float health;
@@ -35,6 +36,7 @@ private:
 	float fireTimer;
 protected:
 	bool isHit = false;
+	float stunnedTimer;
 	float deltaTime;
 	Vector3 targetPos;
 

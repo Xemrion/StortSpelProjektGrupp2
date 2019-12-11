@@ -78,7 +78,7 @@ float TurretHandler::distanceToPlayer(const Vector3& position)
 	return minDistance;
 }
 
-void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,float soundTimer)
+void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size, float dt,float &soundTimer)
 {
 	for (int i = 0; i < this->turrets.size(); i++)
 	{
@@ -107,10 +107,10 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 							{
 								float deltaX = turrets[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
 								float deltaZ = turrets[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-								float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+								float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
 								if (k != i && distance < bulletArray[j].getSplashRange() && !turrets[k]->isDead())
 								{
-									turrets[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+									turrets[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages))*dt * 2);
 								}
 							}
 						}
@@ -133,10 +133,10 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 						{
 							float deltaX = turrets[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
 							float deltaZ = turrets[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+							float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
 							if (k != i && distance < bulletArray[j].getSplashRange() && !turrets[k]->isDead())
 							{
-								turrets[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+								turrets[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages)) * dt * 2);
 							}
 						}
 					}
@@ -158,10 +158,10 @@ void TurretHandler::intersectPlayerBullets(Bullet* bulletArray, size_t size,floa
 						{
 							float deltaX = turrets[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
 							float deltaZ = turrets[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+							float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
 							if (k != i && distance < bulletArray[j].getSplashRange() && !turrets[k]->isDead())
 							{
-								turrets[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+								turrets[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages)) * dt * 2);
 							}
 						}
 					}

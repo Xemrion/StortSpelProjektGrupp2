@@ -183,8 +183,8 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	map = std::make_unique<Map>(graphics, config, physics.get(), *lightList );
 	// Minimap stuff
 	auto tilemap = map->getTileMap();
-	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, .0f, config.tileSideScaleFactor);
-	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
+	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor / 2, .0f, config.tileSideScaleFactor / 2);
+	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor / 2, 0, -config.tileSideScaleFactor / 2);
 	// Needs to be loaded before the menues
 	minimap = createMinimapTexture(*map);
 	generateMapPowerUps();
@@ -500,8 +500,8 @@ void PlayingGameState::ImGui_ProcGen()
 		aStar->generateTileData(map->getTileMap());
 		// minimap stuff
 		auto tilemap = map->getTileMap();
-		topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, 0, config.tileSideScaleFactor);
-		bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
+		topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor / 2, 0, config.tileSideScaleFactor / 2);
+		bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor / 2, 0, -config.tileSideScaleFactor / 2);
 
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();

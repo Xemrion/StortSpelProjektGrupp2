@@ -32,6 +32,10 @@ void UIUpgrading::updateUI(float deltaTime)
 				this->gadgetSelector->setSlot(Slots::WHEEL, this->itemSelector->getSelectedSlot());
 				this->statBox->update(static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getStats());
 			}
+			else if (this->itemSelector->getSelectedType() == ItemType::TYPE_GADGET)
+			{
+				this->gadgetSelector->setSlot(Slots::BACK, this->itemSelector->getSelectedSlot());
+			}
 			else
 			{
 				this->selectingItem = false;
@@ -68,8 +72,8 @@ void UIUpgrading::updateUI(float deltaTime)
 	else
 	{
 		this->gadgetSelector->update(true, deltaTime);
-
-		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
+		
+		if (Input::checkButton(Keys::CONFIRM, States::PRESSED)&&!this->gadgetSelector->isBackSlot())
 		{
 			this->gadgetSelector->setSlotOfSelected(this->itemSelector->getSelectedSlot());
 			this->selectingItem = true;

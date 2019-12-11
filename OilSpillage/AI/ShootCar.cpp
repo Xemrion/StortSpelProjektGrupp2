@@ -27,6 +27,7 @@ ShootCar::ShootCar(float x, float z, int weaponType, Physics* physics)
 	this->stats = VehicleStats::fastCar;
 	setHealth(this->stats.maxHealth);
 	attackRange = 15;
+	setUpActor();
 	createRigidbody(physics);
 	scaling(weapon.damage, 1.1);
 }
@@ -54,6 +55,21 @@ void ShootCar::createRigidbody(Physics* physics)
 	vehicleBody1->getRigidBody()->setFriction(1);
 	pointJoint = physics->addPointJoint(getRigidBody(), this->vehicleBody1->getRigidBody());
 }
+void ShootCar::setUpActor()
+{
+	this->root = &bt.getSelector();
+	Sequence& sequence = bt.getSequence();
+
+	Behavior& inRange = bt.getAction();
+	inRange.addAction(std::bind(&ShootCar::inAttackRange, std::ref(*this)));
+	Behavior& shoot = bt.getAction();
+	shoot.addAction(std::bind(&ShootCar::shoot, std::ref(*this)));
+
+	root->addChildren(sequence);
+	sequence.addChildren(inRange);
+	sequence.addChildren(shoot);
+
+}
 ShootCar::~ShootCar()
 {
 }
@@ -62,10 +78,6 @@ void ShootCar::update(float dt, const Vector3& targetPos)
 {
 	Spitfire::update(dt, targetPos);
 	updateBullets(deltaTime);
-	if ((position - targetPos).Length() < attackRange)
-	{
-		shoot();
-	}
 }
 
 Status ShootCar::shoot()
