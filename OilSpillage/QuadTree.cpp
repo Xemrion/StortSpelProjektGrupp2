@@ -52,22 +52,26 @@ void QuadTree::Node::insert(GameObject* o)
 	if (depth > 0)
 	{
 		
-		if (nwChild->boundingBox.intersectXZ(o->getAABB()))
+		bool nwIntersect = nwChild->boundingBox.intersectXZ(o->getAABB());
+		bool neIntersect = neChild->boundingBox.intersectXZ(o->getAABB());
+		bool swIntersect = swChild->boundingBox.intersectXZ(o->getAABB());
+		bool seIntersect = seChild->boundingBox.intersectXZ(o->getAABB());
+
+		if (nwIntersect + neIntersect + swIntersect + seIntersect > 1.0)
 		{
+			objects.push_back(o);
+			auto comp = [](GameObject* a, GameObject* b) {return a->getAABB().maxPos.y < b->getAABB().maxPos.y; };
+			std::sort(objects.begin(), objects.end(), comp);
+		}
+
+		if (nwIntersect)
 			nwChild->insert(o);
-		}
-		else if (neChild->boundingBox.intersectXZ(o->getAABB()))
-		{
+		if (neIntersect)
 			neChild->insert(o);
-		}
-		else if (swChild->boundingBox.intersectXZ(o->getAABB()))
-		{
+		if (swIntersect)
 			swChild->insert(o);
-		}
-		else if (seChild->boundingBox.intersectXZ(o->getAABB()))
-		{
+		if (seIntersect)
 			seChild->insert(o);
-		}
 	}
 	else
 	{
@@ -86,22 +90,20 @@ void QuadTree::Node::getGameObjects(std::vector<GameObject*>& objects, Frustum& 
 {
 	if (viewFrustum.intersect(boundingBox, frustumBias, true))
 	{
+		for (GameObject* o : this->objects)
+		{
+			if (viewFrustum.intersect(o->getAABB(), frustumBias, true))
+			{
+				objects.push_back(o);
+			}
+		}
+
 		if (depth > 0)
 		{
 			nwChild->getGameObjects(objects, viewFrustum, frustumBias);
 			neChild->getGameObjects(objects, viewFrustum, frustumBias);
 			swChild->getGameObjects(objects, viewFrustum, frustumBias);
 			seChild->getGameObjects(objects, viewFrustum, frustumBias);
-		}
-		else
-		{
-			for (GameObject* o : this->objects)
-			{
-				if (viewFrustum.intersect(o->getAABB(), 10.0, true))
-				{
-					objects.push_back(o);
-				}
-			}
 		}
 	}
 }
@@ -113,16 +115,14 @@ void QuadTree::clearGameObjects()
 
 void QuadTree::Node::clearGameObjects()
 {
+	objects.clear();
+	objects.shrink_to_fit();
+	
 	if (depth > 0)
 	{
 		nwChild->clearGameObjects();
 		neChild->clearGameObjects();
 		swChild->clearGameObjects();
 		seChild->clearGameObjects();
-	}
-	else
-	{
-		objects.clear();
-		objects.shrink_to_fit();
 	}
 }

@@ -681,7 +681,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 		}
 	}
 	
-	drawStaticGameObjects(camera, frustum, 15.0);
+	drawStaticGameObjects(camera, frustum, 10.0);
 	
 	this->deviceContext->PSSetShader(nullptr, nullptr, 0);
 
@@ -2011,18 +2011,17 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 
 	for (GameObject* object : objects)
 	{
-		Matrix world = object->getTransform().Transpose();
-		deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, &world, sizeof(SimpleMath::Matrix));
+		SimpleMath::Matrix world = object->getTransform();
+		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
 		deviceContext->Unmap(worldBuffer.Get(), 0);
-		deviceContext->VSSetConstantBuffers(1, 1, worldBuffer.GetAddressOf());
-
-		Vector4 modColor = object->getColor();
-		deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, &modColor, sizeof(Vector4));
-		deviceContext->Unmap(colorBuffer.Get(), 0);
-
+		UINT vertexCount = object->mesh->getVertexCount();
+		UINT stride = sizeof(Vertex3D);
+		UINT offset = 0;
 		Material material = object->getMaterial();
+
 		ID3D11ShaderResourceView* textureSRV = nullptr;
 		if (material.diffuse != nullptr)
 		{
@@ -2044,15 +2043,23 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 			glossSRV = material.gloss->getShaderResView();
 		}
 
+		MaterialColor modColor;
+		modColor.color = object->getColor();
+		modColor.shading.x = object->getShading();
+		hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &modColor, static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16))));
+		deviceContext->Unmap(colorBuffer.Get(), 0);
+
+
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		deviceContext->PSSetShaderResources(0, 1, &textureSRV);
 		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
 		deviceContext->PSSetShaderResources(5, 1, &specularSRV);
 		deviceContext->PSSetShaderResources(6, 1, &glossSRV);
-		deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
 
-		deviceContext->Draw(static_cast<UINT>(object->mesh->getVertexCount()), 0);
+
+		deviceContext->Draw(vertexCount, 0);
 	}
 }
 
