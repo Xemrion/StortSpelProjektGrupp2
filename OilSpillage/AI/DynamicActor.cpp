@@ -19,7 +19,7 @@ void DynamicActor::move()
 	Vector3 newVelocity = calculateVelocity();
 	if (newVelocity != Vector3())
 	{
-		velocity = calculateVelocity();
+		velocity = newVelocity;
 		velocity.Normalize();
 	}
 	//If newVelocity is 0, slow down the velocity instead
@@ -35,7 +35,6 @@ void DynamicActor::move()
 	Vector3 targetToSelf = (nextPos - position);
 
 	//Rotate
-	//(targetToSelf).Dot(vecForward)
 	if ( ((targetToSelf.x * vecForward.x) + (targetToSelf.z * vecForward.z)) < 0.8)
 	{
 		vecForward -= (targetToSelf * deltaTime) / 0.02f;
@@ -66,8 +65,7 @@ void DynamicActor::update(float dt, const Vector3& targetPos)
 
 Vector3 DynamicActor::calculateVelocity()
 {
-	Vector3 desiredDirection = destination - position;
-	return desiredDirection - velocity;
+	return destination - position;
 }
 
 void DynamicActor::followPath()
