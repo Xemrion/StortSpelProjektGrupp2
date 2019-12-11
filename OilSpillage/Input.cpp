@@ -468,10 +468,20 @@ Vector2 Input::getDirectionR()
 
 	if (!instance->preferGamePad)
 	{
-		float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
-		float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
+		if (checkButtonMouse(MouseKeys::LEFT, States::HELD))
+		{
+			float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
+			float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
 
-		dir = Vector2(mX, -mY);
+			dir = Vector2(mX, -mY);
+		}
+		else
+		{
+			if (checkButtonKeyboard(Keys::R_LEFT, States::HELD)) dir.x -= 1.0f;
+			if (checkButtonKeyboard(Keys::R_RIGHT, States::HELD)) dir.x += 1.0f;
+			if (checkButtonKeyboard(Keys::R_UP, States::HELD)) dir.y += 1.0f;
+			if (checkButtonKeyboard(Keys::R_DOWN, States::HELD)) dir.y -= 1.0f;
+		}
 	}
 	else
 	{
@@ -494,6 +504,22 @@ float Input::getStrengthR()
 	if (!instance->preferGamePad)
 	{
 		strength = checkButtonMouse(MouseKeys::LEFT, States::HELD) ? 1.0f : 0.0f;
+
+		if (strength == 0.0f)
+		{
+			bool left = checkButtonKeyboard(Keys::R_LEFT, States::HELD);
+			bool right = checkButtonKeyboard(Keys::R_RIGHT, States::HELD);
+			bool up = checkButtonKeyboard(Keys::R_UP, States::HELD);
+			bool down = checkButtonKeyboard(Keys::R_DOWN, States::HELD);
+
+			strength = 1.0f;
+
+			if ((left && right && !up && !down) || (!left && !right && up && down) || (left && right && up && down) || (!left && !right && !up && !down))
+			{
+				strength = 0.0f;
+			}
+		}
+		
 	}
 	else
 	{
