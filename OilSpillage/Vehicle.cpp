@@ -654,7 +654,7 @@ void Vehicle::updateWeapon(float deltaTime)
 						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem(Slots::MOUNTED));
 						this->vehicleSlots->getItem(Slots::MOUNTED)->getObject()->setRotation(Vector3(0, newRot, 0));
 
-						if (/*Input::checkButton(Keys::R_SHOULDER, States::HELD) ||*/ Input::getStrengthR() > 0.01f || Input::checkButtonMouse(MouseKeys::LEFT,States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
+						if (Input::getStrengthR() > 0.01f && temp->getWeapon().type != WeaponType::Spikes)
 						{
 							if (temp->getWeapon().updateFireRate())
 							{
@@ -762,7 +762,7 @@ void Vehicle::updateWeapon(float deltaTime)
 						ItemGadget* temp2 = dynamic_cast<ItemGadget*>(this->vehicleSlots->getItem(Slots::BACK));
 						if (this->vehicleSlots->getItem(Slots::BACK)->getType() == ItemType::TYPE_WEAPON && temp != nullptr)
 						{
-							if (Input::checkButton(Keys::CONFIRM, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
+							if (Input::checkButton(Keys::R_SHOULDER, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 							{
 								//weapon.startSound();
 								WeaponHandler::weaponStartSound(temp->getWeapon());
@@ -814,7 +814,7 @@ void Vehicle::updateWeapon(float deltaTime)
 								////test nitro
 							if (temp2->getGadget().type == GadgetType::NITRO )
 							{
-								if (Input::checkButton(Keys::R_SHOULDER, States::HELD) && temp2->getGadget().currentLifeTime > 0) // its alive!
+								if (Input::checkButton(Keys::L_SHOULDER, States::HELD) && temp2->getGadget().currentLifeTime > 0) // its alive!
 								{
 									if (temp2->getGadget().enable != true)
 									{
@@ -858,7 +858,7 @@ void Vehicle::updateWeapon(float deltaTime)
 							}
 							else if(temp2->getGadget().type == GadgetType::EMP)
 							{
-								if (Input::checkButton(Keys::R_SHOULDER, States::RELEASED) && temp2->getGadget().enable != true) // its alive!
+								if (Input::checkButton(Keys::L_SHOULDER, States::RELEASED) && temp2->getGadget().enable != true) // its alive!
 								{	
 									if (empplaced == nullptr)
 									{
@@ -909,7 +909,7 @@ void Vehicle::updateWeapon(float deltaTime)
 						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem(Slots::RIGHT));
 						if (this->vehicleSlots->getItem(Slots::RIGHT)->getType() == ItemType::TYPE_WEAPON && temp != nullptr)
 						{
-							if (Input::checkButton(Keys::L_SHOULDER, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
+							if (Input::checkButton(Keys::R_SHOULDER, States::HELD) && temp->getWeapon().type != WeaponType::Spikes)
 							{
 								//weapon.startSound();
 								WeaponHandler::weaponStartSound(temp->getWeapon());
@@ -964,7 +964,7 @@ void Vehicle::updateWeapon(float deltaTime)
 						ItemWeapon* temp = dynamic_cast<ItemWeapon*>(this->vehicleSlots->getItem(Slots::LEFT));
 						if (this->vehicleSlots->getItem(Slots::LEFT)->getType() == ItemType::TYPE_WEAPON && temp != nullptr)
 						{
-							if (Input::checkButton(Keys::L_SHOULDER, States::HELD))
+							if (Input::checkButton(Keys::R_SHOULDER, States::HELD))
 							{
 								//weapon.startSound();
 								WeaponHandler::weaponStartSound(temp->getWeapon());
