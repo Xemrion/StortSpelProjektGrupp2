@@ -74,6 +74,11 @@ void CarGadgetSelector::init()
 	}
 }
 
+bool CarGadgetSelector::isBackSlot()
+{
+	return this->selected == this->slots[Slots::BACK].get();
+}
+
 void CarGadgetSelector::setSlot(Slots slots, Container::Slot* slot)
 {
 	auto temp = this->selected;

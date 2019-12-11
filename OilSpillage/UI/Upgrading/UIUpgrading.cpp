@@ -72,8 +72,8 @@ void UIUpgrading::updateUI(float deltaTime)
 	else
 	{
 		this->gadgetSelector->update(true, deltaTime);
-
-		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
+		
+		if (Input::checkButton(Keys::CONFIRM, States::PRESSED)&&!this->gadgetSelector->isBackSlot())
 		{
 			this->gadgetSelector->setSlotOfSelected(this->itemSelector->getSelectedSlot());
 			this->selectingItem = true;
