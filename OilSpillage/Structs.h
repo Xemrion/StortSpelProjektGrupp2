@@ -31,7 +31,7 @@ struct AABB
 
 
 
-	bool intersect(AABB other)
+	bool intersect(const AABB& other)
 	{
 		if (minPos.x > other.maxPos.x || maxPos.x < other.minPos.x) return false;
 		if (minPos.y > other.maxPos.y || maxPos.y < other.minPos.y) return false;
@@ -39,7 +39,7 @@ struct AABB
 		return true;
 	}
 
-	bool intersectXZ(AABB other)
+	bool intersectXZ(const AABB& other)
 	{
 		if (minPos.x > other.maxPos.x || maxPos.x < other.minPos.x) return false;
 		if (minPos.z > other.maxPos.z || maxPos.z < other.minPos.z) return false;

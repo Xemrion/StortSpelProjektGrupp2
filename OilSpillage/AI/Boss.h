@@ -14,7 +14,7 @@ public:
 	void checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTimer);
 	void changeHealth(float amount); //changef rom actor
 
-	const std::vector<Weakspot>& getWeakspots();
+	std::vector<Weakspot>& getWeakspots();
 
 private:
 	float timeTilNextPoint;
