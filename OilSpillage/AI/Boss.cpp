@@ -389,7 +389,7 @@ void Boss::updateWeakPoints()
 		this->phase = 2;
 }
 
-void Boss::checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTimer)
+void Boss::checkIfWeakPointHit(Bullet* bulletArray, size_t size, float &soundTimer)
 {
 	for (int i = 0; i < this->weakSpots.size(); i++)
 	{
