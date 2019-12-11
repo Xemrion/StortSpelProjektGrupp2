@@ -661,11 +661,10 @@ void  Map::generateBuildings( )
 						house.object.setScale({ .048f * config.tileSideScaleFactor,
 						                        .048f * config.tileSideScaleFactor,
 						                        .048f * config.tileSideScaleFactor });
-						house.object.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePos) } );
 						#ifndef _DEBUG
-							btRigidBody *tmp = physics->addBox( btVector3( house.object.getPosition().x,
-							                                               house.object.getPosition().y,
-							                                               house.object.getPosition().z ),
+							btRigidBody *tmp = physics->addBox( btVector3( 0,
+								                                           0,
+								                                           0 ),
 							                                    btVector3( 10.5f  * house.object.getScale().x,
 							                                               500.0f,
 							                                               10.5f  * house.object.getScale().z ),
@@ -673,6 +672,7 @@ void  Map::generateBuildings( )
 							tmp->setFriction(0);
 							house.object.setRigidBody( tmp );
 						#endif
+						house.object.setPosition({ tilemap->convertTilePositionToWorldPosition(tilePos) });
 						tilemap->applyLot( maybeLot.value(), Tile::building );
 						++currentArea;
 						houses.singles.push_back( std::move(house) );
@@ -754,14 +754,13 @@ void  Map::generateBuildings( )
 					house.object.mesh       = graphics.getMeshPointer( util::randomElementOf(singleTileModels,    rng)   );
 					house.object.setMaterial( graphics.getMaterial(    util::randomElementOf(singleTileMaterials, rng) ) );
 					house.object.setColor({ .0f, .0f, .0f, .0f });
-					house.object.setPosition({ tilemap->convertTilePositionToWorldPosition(maybeLot.value().nw) - Vector3(0,2,0) } );
 					house.object.setScale({ .0322f * config.tileSideScaleFactor,
 						                     .0322f * config.tileSideScaleFactor,
 						                     .0322f * config.tileSideScaleFactor });
 					#ifndef _DEBUG
-						btRigidBody *tmp = physics->addBox( btVector3( house.object.getPosition().x,
-						                                               house.object.getPosition().y,
-						                                               house.object.getPosition().z ),
+						btRigidBody *tmp = physics->addBox( btVector3( 0,
+						                                               0,
+						                                               0 ),
 						                                    btVector3( 15.5f * house.object.getScale().x,
 						                                               500.0f,
 						                                               15.5f * house.object.getScale().z ),
@@ -769,6 +768,7 @@ void  Map::generateBuildings( )
 						tmp->setFriction(0);
 						house.object.setRigidBody( tmp );
 					#endif
+					house.object.setPosition({ tilemap->convertTilePositionToWorldPosition(maybeLot.value().nw) - Vector3(0,2,0) });
 					tilemap->applyLot( maybeLot.value(), Tile::building );
 					houses.singles.push_back( std::move(house) );
 					++currentArea;

@@ -177,6 +177,7 @@
     <ClCompile Include="AI\Weakspot.cpp" />
     <ClCompile Include="BulletSDK\include\LinearMath\btThreads.cpp" />
     <ClCompile Include="DynamicCamera.cpp" />
+    <ClCompile Include="GameObjectBase.cpp" />
     <ClCompile Include="Inventory\Container.cpp" />
     <ClCompile Include="Inventory\Gadget.cpp" />
     <ClCompile Include="Inventory\Item.cpp" />
@@ -202,7 +203,7 @@
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="SaveSystem.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
-    <ClCompile Include="SimpleGameObject.cpp" />
+    <ClCompile Include="DynamicGameObject.cpp" />
     <ClCompile Include="States\GameState.cpp" />
     <ClCompile Include="States\HighscoreGameState.cpp" />
     <ClCompile Include="States\MenuGameState.cpp" />
@@ -282,6 +283,7 @@
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="AI\Weakspot.h" />
     <ClInclude Include="fog.h" />
+    <ClInclude Include="GameObjectBase.h" />
     <ClInclude Include="Inventory\Gadget.h" />
     <ClInclude Include="Inventory\ItemChassi.h" />
     <ClInclude Include="Inventory\ItemGadget.h" />
@@ -306,7 +308,7 @@
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="PG\Profiler.hpp" />
-    <ClInclude Include="SimpleGameObject.h" />
+    <ClInclude Include="DynamicGameObject.h" />
     <ClInclude Include="States\GameState.h" />
     <ClInclude Include="States\HighscoreGameState.h" />
     <ClInclude Include="States\MenuGameState.h" />

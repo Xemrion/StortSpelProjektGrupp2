@@ -29,19 +29,19 @@ void Skyscraper::generateASkyscraper(std::string name)
 	scrapSkyScraper();
 }
 
-void Skyscraper::setRoofMesh(std::string name, SimpleGameObject* roof)
+void Skyscraper::setRoofMesh(std::string name, DynamicGameObject* roof)
 {
 	std::string meshName = name + "-roof";
 	roof->mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
 }
 
-void Skyscraper::setWallMesh(std::string name, SimpleGameObject* roof)
+void Skyscraper::setWallMesh(std::string name, DynamicGameObject* roof)
 {
 	std::string meshName = name + "-wall";
 	roof->mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
 }
 
-void Skyscraper::setWindowMesh(std::string name, SimpleGameObject* roof)
+void Skyscraper::setWindowMesh(std::string name, DynamicGameObject* roof)
 {
 	std::string meshName = name + "-wind";
 	roof->mesh = Game::getGraphics().getPGMeshPointer(meshName.c_str());
