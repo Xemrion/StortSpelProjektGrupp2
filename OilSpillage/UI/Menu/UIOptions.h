@@ -26,6 +26,8 @@ public:
 	virtual ~UIOptions();
 
 	void init();
+
+	virtual void unloadTextures();
 };
 
 #endif // !UI_OPTIONS_H

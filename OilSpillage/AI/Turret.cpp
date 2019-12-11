@@ -40,7 +40,11 @@ Turret::~Turret()
 
 void Turret::update(float dt, const Vector3& targetPos)
 {
-	Actor::update(dt, targetPos);
+	if(stunnedTimer <= 0)
+	{
+		Actor::update(dt, targetPos);
+	}
+	stunnedTimer -= dt;
 	updateBullets(dt);
 	onFire();
 }

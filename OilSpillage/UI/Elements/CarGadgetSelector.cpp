@@ -36,6 +36,7 @@ CarGadgetSelector::CarGadgetSelector(Vector2 position) : Element(position), used
 
 CarGadgetSelector::~CarGadgetSelector()
 {
+
 }
 
 void CarGadgetSelector::draw(bool selected)
@@ -71,6 +72,11 @@ void CarGadgetSelector::init()
 		this->used[static_cast<Slots>(i)] = vehicleSlots->getInventorySlot(static_cast<Slots>(i));
 		this->slots[i]->setSlot(vehicleSlots->getInventorySlot(static_cast<Slots>(i)));
 	}
+}
+
+bool CarGadgetSelector::isBackSlot()
+{
+	return this->selected == this->slots[Slots::BACK].get();
 }
 
 void CarGadgetSelector::setSlot(Slots slots, Container::Slot* slot)
@@ -136,4 +142,11 @@ void CarGadgetSelector::removeSlot(Container::Slot* slot)
 Container::Slot** CarGadgetSelector::getUsed()
 {
 	return this->used;
+}
+
+void CarGadgetSelector::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/statBG");
+	Game::getGraphics().unloadTexture("UI/carTopdown");
+	Game::getGraphics().unloadTexture("UI/itemSelectorIndicator");
 }

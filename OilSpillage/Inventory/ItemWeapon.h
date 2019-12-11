@@ -17,8 +17,8 @@ public:
 	Item* clone()const;
 
 	virtual void randomize();
-
 	Weapon& getWeapon();
+	virtual void update(float dt);
 };
 
 #endif // !ITEM_WEAPON_H

@@ -32,6 +32,7 @@ public:
 	Matrix& getTransform();
 	Container::Slot* getSlot() const;
 	void setSlot(Container::Slot* slot);
+	void unloadTextures();
 };
 
 #endif // !ITEM_SLOT_H

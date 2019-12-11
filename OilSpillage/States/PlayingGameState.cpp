@@ -8,6 +8,10 @@
 #include "../PG/Profiler.hpp"
 #include "../UI/Playing/UICompletedStage.h"
 #include "../UI/Playing/UIBeforePlaying.h"
+#include "../UI/Menu/UIControls.h"
+#include "../profiling.h"
+
+#define RELEASE_DEBUG
 
 void PlayingGameState::fillTestParticle()
 {
@@ -63,9 +67,6 @@ void PlayingGameState::initAI()
 PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGraphics()), time(time), currentMenu(MENU_BEFORE_PLAYING)
 {
 
-#if defined(_DEBUG) || defined(RELEASE_DEBUG)
-	pausedTime = false;
-#endif // _DEBUG
 	this->current_item = NULL;
 
 	config.seed = seed;
@@ -146,9 +147,14 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 	loadMultitileLayouts("data/layouts/multitilePrefabs.dat");
 	graphics.loadModel("Entities/Drone");
-
+	
+	std::string modelPath;
+	modelPath = MODEL_ROOT_DIR;
+	modelPath += "Entities/Roller_Melee";
+	graphics.loadMesh(modelPath);
+	graphics.loadMaterial("Entities/Roller_Melee");
 	graphics.loadModel("Hospital");
-	graphics.loadModel("Entities/Roller_Melee");
+	//graphics.loadModel("Entities/Roller_Melee");
 	graphics.loadModel("Houses/testHouse");
 	graphics.loadModel("Houses/testHouse2");
 	graphics.loadModel("Houses/testHouse3");
@@ -177,8 +183,8 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	map = std::make_unique<Map>(graphics, config, physics.get(), *lightList );
 	// Minimap stuff
 	auto tilemap = map->getTileMap();
-	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, .0f, config.tileSideScaleFactor);
-	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
+	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor / 2, .0f, config.tileSideScaleFactor / 2);
+	bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor / 2, 0, -config.tileSideScaleFactor / 2);
 	// Needs to be loaded before the menues
 	minimap = createMinimapTexture(*map);
 	generateMapPowerUps();
@@ -192,6 +198,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	menues[MENU_OPTIONS] = std::make_unique<UIOptions>();
 	menues[MENU_COMPLETED_STAGE] = std::make_unique<UICompletedStage>();
 	menues[MENU_BEFORE_PLAYING] = std::make_unique<UIBeforePlaying>();
+	menues[MENU_CONTROLS] = std::make_unique<UIControls>();
 
 	Vector3 startPos = map->getStartPositionInWorldSpace();
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
@@ -291,6 +298,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 PlayingGameState::~PlayingGameState()
 {
+	actorManager.reset();
 	delete this->cameraObject;
 }
 
@@ -299,6 +307,8 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Begin("OilSpillage");
 	ImGui::Text("frame time %.1f, %.1f FPS", 1000.f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("Time Left: %f", time);
+	ImGui::Text("%s", ramUsage(false).c_str());
+	ImGui::Text("%s", vramUsage(false).c_str());
 	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
 	
 
@@ -360,6 +370,8 @@ void PlayingGameState::ImGui_Particles()
 	ImGui::ColorPicker4("Color 3 Slider", colors4);
 	ImGui::SliderFloat("First size", &size1, 0.0f, 1.0f);
 	ImGui::SliderFloat("Second size", &size2, 0.0f, 1.0f);
+	ImGui::SliderFloat("Init.w (size for electro)", &elSize, 0.0f, 20.0f);
+	ImGui::SliderFloat("Init.z (spacing for electro)", &elSpacing, 0.0f, 1.0f);
 	ImGui::SliderInt("Nr of particles times 8", &addNrOfParticles, 1, 10);
 	ImGui::SliderFloat("LifeTime", &lifeTime, 0.0f, 20.0f);
 	ImGui::SliderFloat("Vectorfield size", &vectorFieldSize, 0.0f, 10.0f);
@@ -488,8 +500,8 @@ void PlayingGameState::ImGui_ProcGen()
 		aStar->generateTileData(map->getTileMap());
 		// minimap stuff
 		auto tilemap = map->getTileMap();
-		topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor, 0, config.tileSideScaleFactor);
-		bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor, 0, -config.tileSideScaleFactor);
+		topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor / 2, 0, config.tileSideScaleFactor / 2);
+		bottomRight = tilemap.convertTilePositionToWorldPosition(config.dimensions.x - 1, config.dimensions.y - 1) + Vector3(config.tileSideScaleFactor / 2, 0, -config.tileSideScaleFactor / 2);
 
 		graphics.reloadTexture(minimap);
 		static_cast<UIPlaying*>(menues[MENU_PLAYING].get())->resetMinimapFog();
@@ -545,7 +557,6 @@ void PlayingGameState::setPlayer(Vehicle* theVehicle)
 
 void PlayingGameState::update(float deltaTime)
 {
-
 	/*-------------------------UPDATING-------------------------*/
 	if (currentMenu == PlayingGameState::MENU_PLAYING)
 	{
@@ -554,19 +565,7 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
-		if (Input::isKeyPressed(Keyboard::LeftAlt))
-		{
-			pausedTime = !pausedTime;
-		}
 
-		if (!pausedTime && time > 0.0f)
-		{
-			time = std::max(time - deltaTime, 0.0f);
-		}
-		else if (time <= 0.0f)
-		{
-			Game::setState(Game::STATE_HIGHSCORE);
-		}
 #else
 		if (time > 0.0f)
 		{
@@ -655,7 +654,7 @@ void PlayingGameState::update(float deltaTime)
 		if (timer > 0.1f&&timerEMP>0.0f)
 		{
 			timer = 0.0f;
-			this->graphics.addTestParticle(this->player->getPosition() + Vector3(0, 1, 0), Vector4(0, 0, 0, 10.0f), addNrOfParticles, lifeTime, randomPosPower);
+			this->graphics.addTestParticle(this->player->getPosition() + Vector3(0, 1, 0), Vector4(0, 0, elSpacing, elSize), addNrOfParticles, lifeTime, randomPosPower);
 		}
 #endif
 
@@ -733,6 +732,13 @@ void PlayingGameState::update(float deltaTime)
 		}
 	}
 
+	if (oldMenu == MENU_CONTROLS)
+	{
+		menues[MENU_CONTROLS] = std::make_unique<UIControls>();
+	}
+
+	oldMenu = -1;
+
 	Sound::fadeSoundtrack(soundAggro);
 	
 	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
@@ -742,7 +748,7 @@ void PlayingGameState::update(float deltaTime)
 		ImGui_Driving();
 		//ImGui_ProcGen();
 		//ImGui_AI();
-		ImGui_Particles();
+		//ImGui_Particles();
 		//ImGui_Camera();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -768,8 +774,12 @@ void PlayingGameState::changeTime(float timeDiff) noexcept {
 }
 
 void PlayingGameState::setCurrentMenu(Menu menu) {
+	oldMenu = currentMenu;
 	currentMenu = static_cast<int>(menu);
-	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING) menues[currentMenu]->init();
+
+	if (menu == Menu::MENU_OPTIONS || menu == Menu::MENU_COMPLETED_STAGE || menu == Menu::MENU_BEFORE_PLAYING || menu == Menu::MENU_CONTROLS) { 
+		menues[currentMenu]->init();
+	}
 }
 
 Map::Info PlayingGameState::getMapInfo() const
@@ -1059,7 +1069,7 @@ void PlayingGameState::generateMapPowerUps()
 			}
 		}
 		position.y += 2.0;
-		PowerUp p(position, physics.get(), (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
+		PowerUp p(position, (PowerUpType)(rng() % (UINT)PowerUpType::Length), 90.f);
 
 		addPowerUp(p);
 
@@ -1165,3 +1175,4 @@ Vector3 PlayingGameState::getCameraPos()
 {
 	return this->camera->getPosition();
 }
+

@@ -102,7 +102,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::L_TRIGGER:
 			return false;
 		case Keys::L_SHOULDER:
-			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::UP;
+			return !keyboardState.LeftShift;
 		case Keys::L_PRESS:
 			return false;
 		case Keys::R_UP:
@@ -116,7 +116,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::R_TRIGGER:
 			return false;
 		case Keys::R_SHOULDER:
-			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::UP;
+			return !keyboardState.Space;
 		case Keys::R_PRESS:
 			return false;
 		case Keys::CONFIRM:
@@ -124,9 +124,9 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CANCEL:
 			return !keyboardState.Back;
 		case Keys::ACTION_1:
-			return !keyboardState.Space;
+			return false;
 		case Keys::ACTION_2:
-			return !keyboardState.LeftShift;
+			return false;
 		case Keys::MENU:
 			return !keyboardState.Escape;
 		}
@@ -146,7 +146,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::L_TRIGGER:
 			return false;
 		case Keys::L_SHOULDER:
-			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::HELD;
+			return keyboardState.LeftShift;
 		case Keys::L_PRESS:
 			return false;
 		case Keys::R_UP:
@@ -160,7 +160,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::R_TRIGGER:
 			return false;
 		case Keys::R_SHOULDER:
-			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::HELD;
+			return keyboardState.Space;
 		case Keys::R_PRESS:
 			return false;
 		case Keys::CONFIRM:
@@ -168,9 +168,9 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CANCEL:
 			return keyboardState.Back;
 		case Keys::ACTION_1:
-			return keyboardState.Space;
+			return false;
 		case Keys::ACTION_2:
-			return keyboardState.LeftShift;
+			return false;
 		case Keys::MENU:
 			return keyboardState.Escape;
 		}
@@ -190,7 +190,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::L_TRIGGER:
 			return false;
 		case Keys::L_SHOULDER:
-			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::PRESSED;
+			return instance->keyboardTracker.pressed.LeftShift;
 		case Keys::L_PRESS:
 			return false;
 		case Keys::R_UP:
@@ -204,7 +204,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::R_TRIGGER:
 			return false;
 		case Keys::R_SHOULDER:
-			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::PRESSED;
+			return instance->keyboardTracker.pressed.Space;
 		case Keys::R_PRESS:
 			return false;
 		case Keys::CONFIRM:
@@ -212,9 +212,9 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CANCEL:
 			return instance->keyboardTracker.pressed.Back;
 		case Keys::ACTION_1:
-			return instance->keyboardTracker.pressed.Space;
+			return false;
 		case Keys::ACTION_2:
-			return instance->keyboardTracker.pressed.LeftShift;
+			return false;
 		case Keys::MENU:
 			return instance->keyboardTracker.pressed.Escape;
 		}
@@ -234,7 +234,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::L_TRIGGER:
 			return false;
 		case Keys::L_SHOULDER:
-			return instance->mouseTracker.rightButton == Mouse::ButtonStateTracker::RELEASED;
+			return instance->keyboardTracker.released.LeftShift;
 		case Keys::L_PRESS:
 			return false;
 		case Keys::R_UP:
@@ -248,7 +248,7 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::R_TRIGGER:
 			return false;
 		case Keys::R_SHOULDER:
-			return instance->mouseTracker.leftButton == Mouse::ButtonStateTracker::RELEASED;
+			return instance->keyboardTracker.released.Space;
 		case Keys::R_PRESS:
 			return false;
 		case Keys::CONFIRM:
@@ -256,9 +256,9 @@ bool Input::checkButtonKeyboard(Keys key, States state)
 		case Keys::CANCEL:
 			return instance->keyboardTracker.released.Back;
 		case Keys::ACTION_1:
-			return instance->keyboardTracker.released.Space;
+			return false;
 		case Keys::ACTION_2:
-			return instance->keyboardTracker.released.LeftShift;
+			return false;
 		case Keys::MENU:
 			return instance->keyboardTracker.released.Escape;
 		}
@@ -468,10 +468,20 @@ Vector2 Input::getDirectionR()
 
 	if (!instance->preferGamePad)
 	{
-		float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
-		float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
+		if (checkButtonMouse(MouseKeys::LEFT, States::HELD))
+		{
+			float mX = instance->mouse.GetState().x - (instance->wWidth / 2);
+			float mY = instance->mouse.GetState().y - (instance->wHeight / 2);
 
-		dir = Vector2(mX, -mY);
+			dir = Vector2(mX, -mY);
+		}
+		else
+		{
+			if (checkButtonKeyboard(Keys::R_LEFT, States::HELD)) dir.x -= 1.0f;
+			if (checkButtonKeyboard(Keys::R_RIGHT, States::HELD)) dir.x += 1.0f;
+			if (checkButtonKeyboard(Keys::R_UP, States::HELD)) dir.y += 1.0f;
+			if (checkButtonKeyboard(Keys::R_DOWN, States::HELD)) dir.y -= 1.0f;
+		}
 	}
 	else
 	{
@@ -494,6 +504,22 @@ float Input::getStrengthR()
 	if (!instance->preferGamePad)
 	{
 		strength = checkButtonMouse(MouseKeys::LEFT, States::HELD) ? 1.0f : 0.0f;
+
+		if (strength == 0.0f)
+		{
+			bool left = checkButtonKeyboard(Keys::R_LEFT, States::HELD);
+			bool right = checkButtonKeyboard(Keys::R_RIGHT, States::HELD);
+			bool up = checkButtonKeyboard(Keys::R_UP, States::HELD);
+			bool down = checkButtonKeyboard(Keys::R_DOWN, States::HELD);
+
+			strength = 1.0f;
+
+			if ((left && right && !up && !down) || (!left && !right && up && down) || (left && right && up && down) || (!left && !right && !up && !down))
+			{
+				strength = 0.0f;
+			}
+		}
+		
 	}
 	else
 	{

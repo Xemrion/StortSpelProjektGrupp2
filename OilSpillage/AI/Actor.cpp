@@ -127,3 +127,8 @@ void Actor::setFire(float timer)
 {
 	fireTimer = timer;
 }
+
+void Actor::setStun(float timer)
+{
+	stunnedTimer = timer;
+}

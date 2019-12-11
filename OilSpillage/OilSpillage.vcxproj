@@ -198,6 +198,7 @@
     <ClCompile Include="PG\RoadGenerator.cpp" />
     <ClCompile Include="PG\Skyscraper.cpp" />
     <ClCompile Include="PowerUp.cpp" />
+    <ClCompile Include="Profiling.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="SaveSystem.cpp" />
     <ClCompile Include="Shadows\ShadowMapping.cpp" />
@@ -332,6 +333,7 @@
     <ClInclude Include="Powerup.h" />
     <ClInclude Include="Objectives\Objective.h" />
     <ClInclude Include="Objectives\ObjectiveHandler.h" />
+    <ClInclude Include="Profiling.h" />
     <ClInclude Include="SaveSystem.h" />
     <ClInclude Include="Shadows\ShadowMapping.h" />
     <ClInclude Include="AI\Turret.h" />

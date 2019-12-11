@@ -35,7 +35,7 @@ UpgradingGameState::UpgradingGameState() : graphics(Game::getGraphics()), curren
 
 UpgradingGameState::~UpgradingGameState()
 {
-	Game::getGraphics().unloadTexture("UI/garageThing");
+
 
 }
 
@@ -95,4 +95,11 @@ std::unique_ptr<Vehicle>& UpgradingGameState::getPlayer()
 void UpgradingGameState::setPlayer(Vehicle* theVehicle)
 {
 	this->theVehicle.reset(theVehicle);// = std::make_unique<Vehicle>(theVehicle);
+}
+
+void UpgradingGameState::unloadTextures()
+{
+	this->menues[MENU_UPGRADING]->unloadTextures();
+	this->menues[MENU_RANDOMITEM]->unloadTextures();
+	Game::getGraphics().unloadTexture("UI/garageThing");
 }

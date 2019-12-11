@@ -23,7 +23,7 @@ enum class Keys {
 	L_LEFT, //Left stick left. Keyboard: A
 	L_RIGHT, //Left stick right. Keyboard: D
 	L_TRIGGER, //Left trigger button. Keyboard: ?
-	L_SHOULDER, //Left shoulder button. Keyboard: Mouse Right Click
+	L_SHOULDER, //Left shoulder button. Keyboard: Left shift
 	L_PRESS, //Left stick pressed. Keyboard: ?
 
 	R_UP, //Right stick up. Keyboard: Up
@@ -31,13 +31,13 @@ enum class Keys {
 	R_LEFT, //Right stick left. Keyboard: Left
 	R_RIGHT, //Right stick right. Keyboard: Right
 	R_TRIGGER, //Right trigger button. Keyboard: ?
-	R_SHOULDER, //Right shoulder button. Keyboard: Mouse Left Click 
+	R_SHOULDER, //Right shoulder button. Keyboard: Space
 	R_PRESS, //Right stick pressed. Keyboard: ?
 
 	CONFIRM, //A (PS: X) button. Keyboard: Enter
 	CANCEL, //B (PS: O) button. Keyboard: Return
-	ACTION_1, //X (PS: Square) button. Keyboard: Space
-	ACTION_2, //Y (PS: Triangle) button. Keyboard: Left shift
+	ACTION_1, //X (PS: Square) button. Keyboard: ?
+	ACTION_2, //Y (PS: Triangle) button. Keyboard: ?
 
 	MENU //Menu (PS: Options) button. Keyboard: Escape
 };

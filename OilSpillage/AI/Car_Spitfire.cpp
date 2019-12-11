@@ -25,7 +25,6 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	setMaxHealth(newHealth);
 	setHealth(newHealth);
 
-	this->aggroRange = 500; //TODO: Find better aggro range
 	this->setPoints(150 * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages)));
 	this->trailTimer = 0.0f;
 }
@@ -60,10 +59,6 @@ void Spitfire::updateVehicle()
 	Vector3 accelForce = Vector3(getRigidBody()->getLinearVelocity()) - prevAccelForce;
 	setAccelForce(accelForce, deltaTime);
 	setWheelRotation();
-	this->setPosition(getPosition());
-
-	
-
 }
 
 
@@ -214,7 +209,6 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 		getRigidBody()->getAngularVelocity().getZ());
 
 
-	//Driving Mode: Turn towards direction, semi-realistic
 
 	Vector3 steering3 = Vector3(getRigidBody()->getAngularVelocity().getX(),
 		/*deltaTime*/0.035f * 80 * min(velocitySpeed * 0.15f, 1),
@@ -266,7 +260,6 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 		getRigidBody()->setLinearVelocity(btVector3(getRigidBody()->getLinearVelocity().getX() / (1 + (1.8f * deltaTime)), getRigidBody()->getLinearVelocity().getY(), getRigidBody()->getLinearVelocity().getZ() / (1 + (1.8f * deltaTime))));
 
 		rotateAcceleration /= 1.0f + 0.005f * deltaTime * 40;
-		//vehicle->addRotation(Vector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180)* deltaTime*2 * 60 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
 		getRigidBody()->setAngularVelocity(btVector3(0, ((rotateAcceleration)* DirectX::XM_PI / 180) * deltaTime * 120 * ((abs(velocity.x) + abs(velocity.y)) / 3000), 0));
 	}
 	else {
@@ -306,7 +299,6 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 			getRigidBody()->applyImpulse(btVector3(0, 0, -driftResistance.y), btVector3(0, 0, 0));
 		}
 	}
-	//this->vehicle->getRigidBody()->setLinearVelocity(btVector3((velocity.x * deltaTime*2 * 0.002f) * 100.0f, this->vehicle->getRigidBody()->getLinearVelocity().getY(), -(velocity.y * deltaTime*2 * 0.002f) * 100.0f));
 	getRigidBody()->setAngularVelocity(btVector3(0, getRigidBody()->getAngularVelocity().getY(), 0));
 
 
@@ -324,18 +316,6 @@ void Spitfire::vehicleMovement(float deltaTime, float throttleInputStrength, boo
 	rightDir.Normalize();
 	Vector3 initialDir = -Vector3(getRigidBody()->getLinearVelocity());
 	initialDir.Normalize();
-	//Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - this->vehicleBody1->getPosition() + rightDir*0.5f, -frontTempDir, 1, 20.0f);
-	//Game::getGraphics().addTrail(Vector3(0.0f, -0.5f, 0.0f) - this->vehicleBody1->getPosition() - rightDir * 0.5f, -frontTempDir, 1, 20.0f);
-	if (this->trailTimer > 0.01f && abs(driftForce) > 5.0f)
-	{
-		/*Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
-		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) - frontTempDir * 0.01f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
-
-		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() + rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);
-		Game::getGraphics().addTrail(Vector3(0.0f, -0.6f, 0.0f) + frontTempDir * 1.0f + this->vehicleBody1->getPosition() - rightDir * 0.5f, Vector4(initialDir.x, initialDir.y, initialDir.z, 0.1f * abs(driftForce)), 1, 5.0f);*/
-		this->trailTimer = 0;
-	}
-
 }
 
 void Spitfire::setAccelForce(Vector3 accelForce, float deltaTime)

@@ -6,7 +6,7 @@ class Swarm : public DynamicActor,public Melee
 public:
 	Swarm();
 	Swarm(float x, float z, Physics* physics);
-	~Swarm();
+	virtual ~Swarm();
 	void update(float dt, const Vector3& targetPos);
 protected:
 	void createRigidbody(Physics* physics);

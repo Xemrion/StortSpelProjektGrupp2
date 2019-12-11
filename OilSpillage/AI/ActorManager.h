@@ -23,7 +23,7 @@ public:
 	void createShootCar(float x, float z, int weaponType = 0);
 
 	float distanceToPlayer(const Vector3& position);
-	const std::vector<AIGroup>& getGroups() const;
+	const std::vector<AIGroup*>& getGroups() const;
 	void spawnAttackers(const Vector3& originPos);
 	void spawnChaseCars(const Vector3& originPos);
 	void spawnShootCars(const Vector3& originPos);
@@ -31,6 +31,7 @@ public:
 
 	void intersectPlayerBullets(Bullet* bulletArray, size_t size, float deltaTime);
 private:
+	void* ptr;
 	const int maxNrOfEnemies = 24;
 	const int spawnCooldown = 2;
 	float spawnTimer = 0;
@@ -39,6 +40,7 @@ private:
 	Physics* physics;
 	Map* map;
 	std::mt19937* rng;
+	void teleportActorsToPlayer(const Vector3& targetPos);
 	void updateActors(float dt, const Vector3& targetPos);
 	void updateBosses(float dt, const Vector3& targetPos);
 	//Returns index for the group within the radius with the most members
@@ -54,7 +56,7 @@ private:
 	void createGroup(DynamicActor* actor);
 	Vector3 predictPlayerPos(const Vector3& targetPos);
 	Vector3 findTeleportPos(const Vector3& targetPos, float minDistance, float maxDistance) noexcept;
-	std::vector<AIGroup> groups;
+	std::vector<AIGroup*> groups;
 	std::vector<DynamicActor*> actors;
 	std::vector<Boss*> bosses;
 	TurretHandler turretHandler;

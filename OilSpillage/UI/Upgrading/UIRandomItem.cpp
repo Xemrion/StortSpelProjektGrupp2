@@ -91,3 +91,9 @@ void UIRandomItem::init()
 	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 2);
 	this->promptBar->setPositon(Vector2(SCREEN_WIDTH / 2 - this->promptBar->getSize().x / 2, SCREEN_HEIGHT - this->promptBar->getSize().y - 8.0f));
 }
+
+void UIRandomItem::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/itemSelectorIndicator");
+	this->promptBar->unloadTextures();
+}

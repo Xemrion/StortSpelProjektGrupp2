@@ -16,7 +16,7 @@ void UIUpgrading::updateUI(float deltaTime)
 
 	if (this->selectingItem)
 	{
-		if (Input::checkButton(Keys::ACTION_1, States::PRESSED))
+		if (Input::checkButton(Keys::R_SHOULDER, States::PRESSED))
 		{
 			Game::setState(Game::STATE_PLAYING);
 		}
@@ -31,6 +31,10 @@ void UIUpgrading::updateUI(float deltaTime)
 			{
 				this->gadgetSelector->setSlot(Slots::WHEEL, this->itemSelector->getSelectedSlot());
 				this->statBox->update(static_cast<UpgradingGameState*>(Game::getCurrentState())->getVehicle()->getStats());
+			}
+			else if (this->itemSelector->getSelectedType() == ItemType::TYPE_GADGET)
+			{
+				this->gadgetSelector->setSlot(Slots::BACK, this->itemSelector->getSelectedSlot());
 			}
 			else
 			{
@@ -68,8 +72,8 @@ void UIUpgrading::updateUI(float deltaTime)
 	else
 	{
 		this->gadgetSelector->update(true, deltaTime);
-
-		if (Input::checkButton(Keys::CONFIRM, States::PRESSED))
+		
+		if (Input::checkButton(Keys::CONFIRM, States::PRESSED)&&!this->gadgetSelector->isBackSlot())
 		{
 			this->gadgetSelector->setSlotOfSelected(this->itemSelector->getSelectedSlot());
 			this->selectingItem = true;
@@ -125,6 +129,14 @@ UIUpgrading::~UIUpgrading()
 {
 }
 
+void UIUpgrading::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/itemSelectorTitleBG");
+	this->itemSelector->unloadTextures();
+	this->gadgetSelector->unloadTextures();
+	this->statBox->unloadTextures();
+}
+
 void UIUpgrading::init()
 {
 	Game::getGraphics().loadTexture("UI/itemSelectorTitleBG");
@@ -142,7 +154,7 @@ void UIUpgrading::init()
 		{ Keys::CONFIRM, "Select Item", Color(Colors::White) },
 		{ Keys::CANCEL, "Remove From Car", Color(Colors::White) },
 		{ Keys::R_PRESS, "Rotate Car", Color(Colors::White) },
-		{ Keys::ACTION_1, "Confirm Upgrading", Color(Colors::White) }
+		{ Keys::R_SHOULDER, "Confirm Upgrading", Color(Colors::White) }
 	};
 
 	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 5);

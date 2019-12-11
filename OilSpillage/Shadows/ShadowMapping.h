@@ -61,6 +61,9 @@ private:
 
 	Frustum spotFrustum;
 	Frustum sunFrustum;
+
+	bool sunActive;
+	bool spotActive;
 };
 
 

@@ -20,6 +20,8 @@ public:
 
 	void draw(bool selected);
 	void update(const Stats& stats);
+
+	void unloadTextures();
 };
 
 #endif // !VEHICLE_STAT_BOX_H
