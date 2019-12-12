@@ -112,7 +112,7 @@ PS_OUT main(VS_OUT input) : SV_Target
 	float3 tangent = input.TangentWS.xyz;
 	float3 bitangent = input.BitangentWS.xyz;
 	float3 normalMap = NormalMap.Sample(SampSt, input.Tex).xyz;
-	float4 specularColor = SpecularMap.Sample(SampSt, input.Tex);
+	float4 specularColor = max(SpecularMap.Sample(SampSt, input.Tex), float4(0.03, 0.03, 0.03, 0.0));
 	float gloss = GlossMap.Sample(SampSt, input.Tex).x;
 	gloss = exp2(10.0 * gloss + 1);
 
@@ -207,7 +207,7 @@ PS_OUT main(VS_OUT input) : SV_Target
 		float3 halfway = normalize(normalize(lightVector) + cameraVector);
 		float nDotH = saturate(dot(normal, halfway));
 		float glossTerm = ((gloss + 2) / 8) * pow(nDotH, gloss);
-		float3 fresnelTerm = (specularColor + color) + (1.0f - specularColor + color) * pow(1.0f - nDotH, 5);
+		float3 fresnelTerm = (specularColor) + (1.0f - specularColor) * pow(1.0f - nDotH, 5);
 
 		specularLight.rgb += glossTerm * fresnelTerm * l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible;
 	}
@@ -218,7 +218,7 @@ PS_OUT main(VS_OUT input) : SV_Target
 	output.color = outColor;
 	output.color.a = texColor.a + color.a;
 	output.depth = float4(input.Pos.z, 0.0, 0.0, 1.0);
-	
+
 
 	return output;
 }

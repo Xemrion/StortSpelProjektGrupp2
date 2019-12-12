@@ -4,7 +4,7 @@
 
 
 Spitfire::Spitfire(float x, float z, Physics* physics)
-	: DynamicActor(x, z,physics)
+	: DynamicActor(x, z, physics)
 {
 	targetRotation = 0.0f;
 	this->rotateAcceleration = 0.0f;
@@ -16,7 +16,7 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	this->deltaTime = 0;
 	throttleInputStrength = 0;
 	init(physics);
-	setPosition(Vector3(x,- 1.2f, z));
+	setPosition(Vector3(x, -1.2f, z));
 	vehicleBody1->setPosition(Vector3(x, 0 - 1.2f + 0.65f, z));
 	this->stats = VehicleStats::AICar;
 
@@ -66,17 +66,22 @@ void Spitfire::move()
 {
 	direction = destination - this->position;
 	direction.Normalize();
-	if ((this->position - destination).Length() > 5)
+	if (stunnedTimer <= 0)
 	{
-		throttleInputStrength += 0.025 * deltaTime;
-		if (throttleInputStrength > 1)
+		if ((this->position - destination).Length() > 5)
 		{
-			throttleInputStrength = 1;
+			throttleInputStrength += 0.025 * deltaTime;
+			throttleInputStrength = min(throttleInputStrength, 1);
 		}
+	}
+	else
+	{
+		throttleInputStrength -= 0.5 * deltaTime;
+		throttleInputStrength = max(throttleInputStrength, 0);
 	}
 }
 
-void Spitfire::update(float dt,const Vector3& targetPos)
+void Spitfire::update(float dt, const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
 	updateVehicle();

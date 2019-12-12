@@ -93,10 +93,20 @@ void Item::init()
 		std::make_shared<ItemWeapon>("Spikes", WeaponHandler::getWeapon(WeaponType::Spikes), spike),
 		std::make_shared<ItemGadget>("Nitro", GadgetHandler::getGadget(GadgetType::NITRO) , nitro),
 		std::make_shared<ItemGadget>("EMP",GadgetHandler::getGadget(GadgetType::EMP), emp),
-		std::make_shared<ItemChassi>("Muscle Chassi", 100, 1.0f, chassi1),
-		std::make_shared<ItemWheel>("Muscle Tires", 1.0f, 1.0f, wheel1)
+		std::make_shared<ItemChassi>("Muscle Chassi", 100, 1.0f, chassi1), //DON'T CHANGE THE INDEX OF THESE
+		std::make_shared<ItemWheel>("Muscle Tires", 1.0f, 1.0f, wheel1) //DON'T CHANGE THE INDEX OF THESE
 	};
 
+}
+
+Item* Item::getDefaultChassi()
+{
+	return premadeItems[6]->clone();
+}
+
+Item* Item::getDefaultWheels()
+{
+	return premadeItems[7]->clone();
 }
 
 Item* Item::getRandom()

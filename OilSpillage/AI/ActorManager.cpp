@@ -166,10 +166,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 							{
 								float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
 								float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-								float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+								float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
 								if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
 								{
-									actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+									actors[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages))*deltaTime * 2);
 								}
 							}
 						}
@@ -203,22 +203,28 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						{
 							float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
 							float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-							float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+							float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
 							if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
 							{
-								actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+								actors[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages)) * deltaTime * 2);
 							}
 						}
 					}
-
-					this->actors[i]->changeHealth(-bulletArray[j].getDamage());
+					if(bulletArray[j].getMelee())
+					{
+						this->actors[i]->changeHealth(-bulletArray[j].getDamage()*deltaTime);
+					}
+					else
+					{
+						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
+					}
 					if (!bulletArray[j].getMelee())
 						bulletArray[j].destroy();
 				}
 			}
 		}
 	}
-	turretHandler.intersectPlayerBullets(bulletArray, size, soundTimer);
+	turretHandler.intersectPlayerBullets(bulletArray, size, deltaTime, soundTimer);
 
 	if (this->bosses.size() > 0)
 	{
@@ -254,10 +260,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 								{
 									float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
 									float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-									float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+									float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
 									if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
 									{
-										actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+										actors[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages))* deltaTime * 2);
 									}
 								}
 							}
@@ -284,10 +290,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 							{
 								float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
 								float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-								float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+								float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
 								if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
 								{
-									actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+									actors[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages))* deltaTime * 2);
 								}
 							}
 						}
@@ -314,10 +320,10 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 							{
 								float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
 								float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-								float distance = (deltaX * deltaX) + (deltaZ * deltaZ);
+								float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
 								if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
 								{
-									actors[k]->changeHealth(-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages));
+									actors[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages))* deltaTime * 2);
 								}
 							}
 						}

@@ -1087,6 +1087,45 @@ void Graphics::loadMesh( std::string const &fileName, Vector3 rotation )
 					vertex.bitangent.y = vertices[i].binormalY;
 					vertex.bitangent.z = vertices[i].binormalZ;
 
+					int index0 = (i / 3) * 3 + 0;
+					int index1 = (i / 3) * 3 + 1;
+					int index2 = (i / 3) * 3 + 2;
+
+					Vector3 v0 = Vector3(vertices[index0].x, vertices[index0].y, vertices[index0].z);
+					Vector3 v1 = Vector3(vertices[index1].x, vertices[index1].y, vertices[index1].z);
+					Vector3 v2 = Vector3(vertices[index2].x, vertices[index2].y, vertices[index2].z);
+
+					Vector2 uv0 = Vector2(vertices[index0].u, vertices[index0].v);
+					Vector2 uv1 = Vector2(vertices[index1].u, vertices[index1].v);
+					Vector2 uv2 = Vector2(vertices[index2].u, vertices[index2].v);
+
+					Vector3 dPos0 = v1 - v0;
+					Vector3 dPos1 = v2 - v0;
+
+					Vector2 dUV0 = uv1 - uv0;
+					Vector2 dUV1 = uv2 - uv0;
+
+					float r = 1.0f / max((dUV0.x * dUV1.y - dUV0.y * dUV1.x), 0.000001f);
+					vertex.tangent = (dPos0 * dUV1.y - dPos1 * dUV0.y) * r;
+					vertex.bitangent = (dPos1 * dUV0.x - dPos0 * dUV1.x) * r;
+					vertex.normal.Normalize();
+					vertex.tangent.Normalize();
+					vertex.bitangent.Normalize();
+
+					assert(!isnan(vertex.normal.x));
+					assert(!isnan(vertex.normal.y));
+					assert(!isnan(vertex.normal.z));
+					assert(!isnan(vertex.tangent.x));
+					assert(!isnan(vertex.tangent.y));
+					assert(!isnan(vertex.tangent.z));
+					assert(!isnan(vertex.bitangent.x));
+					assert(!isnan(vertex.bitangent.y));
+					assert(!isnan(vertex.bitangent.z));
+
+					if (vertex.normal.Cross(vertex.tangent).Dot(vertex.bitangent) < 0.0f) {
+						vertex.tangent = vertex.tangent * -1.0f;
+					}
+
 					Vector4 tempPos = Vector4::Transform(Vector4(vertex.position.x, vertex.position.y, vertex.position.z, 1.0f), Matrix::CreateFromYawPitchRoll(rotation.x, rotation.y, rotation.z));
 					vertex.position.x = tempPos.x;
 					vertex.position.y = tempPos.y;
