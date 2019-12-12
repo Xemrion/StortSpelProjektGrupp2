@@ -97,61 +97,43 @@ float4 main(VS_OUT input) : SV_Target
 	{
 		Light l = lights[lightTileData.indices[i]];
 		float3 lightVector = l.pos.xyz - input.wPos.xyz;
-		float attenuation = 0.0;
+		float attenuation;
+		float nDotL = saturate(dot(normal, normalize(lightVector)));
 
-		float nDotL = 0.0;
-		float directional = 1.0;
+		attenuation = dot(lightVector, lightVector);
+		nDotL = max(dot(normal, normalize(lightVector)), 0.0);
 
-		//if the light is a spot light
-		if (l.pos.w == 1.0)
-		{
-			directional = 0.0;
-			float s = dot(-normalize(lightVector), l.directionWidth.xyz);
-			float umbra = cos(l.directionWidth.w);
-			if (s > umbra) {
-				float penumbra = cos(l.directionWidth.w * 0.9);
-				directional = (s - umbra) / (penumbra - umbra);
-				directional *= directional;
-			}
-		}
+		float s = dot(-normalize(lightVector), l.directionWidth.xyz);
+		float umbra = cos(l.directionWidth.w);
+		float penumbra = cos(l.directionWidth.w * 0.9);
+
+		float directional = s > umbra ? ((s - umbra) / (penumbra - umbra)) : 0.0;
+		directional = l.pos.w == 1.0 ? directional * directional : 1.0;
+
 		//if the light is a laser
 		if (l.pos.w == 2.0)
 		{
 			float3 rayPointVector = (l.pos.xyz - input.wPos.xyz) - dot(l.pos.xyz - input.wPos.xyz, l.directionWidth.xyz) * l.directionWidth.xyz;
 			float dist = dot(rayPointVector, rayPointVector);
 
-			float startDist = dot(lightVector, lightVector);
+			float startDist = attenuation;
 			float3 endVector = (l.pos.xyz + l.directionWidth.xyz * l.directionWidth.w) - input.wPos.xyz;
 			float endDist = dot(endVector, endVector);
+			nDotL = 1.0;
 
-			if (startDist < l.directionWidth.w * l.directionWidth.w && endDist < l.directionWidth.w * l.directionWidth.w)
-			{
-				attenuation = l.color.w / (dist * dist);
-				nDotL = abs(dot(normal, normalize(rayPointVector)));
-			}
-			else
-			{
-				attenuation = l.color.w / (min(startDist, endDist)* min(startDist, endDist));
-				if (startDist < endDist)
-				{
-					nDotL = abs(dot(normal, normalize(lightVector)));
-				}
-				else {
-					nDotL = abs(dot(normal, normalize(endVector.xyz)));
-				}
-			}
+			float widthSquared = l.directionWidth.w * l.directionWidth.w;
+			float minDist = min(startDist, endDist);
+			minDist = max(startDist, endDist) < widthSquared ? dist : minDist;
+			attenuation = minDist * minDist;
 		}
-		else
-		{
-			attenuation = l.color.w / dot(lightVector, lightVector);
-			nDotL = abs(dot(normal, normalize(lightVector)));
-		}
-		
-		diffuseLight.rgb += max(l.color.rgb * nDotL * attenuation * directional, 0.0) / (3.1416*2.0);
+
+		attenuation = l.color.w / attenuation;
+		// 1 / (4 * pi) == 0.079577
+		diffuseLight.rgb += max(l.color.rgb * nDotL * attenuation * directional, 0.0) * 0.079577;
 	}
 
 	float4 outColor = (texColor + color) * (diffuseLight + ambient);
-
+	outColor.a = texColor.a + color.a;
 	outColor.a *= fogGradient;
 	return outColor;
 }
