@@ -189,7 +189,7 @@ void Bullet::update(float deltaTime)
 		defaultUpdate(deltaTime);
 	}
 
-	if (timeLeft == 0)
+	if (timeLeft <= 0 && weapon.type != WeaponType::None)
 	{
 		destroy();
 	}
