@@ -174,7 +174,6 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 							}
 						}
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
-						this->actors[i]->setStun(5);
 					}
 				}
 				else if (/*bulletArray[j].getTimeLeft() > 0 && */bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
@@ -219,7 +218,6 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					{
 						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 					}
-					this->actors[i]->setStun(5);
 					if (!bulletArray[j].getMelee())
 						bulletArray[j].destroy();
 				}
