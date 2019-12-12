@@ -310,6 +310,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text("%s", ramUsage(false).c_str());
 	ImGui::Text("%s", vramUsage(false).c_str());
 	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
+	ImGui::Text(("Rotation Target: " + std::to_string(player->getRotatorTarget())).c_str());
 	ImGui::Text(("Angle between: " + std::to_string(player->getAngleBetween())).c_str());
 	
 
