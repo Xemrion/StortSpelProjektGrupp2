@@ -275,6 +275,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 		graphics.getParticleSystem("snow")->setGravity(10.0f);
 		graphics.getParticleSystem("snow")->changeVectorField(1.75f, 0.5f);
 		graphics.getParticleSystem("snow")->changeColornSize(rainColor, 4, 0.0f, 0.047f);
+
 	}
 	if (map->getInfo().environment.getWeather() == Weather::ashfall) {
 		Vector4 ashColor[4] = {
@@ -286,6 +287,43 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 		graphics.getParticleSystem("snow")->setGravity(0.1f);
 		graphics.getParticleSystem("snow")->changeVectorField(0.75f, 3.0f);
 		graphics.getParticleSystem("snow")->changeColornSize(ashColor, 4, 0.0f, 0.047f);
+	}
+
+	if (map->getInfo().environment.getBiome() == Biome::burnt)
+	{
+		graphics.unloadTexture("Tiles/grasslands");
+		graphics.unloadTexture("Tiles/grasslands_nor");
+		graphics.unloadTexture("Tiles/arctic");
+		graphics.unloadTexture("Tiles/arctic_nor");
+		graphics.unloadTexture("Tiles/desert");
+		graphics.unloadTexture("Tiles/desert_nor");
+	}
+	else if (map->getInfo().environment.getBiome() == Biome::grass)
+	{
+		graphics.unloadTexture("Tiles/ashlands");
+		graphics.unloadTexture("Tiles/ashlands_nor");
+		graphics.unloadTexture("Tiles/arctic");
+		graphics.unloadTexture("Tiles/arctic_nor");
+		graphics.unloadTexture("Tiles/desert");
+		graphics.unloadTexture("Tiles/desert_nor");
+	}
+	else if (map->getInfo().environment.getBiome() == Biome::sandy)
+	{
+		graphics.unloadTexture("Tiles/grasslands");
+		graphics.unloadTexture("Tiles/grasslands_nor");
+		graphics.unloadTexture("Tiles/ashlands");
+		graphics.unloadTexture("Tiles/ashlands_nor");
+		graphics.unloadTexture("Tiles/arctic");
+		graphics.unloadTexture("Tiles/arctic_nor");
+	}
+	else if (map->getInfo().environment.getBiome() == Biome::snowy)
+	{
+		graphics.unloadTexture("Tiles/grasslands");
+		graphics.unloadTexture("Tiles/grasslands_nor");
+		graphics.unloadTexture("Tiles/ashlands");
+		graphics.unloadTexture("Tiles/ashlands_nor");
+		graphics.unloadTexture("Tiles/desert");
+		graphics.unloadTexture("Tiles/desert_nor");
 	}
 
 #ifndef _DEBUG
@@ -310,6 +348,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text("%s", ramUsage(false).c_str());
 	ImGui::Text("%s", vramUsage(false).c_str());
 	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
+	ImGui::Text(("Angle between: " + std::to_string(player->getAngleBetween())).c_str());
 	
 
 
@@ -600,7 +639,7 @@ void PlayingGameState::update(float deltaTime)
 		Vector3 currentCamPos = Vector3(cameraObject->getRigidBody()->getWorldTransform().getOrigin().getX(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getY(), cameraObject->getRigidBody()->getWorldTransform().getOrigin().getZ());
 		Vector3 directionCam =  destinationCamPos- currentCamPos;
 		//cameraObject->getRigidBody()->applyForce(btVector3(directionCam.x, directionCam.y, directionCam.z) * 10,btVector3(0,0,0));
-		cameraObject->getRigidBody()->setLinearVelocity(btVector3(std::clamp(directionCam.x,-10.0f,10.0f), std::clamp(directionCam.y, -10.0f, 10.0f), std::clamp(directionCam.z, -10.0f, 10.0f)) * 10);
+		cameraObject->getRigidBody()->setLinearVelocity(btVector3(std::clamp(directionCam.x,-20.0f,20.0f), std::clamp(directionCam.y, -20.0f, 20.0f), std::clamp(directionCam.z, -20.0f, 20.0f)) * 5);
 		camera->setPosition(Vector3(currentCamPos.x, currentCamPos.y, currentCamPos.z));
 		camera->update(deltaTime);
 		updateWeather(deltaTime, currentCamPos);

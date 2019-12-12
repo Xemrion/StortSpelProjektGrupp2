@@ -77,7 +77,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
 	std::unordered_map<std::string, Mesh> meshes;
 	std::unordered_map<std::string, Texture*> textures;
-	std::vector<GameObject*> drawableObjects;
+	std::unordered_map<GameObject*,GameObject*> drawableObjects;
 	LightList* lightList;
 	float cullingDistance = 150.f;
 	

@@ -620,24 +620,24 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
-	for (GameObject* object : drawableObjects)
+	for (auto object = drawableObjects.begin(); object != drawableObjects.end(); object++)
 	{
-		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
+		if (Vector3::Distance(object->second->getPosition(), camera->getPosition()) < cullingDistance)
 		{
-			AABB boundingBox = object->getAABB();
+			AABB boundingBox = object->second->getAABB();
 
 			if (frustum.intersect(boundingBox, 10.0)) 
 			{
-				SimpleMath::Matrix world = object->getTransform();
+				SimpleMath::Matrix world = object->second->getTransform();
 				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
 				HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 				CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
 				deviceContext->Unmap(worldBuffer.Get(), 0);
-				UINT vertexCount = object->mesh->getVertexCount();
+				UINT vertexCount = object->second->mesh->getVertexCount();
 				UINT stride = sizeof(Vertex3D);
 				UINT offset = 0;
-				Material material = object->getMaterial();
+				Material material = object->second->getMaterial();
 
 				ID3D11ShaderResourceView* textureSRV = nullptr;
 				if (material.diffuse != nullptr)
@@ -661,15 +661,15 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 				}
 
 				MaterialColor modColor;
-				modColor.color = object->getColor();
-				modColor.shading.x = object->getShading();
+				modColor.color = object->second->getColor();
+				modColor.shading.x = object->second->getShading();
 				hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 				CopyMemory(mappedResource.pData, &modColor, static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16))));
 				deviceContext->Unmap(colorBuffer.Get(), 0);
 
 				
 				deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+				deviceContext->IASetVertexBuffers(0, 1, object->second->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 				deviceContext->PSSetShaderResources(0, 1, &textureSRV);
 				deviceContext->PSSetShaderResources(1, 1, &normalSRV);
 				deviceContext->PSSetShaderResources(5, 1, &specularSRV);
@@ -740,25 +740,25 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	deviceContext->PSSetShader(nullptr, nullptr, 0);
 	UINT stride = sizeof(Vertex3D);
 	UINT offset = 0;
-	for (GameObject* object : drawableObjects)
+	for (auto object = drawableObjects.begin(); object != drawableObjects.end(); object++)
 	{
-		AABB boundingBox = object->getAABB();
+		AABB boundingBox = object->second->getAABB();
 		if (frustum.intersect(boundingBox, 0.0f))
 		{
-			UINT vertexCount = object->mesh->getVertexCount();
+			UINT vertexCount = object->first->mesh->getVertexCount();
 			
-			SimpleMath::Matrix world = object->getTransform();
+			SimpleMath::Matrix world = object->first->getTransform();
 			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
 			shadowMap.setWorld(worldTr);
-			deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+			deviceContext->IASetVertexBuffers(0, 1, object->second->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 			
-			if (object->getSunShadow())
+			if (object->second->getSunShadow())
 			{
 				shadowMap.setDSun();
 				deviceContext->Draw(vertexCount, 0);
 			}
 
-			if (object->getSpotShadow() && spotFrustum.intersect(boundingBox, 5.0f, false))
+			if (object->second->getSpotShadow() && spotFrustum.intersect(boundingBox, 5.0f, false))
 			{
 				shadowMap.setDSpot();
 				deviceContext->Draw(vertexCount, 0);
@@ -1705,26 +1705,17 @@ void Graphics::addToDrawStatic(GameObject* o)
 void Graphics::addToDraw(GameObject* o)
 {
 	assert( o != nullptr );
-	drawableObjects.push_back(o);
+	drawableObjects[o] = o;
 }
 
 void Graphics::removeFromDraw(GameObject* o)
 {
-	auto obj = std::find(drawableObjects.begin(), drawableObjects.end(), o);
-	int index = std::distance(drawableObjects.begin(), obj);
-	if (obj != drawableObjects.end())
-	{
-		GameObject* temp = drawableObjects[index];
-		drawableObjects[index] = drawableObjects[drawableObjects.size() - 1];
-		drawableObjects[drawableObjects.size() - 1] = temp;
-		drawableObjects.pop_back();
-	}
+	drawableObjects.erase(o);
 }
 
 void Graphics::clearDraw()
 {
 	drawableObjects.clear();
-	drawableObjects.shrink_to_fit();
 	quadTree->clearGameObjects();
 }
 

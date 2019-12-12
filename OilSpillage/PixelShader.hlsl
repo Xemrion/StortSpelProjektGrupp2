@@ -112,7 +112,7 @@ PS_OUT main(VS_OUT input) : SV_Target
 	float3 tangent = input.TangentWS.xyz;
 	float3 bitangent = input.BitangentWS.xyz;
 	float3 normalMap = NormalMap.Sample(SampSt, input.Tex).xyz;
-	float4 specularColor = max(SpecularMap.Sample(SampSt, input.Tex), float4(0.03, 0.03, 0.03, 0.0));
+	float4 specularColor = max(SpecularMap.Sample(SampSt, input.Tex), float4(0.04, 0.04, 0.04, 0.0));
 	float gloss = GlossMap.Sample(SampSt, input.Tex).x;
 	gloss = exp2(10.0 * gloss + 1);
 
@@ -178,22 +178,15 @@ PS_OUT main(VS_OUT input) : SV_Target
 			float startDist = dot(lightVector, lightVector);
 			float3 endVector = (l.pos.xyz + l.directionWidth.xyz * l.directionWidth.w) - input.wPos.xyz;
 			float endDist = dot(endVector, endVector);
+			nDotL = 1.0;
 
 			if (startDist < l.directionWidth.w * l.directionWidth.w && endDist < l.directionWidth.w * l.directionWidth.w)
 			{
 				attenuation = l.color.w / (dist * dist);
-				nDotL = 1.0;
 			}
 			else
 			{
 				attenuation = l.color.w / (min(startDist, endDist) * min(startDist, endDist));
-				if (startDist < endDist)
-				{
-					nDotL = saturate(dot(normal, normalize(lightVector)));
-				}
-				else {
-					nDotL = saturate(dot(normal, normalize(endVector.xyz)));
-				}
 			}
 		}
 		else
@@ -202,12 +195,12 @@ PS_OUT main(VS_OUT input) : SV_Target
 			nDotL = max(dot(normal, normalize(lightVector)), 0.0);
 		}
 
-		diffuseLight.rgb += max(l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible, 0.0);
-
 		float3 halfway = normalize(normalize(lightVector) + cameraVector);
 		float nDotH = saturate(dot(normal, halfway));
 		float glossTerm = ((gloss + 2) / 8) * pow(nDotH, gloss);
 		float3 fresnelTerm = (specularColor) + (1.0f - specularColor) * pow(1.0f - nDotH, 5);
+
+		diffuseLight.rgb += max(l.color.rgb * (float3(1.0, 1.0, 1.0) - fresnelTerm) * nDotL * attenuation * directional * shadowSpotVisible, 0.0);
 
 		specularLight.rgb += glossTerm * fresnelTerm * l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible;
 	}
