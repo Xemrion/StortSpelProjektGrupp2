@@ -210,6 +210,8 @@ private:
 	//Gadget
 	bool nitroTrue;
 	Vector2 targetRotation2;
+	float targetRot;
+	float testVariable;
 public:
 	float fireTimer;
 	Vehicle();
@@ -235,6 +237,7 @@ public:
 	Vector3 getVelocity();
 	float getVelocitySpeed();
 	float getRotator();
+	float getRotatorTarget();
 	Vector3 getCameraDistance(float deltaTime);
 	void setAccelForce(Vector3 accelForce, float deltaTime);
 	void setWheelRotation(float deltaTime);
