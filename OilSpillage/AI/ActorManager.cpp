@@ -141,14 +141,6 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 		{
 			if (!this->actors[i]->isDead())
 			{
-				if (bulletArray[j].getWeaponType() == WeaponType::gadget)
-				{
-					if (Sphere::intersection(bulletArray[j].getPosition(), bulletArray[j].getGadger().radius, this->actors[i]->getPosition()))
-					{
-						//freeze actor
-						this->actors[i]->setStun(bulletArray[j].getGadger().lifeTime);
-					}
-				}
 				if (bulletArray[j].getWeaponType() == WeaponType::Laser)
 				{
 					GameObject* laserObject = bulletArray[j].getGameObject();
@@ -156,10 +148,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
 					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 					{
-						if (soundTimer > 0.05f) {
-							Sound::play("HitSound.wav");
-							soundTimer = 0;
-						}
+						
 						if (bulletArray[j].getFlame())// Damage over Time
 						{
 							actors[i]->setFire(bulletArray[j].getFlameTimer());
@@ -191,10 +180,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						{
 							Sound::play("StarPowerupHit.mp3", 0.75f);
 						}
-						else
-						{
-							Sound::play("HitSound.wav");
-						}
+						
 						soundTimer = 0;
 					}
 					if (bulletArray[j].getFlame())// Damage over Time
@@ -229,6 +215,14 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (!bulletArray[j].getMelee())
 						bulletArray[j].destroy();
 				}
+				else if (bulletArray[j].getWeaponType() == WeaponType::gadget)
+				{
+					if (Sphere::intersection(bulletArray[j].getPosition(), bulletArray[j].getGadger().radius, this->actors[i]->getPosition()))
+					{
+						//freeze actor
+						this->actors[i]->setStun(bulletArray[j].getGadger().lifeTime);
+					}
+				}
 			}
 		}
 	}
@@ -250,10 +244,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
 						if (this->bosses[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 						{
-							if (soundTimer > 0.05f) {
-								Sound::play("HitSound.wav");
-								soundTimer = 0;
-							}
+							
 							if (bulletArray[j].getFlame())// Damage over Time
 							{
 								bosses[i]->setFire(bulletArray[j].getFlameTimer());
@@ -280,10 +271,6 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					}
 					else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
 					{
-						if (soundTimer > 0.05f) {
-							Sound::play("HitSound.wav");
-							soundTimer = 0;
-						}
 						if (bulletArray[j].getFlame())// Damage over Time
 						{
 							bosses[i]->setFire(bulletArray[j].getFlameTimer());
@@ -310,10 +297,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					}
 					if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
 					{
-						if (soundTimer > 0.05f) {
-							Sound::play("HitSound.wav");
-							soundTimer = 0;
-						}
+						
 						if (bulletArray[j].getFlame())// Damage over Time
 						{
 							bosses[i]->setFire(bulletArray[j].getFlameTimer());

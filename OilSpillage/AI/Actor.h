@@ -36,10 +36,10 @@ private:
 	float fireTimer;
 protected:
 	bool isHit = false;
-	float stunnedTimer;
+	bool unStunned = true;
+	float stunTimer;
 	float deltaTime;
 	Vector3 targetPos;
-
 	Stats stats;
 
 	Vector3 vecForward;
