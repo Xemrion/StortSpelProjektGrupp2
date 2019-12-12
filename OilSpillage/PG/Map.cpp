@@ -692,15 +692,24 @@ void  Map::generateBuildings( )
 				 		// set affected tiles and discard lot since we won't remove houses dynamically
 				 		currentTries = 0; // reset counter
 				 		currentArea += maybeLot.value().getCoverage();
+
 						Vector3 worldPosition = tilemap->convertTilePositionToWorldPosition(maybeLot->nw);
-						worldPosition.x += house.dimensions.x * config.tileSideScaleFactor * 0.5f;
-						worldPosition.z += house.dimensions.y * config.tileSideScaleFactor * 0.5f;
+						worldPosition += Vector3(0.5f * config.tileSideScaleFactor * (house.dimensions.x - 1), -1.5f, -0.5f * config.tileSideScaleFactor * (house.dimensions.y - 1));
+						worldPosition -= house.offset;
+
+						house.area.setPosition(worldPosition);
+						
+						
 						house.roof.setPosition(worldPosition);
 						house.walls.setPosition(worldPosition);
 						house.windows.setPosition(worldPosition);
+
 				 		tilemap->applyLot( maybeLot.value(), Tile::building );
-				 		houses.composites.push_back( house ); 
-				 	}
+				 		houses.composites.push_back( std::move(house) ); 
+					}
+					else {
+						skyscraperGenerator->unloadASkyscraper(house.skyscraperMeshIndex);
+					}
 				 }
 				 else if ( (tilesets.size() != 0) and (generateSelection(rng) < .30f ) ) {
 					auto maybeLayout = getMultitileLayout(district,rng);
@@ -783,7 +792,8 @@ void  Map::generateBuildings( )
 	for ( auto &e : houses.composites ) {
 		graphics.addToDrawStatic( &e.walls   );
 		graphics.addToDrawStatic( &e.windows );
-		graphics.addToDrawStatic( &e.roof    );
+		graphics.addToDrawStatic( &e.roof	 );
+		graphics.addToDrawStatic( &e.area    );
 	}
 	for ( auto &e : houses.multis ) {
 		for ( auto &p: e.parts )
@@ -1696,15 +1706,24 @@ CompositeHouse Map::instantiateSkyscraper()
 	temp.roof.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.walls.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.windows.setScale(Vector3(2.0f, 1.0f, 2.0f));
-	temp.roof.setTexture(graphics.getTexturePointer("skyscraper-wall02"));
-	temp.walls.setTexture(graphics.getTexturePointer("skyscraper-wall01"));
-	temp.windows.setTexture(graphics.getTexturePointer("skyscraper-window01"));
+	temp.roof.setTexture(graphics.getTexturePointer("Skyscrapers/wall02"));
+	temp.walls.setTexture(graphics.getTexturePointer("Skyscrapers/wall01"));
+	temp.windows.setTexture(graphics.getTexturePointer("Skyscrapers/window01"));
+	/*temp.roof.setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+	temp.walls.setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+	temp.windows.setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));*/
 
-	Vector3 tempVec = temp.walls.getAABB().maxPos - temp.walls.getAABB().minPos;
-	tempVec.x *= 2;
-	tempVec.z *= 2;
-	temp.dimensions.x = (tempVec.x / config.tileSideScaleFactor);
-	temp.dimensions.y = (tempVec.z / config.tileSideScaleFactor);
+	Vector3 tempVecMax = temp.walls.getAABB().maxPos;
+	Vector3 tempVecMin = temp.walls.getAABB().minPos;
+	Vector3 tempVec = tempVecMax - tempVecMin;
+	temp.offset = tempVecMin + (tempVec * 0.5f);
+	temp.offset.y = tempVecMin.y;
+	temp.dimensions.x = std::ceil(tempVec.x / config.tileSideScaleFactor);
+	temp.dimensions.y = std::ceil(tempVec.z / config.tileSideScaleFactor);
+
+	temp.area.mesh = graphics.getMeshPointer("Cube");
+	temp.area.setScale(tempVec*0.5f);
+	temp.area.setTexture(graphics.getTexturePointer("Skyscrapers/wall02"));
 
 	return temp;
 }

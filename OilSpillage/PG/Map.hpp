@@ -104,7 +104,9 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum, RNG & ) noexcep
 
 struct CompositeHouse {
 	GameObject          walls, windows, roof;
+	GameObject			area;
 	V2u                 dimensions;
+	Vector3				offset;
 	String				skyscraperMeshIndex;
 };
 
