@@ -24,6 +24,7 @@ Bullet::Bullet(Weapon weapon)
 	this->weapon = weapon;
 	this->obj->setScale(weapon.bulletScale);
 	this->obj->setColor(Vector4(0, 0, 0, 1));
+	this->gadget = nullptr;
 }
 
 Bullet::~Bullet()
@@ -152,8 +153,11 @@ void Bullet::update(float deltaTime)
 		this->obj->setPosition(initPos);
 		this->dir = initDir;
 	}
+	/*if (this->weapon.type == WeaponType::gadget)
+	{
 
-	if (this->weapon.type == WeaponType::None)
+	}*/
+	else if(this->weapon.type == WeaponType::None)
 	{
 
 	}
@@ -389,4 +393,24 @@ Vector3 Bullet::getDirection() const
 void Bullet::setDirection(Vector3 newDir)
 {
 	dir = newDir;
+}
+
+Vector3& Bullet::getPosition()
+{
+	return this->initPos;
+}
+
+Gadget Bullet::getGadger() const
+{
+	return *this->gadget;
+}
+
+void Bullet::shootEmp(Gadget& gadget, const Vector3& pos)
+{
+	this->dir = Vector3();
+	this->initPos = pos;
+	this->initDir = Vector3();
+	this->gadget = &gadget;
+	this->timeLeft = gadget.lifeTime;
+	this->weapon.type = WeaponType::gadget;
 }

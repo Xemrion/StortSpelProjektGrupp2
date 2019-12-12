@@ -27,7 +27,7 @@ public:
 	{
 		Gadget(),
 		{10.0f,GadgetType::NITRO,0.0f,6.0f,75.0f,0.0f,3.0f,false},
-		{5.0f,GadgetType::EMP,5.0f,6.0f,0.0f,0.0f,3.0f,false},
+		{5.0f,GadgetType::EMP,15.0f,6.0f,0.0f,0.0f,3.0f,false},
 	};
 	static Gadget getGadget(GadgetType type) {
 		return gadgets[(int)type];

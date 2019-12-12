@@ -101,3 +101,8 @@ void DynamicActor::setStun(float timer)
 {
 	stunnedTimer = timer;
 }
+
+void DynamicActor::Color()
+{
+	setColor(Vector4(1.0f, 0.0f, 0.0f, 1));
+}
