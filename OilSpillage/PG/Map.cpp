@@ -472,7 +472,6 @@ void  Map::generateRoads()
 		}
 		else {
 			roadGenerator.upscale();
-			startPositionInTileSpace = roadGenerator.getStartPosition();
 			break;
 		}
 	}
@@ -485,6 +484,28 @@ void  Map::generateRoads()
 		   roadGenerationLog.close();
 		}
 	}
+
+	// extract valid start positions:
+	Vector<V2u> validStartPositions;
+	validStartPositions.reserve(tilemap->width*2 + tilemap->height*2 - 2);
+	// north & south edges
+	for ( auto x = 0;  x < tilemap->width;  ++x ) {
+		V2u north ( x, 0 ),
+		    south ( x, tilemap->height-1 );
+		for ( auto &pos : {north, south} )
+			if ( tilemap->tileAt(pos) == Tile::road )
+				validStartPositions.emplace_back( std::move(pos) );
+	}
+	// west and east edges
+	for ( auto y = 0;  y < tilemap->height;  ++y ) {
+		V2u west ( 0, y ),
+		    east ( tilemap->width-1, 0 );
+		for ( auto &pos : {west, east} )
+			if ( tilemap->tileAt(pos) == Tile::road )
+				validStartPositions.emplace_back( std::move(pos) );
+	}
+	startPositionInTileSpace = util::randomElementOf(validStartPositions, rng);
+	exitPositionInTileSpace  = util::randomElementOf(validStartPositions, rng);
 }
 
 
@@ -504,10 +525,10 @@ void  Map::generateDistricts()
 		                                         config.dimensions.y / config.districtCellSide,
 		                                         Voronoi::ManhattanDistanceTag{});
 	else districtMap = std::make_unique<Voronoi>( rng,
-		                                            config.districtCellSide,
-		                                            config.dimensions.x / config.districtCellSide,
-		                                            config.dimensions.y / config.districtCellSide,
-		                                            Voronoi::EuclideanDistanceTag{});
+		                                           config.districtCellSide,
+		                                           config.dimensions.x / config.districtCellSide,
+		                                           config.dimensions.y / config.districtCellSide,
+		                                           Voronoi::EuclideanDistanceTag{});
 
 	// generate look-up table (TODO: refactor)
 	districtLookupTable = Vector<District::Enum>( districtMap->noise.size() );
@@ -953,6 +974,16 @@ V2u  Map::getStartPositionInTileSpace() const noexcept
 Vector3  Map::getStartPositionInWorldSpace() const noexcept
 {
 	return tilemap->convertTilePositionToWorldPosition( startPositionInTileSpace );
+}
+
+V2u  Map::getExitPositionInTileSpace() const noexcept
+{
+	return exitPositionInTileSpace;
+}
+
+Vector3  Map::getExitPositionInWorldSpace() const noexcept
+{
+	return tilemap->convertTilePositionToWorldPosition( exitPositionInTileSpace );
 }
 
 void Map::generateRoadDistanceMap() noexcept
@@ -1668,9 +1699,9 @@ MultiTileHouse  Map::instantiateMultitileHouse( V2u const &nw, MultitileLayout &
 //		}
 		model.setPosition( pos + Vector3{.0f, -1.5f+(config.buildingHeightScaleFactor*floorHeightFactor*0.5f*floor), .0f} + offset );
 		model.setColor( color );
-		model.setScale({ config.tileSideScaleFactor*0.005f,
-		                 config.buildingHeightScaleFactor * 0.005f * floorHeightFactor,
-		                 config.tileSideScaleFactor*0.005f });
+		model.setScale({ (config.tileSideScaleFactor+.001f) * 0.005f,    // compensating for excessive size and float inaccuracy
+		                 (config.buildingHeightScaleFactor+.001f) * 0.005f * floorHeightFactor,
+		                 (config.tileSideScaleFactor+.001f) * 0.005f }); // compensating for excessive size and float inaccuracy
 	};
 
 	constexpr auto quadrant_southeast = 0, // 00

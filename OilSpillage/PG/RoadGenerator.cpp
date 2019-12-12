@@ -212,7 +212,6 @@ V2u  RoadGenerator::getStartPosition() const noexcept {
 
 void RoadGenerator::upscale() noexcept
 {
-	// TODO: slumpa deadends
 	MapConfig  newConfig   { map.config };
 	newConfig.dimensions = { map.config.dimensions.x*2, map.config.dimensions.y*2 };
 	TileMap    newMap      { newConfig };
@@ -230,7 +229,25 @@ void RoadGenerator::upscale() noexcept
 						and (y+1 < map.height and map.data[map.index(x,y+1)]==Tile::road))
 					? Tile::road : Tile::ground;
 	}
-	start.x *= 2;
-	start.y *= 2;
+
+	F32_Dist selection;
+	bool oneEdgeRoadFound = false;
+// generate dead ends along the south side
+	for ( auto x = 0;  x < map.width;  ++x ) {
+		auto y = newMap.height-2;
+		if ( newMap.tileAt(x,y) == Tile::road )
+			if ( !oneEdgeRoadFound or selection(rng) < .15f )
+				newMap.tileAt(x,y+1) = Tile::road;
+	}
+	// generate dead ends along the east side
+	for ( auto y = 0;  y < map.height;  ++y ) {
+		auto x = newMap.width-2;
+		if ( newMap.tileAt(x,y) == Tile::road )
+			if ( !oneEdgeRoadFound or selection(rng) < .25f )
+				newMap.tileAt(x+1,y) = Tile::road;
+	}
+
+	start.x *= 2; // bugged and unused, TODO: remove
+	start.y *= 2; // bugged and unused, TODO: remove
 	map = std::move(newMap);
 }

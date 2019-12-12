@@ -114,8 +114,8 @@ Size  Voronoi::computeCellRealEstateArea( U32         const  cellId,
    for ( U32  y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y )
       for ( U32  x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x )
             if ( (diagram[diagramIndex( x, y )] == cellId)
-            and  (map.tileAt( x, y ) == Tile::ground)
-            and  (distanceMap[noiseIndex(x,y)] < district->maxDistFromRoad) )
+            and  (map.tileAt( x, y ) == Tile::ground) )
+            // and  (distanceMap[noiseIndex(x,y)] < district->maxDistFromRoad) )
                ++counter;
 
    return counter;

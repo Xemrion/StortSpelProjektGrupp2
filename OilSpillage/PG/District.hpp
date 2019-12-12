@@ -45,11 +45,11 @@ namespace District {
 	};
 	//                                                road    house     multi    min    max    min      max
 	//                               string name      dist    cover%    tile%    tiles  tiles  floors   floors
-	inline Type const residential  { "residential",   6.0f,   .950f,    .8f,     2,     25,    3,        7 },
+	inline Type const residential  { "residential",   6.0f,   .875f,    .8f,     2,     25,    3,        7 },
 	                  park         { "park",          1.0f,   .000f,    .0f,     0,     0,     0,        0 },
-	                  metropolitan { "metropolitan",  4.0f,   .999f,    .0f,     1,     1,     8,       16 },
-	                  suburban     { "suburban",      1.5f,   .200f,    .0f,     1,     4,     1,        2 },
-	                  downtown     { "downtown",      5.0f,   .975f,    .3f,     2,     8,     5,       10 };
+	                  metropolitan { "metropolitan",  4.0f,   .950f,    .0f,     1,     1,     8,       16 },
+	                  suburban     { "suburban",      3.5f,   .150f,    .0f,     1,     4,     1,        2 },
+	                  downtown     { "downtown",      5.0f,   .925f,    .3f,     2,     8,     5,       10 };
 /*
 	inline Type const residential  { "residential",   2.0f,   1.0f,    .8f,     2,     14,    3,        8 },
 	                  park         { "park",          2.0f,   .00f,    .0f,     0,     0,     0,        0 },

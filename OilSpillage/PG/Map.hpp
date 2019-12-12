@@ -162,6 +162,9 @@ public:
 	Vector3                    generateGroundPositionInWorldSpace( RNG & ) const noexcept;
 	V2u                        getStartPositionInTileSpace()  const noexcept;
 	Vector3                    getStartPositionInWorldSpace() const noexcept;
+	Direction                  getStartDirection() const noexcept;
+	V2u                        getExitPositionInTileSpace()  const noexcept;
+	Vector3                    getExitPositionInWorldSpace() const noexcept;
 	TileMap const &            getTileMap() const noexcept;
 	Voronoi const &            getDistrictMap() const noexcept;
 // TODO: refactor out
@@ -189,6 +192,8 @@ private:
 	CompositeHouse             instantiateSkyscraper();
 	Graphics &                 graphics;
 	V2u                        startPositionInTileSpace;
+	V2u                        exitPositionInTileSpace;
+	Direction                  startDirection;
 	UPtr<TileMap>              tilemap;
 	UPtr<Voronoi>              districtMap;
 	Vector<District::Enum>     districtLookupTable;
