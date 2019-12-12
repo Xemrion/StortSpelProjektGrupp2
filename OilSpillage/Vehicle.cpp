@@ -58,7 +58,8 @@ Vehicle::~Vehicle()
 	//delete spring1;
 	//delete pointJoint;
 	delete this->vehicleSlots;
-	delete empplaced;
+
+	//delete empplaced;
 }
 
 void Vehicle::init(Physics* physics)
@@ -852,6 +853,7 @@ void Vehicle::updateWeapon(float deltaTime)
 									temp2->getGadget().currentLifeTime -= deltaTime;
 									updatedStats.accelerationRate = defaultStats.accelerationRate + temp2->getGadget().power * 0.1f;
 									updatedStats.speed = defaultStats.speed + temp2->getGadget().power * 0.05f;
+			
 									nitroTrue = true;
 								}
 								else if (temp2->getGadget().currentLifeTime <= 0)
@@ -876,7 +878,7 @@ void Vehicle::updateWeapon(float deltaTime)
 							}
 							else if(temp2->getGadget().type == GadgetType::EMP)
 							{
-								if (Input::checkButton(Keys::L_SHOULDER, States::RELEASED) && temp2->getGadget().enable != true) // its alive!
+								if (Input::checkButton(Keys::R_SHOULDER, States::RELEASED) && temp2->getGadget().enable != true) // its alive!
 								{	
 									if (empplaced == nullptr)
 									{
@@ -887,7 +889,15 @@ void Vehicle::updateWeapon(float deltaTime)
 									empplaced->setPosition(this->getPosition());
 									temp2->getGadget().enable = true;
 									temp2->getGadget().currentLifeTime = temp2->getGadget().lifeTime;
-									Game::getGraphics().addParticle("electro", 1, 1, empplaced->getPosition(), Vector4(0.0, 1.0, 0.0, 0.0), 0.1);
+									Game::getGraphics().addParticle("electro", 1, 1, empplaced->getPosition(), Vector4(0.0, 1.0, 0.2, 25.0), 0.1);
+									for (int i = 0; i < Vehicle::bulletCount; ++i)
+									{
+ 										if (bullets[i].getWeaponType() == WeaponType::None)
+										{
+											this->bullets[i].shootEmp(temp2->getGadget(), temp2->getObject()->getPosition());
+											break;
+										}
+									}
 								}
 								else if (temp2->getGadget().currentLifeTime > 0 && temp2->getGadget().enable == true)
 								{
@@ -896,7 +906,7 @@ void Vehicle::updateWeapon(float deltaTime)
 									temp2->getGadget().currentLifeTime -= deltaTime;
 									if (temp2->getGadget().currentTime > 0.1f)
 									{
-										Game::getGraphics().addParticle("electro", 1, 1, empplaced->getPosition(), Vector4(0.0, 1.0, 0.0, 0.0), 0.1);
+										Game::getGraphics().addParticle("electro", 1, 1, empplaced->getPosition(), Vector4(0.0, 1.0, 0.2, 25.0), 0.1);
 										temp2->getGadget().currentTime = 0;
 									}
 								}
