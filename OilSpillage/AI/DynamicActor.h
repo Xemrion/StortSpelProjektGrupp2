@@ -14,6 +14,7 @@ public:
 	int duty;
 	int pathSize;
 	void setStun(float timer);
+	void Color();
 protected:
 	void* curGroup;
 	Vector3* path;
