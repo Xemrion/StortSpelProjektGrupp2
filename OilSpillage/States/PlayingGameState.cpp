@@ -11,7 +11,7 @@
 #include "../UI/Menu/UIControls.h"
 #include "../profiling.h"
 
-#define RELEASE_DEBUG
+//#define RELEASE_DEBUG
 
 void PlayingGameState::fillTestParticle()
 {
@@ -161,6 +161,13 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadModel("Houses/testHouse4");
 	graphics.loadModel("Houses/testHouse5");
 	graphics.loadModel("Houses/testHouse6");
+	graphics.loadModel("Houses/destroyedHouse1");
+	graphics.loadModel("Houses/destroyedHouse2");
+	graphics.loadModel("Houses/destroyedHouse3");
+	graphics.loadModel("Houses/destroyedHouse4");
+	graphics.loadModel("Houses/destroyedHouse5");
+	graphics.loadModel("Houses/destroyedHouse6");
+	graphics.loadModel("Houses/destroyedHouse7");
 	graphics.loadMaterial("Houses/houseMaterial");
 	graphics.loadMaterial("Houses/houseMaterial2");
 	graphics.loadMaterial("Houses/houseMaterial3");
@@ -275,6 +282,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 		graphics.getParticleSystem("snow")->setGravity(10.0f);
 		graphics.getParticleSystem("snow")->changeVectorField(1.75f, 0.5f);
 		graphics.getParticleSystem("snow")->changeColornSize(rainColor, 4, 0.0f, 0.047f);
+
 	}
 	if (map->getInfo().environment.getWeather() == Weather::ashfall) {
 		Vector4 ashColor[4] = {
@@ -286,6 +294,43 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 		graphics.getParticleSystem("snow")->setGravity(0.1f);
 		graphics.getParticleSystem("snow")->changeVectorField(0.75f, 3.0f);
 		graphics.getParticleSystem("snow")->changeColornSize(ashColor, 4, 0.0f, 0.047f);
+	}
+
+	if (map->getInfo().environment.getBiome() == Biome::burnt)
+	{
+		graphics.unloadTexture("Tiles/grasslands");
+		graphics.unloadTexture("Tiles/grasslands_nor");
+		graphics.unloadTexture("Tiles/arctic");
+		graphics.unloadTexture("Tiles/arctic_nor");
+		graphics.unloadTexture("Tiles/desert");
+		graphics.unloadTexture("Tiles/desert_nor");
+	}
+	else if (map->getInfo().environment.getBiome() == Biome::grass)
+	{
+		graphics.unloadTexture("Tiles/ashlands");
+		graphics.unloadTexture("Tiles/ashlands_nor");
+		graphics.unloadTexture("Tiles/arctic");
+		graphics.unloadTexture("Tiles/arctic_nor");
+		graphics.unloadTexture("Tiles/desert");
+		graphics.unloadTexture("Tiles/desert_nor");
+	}
+	else if (map->getInfo().environment.getBiome() == Biome::sandy)
+	{
+		graphics.unloadTexture("Tiles/grasslands");
+		graphics.unloadTexture("Tiles/grasslands_nor");
+		graphics.unloadTexture("Tiles/ashlands");
+		graphics.unloadTexture("Tiles/ashlands_nor");
+		graphics.unloadTexture("Tiles/arctic");
+		graphics.unloadTexture("Tiles/arctic_nor");
+	}
+	else if (map->getInfo().environment.getBiome() == Biome::snowy)
+	{
+		graphics.unloadTexture("Tiles/grasslands");
+		graphics.unloadTexture("Tiles/grasslands_nor");
+		graphics.unloadTexture("Tiles/ashlands");
+		graphics.unloadTexture("Tiles/ashlands_nor");
+		graphics.unloadTexture("Tiles/desert");
+		graphics.unloadTexture("Tiles/desert_nor");
 	}
 
 #ifndef _DEBUG
