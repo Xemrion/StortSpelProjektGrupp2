@@ -33,6 +33,11 @@ ActorManager::~ActorManager()
 		delete bosses[i];
 	}
 	bosses.clear();
+	for (int i = 0; i < groups.size(); i++)
+	{
+		delete groups[i];
+	}
+	groups.clear();
 }
 
 void ActorManager::update(float dt, const Vector3& targetPos)
@@ -631,6 +636,7 @@ void ActorManager::actorDied(int index)
 		AIGroup* temp = groups[grpIndex];
 		groups[grpIndex] = groups[groups.size() -1];
 		groups[groups.size() - 1] = temp;
+		delete groups[groups.size() - 1];
 		groups.pop_back();
 	}
 }
