@@ -49,6 +49,7 @@ void Actor::update(float dt, const Vector3& targetPos)
 	}
 	if (isHit)
 	{
+		
 		setColor(Vector4(getColor().x / (1 + 15.0f * deltaTime), getColor().y, getColor().z, 1));
 		if (getColor().x <= 0.01f)
 		{
@@ -83,6 +84,7 @@ void Actor::changeHealth(float amount)
 {
 	if (amount < 0) {
 		isHit = true;
+		Sound::play("HitSound.wav");
 	}
 	setColor(Vector4(max(getColor().x + -amount * 0.1f, 0), getColor().y, getColor().z, 1));
 	this->health = std::clamp(this->health + amount, 0.0f, this->stats.maxHealth);
