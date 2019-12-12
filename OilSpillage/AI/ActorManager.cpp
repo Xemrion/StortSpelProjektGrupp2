@@ -141,14 +141,6 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 		{
 			if (!this->actors[i]->isDead())
 			{
-				if (bulletArray[j].getWeaponType() == WeaponType::gadget)
-				{
-					if (Sphere::intersection(bulletArray[j].getPosition(), bulletArray[j].getGadger().radius, this->actors[i]->getPosition()))
-					{
-						//freeze actor
-						this->actors[i]->setStun(bulletArray[j].getGadger().lifeTime);
-					}
-				}
 				if (bulletArray[j].getWeaponType() == WeaponType::Laser)
 				{
 					GameObject* laserObject = bulletArray[j].getGameObject();
@@ -222,6 +214,14 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					}
 					if (!bulletArray[j].getMelee())
 						bulletArray[j].destroy();
+				}
+				else if (bulletArray[j].getWeaponType() == WeaponType::gadget)
+				{
+					if (Sphere::intersection(bulletArray[j].getPosition(), bulletArray[j].getGadger().radius, this->actors[i]->getPosition()))
+					{
+						//freeze actor
+						this->actors[i]->setStun(bulletArray[j].getGadger().lifeTime);
+					}
 				}
 			}
 		}

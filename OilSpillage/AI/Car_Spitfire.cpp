@@ -66,7 +66,7 @@ void Spitfire::move()
 {
 	direction = destination - this->position;
 	direction.Normalize();
-	if (stunnedTimer <= 0)
+	if (stunTimer <= 0)
 	{
 		if ((this->position - destination).Length() > 5)
 		{
