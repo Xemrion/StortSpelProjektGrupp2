@@ -94,10 +94,14 @@ void  Voronoi::generateDiagram( RNG &rng, std::function<F32(V2f const&, V2f cons
 }
 
 // TODO: refactor out?
-Size  Voronoi::computeCellRealEstateArea( U32 const cellId, TileMap const &map ) const noexcept {
+Size  Voronoi::computeCellRealEstateArea( U32         const  cellId,
+                                          TileMap     const &map,
+                                          Vector<F32> const &distanceMap,
+                                          District::Enum     district ) const noexcept
+{
    assert( cellId < (width * height) && "Cell ID is too low!" );
 
-   Size    counter { 0 };
+   Size            counter  { 0 };
 
    Bounds  cell; {  /* first we calculate the relevant 1x1~3x3 cell matrix: */
       V2u  centerCell { cellId % width, cellId / width };
@@ -110,7 +114,8 @@ Size  Voronoi::computeCellRealEstateArea( U32 const cellId, TileMap const &map )
    for ( U32  y = cell.min.y * cellSize, yEnd = (cell.max.y+1) * cellSize;  y < yEnd;  ++y )
       for ( U32  x = cell.min.x * cellSize, xEnd = (cell.max.x+1) * cellSize;  x < xEnd;  ++x )
             if ( (diagram[diagramIndex( x, y )] == cellId)
-            and (map.tileAt( x, y ) == Tile::ground) )
+            and  (map.tileAt( x, y ) == Tile::ground)
+            and  (distanceMap[noiseIndex(x,y)] < district->maxDistFromRoad) )
                ++counter;
 
    return counter;

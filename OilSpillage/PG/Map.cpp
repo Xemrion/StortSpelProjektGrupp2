@@ -626,7 +626,7 @@ void  Map::generateBuildings( )
 	for ( U16 cellId = 0;  cellId < districtMap->noise.size();  ++cellId ) {
 		District::Enum const district     { districtLookupTable[cellId] };
 		Size                 currentArea  { 0 };
-		Size const           cellArea     { districtMap->computeCellRealEstateArea(cellId,*tilemap) };
+		Size const           cellArea     { districtMap->computeCellRealEstateArea(cellId,*tilemap, roadDistanceMap, district) };
 		U16_Dist             genNumFloors { district->minFloors, district->maxFloors };
 
 		if ( cellArea != 0 ) { //and (districtType != District::park) ) {
@@ -1900,7 +1900,7 @@ void Map::instantiateTilesAsModels() noexcept
 
 	F32_Dist genSelection {};
 
-	// base
+	// generate base textures:
 	for ( U32 y = 0;  y < tilemap->height;  ++y ) {
 		for ( U32 x = 0;  x < tilemap->width;  ++x ) {
 			auto district = districtAt(x,y);
@@ -1949,7 +1949,7 @@ void Map::instantiateTilesAsModels() noexcept
 
 	auto tileInfo = extractTileInfo(*this);
 
-	// markings
+	// generate markings:
 	for ( auto const &e : tileInfo ) {
 		if ( e.tileType == Tile::road ) {
 			if ( e.districtType == &District::metropolitan
@@ -2009,7 +2009,26 @@ void Map::instantiateTilesAsModels() noexcept
 		}
 	}
 
-	// transitions
+	// generate transitions:   (TODO: make a separate transition texture for when the metropolitan tile is a 3-way or 4-way)
+	for ( auto y=0;  y < tilemap->height;  ++y ) {
+		for ( auto x=0;  x < tilemap->width;  ++x ) {
+			if ( tilemap->tileAt(x,y) == Tile::road ) {
+				auto thisDistrict = districtAt(x,y);
+				auto thisPos      = tilemap->convertTilePositionToWorldPosition(x,y);
+				if ( thisDistrict == &District::suburban or thisDistrict == &District::park ) {
+					if ( y-1 < tilemap->height and tilemap->tileAt(x,y-1) == Tile::road and districtAt(x,y-1) != &District::park and districtAt(x,y-1) != &District::suburban )
+						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x,y-1))/2,    .0f, transitionOffsetY );
+					if ( x+1 < tilemap->width  and tilemap->tileAt(x+1,y) == Tile::road and districtAt(x+1,y) != &District::park and districtAt(x+1,y) != &District::suburban )
+						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x+1,y))/2,  90.0f, transitionOffsetY );
+					if ( y+1 < tilemap->height and tilemap->tileAt(x,y+1) == Tile::road and districtAt(x,y+1) != &District::park and districtAt(x,y+1) != &District::suburban )
+						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x,y+1))/2, 180.0f, transitionOffsetY );
+					if ( x-1 < tilemap->width  and tilemap->tileAt(x-1,y) == Tile::road and districtAt(x-1,y) != &District::park and districtAt(x-1,y) != &District::suburban )
+						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x-1,y))/2, 270.0f, transitionOffsetY );
+				}
+			}
+		}
+	}
+
 
 	// sidewalks
 
@@ -2119,25 +2138,7 @@ void Map::instantiateTilesAsModels() noexcept
 		}
 	}
 */
-	/*/ generate transitions:
-	for ( auto y=0;  y < tilemap->height;  ++y ) {
-		for ( auto x=0;  x < tilemap->width;  ++x ) {
-			if ( tilemap->tileAt(x,y) == Tile::road ) {
-				auto thisDistrict = districtAt(x,y);
-				auto thisPos      = tilemap->convertTilePositionToWorldPosition(x,y);
-				if ( thisDistrict == &District::suburban or thisDistrict == &District::park ) {
-					if ( y-1 < tilemap->height and tilemap->tileAt(x,y-1) == Tile::road and districtAt(x,y-1) != &District::park and districtAt(x,y-1) != &District::suburban )
-						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x,y-1))/2,    .0f, transitionOffsetY );
-					if ( x+1 < tilemap->width  and tilemap->tileAt(x+1,y) == Tile::road and districtAt(x+1,y) != &District::park and districtAt(x+1,y) != &District::suburban )
-						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x+1,y))/2,  90.0f, transitionOffsetY );
-					if ( y+1 < tilemap->height and tilemap->tileAt(x,y+1) == Tile::road and districtAt(x,y+1) != &District::park and districtAt(x,y+1) != &District::suburban )
-						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x,y+1))/2, 180.0f, transitionOffsetY );
-					if ( x-1 < tilemap->width  and tilemap->tileAt(x-1,y) == Tile::road and districtAt(x-1,y) != &District::park and districtAt(x-1,y) != &District::suburban )
-						instantiatePart( "Tiles/road_trans_2file2metro", (thisPos+tilemap->convertTilePositionToWorldPosition(x-1,y))/2, 270.0f, transitionOffsetY );
-				}
-			}
-		}
-	}*/
+
 	for ( auto &e : groundTiles ) 
 		graphics.addToDrawStatic( e.get() );
 }

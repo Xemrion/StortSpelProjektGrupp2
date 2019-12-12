@@ -43,20 +43,20 @@ namespace District {
 	private:
 		inline static Size nextIndex { 0U };
 	};
-	//                                                road    house    multi    min    max    min      max
-	/*/                               string name      dist    cover%   tile%    tiles  tiles  floors   floors
-	inline Type const residential  { "residential",   2.0f,   .85f,    .8f,     2,     14,    3,        8 },
-	                  park         { "park",          2.0f,   .00f,    .0f,     0,     0,     0,        0 },
-	                  metropolitan { "metropolitan",  2.0f,   .95f,    .0f,     1,     1,     8,       16 },
-	                  suburban     { "suburban",      2.0f,   .30f,    .0f,     1,     4,     1,        2 },
-	                  downtown     { "downtown",      2.0f,   .90f,    .3f,     6,     16,    1,        6 };
-*/
+	//                                                road    house     multi    min    max    min      max
+	//                               string name      dist    cover%    tile%    tiles  tiles  floors   floors
+	inline Type const residential  { "residential",   6.0f,   .950f,    .8f,     2,     25,    3,        7 },
+	                  park         { "park",          1.0f,   .000f,    .0f,     0,     0,     0,        0 },
+	                  metropolitan { "metropolitan",  4.0f,   .999f,    .0f,     1,     1,     8,       16 },
+	                  suburban     { "suburban",      1.5f,   .200f,    .0f,     1,     4,     1,        2 },
+	                  downtown     { "downtown",      5.0f,   .975f,    .3f,     2,     8,     5,       10 };
+/*
 	inline Type const residential  { "residential",   2.0f,   1.0f,    .8f,     2,     14,    3,        8 },
 	                  park         { "park",          2.0f,   .00f,    .0f,     0,     0,     0,        0 },
 	                  metropolitan { "metropolitan",  2.0f,   1.0f,    .0f,     1,     1,     8,       16 },
 	                  suburban     { "suburban",      2.0f,   1.0f,    .0f,     1,     4,     1,        2 },
 	                  downtown     { "downtown",      2.0f,   1.0f,    .3f,     6,     16,    1,        6 };
-
+*/
 	inline Vector<Type const *> all { &residential, &park, &metropolitan, &suburban, &downtown };
 
 	using Enum = Type const *;
