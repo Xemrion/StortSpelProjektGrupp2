@@ -8,6 +8,7 @@ Objective::Objective()
 	this->started = false;
 	this->nrOfMax = 0;
 	this->nrOfTargets = 0;
+	this->closestIndex = 0;
 }
 
 Objective::~Objective()
@@ -120,6 +121,11 @@ int Objective::getScore() const
 	return this->mission->points;
 }
 
+GameObject* Objective::getClosestObj() const
+{
+	return this->mission->target[this->closestIndex];
+}
+
 std::string Objective::getInfo() const
 {
 	if (this->mission->typeMission == TypeOfMission::GetToPoint)
@@ -185,15 +191,17 @@ bool Objective::isDone()
 void Objective::update(Vector3 playerPosition)
 {
 	PlayingGameState* ptrState = static_cast<PlayingGameState*>(Game::getCurrentState());
-	Vector3 findClosestPlayer(0.0f, 0.0f, 0.0f);
-
+	Vector3 findClosestPlayer(0,0,0);
+	
 	if (this->mission->typeMission == TypeOfMission::FindAndCollect)
 	{
 		if (started)
 		{
-			if(this->mission->target[0]!=nullptr)
+			if (this->mission->target[0] != nullptr)
+			{
+				this->closestIndex = 0;
 				findClosestPlayer = this->mission->target[0]->getPosition();
-		
+			}
 			//collision check
 			int nrOfDone = 0;
 			for (int i = 0; i < nrOfMax; i++)
@@ -203,9 +211,11 @@ void Objective::update(Vector3 playerPosition)
 				{
 
 					Vector3 closestTemp = this->mission->target[i]->getPosition();
+					
 					if (i != 0 && (findClosestPlayer -playerPosition).Length() > (closestTemp-playerPosition).Length())
 					{
 						findClosestPlayer = closestTemp;
+						this->closestIndex = i;
 					}
 					float time = ptrState->getTime();
 					float sine = sin((time-0) / 0.3f) - 0.5f;
@@ -282,6 +292,23 @@ void Objective::update(Vector3 playerPosition)
 	else if(this->mission->typeMission == TypeOfMission::FindAndCollect)
 	{
 		this->closestToPlayer = findClosestPlayer;
+		
+		Vector3 pos = this->closestToPlayer;
+		Vector3 towardsPlayer = playerPosition - pos;
+		if (towardsPlayer.Length() <= 5.5)
+		{
+			//move closer to player
+			towardsPlayer.Normalize();
+			if (this->mission->target[this->closestIndex] != nullptr)
+			{
+				this->mission->target[this->closestIndex]->setPosition(this->mission->target[this->closestIndex]->getPosition() + (towardsPlayer * 0.33));
+			}
+		}
+		else
+		{
+			//dont move
+		}
+				
 	}
 	else if (this->mission->typeMission == TypeOfMission::BossEvent)
 	{
