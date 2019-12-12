@@ -1183,11 +1183,14 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 				entry.housemap.w  = true;
 			if ( (x > 0) and (y > 0) and (tilemap.tileAt(x-1,y-1)==Tile::building) )
 				entry.housemap.nw = true;
+		}
+	}
+	return results;
+}
 
 
-
-			/* COMPUTE ENTRY CONCRETE MAP */ {
-
+			/* COMPUTE ENTRY CONCRETE MAP */
+/*
 				// d <=> 0b{ NW W SW S ' SE E NE N }
 
 				// used to account for road sidewalk edge cases:
@@ -1251,7 +1254,7 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 							if ( (  entry.districtType == &District::metropolitan
 								  or entry.districtType == &District::residential
 								  or entry.districtType == &District::downtown )
-							and entry.tileType==Tile::road and (nTile!=Tile::road or ( d & 0b1010'1010 )) /* corner! */ )
+							and entry.tileType==Tile::road and (nTile!=Tile::road or ( d & 0b1010'1010 )) )
 							{
 									entry.concreteMap.bitmap |= d; // inner sidewalk!
 							}
@@ -1265,7 +1268,14 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 				}
 			}
 		}
-	}
+	}*/
+
+
+
+
+
+
+
 /*
 	auto const w        = tilemap.width,
 				  h        = tilemap.height,
@@ -1408,11 +1418,11 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 				}
 			}
 		}
-	}*/
+	}
 
 	return results;
 }
-
+*/
 
 /*
 void Map::instantiateHousesAsModels() noexcept {
@@ -1873,7 +1883,7 @@ void Map::instantiateTilesAsModels() noexcept
 	auto biome = info.environment.getBiome();
 
 	groundTiles.reserve( tilemap->data.size() * 3 );// TODO: use worst case scenario: 6 quads per tile?
-	auto instantiatePart = [&]( std::string_view name, Vector3 const &pos, F32 deg=.0f, F32 yOffset=baseOffsetY, Bool hasNormal=true, Bool noShadowcasting=false ) {
+	auto instantiatePart = [&]( std::string_view name, Vector3 const &pos, F32 deg=180.0f, F32 yOffset=baseOffsetY, Bool hasNormal=true, Bool noShadowcasting=false ) {
 		groundTiles.push_back( std::make_unique<GameObject>() );
       auto &model     =  *groundTiles.back();
 		model.mesh      =   graphics.getMeshPointer( "Tiles/Quad_SS" );
@@ -1881,16 +1891,131 @@ void Map::instantiateTilesAsModels() noexcept
 		if ( hasNormal )
 			model.setNormalMap( graphics.getTexturePointer( (std::string(name)+"_nor").c_str() ) );
 		if ( deg > 1.0f )
-			model.setRotation({ .0f, util::degToRad(deg), .0f });
+			model.setRotation({ .0f, util::degToRad(deg+180.0f), .0f });
 		model.setPosition( pos + Vector3{.0f, yOffset, .0f} );
 		model.setColor({ .0f, .0f, .0f, .0f });
-		model.setScale({ tilemap->config.tileSideScaleFactor, 1.0f, tilemap->config.tileSideScaleFactor });
+		model.setScale({ tilemap->config.tileSideScaleFactor+.001f, 1.0f, tilemap->config.tileSideScaleFactor+.001f }); // compensating for imprecision
 		model.setSpotShadow( noShadowcasting );
 		model.setSunShadow(  noShadowcasting );
 	};
 
 	F32_Dist genSelection {};
 
+	// base
+	for ( U32 y = 0;  y < tilemap->height;  ++y ) {
+		for ( U32 x = 0;  x < tilemap->width;  ++x ) {
+			auto district = districtAt(x,y);
+			auto origin   = tilemap->convertTilePositionToWorldPosition(x,y);
+			switch ( tilemap->tileAt(x,y)) {
+				case Tile::ground: {
+					if ( district == &District::metropolitan )
+					{ // no grass tiles in metropolitan districts
+						instantiatePart( "Tiles/concrete", origin, .0f, sidewalkOffsetY );
+					}
+					else if ( district == &District::downtown
+							 or district == &District::residential
+							 or district == &District::suburban
+							 or district == &District::park )
+					{
+						instantiatePart( "Tiles/"+stringify(biome), origin, .0f, baseOffsetY );
+					}
+				} break;
+
+				case Tile::building: {
+					if ( district == &District::metropolitan
+					  or district == &District::downtown
+					  or district == &District::residential )
+						instantiatePart( "Tiles/concrete", origin, .0f, baseOffsetY );
+					else if ( district == &District::suburban 
+							 or district == &District::park )
+					{ // no full-size concrete under buildings in these districts
+						instantiatePart( "Tiles/"+stringify(biome), origin, .0f, baseOffsetY );
+					}
+				} break;
+
+				case Tile::road: {
+					if ( district == &District::metropolitan
+					  or district == &District::downtown
+					  or district == &District::residential )
+						instantiatePart( "Tiles/asphalt", origin, .0f, baseOffsetY );
+					else if ( district == &District::suburban 
+							 or district == &District::park )
+					{
+						instantiatePart( "Tiles/"+stringify(biome), origin, .0f, baseOffsetY );
+					}
+				} break;
+			}
+		}
+	}
+
+	auto tileInfo = extractTileInfo(*this);
+
+	// markings
+	for ( auto const &e : tileInfo ) {
+		if ( e.tileType == Tile::road ) {
+			if ( e.districtType == &District::metropolitan
+           or e.districtType == &District::downtown
+           or e.districtType == &District::residential )
+			{
+				// place eventual road lines:
+				U8 maskedMap = e.roadmap.bitmap & maskRoad;
+				if ( maskedMap == pred4Way ) {
+					instantiatePart( "Tiles/road_marker_4way", e.origin, .0f, markerOffsetY, false );
+				}
+				if ( maskedMap == predStraight )
+					instantiatePart( "Tiles/road_marker_straight_n", e.origin, .0f, markerOffsetY, false );
+				else if ( maskedMap == util::cycleLeft( predStraight, 2 ) )
+					instantiatePart( "Tiles/road_marker_straight_n", e.origin, 90.0f, markerOffsetY, false );
+				else for ( auto d=0; d<8; d+=2 ) {
+					if ( maskedMap == util::cycleLeft( pred3Way, d ) ) {
+						instantiatePart( "Tiles/road_marker_3way_n", e.origin, 45.0f*d, markerOffsetY, false );
+						break;
+					}
+					if ( maskedMap == util::cycleLeft( predBend, d ) ) {
+						instantiatePart( "Tiles/road_marker_turn_ne", e.origin, (45.0f*d)+90.0f, markerOffsetY, false );
+						break;
+					}
+					if ( maskedMap == util::cycleLeft( predDeadend, d ) ) {
+						instantiatePart( "Tiles/road_marker_deadend_n", e.origin, (45.0f*d)+180.0f, markerOffsetY, false );	
+						break;
+					}
+				}
+				instantiatePart( "Tiles/asphalt", e.origin );
+			}
+			else if ( e.districtType == &District::suburban or e.districtType == &District::park ) {
+				// only 2-lane roads in suburban districts and parks
+				auto maskedMap = e.roadmap.bitmap & maskRoad;
+				if ( maskedMap == pred4Way )
+					instantiatePart( "Tiles/road_2file_4way", e.origin, .0f, markerOffsetY );
+				if ( maskedMap == predStraight )
+					instantiatePart( "Tiles/road_2file_straight_n", e.origin, .0f, markerOffsetY );
+				else if ( maskedMap == util::cycleLeft( predStraight, 2 ) )
+					instantiatePart( "Tiles/road_2file_straight_n", e.origin, 90.0f, markerOffsetY );
+				else for ( auto d=0; d<8; d+=2 ) {
+					if ( maskedMap == util::cycleLeft( pred3Way, d ) ) {
+						instantiatePart( "Tiles/road_2file_3way_n", e.origin, 45.0f*d, markerOffsetY );
+						break;
+					}
+					if ( maskedMap == util::cycleLeft( predBend, d ) ) {
+						instantiatePart( "Tiles/road_2file_turn_ne", e.origin, (45.0f*d)+90.0f, markerOffsetY );
+						break;
+					}
+					if ( maskedMap == util::cycleLeft( predDeadend, d ) ) {
+						instantiatePart( "Tiles/road_2file_deadend_n", e.origin, (45.0f*d)+180.0f, markerOffsetY );
+						break;
+					}
+				}
+				instantiatePart( "Tiles/"+stringify(biome), e.origin );
+			}
+		}
+	}
+
+	// transitions
+
+	// sidewalks
+
+
+/*
 	for ( auto const &e : extractTileInfo(*this) ) {
 		// place eventual outer sidewalk borders:
 		if ( (e.concreteMap.bitmap & maskHole) == predHole )
@@ -1919,7 +2044,6 @@ void Map::instantiateTilesAsModels() noexcept
 		}
 			
 		else if ( e.tileType == Tile::ground ) {
-		// intrinsic: center c == 0
 			if ( e.districtType == &District::metropolitan )
 			{ // no grass tiles in metropolitan districts
 				instantiatePart( "Tiles/concrete", e.origin );
@@ -1933,7 +2057,6 @@ void Map::instantiateTilesAsModels() noexcept
 			}
 		}
 		else if ( e.tileType == Tile::road ) {
-		// intrinsic: center c == 1
 			if ( e.districtType == &District::metropolitan
            or e.districtType == &District::downtown
            or e.districtType == &District::residential )
@@ -1996,8 +2119,8 @@ void Map::instantiateTilesAsModels() noexcept
 			// TODO: park roads using L-systems
 		}
 	}
-
-	// generate transitions:
+*/
+	/*/ generate transitions:
 	for ( auto y=0;  y < tilemap->height;  ++y ) {
 		for ( auto x=0;  x < tilemap->width;  ++x ) {
 			if ( tilemap->tileAt(x,y) == Tile::road ) {
@@ -2015,7 +2138,7 @@ void Map::instantiateTilesAsModels() noexcept
 				}
 			}
 		}
-	}
+	}*/
 	for ( auto &e : groundTiles ) 
 		graphics.addToDrawStatic( e.get() );
 }
