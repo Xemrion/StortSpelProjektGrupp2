@@ -1890,8 +1890,7 @@ void Map::instantiateTilesAsModels() noexcept
 		model.setTexture(   graphics.getTexturePointer(name.data()) );
 		if ( hasNormal )
 			model.setNormalMap( graphics.getTexturePointer( (std::string(name)+"_nor").c_str() ) );
-		if ( deg > 1.0f )
-			model.setRotation({ .0f, util::degToRad(deg+180.0f), .0f });
+		model.setRotation({ .0f, util::degToRad(deg+180.0f), .0f });
 		model.setPosition( pos + Vector3{.0f, yOffset, .0f} );
 		model.setColor({ .0f, .0f, .0f, .0f });
 		model.setScale({ tilemap->config.tileSideScaleFactor+.001f, 1.0f, tilemap->config.tileSideScaleFactor+.001f }); // compensating for imprecision
