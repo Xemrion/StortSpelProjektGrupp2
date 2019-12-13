@@ -114,15 +114,26 @@ public:
 		//assert( result.y < height );
 		return result;
 	}
-	inline Tile const &tileAt( U16 x, U16 y ) const noexcept
+	inline Tile const tileAt( U16 x, U16 y ) const noexcept
 	{
 		return data[ index(x, y) ];
 	}
 
-	inline Tile const &tileAt( V2u tilePosition ) const noexcept
+	inline Tile const tileAt( V2u tilePosition ) const noexcept
 	{
 		return data[ index(tilePosition.x, tilePosition.y) ];
 	}
+
+	inline Tile const tile( U32 idx ) const noexcept {
+		assert( idx < data.size() );
+		return data[idx];
+	}
+
+	inline Tile &tile( U32 idx ) noexcept {
+		assert( idx < data.size() );
+		return data[idx];
+	}
+
 	inline Tile& tileAt( U16 x, U16 y ) noexcept
 	{
 		return data[ index(x, y) ];

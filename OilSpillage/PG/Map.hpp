@@ -77,6 +77,7 @@ union NeighbourMask {
 		};
 };
 
+
 struct HouseTileset {
 	String                  name;
 	F32                     floorHeight;
@@ -105,6 +106,10 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum, RNG & ) noexcep
 struct CompositeHouse {
 	GameObject          walls, windows, roof;
 	V2u                 dimensions;
+
+   std::array<GameObject,4> fences;
+   GameObject               boundingBox;
+
 	String				skyscraperMeshIndex;
 };
 
@@ -158,6 +163,9 @@ public:
 	Vector3                    generateGroundPositionInWorldSpace( RNG & ) const noexcept;
 	V2u                        getStartPositionInTileSpace()  const noexcept;
 	Vector3                    getStartPositionInWorldSpace() const noexcept;
+	Direction                  getStartDirection() const noexcept;
+	V2u                        getExitPositionInTileSpace()  const noexcept;
+	Vector3                    getExitPositionInWorldSpace() const noexcept;
 	TileMap const &            getTileMap() const noexcept;
 	Voronoi const &            getDistrictMap() const noexcept;
 // TODO: refactor out
@@ -166,10 +174,13 @@ public:
 	Direction                  getHospitalOrientation(   V2u const hospitalTilePos ) const noexcept;
 	Vector3                    getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept;
 	District::Enum             districtAt( U32 x, U32 y ) const noexcept;
+	inline District::Enum      districtAt( V2u pos )      const noexcept { return districtAt(pos.x, pos.y); }
+	District::Enum             districtAt( U32 idx )      const noexcept;
 	HouseGenData const &       getHouseData() const noexcept;
 	Info const &               getInfo() const noexcept;
 	Vector<F32> const &        getRoadDistanceMap() const noexcept;
 private:
+	void                       eliminateBadSpawnPositions() noexcept;
 	void                       placeStreetlight( Vector3 const &worldPosition, Vector3 const &rotation={.0f,.0f,.0f} ) noexcept;
 	void                       generateDistricts();
 	void                       generateRoads();
@@ -178,12 +189,14 @@ private:
 	void                       generateZebraCrossings();
 	void                       generateStreetlights();
 	Opt<Lot>                   findRandomLot( U16 districtId ) noexcept;
-	Opt<Lot>                   findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
+	Opt<Lot>                   findFixedLot(  U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
 	void                       instantiateTilesAsModels() noexcept;
 	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout &&, HouseTileset const & ) const noexcept;
-	CompositeHouse			   instantiateSkyscraper();
+	CompositeHouse             instantiateSkyscraper();
 	Graphics &                 graphics;
 	V2u                        startPositionInTileSpace;
+	V2u                        exitPositionInTileSpace;
+	Direction                  startDirection;
 	UPtr<TileMap>              tilemap;
 	UPtr<Voronoi>              districtMap;
 	Vector<District::Enum>     districtLookupTable;
@@ -191,10 +204,10 @@ private:
 	Vector<UPtr<GameObject>>   crossingTiles;
 	Physics * const            physics;
 	LightList &                lights;
-	UPtr<Skyscraper>		   skyscraperGenerator;
+	UPtr<Skyscraper>           skyscraperGenerator;
 	// TODO: refactor out:
 	using DistrictID = U16;
-	using BuildingID = U16;                         // 0 = unused tile
+	using BuildingID = U16;                           // 0 = unused tile
 	BuildingID                 nextBuildingID { 1U }; // 1 = first valid ID
 	Vector<BuildingID>         buildingIDs;
 	Vector<F32>                roadDistanceMap;

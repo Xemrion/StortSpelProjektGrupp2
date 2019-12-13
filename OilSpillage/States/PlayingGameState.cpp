@@ -676,6 +676,9 @@ void PlayingGameState::update(float deltaTime)
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 
 #else
+#endif // !_DEBUG
+
+
 		if (time > 0.0f)
 		{
 			time = std::max(time - deltaTime, 0.0f);
@@ -684,7 +687,6 @@ void PlayingGameState::update(float deltaTime)
 		{
 			Game::setState(Game::STATE_HIGHSCORE);
 		}
-#endif // !_DEBUG
 		prevAccelForce = Vector3(player->getRigidBody()->getLinearVelocity());
 		player->updatePlayer(deltaTime);
 		physics->update(deltaTime);
@@ -1196,7 +1198,7 @@ void PlayingGameState::generateObjectives()
 			scalingNr = 1;
 
 		this->objectives.addObjective(TypeOfMission::BossEvent, 200, 1, "Kill the boss",TypeOfTarget::Size,Vector3(0.0f),nullptr,actorManager->createBoss(this->player->getPosition().x, this->player->getPosition().z, 1, scalingNr)); //fix pos
-		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getStartPositionInWorldSpace());
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getExitPositionInWorldSpace());
 	}
 	else
 	{
@@ -1221,7 +1223,7 @@ void PlayingGameState::generateObjectives()
 			prob[0] = std::fminf(prob[0], 1.0f);
 			prob[1] = std::fminf(prob[1], 1.0f);
 		}
-		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, player->getPosition());// ->getStartPositionInWorldSpace());
+		this->objectives.addObjective(TypeOfMission::GetToPoint, 0, 1, "Get out", TypeOfTarget::Size, map->getExitPositionInWorldSpace() ) ;
 	}
 }
 
