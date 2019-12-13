@@ -423,29 +423,14 @@ void ActorManager::updateActors(float dt, const Vector3& targetPos)
 
 void ActorManager::updateBosses(float dt, const Vector3& targetPos)
 {
-	bool hasDied = false;
-	for (int i = 0; i < this->bosses.size(); i++)
+	for (int i = this->bosses.size() - 1; i >= 0; i--)
 	{
-		if (bosses[i] != nullptr && !bosses[i]->isDead())
+		if (bosses[i]->isDead())
 		{
-			bosses[i]->update(dt, targetPos); //creash
+			destroyBoss(i);
+			continue;
 		}
-		else if (bosses[i] != nullptr && bosses[i]->isDead())
-		{
-			hasDied = true;
-		}
-	}
-
-	if (hasDied)
-	{
-		for (int i = this->bosses.size() - 1; i >= 0; i--)
-		{
-			if (bosses[i]->isDead())
-			{
-				Game::getGameInfo().addHighScore(bosses[i]->getPoints());
-				destroyBoss(i);
-			}
-		}
+		bosses[i]->update(dt, targetPos);
 	}
 }
 
