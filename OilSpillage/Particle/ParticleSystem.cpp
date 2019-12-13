@@ -53,9 +53,8 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] =
 	{
-		
-		{"SV_InstanceID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
-		{"SV_VertexID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0, 1, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  }
+		{"SV_InstanceID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 0  },
+		{"SV_VertexID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0,  D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 0  }
 	};
 
 
@@ -116,11 +115,12 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	vBufferDesc.ByteWidth = sizeof(IndirDraw);
 	vBufferDesc.CPUAccessFlags = 0;
 	vBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
+	vBufferDesc.StructureByteStride = 0;
 
 	indDraw.instanceCount = 0;
 	indDraw.vertexStartLoc = 0;
 	indDraw.instanceStartLoc = 0;
-	indDraw.vertexCount = 1;
+	indDraw.vertexCountPerInstance = 3;
 	D3D11_SUBRESOURCE_DATA subData;
 	ZeroMemory(&subData, sizeof(subData));
 	subData.pSysMem = &indDraw;
@@ -535,20 +535,30 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 	deviceContext->Unmap(particleParamRenderCB.Get(), 0);
 
 	UINT offset = 0;
+	UINT copyOffset = 4;
 	UINT stride = sizeof(UINT);
 	ID3D11ShaderResourceView* n = nullptr;
 
 	this->deviceContext->PSSetShader(this->pixelShader.Get(), nullptr, 0);
 	this->deviceContext->VSSetShader(this->vertexShader.Get(), nullptr, 0);
-	this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
-	this->deviceContext->GSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
-	this->deviceContext->GSSetConstantBuffers(1, 1, this->particleParamRenderCB.GetAddressOf());
+	if (this->getName() == "fire")
+	{
+		this->deviceContext->GSSetShader(nullptr, nullptr, 0);
+	}
+	else
+	{
+		this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
+	}
+	this->deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
+	this->deviceContext->VSSetConstantBuffers(1, 1, this->particleParamRenderCB.GetAddressOf());
 
 	ID3D11Buffer* nil = nullptr;
 	
 	this->deviceContext->IASetVertexBuffers(0, 1, &nil, &stride, &offset);
 	this->deviceContext->IASetInputLayout(NULL);
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	deviceContext->IASetInputLayout(this->inputLayout.Get());
+
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	ID3D11UnorderedAccessView* nU = nullptr;
 	//run create particle compute shader here
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &nU, 0);
@@ -556,22 +566,21 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 	if (onlyAdd)
 	{
 		this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV.GetAddressOf());
-		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV.Get());
+		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), copyOffset, this->particlesUAV.Get());
 	}
 	else
 	{
 		if (otherFrame == 1.0f)
 		{
 			this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV2.GetAddressOf());
-			deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV2.Get());
+			deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), copyOffset, this->particlesUAV2.Get());
 		}
 		else
 		{
 			this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV.GetAddressOf());
-			deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV.Get());
+			deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), copyOffset, this->particlesUAV.Get());
 		}
 	}
-	//deviceContext->IASetInputLayout(this->inputLayout.Get());
 	//this->deviceContext->DrawInstanced(16, 1, 0, 0);
 	if(this->texture!=nullptr)
 	{
@@ -579,11 +588,11 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 		rsv = this->texture->getShaderResView();
 		this->deviceContext->PSSetShaderResources(0, 1, &rsv);
 	}
-	this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
+	this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), 0);
 	if (onlyAdd)
 	{
 		this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV2.GetAddressOf());
-		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV2.Get());
+		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), copyOffset, this->particlesUAV2.Get());
 		this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
 
 	}

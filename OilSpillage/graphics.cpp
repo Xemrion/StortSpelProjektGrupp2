@@ -588,15 +588,17 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	deviceContext->RSSetViewports(1, &this->vp);
 
-	this->particleHandler->updateParticleSystems(deltaTime, viewProj);
+	/*this->particleHandler->updateParticleSystems(deltaTime, viewProj);
 
 	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
 	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
 	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
 
-	this->particleHandler->renderParticleSystems(camera);
+	this->particleHandler->renderParticleSystems(camera);*/
 
-	
+	this->particleHandler->getParticleSystem("fire")->updateParticles(deltaTime, viewProj);
+
+	this->particleHandler->getParticleSystem("fire")->drawAll(camera);
 	//set up Shaders
 
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
@@ -685,7 +687,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	
 	this->deviceContext->PSSetShader(nullptr, nullptr, 0);
 
-	this->particleTrail->updateParticles(deltaTime, viewProj);
+	/*this->particleTrail->updateParticles(deltaTime, viewProj);
 
 	this->particleTrail->setShaders();
 	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
@@ -702,7 +704,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->PSSetConstantBuffers(4, 1, this->cameraBuffer.GetAddressOf());
 	deviceContext->PSSetShaderResources(2, 1, this->culledLightBufferSRV.GetAddressOf());
 
-	this->particleTrail->drawAll(camera);
+	this->particleTrail->drawAll(camera);*/
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 
 	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());

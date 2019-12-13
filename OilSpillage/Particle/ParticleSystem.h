@@ -35,8 +35,8 @@ struct SimulationParams
 };
 struct IndirDraw
 {
+	UINT vertexCountPerInstance;//particle count
 	UINT instanceCount;//1
-	UINT vertexCount;//particle count
 	UINT vertexStartLoc;
 	UINT instanceStartLoc;
 };
