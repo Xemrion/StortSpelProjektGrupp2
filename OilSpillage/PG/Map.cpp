@@ -412,18 +412,20 @@ void Map::eliminateBadSpawnPositions() noexcept
 	std::vector<bool> isProcessed(  tilemap->data.size(), false );
 	std::deque<V2u>   toProcess  { startPositionInTileSpace };
 	while ( toProcess.size() ) {
-		U32 idx;
-		V2u pos = toProcess.back(); toProcess.pop_back();
+		auto pos = toProcess.back(); toProcess.pop_back();
 		if ( pos.x >= tilemap->width or pos.y >= tilemap->height )
 			continue; // early exit; out-of-bounds!
-		else if ( idx = tilemap->index(pos); !isProcessed[idx] )
+		auto idx = tilemap->index(pos);
+		if ( isProcessed[idx] )
 			continue; // early exit; revisitation!
-		else if ( tilemap->tileAt(pos) != Tile::building ) {
+		if ( tilemap->tileAt(pos) != Tile::building ) {
 			isAccessible[idx] = true;
-			for ( auto &offset : directionalOffsets() )
-				toProcess.push_back( {pos.x+offset.x, pos.y+offset.y} );
+			toProcess.push_back( { pos.x,   pos.y+1 } ); // S
+			toProcess.push_back( { pos.x,   pos.y-1 } ); // N
+			toProcess.push_back( { pos.x+1, pos.y   } ); // E
+			toProcess.push_back( { pos.x-1, pos.y   } ); // W
 		}
-		isProcessed[idx]  = true;
+		isProcessed[idx] = true;
 	}
 
 	/*std::vector<bool> isReachable( tilemap->data.size() );
@@ -443,7 +445,7 @@ void Map::eliminateBadSpawnPositions() noexcept
 	*/
 
 	for ( auto idx = 0;  idx < tilemap->data.size();  ++idx )
-		if ( tilemap->data[idx] == Tile::ground and !isAccessible[idx] )
+		if ( (tilemap->data[idx] == Tile::ground) and not isAccessible[idx] )
 			tilemap->data[idx] = Tile::building;
 }
 
@@ -2029,7 +2031,7 @@ void Map::instantiateTilesAsModels() noexcept
 			if ( (e.concreteMap.bitmap & util::cycleLeft( maskSide,   d )) == util::cycleLeft(predSide,d) )
 				instantiatePart( "Tiles/sidewalk_side_n", e.origin, 45.0f*d, sidewalkOffsetY );
 			if ( (e.concreteMap.bitmap & util::cycleLeft( maskInnerC, d )) == util::cycleLeft(predInnerC,d) )
-				instantiatePart( "Tiles/sidewalk_corner_inner_ne", e.origin, 180.0f+(45.0f*d), sidewalkOffsetY );
+				instantiatePart( "Tiles/sidewalk_corner_inner_ne", e.origin, (45.0f*d)+90.0f, sidewalkOffsetY );
 			if ( (e.concreteMap.bitmap & util::cycleLeft( maskU,      d )) == util::cycleLeft(predU,d) )
 				instantiatePart( "Tiles/sidewalk_u_n", e.origin, 45.0f*d, sidewalkOffsetY );
 		}
