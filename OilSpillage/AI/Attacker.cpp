@@ -27,6 +27,7 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 
 void Attacker::update(float dt, const Vector3& targetPos)
 {
+	
 	DynamicActor::update(dt, targetPos);
 	this->updateBullets(dt);
 }

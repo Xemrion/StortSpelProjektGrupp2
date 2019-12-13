@@ -4,6 +4,8 @@
 
 ShadowMapping::ShadowMapping()
 {
+	this->spotActive = false;
+	this->sunActive = false;
 }
 
 
@@ -68,8 +70,8 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 
-	depthStencilDesc.Width = 2048;
-	depthStencilDesc.Height = 2048;
+	depthStencilDesc.Width = 1536;
+	depthStencilDesc.Height = 1536;
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.ArraySize = 1;
 	depthStencilDesc.Format = DXGI_FORMAT_R32_TYPELESS;
@@ -265,21 +267,24 @@ void ShadowMapping::prepareSpot()
 void ShadowMapping::setDSun()
 {
 
-	ID3D11ShaderResourceView* nSRV = nullptr;
-	deviceContext->PSSetShaderResources(1, 1, &nSRV);
+		ID3D11ShaderResourceView* nSRV = nullptr;
+		deviceContext->PSSetShaderResources(1, 1, &nSRV);
+		deviceContext->OMSetRenderTargets(0, nullptr, this->depthStencilView.Get());
+		deviceContext->VSSetConstantBuffers(0, 1, this->perFrameCB.GetAddressOf());
+	
 
-	deviceContext->OMSetRenderTargets(0, nullptr, this->depthStencilView.Get());
-	deviceContext->VSSetConstantBuffers(0, 1, this->perFrameCB.GetAddressOf());
 
 }
 
 void ShadowMapping::setDSpot()
 {
+	
+		ID3D11ShaderResourceView* nSRV = nullptr;
+		deviceContext->PSSetShaderResources(1, 1, &nSRV);
+		deviceContext->OMSetRenderTargets(0, nullptr, this->depthStencilViewSpot.Get());
+		deviceContext->VSSetConstantBuffers(0, 1, this->perFrameCBSpot.GetAddressOf());
+		
 
-	ID3D11ShaderResourceView* nSRV = nullptr;
-	deviceContext->PSSetShaderResources(1, 1, &nSRV);
-	deviceContext->OMSetRenderTargets(0, nullptr, this->depthStencilViewSpot.Get());
-	deviceContext->VSSetConstantBuffers(0, 1, this->perFrameCBSpot.GetAddressOf());
 }
 
 Microsoft::WRL::ComPtr <ID3D11SamplerState> ShadowMapping::getShadowSampler()

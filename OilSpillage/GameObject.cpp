@@ -7,10 +7,6 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
-	/*if (rigidBody != nullptr) {
-		physics->DeleteRigidBody(rigidBody);
-		this->rigidBody = nullptr;
-	}*/
 }
 
 GameObject::GameObject(const GameObject& obj)
@@ -18,29 +14,14 @@ GameObject::GameObject(const GameObject& obj)
 	this->color = obj.color;
 	this->material = obj.material;
 	this->mesh = obj.mesh;
-	this->parent = obj.parent;
 	this->physics = obj.physics;
 	this->position = obj.position;
 	this->sunShadow = obj.sunShadow;
 	this->spotShadow = obj.spotShadow;
 	this->rigidBody = obj.rigidBody;
 	this->rotation = obj.rotation;
-	this->rotationQt = obj.rotationQt;
 	this->scale = obj.scale;
 }
-
-//GameObject::GameObject(const GameObject& obj)
-//{
-//
-//}
-//
-//void GameObject::operator=(const GameObject& obj)
-//{
-//	if (this != &obj)
-//	{
-//
-//	}
-//}
 
 bool GameObject::getShading() const
 {
@@ -72,54 +53,12 @@ Matrix GameObject::getTransform()
 	else {
 		btQuaternion rot = rigidBody->getWorldTransform().getRotation();
 		Quaternion d3drotation(rot.x(), rot.y(), rot.z(), rot.w());
-		this->rotationQt = d3drotation;
 		
 		transform *= Matrix::CreateFromQuaternion(d3drotation);
 	}
 	transform *= Matrix::CreateTranslation(position);
 
-	if (this->parent != nullptr)
-	{
-		transform *= this->parent->getTransform();
-	}
-
 	return transform;
-
-	//if (rigidBody == nullptr) {
-	//	Matrix transform(Matrix::CreateScale(scale));
-	//	transform *= Matrix::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
-	//	transform *= Matrix::CreateTranslation(position);
-
-	//	if (this->parent != nullptr)
-	//	{
-	//		transform *= this->parent->getTransform();
-	//	}
-
-	//	return transform;
-	//}
-	//else {
-
-	//	//btVector3 pos = btVector3(rigidBody->getWorldTransform().getOrigin());
-	//	//this->position = Vector3(pos.getX(),pos.getY(),pos.getZ());
-
-	//	Matrix transform(Matrix::CreateScale(scale));
-
-	//	position = Vector3(rigidBody->getWorldTransform().getOrigin());
-	//	btQuaternion rot = rigidBody->getWorldTransform().getRotation();
-	//	Quaternion d3drotation(rot.x(), rot.y(), rot.z(), rot.w());
-
-	//	this->rotationQt = d3drotation;
-
-	//	transform *= Matrix::CreateFromQuaternion(d3drotation);
-	//	transform *= Matrix::CreateTranslation(position);
-
-	//	if (this->parent != nullptr)
-	//	{
-	//		transform *= this->parent->getTransform();
-	//	}
-
-	//	return transform;
-	//}
 }
 
 void GameObject::setShading(bool arg)
@@ -360,31 +299,6 @@ void GameObject::updateObject(float deltaTime)
 
 	this->setPosition(this->getPosition() + this->velocity * deltaTime);
 }
-
-/*Matrix GameObject::btTransformToMatrix(btTransform const& trans) const
-{
-	//store btTranform in 4x4 Matrix
-	Matrix matrix;
-	//XMFLOAT4X4 matrix4x4 = XMFLOAT4X4();
-	btMatrix3x3 const& Rotation = trans.getBasis();
-	btVector3 const& Position = trans.getOrigin();
-	// copy rotation matrix
-	for (int row = 0; row < 3; ++row)
-	{
-
-		for (int column = 0; column < 3; ++column)
-		{
-			matrix.m[row][column] = Rotation[column][row];
-		}
-	}
-
-	// copy position
-	for (int column = 0; column < 3; ++column)
-	{
-		matrix.m[3][column] = Position[column];
-	}
-	return matrix;
-}*/
 
 Vector3 GameObject::btTransformGetRotation(btTransform const& trans) const
 {

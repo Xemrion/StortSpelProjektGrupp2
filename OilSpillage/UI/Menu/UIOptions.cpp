@@ -153,3 +153,10 @@ void UIOptions::init()
 	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 3);
 	this->promptBar->setPositon(Vector2(SCREEN_WIDTH / 2 - this->promptBar->getSize().x / 2, SCREEN_HEIGHT - this->promptBar->getSize().y - 8.0f));
 }
+
+void UIOptions::unloadTextures()
+{
+	this->buttonBack->unloadTextures();
+	this->sliderEffects->unloadTextures();
+	this->checkBoxDrivingMode->unloadTextures();
+}

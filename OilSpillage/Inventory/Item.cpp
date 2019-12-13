@@ -7,6 +7,11 @@
 #include "../PG/defs.hpp"
 std::vector<std::shared_ptr<Item>> Item::premadeItems;
 
+float Item::fixedDecimals(float number, int decimals)
+{
+	return static_cast<int>(number * std::powf(10, decimals)) / std::powf(10, decimals);
+}
+
 GameObject* Item::getObjectByName(std::string name)
 {
 	for (int i = 0; i < Item::premadeItems.size(); i++)
@@ -60,13 +65,13 @@ void Item::init()
 	GameObject* nitro = new GameObject();
 	nitro->mesh = graphics.getMeshPointer("Entities/Nitro");
 	nitro->setMaterial(graphics.getMaterial("Entities/Nitro"));
-	nitro->setScale(Vector3(0.001f));
+	nitro->setScale(Vector3(0.05f));
 	nitro->setPosition(nitro->mesh->getAABB().scale(nitro->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.1f, 0));
 
 	GameObject* emp = new GameObject();
 	emp->mesh = graphics.getMeshPointer("Entities/EMP");
 	emp->setMaterial(graphics.getMaterial("Entities/EMP"));
-	emp->setScale(Vector3(0.0005f));
+	emp->setScale(Vector3(0.05f));
 	emp->setPosition(emp->mesh->getAABB().scale(emp->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.1f, 0));
 
 	GameObject* chassi1 = new GameObject();
@@ -86,12 +91,22 @@ void Item::init()
 		std::make_shared<ItemWeapon>("Flamethrower", WeaponHandler::getWeapon(WeaponType::Flamethrower), flameThrower),
 		std::make_shared<ItemWeapon>("Lazer", WeaponHandler::getWeapon(WeaponType::Laser), lazer),
 		std::make_shared<ItemWeapon>("Spikes", WeaponHandler::getWeapon(WeaponType::Spikes), spike),
-		//std::make_shared<ItemGadget>("Nitro", GadgetHandler::getGadget(GadgetType::NITRO) ,nitro),
-		//std::make_shared<ItemGadget>("EMP",GadgetHandler::getGadget(GadgetType::EMP), emp)//,
-		std::make_shared<ItemChassi>("Muscle Chassi", 100, 1.0f, chassi1),
-		std::make_shared<ItemWheel>("Muscle Tires", 1.0f, 1.0f, wheel1)
+		std::make_shared<ItemGadget>("Nitro", GadgetHandler::getGadget(GadgetType::NITRO) , nitro),
+		std::make_shared<ItemGadget>("EMP",GadgetHandler::getGadget(GadgetType::EMP), emp),
+		std::make_shared<ItemChassi>("Muscle Chassi", 100, 1.0f, chassi1), //DON'T CHANGE THE INDEX OF THESE
+		std::make_shared<ItemWheel>("Muscle Tires", 1.0f, 1.0f, wheel1) //DON'T CHANGE THE INDEX OF THESE
 	};
 
+}
+
+Item* Item::getDefaultChassi()
+{
+	return premadeItems[6]->clone();
+}
+
+Item* Item::getDefaultWheels()
+{
+	return premadeItems[7]->clone();
 }
 
 Item* Item::getRandom()

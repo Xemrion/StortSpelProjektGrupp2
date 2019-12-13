@@ -11,7 +11,7 @@ cbuffer ParticleParameters : register(b0)
 {
     float4 emitterLocation; //w = totalTime
     float4 randomVector;
-    float4 initialDirection; // trailDirection (opposite of carDir)
+    float4 initialDirection; // .w=size
 };
 static const float3 direction[8] =
 {
@@ -48,7 +48,9 @@ void main(uint3 DispatchThreadID : SV_DispatchThreadID)
     p.time.y = emitterLocation.w;
     NewSimulationState.Append(p);
     float scale = 25.0f;
+    scale = initialDirection.w;
     float spacing = 0.2f;
+    spacing = initialDirection.z;
     for (int i = 1; i < scale; i++)
     {
         float3 randomVec = 2.0f*direction[DispatchThreadID.x] + hash(i * 2.0f + DispatchThreadID.x * randomVector.xyz) + hash(randomVector.xyz);

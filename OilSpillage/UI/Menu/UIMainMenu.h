@@ -26,6 +26,9 @@ public:
 	virtual ~UIMainMenu();
 
 	void init();
+	virtual void unloadTextures();
+
+	
 };
 
 #endif // !UI_MAIN_MENU_H

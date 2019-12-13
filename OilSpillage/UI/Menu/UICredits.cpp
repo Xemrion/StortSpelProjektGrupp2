@@ -60,3 +60,9 @@ void UICredits::init()
 	this->promptBar = std::make_unique<ButtonPromptBar>(prompts, 2);
 	this->promptBar->setPositon(Vector2(10, SCREEN_HEIGHT - this->promptBar->getSize().y - 8.0f));
 }
+
+void UICredits::unloadTextures()
+{
+	this->buttonBack->unloadTextures();
+	this->promptBar->unloadTextures();
+}

@@ -13,6 +13,10 @@ void UIPaused::updateUI(float deltaTime)
 		{
 			static_cast<PlayingGameState*>(Game::getCurrentState())->setCurrentMenu(PlayingGameState::MENU_PLAYING);
 		}
+		else if (this->selected == this->buttonControls.get())
+		{
+			static_cast<PlayingGameState*>(Game::getCurrentState())->setCurrentMenu(PlayingGameState::MENU_CONTROLS);
+		}
 		else if (this->selected == this->buttonOptions.get())
 		{
 			static_cast<PlayingGameState*>(Game::getCurrentState())->setCurrentMenu(PlayingGameState::MENU_OPTIONS);
@@ -32,6 +36,7 @@ void UIPaused::drawUI()
 {
 	UserInterface::getSpriteBatch()->Begin(SpriteSortMode_Deferred, UserInterface::getCommonStates()->NonPremultiplied());
 	this->buttonUnpause->draw(this->selected == this->buttonUnpause.get());
+	this->buttonControls->draw(this->selected == this->buttonControls.get());
 	this->buttonOptions->draw(this->selected == this->buttonOptions.get());
 	this->buttonMainMenu->draw(this->selected == this->buttonMainMenu.get());
 	this->promptBar->draw(false);
@@ -49,11 +54,13 @@ UIPaused::~UIPaused()
 void UIPaused::init()
 {
 	this->buttonUnpause = std::make_unique<Button>(Text("Resume", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y * 2));
-	this->buttonOptions = std::make_unique<Button>(Text("Options", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y / 2));
-	this->buttonMainMenu = std::make_unique<Button>(Text("Main Menu", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y));
+	this->buttonControls = std::make_unique<Button>(Text("Controls", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 - Button::size.y / 2));
+	this->buttonOptions = std::make_unique<Button>(Text("Options", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y));
+	this->buttonMainMenu = std::make_unique<Button>(Text("Main Menu", Color(Colors::Black), TextAlignment::Center), Vector2(SCREEN_WIDTH / 2 - Button::size.x / 2, SCREEN_HEIGHT / 2 + Button::size.y * 2.5f));
 
-	this->buttonUnpause->setNeighbours(nullptr, nullptr, this->buttonMainMenu.get(), this->buttonOptions.get());
-	this->buttonOptions->setNeighbours(nullptr, nullptr, this->buttonUnpause.get(), this->buttonMainMenu.get());
+	this->buttonUnpause->setNeighbours(nullptr, nullptr, this->buttonMainMenu.get(), this->buttonControls.get());
+	this->buttonControls->setNeighbours(nullptr, nullptr, this->buttonUnpause.get(), this->buttonOptions.get());
+	this->buttonOptions->setNeighbours(nullptr, nullptr, this->buttonControls.get(), this->buttonMainMenu.get());
 	this->buttonMainMenu->setNeighbours(nullptr, nullptr, this->buttonOptions.get(), this->buttonUnpause.get());
 
 	this->selected = this->buttonUnpause.get();

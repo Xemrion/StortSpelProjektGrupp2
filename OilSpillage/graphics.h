@@ -77,7 +77,7 @@ class Graphics {
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
 	std::unordered_map<std::string, Mesh> meshes;
 	std::unordered_map<std::string, Texture*> textures;
-	std::vector<GameObject*> drawableObjects;
+	std::unordered_map<GameObject*,GameObject*> drawableObjects;
 	LightList* lightList;
 	float cullingDistance = 150.f;
 	
@@ -124,11 +124,12 @@ public:
 	void loadMesh(     std::string const &path, Vector3 rotation={.0f,.0f,.0f} );
 	void loadMesh(     std::string const& path, std::vector<Vertex3D>& toMesh, Vector3 rotation = { .0f,.0f,.0f });
 	void unloadMesh(std::string const& name);
-	void loadMaterial( std::string const &path );
+	void loadMaterial( std::string const &path , bool tga = true);
 	void loadModel(    std::string const &path, Vector3 rotation={.0f,.0f,.0f} );
 	void loadShape(Shapes shape, Vector3 normalForQuad = Vector3(0, 0, 0));
 	bool loadTexture(std::string fileName, bool overridePath = false, bool cpuOnly = false);
 	bool reloadTexture( std::string fileName, bool overridePath=false );
+	bool unloadTexture(const char* path, bool tga = true);
 	const Mesh* getPGMeshPointer(const char* path);
 	const Mesh* getMeshPointer(const char *path);
 	Texture* getTexturePointer(const char *path, bool tga = true);

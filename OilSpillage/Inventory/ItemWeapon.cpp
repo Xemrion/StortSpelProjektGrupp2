@@ -1,50 +1,53 @@
 #include "ItemWeapon.h"
 #include <sstream>
 #include "../game.h"
+#include <iomanip>
+
 std::string ItemWeapon::generateDescription(Weapon weapon)
 {
 	std::stringstream stream;
 	stream << std::boolalpha;
+
 	if (weapon.type == WeaponType::MachineGun) {
-		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
-		stream << "Fire Rate: " << weapon.fireRate << "\n";
-		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
-		stream << "Max Spread: " << weapon.maxSpread << "\n";
+		stream << "Damage/S: " << Item::fixedDecimals(weapon.damage / weapon.fireRate, 2) << "\n";
+		stream << "Fire Rate: " << Item::fixedDecimals(weapon.fireRate, 2) << "\n";
+		stream << "Bullet Speed: " << Item::fixedDecimals(weapon.bulletSpeed, 2) << "\n";
+		stream << "Max Spread: " << Item::fixedDecimals(weapon.maxSpread, 2) << "\n";
 	}
 	else if(weapon.type == WeaponType::Laser){
-		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
-		stream << "Overheat : " << weapon.maxSpread << "\n";
+		stream << "Damage/S: " << Item::fixedDecimals(weapon.damage, 2) << "\n";
+		stream << "Overheat : " << Item::fixedDecimals(weapon.maxSpread, 2) << "\n";
 
 
 	}
 	else if(weapon.type == WeaponType::Flamethrower) {
-		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
-		stream << "Fire Rate: " << weapon.fireRate << "\n";
-		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
-		stream << "Max Spread: " << weapon.maxSpread << "\n";
+		stream << "Damage/S: " << Item::fixedDecimals(weapon.damage / weapon.fireRate, 2) << "\n";
+		stream << "Fire Rate: " << Item::fixedDecimals(weapon.fireRate, 2) << "\n";
+		stream << "Bullet Speed: " << Item::fixedDecimals(weapon.bulletSpeed, 2) << "\n";
+		stream << "Max Spread: " << Item::fixedDecimals(weapon.maxSpread, 2) << "\n";
 	}
 	else if(weapon.type == WeaponType::Spikes){
-		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
+		stream << "Damage/S: " << Item::fixedDecimals(weapon.damage, 2) << "\n";
 
 	}
 	else {
-		stream << "Damage/S: " << weapon.damage / weapon.fireRate << "\n";
-		stream << "Fire Rate: " << weapon.fireRate << "\n";
-		stream << "Bullet Speed: " << weapon.bulletSpeed << "\n";
-		stream << "Max Spread: " << weapon.maxSpread << "\n";
+		stream << "Damage/S: " << Item::fixedDecimals(weapon.damage / weapon.fireRate, 2) << "\n";
+		stream << "Fire Rate: " << Item::fixedDecimals(weapon.fireRate, 2) << "\n";
+		stream << "Bullet Speed: " << Item::fixedDecimals(weapon.bulletSpeed, 2) << "\n";
+		stream << "Max Spread: " << Item::fixedDecimals(weapon.maxSpread, 2) << "\n";
 
 	}
 	if (weapon.doesDoT)
 	{
-		stream << "DoT duration: " << weapon.doTTimer << "\n";
+		stream << "DoT duration: " << Item::fixedDecimals(weapon.doTTimer, 2) << "\n";
 	}
 	if (weapon.doesKnockBack)
 	{
-		stream << "Knockback force: " << weapon.knockbackForce << "\n";
+		stream << "Knockback force: " << Item::fixedDecimals(weapon.knockbackForce, 2) << "\n";
 	}
 	if (weapon.doesSplashDmg)
 	{
-		stream << "Splash damage range: " << weapon.splashRange << "\n";
+		stream << "Splash damage range: " << Item::fixedDecimals(weapon.splashRange, 2) << "\n";
 	}
 	return stream.str();
 }
@@ -201,4 +204,12 @@ void ItemWeapon::randomize()
 Weapon& ItemWeapon::getWeapon()
 {
 	return this->weapon;
+}
+
+void ItemWeapon::update(float dt)
+{
+	if (weapon.type == WeaponType::Spikes)
+	{
+
+	}
 }

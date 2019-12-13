@@ -26,8 +26,11 @@ protected:
 	Vector4 baseColor;
 	GameObject* object;
 public:
+	static float fixedDecimals(float number, int decimals);
 	static GameObject* getObjectByName(std::string name);
 	static void init();
+	static Item* getDefaultChassi();
+	static Item* getDefaultWheels();
 	static Item* getRandom();
 	static Matrix generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale = Vector3::One, Quaternion rotation = Quaternion::Identity, bool ignoreObjectRotation = false);
 
@@ -35,7 +38,6 @@ public:
 	virtual ~Item();
 	Item(const Item& obj);
 	virtual Item* clone()const;
-
 	virtual void randomize();
 
 	std::string getName() const;
@@ -43,6 +45,7 @@ public:
 	ItemType getType() const;
 	GameObject* getObject() const;
 	Vector4 getBaseColor() const;
+
 };
 
 #endif // !ITEM_H

@@ -39,6 +39,8 @@ public:
 
 	virtual void draw(bool selected);
 	void setText(std::string text);
+
+	void unloadTextures();
 };
 
 #endif // !BUTTON_H

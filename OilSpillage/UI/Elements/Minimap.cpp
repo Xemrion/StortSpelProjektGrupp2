@@ -176,7 +176,7 @@ void Minimap::draw(bool selected)
 
 	for (int i = 0; i < static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->getGroups().size(); i++)
 	{
-		targetPos = static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->getGroups()[i].getAveragePos();
+		targetPos = static_cast<PlayingGameState*>(Game::getCurrentState())->actorManager->getGroups()[i]->getAveragePos();
 		if ((targetPos - playerPos).Length() < this->enemyViewDist)
 		{
 			targetMapPos = Vector3::Transform(targetPos, this->mapMatrix);
@@ -274,22 +274,11 @@ void Minimap::update(float deltaTime)
 			for (int y = static_cast<int>(topLeft.y); y < static_cast<int>(std::roundf(bottomRight.y)); y++)
 			{
 				float shade = 255;
-				if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius)
-				{
-					shade = 150;
-				}
-				if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.8f)
-				{
-					shade = 100;
-				}
-				if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.6f)
-				{
-					shade = 50;
-				}
-				if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius * 0.4f)
+				/*if ((playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length() < this->fogClearRadius)
 				{
 					shade = 0;
-				}
+				}*/		
+				shade = 9 * (playerMapPos - Vector3(static_cast<float>(x), 0, static_cast<float>(y))).Length();
 				if (this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] > shade) {
 					this->pixels[(y * this->textureFogTemp->getWidth() + x) * 4 + 3] = shade;
 				}

@@ -1,12 +1,15 @@
 #include "ItemChassi.h"
 #include <sstream>
 #include "../game.h"
+#include <iomanip>
 
 std::string ItemChassi::generateDescription(float maxHealth, float speed)
 {
 	std::stringstream stream;
-	stream << "Max Health: " << maxHealth << "\n";
-	stream << "Top Speed: " << speed << "\n";
+	stream << std::boolalpha;
+
+	stream << "Max Health: " << Item::fixedDecimals(maxHealth, 2) << "\n";
+	stream << "Top Speed: " << Item::fixedDecimals(speed, 2) << "\n";
 
 	return stream.str();
 }
@@ -33,8 +36,8 @@ Item* ItemChassi::clone() const
 
 void ItemChassi::randomize()
 {
-	this->maxHealth = this->maxHealth * static_cast<int>((((rand() % 100 +1)) + (10 * Game::getLocalScale())));
-	this->speed = this->speed * ((rand() % 100 + 1)*0.01f) + (1 * Game::getLocalScale());
+	this->maxHealth = 0.01f*this->maxHealth * static_cast<int>((((rand() % 200 +1)) + (200 * Game::getLocalScale())-190));
+	this->speed = this->speed * ((rand() % 200 + 1)*0.01f) + (2 * Game::getLocalScale())-2;
 	
 	this->description = generateDescription(this->maxHealth, this->speed);
 	Item::randomize();

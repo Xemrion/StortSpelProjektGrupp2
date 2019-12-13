@@ -31,7 +31,7 @@ struct AABB
 
 
 
-	bool intersect(AABB other)
+	bool intersect(const AABB& other)
 	{
 		if (minPos.x > other.maxPos.x || maxPos.x < other.minPos.x) return false;
 		if (minPos.y > other.maxPos.y || maxPos.y < other.minPos.y) return false;
@@ -39,7 +39,7 @@ struct AABB
 		return true;
 	}
 
-	bool intersectXZ(AABB other)
+	bool intersectXZ(const AABB& other)
 	{
 		if (minPos.x > other.maxPos.x || maxPos.x < other.minPos.x) return false;
 		if (minPos.z > other.maxPos.z || maxPos.z < other.minPos.z) return false;
@@ -74,7 +74,19 @@ struct AABB
 		return tmin <= tmax && tmin <= dist && tmax >= bias;
 	}
 };
-
+struct Sphere
+{
+	static bool intersection(DirectX::SimpleMath::Vector3& origin, float radius, DirectX::SimpleMath::Vector3 position)
+	{
+		DirectX::SimpleMath::Vector3 distance = origin - position;
+		float fdist = (distance.x * distance.x + distance.y * distance.y + distance.z * distance.z);// distance.Dot(distance);
+		if (fdist < (radius * radius))
+		{
+			return true;
+		}
+		return false;
+	}
+};
 struct Material
 {
 	Texture* diffuse = nullptr;

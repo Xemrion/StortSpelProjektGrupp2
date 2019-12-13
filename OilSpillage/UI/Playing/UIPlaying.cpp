@@ -149,24 +149,24 @@ void UIPlaying::drawUI()
 
 	if (currObj != nullptr && currObj->getType() == TypeOfMission::BossEvent)
 	{
-		std::vector<Weakspot> weakspots = currObj->getBoss()->getWeakspots();
+		
 
-		if (weakspots.size() > 0) //draw shield only if exists
+		if (currObj->getBoss()->getWeakspots().size() > 0) //draw shield only if exists
 		{
-			if (weakspots.size() == 2) //draw shield only if exists
+			if (currObj->getBoss()->getWeakspots().size() == 2) //draw shield only if exists
 			{
-				this->bossShieldBar1->setAmount(weakspots[0].getHealth() / static_cast<float>(weakspots[0].getMaxHP()));
-				this->bossShieldBar2->setAmount(weakspots[1].getHealth() / static_cast<float>(weakspots[1].getMaxHP()));
+				this->bossShieldBar1->setAmount(currObj->getBoss()->getWeakspots()[0].getHealth() / static_cast<float>(currObj->getBoss()->getWeakspots()[0].getMaxHP()));
+				this->bossShieldBar2->setAmount(currObj->getBoss()->getWeakspots()[1].getHealth() / static_cast<float>(currObj->getBoss()->getWeakspots()[1].getMaxHP()));
 			}
-			else if (weakspots.size() == 1) //draw shield only if exists
+			else if (currObj->getBoss()->getWeakspots().size() == 1) //draw shield only if exists
 			{
-				if (weakspots[0].getWeakspotNr() == 0)
+				if (currObj->getBoss()->getWeakspots()[0].getWeakspotNr() == 0)
 				{
-					this->bossShieldBar1->setAmount(weakspots[0].getHealth() / static_cast<float>(weakspots[0].getMaxHP()));
+					this->bossShieldBar1->setAmount(currObj->getBoss()->getWeakspots()[0].getHealth() / static_cast<float>(currObj->getBoss()->getWeakspots()[0].getMaxHP()));
 				}
-				else if (weakspots[0].getWeakspotNr() == 1)
+				else if (currObj->getBoss()->getWeakspots()[0].getWeakspotNr() == 1)
 				{
-					this->bossShieldBar2->setAmount(weakspots[0].getHealth() / static_cast<float>(weakspots[0].getMaxHP()));
+					this->bossShieldBar2->setAmount(currObj->getBoss()->getWeakspots()[0].getHealth() / static_cast<float>(currObj->getBoss()->getWeakspots()[0].getMaxHP()));
 				}
 			}
 		}
@@ -217,21 +217,21 @@ void UIPlaying::drawUI()
 		this->bossHealthBar->draw(false); //false = change color to gray
 		UserInterface::getFontArial()->DrawString(UserInterface::getSpriteBatch(), "Qwerty", Vector2((SCREEN_WIDTH / 2), 660), Colors::Yellow, 0, Vector2(textBoss.x / 2, textBoss.y / 2), 0.4f);
 		
-		std::vector<Weakspot> weakspots = currObj->getBoss()->getWeakspots();
-		if (weakspots.size() > 0) //draw shield only if exists
+		
+		if (currObj->getBoss()->getWeakspots().size() > 0) //draw shield only if exists
 		{
-			if (weakspots.size() == 2) //draw shield only if exists
+			if (currObj->getBoss()->getWeakspots().size() == 2) //draw shield only if exists
 			{
 				this->bossShieldBar1->draw(false);
 				this->bossShieldBar2->draw(false);
 			}
-			else if (weakspots.size() == 1) //draw shield only if exists
+			else if (currObj->getBoss()->getWeakspots().size() == 1) //draw shield only if exists
 			{
-				if (weakspots[0].getWeakspotNr() == 0)
+				if (currObj->getBoss()->getWeakspots()[0].getWeakspotNr() == 0)
 				{
 					this->bossShieldBar1->draw(false);
 				}
-				else if (weakspots[0].getWeakspotNr() == 1)
+				else if (currObj->getBoss()->getWeakspots()[0].getWeakspotNr() == 1)
 				{
 					this->bossShieldBar2->draw(false);
 				}

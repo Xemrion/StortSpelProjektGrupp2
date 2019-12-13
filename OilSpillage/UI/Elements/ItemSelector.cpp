@@ -24,6 +24,7 @@ ItemSelector::ItemSelector(Vector2 position) : Element(position), drawTextBox(tr
 
 ItemSelector::~ItemSelector()
 {
+	
 }
 
 void ItemSelector::draw(bool selected)
@@ -197,4 +198,10 @@ bool ItemSelector::isSelectedValid() const
 void ItemSelector::setUsed(Container::Slot** used)
 {
 	this->used = used;
+}
+
+void ItemSelector::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/itemSelectorBG");
+	Game::getGraphics().unloadTexture("UI/itemSelectorIndicator");
 }

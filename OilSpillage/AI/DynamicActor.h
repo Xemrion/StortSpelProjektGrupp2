@@ -9,18 +9,22 @@ public:
 	void setPath(Vector3* path);
 	virtual void update(float dt, const Vector3& targetPos);
 	virtual void knockBack(Vector3 direction, float force);
+	void setGroup(void* newGroup);
+	void* getGroup()const;
+	int pathSize;
+	void setStun(float timer);
+	void Color();
 
 	int duty;
-	int pathSize;
-protected:	
+protected:
+	void* curGroup;
 	Vector3* path;
-	int aggroRange;
 	Vector3 destination;
 	Vector3 velocity;
+	
 
 	virtual void move();
 	virtual Vector3 calculateVelocity();
 	virtual void followPath();
-	Status inAggroRange();
 
 };

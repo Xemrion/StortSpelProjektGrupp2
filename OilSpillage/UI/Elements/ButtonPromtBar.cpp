@@ -8,45 +8,45 @@ ButtonPromptBar::ButtonPromptBar(Prompt prompts[], int length, Vector2 position)
 	Game::getGraphics().loadTexture("UI/stick_right");
 	Game::getGraphics().loadTexture("UI/button_confirm");
 	Game::getGraphics().loadTexture("UI/button_cancel");
-	Game::getGraphics().loadTexture("UI/button_action_1");
-	Game::getGraphics().loadTexture("UI/button_action_2");
 	Game::getGraphics().loadTexture("UI/button_menu");
+	Game::getGraphics().loadTexture("UI/shoulder_left");
+	Game::getGraphics().loadTexture("UI/shoulder_right");
 	Game::getGraphics().loadTexture("UI/stick_ps_left");
 	Game::getGraphics().loadTexture("UI/stick_ps_right");
 	Game::getGraphics().loadTexture("UI/button_ps_confirm");
 	Game::getGraphics().loadTexture("UI/button_ps_cancel");
-	Game::getGraphics().loadTexture("UI/button_ps_action_1");
-	Game::getGraphics().loadTexture("UI/button_ps_action_2");
 	Game::getGraphics().loadTexture("UI/button_ps_menu");
+	Game::getGraphics().loadTexture("UI/shoulder_ps_left");
+	Game::getGraphics().loadTexture("UI/shoulder_ps_right");
 	Game::getGraphics().loadTexture("UI/stick_kb_left");
 	Game::getGraphics().loadTexture("UI/stick_kb_right");
 	Game::getGraphics().loadTexture("UI/button_kb_confirm");
 	Game::getGraphics().loadTexture("UI/button_kb_cancel");
-	Game::getGraphics().loadTexture("UI/button_kb_action_1");
-	Game::getGraphics().loadTexture("UI/button_kb_action_2");
 	Game::getGraphics().loadTexture("UI/button_kb_menu");
+	Game::getGraphics().loadTexture("UI/shoulder_kb_left");
+	Game::getGraphics().loadTexture("UI/shoulder_kb_right");
 
 	this->textures[static_cast<int>(Keys::L_PRESS)] = Game::getGraphics().getTexturePointer("UI/stick_left");
 	this->textures[static_cast<int>(Keys::R_PRESS)] = Game::getGraphics().getTexturePointer("UI/stick_right");
 	this->textures[static_cast<int>(Keys::CONFIRM)] = Game::getGraphics().getTexturePointer("UI/button_confirm");
 	this->textures[static_cast<int>(Keys::CANCEL)] = Game::getGraphics().getTexturePointer("UI/button_cancel");
-	this->textures[static_cast<int>(Keys::ACTION_1)] = Game::getGraphics().getTexturePointer("UI/button_action_1");
-	this->textures[static_cast<int>(Keys::ACTION_2)] = Game::getGraphics().getTexturePointer("UI/button_action_2");
 	this->textures[static_cast<int>(Keys::MENU)] = Game::getGraphics().getTexturePointer("UI/button_menu");
+	this->textures[static_cast<int>(Keys::L_SHOULDER)] = Game::getGraphics().getTexturePointer("UI/shoulder_left");
+	this->textures[static_cast<int>(Keys::R_SHOULDER)] = Game::getGraphics().getTexturePointer("UI/shoulder_right");
 	this->texturesPs[static_cast<int>(Keys::L_PRESS)] = Game::getGraphics().getTexturePointer("UI/stick_ps_left");
 	this->texturesPs[static_cast<int>(Keys::R_PRESS)] = Game::getGraphics().getTexturePointer("UI/stick_ps_right");
 	this->texturesPs[static_cast<int>(Keys::CONFIRM)] = Game::getGraphics().getTexturePointer("UI/button_ps_confirm");
 	this->texturesPs[static_cast<int>(Keys::CANCEL)] = Game::getGraphics().getTexturePointer("UI/button_ps_cancel");
-	this->texturesPs[static_cast<int>(Keys::ACTION_1)] = Game::getGraphics().getTexturePointer("UI/button_ps_action_1");
-	this->texturesPs[static_cast<int>(Keys::ACTION_2)] = Game::getGraphics().getTexturePointer("UI/button_ps_action_2");
 	this->texturesPs[static_cast<int>(Keys::MENU)] = Game::getGraphics().getTexturePointer("UI/button_ps_menu");
+	this->texturesPs[static_cast<int>(Keys::L_SHOULDER)] = Game::getGraphics().getTexturePointer("UI/shoulder_ps_left");
+	this->texturesPs[static_cast<int>(Keys::R_SHOULDER)] = Game::getGraphics().getTexturePointer("UI/shoulder_ps_right");
 	this->texturesKb[static_cast<int>(Keys::L_PRESS)] = Game::getGraphics().getTexturePointer("UI/stick_kb_left");
 	this->texturesKb[static_cast<int>(Keys::R_PRESS)] = Game::getGraphics().getTexturePointer("UI/stick_kb_right");
 	this->texturesKb[static_cast<int>(Keys::CONFIRM)] = Game::getGraphics().getTexturePointer("UI/button_kb_confirm");
 	this->texturesKb[static_cast<int>(Keys::CANCEL)] = Game::getGraphics().getTexturePointer("UI/button_kb_cancel");
-	this->texturesKb[static_cast<int>(Keys::ACTION_1)] = Game::getGraphics().getTexturePointer("UI/button_kb_action_1");
-	this->texturesKb[static_cast<int>(Keys::ACTION_2)] = Game::getGraphics().getTexturePointer("UI/button_kb_action_2");
 	this->texturesKb[static_cast<int>(Keys::MENU)] = Game::getGraphics().getTexturePointer("UI/button_kb_menu");
+	this->texturesKb[static_cast<int>(Keys::L_SHOULDER)] = Game::getGraphics().getTexturePointer("UI/shoulder_kb_left");
+	this->texturesKb[static_cast<int>(Keys::R_SHOULDER)] = Game::getGraphics().getTexturePointer("UI/shoulder_kb_right");
 
 	this->prompts = std::make_unique<Prompt[]>(length);
 	float sizeX = 0.0f;
@@ -117,4 +117,29 @@ void ButtonPromptBar::setPositon(Vector2 position)
 Vector2 ButtonPromptBar::getSize() const
 {
 	return this->size;
+}
+
+void ButtonPromptBar::unloadTextures()
+{
+	Game::getGraphics().unloadTexture("UI/stick_left");
+	Game::getGraphics().unloadTexture("UI/stick_right");
+	Game::getGraphics().unloadTexture("UI/button_confirm");
+	Game::getGraphics().unloadTexture("UI/button_cancel");
+	Game::getGraphics().unloadTexture("UI/button_action_1");
+	Game::getGraphics().unloadTexture("UI/button_action_2");
+	Game::getGraphics().unloadTexture("UI/button_menu");
+	Game::getGraphics().unloadTexture("UI/stick_ps_left");
+	Game::getGraphics().unloadTexture("UI/stick_ps_right");
+	Game::getGraphics().unloadTexture("UI/button_ps_confirm");
+	Game::getGraphics().unloadTexture("UI/button_ps_cancel");
+	Game::getGraphics().unloadTexture("UI/button_ps_action_1");
+	Game::getGraphics().unloadTexture("UI/button_ps_action_2");
+	Game::getGraphics().unloadTexture("UI/button_ps_menu");
+	Game::getGraphics().unloadTexture("UI/stick_kb_left");
+	Game::getGraphics().unloadTexture("UI/stick_kb_right");
+	Game::getGraphics().unloadTexture("UI/button_kb_confirm");
+	Game::getGraphics().unloadTexture("UI/button_kb_cancel");
+	Game::getGraphics().unloadTexture("UI/button_kb_action_1");
+	Game::getGraphics().unloadTexture("UI/button_kb_action_2");
+	Game::getGraphics().unloadTexture("UI/button_kb_menu");
 }

@@ -5,7 +5,7 @@
 #include "GameObject.h"
 #include "Sound.h"
 #include "Lights.h"
-
+#include "Inventory/Gadget.h"
 enum class WeaponType
 {
 	Default,
@@ -26,6 +26,7 @@ enum class WeaponType
 	aiBossMachineGun,
 	aiBossMachineGunPhase2,
 	aiBossMissileLauncher,
+	gadget,
 	None
 };
 
@@ -66,8 +67,8 @@ struct Weapon
 			soundTimer += 100.0f;
 		}
 		timeSinceLastShot += deltaTime;
-		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * spreadDecreasePerSecond * maxSpread, 0.0);
-		remainingCooldown = max(remainingCooldown - deltaTime, 0.0);
+		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * spreadDecreasePerSecond * maxSpread, 0.0f);
+		remainingCooldown = max(remainingCooldown - deltaTime, 0.0f);
 	};
 
 	bool updateFireRate()
@@ -89,10 +90,10 @@ public:
 		Weapon(), //default gun
 		{      6,      0.05f,        55.0f,          1.4f,		Vector3(0.07f, 0.07f, 0.3f),	 0.1f,  0.3f,  0.11f,  0.0f,  0.7f,  0.0,  WeaponType::MachineGun },
 		{     10,       1.5f,        13.0f,          3.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::MissileLauncher, false, false, true, true, 0.0f, 20.0f, 5.0f },
-		{      2,     0.015f,         0.0f,         0.15f,		Vector3(0.37f, 0.37f, 50.0f),	 0.0f,  5.0f,  1.75f,  0.0f,  1.5f,  0.0,  WeaponType::Laser },
+		{     10,     0.015f,         0.0f,         0.15f,		Vector3(0.37f, 0.37f, 50.0f),	 0.0f,  5.0f,  1.75f,  0.0f,  1.5f,  0.0,  WeaponType::Laser },
 		{    300,       1.5f,         0.0f,         0.15f,		Vector3(0.17f, 0.17f, 30.0f),	 0.0f,  0.0f,  0.11f,  0.0f,  2.0f,  0.0,  WeaponType::Railgun },
 		{      4,      0.01f,         8.0f,          1.3f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Flamethrower, false, true, false, false, 4.0f },
-		{      5,      0.005f,        1.0f,          0.2f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Spikes, true },
+		{     20,      0.005f,        1.0f,          0.2f,		Vector3(1.0f, 1.0f, 1.0f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Spikes, true },
 		{   1000,      0.005f,       0.01f,          0.2f,		Vector3(1.5f, 1.5f, 1.5f),		 0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::Star, true },
 		{	   2,       0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::aiMachineGun },
 		{	   5,       0.3f,        12.0f,          1.0f,	    Vector3(0.2f, 0.2f, 0.2f),       0.2f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0,  WeaponType::aiMelee },
@@ -104,6 +105,7 @@ public:
 		{      1,     0.025f,        30.0f,          4.0f,		Vector3(1.0f, 1.0f, 1.0f),	  	 0.2f, 60.0f,  20.0f,  0.0f,  0.7f,  0.0,  WeaponType::aiBossMachineGun },
 		{      3,     0.022f,        45.0f,          3.5f,		Vector3(1.0f, 1.0f, 1.0f),	  	 0.1f, 10.0f,  10.0f,  0.0f,  0.7f,  0.0,  WeaponType::aiBossMachineGunPhase2 },
 		{    100,       0.5f,        40.0f,         15.0f,		Vector3(1.0f, 1.0f, 1.0f),		 1.0f,  0.0f,   0.0f,  0.0f,  2.0f,  0.0f, WeaponType::aiBossMissileLauncher },
+		{    5.0f,       5.0f,        5.0f,         5.0f,		Vector3(1.0f, 1.0f, 1.0f),		0.0f,  0.0f,   0.0f,  0.0f,  0.0f,  0.0f, WeaponType::gadget },
 		{0, 0, 0, 0, Vector3(0,0,0), 0, 0, 0, 0, 0, 0, WeaponType::None}
 
 	};
@@ -196,6 +198,7 @@ class Bullet
 	float timeLeft = 0.0f;
 	Weapon weapon;
 	static float soundTimer;
+	Gadget* gadget;
 public:
 	Bullet();
 	Bullet(Weapon weapon);
@@ -219,6 +222,9 @@ public:
 	static void updateSoundTimer(float deltaTime);
 	Vector3 getDirection() const;
 	void setDirection(Vector3 newDir);
+	Vector3& getPosition();
+	Gadget getGadger() const;
+	void shootEmp(Gadget& gadget, const Vector3& pos);
 };
 
 #endif // !WEAPON_H

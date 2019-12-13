@@ -23,6 +23,7 @@ private:
 	Graphics& graphics;
 	std::unique_ptr<UserInterface> menues[MENUCOUNT];
 	int currentMenu;
+	int oldMenu;
 	Texture* textureLogo;
 	
 	std::unique_ptr<VehicleSlots> slots;
@@ -38,6 +39,8 @@ public:
 	void update(float deltaTime);
 	void setCurrentMenu(Menu menu);
 	VehicleSlots* getSlots();
+
+	virtual void unloadTextures();
 };
 
 #endif // !MENU_GAME_STATE_H

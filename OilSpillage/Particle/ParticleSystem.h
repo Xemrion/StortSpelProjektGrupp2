@@ -3,7 +3,6 @@
 #include<wrl/client.h>
 #include<d3dcompiler.h>
 #include"..///DynamicCamera.h"
-#include<mutex>
 using namespace DirectX::SimpleMath;
 struct Particle
 {
@@ -113,21 +112,17 @@ private:
 		std::copy(s.begin(), s.end(), temp.begin());
 		return temp;
 	};
-	int frameID;
 	int capParticle;//100*512
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
 	int nrOfParticles;
 	float otherFrame;
-	int lastUsedParticle;
 	int firstAdd;
 	float deltaTime;
 	float sinMovement;
 	IndirDraw indDraw;
-	ParticleRenderParams colorNSize;
 	ParticleParams pParams;
 	SimulationParams sP;
-	ParticleShaders particleShaders;
 	ParticleSData systemData;
 
 	bool onlyAdd;
@@ -140,9 +135,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> nrOfParticlesCB;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> simParams;//for update
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;//for update
-
-	ID3D11ShaderResourceView* depthSRV;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> collisionViewProj;
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
 	Microsoft::WRL::ComPtr<ID3D10Blob> vertexShaderBlob;

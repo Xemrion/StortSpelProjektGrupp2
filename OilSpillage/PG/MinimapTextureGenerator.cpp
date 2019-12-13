@@ -326,8 +326,8 @@ String createFogOfWarTexture( Map const &map )
 		[&generateSelection,&rng]() {
 			RGBA color;
 			if      ( generateSelection(rng) <= .05f ) color = util::blendColor( 0xFF'FFFFFF, 0xFF'000000, .00f );
-			else if ( generateSelection(rng) <= .95f ) color = util::blendColor( 0xFF'FFFFFF, 0xFF'000000, .10f );
-			else                                       color = util::blendColor( 0xFF'FFFFFF, 0xFF'000000, .15f );
+			else if ( generateSelection(rng) <= .95f ) color = util::blendColor( 0xFF'FFFFFF, 0xFF'000000, .05f );
+			else                                       color = util::blendColor( 0xFF'FFFFFF, 0xFF'000000, .10f );
 			return color;
    }};
 

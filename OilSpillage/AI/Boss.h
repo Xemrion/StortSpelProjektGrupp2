@@ -11,10 +11,10 @@ public:
 	Boss(float x, float z, int weaponType, Physics* physics, float scalingNr); //, std::vector<Weakspot*>
 	virtual ~Boss();
 	void update(float dt, const Vector3& targetPos);
-	void checkIfWeakPointHit(Bullet* bulletArray, size_t size, float soundTimer);
+	void checkIfWeakPointHit(Bullet* bulletArray, size_t size, float &soundTimer);
 	void changeHealth(float amount); //changef rom actor
 
-	const std::vector<Weakspot>& getWeakspots();
+	std::vector<Weakspot>& getWeakspots();
 
 private:
 	float timeTilNextPoint;

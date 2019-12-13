@@ -13,11 +13,14 @@ private:
 
 	Texture* textureControls;
 	std::unique_ptr<ButtonPromptBar> promptBar;
+	std::unique_ptr<ButtonPromptBar> promptBar2;
 public:
 	UIControls();
 	virtual ~UIControls();
 
 	void init();
+
+	virtual void unloadTextures();
 };
 
 #endif // !UI_CONTROLS_H

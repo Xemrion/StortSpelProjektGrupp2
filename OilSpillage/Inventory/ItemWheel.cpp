@@ -33,8 +33,8 @@ Item* ItemWheel::clone() const
 
 void ItemWheel::randomize()
 {
-	this->accelerationRate = this->accelerationRate * ((rand() % 100 + 1) * 0.01f) + (1 * Game::getLocalScale());
-	this->handlingRate = this->handlingRate * ((rand() % 100 + 1) * 0.01f) + (1 * Game::getLocalScale());
+	this->accelerationRate = this->accelerationRate * ((rand() % 200 + 1) * 0.01f) + (2 * Game::getLocalScale())-2;
+	this->handlingRate = this->handlingRate * ((rand() % 200 + 1) * 0.01f) + (2 * Game::getLocalScale())-2;
 
 	this->description = this->generateDescription(this->accelerationRate, this->handlingRate);
 	Item::randomize();
