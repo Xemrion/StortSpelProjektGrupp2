@@ -15,8 +15,8 @@ private:
 	bool predicting = false;
 protected:
 	Weapon weapon;
-	static const int bulletCount = 32;
-	Bullet bullets[bulletCount];
+	int bulletCount = 0;
+	Bullet* bullets;
 	float timeSinceLastShot;
 	int attackRange;
 	void updateBullets(float deltaTime);

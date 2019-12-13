@@ -13,6 +13,7 @@ Bullet::Bullet()
 	this->obj->setScale(Vector3(0.05f, 0.25f, 0.35f));
 	this->obj->setColor(Vector4(1.2f, 1.2f, 0, 1));
 	this->weapon.type = WeaponType::None;
+	this->gadget = nullptr;
 }
 
 Bullet::Bullet(Weapon weapon)
@@ -153,6 +154,7 @@ void Bullet::update(float deltaTime)
 		this->obj->setPosition(initPos);
 		this->dir = initDir;
 	}
+	
 	if(this->weapon.type == WeaponType::None)
 	{
 
