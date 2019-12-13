@@ -127,33 +127,27 @@ bool ObjectiveHandler::isAllDone()
 
 void ObjectiveHandler::update(Vector3 playerPos, Physics* physics)
 {
-	
-	
-
-
 	if (this->objectiveVec.size() != 0)
 	{
-		this->objectiveVec.at(0)->update(playerPos);
+		this->objectiveVec[0]->update(playerPos);
 
-		if (this->objectiveVec.at(0)->isDone())
+		if (this->objectiveVec[0]->isDone())
 		{
-			if (this->objectiveVec.at(0)->getType()==TypeOfMission::FindAndCollect)
+			if (this->objectiveVec[0]->getType()==TypeOfMission::FindAndCollect)
 			{
-				for (int j = 0; j < this->objectiveVec.at(0)->getNrOfMax(); j++)
+				for (int j = 0; j < this->objectiveVec[0]->getNrOfMax(); j++)
 				{
-					Game::getGraphics().removeFromDraw(this->pickUpArrs.at(0)[j]);
+					Game::getGraphics().removeFromDraw(this->pickUpArrs[0][j]);
 				}
 			}
-			static_cast<PlayingGameState*>(Game::getCurrentState())->changeTime(this->objectiveVec.at(0)->getRewardTime());
+			static_cast<PlayingGameState*>(Game::getCurrentState())->changeTime(this->objectiveVec[0]->getRewardTime());
 			Game::getGameInfo().addHighScore(objectiveVec[0]->getScore());
 			Game::getGameInfo().nrOfObjectives++;
-			delete this->objectiveVec.at(0);
+			delete this->objectiveVec[0];
 			this->objectiveVec.erase(this->objectiveVec.begin());
 			this->eventNewObj = true;
 		}
 	}
-
-	
 }
 
 Type ObjectiveHandler::getTypes() const
