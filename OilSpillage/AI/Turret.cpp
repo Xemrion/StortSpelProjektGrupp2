@@ -4,7 +4,7 @@ Turret::Turret()
 {}
 
 Turret::Turret(float x, float z, int weaponType, Physics* physics)
-	: Actor(x, z, physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
+	: Actor(x, z), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 23;
