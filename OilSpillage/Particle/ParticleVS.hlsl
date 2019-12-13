@@ -4,6 +4,7 @@ struct Particle
 	float4 direction;//.w=size
 	float2 time;
 };
+StructuredBuffer<Particle> SimulationState;
 cbuffer CB_PER_FRAME : register(b0)
 {
     float4x4 viewProj;
@@ -16,7 +17,6 @@ cbuffer ParticleRenderParams : register(b1)
     float4 colors[4];
     float4 config; //.x = nrOfColors, .y = startSize .z = endSize
 };
-StructuredBuffer<Particle> SimulationState;
 
 struct VS_INPUT
 {

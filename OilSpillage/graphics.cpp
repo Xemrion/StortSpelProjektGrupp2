@@ -34,7 +34,7 @@ Graphics::Graphics()
 
 	this->particleSystem->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
 	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
-	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso", "TrailPS.cso");
+	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso", "TrailPS.cso","TrailVS.cso");
 
 	this->particleHandler->addParticleSystem(this->particleSystem,  "fire");
 	this->particleHandler->addParticleSystem(this->particleSystem2, "smoke");
@@ -81,6 +81,8 @@ Graphics::Graphics()
 
 	//this->particleHandler->getParticleSystem("rain")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 	this->particleTrail->loadSystem();
+	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso", "TrailPS.cso", "TrailVS.cso");
+
 	this->particleHandler->getParticleSystem("electro")->setUpdateShader("ElectroUpdateCS.cso");
 	//this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
@@ -687,12 +689,12 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	
 	this->deviceContext->PSSetShader(nullptr, nullptr, 0);
 
-	/*this->particleTrail->updateParticles(deltaTime, viewProj);
+	this->particleTrail->updateParticles(deltaTime, viewProj);
 
 	this->particleTrail->setShaders();
 	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
 	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
-	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->VSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
 	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
 
 	deviceContext->OMSetDepthStencilState(readOnlyDST.Get(), 0);
@@ -704,7 +706,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->PSSetConstantBuffers(4, 1, this->cameraBuffer.GetAddressOf());
 	deviceContext->PSSetShaderResources(2, 1, this->culledLightBufferSRV.GetAddressOf());
 
-	this->particleTrail->drawAll(camera);*/
+	this->particleTrail->drawAll(camera);
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 
 	deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());

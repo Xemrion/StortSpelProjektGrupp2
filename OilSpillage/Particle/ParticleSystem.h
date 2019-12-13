@@ -89,6 +89,8 @@ public:
 	bool loadSystem();
 	bool saveSystem();
 
+	void setQuad();
+
 	void setShaders();
 
 	float getStartSize()const;
@@ -124,7 +126,7 @@ private:
 	ParticleParams pParams;
 	SimulationParams sP;
 	ParticleSData systemData;
-
+	bool quad;
 	bool onlyAdd;
 	D3D11_BUFFER_UAV_FLAG bufferType;
 	int indexForTrail;

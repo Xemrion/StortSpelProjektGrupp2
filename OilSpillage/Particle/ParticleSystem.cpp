@@ -19,6 +19,7 @@ ParticleSystem::ParticleSystem()
 	this->bufferType = D3D11_BUFFER_UAV_FLAG::D3D11_BUFFER_UAV_FLAG_APPEND;
 	this->indexForTrail = 0;
 	this->texture = nullptr;
+	this->quad = false;
 }
 
 
@@ -120,7 +121,14 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	indDraw.instanceCount = 0;
 	indDraw.vertexStartLoc = 0;
 	indDraw.instanceStartLoc = 0;
-	indDraw.vertexCountPerInstance = 3;
+	if (this->quad)
+	{
+		indDraw.vertexCountPerInstance = 6;//for quad
+	}
+	else
+	{
+		indDraw.vertexCountPerInstance = 3;
+	}
 	D3D11_SUBRESOURCE_DATA subData;
 	ZeroMemory(&subData, sizeof(subData));
 	subData.pSysMem = &indDraw;
@@ -541,14 +549,15 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 
 	this->deviceContext->PSSetShader(this->pixelShader.Get(), nullptr, 0);
 	this->deviceContext->VSSetShader(this->vertexShader.Get(), nullptr, 0);
-	if (this->getName() == "fire")
+	/*if (this->getName() == "fire")
 	{
 		this->deviceContext->GSSetShader(nullptr, nullptr, 0);
 	}
 	else
 	{
 		this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
-	}
+	}*/
+	this->deviceContext->GSSetShader(nullptr, nullptr, 0);
 	this->deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
 	this->deviceContext->VSSetConstantBuffers(1, 1, this->particleParamRenderCB.GetAddressOf());
 
@@ -560,6 +569,7 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	ID3D11UnorderedAccessView* nU = nullptr;
+
 	//run create particle compute shader here
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &nU, 0);
 	deviceContext->CSSetUnorderedAccessViews(1, 1, &nU, 0);
@@ -650,13 +660,18 @@ bool ParticleSystem::saveSystem()
 	return true;
 }
 
+void ParticleSystem::setQuad()
+{
+	this->quad = true;
+}
+
 void ParticleSystem::setShaders()
 {
 	this->deviceContext->PSSetShader(nullptr, nullptr, 0);
 
 	this->deviceContext->PSSetShader(this->pixelShader.Get(), nullptr, 0);
 	this->deviceContext->VSSetShader(this->vertexShader.Get(), nullptr, 0);
-	this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
+	//this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
 }
 
 float ParticleSystem::getStartSize() const
