@@ -15,13 +15,13 @@ class QuadTree
 		std::unique_ptr<Node> neChild;
 		std::unique_ptr<Node> swChild;
 		std::unique_ptr<Node> seChild;
-		std::vector<DynamicGameObject*> objects;
+		std::vector<GameObjectBase*> objects;
 		AABB boundingBox;
 		UINT depth;
 	public:
 		Node(AABB&& boundingBox, UINT treeDepth);
-		void insert(DynamicGameObject* o);
-		void getGameObjects(std::vector<DynamicGameObject*>& objects, Frustum& viewFrustum, float& frustumBias);
+		void insert(GameObjectBase* o);
+		void getGameObjects(std::vector<GameObjectBase*>& objects, Frustum& viewFrustum, float& frustumBias);
 		void clearGameObjects();
 	};
 	std::unique_ptr<Node> root;
@@ -32,7 +32,7 @@ public:
 	QuadTree( QuadTree &&)                = delete;
 	QuadTree &operator=(QuadTree const &) = delete;
 	QuadTree &operator=(QuadTree &&)      = delete;
-	void insert(DynamicGameObject* o);
-	void getGameObjects(std::vector<DynamicGameObject*>& objects, Frustum viewFrustum, float frustumBias);
+	void insert(GameObjectBase* o);
+	void getGameObjects(std::vector<GameObjectBase*>& objects, Frustum viewFrustum, float frustumBias);
 	void clearGameObjects();
 };

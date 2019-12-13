@@ -25,4 +25,6 @@ private:
 	float turretAngle;
 
 	void calculateTarget(float angle);
+
+	static Vector3 zeroVector;
 };

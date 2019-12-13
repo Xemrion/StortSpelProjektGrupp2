@@ -6,12 +6,12 @@ class BossAbilities
 {
 public:
 	BossAbilities();
-	BossAbilities(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType);
+	BossAbilities(btRigidBody* pos, Vector3* targetPos, Vector3* velocity, int weaponType);
 	virtual ~BossAbilities();
 	BossAbilities& operator=(const BossAbilities& other);
 
 private:
-	Vector3* positionPtr;
+	btRigidBody* positionPtr;
 	Vector3* targetPosPtr;
 	Vector3* velocityPtr;
 	int flameXDirDegree;

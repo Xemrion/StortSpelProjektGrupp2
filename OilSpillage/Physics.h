@@ -62,8 +62,8 @@ public:
 	Physics();
 	~Physics();
 	void update(float deltaTime);
-	btRigidBody* addSphere(float radius, btVector3 Origin, float mass, GameObject* obj = nullptr);
-	btRigidBody* addBox(btVector3 Origin, btVector3 size, float mass, GameObject* obj = nullptr);
+	btRigidBody* addSphere(float radius, btVector3 Origin, float mass, GameObjectBase* obj = nullptr);
+	btRigidBody* addBox(btVector3 Origin, btVector3 size, float mass, GameObjectBase* obj = nullptr);
 	btRigidBody* addCylinder(btVector3 Origin, btVector3 size, float mass);
 	btRigidBody* addCapsule(btScalar radius, btVector3 Origin, btScalar height, float mass);
 	btGeneric6DofSpring2Constraint* addSpring(btRigidBody* box1, btRigidBody* box2);

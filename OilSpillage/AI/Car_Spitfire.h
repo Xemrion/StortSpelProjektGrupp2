@@ -29,7 +29,7 @@ private:
 	void updateVehicle(); 
 protected:
 	btPoint2PointConstraint* pointJoint;
-	GameObject* vehicleBody1;
+	DynamicGameObject* vehicleBody1;
 public:
 	Spitfire(float x, float z,Physics* physics);
 	Spitfire();
@@ -43,7 +43,7 @@ public:
 
 	float getYaw(DirectX::XMVECTOR Quaternion);
 	float getHeading(Quaternion qt);
-	GameObject* getVehicleBody1();
+	DynamicGameObject* getVehicleBody1();
 
 	void move();
 	virtual void update(float dt, const Vector3& targetPos);

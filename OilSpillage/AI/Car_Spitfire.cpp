@@ -64,9 +64,8 @@ void Spitfire::updateVehicle()
 
 void Spitfire::move()
 {
-	direction = destination - this->position;
-	direction.Normalize();
-	if ((this->position - destination).Length() > 5)
+	direction = destination - this->getPosition();
+	if (direction.Length() > 5)
 	{
 		throttleInputStrength += 0.025 * deltaTime;
 		if (throttleInputStrength > 1)
@@ -74,6 +73,7 @@ void Spitfire::move()
 			throttleInputStrength = 1;
 		}
 	}
+	direction.Normalize();
 }
 
 void Spitfire::update(float dt,const Vector3& targetPos)
@@ -88,7 +88,7 @@ void Spitfire::followPath()
 	if (pathSize >= 0)
 	{
 		destination = *path;
-		if ((destination - position).Length() < 15)
+		if ((destination - this->getPosition()).Length() < 15)
 		{
 			path--;
 			pathSize--;
@@ -109,7 +109,7 @@ void Spitfire::init(Physics* physics)
 	setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
 
 
-	this->vehicleBody1 = new GameObject;
+	this->vehicleBody1 = new DynamicGameObject;
 	vehicleBody1->mesh = Game::getGraphics().getMeshPointer("Entities/Player1");
 	vehicleBody1->setSpotShadow(false);
 	Game::getGraphics().addToDraw(vehicleBody1);
@@ -395,7 +395,7 @@ float Spitfire::getHeading(Quaternion qt)
 	return heading;
 }
 
-GameObject* Spitfire::getVehicleBody1()
+DynamicGameObject* Spitfire::getVehicleBody1()
 {
 	return this->vehicleBody1;
 }

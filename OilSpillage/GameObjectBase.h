@@ -48,8 +48,9 @@ public:
 	void			setColor(const Vector4& aColor);
 	Vector4			getColor() const;
 	Vector3			getScale() const;
-	AABB&			getAABB();
+	AABB			getAABB();
 
 	static Vector3	btTransformGetRotation(btTransform const& trans);
 	static Vector3	btTransformGetPosition(btTransform const& trans);
+	static Vector3	btVectorConv(btVector3 const& vector);
 };

@@ -4,7 +4,7 @@
 Actor::Actor()
 {
 	//this->velocity = Vector3(10.0f, 0.0f, 10.0f);
-	this->position = Vector3(0, 0.0f, 0);
+	this->setPosition(Vector3(0, 0.0f, 0));
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	this->points = 0;
 }
@@ -12,7 +12,7 @@ Actor::Actor()
 Actor::Actor(float x, float z, Physics* physics)
 {
 	//this->velocity = Vector3(10.0f, 0.0f, 10.0f);
-	this->position = Vector3(x, -1.0f, z);
+	this->setPosition(Vector3(x, -1.0f, z));
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	this->points = 0;
 	this->fireTimer = 0;
@@ -21,15 +21,15 @@ Actor::~Actor()
 {
 	for (int i = 0; i < 2; i++)
 	{
-		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
-		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
-		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
-		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+		Game::getGraphics().addParticle("explosion", 1, 1, this->getPosition(), Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+		Game::getGraphics().addParticle("explosion", 1, 1, this->getPosition(), Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+		Game::getGraphics().addParticle("explosion", 1, 1, this->getPosition(), Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+		Game::getGraphics().addParticle("explosion", 1, 1, this->getPosition(), Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
 	}
 	for (int i = 0; i < 24; i++)
 	{
-		Game::getGraphics().addParticle(position, Vector3(0.0f), 1, 3);
-		Game::getGraphics().addParticle2(position, Vector3(0.0f), 1, 3);
+		Game::getGraphics().addParticle(this->getPosition(), Vector3(0.0f), 1, 3);
+		Game::getGraphics().addParticle2(this->getPosition(), Vector3(0.0f), 1, 3);
 	}
 }
 
@@ -116,7 +116,7 @@ void Actor::onFire()
 		{
 			for (int i = 0; i < 10; i++)
 			{
-				Game::getGraphics().addParticle("fire", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+				Game::getGraphics().addParticle("fire", 1, 1, this->getPosition(), Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
 			}
 			particleTimer = 0.1f;
 		}

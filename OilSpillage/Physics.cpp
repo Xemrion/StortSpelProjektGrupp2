@@ -94,7 +94,7 @@ void Physics::update(float deltaTime)
 	this->world->stepSimulation(deltaTime, 6, 1. / 120.);
 }
 
-btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, GameObject* obj)
+btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, GameObjectBase* obj)
 {	//add object set transform
 	btTransform t; //
 	t.setIdentity();
@@ -121,7 +121,7 @@ btRigidBody* Physics::addSphere(float radius, btVector3 Origin, float mass, Game
 	return body;
 }
 
-btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass, GameObject* objects)
+btRigidBody* Physics::addBox(btVector3 Origin, btVector3 size, float mass, GameObjectBase* objects)
 {
 	//add object set transform
 	btTransform t; //

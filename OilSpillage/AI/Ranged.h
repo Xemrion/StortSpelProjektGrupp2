@@ -5,7 +5,7 @@
 class Ranged
 {
 private:
-	Vector3* positionPtr;
+	btRigidBody* positionPtr;
 	Vector3* targetPosPtr;
 	Vector3* velocityPtr;
 	float* deltaTimePtr;
@@ -25,6 +25,6 @@ protected:
 
 public:
 	Ranged();
-	Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity, float* deltaTimePtr, int weaponType);
+	Ranged(btRigidBody* pos, Vector3* targetPos, Vector3* velocity, float* deltaTimePtr, int weaponType);
 	virtual ~Ranged();
 };

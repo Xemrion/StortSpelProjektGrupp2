@@ -121,7 +121,7 @@ Item* Item::getRandom()
 Matrix Item::generateTransform(GameObject* object, Vector2 screenPos, Vector3 scale, Quaternion rotation, bool ignoreObjectRotation)
 {
 	Matrix transform = Matrix::CreateScale(scale * object->getScale());
-	transform *= Matrix::CreateFromQuaternion(Quaternion::Concatenate(rotation, ignoreObjectRotation ? Quaternion() : object->getRotationQuaternion()));
+	transform *= Matrix::CreateFromQuaternion(Quaternion::Concatenate(rotation, ignoreObjectRotation ? Quaternion() : Quaternion(XMQuaternionRotationRollPitchYawFromVector(object->getRotation()))));
 	transform *= Matrix::CreateTranslation(Game::getGraphics().screenToWorldSpaceUI(screenPos) + object->getPosition());
 
 	return transform;

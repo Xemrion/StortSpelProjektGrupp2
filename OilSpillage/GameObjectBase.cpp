@@ -108,7 +108,7 @@ Vector3 GameObjectBase::getScale() const
 	return this->scale;
 }
 
-AABB& GameObjectBase::getAABB()
+AABB GameObjectBase::getAABB()
 {
 	AABB boundingBox = this->mesh->getAABB().scale(this->scale);
 	Vector3 position = this->getPosition();
@@ -132,4 +132,9 @@ Vector3 GameObjectBase::btTransformGetPosition(btTransform const& trans)
 {
 	btVector3 const Position = trans.getOrigin();
 	return Vector3(Position.getX(), Position.getY(), Position.getZ());
+}
+
+Vector3 GameObjectBase::btVectorConv(btVector3 const& vector)
+{
+	return Vector3(vector.operator const float *());
 }

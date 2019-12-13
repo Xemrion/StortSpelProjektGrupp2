@@ -2,13 +2,13 @@
 #include "Behaviour.h"
 #include<vector>
 #include "../VehicleStats.h"
-#include "../GameObject.h"
+#include "../DynamicGameObject.h"
 #include<SimpleMath.h>
 #include<DirectXMath.h>
 #include"..//game.h"
 
 using namespace DirectX::SimpleMath;
-class Actor : public GameObject
+class Actor : public DynamicGameObject
 {
 public:
 	Actor();

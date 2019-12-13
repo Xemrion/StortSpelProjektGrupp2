@@ -27,10 +27,10 @@ void ChaseCar::createRigidbody(Physics* physics)
 
 void ChaseCar::followPath()
 {
-	if (pathSize >= 0 && (position - targetPos).Length() > 40)
+	if (pathSize >= 0 && (this->getPosition() - targetPos).Length() > 40)
 	{
 		destination = *path;
-		if ((destination - position).Length() < 15)
+		if ((destination - this->getPosition()).Length() < 15)
 		{
 			path--;
 			pathSize--;

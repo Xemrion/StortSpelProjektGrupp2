@@ -28,7 +28,7 @@ subject to the following restrictions:
 struct btBroadphaseProxy;
 class btCollisionShape;
 struct btCollisionShapeData;
-class GameObject;
+class GameObjectBase;
 #include "LinearMath/btMotionState.h"
 #include "LinearMath/btAlignedAllocator.h"
 #include "LinearMath/btAlignedObjectArray.h"
@@ -96,7 +96,7 @@ protected:
 
 	///users can point to their objects, m_userPointer is not used by Bullet, see setUserPointer/getUserPointer
 
-	GameObject* m_userObjectPointer;
+	GameObjectBase* m_userObjectPointer;
 
 	int m_userIndex2;
 
@@ -514,7 +514,7 @@ public:
 	}
 
 	///users can point to their objects, userPointer is not used by Bullet
-	GameObject* getUserPointer() const
+	GameObjectBase* getUserPointer() const
 	{
 		return m_userObjectPointer;
 	}
@@ -535,7 +535,7 @@ public:
 	}
 
 	///users can point to their objects, userPointer is not used by Bullet
-	void setUserPointer(GameObject* userPointer)
+	void setUserPointer(GameObjectBase* userPointer)
 	{
 		m_userObjectPointer = userPointer;
 	}

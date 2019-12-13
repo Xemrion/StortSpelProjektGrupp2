@@ -175,44 +175,40 @@ void Map::generateBorder()
 		graphics.addToDrawStatic(&e);
 	
 	// west
-	border.bounds[0].setPosition({ tilemap->convertTilePositionToWorldPosition(-1,tilemap->height/2)});
-	auto pos0 = border.bounds[0].getPosition();
 	auto sca0 = btVector3( config.tileSideScaleFactor/2, 50.0f, (tilemap->height+2)*config.tileSideScaleFactor );
-	btRigidBody *tmp0 = physics->addBox( btVector3( pos0.x, pos0.y, pos0.z ),
+	btRigidBody *tmp0 = physics->addBox( btVector3(),
 	                                     btVector3( sca0 ),
 	                                     .0f );
 	tmp0->setFriction(0);
 	border.bounds[0].setRigidBody( tmp0 );
+	border.bounds[0].setPosition({ tilemap->convertTilePositionToWorldPosition(-1,tilemap->height / 2) });
 
 	// east
-	border.bounds[1].setPosition({ tilemap->convertTilePositionToWorldPosition(tilemap->width,tilemap->height/2)});
-	auto pos1 = border.bounds[1].getPosition();
 	auto sca1 = btVector3( config.tileSideScaleFactor/2, 50.0f, (tilemap->height+2)*config.tileSideScaleFactor );
-	btRigidBody *tmp1 = physics->addBox( btVector3( pos1.x, pos1.y, pos1.z ),
+	btRigidBody *tmp1 = physics->addBox( btVector3(),
 	                                     btVector3( sca1 ),
 	                                     .0f );
 	tmp1->setFriction(0);
 	border.bounds[1].setRigidBody( tmp1 );
+	border.bounds[1].setPosition({ tilemap->convertTilePositionToWorldPosition(tilemap->width,tilemap->height / 2) });
 
 	// north
-	border.bounds[2].setPosition({ tilemap->convertTilePositionToWorldPosition(tilemap->width/2,-1)});
-	auto pos2 = border.bounds[2].getPosition();
 	auto sca2 = btVector3( (tilemap->width+2)*config.tileSideScaleFactor, 50.0f, config.tileSideScaleFactor/2 );
-	btRigidBody *tmp2 = physics->addBox( btVector3( pos2.x, pos2.y, pos2.z ),
+	btRigidBody *tmp2 = physics->addBox( btVector3(),
 	                                     btVector3( sca2 ),
 	                                     .0f );
 	tmp2->setFriction(0);
 	border.bounds[2].setRigidBody( tmp2 );
+	border.bounds[2].setPosition({ tilemap->convertTilePositionToWorldPosition(tilemap->width / 2,-1) });
 
 	// south
-	border.bounds[3].setPosition({ tilemap->convertTilePositionToWorldPosition(tilemap->width/2,tilemap->height)});
-	auto pos3 = border.bounds[3].getPosition();
 	auto sca3 = btVector3( (tilemap->width+2)*config.tileSideScaleFactor, 50.0f, config.tileSideScaleFactor/2 );
-	btRigidBody *tmp3 = physics->addBox( btVector3( pos3.x, pos3.y, pos3.z ),
+	btRigidBody *tmp3 = physics->addBox( btVector3(),
 	                                     btVector3( sca3 ),
 	                                     .0f );
 	tmp3->setFriction(0);
 	border.bounds[3].setRigidBody( tmp3 );
+	border.bounds[3].setPosition({ tilemap->convertTilePositionToWorldPosition(tilemap->width / 2,tilemap->height) });
 }
 
 void Map::generateZebraCrossings()
@@ -433,7 +429,7 @@ Map::~Map() noexcept
 		physics->deleteRigidBody( e.object.getRigidBody() );
 
 	for ( auto &e : houses.multis )
-		for ( auto &p : e.parts )
+		for ( auto &p : e.hitboxes )
 			physics->deleteRigidBody( p.getRigidBody() );
 
 	for ( auto &e : border.bounds )

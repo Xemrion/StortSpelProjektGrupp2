@@ -7,7 +7,7 @@ Swarm::Swarm()
 }
 
 Swarm::Swarm(float x, float z, Physics* physics)
-	: DynamicActor(x, z, physics), Melee(&position, &velocity, &deltaTime)
+	: DynamicActor(x, z, physics), Melee(this->getRigidBody(), &velocity, &deltaTime)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	Game::getGraphics().addToDraw(this);
@@ -32,7 +32,7 @@ Swarm::Swarm(float x, float z, Physics* physics)
 void Swarm::update(float dt, const Vector3& targetPos)
 {
 	DynamicActor::update(dt, targetPos);
-	if ((position - targetPos).Length() < 2)
+	if ((this->getPosition() - targetPos).Length() < 2)
 	{
 		meleeAttack();
 	}
@@ -40,6 +40,7 @@ void Swarm::update(float dt, const Vector3& targetPos)
 
 void Swarm::createRigidbody(Physics* physics)
 {
+	Vector3 position = this->getPosition();
 	btRigidBody* tempo = physics->addSphere(0.7f, btVector3(position.x, position.y, position.z), 0.5f, this);
 	setRigidBody(tempo);
 	getRigidBody()->activate();
@@ -58,6 +59,7 @@ Swarm::~Swarm()
 }
 Vector3 Swarm::calculateVelocity()
 {
+	Vector3 position = this->getPosition();
 	Vector3 desiredDirection = destination - position;
 	Vector3 offsetVec;
 	Vector3 eliminatingVec = Vector3(0.0f, -2.0f, 0.0f);

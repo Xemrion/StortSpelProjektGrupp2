@@ -30,9 +30,8 @@ void DynamicActor::move()
 		velocity.x = max(velocity.x, 0);
 		velocity.z = max(velocity.z, 0);
 	}
-	Vector3 nextPos = position + Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.speed;
 	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x, 0.0f, velocity.z) * (stats.speed) * 1.5);
-	Vector3 targetToSelf = (nextPos - position);
+	Vector3 targetToSelf = Vector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * stats.speed;
 
 	//Rotate
 	if ( ((targetToSelf.x * vecForward.x) + (targetToSelf.z * vecForward.z)) < 0.8)
@@ -65,19 +64,19 @@ void DynamicActor::update(float dt, const Vector3& targetPos)
 
 Vector3 DynamicActor::calculateVelocity()
 {
-	return destination - position;
+	return destination - this->getPosition();
 }
 
 void DynamicActor::followPath()
 {
-	if ((position - targetPos).Length() < 15)
+	if ((this->getPosition() - targetPos).Length() < 15)
 	{
 		destination = targetPos;
 	}
 	else if (pathSize >= 0)
 	{
 		destination = *path;
-		if ((destination - position).Length() < 2)
+		if ((destination - this->getPosition()).Length() < 2)
 		{
 			path--;
 			pathSize--;

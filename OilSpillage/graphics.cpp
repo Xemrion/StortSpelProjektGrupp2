@@ -620,7 +620,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
-	for (DynamicGameObject* object : drawableObjects)
+	for (GameObjectBase* object : drawableObjects)
 	{
 		if (Vector3::Distance(object->getPosition(), camera->getPosition()) < cullingDistance)
 		{
@@ -740,7 +740,7 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	deviceContext->PSSetShader(nullptr, nullptr, 0);
 	UINT stride = sizeof(Vertex3D);
 	UINT offset = 0;
-	for (DynamicGameObject* object : drawableObjects)
+	for (GameObjectBase* object : drawableObjects)
 	{
 		AABB boundingBox = object->getAABB();
 		if (frustum.intersect(boundingBox, 0.0f))
@@ -767,10 +767,10 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 		}
 	}
 
-	std::vector<DynamicGameObject*> objects;
+	std::vector<GameObjectBase*> objects;
 	quadTree->getGameObjects(objects, frustum, 0.0f);
 	
-	for (DynamicGameObject* o : objects)
+	for (GameObjectBase* o : objects)
 	{
 		AABB boundingBox = o->getAABB();
 		UINT vertexCount = o->mesh->getVertexCount();
@@ -1657,25 +1657,25 @@ Material Graphics::getMaterial(const char* modelPath)
 	return material;
 }
 
-void Graphics::addToDrawStatic(DynamicGameObject* o)
+void Graphics::addToDrawStatic(GameObjectBase* o)
 {
 	assert( o != nullptr );
 	quadTree->insert(o);
 }
 
-void Graphics::addToDraw(DynamicGameObject* o)
+void Graphics::addToDraw(GameObjectBase* o)
 {
 	assert( o != nullptr );
 	drawableObjects.push_back(o);
 }
 
-void Graphics::removeFromDraw(DynamicGameObject* o)
+void Graphics::removeFromDraw(GameObjectBase* o)
 {
 	auto obj = std::find(drawableObjects.begin(), drawableObjects.end(), o);
 	int index = std::distance(drawableObjects.begin(), obj);
 	if (obj != drawableObjects.end())
 	{
-		DynamicGameObject* temp = drawableObjects[index];
+		GameObjectBase* temp = drawableObjects[index];
 		drawableObjects[index] = drawableObjects[drawableObjects.size() - 1];
 		drawableObjects[drawableObjects.size() - 1] = temp;
 		drawableObjects.pop_back();
@@ -1694,13 +1694,13 @@ void Graphics::clearStaticObjects()
 	quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 }
 
-void Graphics::addToUIDraw(DynamicGameObject* obj, Matrix* world)
+void Graphics::addToUIDraw(GameObjectBase* obj, Matrix* world)
 {
 	assert(obj != nullptr);
-	uiObjects.push_back(std::pair<DynamicGameObject*, Matrix*>(obj, world));
+	uiObjects.push_back(std::pair<GameObjectBase*, Matrix*>(obj, world));
 }
 
-void Graphics::removeFromUIDraw(DynamicGameObject* obj, Matrix* world)
+void Graphics::removeFromUIDraw(GameObjectBase* obj, Matrix* world)
 {
 	for (auto pair = uiObjects.begin(); pair != uiObjects.end(); pair++)
 	{
@@ -1782,7 +1782,7 @@ void Graphics::renderUI(float deltaTime)
 		}
 	}
 	int index = 0;
-	for (std::pair<DynamicGameObject*,Matrix*> object : this->uiObjects)
+	for (std::pair<GameObjectBase*,Matrix*> object : this->uiObjects)
 	{
 		if (object == this->uiObjects.back() && this->selectedObjUI.first!=nullptr)
 		{
@@ -1847,7 +1847,7 @@ void Graphics::renderUI(float deltaTime)
 	deviceContext->VSSetShader(this->shaderDebug.vs.getShader(), nullptr, 0);
 }
 
-void Graphics::setSelectedUI(DynamicGameObject* obj, Matrix* mat)
+void Graphics::setSelectedUI(GameObjectBase* obj, Matrix* mat)
 {
 	this->selectedObjUI.first = obj;
 	this->selectedObjUI.second = mat;
@@ -2006,10 +2006,10 @@ void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, fl
 	UINT offset = 0;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-	std::vector<DynamicGameObject*> objects;
+	std::vector<GameObjectBase*> objects;
 	quadTree->getGameObjects(objects, frustum, frustumBias );
 
-	for (DynamicGameObject* object : objects)
+	for (GameObjectBase* object : objects)
 	{
 		SimpleMath::Matrix world = object->getTransform();
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
@@ -2087,7 +2087,7 @@ void Graphics::drawFog(DynamicCamera* camera, float deltaTime)
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	int i = 0;
-	for (DynamicGameObject* object : fog->getQuads())
+	for (GameObjectBase* object : fog->getQuads())
 	{
 		SimpleMath::Matrix world = object->getTransform();
 		SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);

@@ -68,7 +68,6 @@ void Vehicle::init(Physics* physics)
 	Game::getGraphics().loadShape(Shapes::SHAPE_CUBE);
 	mesh = Game::getGraphics().getMeshPointer("Cube");
 	//Game::getGraphics().addToDraw(vehicle);
-	setPosition(Vector3(0.0f, 10.0f, 0.0f));
 	setScale(Vector3(0.5f, 0.14f, 0.9f));
 	Game::getGraphics().loadTexture("CarTemp");
 	setTexture(Game::getGraphics().getTexturePointer("CarTemp"));
@@ -85,7 +84,7 @@ void Vehicle::init(Physics* physics)
 
 	//vehicleBody1->setTexture(Game::getGraphics().getMaterial("Entities/Player").diffuse);
 	
-	this->vehicleBody1 = new GameObject;
+	this->vehicleBody1 = new DynamicGameObject;
 	Game::getGraphics().loadModel("Entities/Player_Car_Parts/Chassi1");
 	vehicleBody1->setSpotShadow(false);
 	Game::getGraphics().addToDraw(vehicleBody1);
@@ -122,17 +121,18 @@ void Vehicle::init(Physics* physics)
 	wheel4->setMaterial(Game::getGraphics().getMaterial("Entities/Player_Car_Parts/Wheel1"));
 
 	//btRigidBody* tempo = physics->addBox(btVector3(getPosition().x, getPosition().y, getPosition().z), btVector3(getScale().x, getScale().y, getScale().z), 10.0f);
-	btRigidBody* tempo = physics->addCapsule(getScale().x,btVector3(getPosition().x, getPosition().y, getPosition().z), getScale().z, 10.0f);
+	btRigidBody* tempo = physics->addCapsule(getScale().x,btVector3(), getScale().z, 10.0f);
 	this->setRigidBody(tempo);
 	this->getRigidBody()->activate();
 	this->getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	this->getRigidBody()->setFriction(0);
 	this->getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
 
-
+	setPosition(Vector3(0.0f, 10.0f, 0.0f));
+	AABB aabb = this->vehicleBody1->mesh->getAABB().scale(this->vehicleBody1->getScale());
 	tempo = physics->addBox(
-		btVector3(getPosition().x, getPosition().y + 0.65f, getPosition().z),
-		-btVector3(this->vehicleBody1->getAABB().minPos.x - this->vehicleBody1->getAABB().maxPos.x, (this->vehicleBody1->getAABB().minPos.y - this->vehicleBody1->getAABB().maxPos.y) * 0.2f, this->vehicleBody1->getAABB().minPos.z - this->vehicleBody1->getAABB().maxPos.z) * 0.5f,
+		btVector3(),
+		-btVector3(aabb.minPos.x - aabb.maxPos.x, (aabb.minPos.y - aabb.maxPos.y) * 0.2f, aabb.minPos.z - aabb.maxPos.z) * 0.5f,
 		1.0f,
 		this);
 	vehicleBody1->setRigidBody(tempo);
@@ -1626,7 +1626,7 @@ void Vehicle::onFire(float dt)
 		{
 			for (int i = 0; i < 10; i++)
 			{
-				Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+				Game::getGraphics().addParticle("explosion", 1, 1, this->getPosition(), Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
 			}
 			particleTimer = 0.1f;
 		}

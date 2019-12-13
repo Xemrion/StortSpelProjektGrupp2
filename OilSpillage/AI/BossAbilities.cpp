@@ -3,10 +3,9 @@
 
 BossAbilities::BossAbilities()
 {
-	Vector3 *vec = { 0 };
-	this->positionPtr = vec;
-	this->targetPosPtr = vec;
-	this->velocityPtr = vec;
+	this->positionPtr = nullptr;
+	this->targetPosPtr = nullptr;
+	this->velocityPtr = nullptr;
 	this->flameXDirDegree = 0;
 	this->flameZDirDegree = 0;
 	this->turnToShoot = 0;
@@ -27,7 +26,7 @@ BossAbilities::BossAbilities()
 	this->frontVecShoot = { 0, 0, 0 };
 }
 
-BossAbilities::BossAbilities(Vector3* pos, Vector3* targetPos, Vector3* velocity, int weaponType)
+BossAbilities::BossAbilities(btRigidBody* pos, Vector3* targetPos, Vector3* velocity, int weaponType)
 {
 	this->positionPtr = pos;
 	this->targetPosPtr = targetPos;
@@ -61,7 +60,7 @@ BossAbilities& BossAbilities::operator=(const BossAbilities& other)
 	if (this != &other)
 	{
 		this->positionPtr = other.positionPtr;
-		this->targetPosPtr = other.positionPtr;
+		this->targetPosPtr = other.targetPosPtr;
 		this->velocityPtr = other.velocityPtr;
 		this->flameXDirDegree = other.flameXDirDegree;
 		this->flameZDirDegree = other.flameZDirDegree;
@@ -98,7 +97,7 @@ Status BossAbilities::inAttackRange()
 {
 	Status status;
 
-	if ((*positionPtr - *targetPosPtr).Length() > attackRange)
+	if ((GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) - *targetPosPtr).Length() > attackRange)
 	{
 		status = Status::FAILURE;
 	}
@@ -153,7 +152,7 @@ Status BossAbilities::shoot()
 			{
 				offset = (rand() % 4) - 2;
 				offset *= 0.9f;
-				offsetPos = Vector3(targetPosPtr->x - offset, 0.0f, targetPosPtr->z - offset);
+				offsetPos = Vector3(targetPosPtr->x -offset, 0.0f, targetPosPtr->z - offset);
 			}
 			else
 			{
@@ -162,7 +161,7 @@ Status BossAbilities::shoot()
 				float predictionFactor = 0.4f;
 				offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
 			}
-			if ((*positionPtr - *targetPosPtr).Length() < 9999) // range, depends on change weapon func
+			if ((GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) - *targetPosPtr).Length() < 9999) // range, depends on change weapon func
 			{
 				if (this->timeSinceLastShot >= this->weapon.fireRate)
 				{
@@ -172,12 +171,12 @@ Status BossAbilities::shoot()
 					{
 						if (bullets[i].getTimeLeft() == 0.0)
 						{
-							Vector3 dir = (*targetPosPtr - *this->positionPtr);
-							Vector3 dir2 = (*targetPosPtr - *this->positionPtr);
+							Vector3 dir = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) - *targetPosPtr;
+							Vector3 dir2 = dir;
 							dir.Normalize();
 							dir2.Normalize();
-							Vector3 bulletOrigin = *this->positionPtr + (this->rightVecShoot * 2.5) + (this->frontVecShoot * -3);
-							Vector3 bulletOriginLeft = *this->positionPtr + (this->rightVecShoot * 2.5 * -1) + (this->frontVecShoot * -3);
+							Vector3 bulletOrigin = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + (this->rightVecShoot * 2.5) + (this->frontVecShoot * -3);
+							Vector3 bulletOriginLeft = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + (this->rightVecShoot * 2.5 * -1) + (this->frontVecShoot * -3);
 							bulletOrigin.y = 0.5;
 							bulletOriginLeft.y = 0.5;
 							dir = (offsetPos - bulletOrigin);
@@ -229,7 +228,7 @@ Status BossAbilities::shoot()
 				float predictionFactor = 0.4f;
 				offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
 			}
-			if ((*positionPtr - *targetPosPtr).Length() < 9999)
+			if ((GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) - *targetPosPtr).Length() < 9999)
 			{
 				if (this->timeSinceLastShot >= this->weapon.fireRate)
 				{
@@ -257,8 +256,8 @@ Status BossAbilities::shoot()
 							Vector3 dir = (flameThrowerDir); //from boss to dir
 							dir.Normalize();
 
-							Vector3 bulletOrigin = *this->positionPtr + (dir * 3);
-							Vector3 bulletOriginNeg = *this->positionPtr + (-dir * 3);
+							Vector3 bulletOrigin = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + (dir * 3);
+							Vector3 bulletOriginNeg = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + (-dir * 3);
 
 							/*dir = (offsetPos - bulletOrigin);
 							dir.Normalize();*/
@@ -306,7 +305,7 @@ Status BossAbilities::shoot()
 				float predictionFactor = 0.4f;
 				offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
 			}
-			if ((*positionPtr - *targetPosPtr).Length() < 9999) // range, depends on change weapon func
+			if ((GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) - *targetPosPtr).Length() < 9999) // range, depends on change weapon func
 			{
 				if (this->timeSinceLastShot >= this->weapon.fireRate)
 				{
@@ -316,9 +315,9 @@ Status BossAbilities::shoot()
 					{
 						if (bullets[i].getTimeLeft() == 0.0)
 						{
-							Vector3 dir = (*targetPosPtr - *this->positionPtr);
+							Vector3 dir = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) - *targetPosPtr;
 							dir.Normalize();
-							Vector3 bulletOrigin = *this->positionPtr + dir;
+							Vector3 bulletOrigin = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + dir;
 							bulletOrigin.y = 0.1;
 							dir = (offsetPos - bulletOrigin);
 							dir.Normalize();
@@ -358,7 +357,7 @@ Status BossAbilities::shoot()
 				float predictionFactor = 0.4f;
 				offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
 			}
-			if ((*positionPtr - *targetPosPtr).Length() < 9999)
+			if ((GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) - *targetPosPtr).Length() < 9999)
 			{
 				if (this->timeSinceLastShot >= this->weapon.fireRate)
 				{
@@ -386,8 +385,8 @@ Status BossAbilities::shoot()
 							Vector3 dir = (flameThrowerDir); //from boss to dir
 							dir.Normalize();
 								
-							Vector3 bulletOrigin = *this->positionPtr + (dir * 3);
-							Vector3 bulletOriginNeg = *this->positionPtr + (-dir * 3);
+							Vector3 bulletOrigin = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + (dir * 3);
+							Vector3 bulletOriginNeg = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + (-dir * 3);
 	
 							/*dir = (offsetPos - bulletOrigin);
 							dir.Normalize();*/
@@ -435,7 +434,7 @@ Status BossAbilities::shoot()
 				float predictionFactor = 0.4f;
 				offsetPos = Vector3(targetPosPtr->x + targetVelocity.x * predictionFactor, 0.0f, (targetPosPtr->z + targetVelocity.z * predictionFactor));
 			}
-			if ((*positionPtr - *targetPosPtr).Length() < 9999) // range, depends on change weapon func
+			if ((GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) - *targetPosPtr).Length() < 9999) // range, depends on change weapon func
 			{
 				if (this->timeSinceLastShot >= this->weapon.fireRate)
 				{
@@ -445,12 +444,12 @@ Status BossAbilities::shoot()
 					{
 						if (bullets[i].getTimeLeft() == 0.0)
 						{
-							Vector3 dir = (*targetPosPtr - *this->positionPtr);
-							Vector3 dir2 = (*targetPosPtr - *this->positionPtr);
+							Vector3 dir = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) - *targetPosPtr;
+							Vector3 dir2 = dir;
 							dir.Normalize();
 							dir2.Normalize();
-							Vector3 bulletOrigin = *this->positionPtr + (this->rightVecShoot * 2.5) + (this->frontVecShoot * -3);
-							Vector3 bulletOriginLeft = *this->positionPtr + (this->rightVecShoot * 2.5 * -1) + (this->frontVecShoot * -3);
+							Vector3 bulletOrigin = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + (this->rightVecShoot * 2.5) + (this->frontVecShoot * -3);
+							Vector3 bulletOriginLeft = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + (this->rightVecShoot * 2.5 * -1) + (this->frontVecShoot * -3);
 							bulletOrigin.y = 0.1;
 							bulletOriginLeft.y = 0.1;
 							dir = (offsetPos - bulletOrigin);

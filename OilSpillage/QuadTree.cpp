@@ -42,12 +42,12 @@ QuadTree::Node::Node(AABB&& boundingBox, UINT treeDepth)
 	seChild = make_unique<Node>(move(seBoundingBox), treeDepth - 1);
 }
 
-void QuadTree::insert(DynamicGameObject* o)
+void QuadTree::insert(GameObjectBase* o)
 {
 	root->insert(o);
 }
 
-void QuadTree::Node::insert(DynamicGameObject* o)
+void QuadTree::Node::insert(GameObjectBase* o)
 {
 	if (depth > 0)
 	{
@@ -60,7 +60,7 @@ void QuadTree::Node::insert(DynamicGameObject* o)
 		if (nwIntersect + neIntersect + swIntersect + seIntersect > 1.0)
 		{
 			objects.push_back(o);
-			auto comp = [](DynamicGameObject* a, DynamicGameObject* b) {return a->getAABB().maxPos.y < b->getAABB().maxPos.y; };
+			auto comp = [](GameObjectBase* a, GameObjectBase* b) {return a->getAABB().maxPos.y < b->getAABB().maxPos.y; };
 			std::sort(objects.begin(), objects.end(), comp);
 		}
 
@@ -76,21 +76,21 @@ void QuadTree::Node::insert(DynamicGameObject* o)
 	else
 	{
 		objects.push_back(o);
-		auto comp = [](DynamicGameObject* a, DynamicGameObject* b) {return a->getAABB().maxPos.y < b->getAABB().maxPos.y; };
+		auto comp = [](GameObjectBase* a, GameObjectBase* b) {return a->getAABB().maxPos.y < b->getAABB().maxPos.y; };
 		std::sort(objects.begin(), objects.end(), comp);
 	}
 }
 
-void QuadTree::getGameObjects(std::vector<DynamicGameObject*>& objects, Frustum viewFrustum, float frustumBias)
+void QuadTree::getGameObjects(std::vector<GameObjectBase*>& objects, Frustum viewFrustum, float frustumBias)
 {
 	root->getGameObjects(objects, viewFrustum, frustumBias);
 }
 
-void QuadTree::Node::getGameObjects(std::vector<DynamicGameObject*>& objects, Frustum& viewFrustum, float& frustumBias)
+void QuadTree::Node::getGameObjects(std::vector<GameObjectBase*>& objects, Frustum& viewFrustum, float& frustumBias)
 {
 	if (viewFrustum.intersect(boundingBox, frustumBias, true))
 	{
-		for (DynamicGameObject* o : this->objects)
+		for (GameObjectBase* o : this->objects)
 		{
 			if (viewFrustum.intersect(o->getAABB(), frustumBias, true))
 			{

@@ -30,11 +30,6 @@ void GameObject::setPosition(Vector3 newPos)
 	this->position = newPos;
 }
 
-void GameObject::setGameObjectPos(Vector3 newPos)
-{
-	this->position = newPos;
-}
-
 void GameObject::move(Vector3 addPos)
 {
 	this->position += addPos;

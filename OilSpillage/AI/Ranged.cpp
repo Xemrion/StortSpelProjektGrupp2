@@ -9,7 +9,7 @@ void Ranged::updateBullets(float deltaTime)
 	{
 		if (bullets[i].getWeaponType() == WeaponType::aiLaser)
 		{
-			bullets[i].getGameObject()->setPosition(*positionPtr);
+			bullets[i].getGameObject()->setPosition(GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()));
 			const float laserDropOffSpeed = 1.0;
 			laser->setDirection(bullets[i].getDirection());
 			laser->setPos(bullets[i].getGameObject()->getPosition());
@@ -23,7 +23,7 @@ Status Ranged::inAttackRange()
 {
 	Status status;
 
-	if ((*positionPtr - *targetPosPtr).Length() > attackRange)
+	if ((GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) - *targetPosPtr).Length() > attackRange)
 	{
 		status = Status::FAILURE;
 	}
@@ -93,9 +93,9 @@ Status Ranged::shoot()
 			{
 				if (weapon.type != WeaponType::aiLaser)
 				{
-					Vector3 dir = (offsetPos - *this->positionPtr);
+					Vector3 dir = (offsetPos - GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()));
 					dir.Normalize();
-					Vector3 bulletOrigin = *this->positionPtr + dir;
+					Vector3 bulletOrigin = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + dir;
 
 					this->bullets[i].shoot(
 						weapon,
@@ -107,9 +107,9 @@ Status Ranged::shoot()
 				}
 				else
 				{
-					Vector3 dir = (*targetPosPtr - *this->positionPtr);
+					Vector3 dir = *targetPosPtr - GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin());
 					dir.Normalize();
-					Vector3 bulletOrigin = *this->positionPtr + dir;
+					Vector3 bulletOrigin = GameObjectBase::btVectorConv(positionPtr->getWorldTransform().getOrigin()) + dir;
 
 					this->bullets[i].shoot(
 						weapon,
@@ -132,7 +132,7 @@ Ranged::Ranged()
 
 }
 
-Ranged::Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity, float* deltaTimePtr, int weaponType)
+Ranged::Ranged(btRigidBody* pos, Vector3* targetPos, Vector3* velocity, float* deltaTimePtr, int weaponType)
 {
 	this->positionPtr = pos;
 	this->targetPosPtr = targetPos;

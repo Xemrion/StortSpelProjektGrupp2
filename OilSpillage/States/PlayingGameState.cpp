@@ -204,12 +204,11 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	player->setPosition(startPos + Vector3(.0f, 0.00f - 1.2f, .0f));
 	player->getVehicleBody1()->setPosition(startPos + Vector3(.0f, 0.65f - 1.2f, .0f));
 
-	this->cameraObject = new GameObject;
+	this->cameraObject = new DynamicGameObject;
 	Game::getGraphics().loadShape(Shapes::SHAPE_CUBE);
 	cameraObject->mesh = Game::getGraphics().getMeshPointer("Cube");
-	cameraObject->setPosition(Vector3(player->getPosition().x, 10.0f, player->getPosition().z));
 	cameraObject->setScale(Vector3(1.5f, 1.5f, 1.5f));
-	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x, btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), 0.01f);
+	btRigidBody* tempo = physics->addSphere(cameraObject->getScale().x, btVector3(), 0.01f);
 	//btRigidBody* tempo = physics->addBox(btVector3(cameraObject->getPosition().x, cameraObject->getPosition().y, cameraObject->getPosition().z), btVector3(0.5f, 0.5f, 0.5f), 10.0f);
 	cameraObject->setRigidBody(tempo);
 	cameraObject->getRigidBody()->activate();
@@ -217,6 +216,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	cameraObject->getRigidBody()->setFriction(0);
 	cameraObject->getRigidBody()->setGravity(btVector3(0, 0, 0));
 	//cameraObject->getRigidBody()->setDamping(10,0);
+	cameraObject->setPosition(Vector3(player->getPosition().x, 10.0f, player->getPosition().z));
 	cameraTimer = 0;
 
 	initAI();
@@ -827,12 +827,11 @@ void PlayingGameState::spawnObjects()
 	float randomValue2 = 0;
 	float randomValue3 = 0;
 	for (int i = 0; i < 15; i++) {
-		physicsObjects.emplace_back(std::make_unique<GameObject>());
-		auto objPtr = physicsObjects.back().get();
+		physicsObjects.emplace_back(std::make_unique<DynamicGameObject>());
+		auto objPtr = static_cast<DynamicGameObject*>(physicsObjects.back().get());
 		objPtr->mesh = graphics.getMeshPointer("Entities/Barrel");
 		objPtr->setTexture(graphics.getMaterial("Entities/Barrel").diffuse);
 		graphics.addToDraw(objPtr);
-		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
 		objPtr->setScale(Vector3(size, size, size));
 		randomValue = (rand() % 5) * 0.03f;
 		randomValue2 = (rand() % 5) * 0.03f;
@@ -844,6 +843,7 @@ void PlayingGameState::spawnObjects()
 		objPtr->getRigidBody()->setFriction(0.7f);
 		objPtr->getRigidBody()->setActivationState(0);
 		objPtr->getRigidBody()->setDeactivationTime(0.1f);
+		objPtr->setPosition(Vector3(-200, 0.2f + i, -200));
 	}
 	for (int i = 0; i < 15; i++) {
 		physicsObjects.emplace_back(std::make_unique<GameObject>());
@@ -876,7 +876,8 @@ void PlayingGameState::spawnObjects()
 
 void PlayingGameState::moveObjects()
 {
-	GameObject* object = physicsObjects.at(physicsObjID).get();
+	GameObjectBase* object = physicsObjects.at(physicsObjID).get();
+	DynamicGameObject* dynamicObject = dynamic_cast<DynamicGameObject*>(object);
 	auto tilemap = map->getTileMap();
 	if (object->getPosition().x > (player->getPosition().x + 80) ||
 		object->getPosition().x < (player->getPosition().x - 80) ||
@@ -884,8 +885,8 @@ void PlayingGameState::moveObjects()
 
 
 		object->getPosition().z < (player->getPosition().z - 50)) {
-		if (object->getRigidBody() != nullptr) {
-			object->getRigidBody()->setActivationState(0);
+		if (dynamicObject != nullptr) {
+			dynamicObject->getRigidBody()->setActivationState(0);
 		}
 		int randomValue = rand() % 2 + 1;
 		if (randomValue == 1) {
@@ -914,13 +915,13 @@ void PlayingGameState::moveObjects()
 		}
 		randomValue = rand() % 360 + 1;
 		int randomValue2 = 0;
-		if (object->getRigidBody() != nullptr) {
+		if (dynamicObject != nullptr) {
 			randomValue2 = rand() % 2;
 		}
 		Quaternion qt1 = Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(randomValue2 * 90 * XM_PI / 180, randomValue * XM_PI / 180, 0));
 		btQuaternion qt = btQuaternion(qt1.x, qt1.y, qt1.z, qt1.w);
-		if (object->getRigidBody() != nullptr) {
-			object->getRigidBody()->getWorldTransform().setRotation(qt);
+		if (dynamicObject != nullptr) {
+			dynamicObject->getRigidBody()->getWorldTransform().setRotation(qt);
 		}
 		else {
 			object->setRotation(Vector3(randomValue2 * 90 * XM_PI / 180, randomValue * XM_PI / 180, 0));
@@ -1016,18 +1017,20 @@ void PlayingGameState::updateObjects()
 
 void PlayingGameState::paperCollision(float deltaTime)
 {
-
+	GameObject* object = nullptr;
 	float randomValue = 0;
 	for (auto& obj : physicsObjects) {
-		if (obj->getRigidBody() == nullptr) {
+		object = dynamic_cast<GameObject*>(obj.get());
+		if (object)
+		{
 			randomValue = rand() % 2;
-			if (((player->getPosition() - obj->getPosition()).Length()) < 1.5f && abs(player->getVelocitySpeed()) > 8.0f && randomValue == 1) {
+			if (((player->getPosition() - object->getPosition()).Length()) < 1.5f && abs(player->getVelocitySpeed()) > 8.0f && randomValue == 1) {
 				randomValue = rand() % 20;
 				randomValue = std::max(randomValue - 5.0f, 0.0f);
-				obj->setVelocity(Vector3(player->getRigidBody()->getLinearVelocity().getX(), randomValue * 0.5f, player->getRigidBody()->getLinearVelocity().getZ()));
-				obj->setPosition(obj->getPosition() + Vector3(0, 0.1f, 0));
+				object->setVelocity(Vector3(player->getRigidBody()->getLinearVelocity().getX(), randomValue * 0.5f, player->getRigidBody()->getLinearVelocity().getZ()));
+				object->setPosition(object->getPosition() + Vector3(0, 0.1f, 0));
 			}
-			obj->updateObject(deltaTime);
+			object->updateObject(deltaTime);
 		}
 	}
 }

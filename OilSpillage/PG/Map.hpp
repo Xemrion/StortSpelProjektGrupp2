@@ -113,7 +113,7 @@ struct SingleTileHouse {
 };
 
 struct MultiTileHouse {
-	Vector<DynamicGameObject> parts;
+	Vector<GameObject> parts;
 	Vector<DynamicGameObject> hitboxes;
 	Bounds             bounds; // refactor remove?
 	V2u                nw;
@@ -127,7 +127,7 @@ struct HouseGenData {
 };
 
 struct Border {
-	Vector<DynamicGameObject>  meshes;
+	Vector<GameObject>  meshes;
 	Vector<DynamicGameObject>  bounds { Size(4) };
 };
 
@@ -187,8 +187,8 @@ private:
 	UPtr<TileMap>              tilemap;
 	UPtr<Voronoi>              districtMap;
 	Vector<District::Enum>     districtLookupTable;
-	Vector<UPtr<DynamicGameObject>>   groundTiles;
-	Vector<UPtr<DynamicGameObject>>   crossingTiles;
+	Vector<UPtr<GameObject>>   groundTiles;
+	Vector<UPtr<GameObject>>   crossingTiles;
 	Physics * const            physics;
 	LightList &                lights;
 	UPtr<Skyscraper>		   skyscraperGenerator;

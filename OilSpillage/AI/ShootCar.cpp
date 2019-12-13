@@ -2,10 +2,10 @@
 
 void ShootCar::followPath()
 {
-	if (pathSize >= 0 && (position - targetPos).Length() > 40)
+	if (pathSize >= 0 && (this->getPosition() - targetPos).Length() > 40)
 	{
 		destination = *path;
-		if ((destination - position).Length() < 15)
+		if ((destination - this->getPosition()).Length() < 15)
 		{
 			path--;
 			pathSize--;
@@ -22,7 +22,7 @@ ShootCar::ShootCar()
 }
 
 ShootCar::ShootCar(float x, float z, int weaponType, Physics* physics)
-	: Spitfire(x, z, physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
+	: Spitfire(x, z, physics), Ranged(this->getRigidBody(), &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->stats = VehicleStats::fastCar;
 	setHealth(this->stats.maxHealth);
@@ -62,7 +62,7 @@ void ShootCar::update(float dt, const Vector3& targetPos)
 {
 	Spitfire::update(dt, targetPos);
 	updateBullets(deltaTime);
-	if ((position - targetPos).Length() < attackRange)
+	if ((this->getPosition() - targetPos).Length() < attackRange)
 	{
 		shoot();
 	}
@@ -82,7 +82,7 @@ Status ShootCar::shoot()
 				{
 					Vector3 dir = Vector3(vehicleBody1->getRigidBody()->getLinearVelocity());
 					dir.Normalize();
-					Vector3 bulletOrigin = position + dir;
+					Vector3 bulletOrigin = this->getPosition() + dir;
 
 					this->bullets[i].shoot(
 						weapon,
@@ -94,9 +94,9 @@ Status ShootCar::shoot()
 				}
 				else if (weapon.type == WeaponType::aiLaser)
 				{
-					Vector3 dir = (targetPos - position);
+					Vector3 dir = (targetPos - this->getPosition());
 					dir.Normalize();
-					Vector3 bulletOrigin = position + dir;
+					Vector3 bulletOrigin = this->getPosition() + dir;
 
 					this->bullets[i].shoot(
 						weapon,
@@ -108,9 +108,9 @@ Status ShootCar::shoot()
 				}
 				else
 				{
-					Vector3 dir = (targetPos - position);
+					Vector3 dir = (targetPos - this->getPosition());
 					dir.Normalize();
-					Vector3 bulletOrigin = position + dir;
+					Vector3 bulletOrigin = this->getPosition() + dir;
 
 					this->bullets[i].shoot(
 						weapon,

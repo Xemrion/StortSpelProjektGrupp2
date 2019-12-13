@@ -31,7 +31,6 @@ Boss::Boss(Boss&& boss)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Boss");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Boss"));
 	this->setScale(Vector3(1, 1, 1));
-	this->setPosition(Vector3(position.x, position.y, position.z));
 	Game::getGraphics().addToDraw(this);
 
 
@@ -55,7 +54,7 @@ Boss::Boss(Boss&& boss)
 }
 
 Boss::Boss(float x, float z, int weaponType, Physics* physics, float scalingNr)
-	:DynamicActor(x, z, physics), BossAbilities(&this->position, &this->targetPos, &this->velocity, weaponType)
+	:DynamicActor(x, z, physics), BossAbilities(this->getRigidBody(), &this->targetPos, &this->velocity, weaponType)
 {
 	setUpActor();
 
@@ -67,7 +66,6 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics, float scalingNr)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Boss");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Boss"));
 	this->setScale(Vector3(1, 1, 1));
-	this->setPosition(Vector3(position.x, position.y, position.z));
 	Game::getGraphics().addToDraw(this);
 
 	this->attackRange = 85;
@@ -89,6 +87,7 @@ Boss::Boss(float x, float z, int weaponType, Physics* physics, float scalingNr)
 	this->weakSpots.push_back(Weakspot(0, this->scalingNr));
 	this->initiateWeakPoints();
 
+	Vector3 position = this->getPosition();
 	btRigidBody* tempo = physics->addSphere(3.5f, btVector3(position.x, position.y, position.z), 1.5f, this);
 	setRigidBody(tempo);
 	getRigidBody()->activate();
@@ -253,7 +252,7 @@ void Boss::move()
 	this->getRigidBody()->setLinearVelocity(btVector3(velocity.x * 0.01, 0.0f, velocity.z * 0.01) * 200);
 
 	this->currentVelocityVector = (btVector3(velocity.x * deltaTime, 0.0f, velocity.z * deltaTime) * 200);
-	Vector3 targetToSelf = (this->playerPos - position);
+	Vector3 targetToSelf = (this->playerPos - this->getPosition());
 	this->targetToSelf = targetToSelf;
 
 	//Rotate
@@ -281,7 +280,7 @@ void Boss::move()
 
 Vector3 Boss::calculateVelocity()
 {
-	Vector3 desiredDirection = this->currentPoint - position;
+	Vector3 desiredDirection = this->currentPoint - this->getPosition();
 
 	return desiredDirection - velocity;
 }

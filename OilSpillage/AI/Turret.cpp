@@ -1,17 +1,18 @@
 #include "Turret.h"
 
+Vector3 Turret::zeroVector;
+
 Turret::Turret()
 {}
 
 Turret::Turret(float x, float z, int weaponType, Physics* physics)
-	: Actor(x, z,physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
+	: Actor(x, z,physics), Ranged(this->getRigidBody(), &this->targetPos, &Turret::zeroVector, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 23;
 	turretAngle = 90;
 	this->calculateTarget(turretAngle);
 	setUpActor();
-	this->body.setPosition(this->position);
 	this->body.setScale(this->scale);
 	this->body.mesh = Game::getGraphics().getMeshPointer("Entities/Turret");
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Turret1");
@@ -28,8 +29,8 @@ Turret::Turret(float x, float z, int weaponType, Physics* physics)
 	scaling(weapon.damage, 1.1);
 	this->setPoints(100 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
 
-	this->velocity = Vector3();
 	createRigidbody(physics);
+	this->body.setPosition(this->getPosition());
 }
 
 Turret::~Turret()
@@ -51,7 +52,7 @@ void Turret::update(float dt, const Vector3& targetPos)
 
 void Turret::createRigidbody(Physics* physics)
 {
-	btRigidBody* tempo = physics->addSphere(0.5f, btVector3(position.x, position.y, position.z), 0, this);
+	btRigidBody* tempo = physics->addSphere(0.5f, btVector3(), 0, this);
 	setRigidBody(tempo);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
@@ -99,7 +100,7 @@ void Turret::setUpActor()
 
 Status Turret::rotateTowards()
 {
-	Vector3 targetToSelf = (targetPos - position);
+	Vector3 targetToSelf = (targetPos - this->getPosition());
 
 	if ((targetToSelf).Dot(vecForward) < 0.8)
 	{
@@ -129,7 +130,7 @@ Status Turret::inRange()
 Status Turret::lineOfSight()
 {
 	Status status = Status::FAILURE;
-	Vector3 dir = this->position - targetPos;
+	Vector3 dir = this->getPosition() - targetPos;
 	dir.Normalize();
 	float value = dir.Dot(vecForward);
 	float angle = std::abs(acos(value));

@@ -1,7 +1,7 @@
 #ifndef VEHICLE_H
 #define VEHICLE_H
 
-#include "GameObject.h"
+#include "DynamicGameObject.h"
 #include "Weapon.h"
 #include "VehicleStats.h"
 #include "Powerup.h"
@@ -122,7 +122,7 @@ public:
 	}
 
 };
-class Vehicle : public GameObject
+class Vehicle : public DynamicGameObject
 {
 private:
 	btScalar mRotation;
@@ -134,7 +134,7 @@ private:
 	//btGeneric6DofSpring2Constraint* spring2;
 	//btGeneric6DofSpring2Constraint* spring3;
 	//btGeneric6DofSpring2Constraint* spring4;
-	GameObject* vehicleBody1;
+	DynamicGameObject* vehicleBody1;
 	btPoint2PointConstraint* pointJoint;
 	//btRaycastVehicle* vehicleBody;
 	btRaycastVehicle::btVehicleTuning	m_tuning;
@@ -221,7 +221,7 @@ public:
 	void setVehicleSlots(VehicleSlots* slots);
 	void setSpecSlot(Slots slot, Item* item, Container::Slot* inventorySlot);
 	VehicleSlots* getSlots();
-	GameObject* getVehicleBody1() { return this->vehicleBody1; }
+	DynamicGameObject* getVehicleBody1() { return this->vehicleBody1; }
 	float getAcceleratorX();
 	void startEngineSound();
 	void stopEngineSound();

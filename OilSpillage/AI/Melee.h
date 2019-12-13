@@ -4,7 +4,7 @@
 class Melee
 {
 private:
-	Vector3* positionPtr;
+	btRigidBody* positionPtr;
 	Vector3* velocityPtr;
 	float* deltaTimePtr;
 protected:
@@ -15,6 +15,6 @@ protected:
 	void meleeAttack();
 public:
 	Melee();
-	Melee(Vector3* pos,Vector3* velocity, float* deltaTimePtr);
+	Melee(btRigidBody* pos,Vector3* velocity, float* deltaTimePtr);
 	virtual ~Melee();
 };

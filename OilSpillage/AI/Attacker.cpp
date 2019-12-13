@@ -5,7 +5,7 @@ Attacker::Attacker()
 }
 
 Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
-	:DynamicActor(x, z, physics), Ranged(&this->position, &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
+	:DynamicActor(x, z, physics), Ranged(this->getRigidBody(), &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
@@ -33,7 +33,7 @@ void Attacker::update(float dt, const Vector3& targetPos)
 }
 void Attacker::createRigidbody(Physics* physics)
 {
-	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(position.x, position.y, position.z), 0.5f, this);
+	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(), 0.5f, this);
 	setRigidBody(tempo);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
@@ -68,7 +68,7 @@ void Attacker::setUpActor()
 Vector3 Attacker::calculateVelocity()
 {
 	//Move away from player if within 11, move towards it if further than 12, stand still if between the two
-
+	Vector3 position = this->getPosition();
 	Vector3 desiredDirection = destination - position;
 	if (destination == targetPos)
 	{

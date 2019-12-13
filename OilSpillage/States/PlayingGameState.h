@@ -12,6 +12,7 @@
 #include "../PG/Generic L-System.h"
 #include "../UI/UserInterface.h"
 #include "../Powerup.h"
+#include "../DynamicGameObject.h"
 
 #include"..////Objectives/ObjectiveHandler.h"
 using namespace DirectX::SimpleMath;
@@ -93,7 +94,7 @@ private:
 	std::vector<CinematicPos>       points;
 	std::vector<std::unique_ptr<PowerUp>> powerUps;
 	SpotLight                      *playerLight;
-	GameObject*		cameraObject;
+	DynamicGameObject*		cameraObject;
 	float			cameraTimer;
 	float			snowTimer;
 
@@ -105,7 +106,7 @@ private:
 	//Bullet
 	std::unique_ptr<Physics>		physics;
 	std::unique_ptr<GameObject>		buildingTest;
-	Vector<UPtr<GameObject>>		physicsObjects;
+	Vector<UPtr<GameObjectBase>>	physicsObjects;
 	int physicsObjID;
 	int count;
 	Vector3 prevAccelForce;
