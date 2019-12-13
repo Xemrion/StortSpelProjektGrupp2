@@ -614,6 +614,9 @@ void PlayingGameState::update(float deltaTime)
 #if defined(_DEBUG) || defined(RELEASE_DEBUG)
 
 #else
+#endif // !_DEBUG
+
+
 		if (time > 0.0f)
 		{
 			time = std::max(time - deltaTime, 0.0f);
@@ -622,7 +625,6 @@ void PlayingGameState::update(float deltaTime)
 		{
 			Game::setState(Game::STATE_HIGHSCORE);
 		}
-#endif // !_DEBUG
 		prevAccelForce = Vector3(player->getRigidBody()->getLinearVelocity());
 		player->updatePlayer(deltaTime);
 		physics->update(deltaTime);

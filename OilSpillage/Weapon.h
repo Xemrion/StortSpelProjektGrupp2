@@ -67,8 +67,8 @@ struct Weapon
 			soundTimer += 100.0f;
 		}
 		timeSinceLastShot += deltaTime;
-		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * spreadDecreasePerSecond * maxSpread, 0.0);
-		remainingCooldown = max(remainingCooldown - deltaTime, 0.0);
+		currentSpreadIncrease = max(currentSpreadIncrease - deltaTime * spreadDecreasePerSecond * maxSpread, 0.0f);
+		remainingCooldown = max(remainingCooldown - deltaTime, 0.0f);
 	};
 
 	bool updateFireRate()
