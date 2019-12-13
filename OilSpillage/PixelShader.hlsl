@@ -125,8 +125,8 @@ PS_OUT main(VS_OUT input) : SV_Target
 
 	uint2 lightTileIndex = uint2(input.Pos.x * 0.0625f, input.Pos.y * 0.0625f);
 	TileData lightTileData = tileData[lightTileIndex.y * 80 + lightTileIndex.x];
-	float sunShadow = (1 - shadowVisible(input.shadowPos, ShadowMap, 0.0005f));
-	float4 ambient = float4(float3(0.2f, 0.2f, 0.2f) * sunColor.rgb, 1.0);
+	float sunShadow = max((1.0 - shadowVisible(input.shadowPos, ShadowMap, 0.0005f)), 0.2);
+	float4 ambient = float4(float3(0.2f, 0.2f, 0.2f), 1.0);
 
 	float shadowSpotVisible = 1.0f;
 	float3 cameraVector = normalize(cameraPos.xyz - input.wPos.xyz);
@@ -192,7 +192,6 @@ PS_OUT main(VS_OUT input) : SV_Target
 		float3 fresnelTerm = (specularColor) + (1.0f - specularColor) * pow(1.0f - nDotH, 5);
 		
 		diffuseLight.rgb += max(l.color.rgb * (float3(1.0, 1.0, 1.0) - fresnelTerm) * nDotL * attenuation * directional * shadowSpotVisible, 0.0);
-
 		specularLight.rgb += glossTerm * fresnelTerm * l.color.rgb * nDotL * attenuation * directional * shadowSpotVisible;
 	}
 
@@ -202,7 +201,6 @@ PS_OUT main(VS_OUT input) : SV_Target
 	output.color = outColor;
 	output.color.a = texColor.a + color.a;
 	output.depth = float4(input.Pos.z, 0.0, 0.0, 1.0);
-
 
 	return output;
 }
