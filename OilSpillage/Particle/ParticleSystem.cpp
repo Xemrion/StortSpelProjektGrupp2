@@ -53,7 +53,9 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] =
 	{
-		{"SV_VertexID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  }
+		
+		{"SV_InstanceID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"SV_VertexID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0, 1, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  }
 	};
 
 
@@ -115,10 +117,10 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	vBufferDesc.CPUAccessFlags = 0;
 	vBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
 
-	indDraw.instanceCount = 1;
+	indDraw.instanceCount = 0;
 	indDraw.vertexStartLoc = 0;
 	indDraw.instanceStartLoc = 0;
-	indDraw.vertexCount = 0;
+	indDraw.vertexCount = 1;
 	D3D11_SUBRESOURCE_DATA subData;
 	ZeroMemory(&subData, sizeof(subData));
 	subData.pSysMem = &indDraw;
