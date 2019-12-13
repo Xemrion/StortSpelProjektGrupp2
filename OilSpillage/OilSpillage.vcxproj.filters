@@ -118,7 +118,6 @@
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="physics.cpp" />
-    <ClCompile Include="SoLoud\src\backend\null\soloud_null.cpp" />
     <ClCompile Include="AI\ShootCar.cpp" />
     <ClCompile Include="UI\Elements\AnimatedText.cpp" />
     <ClCompile Include="PG\Generic L-System.cpp" />
@@ -152,6 +151,7 @@
     <ClCompile Include="Inventory\Gadget.cpp" />
     <ClCompile Include="States\GameState.cpp" />
     <ClCompile Include="Profiling.cpp" />
+    <ClCompile Include="PG\DisjointSets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -253,42 +253,6 @@
     <ClInclude Include="UI\Elements\TextBox.h" />
     <ClInclude Include="UI\Elements\CarGadgetSelector.h" />
     <ClInclude Include="UI\Elements\VehicleStatBox.h" />
-    <ClInclude Include="SoLoud\include\soloud.h" />
-    <ClInclude Include="SoLoud\include\soloud_audiosource.h" />
-    <ClInclude Include="SoLoud\include\soloud_bassboostfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_biquadresonantfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_bus.h" />
-    <ClInclude Include="SoLoud\include\soloud_c.h" />
-    <ClInclude Include="SoLoud\include\soloud_dcremovalfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_echofilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_error.h" />
-    <ClInclude Include="SoLoud\include\soloud_fader.h" />
-    <ClInclude Include="SoLoud\include\soloud_fft.h" />
-    <ClInclude Include="SoLoud\include\soloud_fftfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_file.h" />
-    <ClInclude Include="SoLoud\include\soloud_file_hack_off.h" />
-    <ClInclude Include="SoLoud\include\soloud_file_hack_on.h" />
-    <ClInclude Include="SoLoud\include\soloud_filter.h" />
-    <ClInclude Include="SoLoud\include\soloud_flangerfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_internal.h" />
-    <ClInclude Include="SoLoud\include\soloud_lofifilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_monotone.h" />
-    <ClInclude Include="SoLoud\include\soloud_openmpt.h" />
-    <ClInclude Include="SoLoud\include\soloud_queue.h" />
-    <ClInclude Include="SoLoud\include\soloud_robotizefilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_sfxr.h" />
-    <ClInclude Include="SoLoud\include\soloud_speech.h" />
-    <ClInclude Include="SoLoud\include\soloud_tedsid.h" />
-    <ClInclude Include="SoLoud\include\soloud_thread.h" />
-    <ClInclude Include="SoLoud\include\soloud_wav.h" />
-    <ClInclude Include="SoLoud\include\soloud_waveshaperfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_wavstream.h" />
-    <ClInclude Include="SoLoud\include\soloud_vic.h" />
-    <ClInclude Include="SoLoud\include\soloud_vizsn.h" />
-    <ClInclude Include="SoLoud\src\audiosource\wav\stb_vorbis.h" />
-    <ClInclude Include="SoLoud\src\audiosource\wav\dr_wav.h" />
-    <ClInclude Include="SoLoud\src\audiosource\wav\dr_flac.h" />
-    <ClInclude Include="SoLoud\src\audiosource\wav\dr_mp3.h" />
     <ClInclude Include="PG\Modelizer.hpp" />
     <ClInclude Include="AI\TurretHandler.h" />
     <ClInclude Include="AI\Swarm.h" />
@@ -304,10 +268,6 @@
     <ClInclude Include="AI\ShootCar.h" />
     <ClInclude Include="Inventory\Container.h" />
     <ClInclude Include="UI\Elements\ButtonPromtBar.h" />
-    <ClInclude Include="SoLoud\src\audiosource\speech\darray.h" />
-    <ClInclude Include="SoLoud\src\audiosource\speech\klatt.h" />
-    <ClInclude Include="SoLoud\src\audiosource\speech\resonator.h" />
-    <ClInclude Include="SoLoud\src\audiosource\speech\tts.h" />
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="physics.h" />
@@ -334,6 +294,7 @@
     <ClInclude Include="Inventory\ItemGadget.h" />
     <ClInclude Include="Inventory\Gadget.h" />
     <ClInclude Include="Profiling.h" />
+    <ClInclude Include="PG\DisjointSets.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

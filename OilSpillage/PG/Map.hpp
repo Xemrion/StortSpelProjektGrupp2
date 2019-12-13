@@ -77,6 +77,7 @@ union NeighbourMask {
 		};
 };
 
+
 struct HouseTileset {
 	String                  name;
 	F32                     floorHeight;
@@ -173,11 +174,13 @@ public:
 	Direction                  getHospitalOrientation(   V2u const hospitalTilePos ) const noexcept;
 	Vector3                    getHospitalFrontPosition( V2u const hospitalTilePos ) const noexcept;
 	District::Enum             districtAt( U32 x, U32 y ) const noexcept;
-	District::Enum             districtAt( U32 idx ) const noexcept;
+	inline District::Enum      districtAt( V2u pos )      const noexcept { return districtAt(pos.x, pos.y); }
+	District::Enum             districtAt( U32 idx )      const noexcept;
 	HouseGenData const &       getHouseData() const noexcept;
 	Info const &               getInfo() const noexcept;
 	Vector<F32> const &        getRoadDistanceMap() const noexcept;
 private:
+	void                       eliminateBadSpawnPositions() noexcept;
 	void                       placeStreetlight( Vector3 const &worldPosition, Vector3 const &rotation={.0f,.0f,.0f} ) noexcept;
 	void                       generateDistricts();
 	void                       generateRoads();
@@ -186,7 +189,7 @@ private:
 	void                       generateZebraCrossings();
 	void                       generateStreetlights();
 	Opt<Lot>                   findRandomLot( U16 districtId ) noexcept;
-	Opt<Lot>                   findFixedLot( U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
+	Opt<Lot>                   findFixedLot(  U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
 	void                       instantiateTilesAsModels() noexcept;
 	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout &&, HouseTileset const & ) const noexcept;
 	CompositeHouse             instantiateSkyscraper();

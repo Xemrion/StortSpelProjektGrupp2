@@ -235,16 +235,24 @@ void RoadGenerator::upscale() noexcept
 // generate dead ends along the south side
 	for ( auto x = 0;  x < map.width;  ++x ) {
 		auto y = newMap.height-2;
-		if ( newMap.tileAt(x,y) == Tile::road )
-			if ( !oneEdgeRoadFound or selection(rng) < .15f )
+		if ( newMap.tileAt(x,y) == Tile::road ) {
+			if ( !oneEdgeRoadFound or selection(rng) < .25f ) {
 				newMap.tileAt(x,y+1) = Tile::road;
+            oneEdgeRoadFound = true;
+            ++x;
+         }
+      }
 	}
 	// generate dead ends along the east side
 	for ( auto y = 0;  y < map.height;  ++y ) {
 		auto x = newMap.width-2;
-		if ( newMap.tileAt(x,y) == Tile::road )
-			if ( !oneEdgeRoadFound or selection(rng) < .25f )
+		if ( newMap.tileAt(x,y) == Tile::road ) {
+			if ( !oneEdgeRoadFound or selection(rng) < .25f ) {
 				newMap.tileAt(x+1,y) = Tile::road;
+            oneEdgeRoadFound = true;
+            ++y;
+         }
+      }
 	}
 
 	start.x *= 2; // bugged and unused, TODO: remove

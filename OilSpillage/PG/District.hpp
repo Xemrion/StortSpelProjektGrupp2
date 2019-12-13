@@ -61,3 +61,13 @@ namespace District {
 
 	using Enum = Type const *;
 }
+
+inline bool isInnerCity( District::Enum d ) noexcept {
+	using namespace District;
+	return d==&metropolitan or d==&residential or d==&downtown;
+}
+
+inline bool isOuterCity( District::Enum d ) noexcept {
+	using namespace District;
+	return d==&park or d==&suburban;
+}

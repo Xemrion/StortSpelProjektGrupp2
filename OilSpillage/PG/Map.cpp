@@ -4,6 +4,17 @@
 #include "Profiler.hpp"
 
 
+std::array<V2i,8> directionalOffsets() noexcept {
+	return { V2i{  0, -1 },    // N
+		      V2i{ +1, -1 },    // NE
+		      V2i{ +1,  0 },    //  E
+		      V2i{ +1, +1 },    // SE
+		      V2i{  0, +1 },    // S
+		      V2i{ -1, +1 },    // SW
+		      V2i{ -1,  0 },    //  W
+		      V2i{ -1, -1 }  }; // NW
+}
+
 // NE "outer corner":
 //     map     mask    predicate
 //     x01     011     001
@@ -139,13 +150,13 @@ void Map::generateBorder()
 				border.meshes.emplace_back();
 				auto &ground       = border.meshes.back();
 				ground.mesh        = graphics.getMeshPointer("Tiles/Quad_SS");
-				ground.setNormalMap(   graphics.getTexturePointer( ( std::string("Tiles/")+stringify(biome)+"_nor").c_str() ) );
+				ground.setNormalMap( graphics.getTexturePointer( ( std::string("Tiles/")+stringify(biome)+"_nor").c_str() ) );
 				ground.setColor({ .0f, .0f, .0f, .0f });
 				ground.setTexture( graphics.getTexturePointer( ( std::string("Tiles/")+stringify(biome)).c_str() ) );
 				Vector3  offset     { .0f, baseOffsetY, .0f };
 				ground.setPosition( tilemap->convertTilePositionToWorldPosition(x,y) + offset );
 				ground.setScale({ config.tileSideScaleFactor, 1.0f, config.tileSideScaleFactor });
-			}
+			}	
 		}
 	}
 
@@ -162,9 +173,9 @@ void Map::generateBorder()
 				border.meshes.emplace_back();
 				auto &wallPiece      = border.meshes.back();
 				wallPiece.mesh       = graphics.getMeshPointer("Cube");
-				wallPiece.setColor({ .75f, .75f, .75f, 0.0f });
-				wallPiece.setTexture(   graphics.getTexturePointer("Tiles/concrete"));
-				wallPiece.setNormalMap( graphics.getTexturePointer("Tiles/concrete_nor"));
+				wallPiece.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+				//wallPiece.setTexture(   graphics.getTexturePointer("Tiles/concrete"));
+				//wallPiece.setNormalMap( graphics.getTexturePointer("Tiles/concrete_nor"));
 				Vector3  offset       { isVertical? (isWest? -align:align):.0f, -1.5f, isHorizontal? (isNorth? align:-align):.0f};
 				wallPiece.setPosition( tilemap->convertTilePositionToWorldPosition(x,y) + offset );
 				wallPiece.setScale({ config.tileSideScaleFactor/(isVertical? 8:2), config.tileSideScaleFactor/4, config.tileSideScaleFactor/(isHorizontal? 8:2) });
@@ -393,6 +404,49 @@ Opt<const MultitileLayout *> getMultitileLayout( District::Enum d, RNG &rng ) no
 	return {}; // no valid layout found
 }
 
+#include <deque>
+// hacky solution to stop AIs from spawning in inaccessible regions
+void Map::eliminateBadSpawnPositions() noexcept
+{
+	std::vector<bool> isAccessible( tilemap->data.size(), false );
+	std::vector<bool> isProcessed(  tilemap->data.size(), false );
+	std::deque<V2u>   toProcess  { startPositionInTileSpace };
+	while ( toProcess.size() ) {
+		U32 idx;
+		V2u pos = toProcess.back(); toProcess.pop_back();
+		if ( pos.x >= tilemap->width or pos.y >= tilemap->height )
+			continue; // early exit; out-of-bounds!
+		else if ( idx = tilemap->index(pos); !isProcessed[idx] )
+			continue; // early exit; revisitation!
+		else if ( tilemap->tileAt(pos) != Tile::building ) {
+			isAccessible[idx] = true;
+			for ( auto &offset : directionalOffsets() )
+				toProcess.push_back( {pos.x+offset.x, pos.y+offset.y} );
+		}
+		isProcessed[idx]  = true;
+	}
+
+	/*std::vector<bool> isReachable( tilemap->data.size() );
+
+	const auto recursiveCheck = [this,&isReachable]( V2u start ) -> void {
+		auto recursiveCheck_impl = [this,&isReachable]( U32 x, U32 y, auto &self ) mutable -> void {
+			if ( x < tilemap->width and y < tilemap->height and tilemap->tileAt(x,y) != Tile::building ) {
+				isReachable[tilemap->index(x,y)] = true;
+				for ( auto &offset : directionalOffsets() )
+					self( x+offset.x, y+offset.y, self );
+			}
+		};
+		recursiveCheck_impl( start.x, start.y, recursiveCheck_impl );
+	};
+
+	recursiveCheck( startPositionInTileSpace );
+	*/
+
+	for ( auto idx = 0;  idx < tilemap->data.size();  ++idx )
+		if ( tilemap->data[idx] == Tile::ground and !isAccessible[idx] )
+			tilemap->data[idx] = Tile::building;
+}
+
 Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightList &lights                         ):
 	graphics        ( graphics                                                                                      ),
 	physics         ( physics                                                                                       ),
@@ -420,8 +474,9 @@ Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightLi
 	generateBuildings();
 	generateBorder();
 	generateStreetlights();
-	generateZebraCrossings();
 	instantiateTilesAsModels();
+	generateZebraCrossings();
+	eliminateBadSpawnPositions();
 }
 
 Map::~Map() noexcept
@@ -1151,6 +1206,7 @@ District::Enum  Map::districtAt( U32 x, U32 y ) const noexcept {
 	return districtLookupTable[ cellIdx ];
 }
 
+
 District::Enum  Map::districtAt(U32 idx) const noexcept
 {
 	assert( idx < districtMap->diagram.size() );
@@ -1166,18 +1222,40 @@ District::Enum  Map::districtAt(U32 idx) const noexcept
 
 // Wraps a tile's type and encodes the possible existence of neighbouring road tiles in the 8 eight directions into bits.
 struct TileInfo {
-   NeighbourMask   roadmap, housemap, concreteMap;
-	Vector3         origin;
-	Tile            tileType;
-	District::Enum  districtType;
+   NeighbourMask      roadmap, housemap, concreteMap;
+	Vector3            origin;
+	Tile               tileType;
+	District::Enum     districtType;
 };
 
-inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
+
+inline Vector<TileInfo>  extractTileInfo( Map const &map ) noexcept {
 	auto const &tilemap = map.getTileMap();
-	Vector<TileInfo>  results  { tilemap.data.size() };
+
+	auto dirOffsets = directionalOffsets();
+
+	auto extractTransitionMap = [&tilemap, &map, &dirOffsets]( U32 x, U32 y, bool outOfBoundsDefault, auto predicate ) {
+		NeighbourMask result;
+		U8 currBit = 1;
+		for ( auto &offset : dirOffsets ) {
+			U32 nX = x + offset.x,
+			    nY = y + offset.y;
+			if ( nX < tilemap.width and nY < tilemap.height ) {
+				auto t = tilemap.tileAt(nX,nY);
+				auto d = map.districtAt(nX,nY);
+				if ( predicate(t,d) )
+					result.bitmap |= currBit;
+			}
+			else if ( outOfBoundsDefault == true ) result.bitmap |= currBit;
+			currBit <<= 1;
+		}
+		return result;
+	};
+
+	Vector<TileInfo> info  = Vector<TileInfo>{ tilemap.data.size() };
 	for ( auto y=0;  y < tilemap.height;  ++y ) {
 		for ( auto x=0;  x < tilemap.width;  ++x ) {
-			auto &entry        = results[ tilemap.index(x,y) ];
+			auto &entry        = info[ tilemap.index(x,y) ];
 			entry.origin       = tilemap.convertTilePositionToWorldPosition(x,y);
 			entry.tileType     = tilemap.tileAt(x,y);
 			entry.districtType = map.districtAt(x,y);
@@ -1214,9 +1292,32 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 				entry.housemap.w  = true;
 			if ( (x > 0) and (y > 0) and (tilemap.tileAt(x-1,y-1)==Tile::building) )
 				entry.housemap.nw = true;
+
+			auto tile     = tilemap.tileAt( x, y );
+			auto district = map.districtAt( x, y );
+			if ( isInnerCity(district) )
+			{
+				if ( tile==Tile::road ) {
+					entry.concreteMap = extractTransitionMap(x, y, true, []( auto t, auto d ) { return t != Tile::road; } );
+				}
+				else if ( district != &District::metropolitan and tile == Tile::ground ) {
+					entry.concreteMap = extractTransitionMap(x, y, true, []( auto t, auto d ) { return t != Tile::ground; } );
+				}
+			}
+			else { // park or suburban
+				if ( tile == Tile::road ) {
+					entry.concreteMap = extractTransitionMap(x, y, true, []( auto t, auto d ) { return isInnerCity(d) and t!=Tile::road; } );
+				}
+				else if ( tile == Tile::ground ) {
+					entry.concreteMap = extractTransitionMap(x, y, true, []( auto t, auto d ) { return d==&District::metropolitan or (isInnerCity(d) and t!=Tile::ground); } );
+				}
+			}    
+
+
 		}
 	}
-	return results;
+
+	return info;
 }
 
 
@@ -1301,159 +1402,6 @@ inline Vector<TileInfo> extractTileInfo( Map const &map ) noexcept {
 		}
 	}*/
 
-
-
-
-
-
-
-/*
-	auto const w        = tilemap.width,
-				  h        = tilemap.height,
-				  stride   = w * 2 + 1;
-	Size const numEdges = 2*w*h + w + h;
-	Size const numFaces = w*h;
-	auto       edges    = std::vector<bool>( numEdges, false );
-	auto       faces    = std::vector<bool>( numFaces, false );
-
-	auto edge           = [&edges,w,stride]( U32 x, U32 y, Direction d ) -> bool& {
-									if      ( d==Direction::north ) return edges[((y+0)*stride) + x        ];
-									else if ( d==Direction::east  ) return edges[((y+0)*stride) + x + w + 1];
-									else if ( d==Direction::south ) return edges[((y+1)*stride) + x        ];
-									else if ( d==Direction::west  ) return edges[((y+0)*stride) + x + w    ];
-									else assert( false and "Invalid direction!" );
-								 };
-
-	auto face     = [&faces,w]( U32 x, U32 y ) -> bool& {
-									 return faces[y*w+x]; 
-								 };
-
-	auto const getIndexOf = [w]( U32 x, U32 y, Direction d ) {
-									 auto i = y * w + x;
-									 if      ( d==Direction::north ) i-=w;
-									 else if ( d==Direction::east  ) ++i;
-									 else if ( d==Direction::south ) i+=w;
-									 else if ( d==Direction::west  ) --i;
-									 return i;
-								 };
-	auto const isInBounds = [w,h]( Size i ) {
-									 return i < (w*h);
-								 };
-
-	for ( U16 y = 0;  y < h;  ++y ) {
-		for ( U16 x = 0;  x < w;  ++x ) {
-			auto const tile                = tilemap.tileAt(x,y);
-			auto const district            = map.districtAt(x,y);
-			auto const isFullPavedDistrict = district==&District::metropolitan;
-			auto const isHalfPavedDistrict = district==&District::downtown or district==&District::residential;
-			auto const isPavedDistrict     = isFullPavedDistrict or isHalfPavedDistrict;
-
-			if ( isFullPavedDistrict )
-				face(x,y) = true;
-
-			if ( isPavedDistrict and tile==Tile::road ) {
-				for ( auto const &direction : directions )
-					if ( tileInDirection(direction)!=Tile::road )
-						edge(x,y,direction) = true;
-			}
-			else if ( isHalfPavedDistrict and tile==Tile::ground ) {
-				for ( auto const &direction : directions )
-					if ( tileInDirection(direction)==Tile::road )
-						edge(x,y,direction) = true;
-			}
-			else if ( not isPavedDistrict ) {
-				for ( auto const &direction : directions ) {
-			   auto const index = getIndexOf(x,y,direction);
-					if ( isInBounds(index) ) {
-						auto neighbourTile     =   tilemap.tileAt(index);
-						auto neighbourDistrict =   map.districtAt(index);
-						if ( neighbourDistrict != &District::park
-						 and neighbourDistrict != &District::suburban
-						 and neighbourTile     !=      Tile::road ) {
-							edge(x,y,direction) = true;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	for ( auto y = 0;  y < h;  ++y ) {
-		for ( auto x = 0;  x < w;  ++x ) {
-			if ( not face(x,y) ) {
-				auto origin = tilemap.convertTilePositionToWorldPosition(x,y);
-				// corners..
-
-				// NE corner!
-				if ( ( edge(index(x,y)+N, Direction::east ).value_or(false) and edge(index(x,y)+E,   Direction::north).value_or(false) )
-				  or ( edge(index(x,y)+N, Direction::east ).value_or(false) and edge(index(x,y)+E+N, Direction::west ).value_or(false) )
-				  or ( edge(index(x,y)+E, Direction::north).value_or(false) and edge(index(x,y)+E+N, Direction::south).value_or(false) ) )
-				{
-					instantiatePart( "Tiles/sidewalk_corner_outer_ne", origin, .0f, sidewalkOffsetY ); // TODO: origin
-				}
-
-				// SE corner!
-				if ( ( edge(index(x,y)+S, Direction::east ).value_or(false) and edge(index(x,y)+E,   Direction::south).value_or(false) )
-				  or ( edge(index(x,y)+S, Direction::east ).value_or(false) and edge(index(x,y)+E+S, Direction::west ).value_or(false) )
-				  or ( edge(index(x,y)+E, Direction::south).value_or(false) and edge(index(x,y)+E+S, Direction::north).value_or(false) ) )
-				{
-					instantiatePart( "Tiles/sidewalk_corner_outer_se", origin, 90.0f, sidewalkOffsetY ); // TODO: origin
-				}
-
-				// SW corner!
-				if ( ( edge(index(x,y)+S, Direction::west ).value_or(false) and edge(index(x,y)+W,   Direction::south).value_or(false) )
-				  or ( edge(index(x,y)+S, Direction::west ).value_or(false) and edge(index(x,y)+W+S, Direction::east ).value_or(false) )
-				  or ( edge(index(x,y)+W, Direction::south).value_or(false) and edge(index(x,y)+W+S, Direction::north).value_or(false) ) )
-				{
-					instantiatePart( "Tiles/sidewalk_corner_outer_sw", origin, 180.0f, sidewalkOffsetY ); // TODO: origin
-				}
-
-				// NW corner!
-				if ( ( edge(index(x,y)+N, Direction::west ).value_or(false) and edge(index(x,y)+W,   Direction::north).value_or(false) )
-				  or ( edge(index(x,y)+N, Direction::west ).value_or(false) and edge(index(x,y)+W+N, Direction::east ).value_or(false) )
-				  or ( edge(index(x,y)+W, Direction::north).value_or(false) and edge(index(x,y)+W+N, Direction::south).value_or(false) ) )
-				{
-					instantiatePart( "Tiles/sidewalk_corner_outer_nw", origin, 270.0f, sidewalkOffsetY ); // TODO: origin
-				}
-
-				// check if "hole"
-				int internalEdgeCount = 0;
-				for ( auto direction : directions )
-					if ( edge(index(x,y), direction) )
-						++internalEdgeCount;
-				if ( internalEdgeCount == 4 ) // 1 at most
-					instantiatePart( "Tiles/sidewalk_hole", origin, sidewalkOffsetY ); // TODO: origin
-				else if ( internalEdgeCount == 3 ) { // 1 at most
-					F32 rotation = .0f;
-					for ( auto direction : directions ) {
-						if ( not edge(index(x,y), direction) )
-							instantiatePart( "Tiles/sidewalk_u_n", origin, rotation, sidewalkOffsetY ); // TODO: origin
-						else rotation += 90.0f;
-					}
-				}     
-				else if ( internalEdgeCount == 2 ) {
-					F32 rotation = .0f;
-					for ( auto direction : directions ) { // 2 at most
-						if ( edge(index(x,y), direction) and edge(index(x,y), turnRight(direction)) ) {
-							instantiatePart( "Tiles/sidewalk_corner_inner_ne", origin, rotation, sidewalkOffsetY ); // TODO: origin
-							continue;
-						}
-						else rotation += 90.0f;
-					}
-				}
-				for ( auto direction : directions ) { // 2 at most
-					F32 rotation = .0f;
-					if ( edge(index(x,y), direction) and not edge(index(x,y), turnRight(direction)) and not edge(index(x,y), turn_right(direction)) )
-						instantiatePart( "Tiles/sidewalk_side_n", origin, rotation, sidewalkOffsetY ); // TODO : origin
-					else rotation += 90.0f;
-				}
-			}
-		}
-	}
-
-	return results;
-}
-*/
 
 /*
 void Map::instantiateHousesAsModels() noexcept {
@@ -1914,7 +1862,7 @@ void Map::instantiateTilesAsModels() noexcept
 	auto biome = info.environment.getBiome();
 
 	groundTiles.reserve( tilemap->data.size() * 3 );// TODO: use worst case scenario: 6 quads per tile?
-	auto instantiatePart = [&]( std::string_view name, Vector3 const &pos, F32 deg=180.0f, F32 yOffset=baseOffsetY, Bool hasNormal=true, Bool noShadowcasting=false ) {
+	auto instantiatePart = [&]( std::string_view name, Vector3 const &pos, F32 deg=.0f, F32 yOffset=baseOffsetY, Bool hasNormal=true, Bool noShadowcasting=false ) {
 		groundTiles.push_back( std::make_unique<GameObject>() );
       auto &model     =  *groundTiles.back();
 		model.mesh      =   graphics.getMeshPointer( "Tiles/Quad_SS" );
@@ -2062,6 +2010,131 @@ void Map::instantiateTilesAsModels() noexcept
 
 
 	// sidewalks
+	for ( auto const &e : tileInfo ) {
+		if ( (e.concreteMap.bitmap & maskHole) == predHole )
+				instantiatePart( "Tiles/sidewalk_hole", e.origin, .0f, sidewalkOffsetY );
+		else for ( auto d = 0;  d < 8;  d += 2 ) {
+			if ( (e.concreteMap.bitmap & util::cycleLeft( maskOuterC, d )) == util::cycleLeft(predOuterC,d) )
+				instantiatePart( "Tiles/sidewalk_corner_outer_ne", e.origin, (45.0f*d)+90.0f, sidewalkOffsetY );
+			if ( (e.concreteMap.bitmap & util::cycleLeft( maskSide,   d )) == util::cycleLeft(predSide,d) )
+				instantiatePart( "Tiles/sidewalk_side_n", e.origin, 45.0f*d, sidewalkOffsetY );
+			if ( (e.concreteMap.bitmap & util::cycleLeft( maskInnerC, d )) == util::cycleLeft(predInnerC,d) )
+				instantiatePart( "Tiles/sidewalk_corner_inner_ne", e.origin, 180.0f+(45.0f*d), sidewalkOffsetY );
+			if ( (e.concreteMap.bitmap & util::cycleLeft( maskU,      d )) == util::cycleLeft(predU,d) )
+				instantiatePart( "Tiles/sidewalk_u_n", e.origin, 45.0f*d, sidewalkOffsetY );
+		}
+	}
+/*
+	auto const w        = tilemap->width,
+	           h        = tilemap->height,
+	           stride   = w * 2 + 1;
+	Size const numEdges = 2*w*h + w + h;
+	Size const numFaces = w*h;
+
+	auto edges = std::vector<bool>( numEdges, false );
+	auto faces = std::vector<bool>( numFaces, false );
+
+	auto edge             = [&edges,w,stride]( U32 x, U32 y, Direction d ) {
+	                           if      ( d==Direction::north ) return edges[((y+0)*stride) + x        ];
+	                           else if ( d==Direction::east  ) return edges[((y+0)*stride) + x + w + 1];
+	                           else if ( d==Direction::south ) return edges[((y+1)*stride) + x        ];
+	                           else if ( d==Direction::west  ) return edges[((y+0)*stride) + x + w    ];
+	                           else assert( false and "Invalid direction!" );
+	                        };
+
+	auto face             = [&faces,w]( U32 x, U32 y ) {
+	                           return faces[y * w + x]; 
+	                        };
+
+	auto maybeIndexInDirection = [w,h]( U32 x, U32 y, Direction d ) -> std::optional<U64> {
+	                             
+	                              if ( ((d == Direction::north) and ((y-1) >= h ))
+	                              or   ((d == Direction::east ) and ((x+1) >= w ))
+	                              or   ((d == Direction::south) and ((y+1) >= h ))
+	                              or   ((d == Direction::west ) and ((x-1) >= w )) )
+	                                 return {};
+	                              else {
+                                    auto i = y * w + x;
+	                                 if      ( d==Direction::north ) i-=w;
+	                                 else if ( d==Direction::east  ) ++i;
+	                                 else if ( d==Direction::south ) i+=w;
+	                                 else if ( d==Direction::west  ) --i;
+	                                 return i;
+                                 }
+	                           };
+
+	auto tileInDirection = [&]( U32 x, U32 y, Direction d ) -> std::optional<Tile> {
+	                          if      ( d == Direction::north )  --y;
+	                          else if ( d == Direction::south )  ++y;
+	                          if      ( d == Direction::west  )  --x;
+	                          else if ( d == Direction::east  )  ++x;
+
+	                          if ( (y >= tilemap->height and d == Direction::north )
+	                          or   (x >= tilemap->width  and d == Direction::east  )
+	                          or   (y >= tilemap->height and d == Direction::south )
+	                          or   (x >= tilemap->width  and d == Direction::west  ) )
+	                             return {};
+	                          else return tilemap->tileAt(x,y);
+	                       };
+	
+	auto hasNeighbourInDirection = [w,h]( U32 x, U32 y, Direction d ) {
+	                                  return ( d==Direction::north and y != 0   )
+	                                      or ( d==Direction::east  and x != w-1 )
+	                                      or ( d==Direction::south and y != h-1 )
+	                                      or ( d==Direction::west  and x != 0   );
+	                               };
+
+	for ( auto y = 0;  y < h;  ++y ) {
+		for ( auto x = 0;  x < w;  ++x ) {
+			auto const tile                = tilemap->tileAt(x,y);
+			auto const district            = districtAt(x,y);
+			auto const isFullPavedDistrict = district==&District::metropolitan;
+			auto const isHalfPavedDistrict = district==&District::downtown or district==&District::residential;
+			auto const isPavedDistrict     = isFullPavedDistrict or isHalfPavedDistrict;
+
+			if ( isFullPavedDistrict )
+				face(x,y) = true;
+
+			if ( isPavedDistrict and tile==Tile::road ) {
+				for ( auto const &direction : directions )
+					if ( tileInDirection(x,y,direction).value_or(Tile::ground) != Tile::road )
+						edge(x,y,direction) = true;
+			}
+			else if ( isHalfPavedDistrict and tile==Tile::ground ) {
+				for ( auto const &direction : directions )
+					if ( tileInDirection(x,y,direction).value_or(Tile::ground) == Tile::road )
+						edge(x,y,direction) = true;
+			}
+			else if ( not isPavedDistrict ) {
+				for ( auto const &direction : directions ) {
+					auto maybeIndex = maybeIndexInDirection(x,y,direction);
+					if ( maybeIndex ) {
+						auto neighbourTile     =   tilemap->data[maybeIndex.value()];
+						auto neighbourDistrict =   districtAt(maybeIndex.value());
+						if ( neighbourDistrict != &District::park
+						 and neighbourDistrict != &District::suburban
+						 and neighbourTile     !=  Tile::road ) {
+							edge(x,y,direction) =   true;
+						}
+					}
+				}
+			}
+		}
+	}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*
@@ -2069,7 +2142,7 @@ void Map::instantiateTilesAsModels() noexcept
 		// place eventual outer sidewalk borders:
 		if ( (e.concreteMap.bitmap & maskHole) == predHole )
 				instantiatePart( "Tiles/sidewalk_hole", e.origin, sidewalkOffsetY );
-		else for ( auto d=0;  d<8;  d+=2 ) {
+		else for ( auto d = 0;  d < 8;  d += 2 ) {
 			if ( (e.concreteMap.bitmap & util::cycleLeft( maskOuterC, d )) == util::cycleLeft(predOuterC,d) )
 				instantiatePart( "Tiles/sidewalk_corner_outer_ne", e.origin, 45.0f*d, sidewalkOffsetY );
 			if ( (e.concreteMap.bitmap & util::cycleLeft( maskSide,   d )) == util::cycleLeft(predSide,d) )
