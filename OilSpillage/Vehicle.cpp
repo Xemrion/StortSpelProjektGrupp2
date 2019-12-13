@@ -608,7 +608,7 @@ void Vehicle::updateWeapon(float deltaTime)
 			{
 				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setPosition(this->vehicleBody1->getPosition() - 1.25f * frontTempDir - Vector3(0.0f, 0.25f, 0.0f));
 				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14f, acos(angleWP) - 3.14 / 2));
-				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setScale(Vector3(0.15f, 0.15f,0.15f));
+				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setScale(Vector3(0.10f, 0.10f,0.10f));
 			}
 		}
 		/*END*/
