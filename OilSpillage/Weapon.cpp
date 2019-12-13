@@ -153,11 +153,7 @@ void Bullet::update(float deltaTime)
 		this->obj->setPosition(initPos);
 		this->dir = initDir;
 	}
-	/*if (this->weapon.type == WeaponType::gadget)
-	{
-
-	}*/
-	else if(this->weapon.type == WeaponType::None)
+	if(this->weapon.type == WeaponType::None)
 	{
 
 	}
