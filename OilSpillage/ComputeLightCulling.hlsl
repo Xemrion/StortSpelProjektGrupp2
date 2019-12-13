@@ -117,37 +117,22 @@ void main(uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID)
 			radius *= 2.0;
 			pos.xyz += l.directionWidth.xyz * radius;
 		}
-		if (l.pos.w == 2.0)
+		else if (l.pos.w == 2.0)
 		{
 			Ray ray;
 			ray.origin = pos.xyz;
 			ray.dir = normalize(mul(float4(l.directionWidth.xyz, 0.0), view));
 			ray.length = l.directionWidth.w;
-		
-			//inside = testPlaneRay(ray, groupFrustum.left);
-			//if (!inside) inside = testPlaneRay(ray, groupFrustum.right);
-			//if (!inside) inside = testPlaneRay(ray, groupFrustum.bottom);
-			//if (!inside) inside = testPlaneRay(ray, groupFrustum.top);
-			//float3 endPos = ray.origin + ray.dir * ray.length;
-			
-			//float d0 = dot(ray.origin, groupFrustum.left);
-			//float d1 = dot(ray.origin + ray.dir * ray.length, groupFrustum.left);
-			//float minDist = min(d0, d1);
-			//float maxDist = max(d0, d1);
-			//inside = ((minDist < 0.0) && (maxDist > 0.0));
+
 			inside = false;
-			float radius = sqrt(sqrt(l.color.w / 0.05));
+			radius = sqrt(radius);
 			int intersections = 0;
-			if (testPlaneRay(ray, groupFrustum.left, radius)) intersections++;
-			if (testPlaneRay(ray, groupFrustum.right, radius)) intersections++;
-			if (testPlaneRay(ray, groupFrustum.top, radius)) intersections++;
-			if (testPlaneRay(ray, groupFrustum.bottom, radius)) intersections++;
+			intersections += testPlaneRay(ray, groupFrustum.left, radius);
+			intersections += testPlaneRay(ray, groupFrustum.right, radius);
+			intersections += testPlaneRay(ray, groupFrustum.top, radius);
+			intersections += testPlaneRay(ray, groupFrustum.bottom, radius);
 
 			if (intersections == 4) inside = true;
-			//inside = !(distancePlanePoint(pos.xyz, groupFrustum.left, radius) && testPlanePoint(endPos, groupFrustum.left, radius));
-			//if (inside) inside = !(testPlanePoint(pos.xyz, groupFrustum.right, radius) && testPlanePoint(endPos, groupFrustum.right, radius));
-			//if (inside) inside = !(testPlanePoint(pos.xyz, groupFrustum.top, radius) && testPlanePoint(endPos, groupFrustum.top, radius));
-			//if (inside) inside = !(testPlanePoint(pos.xyz, groupFrustum.bottom, radius) && testPlanePoint(endPos, groupFrustum.bottom, radius));
 		}
 		else
 		{
@@ -155,7 +140,6 @@ void main(uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID)
 			if (inside) inside = testPlanePoint(pos.xyz, groupFrustum.right, radius);
 			if (inside) inside = testPlanePoint(pos.xyz, groupFrustum.top, radius);
 			if (inside) inside = testPlanePoint(pos.xyz, groupFrustum.bottom, radius);
-			//inside = false;
 		}
 
 		if (inside)
