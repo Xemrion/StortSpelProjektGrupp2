@@ -190,7 +190,6 @@
     <ClCompile Include="Objectives\ObjectiveHandler.cpp" />
     <ClCompile Include="Particle\ParticleHandler.cpp" />
     <ClCompile Include="Particle\ParticleSystem.cpp" />
-    <ClCompile Include="PG\DisjointSets.cpp" />
     <ClCompile Include="PG\Generic L-System.cpp" />
     <ClCompile Include="PG\MapConfig.cpp" />
     <ClCompile Include="PG\Map.cpp" />
