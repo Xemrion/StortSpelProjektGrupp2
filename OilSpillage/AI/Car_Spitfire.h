@@ -11,21 +11,16 @@ private:
 
 	float targetRotation;
 	float rotateAcceleration;
-	bool rotationDirection;
 	float reverseTimer;
 	float reverseTimer2;
 	float soundTimer;
-
 	float trailTimer;
 
 	float velocitySpeed;
 	class Physics* physics;
 
-
-	void setUpActor();
 	Vector3 direction;
 	float throttleInputStrength;
-	Vector3 accelForce;
 	void updateVehicle(); 
 protected:
 	btPoint2PointConstraint* pointJoint;
