@@ -9,7 +9,6 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	targetRotation = 0.0f;
 	this->rotateAcceleration = 0.0f;
 	this->velocitySpeed = 0.0f;
-	this->rotationDirection = true;
 	this->reverseTimer = 0;
 	this->reverseTimer2 = 0;
 	this->direction = Vector3(1, 0, 0);
