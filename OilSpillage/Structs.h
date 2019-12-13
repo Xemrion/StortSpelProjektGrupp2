@@ -79,7 +79,7 @@ struct Sphere
 	static bool intersection(DirectX::SimpleMath::Vector3& origin, float radius, DirectX::SimpleMath::Vector3 position)
 	{
 		DirectX::SimpleMath::Vector3 distance = origin - position;
-		float fdist = distance.Dot(distance);
+		float fdist = (distance.x * distance.x + distance.y * distance.y + distance.z * distance.z);// distance.Dot(distance);
 		if (fdist < (radius * radius))
 		{
 			return true;
