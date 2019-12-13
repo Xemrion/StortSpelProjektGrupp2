@@ -487,7 +487,8 @@ Map::~Map() noexcept
 	for ( auto &e : houses.composites ) {
 		physics->deleteRigidBody( e.walls.getRigidBody() );
 		physics->deleteRigidBody( e.windows.getRigidBody() );
-		physics->deleteRigidBody( e.roof.getRigidBody() );
+		physics->deleteRigidBody( e.roof.getRigidBody());
+		physics->deleteRigidBody( e.area.getRigidBody() );
 		skyscraperGenerator->unloadASkyscraper(e.skyscraperMeshIndex);
 	}
 
@@ -778,7 +779,7 @@ void  Map::generateBuildings( )
 			// place multi-tile houses:
 			float probability = generateSelection(rng);
 			while ( (tilesets.size() != 0) and (++currentTries < maxTries)
-			       and (computeCurrentDistrictCoverage() < multitileCoveragePercentage ) )
+			       and (computeCurrentDistrictCoverage() < targetCoverage) )
 			{
 				 if ( (district == &District::metropolitan) and (houses.composites.size() < 25) 
 					 and (generateSelection(rng) < .4f) ) {
