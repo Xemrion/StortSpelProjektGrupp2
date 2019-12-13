@@ -9,7 +9,7 @@ public:
 	virtual ~Turret();
 	void update(float dt, const Vector3& targetPos);
 protected:
-	virtual void createRigidbody(Physics* physics);
+	virtual btRigidBody* createRigidbody(Physics* physics);
 private:
 	void setForwardVector(Vector3 forward);
 	void setSightRange(int range);

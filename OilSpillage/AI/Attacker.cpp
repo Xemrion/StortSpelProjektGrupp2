@@ -5,7 +5,7 @@ Attacker::Attacker()
 }
 
 Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
-	:DynamicActor(x, z, physics), Ranged(this->getRigidBody(), &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
+	:DynamicActor(x, z, physics), Ranged(this->createRigidbody(physics), &this->targetPos, &this->velocity, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	setUpActor();
@@ -20,7 +20,6 @@ Attacker::Attacker(float x, float z, int weaponType, Physics* physics)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Roller_Melee");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Roller_Melee"));
 	this->attackRange = 12;
-	createRigidbody(physics);
 	this->setPoints(100 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
 	scaling(weapon.damage, 1.1);
 }
@@ -31,7 +30,7 @@ void Attacker::update(float dt, const Vector3& targetPos)
 	DynamicActor::update(dt, targetPos);
 	this->updateBullets(dt);
 }
-void Attacker::createRigidbody(Physics* physics)
+btRigidBody* Attacker::createRigidbody(Physics* physics)
 {
 	btRigidBody* tempo = physics->addSphere(1.0f, btVector3(), 0.5f, this);
 	setRigidBody(tempo);
@@ -39,6 +38,8 @@ void Attacker::createRigidbody(Physics* physics)
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);
 	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+
+	return getRigidBody();
 }
 Attacker::~Attacker()
 {

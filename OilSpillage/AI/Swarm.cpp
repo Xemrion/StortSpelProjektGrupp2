@@ -7,7 +7,7 @@ Swarm::Swarm()
 }
 
 Swarm::Swarm(float x, float z, Physics* physics)
-	: DynamicActor(x, z, physics), Melee(this->getRigidBody(), &velocity, &deltaTime)
+	: DynamicActor(x, z, physics), Melee(this->createRigidbody(physics), &velocity, &deltaTime)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	Game::getGraphics().addToDraw(this);
@@ -24,7 +24,6 @@ Swarm::Swarm(float x, float z, Physics* physics)
 	this->mesh = Game::getGraphics().getMeshPointer("Entities/Drone");
 	this->setMaterial(Game::getGraphics().getMaterial("Entities/Drone"));
 	this->weapon = WeaponHandler::getWeapon(WeaponType::aiMelee);
-	createRigidbody(physics);
 	this->setPoints(50 * (1 + (0.1 * Game::getGameInfo().nrOfClearedStages)));
 	scaling(weapon.damage, 1.1f);
 }
@@ -38,15 +37,16 @@ void Swarm::update(float dt, const Vector3& targetPos)
 	}
 }
 
-void Swarm::createRigidbody(Physics* physics)
+btRigidBody* Swarm::createRigidbody(Physics* physics)
 {
-	Vector3 position = this->getPosition();
-	btRigidBody* tempo = physics->addSphere(0.7f, btVector3(position.x, position.y, position.z), 0.5f, this);
+	btRigidBody* tempo = physics->addSphere(0.7f, btVector3(), 0.5f, this);
 	setRigidBody(tempo);
 	getRigidBody()->activate();
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);
 	getRigidBody()->setLinearFactor(btVector3(1, 0, 1));
+
+	return getRigidBody();
 }
 
 Swarm::~Swarm()

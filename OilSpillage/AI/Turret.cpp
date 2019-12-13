@@ -6,7 +6,7 @@ Turret::Turret()
 {}
 
 Turret::Turret(float x, float z, int weaponType, Physics* physics)
-	: Actor(x, z,physics), Ranged(this->getRigidBody(), &this->targetPos, &Turret::zeroVector, &this->deltaTime, weaponType)
+	: Actor(x, z,physics), Ranged(this->createRigidbody(physics), &this->targetPos, &Turret::zeroVector, &this->deltaTime, weaponType)
 {
 	this->setScale(Vector3(0.01f, 0.01f, 0.01f));
 	this->sightRange = 23;
@@ -29,7 +29,6 @@ Turret::Turret(float x, float z, int weaponType, Physics* physics)
 	scaling(weapon.damage, 1.1);
 	this->setPoints(100 * (1 + (0.2 * Game::getGameInfo().nrOfClearedStages)));
 
-	createRigidbody(physics);
 	this->body.setPosition(this->getPosition());
 }
 
@@ -50,7 +49,7 @@ void Turret::update(float dt, const Vector3& targetPos)
 	onFire();
 }
 
-void Turret::createRigidbody(Physics* physics)
+btRigidBody* Turret::createRigidbody(Physics* physics)
 {
 	btRigidBody* tempo = physics->addSphere(0.5f, btVector3(), 0, this);
 	setRigidBody(tempo);
@@ -58,6 +57,8 @@ void Turret::createRigidbody(Physics* physics)
 	getRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	getRigidBody()->setFriction(0);
 	getRigidBody()->setLinearFactor(btVector3(0, 0, 0));
+
+	return getRigidBody();
 }
 
 void Turret::setForwardVector(Vector3 forward)

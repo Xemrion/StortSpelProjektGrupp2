@@ -9,7 +9,7 @@ public:
 	virtual ~Swarm();
 	void update(float dt, const Vector3& targetPos);
 protected:
-	void createRigidbody(Physics* physics);
+	btRigidBody* createRigidbody(Physics* physics);
 private:
 	void setUpActor();
 	Vector3 calculateVelocity();
