@@ -130,7 +130,7 @@ void Actor::onFire()
 		{
 			for (int i = 0; i < 10; i++)
 			{
-				Game::getGraphics().addParticle("fire", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+				Game::getGraphics().addParticle(position, Vector3(0.0f), 1, 1.5f); //DONT CHANGE
 			}
 			particleTimer = 0.1f;
 		}
