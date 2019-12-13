@@ -5,7 +5,7 @@ DynamicActor::DynamicActor()
 }
 
 DynamicActor::DynamicActor(float x, float z, Physics* physics)
-	:Actor(x, z, physics)
+	:Actor(x, z)
 {
 	this->pathSize = -1;
 }

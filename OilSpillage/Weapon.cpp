@@ -153,7 +153,6 @@ void Bullet::update(float deltaTime)
 		this->obj->setPosition(initPos);
 		this->dir = initDir;
 	}
-	
 	if(this->weapon.type == WeaponType::None)
 	{
 
