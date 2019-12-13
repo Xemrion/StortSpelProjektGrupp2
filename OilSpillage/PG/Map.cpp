@@ -425,7 +425,8 @@ Map::~Map() noexcept
 	for ( auto &e : houses.composites ) {
 		physics->DeleteRigidBody( e.walls.getRigidBody() );
 		physics->DeleteRigidBody( e.windows.getRigidBody() );
-		physics->DeleteRigidBody( e.roof.getRigidBody() );
+		physics->DeleteRigidBody( e.roof.getRigidBody());
+		physics->DeleteRigidBody( e.area.getRigidBody() );
 		skyscraperGenerator->unloadASkyscraper(e.skyscraperMeshIndex);
 	}
 
@@ -685,7 +686,8 @@ void  Map::generateBuildings( )
 			// place multi-tile houses:
 			while ( (++currentTries < maxTries)  and (computeCurrentDistrictCoverage() < targetCoverage) )
 			{
-				 if ( (district == &District::metropolitan) ) {
+				 if ( (district == &District::metropolitan) and (houses.composites.size() < 25) 
+					 and (generateSelection(rng) < .4f) ) {
 				 	auto house    = instantiateSkyscraper();
 				 	auto maybeLot = findFixedLot( cellId, house.dimensions.x, house.dimensions.y, Vector<Bool>(house.dimensions.x * house.dimensions.y, true));
 				 	if ( maybeLot ) {
@@ -695,14 +697,23 @@ void  Map::generateBuildings( )
 
 						Vector3 worldPosition = tilemap->convertTilePositionToWorldPosition(maybeLot->nw);
 						worldPosition += Vector3(0.5f * config.tileSideScaleFactor * (house.dimensions.x - 1), -1.5f, -0.5f * config.tileSideScaleFactor * (house.dimensions.y - 1));
-						worldPosition -= house.offset;
-
 						house.area.setPosition(worldPosition);
-						
+						worldPosition += house.offset;
 						
 						house.roof.setPosition(worldPosition);
 						house.walls.setPosition(worldPosition);
 						house.windows.setPosition(worldPosition);
+
+						btRigidBody* tmp = physics->addBox(btVector3(house.area.getPosition().x,
+							house.area.getPosition().y,
+							house.area.getPosition().z),
+							btVector3(0.5f * config.tileSideScaleFactor * house.dimensions.x,
+								house.roof.mesh->getAABB().maxPos.y,
+								0.5f * config.tileSideScaleFactor * house.dimensions.y),
+							.0f);
+
+						tmp->setFriction(0);
+						house.area.setRigidBody(tmp, physics);
 
 				 		tilemap->applyLot( maybeLot.value(), Tile::building );
 				 		houses.composites.push_back( std::move(house) ); 
@@ -1716,13 +1727,14 @@ CompositeHouse Map::instantiateSkyscraper()
 	Vector3 tempVecMax = temp.walls.getAABB().maxPos;
 	Vector3 tempVecMin = temp.walls.getAABB().minPos;
 	Vector3 tempVec = tempVecMax - tempVecMin;
-	temp.offset = tempVecMin + (tempVec * 0.5f);
-	temp.offset.y = tempVecMin.y;
+	temp.offset = Vector3(1.0f,1.0f,1.0f) - (tempVecMin + (tempVec * 0.5f));
+	temp.offset.y = 1.0f;
 	temp.dimensions.x = std::ceil(tempVec.x / config.tileSideScaleFactor);
 	temp.dimensions.y = std::ceil(tempVec.z / config.tileSideScaleFactor);
 
 	temp.area.mesh = graphics.getMeshPointer("Cube");
-	temp.area.setScale(tempVec*0.5f);
+	Vector3 toScaleBox(config.tileSideScaleFactor * temp.dimensions.x, 2.0f, config.tileSideScaleFactor * temp.dimensions.y);
+	temp.area.setScale(toScaleBox*0.5f);
 	temp.area.setTexture(graphics.getTexturePointer("Skyscrapers/wall02"));
 
 	return temp;
