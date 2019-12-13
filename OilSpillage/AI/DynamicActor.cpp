@@ -17,7 +17,7 @@ DynamicActor::~DynamicActor()
 void DynamicActor::move()
 {
 	Vector3 newVelocity = calculateVelocity();
-	if (newVelocity != Vector3() && stunTimer <= 0)
+	if (newVelocity != Vector3() && !stunned)
 	{
 		velocity = newVelocity;
 		velocity.Normalize();
@@ -103,7 +103,7 @@ void DynamicActor::setStun(float timer)
 	{
 		stunTimer = timer;
 		setColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
-		unStunned = false;
+		stunned = true;
 	}
 }
 
