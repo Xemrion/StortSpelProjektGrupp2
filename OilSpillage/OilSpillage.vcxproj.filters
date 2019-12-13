@@ -151,6 +151,7 @@
     <ClCompile Include="Inventory\Gadget.cpp" />
     <ClCompile Include="States\GameState.cpp" />
     <ClCompile Include="Profiling.cpp" />
+    <ClCompile Include="PG\DisjointSets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AIGroup.h" />
@@ -293,6 +294,7 @@
     <ClInclude Include="Inventory\ItemGadget.h" />
     <ClInclude Include="Inventory\Gadget.h" />
     <ClInclude Include="Profiling.h" />
+    <ClInclude Include="PG\DisjointSets.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
