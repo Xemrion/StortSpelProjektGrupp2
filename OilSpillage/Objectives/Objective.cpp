@@ -191,32 +191,16 @@ bool Objective::isDone()
 void Objective::update(Vector3 playerPosition)
 {
 	PlayingGameState* ptrState = static_cast<PlayingGameState*>(Game::getCurrentState());
-	Vector3 findClosestPlayer(0,0,0);
 	
 	if (this->mission->typeMission == TypeOfMission::FindAndCollect)
 	{
 		if (started)
 		{
-			if (this->mission->target[0] != nullptr)
-			{
-				this->closestIndex = 0;
-				findClosestPlayer = this->mission->target[0]->getPosition();
-			}
 			//collision check
-			int nrOfDone = 0;
-			for (int i = 0; i < nrOfMax; i++)
+			for (int i = 0; i < nrOfTargets; i++)
 			{
-
 				if (this->mission->target[i] != nullptr)
 				{
-
-					Vector3 closestTemp = this->mission->target[i]->getPosition();
-					
-					if (i != 0 && (findClosestPlayer -playerPosition).Length() > (closestTemp-playerPosition).Length())
-					{
-						findClosestPlayer = closestTemp;
-						this->closestIndex = i;
-					}
 					float time = ptrState->getTime();
 					float sine = sin((time-0) / 0.3f) - 0.5f;
 					float color = max(sine, 0.0f);
@@ -229,20 +213,18 @@ void Objective::update(Vector3 playerPosition)
 					if (vecPlayerToObj.Length() < this->mission->target[i]->getScale().x * 2.0f)
 					{
 						this->mission->target[i]->setPosition(Vector3(1000, 1000, 1000));
-						GameObject* temp = this->mission->target[nrOfMax - 1];
-						this->mission->target[i] = temp;//
-						this->mission->target[nrOfMax - 1] = nullptr;
+						GameObject* temp = this->mission->target[i];
+						this->mission->target[i] = this->mission->target[nrOfTargets - 1];//
+						this->mission->target[nrOfTargets - 1] = temp;
 						this->nrOfTargets--;
+						break;
 					}
 				}
-				else
-				{
-					nrOfDone++;
-				}
 			}
-			if (nrOfDone == nrOfMax)
+			if (this->nrOfTargets<1)
 			{
 				done = true;
+				return;
 			}
 
 		}
@@ -291,24 +273,31 @@ void Objective::update(Vector3 playerPosition)
 	}
 	else if(this->mission->typeMission == TypeOfMission::FindAndCollect)
 	{
-		this->closestToPlayer = findClosestPlayer;
+		int index = 0;
+		Vector3 closest = this->mission->target[0]->getPosition();
+		for (int i = 0; i < nrOfTargets; i++)
+		{
+			if (this->mission->target[i] != nullptr)
+			{
+				if ((this->mission->target[i]->getPosition() - playerPosition).Length() < (closest - playerPosition).Length())
+				{
+					closest = this->mission->target[i]->getPosition();
+					index = i;
+				}
+			}
+		}
+		this->closestToPlayer = closest;
 		
-		Vector3 pos = this->closestToPlayer;
-		Vector3 towardsPlayer = playerPosition - pos;
-		if (towardsPlayer.Length() <= 5.5)
+		Vector3 towardsPlayer = playerPosition - this->closestToPlayer;
+		if (towardsPlayer.Length() <= 10.5)
 		{
 			//move closer to player
 			towardsPlayer.Normalize();
-			if (this->mission->target[this->closestIndex] != nullptr)
+			if (this->mission->target[index] != nullptr)
 			{
-				this->mission->target[this->closestIndex]->setPosition(this->mission->target[this->closestIndex]->getPosition() + (towardsPlayer * 0.33));
+				this->mission->target[index]->setPosition(this->mission->target[index]->getPosition() + (towardsPlayer * 0.33));
 			}
-		}
-		else
-		{
-			//dont move
-		}
-				
+		}		
 	}
 	else if (this->mission->typeMission == TypeOfMission::BossEvent)
 	{
