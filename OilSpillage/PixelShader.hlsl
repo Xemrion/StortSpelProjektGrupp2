@@ -132,16 +132,16 @@ PS_OUT main(VS_OUT input) : SV_Target
 	float3 cameraVector = normalize(cameraPos.xyz - input.wPos.xyz);
 
 	float4 diffuseLight = float4(0.0, 0.0, 0.0, 1.0);
-	diffuseLight.rgb += -dot(sunDir, normal) * sunShadow * sunColor.rgb;
+	diffuseLight.rgb += -dot(sunDir.xyz, normal) * sunShadow * sunColor.rgb;
 
 	float4 specularLight = float4(0.0, 0.0, 0.0, 1.0);
 
 	{
-		float3 halfway = normalize(normalize(-sunDir) + cameraVector);
+		float3 halfway = normalize(normalize(-sunDir.xyz) + cameraVector);
 		float nDotH = saturate(dot(normal, halfway));
 		float glossTerm = ((gloss + 2) / 8) * pow(nDotH, gloss);
 		float3 fresnelTerm = specularColor + (1.0f - specularColor) * pow(1.0f - nDotH, 5);
-		specularLight.rgb += max(sunColor * sunShadow, ambient) * fresnelTerm * glossTerm * saturate(dot(normal, -sunDir));
+		specularLight.rgb += max(sunColor.xyz * sunShadow, ambient.xyz) * fresnelTerm * glossTerm * saturate(dot(normal, -sunDir.xyz));
 	}
 
 	for (int i = 0; i < lightTileData.numLights; ++i)

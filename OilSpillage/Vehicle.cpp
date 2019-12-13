@@ -195,9 +195,6 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		updatePowerUpEffects(deltaTime);
 	}
 
-
-	tempTargetRotation = targetRotation;
-
 	//Quaternion Rotation to Euler
 	btScalar m;
 	btScalar n;
@@ -214,6 +211,11 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 	if (vehicleRotation < 0)
 		vehicleRotation += 360;
 	mRotation = vehicleRotation;
+
+	tempTargetRotation = targetRotation;
+	if (throttleInputStrength > 0.01f) {
+		targetRot = mRotation;
+	}
 
 	//Rotate Chassis toward Body
 	vehicleBody1->getRigidBody()->applyImpulse(btVector3(0, 80 * deltaTime, 0), btVector3(0, 10, 0));
@@ -353,6 +355,10 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 		Vector3 steering3 = Vector3(getRigidBody()->getAngularVelocity().getX(),
 			/*deltaTime*/0.035f * stats.handlingRate * 80 * min(velocitySpeed * 0.25f, 1),
 			getRigidBody()->getAngularVelocity().getZ());
+		if (nitroTrue && (throttleInputStrength < 0.01f)) {
+
+			targetRotation = targetRot;
+		}
 		if(nitroTrue){
 			throttleInputStrength = 1.0f;
 		}
@@ -388,9 +394,6 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 			}
 
 			float difference2 = min((180 - abs(abs(vehicleRotation - targetRotation) - 180)) * 0.05f, 1.0f);
-			if (nitroTrue) {
-				targetRotation = bodyHeading;
-			}
 			if (vehicleRotation < targetRotation) {
 				if (abs(vehicleRotation - targetRotation) < 180) {
 					getRigidBody()->setAngularVelocity(btVector3(0, steering3.y * difference2, 0));
@@ -523,7 +526,7 @@ void Vehicle::update(float deltaTime, float throttleInputStrength, bool throttle
 			driftBool = true;
 		}
 		Sound::changeLoopingPitch(soundHandle, 3);
-		Sound::changeLoopingVolume(soundHandle, min(20 * sin((time - 1) / 0.0095f) + 0, 0.7f));
+		Sound::changeLoopingVolume(soundHandle, min(1 * sin((time - 1) / 0.0135f) + 0, 0.7f));
 	}
 
 	if (this->immortal)
@@ -605,7 +608,7 @@ void Vehicle::updateWeapon(float deltaTime)
 			{
 				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setPosition(this->vehicleBody1->getPosition() - 1.25f * frontTempDir - Vector3(0.0f, 0.25f, 0.0f));
 				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setRotation(Vector3(0, this->vehicleBody1->getRotation().y + 3.14f, acos(angleWP) - 3.14 / 2));
-				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setScale(Vector3(0.15f, 0.15f,0.15f));
+				this->vehicleSlots->getItem(Slots::BACK)->getObject()->setScale(Vector3(0.10f, 0.10f,0.10f));
 			}
 		}
 		/*END*/
@@ -851,7 +854,7 @@ void Vehicle::updateWeapon(float deltaTime)
 										temp2->getGadget().currentTime = 0;
 									}
 									temp2->getGadget().currentLifeTime -= deltaTime;
-									updatedStats.accelerationRate = defaultStats.accelerationRate + temp2->getGadget().power * 0.1f;
+									updatedStats.accelerationRate = defaultStats.accelerationRate + temp2->getGadget().power * 0.2f;
 									updatedStats.speed = defaultStats.speed + temp2->getGadget().power * 0.05f;
 			
 									nitroTrue = true;
@@ -1311,6 +1314,11 @@ float Vehicle::getVelocitySpeed()
 float Vehicle::getRotator()
 {
 	return this->mRotation /** (180 / DirectX::XM_PI)*/;
+}
+
+float Vehicle::getRotatorTarget()
+{
+	return this->testVariable;
 }
 
 const int& Vehicle::getHealthRef() const

@@ -127,36 +127,8 @@ bool ObjectiveHandler::isAllDone()
 
 void ObjectiveHandler::update(Vector3 playerPos, Physics* physics)
 {
-	//------------------IF THIS BOTTNECKS FIX BETTER RIGIDBODY FOR THIS / NO RIGIDBODY-----------------
-	//just move all if close enough, no need to check closest
-
-	if (this->objectiveVec.size() != 0)
-	{
-		if (this->objectiveVec.at(0)->getType() == TypeOfMission::FindAndCollect)
-		{
-			for (int i = 0; i < this->objectiveVec.at(0)->getNrOfMax(); i++) // 5
-			{
-				Vector3 pos = this->pickUpArrs.at(0)[i]->getPosition();
-				Vector3 towardsPlayer = playerPos - pos;
-				towardsPlayer.Normalize();
-
-				float distanceFromPlayerToPickup =
-					sqrtf((pos.x - playerPos.x) * (pos.x - playerPos.x) +
-					(pos.y - playerPos.y) * (pos.y - playerPos.y) +
-						(pos.z - playerPos.z) * (pos.z - playerPos.z));
-
-				if (distanceFromPlayerToPickup <= 17.5)
-				{
-					//move closer to player
-					this->pickUpArrs.at(0)[i]->setPosition(this->pickUpArrs.at(0)[i]->getPosition() + (towardsPlayer * 0.33));
-				}
-				else
-				{
-					//dont move
-				}
-			}
-		}
-	}
+	
+	
 
 
 	if (this->objectiveVec.size() != 0)
@@ -180,6 +152,8 @@ void ObjectiveHandler::update(Vector3 playerPos, Physics* physics)
 			this->eventNewObj = true;
 		}
 	}
+
+	
 }
 
 Type ObjectiveHandler::getTypes() const

@@ -161,6 +161,13 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadModel("Houses/testHouse4");
 	graphics.loadModel("Houses/testHouse5");
 	graphics.loadModel("Houses/testHouse6");
+	graphics.loadModel("Houses/destroyedHouse1");
+	graphics.loadModel("Houses/destroyedHouse2");
+	graphics.loadModel("Houses/destroyedHouse3");
+	graphics.loadModel("Houses/destroyedHouse4");
+	graphics.loadModel("Houses/destroyedHouse5");
+	graphics.loadModel("Houses/destroyedHouse6");
+	graphics.loadModel("Houses/destroyedHouse7");
 	graphics.loadMaterial("Houses/houseMaterial");
 	graphics.loadMaterial("Houses/houseMaterial2");
 	graphics.loadMaterial("Houses/houseMaterial3");
@@ -348,6 +355,7 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text("%s", ramUsage(false).c_str());
 	ImGui::Text("%s", vramUsage(false).c_str());
 	ImGui::Text(("Rotation: " + std::to_string(player->getRotator())).c_str());
+	ImGui::Text(("Rotation Target: " + std::to_string(player->getRotatorTarget())).c_str());
 	ImGui::Text(("Angle between: " + std::to_string(player->getAngleBetween())).c_str());
 	
 
