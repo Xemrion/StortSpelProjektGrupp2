@@ -59,6 +59,7 @@ public:
 	Boss* getBoss()const;
 	int getRewardTime()const;
 	int getScore()const;
+	GameObject* getClosestObj()const;
 	std::string getInfo()const;
 	Vector3 getAveragePosition()const;
 	Vector3 getClosestToPlayer()const;
@@ -73,4 +74,5 @@ private:
 	bool started;
 	int nrOfMax;
 	int nrOfTargets;
+	int closestIndex;
 };

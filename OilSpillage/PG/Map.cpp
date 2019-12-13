@@ -679,6 +679,16 @@ static std::vector singleTileModels {
 	"Houses/testHouse6"
 };
 
+static std::vector singleTileModelsDestroyed{
+	"Houses/destroyedHouse1",
+	"Houses/destroyedHouse2",
+	"Houses/destroyedHouse3",
+	"Houses/destroyedHouse4",
+	"Houses/destroyedHouse5",
+	"Houses/destroyedHouse6",
+	"Houses/destroyedHouse7"
+};
+
 static std::vector singleTileMaterials {
 	"Houses/houseMaterial",
 	"Houses/houseMaterial2",
@@ -833,7 +843,7 @@ void  Map::generateBuildings( )
 				if ( maybeLot ) {
 					currentTries = 0; // reset counter
 					SingleTileHouse house;
-					house.object.mesh       = graphics.getMeshPointer( util::randomElementOf(singleTileModels,    rng)   );
+					house.object.mesh       = graphics.getMeshPointer( util::randomElementOf(singleTileModelsDestroyed,    rng)   );
 					house.object.setMaterial( graphics.getMaterial(    util::randomElementOf(singleTileMaterials, rng) ) );
 					house.object.setColor({ .0f, .0f, .0f, .0f });
 					house.object.setPosition({ tilemap->convertTilePositionToWorldPosition(maybeLot.value().nw) - Vector3(0,2,0) } );

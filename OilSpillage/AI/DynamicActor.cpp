@@ -5,7 +5,7 @@ DynamicActor::DynamicActor()
 }
 
 DynamicActor::DynamicActor(float x, float z, Physics* physics)
-	:Actor(x, z, physics)
+	:Actor(x, z)
 {
 	this->pathSize = -1;
 }
@@ -17,7 +17,7 @@ DynamicActor::~DynamicActor()
 void DynamicActor::move()
 {
 	Vector3 newVelocity = calculateVelocity();
-	if (newVelocity != Vector3() && stunnedTimer <= 0)
+	if (newVelocity != Vector3() && !stunned)
 	{
 		velocity = newVelocity;
 		velocity.Normalize();
@@ -99,5 +99,15 @@ void* DynamicActor::getGroup() const
 
 void DynamicActor::setStun(float timer)
 {
-	stunnedTimer = timer;
+	if (stunTimer <= 0)
+	{
+		stunTimer = timer;
+		setColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+		stunned = true;
+	}
+}
+
+void DynamicActor::Color()
+{
+	setColor(Vector4(1.0f, 0.0f, 0.0f, 1));
 }

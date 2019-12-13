@@ -204,11 +204,14 @@ private:
 	float velocitySimple;
 	float velocitySpeed;
 	class Physics* physics;
+	float angleBetween;
 	Vector2 vehicleDirection;
 	GameObject* empplaced;
 	//Gadget
 	bool nitroTrue;
 	Vector2 targetRotation2;
+	float targetRot;
+	float testVariable;
 public:
 	float fireTimer;
 	Vehicle();
@@ -234,6 +237,7 @@ public:
 	Vector3 getVelocity();
 	float getVelocitySpeed();
 	float getRotator();
+	float getRotatorTarget();
 	Vector3 getCameraDistance(float deltaTime);
 	void setAccelForce(Vector3 accelForce, float deltaTime);
 	void setWheelRotation(float deltaTime);
@@ -252,10 +256,13 @@ public:
 	float getTotalRespawnTime()const;
 	float getRespawnTimer()const;
 
+	float getAngleBetween();
 	float getPitch(DirectX::XMVECTOR Quaternion);
 	float getYaw(DirectX::XMVECTOR Quaternion);
 	float getRoll(DirectX::XMVECTOR Quaternion);
 	float getHeading(Quaternion qt);
+	float getAttitude(Quaternion qt);
+	float getBank(Quaternion qt);
 
 	Bullet* getBulletArray(size_t& count);
 	void addPowerUp(PowerUpType p);

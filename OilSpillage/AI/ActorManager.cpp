@@ -33,6 +33,11 @@ ActorManager::~ActorManager()
 		delete bosses[i];
 	}
 	bosses.clear();
+	for (int i = 0; i < groups.size(); i++)
+	{
+		delete groups[i];
+	}
+	groups.clear();
 }
 
 void ActorManager::update(float dt, const Vector3& targetPos)
@@ -148,10 +153,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
 					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 					{
-						if (soundTimer > 0.05f) {
-							Sound::play("HitSound.wav");
-							soundTimer = 0;
-						}
+						
 						if (bulletArray[j].getFlame())// Damage over Time
 						{
 							actors[i]->setFire(bulletArray[j].getFlameTimer());
@@ -183,10 +185,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						{
 							Sound::play("StarPowerupHit.mp3", 0.75f);
 						}
-						else
-						{
-							Sound::play("HitSound.wav");
-						}
+						
 						soundTimer = 0;
 					}
 					if (bulletArray[j].getFlame())// Damage over Time
@@ -221,6 +220,14 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					if (!bulletArray[j].getMelee())
 						bulletArray[j].destroy();
 				}
+				else if (bulletArray[j].getWeaponType() == WeaponType::gadget)
+				{
+					if (Sphere::intersection(bulletArray[j].getPosition(), bulletArray[j].getGadger().radius, this->actors[i]->getPosition()))
+					{
+						//freeze actor
+						this->actors[i]->setStun(bulletArray[j].getGadger().lifeTime);
+					}
+				}
 			}
 		}
 	}
@@ -242,10 +249,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 						Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
 						if (this->bosses[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
 						{
-							if (soundTimer > 0.05f) {
-								Sound::play("HitSound.wav");
-								soundTimer = 0;
-							}
+							
 							if (bulletArray[j].getFlame())// Damage over Time
 							{
 								bosses[i]->setFire(bulletArray[j].getFlameTimer());
@@ -272,10 +276,6 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					}
 					else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
 					{
-						if (soundTimer > 0.05f) {
-							Sound::play("HitSound.wav");
-							soundTimer = 0;
-						}
 						if (bulletArray[j].getFlame())// Damage over Time
 						{
 							bosses[i]->setFire(bulletArray[j].getFlameTimer());
@@ -302,10 +302,7 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 					}
 					if (bulletArray[j].getMelee() && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->bosses[i]->getAABB()))
 					{
-						if (soundTimer > 0.05f) {
-							Sound::play("HitSound.wav");
-							soundTimer = 0;
-						}
+						
 						if (bulletArray[j].getFlame())// Damage over Time
 						{
 							bosses[i]->setFire(bulletArray[j].getFlameTimer());
@@ -426,29 +423,14 @@ void ActorManager::updateActors(float dt, const Vector3& targetPos)
 
 void ActorManager::updateBosses(float dt, const Vector3& targetPos)
 {
-	bool hasDied = false;
-	for (int i = 0; i < this->bosses.size(); i++)
+	for (int i = this->bosses.size() - 1; i >= 0; i--)
 	{
-		if (bosses[i] != nullptr && !bosses[i]->isDead())
+		if (bosses[i]->isDead())
 		{
-			bosses[i]->update(dt, targetPos); //creash
+			destroyBoss(i);
+			continue;
 		}
-		else if (bosses[i] != nullptr && bosses[i]->isDead())
-		{
-			hasDied = true;
-		}
-	}
-
-	if (hasDied)
-	{
-		for (int i = this->bosses.size() - 1; i >= 0; i--)
-		{
-			if (bosses[i]->isDead())
-			{
-				Game::getGameInfo().addHighScore(bosses[i]->getPoints());
-				destroyBoss(i);
-			}
-		}
+		bosses[i]->update(dt, targetPos);
 	}
 }
 
@@ -639,6 +621,7 @@ void ActorManager::actorDied(int index)
 		AIGroup* temp = groups[grpIndex];
 		groups[grpIndex] = groups[groups.size() -1];
 		groups[groups.size() - 1] = temp;
+		delete groups[groups.size() - 1];
 		groups.pop_back();
 	}
 }

@@ -20,8 +20,6 @@ protected:
 	Vector3  position{ 1.0f, 1.0f, 1.0f };
 	Vector3  scale{ 1.0f, 1.0f, 1.0f };
 	Vector3  rotation;
-	Vector3 rotateAround;
-	Quaternion rotationQt;
 	Vector4  color;
 	Material material;
 	Vector3 velocity;
@@ -30,10 +28,8 @@ public:
 	~GameObject();
 
 	GameObject(const GameObject& obj);
-	/*void operator=(const GameObject& obj);*/
 
 	const Mesh *mesh   = nullptr;
-	GameObject *parent = nullptr;
 	
 	bool getShading()const;
 	bool getSpotShadow()const;

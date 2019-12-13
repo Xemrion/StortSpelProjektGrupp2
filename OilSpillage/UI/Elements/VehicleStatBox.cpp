@@ -58,12 +58,12 @@ void VehicleStatBox::draw(bool selected)
 
 void VehicleStatBox::update(const Stats& stats)
 {
-	this->amounts[0] = stats.maxHealth / (VehicleStats::defaultStats.maxHealth * 2.0f);
-	this->amounts[1] = stats.durability / (VehicleStats::defaultStats.durability * 2.0f);
-	this->amounts[2] = stats.armour / (VehicleStats::defaultStats.armour * 2.0f);
-	this->amounts[3] = stats.accelerationRate / (VehicleStats::defaultStats.accelerationRate * 2.0f);
-	this->amounts[4] = stats.speed / (VehicleStats::defaultStats.speed * 2.0f);
-	this->amounts[5] = stats.handlingRate / (VehicleStats::defaultStats.handlingRate * 2.0f);
+	this->amounts[0] = stats.maxHealth / (VehicleStats::defaultStats.maxHealth * 10.0f);
+	this->amounts[1] = stats.durability / (VehicleStats::defaultStats.durability * 10.0f);
+	this->amounts[2] = stats.armour / (VehicleStats::defaultStats.armour * 10.0f);
+	this->amounts[3] = stats.accelerationRate / (VehicleStats::defaultStats.accelerationRate * 10.0f);
+	this->amounts[4] = stats.speed / (VehicleStats::defaultStats.speed * 10.0f);
+	this->amounts[5] = stats.handlingRate / (VehicleStats::defaultStats.handlingRate * 10.0f);
 }
 
 void VehicleStatBox::unloadTextures()

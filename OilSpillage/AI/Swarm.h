@@ -11,7 +11,6 @@ public:
 protected:
 	void createRigidbody(Physics* physics);
 private:
-	void setUpActor();
 	Vector3 calculateVelocity();
 };
 

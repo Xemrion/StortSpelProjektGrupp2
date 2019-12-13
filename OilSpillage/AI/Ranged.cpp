@@ -140,6 +140,8 @@ Ranged::Ranged(Vector3* pos, Vector3* targetPos, Vector3* velocity, float* delta
 	this->attackRange = 8;
 	this->deltaTimePtr = deltaTimePtr;
 	assignWeapon(weaponType);
+	this->bulletCount = (this->weapon.bulletLifetime / this->weapon.fireRate) + 1;
+	bullets = new Bullet[this->bulletCount];
 }
 
 Ranged::~Ranged()
@@ -152,4 +154,6 @@ Ranged::~Ranged()
 			gameState->removeLight(laser);
 		}
 	}
+
+	delete[] bullets;
 }

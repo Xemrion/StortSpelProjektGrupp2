@@ -211,7 +211,6 @@ btPoint2PointConstraint* Physics::addPointJoint(btRigidBody* box1, btRigidBody* 
 {
 	btPoint2PointConstraint* pointJoint = new btPoint2PointConstraint(*box1, *box2, btVector3(0, 0.00f, 0), btVector3(0, -0.55f, 0));
 	pointJoints.push_back(pointJoint);
-
 	this->world->addConstraint(pointJoint);
 
 	return pointJoint;

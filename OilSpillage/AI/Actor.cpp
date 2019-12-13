@@ -9,13 +9,13 @@ Actor::Actor()
 	this->points = 0;
 }
 
-Actor::Actor(float x, float z, Physics* physics)
+Actor::Actor(float x, float z)
 {
 	this->velocity = Vector3(10.0f, 0.0f, 10.0f);
 	this->position = Vector3(x, -1.0f, z);
 	this->vecForward = Vector3(-1.0f, 0.0f, 0.0f);
 	this->points = 0;
-	this->stunnedTimer = 0;
+	this->stunTimer = 0;
 	this->fireTimer = 0;
 }
 Actor::~Actor()
@@ -38,9 +38,20 @@ void Actor::update(float dt, const Vector3& targetPos)
 {
 	this->deltaTime = dt;
 	this->targetPos = targetPos;
-	if (root != nullptr && stunnedTimer <= 0)
+	if (stunned)
 	{
-		this->root->func();
+		if (stunTimer <= 0)
+		{
+			stunned = false;
+			setColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+		}
+	}
+	else
+	{
+		if (root != nullptr)
+		{
+			this->root->func();
+		}
 	}
 	if (isHit)
 	{
@@ -50,7 +61,7 @@ void Actor::update(float dt, const Vector3& targetPos)
 			isHit = false;
 		}
 	}
-	stunnedTimer -= deltaTime;
+	stunTimer -= dt;
 	particleTimer -= deltaTime;
 }
 
@@ -78,6 +89,7 @@ void Actor::changeHealth(float amount)
 {
 	if (amount < 0) {
 		isHit = true;
+		Sound::play("HitSound.wav");
 	}
 	setColor(Vector4(max(getColor().x + -amount * 0.1f, 0), getColor().y, getColor().z, 1));
 	this->health = std::clamp(this->health + amount, 0.0f, this->stats.maxHealth);
@@ -132,5 +144,10 @@ void Actor::setFire(float timer)
 
 void Actor::setStun(float timer)
 {
-	stunnedTimer = timer;
+	if(stunTimer <= 0)
+	{
+		stunTimer = timer;
+		setColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+		stunned = true;
+	}
 }

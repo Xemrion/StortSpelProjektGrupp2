@@ -9,7 +9,6 @@ Spitfire::Spitfire(float x, float z, Physics* physics)
 	targetRotation = 0.0f;
 	this->rotateAcceleration = 0.0f;
 	this->velocitySpeed = 0.0f;
-	this->rotationDirection = true;
 	this->reverseTimer = 0;
 	this->reverseTimer2 = 0;
 	this->direction = Vector3(1, 0, 0);
@@ -66,7 +65,7 @@ void Spitfire::move()
 {
 	direction = destination - this->position;
 	direction.Normalize();
-	if (stunnedTimer <= 0)
+	if (stunTimer <= 0)
 	{
 		if ((this->position - destination).Length() > 5)
 		{

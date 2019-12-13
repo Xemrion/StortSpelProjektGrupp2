@@ -12,7 +12,7 @@ class Actor : public GameObject
 {
 public:
 	Actor();
-	Actor(float x, float z,Physics* physics);
+	Actor(float x, float z);
 	virtual ~Actor();
 	virtual void update(float dt, const Vector3& targetPos);
 
@@ -36,10 +36,10 @@ private:
 	float fireTimer;
 protected:
 	bool isHit = false;
-	float stunnedTimer;
+	bool stunned;
+	float stunTimer;
 	float deltaTime;
 	Vector3 targetPos;
-
 	Stats stats;
 
 	Vector3 vecForward;
