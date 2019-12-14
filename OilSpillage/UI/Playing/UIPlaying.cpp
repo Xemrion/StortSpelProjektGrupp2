@@ -290,6 +290,8 @@ bool UIPlaying::hasExploredOnMinimap(Vector3 worldPosition) const
 
 void UIPlaying::addTimeChangeText(float amount)
 {
+	if (amount == 0) return;
+
 	this->timeChangeText = std::make_unique<AnimatedText>((amount < 0 ? "" : "+") + std::to_string(static_cast<int>(amount)), amount < 0 ? Color(Colors::Red) : Color(Colors::Green), 0.5f, Animation::NONE);
 	this->timeChangeText->setPosition(this->timer->getPosition() + this->timer->getSize() * 0.5f - this->timeChangeText->getSize() * 0.5f);
 	this->timeChangeText->beginAnimation();
