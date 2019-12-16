@@ -32,9 +32,9 @@ Graphics::Graphics()
 	this->selectedObjUI.first = nullptr;
 	this->selectedObjUI.second = nullptr;
 
-	this->particleSystem->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
-	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleGS.cso");
-	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso", "TrailPS.cso");
+	this->particleSystem->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleVS.cso");
+	this->particleSystem2->setParticleShaders("ParticleUpdateCS.cso", "ParticleCreateCS.cso", "ParticleVS.cso");
+	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailVS.cso", "TrailPS.cso");
 
 	this->particleHandler->addParticleSystem(this->particleSystem,  "fire");
 	this->particleHandler->addParticleSystem(this->particleSystem2, "smoke");
@@ -43,7 +43,7 @@ Graphics::Graphics()
 	Vector4 colors[4] = {
 		Vector4(0.0f,0.0f,1.0f,1.0f)
 	};
-	this->particleHandler->addParticleSystem("electro", colors, 1, 0.1f, 0.1f, 0.0f, 0.0f,"TrailUpdateCS.cso","ElectroCreateCS.cso","TrailGS.cso");
+	this->particleHandler->addParticleSystem("electro", colors, 1, 0.1f, 0.1f, 0.0f, 0.0f,"TrailUpdateCS.cso","ElectroCreateCS.cso","TrailVS.cso");
 	//this->particleHandler->getParticleSystem("electro")->setParticleShaders("TrailUpdateCS.cso", "ElectroCreateCS.cso", "ElectroGS.cso", "ElectroPS.cso");
 	Vector4 fireX[4] = {
 		Vector4(1.0f,0.0f,1.0f,1.0f)
@@ -68,19 +68,16 @@ Graphics::Graphics()
 	this->particleHandler->addParticleSystem("snow", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 	this->particleHandler->getParticleSystem("snow")->setGravity(-0.25f);
 	this->particleHandler->getParticleSystem("snow")->changeVectorField(2.5f,3.0f);
-	//this->particleHandler->addParticleSystem("ash", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
-	//this->particleHandler->getParticleSystem("ash")->setGravity(-0.25f);
-	//this->particleHandler->getParticleSystem("ash")->changeVectorField(0.75f, 3.0f);
-	//this->particleHandler->addParticleSystem("rain", rainColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
+
 
 	this->particleHandler->loadParticleSystems();
-	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso", "DebrisCreateCS.cso", "ParticleGS.cso");
-	this->particleHandler->getParticleSystem("snow")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
-	//this->particleHandler->getParticleSystem("ash")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
+	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso", "DebrisCreateCS.cso", "ParticleVS.cso");
+	this->particleHandler->getParticleSystem("snow")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleVS.cso");
+	
 
-
-	//this->particleHandler->getParticleSystem("rain")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 	this->particleTrail->loadSystem();
+	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailVS.cso", "TrailPS.cso");
+	this->particleHandler->getParticleSystem("snow")->setVertexShader("SnowParticleVS.cso");
 	this->particleHandler->getParticleSystem("electro")->setUpdateShader("ElectroUpdateCS.cso");
 	//this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
@@ -456,7 +453,6 @@ bool Graphics::init(Window* window)
 		Vector4(0.0f,0.0f,0.0f,1.0f)
 	};
 	
-	//this->particleHandler->getParticleSystem("electro")->changeColornSize(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
 	
 	Vector4 debrisColor[4] = {
 		Vector4(0.0f,0.0f,0.0f,1.0f),
@@ -464,13 +460,8 @@ bool Graphics::init(Window* window)
 		Vector4(0.0f,0.0f,0.0f,1.0f),
 		Vector4(0.0f,0.0f,0.0f,1.0f)
 	};
-	//this->particleHandler->getParticleSystem("debris")->changeColornSize(debrisColor, 4, 0.1f, 0.1f);
-	//this->particleHandler->getParticleSystem("debris")->changeVectorField(0.0f, 1.0f);
-
-	//this->particleHandler->getParticleSystem("debris")->saveSystem();
-
-	//this->particleHandler->getParticleSystem("electro")->setParticleShaders(colorsE, 1, 1.0f, 1.0f);// Vector3(0, 0, 3), Vector3(1, 0, 0));
-	this->particleHandler->getParticleSystem("electro")->setGeometryShader("ParticleGS.cso");
+	
+	this->particleHandler->getParticleSystem("electro")->setVertexShader("ParticleVS.cso");
 	this->particleHandler->getParticleSystem("electro")->setPixelShader("ParticlePS.cso");
 
 
@@ -483,15 +474,14 @@ bool Graphics::init(Window* window)
 	this->particleTrail->setTexture(getTexturePointer("ParticleTextures/trail"));
 	Vector4 testTC[4] = { Vector4(0.6f,0.6f,0.6f,0.1f) };
 	this->particleTrail->setColor(testTC, 1);
-
+	this->particleTrail->setQuad();
 	this->particleTrail->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("debris")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("snow")->initiateParticles(device.Get(), deviceContext.Get());
 
-	//this->particleHandler->getParticleSystem("ash")->initiateParticles(device.Get(), deviceContext.Get());
-	//this->particleHandler->getParticleSystem("rain")->initiateParticles(device.Get(), deviceContext.Get());
+	
 
 
 	this->particleSystem->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
@@ -503,15 +493,11 @@ bool Graphics::init(Window* window)
 	this->particleHandler->getParticleSystem("snow")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
 
 	
-	//this->particleHandler->getParticleSystem("ash")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
-	//this->particleHandler->getParticleSystem("rain")->addParticle(1, 0, Vector3(0, 0, 3), Vector3(1, 0, 0));
+	
 
 
 
-	//this->particleHandler->getParticleSystem("ash")->setGravity(0.1f);
-	//this->particleHandler->getParticleSystem("ash")->setMass(0.5f);
-	//this->particleHandler->getParticleSystem("rain")->setGravity(10.0f);
-	//this->particleHandler->getParticleSystem("rain")->setMass(0.5f);
+	
 	FogMaterial fogMaterial;
 	fog = std::make_unique<Fog>();
 	fogMaterial.color = Vector3(1.0, 1.0, 1.0);
@@ -690,7 +676,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	this->particleTrail->setShaders();
 	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
 	deviceContext->PSSetSamplers(0, 1, this->sampler.GetAddressOf());
-	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
+	deviceContext->VSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
 	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
 
 	deviceContext->OMSetDepthStencilState(readOnlyDST.Get(), 0);
@@ -917,7 +903,7 @@ void Graphics::setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float s
 {
 	if (nrOfColors < 5)
 	{
-		//this->particleSystem2.changeColornSize(colors, nrOfColors, startSize, endSize);
+		this->particleSystem2->changeColornSize(colors, nrOfColors, startSize, endSize);
 	}
 }
 
@@ -928,7 +914,7 @@ void Graphics::setVectorField(float vectorFieldSize, float vectorFieldPower)
 
 void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 {
-	//this->particleSystem2.changeVectorField(vectorFieldPower, vectorFieldSize);
+	this->particleSystem2->changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
 void Graphics::addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime)
@@ -1313,8 +1299,9 @@ void Graphics::loadMesh(std::string const& fileName, std::vector<Vertex3D>& toMe
 void Graphics::unloadMesh(std::string const& name)
 {
 	if (meshes.find(name) != meshes.end()) {
-		meshes.erase(name);
+		meshes.erase(meshes.find(name));
 	}
+	else assert(false and "Failed to unload mesh!");
 }
 
 void Graphics::loadModel( std::string const &path, Vector3 rotation )

@@ -89,9 +89,11 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadTexture("brownPaperCardboard");
 
 	//Skyscraper Textures
+	graphics.loadTexture("Skyscrapers/roof01");
 	graphics.loadTexture("Skyscrapers/wall01");
-	graphics.loadTexture("Skyscrapers/window01");
 	graphics.loadTexture("Skyscrapers/wall02");
+	graphics.loadTexture("Skyscrapers/window01");
+	
 
 	graphics.loadModel("Entities/Star");
 	graphics.loadModel("Entities/Streetlight");

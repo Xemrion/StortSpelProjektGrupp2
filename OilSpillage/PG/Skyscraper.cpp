@@ -14,9 +14,12 @@ Skyscraper::~Skyscraper()
 void Skyscraper::generateASkyscraper(std::string name)
 {
 	bool success = false;
+	int counter = 0;
 	do {
 		if (this->floors.size() == 0) {
-			generateSkyscraper();
+			while (!generateSkyscraper() && counter < 200) {
+				counter++;
+			}
 		}
 		if (saveSkyscraper(name)) {
 			success = true;
@@ -62,8 +65,6 @@ void Skyscraper::unloadASkyscraper(std::string names)
 	unloadRoof(names);
 	unloadWall(names);
 	unloadWindow(names);
-	
-	names.clear();
 }
 
 void Skyscraper::unloadRoof(std::string name)
@@ -84,20 +85,22 @@ void Skyscraper::unloadWindow(std::string name)
 	Game::getGraphics().unloadMesh(meshName);
 }
 
-void Skyscraper::generateSkyscraper()
+bool Skyscraper::generateSkyscraper()
 {
+	int nrOfFloors = 0;
 	this->floors.clear();
 	Vector3 modifyBy(0.0f, 2.0f, 0.0f);
 	I32_Dist floorPoints(4, 8), rotation(1, 360), height(3, 8), vectorPoint(1, 500);
-	I32_Dist floors(2 , 4);
-	int nrOfFloors = 0;
+	I32_Dist floors(2, 4);
 	//Random
 	SkyscraperFloor toAdd(floorPoints(rng));
 	SkyscraperFloor roof(floorPoints(rng));
 
 	//Random
 	toAdd.rotateDeg(rotation(rng));
-	roof.unionShapes(toAdd, roof.getAVertex((vectorPoint(rng))));
+	if (!roof.unionShapes(toAdd, roof.getAVertex((vectorPoint(rng))))) {
+		return false;
+	}
 
 	SkyscraperFloor temp(roof);
 	temp.scale(Vector3(0.8f, 1.0f, 0.8f));
@@ -110,11 +113,13 @@ void Skyscraper::generateSkyscraper()
 		this->floors[i].translateBy(modifyBy);
 	}
 
-	
+
 	//Random
 	toAdd.regenerateShape(floorPoints(rng));
 	toAdd.rotateDeg(rotation(rng));
-	roof.unionShapes(toAdd, roof.getAVertex(vectorPoint(rng)));
+	if (!roof.unionShapes(toAdd, roof.getAVertex(vectorPoint(rng)))) {
+		return false;
+	}
 	this->floors.push_back(roof);
 
 	//Random
@@ -126,7 +131,9 @@ void Skyscraper::generateSkyscraper()
 	//Random
 	toAdd.regenerateShape(floorPoints(rng));
 	toAdd.rotateDeg(rotation(rng));
-	roof.unionShapes(toAdd, roof.getAVertex(vectorPoint(rng)));
+	if (!roof.unionShapes(toAdd, roof.getAVertex(vectorPoint(rng)))) {
+		return false;
+	}
 	this->floors.push_back(roof);
 
 	//Random
@@ -134,13 +141,15 @@ void Skyscraper::generateSkyscraper()
 	for (int i = 0; i < this->floors.size(); i++) {
 		this->floors[i].translateBy(modifyBy);
 	}
-		
+
 	this->floors.push_back(roof);
 
 	modifyBy.y = 2.0f;
 	for (int i = 0; i < this->floors.size(); i++) {
 		this->floors[i].translateBy(modifyBy);
 	}
+
+	return true;
 }
 
 bool Skyscraper::generateSkyscraperMesh()
