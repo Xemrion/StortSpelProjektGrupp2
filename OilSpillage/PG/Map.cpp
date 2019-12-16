@@ -783,7 +783,7 @@ void  Map::generateBuildings( )
 			{
 				 if ( district == &District::metropolitan ) {
 
-					 if ( skyscraperCounter++ > 12 ) //Break if enough skyscrapers
+					 if ( skyscraperCounter++ > 12 || houses.composites.size() > 40) //Break if enough skyscrapers
 						 break;
 				 	
 					auto house    = instantiateSkyscraper();
