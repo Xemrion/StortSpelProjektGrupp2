@@ -37,6 +37,7 @@ Actor::~Actor()
 void Actor::update(float dt, const Vector3& targetPos)
 {
 	this->deltaTime = dt;
+	this->soundTimer += dt;
 	this->targetPos = targetPos;
 	if (stunned)
 	{
@@ -89,7 +90,10 @@ void Actor::changeHealth(float amount)
 {
 	if (amount < 0) {
 		isHit = true;
+	}
+	if (amount < 0 && soundTimer > 0.1f) {
 		Sound::play("HitSound.wav");
+		soundTimer = 0;
 	}
 	setColor(Vector4(max(getColor().x + -amount * 0.1f, 0), getColor().y, getColor().z, 1));
 	this->health = std::clamp(this->health + amount, 0.0f, this->stats.maxHealth);
