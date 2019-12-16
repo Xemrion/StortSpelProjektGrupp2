@@ -78,6 +78,8 @@ class Graphics {
 	std::unordered_map<std::string, Mesh> meshes;
 	std::unordered_map<std::string, Texture*> textures;
 	std::unordered_map<GameObject*,GameObject*> drawableObjects;
+	std::vector<GameObject*> culledObjects;
+	std::vector<Matrix> culledWorldMatrices;
 	LightList* lightList;
 	float cullingDistance = 150.f;
 	
@@ -114,6 +116,7 @@ class Graphics {
 	void cullLights(Matrix view);
 	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
 	void drawFog(DynamicCamera* camera, float deltaTime);
+	int prepareObjects(DynamicCamera* camera);
 public:
 	Graphics();
 	~Graphics();
@@ -151,7 +154,7 @@ public:
 	void setLightList(LightList* lightList);
 	void presentScene();
 	void render(DynamicCamera* camera, float deltaTime);
-	void renderShadowmap(DynamicCamera* camera);
+	void renderShadowmap(DynamicCamera* camera, int culledObjectAmount);
 	bool createShaders();
 	void fillLightBuffers();
 	void clearScreen(Vector4 color);

@@ -5,6 +5,8 @@
 #include "ShaderDefines.hlsli"
 #include "UI/UserInterface.h"
 #include <cassert>
+#include <future>
+#include <atomic>
 
 // quad tree side (+ border)
 #define MAX_SIDE  68.0f
@@ -85,6 +87,8 @@ Graphics::Graphics()
 	//this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
 
+	culledObjects.reserve(2000);
+	culledWorldMatrices.reserve(2000);
 }
 
 Graphics::~Graphics()
@@ -542,13 +546,51 @@ Window* Graphics::getWindow()
 	return this->window;
 }
 
+int Graphics::prepareObjects(DynamicCamera* camera)
+{
+	std::atomic<int> objectCount = 0;
+	Frustum frustum = camera->getFrustum();
+	culledObjects.reserve(drawableObjects.size());
+	culledWorldMatrices.reserve(drawableObjects.size());
+
+	auto cullAndPrepareWorldMatrix = [&](std::unordered_map<GameObject*, GameObject*>::iterator begin, std::unordered_map<GameObject*, GameObject*>::iterator end)
+	{
+		for (auto object = begin; object != end; object++)
+		{
+			if (Vector3::Distance(object->second->getPosition(), camera->getPosition()) < cullingDistance)
+			{
+				AABB boundingBox = object->second->getAABB();
+
+				if (frustum.intersect(boundingBox, 10.0))
+				{
+					int index = std::atomic_fetch_add(&objectCount, 1);
+					culledObjects[index] = object->second;
+					SimpleMath::Matrix world = DirectX::XMMatrixTranspose(object->second->getTransform());
+					culledWorldMatrices[index] = world;
+				}
+			}
+		}
+	};
+
+	auto a = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
+	auto b = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
+	auto c = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
+	auto d = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
+
+	a.wait();
+	b.wait();
+	c.wait();
+	d.wait();
+
+	return objectCount;
+}
+
 void Graphics::render(DynamicCamera* camera, float deltaTime)
 {
 	float color[4] = {
 		0,0,0,1
 	};
-	//deviceContext->ClearRenderTargetView(renderTargetView.Get(), color);
-	
+
 	color[0] = 1.0;
 	color[1] = 1.0;
 	color[2] = 1.0;
@@ -562,7 +604,9 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	renderShadowmap(camera);
+	int culledObjectAmount = prepareObjects(camera);
+	
+	renderShadowmap(camera, culledObjectAmount);
 
 	deviceContext->RSSetState(rasterState.Get());
 
@@ -620,65 +664,56 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	deviceContext->VSSetConstantBuffers(1, 1, this->worldBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(0, 1, this->colorBuffer.GetAddressOf());
-	for (auto object = drawableObjects.begin(); object != drawableObjects.end(); object++)
+
+	
+	for(int objectIndex = 0; objectIndex < culledObjectAmount; objectIndex++)
 	{
-		if (Vector3::Distance(object->second->getPosition(), camera->getPosition()) < cullingDistance)
+		GameObject* object = culledObjects[objectIndex];
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &culledWorldMatrices[objectIndex], sizeof(SimpleMath::Matrix));
+		deviceContext->Unmap(worldBuffer.Get(), 0);
+		UINT vertexCount = object->mesh->getVertexCount();
+		UINT stride = sizeof(Vertex3D);
+		UINT offset = 0;
+		Material material = object->getMaterial();
+
+		ID3D11ShaderResourceView* textureSRV = nullptr;
+		if (material.diffuse != nullptr)
 		{
-			AABB boundingBox = object->second->getAABB();
-
-			if (frustum.intersect(boundingBox, 10.0)) 
-			{
-				SimpleMath::Matrix world = object->second->getTransform();
-				SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-				CopyMemory(mappedResource.pData, &worldTr, sizeof(SimpleMath::Matrix));
-				deviceContext->Unmap(worldBuffer.Get(), 0);
-				UINT vertexCount = object->second->mesh->getVertexCount();
-				UINT stride = sizeof(Vertex3D);
-				UINT offset = 0;
-				Material material = object->second->getMaterial();
-
-				ID3D11ShaderResourceView* textureSRV = nullptr;
-				if (material.diffuse != nullptr)
-				{
-					textureSRV = material.diffuse->getShaderResView();
-				}
-				ID3D11ShaderResourceView* normalSRV = nullptr;
-				if (material.normal != nullptr)
-				{
-					normalSRV = material.normal->getShaderResView();
-				}
-				ID3D11ShaderResourceView* specularSRV = nullptr;
-				if (material.specular != nullptr)
-				{
-					specularSRV = material.specular->getShaderResView();
-				}
-				ID3D11ShaderResourceView* glossSRV = nullptr;
-				if (material.gloss != nullptr)
-				{
-					glossSRV = material.gloss->getShaderResView();
-				}
-
-				MaterialColor modColor;
-				modColor.color = object->second->getColor();
-				modColor.shading.x = object->second->getShading();
-				hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-				CopyMemory(mappedResource.pData, &modColor, static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16))));
-				deviceContext->Unmap(colorBuffer.Get(), 0);
-
-				
-				deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				deviceContext->IASetVertexBuffers(0, 1, object->second->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-				deviceContext->PSSetShaderResources(0, 1, &textureSRV);
-				deviceContext->PSSetShaderResources(1, 1, &normalSRV);
-				deviceContext->PSSetShaderResources(5, 1, &specularSRV);
-				deviceContext->PSSetShaderResources(6, 1, &glossSRV);
-				
-
-				deviceContext->Draw(vertexCount, 0);
-			}
+			textureSRV = material.diffuse->getShaderResView();
 		}
+		ID3D11ShaderResourceView* normalSRV = nullptr;
+		if (material.normal != nullptr)
+		{
+			normalSRV = material.normal->getShaderResView();
+		}
+		ID3D11ShaderResourceView* specularSRV = nullptr;
+		if (material.specular != nullptr)
+		{
+			specularSRV = material.specular->getShaderResView();
+		}
+		ID3D11ShaderResourceView* glossSRV = nullptr;
+		if (material.gloss != nullptr)
+		{
+			glossSRV = material.gloss->getShaderResView();
+		}
+
+		MaterialColor modColor;
+		modColor.color = object->getColor();
+		modColor.shading.x = object->getShading();
+		hr = deviceContext->Map(colorBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, &modColor, static_cast<UINT>(sizeof(MaterialColor) + (16 - (sizeof(MaterialColor) % 16))));
+		deviceContext->Unmap(colorBuffer.Get(), 0);
+
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+		deviceContext->PSSetShaderResources(0, 1, &textureSRV);
+		deviceContext->PSSetShaderResources(1, 1, &normalSRV);
+		deviceContext->PSSetShaderResources(5, 1, &specularSRV);
+		deviceContext->PSSetShaderResources(6, 1, &glossSRV);
+		
+		deviceContext->Draw(vertexCount, 0);
 	}
 	
 	drawStaticGameObjects(camera, frustum, 10.0);
@@ -727,7 +762,7 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	// Present the back buffer to the screen since rendering is complete.
 }
 
-void Graphics::renderShadowmap(DynamicCamera* camera)
+void Graphics::renderShadowmap(DynamicCamera* camera, int culledObjectAmount)
 {
 	//Frustum frustum = camera->getFrustum();
 	shadowMap.prepare();//clear depth
@@ -740,30 +775,25 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 	deviceContext->PSSetShader(nullptr, nullptr, 0);
 	UINT stride = sizeof(Vertex3D);
 	UINT offset = 0;
-	for (auto object = drawableObjects.begin(); object != drawableObjects.end(); object++)
+
+	for (int objectIndex = 0; objectIndex < culledObjectAmount; objectIndex++)
 	{
-		AABB boundingBox = object->second->getAABB();
-		if (frustum.intersect(boundingBox, 0.0f))
+		GameObject* object = culledObjects[objectIndex];
+		UINT vertexCount = object->mesh->getVertexCount();
+		
+		shadowMap.setWorld(culledWorldMatrices[objectIndex]);
+		deviceContext->IASetVertexBuffers(0, 1, object->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+		
+		if (object->getSunShadow())
 		{
-			UINT vertexCount = object->first->mesh->getVertexCount();
-			
-			SimpleMath::Matrix world = object->first->getTransform();
-			SimpleMath::Matrix worldTr = DirectX::XMMatrixTranspose(world);
-			shadowMap.setWorld(worldTr);
-			deviceContext->IASetVertexBuffers(0, 1, object->second->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-			
-			if (object->second->getSunShadow())
-			{
-				shadowMap.setDSun();
-				deviceContext->Draw(vertexCount, 0);
-			}
+			shadowMap.setDSun();
+			deviceContext->Draw(vertexCount, 0);
+		}
 
-			if (object->second->getSpotShadow() && spotFrustum.intersect(boundingBox, 5.0f, false))
-			{
-				shadowMap.setDSpot();
-				deviceContext->Draw(vertexCount, 0);
-			}
-
+		if (object->getSpotShadow() && spotFrustum.intersect(object->getAABB(), 5.0f, false))
+		{
+			shadowMap.setDSpot();
+			deviceContext->Draw(vertexCount, 0);
 		}
 	}
 
@@ -775,8 +805,7 @@ void Graphics::renderShadowmap(DynamicCamera* camera)
 		AABB boundingBox = o->getAABB();
 		UINT vertexCount = o->mesh->getVertexCount();
 		SimpleMath::Matrix world = o->getTransform().Transpose();
-		SimpleMath::Matrix worldTr = world;
-		shadowMap.setWorld(worldTr);
+		shadowMap.setWorld(world);
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		if (o->getSunShadow())
 		{
