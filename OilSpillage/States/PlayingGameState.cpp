@@ -89,9 +89,11 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadTexture("brownPaperCardboard");
 
 	//Skyscraper Textures
+	graphics.loadTexture("Skyscrapers/roof01");
 	graphics.loadTexture("Skyscrapers/wall01");
-	graphics.loadTexture("Skyscrapers/window01");
 	graphics.loadTexture("Skyscrapers/wall02");
+	graphics.loadTexture("Skyscrapers/window01");
+	
 
 	graphics.loadModel("Entities/Star");
 	graphics.loadModel("Entities/Streetlight");
@@ -155,19 +157,17 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadMaterial("Entities/Roller_Melee");
 	graphics.loadModel("Hospital");
 	//graphics.loadModel("Entities/Roller_Melee");
-	graphics.loadModel("Houses/testHouse");
-	graphics.loadModel("Houses/testHouse2");
-	graphics.loadModel("Houses/testHouse3");
-	graphics.loadModel("Houses/testHouse4");
-	graphics.loadModel("Houses/testHouse5");
-	graphics.loadModel("Houses/testHouse6");
+	//graphics.loadModel("Houses/testHouse");
+	//graphics.loadModel("Houses/testHouse2");
+	//graphics.loadModel("Houses/testHouse3");
+	//graphics.loadModel("Houses/testHouse4");
+	//graphics.loadModel("Houses/testHouse5");
+	//graphics.loadModel("Houses/testHouse6");
 	graphics.loadModel("Houses/destroyedHouse1");
 	graphics.loadModel("Houses/destroyedHouse2");
 	graphics.loadModel("Houses/destroyedHouse3");
 	graphics.loadModel("Houses/destroyedHouse4");
 	graphics.loadModel("Houses/destroyedHouse5");
-	graphics.loadModel("Houses/destroyedHouse6");
-	graphics.loadModel("Houses/destroyedHouse7");
 	graphics.loadMaterial("Houses/houseMaterial");
 	graphics.loadMaterial("Houses/houseMaterial2");
 	graphics.loadMaterial("Houses/houseMaterial3");

@@ -1299,8 +1299,9 @@ void Graphics::loadMesh(std::string const& fileName, std::vector<Vertex3D>& toMe
 void Graphics::unloadMesh(std::string const& name)
 {
 	if (meshes.find(name) != meshes.end()) {
-		meshes.erase(name);
+		meshes.erase(meshes.find(name));
 	}
+	else assert(false and "Failed to unload mesh!");
 }
 
 void Graphics::loadModel( std::string const &path, Vector3 rotation )
