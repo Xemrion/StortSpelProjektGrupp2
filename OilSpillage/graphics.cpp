@@ -5,7 +5,6 @@
 #include "ShaderDefines.hlsli"
 #include "UI/UserInterface.h"
 #include <cassert>
-#include <future>
 #include <atomic>
 
 // quad tree side (+ border)
@@ -86,6 +85,7 @@ Graphics::Graphics()
 
 	culledObjects.reserve(2000);
 	culledWorldMatrices.reserve(2000);
+	culledObjectsStatic.reserve(2000);
 }
 
 Graphics::~Graphics()
@@ -573,6 +573,9 @@ int Graphics::prepareObjects(DynamicCamera* camera)
 
 void Graphics::render(DynamicCamera* camera, float deltaTime)
 {
+	int culledObjectAmount = prepareObjects(camera);
+	Frustum frustum = camera->getFrustum();
+
 	float color[4] = {
 		0,0,0,1
 	};
@@ -586,13 +589,12 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 	deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 1);
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
-	Frustum frustum = camera->getFrustum();
 
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	int culledObjectAmount = prepareObjects(camera);
-	
 	renderShadowmap(camera, culledObjectAmount);
+	culledObjectsStatic.clear();
+	quadTreeCullingThread = std::async(std::launch::async, &QuadTree::getGameObjects, quadTree.get(), std::ref(culledObjectsStatic), frustum, 10.0f);
 
 	deviceContext->RSSetState(rasterState.Get());
 
@@ -701,8 +703,8 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 		
 		deviceContext->Draw(vertexCount, 0);
 	}
-	
-	drawStaticGameObjects(camera, frustum, 10.0);
+	quadTreeCullingThread.wait();
+	drawStaticGameObjects(camera, frustum, culledObjectsStatic);
 	
 	this->deviceContext->PSSetShader(nullptr, nullptr, 0);
 
@@ -750,13 +752,16 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 void Graphics::renderShadowmap(DynamicCamera* camera, int culledObjectAmount)
 {
+	Frustum frustum = shadowMap.getSunFrustum();
+	Frustum spotFrustum = shadowMap.getSpotFrustum();
+	culledObjectsStatic.clear();
+	quadTreeCullingThread = std::async(std::launch::async, &QuadTree::getGameObjects, quadTree.get(), std::ref(culledObjectsStatic), frustum, 5.0f);
 	//Frustum frustum = camera->getFrustum();
 	shadowMap.prepare();//clear depth
 	shadowMap.prepareSpot();//clear depth
 	shadowMap.setViewProjSun(camera, Vector3(lightList->getSun().getDirection().x, lightList->getSun().getDirection().y, lightList->getSun().getDirection().z));
 	//Setting the viewprojSpot in playinggamestate cause playerlight is there
-	Frustum frustum = shadowMap.getSunFrustum();
-	Frustum spotFrustum = shadowMap.getSpotFrustum();
+
 
 	deviceContext->PSSetShader(nullptr, nullptr, 0);
 	UINT stride = sizeof(Vertex3D);
@@ -783,10 +788,8 @@ void Graphics::renderShadowmap(DynamicCamera* camera, int culledObjectAmount)
 		}
 	}
 
-	std::vector<GameObject*> objects;
-	quadTree->getGameObjects(objects, frustum, 0.0f);
-	
-	for (GameObject* o : objects)
+	quadTreeCullingThread.wait();
+	for (GameObject* o : culledObjectsStatic)
 	{
 		AABB boundingBox = o->getAABB();
 		UINT vertexCount = o->mesh->getVertexCount();
@@ -2046,14 +2049,11 @@ float Graphics::getCullingDistance()
 	return cullingDistance;
 }
 
-void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias)
+void Graphics::drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, std::vector<GameObject*>& objects)
 {
 	UINT stride = sizeof(Vertex3D);
 	UINT offset = 0;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-	std::vector<GameObject*> objects;
-	quadTree->getGameObjects(objects, frustum, frustumBias );
 
 	for (GameObject* object : objects)
 	{

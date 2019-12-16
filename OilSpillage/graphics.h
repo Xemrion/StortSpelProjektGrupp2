@@ -25,6 +25,7 @@
 #include"Particle/ParticleHandler.h"
 #include "Structs.h"
 #include "Fog.h"
+#include <future>
 char const MODEL_ROOT_DIR[]   { "data/models/" };
 char const TEXTURE_ROOT_DIR[] { "data/textures/" };
 
@@ -80,6 +81,9 @@ class Graphics {
 	std::unordered_map<GameObject*,GameObject*> drawableObjects;
 	std::vector<GameObject*> culledObjects;
 	std::vector<Matrix> culledWorldMatrices;
+	std::vector<GameObject*> culledObjectsStatic;
+	std::vector<Matrix> culledWorldMatricesStatic;
+	std::future<void> quadTreeCullingThread;
 	LightList* lightList;
 	float cullingDistance = 150.f;
 	
@@ -114,7 +118,7 @@ class Graphics {
 	std::pair<GameObject*,Matrix*> selectedObjUI;
 
 	void cullLights(Matrix view);
-	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, float frustumBias);
+	void drawStaticGameObjects(DynamicCamera* camera, Frustum& frustum, std::vector<GameObject*>& objects);
 	void drawFog(DynamicCamera* camera, float deltaTime);
 	int prepareObjects(DynamicCamera* camera);
 public:
