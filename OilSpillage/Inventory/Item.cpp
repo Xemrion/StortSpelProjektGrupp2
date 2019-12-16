@@ -37,6 +37,10 @@ void Item::init()
 	graphics.loadModel("Entities/EMP");
 	graphics.loadModel("Entities/Player_Car_Parts/Chassi1");
 	graphics.loadModel("Entities/Player_Car_Parts/Wheel1");
+	graphics.loadModel("Entities/Player_Car_Parts/Chassi2");
+	graphics.loadModel("Entities/Player_Car_Parts/Wheel2");
+	graphics.loadModel("Entities/Player_Car_Parts/Chassi3");
+	graphics.loadModel("Entities/Player_Car_Parts/Wheel3");
 
 	GameObject* machineGun = new GameObject();
 	machineGun->mesh = graphics.getMeshPointer("Entities/Minigun");
@@ -86,6 +90,30 @@ void Item::init()
 	wheel1->setScale(Vector3(0.21f));
 	wheel1->setPosition(wheel1->mesh->getAABB().scale(wheel1->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.1f, 0));
 
+	GameObject* chassi2 = new GameObject();
+	chassi2->mesh = graphics.getMeshPointer("Entities/Player_Car_Parts/Chassi2");
+	chassi2->setMaterial(graphics.getMaterial("Entities/Player_Car_Parts/Chassi2"));
+	chassi2->setScale(Vector3(0.05f));
+	chassi2->setPosition(chassi2->mesh->getAABB().scale(chassi2->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.1f, 0));
+
+	GameObject* wheel2 = new GameObject();
+	wheel2->mesh = graphics.getMeshPointer("Entities/Player_Car_Parts/Wheel2");
+	wheel2->setMaterial(graphics.getMaterial("Entities/Player_Car_Parts/Wheel2"));
+	wheel2->setScale(Vector3(0.21f));
+	wheel2->setPosition(wheel2->mesh->getAABB().scale(wheel2->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.1f, 0));
+
+	GameObject* chassi3 = new GameObject();
+	chassi3->mesh = graphics.getMeshPointer("Entities/Player_Car_Parts/Chassi3");
+	chassi3->setMaterial(graphics.getMaterial("Entities/Player_Car_Parts/Chassi3"));
+	chassi3->setScale(Vector3(0.05f));
+	chassi3->setPosition(chassi3->mesh->getAABB().scale(chassi3->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.1f, 0));
+
+	GameObject* wheel3 = new GameObject();
+	wheel3->mesh = graphics.getMeshPointer("Entities/Player_Car_Parts/Wheel3");
+	wheel3->setMaterial(graphics.getMaterial("Entities/Player_Car_Parts/Wheel3"));
+	wheel3->setScale(Vector3(0.21f));
+	wheel3->setPosition(wheel3->mesh->getAABB().scale(wheel3->getScale()).maxPos * Vector3(0, 1, 0) + Vector3(0, 0.1f, 0));
+
 	Item::premadeItems = {
 		std::make_shared<ItemWeapon>("Machinegun", WeaponHandler::getWeapon(WeaponType::MachineGun), machineGun),
 		std::make_shared<ItemWeapon>("Flamethrower", WeaponHandler::getWeapon(WeaponType::Flamethrower), flameThrower),
@@ -94,7 +122,11 @@ void Item::init()
 		std::make_shared<ItemGadget>("Nitro", GadgetHandler::getGadget(GadgetType::NITRO) , nitro),
 		std::make_shared<ItemGadget>("EMP",GadgetHandler::getGadget(GadgetType::EMP), emp),
 		std::make_shared<ItemChassi>("Muscle Chassi", 100, 1.0f, chassi1), //DON'T CHANGE THE INDEX OF THESE
-		std::make_shared<ItemWheel>("Muscle Tires", 1.0f, 1.0f, wheel1) //DON'T CHANGE THE INDEX OF THESE
+		std::make_shared<ItemWheel>("Muscle Tires", 1.0f, 1.0f, wheel1), //DON'T CHANGE THE INDEX OF THESE
+		std::make_shared<ItemChassi>("Sport Chassi", 100, 1.0f, chassi2), 
+		std::make_shared<ItemWheel>("Sport Tires", 1.0f, 1.0f, wheel2),
+		std::make_shared<ItemChassi>("SUV Chassi", 100, 1.0f, chassi3),
+		std::make_shared<ItemWheel>("SUV Tires", 1.0f, 1.0f, wheel3)
 	};
 
 }

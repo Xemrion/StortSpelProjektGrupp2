@@ -180,7 +180,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 	lightList->setSun(Sun(Vector3(1.0f, -1.0f, 0.1f), Vector3(1.0f, 0.96f, 0.89f)));
 
-	graphics.setLightList(lightList.get());
+	
 	SpotLight tempLight(Vector3(0, 0, 0), Vector3(0.9, 0.5, 0), 1.0f, Vector3(0, 0, 0), 0.0f);
 	this->player->setSpotLight(lightList->addLight(tempLight));
 
@@ -332,6 +332,68 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 		graphics.unloadTexture("Tiles/desert");
 		graphics.unloadTexture("Tiles/desert_nor");
 	}
+
+	//Weather effects
+	FogMaterial material;
+	material.color = Vector3(1.0f, 1.0f, 1.0f);
+	material.scale = 5.0f;
+	material.density = 0.5f;
+	material.ambientDensity = 0.05f;
+	material.densityThreshold = 0.15f;
+	if (map->getInfo().environment.getBiome() == Biome::grass) {
+		material.color = Vector3(1.0f, 1.0f, 1.0f);
+	}
+	if (map->getInfo().environment.getBiome() == Biome::sandy) {
+		material.color = Vector3(0.8f, 0.8f, 0.48f);
+	}
+	if (map->getInfo().environment.getBiome() == Biome::burnt) {
+		material.color = Vector3(0.35, 0.17, 0.17);
+	}
+	if (map->getInfo().environment.getBiome() == Biome::snowy) {
+		material.color = Vector3(0.8f, 0.8f, 1.0f);
+	}
+	if (map->getInfo().environment.getWeather() == Weather::snow) {
+		material.density = 0.7f;
+		graphics.setFogWindSpeed(Vector2(0.001f,0.001f));
+	}
+	else if(map->getInfo().environment.getWeather() == Weather::sandstorm){
+		material.density = 1.6f;
+		graphics.setFogWindSpeed(Vector2(0.02f, 0.02f));
+	}
+	else if (map->getInfo().environment.getWeather() == Weather::fog) {
+		material.density = 1.6f;
+		graphics.setFogWindSpeed(Vector2(0.001f, 0.001f));
+	}
+	else if (map->getInfo().environment.getWeather() == Weather::clear) {
+		material.density = 0.0f;
+		graphics.setFogWindSpeed(Vector2(0.0f, 0.0f));
+	}
+	else if (map->getInfo().environment.getWeather() == Weather::ashfall) {
+		material.density = 0.8f;
+		graphics.setFogWindSpeed(Vector2(0.001f, 0.001f));
+	}
+	graphics.setFog(material, 3, 3.25f);
+	graphics.enableFog();
+
+	Sun sun;
+	Vector3 sundir(1.0f, -1.0f, 0.1f);
+	if (map->getInfo().environment.getTime() == Time::sunrise) {
+		sun.setColor(Vector3(1, 1, 1));
+		//sundir = Vector3(1,-1,1);
+	}
+	else if (map->getInfo().environment.getTime() == Time::noon) {
+		sun.setColor(Vector3(1, 1, 1));
+	}
+	else if (map->getInfo().environment.getTime() == Time::sunset) {
+		sun.setColor(Vector3(1.0f, 0.65f, 0.3f));
+		//sundir = Vector3(-1, -1, -1);
+	}
+	else if (map->getInfo().environment.getTime() == Time::night) {
+		sun.setColor(Vector3(0.2f, 0.2f, 0.25f));
+	}
+	sun.setDirection(sundir);
+	lightList->setSun(sun);
+	graphics.setLightList(lightList.get());
 
 #ifndef _DEBUG
 	spawnObjects();
