@@ -1874,7 +1874,7 @@ CompositeHouse Map::instantiateSkyscraper()
 	temp.roof.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.walls.setScale(Vector3(2.0f, 1.0f, 2.0f));
 	temp.windows.setScale(Vector3(2.0f, 1.0f, 2.0f));
-	temp.roof.setTexture(graphics.getTexturePointer("Skyscrapers/wall02"));
+	temp.roof.setTexture(graphics.getTexturePointer("Skyscrapers/roof01"));
 	temp.walls.setTexture(graphics.getTexturePointer("Skyscrapers/wall01"));
 	temp.windows.setTexture(graphics.getTexturePointer("Skyscrapers/window01"));
 	/*temp.roof.setColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
