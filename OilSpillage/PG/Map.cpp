@@ -516,21 +516,17 @@ void  Map::generateRoads()
 	DBG_PROBE( Map::generateRoads );
 	I32_Dist   generateSeed {};
 	MapConfig  roadConfig { config };
-	// generate roads at a lower resolution so we can uspscale the road network to our desired resolution later
-	roadConfig.dimensions.x = config.dimensions.x / 2;
-	roadConfig.dimensions.y = config.dimensions.y / 2;
 	tilemap = std::make_unique<TileMap>( roadConfig );
-	for(;;) { // TODO: add MAX_TRIES?
+	for (;;) { // TODO: add MAX_TRIES?
 		RoadGenerator roadGenerator{ *tilemap };
 		roadGenerator.generate(roadConfig);
-		if (tilemap->getRoadCoverage() < roadConfig.roadMinTotalCoverage) {
+		if ( auto coverage = tilemap->getRoadCoverage();
+		          coverage < roadConfig.roadMinTotalCoverage
+		       or coverage > roadConfig.roadMaxTotalCoverage )
+		{
 			roadConfig.seed = generateSeed(rng);
 			tilemap = std::make_unique<TileMap>( roadConfig );
-		}
-		else {
-			roadGenerator.upscale();
-			break;
-		}
+		} else break;
 	}
 
 	
@@ -556,7 +552,7 @@ void  Map::generateRoads()
 	// west and east edges
 	for ( auto y = 0;  y < tilemap->height;  ++y ) {
 		V2u west ( 0, y ),
-		    east ( tilemap->width-1, 0 );
+		    east ( tilemap->width-1, y );
 		for ( auto &pos : {west, east} )
 			if ( tilemap->tileAt(pos) == Tile::road )
 				validStartPositions.emplace_back( std::move(pos) );
