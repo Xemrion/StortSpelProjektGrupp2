@@ -1,8 +1,8 @@
 struct Particle
 {
-	float4 position;//.w = initialSize
-	float4 direction;//.w=size
-	float2 time;
+    float4 position; //.w = initialSize
+    float4 direction; //.w=size
+    float2 time;
 };
 StructuredBuffer<Particle> SimulationState;
 cbuffer CB_PER_FRAME : register(b0)
@@ -42,7 +42,7 @@ float4 fadeOverTime(float4 startColor, float4 endColor, float time, float totTim
 };
 VS_OUT main(in VS_INPUT input)
 {
-	VS_OUT output = (VS_OUT)0;
+    VS_OUT output = (VS_OUT) 0;
 	
     float3 vert;
     
@@ -56,7 +56,13 @@ VS_OUT main(in VS_INPUT input)
     float startSize = config.y;
     float endSize = config.z;
     float size = 0.0f;
-    size = lerp(startSize, endSize, smoothstep(0.0, totalLifeTime - 1.0f, time)) * (1.0 - smoothstep(totalLifeTime - 1.0f, totalLifeTime, time));
+    float timeZeroToOne = (time / totalLifeTime);
+    if (timeZeroToOne <= 0.02f)
+        size = startSize;
+    else if (timeZeroToOne > 0.02f && timeZeroToOne < 0.2f)
+        size = lerp(size, endSize, time);
+    else if (timeZeroToOne >= 0.2f)
+        size = endSize * (1.0 - smoothstep(totalLifeTime - 1.0f, totalLifeTime, time));
     
     float nrOfColors = config.x;
     float4 testColor = float4(1.0f, 0.0f, 1.0f, 1.0f);
@@ -76,9 +82,9 @@ VS_OUT main(in VS_INPUT input)
     float2 texCoord;
     float3 testUp = up;
     float3 testRight = right;
-    if(upp.w > 0.9f)
+    if (upp.w > 0.9f)
     {
-        if(input.vertexId == 0)
+        if (input.vertexId == 0)
         {
             vert = SimulationState[input.instanceId].position.xyz + testUp * size; // Top middle
             texCoord = float2(0.5f, 1.0f);
@@ -126,5 +132,5 @@ VS_OUT main(in VS_INPUT input)
     output.color = testColor;
     
     
-	return output;
+    return output;
 }

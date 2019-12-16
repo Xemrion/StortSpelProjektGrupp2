@@ -48,12 +48,6 @@ float4 fadeOverTime(float4 startColor, float4 endColor, float time, float totTim
 VS_OUT main(in VS_INPUT input)
 {
     VS_OUT output = (VS_OUT) 0;
-	
-    output.pos.xyz = SimulationState[input.instanceId].position.xyz;
-    output.pos.w = SimulationState[input.instanceId].direction.w;
-    float3 vert;
-    
-   
     
     float time = SimulationState[input.instanceId].time.x;
     float totalLifeTime = SimulationState[input.instanceId].time.y;
@@ -78,42 +72,45 @@ VS_OUT main(in VS_INPUT input)
     {
         testColor = fadeOverTime(colors[2], colors[3], time % halfTime, halfTime);
     }
-    float3 partPos = SimulationState[input.instanceId].position.xyz;
-    float4 direction = SimulationState[input.instanceId].direction;
-    float3 testUp = normalize(direction.xyz);
+    float3 vert;
     float2 texCoord;
-    float3 right = -normalize(cross(testUp, float3(0.0f, 1.0f, 0.0f)));
+    float3 particlePos = SimulationState[input.instanceId].position.xyz;
+    float4 direction = SimulationState[input.instanceId].direction;
+    
+    float3 trailDirection = normalize(direction.xyz);
+    float3 right = -normalize(cross(trailDirection, float3(0.0f, 1.0f, 0.0f)));
+
+    float3 testUp = trailDirection;
     float3 testRight = right;
 
     if (input.vertexId == 0)
     {
-        vert = SimulationState[input.instanceId].position.xyz - testRight * size + testUp * size * direction.w; // Top Left
+        vert = particlePos - testRight * size + testUp * size * direction.w; // Top Left
         texCoord = float2(0.0f, 0.0f);
-
     }
     else if (input.vertexId == 1)
     {
-        vert = SimulationState[input.instanceId].position.xyz + testRight * size + testUp * size * direction.w; // Top right
+        vert = particlePos + testRight * size + testUp * size * direction.w; // Top right
         texCoord = float2(1.0f, 0.0f);
     }
     else if (input.vertexId == 2)
     {
-        vert = SimulationState[input.instanceId].position.xyz - testRight * size - testUp * size * direction.w; // bot left 
+        vert = particlePos - testRight * size - testUp * size * direction.w; // bot left 
         texCoord = float2(0.0f, 1.0f);
     }
     else if(input.vertexId == 3)
     {
-        vert = SimulationState[input.instanceId].position.xyz + testRight * size + testUp * size * direction.w; // Top right
+        vert = particlePos + testRight * size + testUp * size * direction.w; // Top right
         texCoord = float2(1.0f, 0.0f);
     }
     else if (input.vertexId == 4)
     {
-        vert = SimulationState[input.instanceId].position.xyz + testRight * size - testUp * size * direction.w; // bot right
+        vert = particlePos + testRight * size - testUp * size * direction.w; // bot right
         texCoord = float2(1.0f, 1.0f);
     }
     else if (input.vertexId == 5)
     {
-        vert = SimulationState[input.instanceId].position.xyz - testRight * size - testUp * size * direction.w; // bot left
+        vert = particlePos - testRight * size - testUp * size * direction.w; // bot left
         texCoord = float2(0.0f, 1.0f);
     }
 	

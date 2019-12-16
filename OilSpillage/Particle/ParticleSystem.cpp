@@ -87,10 +87,6 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	hr = device->CreateVertexShader(this->vertexShaderBlob->GetBufferPointer(), this->vertexShaderBlob->GetBufferSize(), NULL, this->vertexShader.GetAddressOf());
 	hr = device->CreateInputLayout(inputDesc, numElements, this->vertexShaderBlob->GetBufferPointer(), this->vertexShaderBlob->GetBufferSize(), this->inputLayout.GetAddressOf());
 
-	filePath = shaderfolder + StringToWString(this->systemData.shaders.gsPrimitive);
-	hr = D3DReadFileToBlob(filePath.c_str(), this->geometryShaderBlob.GetAddressOf());
-	hr = device->CreateGeometryShader(this->geometryShaderBlob->GetBufferPointer(), this->geometryShaderBlob->GetBufferSize(), NULL, this->geometryShader.GetAddressOf());
-
 	filePath = shaderfolder + StringToWString(this->systemData.shaders.pixelShader);
 	hr = D3DReadFileToBlob(filePath.c_str(), this->pixelShaderBlob.GetAddressOf());
 	hr = device->CreatePixelShader(this->pixelShaderBlob->GetBufferPointer(), this->pixelShaderBlob->GetBufferSize(), NULL, this->pixelShader.GetAddressOf());
@@ -549,15 +545,8 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 
 	this->deviceContext->PSSetShader(this->pixelShader.Get(), nullptr, 0);
 	this->deviceContext->VSSetShader(this->vertexShader.Get(), nullptr, 0);
-	/*if (this->getName() == "fire")
-	{
-		this->deviceContext->GSSetShader(nullptr, nullptr, 0);
-	}
-	else
-	{
-		this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
-	}*/
 	this->deviceContext->GSSetShader(nullptr, nullptr, 0);
+
 	this->deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
 	this->deviceContext->VSSetConstantBuffers(1, 1, this->particleParamRenderCB.GetAddressOf());
 
@@ -606,7 +595,6 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 		this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
 
 	}
-	this->deviceContext->GSSetShader(nullptr, 0, 0);
 	this->deviceContext->VSSetShaderResources(0, 1, &n);
 	if (otherFrame > 0.9f)
 	{
@@ -671,7 +659,7 @@ void ParticleSystem::setShaders()
 
 	this->deviceContext->PSSetShader(this->pixelShader.Get(), nullptr, 0);
 	this->deviceContext->VSSetShader(this->vertexShader.Get(), nullptr, 0);
-	//this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
+	this->deviceContext->GSSetShader(nullptr, nullptr, 0);
 }
 
 float ParticleSystem::getStartSize() const

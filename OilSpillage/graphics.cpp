@@ -68,21 +68,16 @@ Graphics::Graphics()
 	this->particleHandler->addParticleSystem("snow", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
 	this->particleHandler->getParticleSystem("snow")->setGravity(-0.25f);
 	this->particleHandler->getParticleSystem("snow")->changeVectorField(2.5f,3.0f);
-	//this->particleHandler->addParticleSystem("ash", snowColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
-	//this->particleHandler->getParticleSystem("ash")->setGravity(-0.25f);
-	//this->particleHandler->getParticleSystem("ash")->changeVectorField(0.75f, 3.0f);
-	//this->particleHandler->addParticleSystem("rain", rainColor, 4, 0.1f, 0.1f, 0.0f, 1.0f);
+
 
 	this->particleHandler->loadParticleSystems();
 	this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso", "DebrisCreateCS.cso", "ParticleGS.cso");
 	this->particleHandler->getParticleSystem("snow")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
-	//this->particleHandler->getParticleSystem("ash")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
+	
 
-
-	//this->particleHandler->getParticleSystem("rain")->setParticleShaders("SnowUpdateCS.cso", "SnowCreateCS.cso", "SnowParticleGS.cso");
 	this->particleTrail->loadSystem();
 	this->particleTrail->setParticleShaders("TrailUpdateCS.cso", "TrailCreateCS.cso", "TrailGS.cso", "TrailPS.cso", "TrailVS.cso");
-
+	this->particleHandler->getParticleSystem("snow")->setVertexShader("SnowParticleVS.cso");
 	this->particleHandler->getParticleSystem("electro")->setUpdateShader("ElectroUpdateCS.cso");
 	//this->particleHandler->getParticleSystem("debris")->setParticleShaders("DebrisUpdateCS.cso","DebrisCreateCS.cso","ParticleGS.cso");
 	this->quadTree = std::make_unique<QuadTree>(Vector2(-MAX_SIDE * 20.f, -MAX_SIDE * 20.f), Vector2(MAX_SIDE * 20.f, MAX_SIDE * 20.0f), 4);
@@ -485,7 +480,7 @@ bool Graphics::init(Window* window)
 	this->particleTrail->setTexture(getTexturePointer("ParticleTextures/trail"));
 	Vector4 testTC[4] = { Vector4(0.6f,0.6f,0.6f,0.1f) };
 	this->particleTrail->setColor(testTC, 1);
-
+	this->particleTrail->setQuad();
 	this->particleTrail->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("electro")->initiateParticles(device.Get(), deviceContext.Get());
 	this->particleHandler->getParticleSystem("explosion")->initiateParticles(device.Get(), deviceContext.Get());
@@ -590,17 +585,15 @@ void Graphics::render(DynamicCamera* camera, float deltaTime)
 
 	deviceContext->RSSetViewports(1, &this->vp);
 
-	/*this->particleHandler->updateParticleSystems(deltaTime, viewProj);
+	this->particleHandler->updateParticleSystems(deltaTime, viewProj);
 
 	deviceContext->PSSetShaderResources(1, 1, this->shadowMap.getShadowMap().GetAddressOf());
 	deviceContext->GSSetConstantBuffers(2, 1, this->shadowMap.getViewProj().GetAddressOf());
 	deviceContext->PSSetSamplers(1, 1, this->shadowMap.getShadowSampler().GetAddressOf());
 
-	this->particleHandler->renderParticleSystems(camera);*/
+	this->particleHandler->renderParticleSystems(camera);
 
-	this->particleHandler->getParticleSystem("fire")->updateParticles(deltaTime, viewProj);
-
-	this->particleHandler->getParticleSystem("fire")->drawAll(camera);
+	
 	//set up Shaders
 
 	deviceContext->IASetInputLayout(this->shaderDefault.vs.getInputLayout());
