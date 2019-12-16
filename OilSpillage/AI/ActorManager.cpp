@@ -679,7 +679,7 @@ Vector3 ActorManager::findTeleportPos(const Vector3& targetPos, float minDistanc
 	for (float i = 0;; i += 1.0) {
 		Vector3 position = map->generateNonBuildingPositionInWorldSpace(*rng);
 		float distance = (position - targetPos).Length();
-		if ((distance <= maxDistance + i) && (distance >= minDistance))
+		if ((distance <= maxDistance * (1 + i)) && (distance >= minDistance))
 		{
 			return position;
 		}
