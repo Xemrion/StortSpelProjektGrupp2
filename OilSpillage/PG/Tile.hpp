@@ -7,6 +7,7 @@
 enum class Tile : U8 
 {
    ground,
+   inaccessibleGround,
    road,
    building,
    water

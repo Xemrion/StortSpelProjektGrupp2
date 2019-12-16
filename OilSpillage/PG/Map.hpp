@@ -207,7 +207,7 @@ private:
 	UPtr<Skyscraper>           skyscraperGenerator;
 	// TODO: refactor out:
 	using DistrictID = U16;
-	using BuildingID = U16;                         // 0 = unused tile
+	using BuildingID = U16;                           // 0 = unused tile
 	BuildingID                 nextBuildingID { 1U }; // 1 = first valid ID
 	Vector<BuildingID>         buildingIDs;
 	Vector<F32>                roadDistanceMap;
