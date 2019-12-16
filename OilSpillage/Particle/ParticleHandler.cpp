@@ -26,21 +26,21 @@ void ParticleHandler::addParticleSystem(ParticleSystem* system, std::string name
 	names.push_back(system->getName());
 }
 
-void ParticleHandler::addParticleSystem(std::string name, std::string csUpdate, std::string csCreate, std::string gs)
+void ParticleHandler::addParticleSystem(std::string name, std::string csUpdate, std::string csCreate, std::string vs)
 {
 	ParticleSystem* newSystem = new ParticleSystem;
 	newSystem->setNameofSystem(name);
-	newSystem->setParticleShaders(csUpdate, csCreate, gs);
+	newSystem->setParticleShaders(csUpdate, csCreate, vs);
 	names.push_back(newSystem->getName());
 
 	this->particleSystems[newSystem->getName()] = newSystem;
 }
 
-void ParticleHandler::addParticleSystem(std::string name, Vector4 colors[4], int nrOfColors, float startSize, float endSize, float vectorFieldPower, float vectorFieldSize, std::string csUpdate, std::string csCreate, std::string gs)
+void ParticleHandler::addParticleSystem(std::string name, Vector4 colors[4], int nrOfColors, float startSize, float endSize, float vectorFieldPower, float vectorFieldSize, std::string csUpdate, std::string csCreate, std::string vs)
 {
 	ParticleSystem* newSystem = new ParticleSystem;
 	newSystem->setNameofSystem(name);
-	newSystem->setParticleShaders(csUpdate, csCreate, gs);
+	newSystem->setParticleShaders(csUpdate, csCreate, vs);
 	newSystem->changeColornSize(colors, nrOfColors, startSize, endSize);
 	newSystem->changeVectorField(vectorFieldPower, vectorFieldSize);
 	names.push_back(newSystem->getName());

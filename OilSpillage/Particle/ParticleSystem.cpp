@@ -6,6 +6,14 @@ ParticleSystem::ParticleSystem()
 	this->device = nullptr;
 	this->deviceContext = nullptr;
 	this->indDraw.instanceCount = 1;
+	std::string def = "DEFAULT";
+	strcpy(this->systemData.name, def.c_str());
+	strcpy(this->systemData.shaders.csCreate, def.c_str());
+	strcpy(this->systemData.shaders.csUpdate, def.c_str());
+	strcpy(this->systemData.shaders.gsPrimitive, def.c_str());
+	strcpy(this->systemData.shaders.vertexShader, def.c_str());
+	strcpy(this->systemData.shaders.pixelShader, def.c_str());
+
 	//default
 	this->capParticle = 51200 * 2;
 	this->otherFrame = 1.0f;
@@ -485,11 +493,10 @@ void ParticleSystem::changeVectorField(float vectorFieldPower, float vectorField
 	this->sP.vectorField.y = this->systemData.vectorFieldPower;
 	this->sP.vectorField.z = this->systemData.vectorFieldSize;
 }
-void ParticleSystem::setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader, std::string vertexShader)
+void ParticleSystem::setParticleShaders(std::string csUpdate, std::string csCreate, std::string vertexShader, std::string pixelShader)
 {
 	strcpy(this->systemData.shaders.csUpdate, csUpdate.c_str());
 	strcpy(this->systemData.shaders.csCreate, csCreate.c_str());
-	strcpy(this->systemData.shaders.gsPrimitive, gsPrimitive.c_str());
 	strcpy(this->systemData.shaders.pixelShader, pixelShader.c_str());
 	strcpy(this->systemData.shaders.vertexShader, vertexShader.c_str());
 }
@@ -504,10 +511,6 @@ void ParticleSystem::setUpdateShader(std::string csUpdate)
 void ParticleSystem::setCreateShader(std::string csCreate)
 {
 	strcpy(this->systemData.shaders.csCreate, csCreate.c_str());
-}
-void ParticleSystem::setGeometryShader(std::string gsPrimitive)
-{
-	strcpy(this->systemData.shaders.gsPrimitive, gsPrimitive.c_str());
 }
 void ParticleSystem::setPixelShader(std::string pixelShader)
 {
