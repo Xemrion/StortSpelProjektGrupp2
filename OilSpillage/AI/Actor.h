@@ -36,8 +36,9 @@ private:
 	float fireTimer;
 protected:
 	bool isHit = false;
-	bool unStunned = true;
+	bool stunned;
 	float stunTimer;
+	float soundTimer;
 	float deltaTime;
 	Vector3 targetPos;
 	Stats stats;

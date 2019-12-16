@@ -37,19 +37,25 @@ Actor::~Actor()
 void Actor::update(float dt, const Vector3& targetPos)
 {
 	this->deltaTime = dt;
+	this->soundTimer += dt;
 	this->targetPos = targetPos;
-	if (root != nullptr && stunTimer <= 0 && unStunned)
+	if (stunned)
 	{
-		this->root->func();
+		if (stunTimer <= 0)
+		{
+			stunned = false;
+			setColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+		}
 	}
-	else if(stunTimer <= 0 && !unStunned)
+	else
 	{
-		unStunned = true;
-		setColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+		if (root != nullptr)
+		{
+			this->root->func();
+		}
 	}
 	if (isHit)
 	{
-		
 		setColor(Vector4(getColor().x / (1 + 15.0f * deltaTime), getColor().y, getColor().z, 1));
 		if (getColor().x <= 0.01f)
 		{
@@ -84,7 +90,10 @@ void Actor::changeHealth(float amount)
 {
 	if (amount < 0) {
 		isHit = true;
+	}
+	if (amount < 0 && soundTimer > 0.1f) {
 		Sound::play("HitSound.wav");
+		soundTimer = 0;
 	}
 	setColor(Vector4(max(getColor().x + -amount * 0.1f, 0), getColor().y, getColor().z, 1));
 	this->health = std::clamp(this->health + amount, 0.0f, this->stats.maxHealth);
@@ -125,7 +134,7 @@ void Actor::onFire()
 		{
 			for (int i = 0; i < 10; i++)
 			{
-				Game::getGraphics().addParticle("fire", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
+				Game::getGraphics().addParticle(position, Vector3(0.0f), 1, 1.5f); //DONT CHANGE
 			}
 			particleTimer = 0.1f;
 		}
@@ -143,6 +152,6 @@ void Actor::setStun(float timer)
 	{
 		stunTimer = timer;
 		setColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
-		unStunned = false;
+		stunned = true;
 	}
 }

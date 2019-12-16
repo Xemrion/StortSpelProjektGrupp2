@@ -146,14 +146,50 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 		{
 			if (!this->actors[i]->isDead())
 			{
-				if (bulletArray[j].getWeaponType() == WeaponType::Laser)
+				if (bulletArray[j].getWeaponType() != WeaponType::None)
 				{
-					GameObject* laserObject = bulletArray[j].getGameObject();
-					Vector3 rayDir = bulletArray[j].getDirection();
-					Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
-					if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
+					if (bulletArray[j].getWeaponType() == WeaponType::Laser)
 					{
-						
+						GameObject* laserObject = bulletArray[j].getGameObject();
+						Vector3 rayDir = bulletArray[j].getDirection();
+						Vector3 rayOrigin = laserObject->getPosition() - rayDir * laserObject->getScale().z;
+						if (this->actors[i]->getAABB().intersectXZ(rayOrigin, rayDir, laserObject->getScale().z, -1.0))
+						{
+
+							if (bulletArray[j].getFlame())// Damage over Time
+							{
+								actors[i]->setFire(bulletArray[j].getFlameTimer());
+							}
+							if (bulletArray[j].getKnockback())// Knockback
+							{
+								actors[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
+							}
+							if (bulletArray[j].getSplashBool())
+							{
+								for (int k = 0; k < actors.size(); k++)
+								{
+									float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
+									float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
+									float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
+									if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
+									{
+										actors[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages)) * deltaTime * 2);
+									}
+								}
+							}
+							this->actors[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
+						}
+					}
+					else if (bulletArray[j].getTimeLeft() > 0 && bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
+					{
+						if (soundTimer > 0.05f) {
+							if (bulletArray[j].getWeaponType() == WeaponType::Star)
+							{
+								Sound::play("StarPowerupHit.mp3", 0.75f);
+							}
+
+							soundTimer = 0;
+						}
 						if (bulletArray[j].getFlame())// Damage over Time
 						{
 							actors[i]->setFire(bulletArray[j].getFlameTimer());
@@ -171,61 +207,28 @@ void ActorManager::intersectPlayerBullets(Bullet* bulletArray, size_t size, floa
 								float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
 								if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
 								{
-									actors[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages))*deltaTime * 2);
+									actors[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages)) * deltaTime * 2);
 								}
 							}
 						}
-						this->actors[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
-					}
-				}
-				else if (/*bulletArray[j].getTimeLeft() > 0 && */bulletArray[j].getGameObject()->getAABB().intersectXZ(this->actors[i]->getAABB()))
-				{
-					if (soundTimer > 0.05f) {
-						if (bulletArray[j].getWeaponType() == WeaponType::Star)
+						if (bulletArray[j].getMelee())
 						{
-							Sound::play("StarPowerupHit.mp3", 0.75f);
+							this->actors[i]->changeHealth(-bulletArray[j].getDamage() * deltaTime);
 						}
-						
-						soundTimer = 0;
-					}
-					if (bulletArray[j].getFlame())// Damage over Time
-					{
-						actors[i]->setFire(bulletArray[j].getFlameTimer());
-					}
-					if (bulletArray[j].getKnockback())// Knockback
-					{
-						actors[i]->knockBack(bulletArray[j].getDirection(), bulletArray[j].getKnockbackForce());
-					}
-					if (bulletArray[j].getSplashBool())
-					{
-						for (int k = 0; k < actors.size(); k++)
+						else
 						{
-							float deltaX = actors[k]->getPosition().x - bulletArray[j].getGameObject()->getPosition().x;
-							float deltaZ = actors[k]->getPosition().z - bulletArray[j].getGameObject()->getPosition().z;
-							float distance = sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
-							if (k != i && distance < bulletArray[j].getSplashRange() && !actors[k]->isDead())
-							{
-								actors[k]->changeHealth((-bulletArray[j].getDamage() / (20 - Game::getGameInfo().nrOfClearedStages)) * deltaTime * 2);
-							}
+							this->actors[i]->changeHealth(-bulletArray[j].getDamage());
 						}
+						if (!bulletArray[j].getMelee())
+							bulletArray[j].destroy();
 					}
-					if(bulletArray[j].getMelee())
+					else if (bulletArray[j].getWeaponType() == WeaponType::gadget)
 					{
-						this->actors[i]->changeHealth(-bulletArray[j].getDamage()*deltaTime);
-					}
-					else
-					{
-						this->actors[i]->changeHealth(-bulletArray[j].getDamage());
-					}
-					if (!bulletArray[j].getMelee())
-						bulletArray[j].destroy();
-				}
-				else if (bulletArray[j].getWeaponType() == WeaponType::gadget)
-				{
-					if (Sphere::intersection(bulletArray[j].getPosition(), bulletArray[j].getGadger().radius, this->actors[i]->getPosition()))
-					{
-						//freeze actor
-						this->actors[i]->setStun(bulletArray[j].getGadger().lifeTime);
+						if (Sphere::intersection(bulletArray[j].getPosition(), bulletArray[j].getGadger().radius, this->actors[i]->getPosition()))
+						{
+							//freeze actor
+							this->actors[i]->setStun(bulletArray[j].getGadger().lifeTime);
+						}
 					}
 				}
 			}
@@ -423,29 +426,14 @@ void ActorManager::updateActors(float dt, const Vector3& targetPos)
 
 void ActorManager::updateBosses(float dt, const Vector3& targetPos)
 {
-	bool hasDied = false;
-	for (int i = 0; i < this->bosses.size(); i++)
+	for (int i = this->bosses.size() - 1; i >= 0; i--)
 	{
-		if (bosses[i] != nullptr && !bosses[i]->isDead())
+		if (bosses[i]->isDead())
 		{
-			bosses[i]->update(dt, targetPos); //creash
+			destroyBoss(i);
+			continue;
 		}
-		else if (bosses[i] != nullptr && bosses[i]->isDead())
-		{
-			hasDied = true;
-		}
-	}
-
-	if (hasDied)
-	{
-		for (int i = this->bosses.size() - 1; i >= 0; i--)
-		{
-			if (bosses[i]->isDead())
-			{
-				Game::getGameInfo().addHighScore(bosses[i]->getPoints());
-				destroyBoss(i);
-			}
-		}
+		bosses[i]->update(dt, targetPos);
 	}
 }
 

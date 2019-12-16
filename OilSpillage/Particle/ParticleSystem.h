@@ -3,7 +3,6 @@
 #include<wrl/client.h>
 #include<d3dcompiler.h>
 #include"..///DynamicCamera.h"
-#include<mutex>
 using namespace DirectX::SimpleMath;
 struct Particle
 {
@@ -36,7 +35,7 @@ struct SimulationParams
 };
 struct IndirDraw
 {
-	UINT vertexCount;//particle count
+	UINT vertexCountPerInstance;//particle count
 	UINT instanceCount;//1
 	UINT vertexStartLoc;
 	UINT instanceStartLoc;
@@ -78,17 +77,18 @@ public:
 	//gravity = -1 means -1 * 9.82
 	void setGravity(float gravity);
 	void changeVectorField(float vectorFieldPower, float vectorFieldSize);
-	void setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader = "ParticlePS.cso", std::string vertexShader = "ParticleVS.cso");
+	void setParticleShaders(std::string csUpdate, std::string csCreate, std::string vertexShader = "ParticleVS.cso", std::string pixelShader = "ParticlePS.cso");
 	void setVertexShader(std::string vertexShader);
 	void setUpdateShader(std::string csUpdate);
 	void setCreateShader(std::string csCreate);
-	void setGeometryShader(std::string gsPrimitive);
 	void setPixelShader(std::string pixelShader);
 	void setBufferType(D3D11_BUFFER_UAV_FLAG flag);
 
 	void drawAll(DynamicCamera* camera);
 	bool loadSystem();
 	bool saveSystem();
+
+	void setQuad();
 
 	void setShaders();
 
@@ -99,37 +99,32 @@ public:
 	Vector4 getColor(int index)const;
 private:
 
-	std::wstring StringToWString(const std::string& s)
+	std::wstring StringToWString(const std::string& aString)
 	{
-		std::wstring temp(s.length(), L' ');
-		std::copy(s.begin(), s.end(), temp.begin());
+		std::wstring temp(aString.length(), L' ');
+		std::copy(aString.begin(), aString.end(), temp.begin());
 		return temp;
 	};
 
-
-	std::string WStringToString(const std::wstring& s)
+	std::string WStringToString(const std::wstring& aWstring)
 	{
-		std::string temp(s.length(), ' ');
-		std::copy(s.begin(), s.end(), temp.begin());
+		std::string temp(aWstring.length(), ' ');
+		std::copy(aWstring.begin(), aWstring.end(), temp.begin());
 		return temp;
 	};
-	int frameID;
 	int capParticle;//100*512
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
 	int nrOfParticles;
 	float otherFrame;
-	int lastUsedParticle;
 	int firstAdd;
 	float deltaTime;
 	float sinMovement;
 	IndirDraw indDraw;
-	ParticleRenderParams colorNSize;
 	ParticleParams pParams;
 	SimulationParams sP;
-	ParticleShaders particleShaders;
 	ParticleSData systemData;
-
+	bool quad;
 	bool onlyAdd;
 	D3D11_BUFFER_UAV_FLAG bufferType;
 	int indexForTrail;
@@ -141,18 +136,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> simParams;//for update
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;//for update
 
-	ID3D11ShaderResourceView* depthSRV;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> collisionViewProj;
-
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
 	Microsoft::WRL::ComPtr<ID3D10Blob> vertexShaderBlob;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
 	Microsoft::WRL::ComPtr<ID3D10Blob> pixelShaderBlob;
-
-	Microsoft::WRL::ComPtr<ID3D11GeometryShader> geometryShader;
-	Microsoft::WRL::ComPtr<ID3D10Blob> geometryShaderBlob;
 
 	Microsoft::WRL::ComPtr<ID3D11ComputeShader> computeShader;
 	Microsoft::WRL::ComPtr<ID3D10Blob> computeShaderBlob;

@@ -13,7 +13,7 @@ private:
 
 	bool generateSkyscraperMesh();
 	void scrapSkyScraper();
-	void generateSkyscraper();
+	bool generateSkyscraper();
 	bool saveSkyscraper(std::string name);
 	void unloadRoof(std::string name);
 	void unloadWall(std::string name);

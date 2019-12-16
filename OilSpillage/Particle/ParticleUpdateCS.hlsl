@@ -18,10 +18,6 @@ cbuffer ParticleCount : register(b1)
 {
 	uint4 NumParticles;
 };
-cbuffer CameraMatrix : register(b2)
-{
-	float4x4 viewProj;
-};
 float random(float2 arg)
 {
 	return frac(sin(dot(arg.xy, float2(13.5123, 48.321))) * 52323.457821);

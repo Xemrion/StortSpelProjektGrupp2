@@ -31,7 +31,7 @@
     <FxCompile Include="Particle\ElectroUpdateCS.hlsl" />
     <FxCompile Include="Particle\SnowCreateCS.hlsl" />
     <FxCompile Include="Particle\SnowUpdateCS.hlsl" />
-    <FxCompile Include="Particle\SnowParticleGS.hlsl" />
+    <FxCompile Include="Particle\SnowParticleVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI\AIGroup.cpp" />
@@ -293,6 +293,7 @@
     <ClInclude Include="Inventory\ItemGadget.h" />
     <ClInclude Include="Inventory\Gadget.h" />
     <ClInclude Include="Profiling.h" />
+    <ClInclude Include="PG\DisjointSets.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

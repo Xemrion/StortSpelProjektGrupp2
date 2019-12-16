@@ -5,6 +5,13 @@
 
 enum class Direction : U8 { north, east, south, west };
 
+std::array constexpr directions {
+	Direction::north,
+	Direction::east,
+	Direction::south,
+	Direction::west
+};
+
 inline constexpr Direction turnLeft(Direction d) noexcept {
 	if      ( d == Direction::east  )  return Direction::north;
 	else if ( d == Direction::north )  return Direction::west;
@@ -19,7 +26,7 @@ inline constexpr Direction turnRight(Direction d) noexcept {
 	else   /* d == Direction::west */  return Direction::north;
 }
 
-inline constexpr Direction turn_around(Direction d) noexcept {
+inline constexpr Direction turnAround(Direction d) noexcept {
 	if      ( d == Direction::east  )  return Direction::west;
 	else if ( d == Direction::north )  return Direction::south;
 	else if ( d == Direction::south )  return Direction::north;

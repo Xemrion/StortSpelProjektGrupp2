@@ -1472,7 +1472,7 @@ void Vehicle::setWheelRotation(float deltaTime)
 	wheel3->setPosition(Vector3(wheel3Pos.x, height, wheel3Pos.y));
 	wheel4->setPosition(Vector3(wheel4Pos.x, height, wheel4Pos.y));
 
-	Quaternion rotationNow = XMQuaternionRotationRollPitchYaw(wheel2->getRotation().x, wheel2->getRotation().y, wheel2->getRotation().z);
+	Quaternion rotationNow = XMQuaternionRotationRollPitchYaw(wheel1->getRotation().x, wheel1->getRotation().y, wheel1->getRotation().z);
 	Quaternion rotationDest = Quaternion::Lerp(rotationNow, Quaternion::CreateFromAxisAngle(Vector3(0, 1, 0), std::atan2f(Input::getDirectionL().x, Input::getDirectionL().y)), deltaTime * 20);
 	if (playingState == nullptr) {
 		rotationDest = qt;
@@ -1496,10 +1496,10 @@ void Vehicle::setWheelRotation(float deltaTime)
 	}
 	float wheelHeading = getHeading(rotationDest);
 
-	wheel1->setRotation(Vector3(0, wheelHeading + XM_PI, 0));
-	wheel2->setRotation(Vector3(0, wheelHeading, 0));
-	wheel3->setRotation(Vector3(0, vehicleBody1->getRotation().y, 0));
-	wheel4->setRotation(Vector3(0, vehicleBody1->getRotation().y + XM_PI, 0));
+	wheel1->setRotation(Vector3(0, wheelHeading, 0));
+	wheel2->setRotation(Vector3(0, wheelHeading - XM_PI, 0));
+	wheel3->setRotation(Vector3(0, vehicleBody1->getRotation().y - XM_PI, 0));
+	wheel4->setRotation(Vector3(0, vehicleBody1->getRotation().y, 0));
 }
 
 void Vehicle::setWheels(ItemWheel* wheel)

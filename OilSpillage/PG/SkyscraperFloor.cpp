@@ -143,16 +143,25 @@ bool SkyscraperFloor::evenOddCheck(Vector3 pointB1, Vector3 pointB2, Vector3 poi
 	return intersect;
 }
 
-void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
+bool SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 {
 	toUnion.translate(newCenter);
 	std::vector<Vector3> intersections;
+	bool exists;
 	Vector3 intersectionA(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < toUnion.nrOfEdges; i++) {
 		for (int j = 0; j < this->nrOfEdges; j++) {
 			intersectionA = intersectingLines(toUnion.verticies[i], toUnion.verticies[(size_t(i) + 1) % toUnion.nrOfEdges], this->verticies[j], this->verticies[(size_t(j) + 1) % this->nrOfEdges]);
 			if (intersectionA.y != -1.0f) {
-				intersections.push_back(intersectionA);
+				exists = false;
+				for (int k = 0; k < intersections.size() && !exists; k++) {
+					if (intersections[k] == intersectionA) {
+						exists = true;
+					}
+				}
+				if (!exists) {
+					intersections.push_back(intersectionA);
+				}
 				if (this->verticies[(size_t(j) + 1) % this->nrOfEdges] != intersectionA) {
 					this->verticies.insert(this->verticies.begin() + j + 1, intersectionA);
 					this->nrOfEdges++;
@@ -164,125 +173,117 @@ void SkyscraperFloor::unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter)
 			}
 		}
 	}
-	if (intersections.size() > 0) {
-		//Even-Odd Rule
-		int evenOddCount;
-		bool found;
-		//Remove points with an odd number of intersections with the other shape. (Odd = inside, Even = outside)
-		SkyscraperFloor temp1(toUnion);
-		SkyscraperFloor temp2(*this);
-		for (int i = 0; i < this->nrOfEdges; i++) { //Check points in this
-			found = false;
-			evenOddCount = 0;
-			for (int k = 0; k < intersections.size(); k++) {
-				if (this->verticies[i] == intersections[k]) {
-					found = true;
-				}
-			}
-			if (!found) {
-				for (int j = 0; j < temp1.nrOfEdges; j++) {
-					if (evenOddCheck(temp1.verticies[j], temp1.verticies[(size_t(j) + 1) % toUnion.nrOfEdges], this->verticies[i])) {
-						evenOddCount++;
-					}
-				}
-				if (evenOddCount % 2 == 1) {
-					this->verticies.erase(this->verticies.begin() + i);
-					this->nrOfEdges--;
-					i--;
-				}
-			}
-		}
-		for (int i = 0; i < toUnion.nrOfEdges; i++) { //Check points in toUnion
-			found = false;
-			evenOddCount = 0;
-			for (int k = 0; k < intersections.size() && !found; k++) {
-				if (toUnion.verticies[i] == intersections[k]) {
-					found = true;
-				}
-			}
-			if (!found) {
-				for (int j = 0; j < temp2.nrOfEdges; j++) {
-					if (evenOddCheck(temp2.verticies[j], temp2.verticies[(size_t(j) + 1) % temp2.nrOfEdges], toUnion.verticies[i])) {
-						evenOddCount++;
-					}
-				}
-				if (evenOddCount % 2 == 1) {
-					toUnion.verticies.erase(toUnion.verticies.begin() + i);
-					toUnion.nrOfEdges--;
-					i--;
-				}
-			}
-		}
-
-		//Add them together
-		std::vector<std::pair<int,int>> indicesOfIntersections;
-		indicesOfIntersections.resize(intersections.size());
-		for (int i = 0; i < intersections.size(); i++) { 
-			for (int j = 0; j < toUnion.nrOfEdges; j++) {
-				if (intersections[i] == toUnion.verticies[j]) {
-					indicesOfIntersections[i].first = j; //Save index of intersection to other shape
-				}
-			}
-			for (int j = 0; j < this->nrOfEdges; j++) {
-				if (intersections[i] == this->verticies[j]) {
-					indicesOfIntersections[i].second = j; //Save index of intersection to this shape
-				}
-			}
-		}
-		if (indicesOfIntersections[0].first == 0) { //If first is 0, then it is connected to second
-			for (int i = 0; i < indicesOfIntersections.size(); i+=2) {
-				this->verticies.insert(
-						this->verticies.begin() + indicesOfIntersections[i].second + 1,
-						toUnion.verticies.begin() + indicesOfIntersections[i].first + 1,
-						toUnion.verticies.begin() + size_t(indicesOfIntersections[size_t(i) + 1].first));
-			}
-		}
-		else { //If first is not 0, then first and last are connected.
-			for (size_t i = 1; i < indicesOfIntersections.size(); i+=2) {
-				if (i == indicesOfIntersections.size() - 1) {
-					this->verticies.insert(
-						this->verticies.begin() + indicesOfIntersections[i].second + 1,
-						toUnion.verticies.begin() + indicesOfIntersections[i].first + 1,
-						toUnion.verticies.end());
-					this->verticies.insert(
-						this->verticies.begin() + indicesOfIntersections[i].second + 1 + ((size_t(toUnion.nrOfEdges) - 1) - (indicesOfIntersections[i].first)),
-						toUnion.verticies.begin(),
-						toUnion.verticies.begin() + indicesOfIntersections[0].first);
-				}
-				else {
-					if (indicesOfIntersections[i].first > indicesOfIntersections[i + 1].first) {
-						std::swap(indicesOfIntersections[i].first, indicesOfIntersections[i + 1].first);
-					}
-					this->verticies.insert(
-						this->verticies.begin() + indicesOfIntersections[i].second + 1,
-						toUnion.verticies.begin() + indicesOfIntersections[i].first + 1,
-						toUnion.verticies.begin() + indicesOfIntersections[i + 1].first);
-				}
-			}
-		}
-		this->nrOfEdges = int(this->verticies.size());
+	if (intersections.size() % 2 == 1 || intersections.size() == 0) {
+		return false;
 	}
-	else {
-		//Even-Odd Rule on one point in
-		int evenOddCount = 0;
-		for (int i = 0; i < toUnion.nrOfEdges; i++) {
-			evenOddCount = 0;
-			if (i == toUnion.nrOfEdges - 1) {
-				if (evenOddCheck(toUnion.verticies[i], toUnion.verticies[0], this->verticies[0])) {
+	//Even-Odd Rule
+	int evenOddCount;
+	bool found;
+	//Remove points with an odd number of intersections with the other shape. (Odd = inside, Even = outside)
+	SkyscraperFloor temp1(toUnion);
+	SkyscraperFloor temp2(*this);
+	for (int i = 0; i < this->nrOfEdges; i++) { //Check points in this
+		found = false;
+		evenOddCount = 0;
+		for (int k = 0; k < intersections.size(); k++) {
+			if (this->verticies[i] == intersections[k]) {
+				found = true;
+			}
+		}
+		if (!found) {
+			for (int j = 0; j < temp1.nrOfEdges; j++) {
+				if (evenOddCheck(temp1.verticies[j], temp1.verticies[(size_t(j) + 1) % toUnion.nrOfEdges], this->verticies[i])) {
 					evenOddCount++;
 				}
+			}
+			if (evenOddCount % 2 == 1) {
+				this->verticies.erase(this->verticies.begin() + i);
+				this->nrOfEdges--;
+				i--;
+			}
+		}
+	}
+	for (int i = 0; i < toUnion.nrOfEdges; i++) { //Check points in toUnion
+		found = false;
+		evenOddCount = 0;
+		for (int k = 0; k < intersections.size() && !found; k++) {
+			if (toUnion.verticies[i] == intersections[k]) {
+				found = true;
+			}
+		}
+		if (!found) {
+			for (int j = 0; j < temp2.nrOfEdges; j++) {
+				if (evenOddCheck(temp2.verticies[j], temp2.verticies[(size_t(j) + 1) % temp2.nrOfEdges], toUnion.verticies[i])) {
+					evenOddCount++;
+				}
+			}
+			if (evenOddCount % 2 == 1) {
+				toUnion.verticies.erase(toUnion.verticies.begin() + i);
+				toUnion.nrOfEdges--;
+				i--;
+			}
+		}
+	}
+
+	//Add them together
+	std::vector<std::pair<int,int>> indicesOfIntersections;
+	indicesOfIntersections.resize(intersections.size());
+	for (int i = 0; i < intersections.size(); i++) { 
+		for (int j = 0; j < toUnion.nrOfEdges; j++) {
+			if (intersections[i] == toUnion.verticies[j]) {
+				indicesOfIntersections[i].first = j; //Save index of intersection to other shape
+			}
+		}
+		for (int j = 0; j < this->nrOfEdges; j++) {
+			if (intersections[i] == this->verticies[j]) {
+				indicesOfIntersections[i].second = j; //Save index of intersection to this shape
+			}
+		}
+	}
+	//Sort
+	int lowestFirst = 0;
+	for (int i = 0; i < indicesOfIntersections.size(); i++) {
+		lowestFirst = i;
+		for (int j = i + 1; j < indicesOfIntersections.size(); j++) {
+			if (indicesOfIntersections[lowestFirst].first > indicesOfIntersections[j].first) {
+				lowestFirst = j;
+			}
+		}
+		std::swap(indicesOfIntersections[i].first, indicesOfIntersections[lowestFirst].first);
+	}
+	if (indicesOfIntersections[0].first == 0) { //If first is 0, then it is connected to second
+		for (int i = 0; i < indicesOfIntersections.size(); i+=2) {
+			this->verticies.insert( //Fix uneven intersections
+					this->verticies.begin() + indicesOfIntersections[i].second + 1,
+					toUnion.verticies.begin() + indicesOfIntersections[i].first + 1,
+					toUnion.verticies.begin() + size_t(indicesOfIntersections[size_t(i) + 1].first));
+		}
+	}
+	else { //If first is not 0, then first and last are connected.
+		for (size_t i = 1; i < indicesOfIntersections.size(); i+=2) {
+			if (i == indicesOfIntersections.size() - 1) {
+				this->verticies.insert(
+					this->verticies.begin() + indicesOfIntersections[i].second + 1,
+					toUnion.verticies.begin() + indicesOfIntersections[i].first + 1,
+					toUnion.verticies.end());
+				this->verticies.insert(
+					this->verticies.begin() + indicesOfIntersections[i].second + 1 + ((size_t(toUnion.nrOfEdges) - 1) - (indicesOfIntersections[i].first)),
+					toUnion.verticies.begin(),
+					toUnion.verticies.begin() + indicesOfIntersections[0].first);
 			}
 			else {
-				if (evenOddCheck(toUnion.verticies[i], toUnion.verticies[size_t(i) + 1], this->verticies[0])) {
-					evenOddCount++;
+				if (indicesOfIntersections[i].first > indicesOfIntersections[i + 1].first) {
+					std::swap(indicesOfIntersections[i].first, indicesOfIntersections[i + 1].first);
 				}
+				this->verticies.insert(
+					this->verticies.begin() + indicesOfIntersections[i].second + 1,
+					toUnion.verticies.begin() + indicesOfIntersections[i].first + 1,
+					toUnion.verticies.begin() + indicesOfIntersections[i + 1].first);
 			}
-		}if (evenOddCount % 2 == 1) {
-			this->verticies.clear();
-			this->verticies = toUnion.verticies;
 		}
 	}
-
+	this->nrOfEdges = int(this->verticies.size());
+	return true;
 }
 
 bool SkyscraperFloor::getTriangleIndices()
