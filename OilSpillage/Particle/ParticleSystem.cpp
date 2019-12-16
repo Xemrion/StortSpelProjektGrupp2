@@ -6,6 +6,14 @@ ParticleSystem::ParticleSystem()
 	this->device = nullptr;
 	this->deviceContext = nullptr;
 	this->indDraw.instanceCount = 1;
+	std::string def = "DEFAULT";
+	strcpy(this->systemData.name, def.c_str());
+	strcpy(this->systemData.shaders.csCreate, def.c_str());
+	strcpy(this->systemData.shaders.csUpdate, def.c_str());
+	strcpy(this->systemData.shaders.gsPrimitive, def.c_str());
+	strcpy(this->systemData.shaders.vertexShader, def.c_str());
+	strcpy(this->systemData.shaders.pixelShader, def.c_str());
+
 	//default
 	this->capParticle = 51200 * 2;
 	this->otherFrame = 1.0f;
@@ -19,6 +27,7 @@ ParticleSystem::ParticleSystem()
 	this->bufferType = D3D11_BUFFER_UAV_FLAG::D3D11_BUFFER_UAV_FLAG_APPEND;
 	this->indexForTrail = 0;
 	this->texture = nullptr;
+	this->quad = false;
 }
 
 
@@ -53,7 +62,8 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	
 	D3D11_INPUT_ELEMENT_DESC inputDesc[] =
 	{
-		{"SV_VertexID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0  }
+		{"SV_InstanceID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 0  },
+		{"SV_VertexID", 0, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0,  D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 0  }
 	};
 
 
@@ -85,10 +95,6 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	hr = device->CreateVertexShader(this->vertexShaderBlob->GetBufferPointer(), this->vertexShaderBlob->GetBufferSize(), NULL, this->vertexShader.GetAddressOf());
 	hr = device->CreateInputLayout(inputDesc, numElements, this->vertexShaderBlob->GetBufferPointer(), this->vertexShaderBlob->GetBufferSize(), this->inputLayout.GetAddressOf());
 
-	filePath = shaderfolder + StringToWString(this->systemData.shaders.gsPrimitive);
-	hr = D3DReadFileToBlob(filePath.c_str(), this->geometryShaderBlob.GetAddressOf());
-	hr = device->CreateGeometryShader(this->geometryShaderBlob->GetBufferPointer(), this->geometryShaderBlob->GetBufferSize(), NULL, this->geometryShader.GetAddressOf());
-
 	filePath = shaderfolder + StringToWString(this->systemData.shaders.pixelShader);
 	hr = D3DReadFileToBlob(filePath.c_str(), this->pixelShaderBlob.GetAddressOf());
 	hr = device->CreatePixelShader(this->pixelShaderBlob->GetBufferPointer(), this->pixelShaderBlob->GetBufferSize(), NULL, this->pixelShader.GetAddressOf());
@@ -114,11 +120,19 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	vBufferDesc.ByteWidth = sizeof(IndirDraw);
 	vBufferDesc.CPUAccessFlags = 0;
 	vBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
+	vBufferDesc.StructureByteStride = 0;
 
-	indDraw.instanceCount = 1;
+	indDraw.instanceCount = 0;
 	indDraw.vertexStartLoc = 0;
 	indDraw.instanceStartLoc = 0;
-	indDraw.vertexCount = 0;
+	if (this->quad)
+	{
+		indDraw.vertexCountPerInstance = 6;//for quad
+	}
+	else
+	{
+		indDraw.vertexCountPerInstance = 3;
+	}
 	D3D11_SUBRESOURCE_DATA subData;
 	ZeroMemory(&subData, sizeof(subData));
 	subData.pSysMem = &indDraw;
@@ -479,11 +493,10 @@ void ParticleSystem::changeVectorField(float vectorFieldPower, float vectorField
 	this->sP.vectorField.y = this->systemData.vectorFieldPower;
 	this->sP.vectorField.z = this->systemData.vectorFieldSize;
 }
-void ParticleSystem::setParticleShaders(std::string csUpdate, std::string csCreate, std::string gsPrimitive, std::string pixelShader, std::string vertexShader)
+void ParticleSystem::setParticleShaders(std::string csUpdate, std::string csCreate, std::string vertexShader, std::string pixelShader)
 {
 	strcpy(this->systemData.shaders.csUpdate, csUpdate.c_str());
 	strcpy(this->systemData.shaders.csCreate, csCreate.c_str());
-	strcpy(this->systemData.shaders.gsPrimitive, gsPrimitive.c_str());
 	strcpy(this->systemData.shaders.pixelShader, pixelShader.c_str());
 	strcpy(this->systemData.shaders.vertexShader, vertexShader.c_str());
 }
@@ -498,10 +511,6 @@ void ParticleSystem::setUpdateShader(std::string csUpdate)
 void ParticleSystem::setCreateShader(std::string csCreate)
 {
 	strcpy(this->systemData.shaders.csCreate, csCreate.c_str());
-}
-void ParticleSystem::setGeometryShader(std::string gsPrimitive)
-{
-	strcpy(this->systemData.shaders.gsPrimitive, gsPrimitive.c_str());
 }
 void ParticleSystem::setPixelShader(std::string pixelShader)
 {
@@ -533,43 +542,47 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 	deviceContext->Unmap(particleParamRenderCB.Get(), 0);
 
 	UINT offset = 0;
+	UINT copyOffset = 4;
 	UINT stride = sizeof(UINT);
 	ID3D11ShaderResourceView* n = nullptr;
 
 	this->deviceContext->PSSetShader(this->pixelShader.Get(), nullptr, 0);
 	this->deviceContext->VSSetShader(this->vertexShader.Get(), nullptr, 0);
-	this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
-	this->deviceContext->GSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
-	this->deviceContext->GSSetConstantBuffers(1, 1, this->particleParamRenderCB.GetAddressOf());
+	this->deviceContext->GSSetShader(nullptr, nullptr, 0);
+
+	this->deviceContext->VSSetConstantBuffers(0, 1, this->viewProjBuffer.GetAddressOf());
+	this->deviceContext->VSSetConstantBuffers(1, 1, this->particleParamRenderCB.GetAddressOf());
 
 	ID3D11Buffer* nil = nullptr;
 	
 	this->deviceContext->IASetVertexBuffers(0, 1, &nil, &stride, &offset);
 	this->deviceContext->IASetInputLayout(NULL);
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	deviceContext->IASetInputLayout(this->inputLayout.Get());
+
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	ID3D11UnorderedAccessView* nU = nullptr;
+
 	//run create particle compute shader here
 	deviceContext->CSSetUnorderedAccessViews(0, 1, &nU, 0);
 	deviceContext->CSSetUnorderedAccessViews(1, 1, &nU, 0);
 	if (onlyAdd)
 	{
 		this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV.GetAddressOf());
-		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV.Get());
+		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), copyOffset, this->particlesUAV.Get());
 	}
 	else
 	{
 		if (otherFrame == 1.0f)
 		{
 			this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV2.GetAddressOf());
-			deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV2.Get());
+			deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), copyOffset, this->particlesUAV2.Get());
 		}
 		else
 		{
 			this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV.GetAddressOf());
-			deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV.Get());
+			deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), copyOffset, this->particlesUAV.Get());
 		}
 	}
-	//deviceContext->IASetInputLayout(this->inputLayout.Get());
 	//this->deviceContext->DrawInstanced(16, 1, 0, 0);
 	if(this->texture!=nullptr)
 	{
@@ -577,15 +590,14 @@ void ParticleSystem::drawAll(DynamicCamera* camera)
 		rsv = this->texture->getShaderResView();
 		this->deviceContext->PSSetShaderResources(0, 1, &rsv);
 	}
-	this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
+	this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), 0);
 	if (onlyAdd)
 	{
 		this->deviceContext->VSSetShaderResources(0, 1, this->particlesSRV2.GetAddressOf());
-		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), offset, this->particlesUAV2.Get());
+		deviceContext->CopyStructureCount(this->indArgsBuffer.Get(), copyOffset, this->particlesUAV2.Get());
 		this->deviceContext->DrawInstancedIndirect(this->indArgsBuffer.Get(), offset);
 
 	}
-	this->deviceContext->GSSetShader(nullptr, 0, 0);
 	this->deviceContext->VSSetShaderResources(0, 1, &n);
 	if (otherFrame > 0.9f)
 	{
@@ -639,13 +651,18 @@ bool ParticleSystem::saveSystem()
 	return true;
 }
 
+void ParticleSystem::setQuad()
+{
+	this->quad = true;
+}
+
 void ParticleSystem::setShaders()
 {
 	this->deviceContext->PSSetShader(nullptr, nullptr, 0);
 
 	this->deviceContext->PSSetShader(this->pixelShader.Get(), nullptr, 0);
 	this->deviceContext->VSSetShader(this->vertexShader.Get(), nullptr, 0);
-	this->deviceContext->GSSetShader(this->geometryShader.Get(), nullptr, 0);
+	this->deviceContext->GSSetShader(nullptr, nullptr, 0);
 }
 
 float ParticleSystem::getStartSize() const
