@@ -673,14 +673,14 @@ Vector3 Map::generateGroundPositionInWorldSpace(RNG& rng) const noexcept
 
 
 // TODO: make district specific like MultitileTilesets
-static std::vector singleTileModels {
-	"Houses/testHouse",
-	"Houses/testHouse2",
-	"Houses/testHouse3",
-	"Houses/testHouse4",
-	"Houses/testHouse5",
-	"Houses/testHouse6"
-};
+//static std::vector singleTileModels {
+//	"Houses/testHouse",
+//	"Houses/testHouse2",
+//	"Houses/testHouse3",
+//	"Houses/testHouse4",
+//	"Houses/testHouse5",
+//	"Houses/testHouse6"
+//};
 
 static std::vector singleTileModelsDestroyed{
 	"Houses/destroyedHouse1",
@@ -688,8 +688,6 @@ static std::vector singleTileModelsDestroyed{
 	"Houses/destroyedHouse3",
 	"Houses/destroyedHouse4",
 	"Houses/destroyedHouse5",
-	"Houses/destroyedHouse6",
-	"Houses/destroyedHouse7"
 };
 
 static std::vector singleTileMaterials {
