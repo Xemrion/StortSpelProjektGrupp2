@@ -155,6 +155,9 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	desc.ByteWidth= static_cast<UINT>(sizeof(ParticleParams) + (16 - (sizeof(ParticleParams) % 16)));
 	hr = device->CreateBuffer(&desc, 0, particleParamCB.GetAddressOf());
 
+	desc.ByteWidth = static_cast<UINT>(sizeof(ParticlesAdd) + (16 - (sizeof(ParticlesAdd) % 16)));
+	hr = device->CreateBuffer(&desc, 0, particleParamArr.GetAddressOf());
+
 	desc.ByteWidth = static_cast<UINT>(sizeof(ParticleRenderParams) + (16 - (sizeof(ParticleRenderParams) % 16)));
 	hr = device->CreateBuffer(&desc, 0, particleParamRenderCB.GetAddressOf());
 	
@@ -389,7 +392,7 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 		this->deviceContext->CSSetConstantBuffers(2, 1, &nB);
 		this->deviceContext->CSSetConstantBuffers(1, 1, &nB);
 		this->deviceContext->CSSetConstantBuffers(0, 1, &nB);
-		deviceContext->CSSetConstantBuffers(0, 1, this->particleParamCB.GetAddressOf());
+		deviceContext->CSSetConstantBuffers(0, 1, this->particleParamArr.GetAddressOf());
 		if (otherFrame == 1 || onlyAdd)
 		{
 			deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
@@ -405,15 +408,19 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 		deviceContext->CSSetShader(this->createComputeShader.Get(), 0, 0);
 	
 	
+
 		for (int i = 0; i < this->addList.size(); i++)
 		{
-			pParams = this->addList[i];
-			D3D11_MAPPED_SUBRESOURCE mappedResource;
-			HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-			CopyMemory(mappedResource.pData, &pParams, sizeof(ParticleParams));
-			deviceContext->Unmap(particleParamCB.Get(), 0);
+			this->addArr.arr[i % 32] = this->addList[i % 32];
 
-			deviceContext->Dispatch(1, 1, 1);
+			if ((i%32==31 && i != 0) || i == this->addList.size()-1)
+			{
+				D3D11_MAPPED_SUBRESOURCE mappedResource;
+				HRESULT hr = deviceContext->Map(particleParamArr.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				CopyMemory(mappedResource.pData, &this->addArr, sizeof(ParticlesAdd));
+				deviceContext->Unmap(particleParamArr.Get(), 0);
+				deviceContext->Dispatch(i%32 + 1, 1, 1);
+			}
 		}
 	
 		this->addList.clear();

@@ -539,7 +539,7 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 			groups[currentGroup]->actors[j]->setPath(groups[currentGroup]->path.data() + groups[currentGroup]->path.size() - 1);
 			groups[currentGroup]->actors[j]->pathSize = groups[currentGroup]->path.size() - 1;
 		}
-		if (currentGroup == groups.size())
+		if (currentGroup == groups.size()-1)
 		{
 			currentGroup = 0;
 		}

@@ -11,7 +11,7 @@
 #include "../UI/Menu/UIControls.h"
 #include "../profiling.h"
 
-//#define RELEASE_DEBUG
+#define RELEASE_DEBUG
 
 void PlayingGameState::fillTestParticle()
 {
@@ -758,14 +758,14 @@ void PlayingGameState::update(float deltaTime)
 		}
 
 		actorManager->intersectPlayerBullets(playerBullets, playerBulletCount, deltaTime);
-		actorManager->update(deltaTime, player->getPosition());
+		//actorManager->update(deltaTime, player->getPosition());
 		accelForce = Vector3(player->getRigidBody()->getLinearVelocity().getX(), player->getRigidBody()->getLinearVelocity().getY(), player->getRigidBody()->getLinearVelocity().getZ()) - Vector3(prevAccelForce.x, prevAccelForce.y, prevAccelForce.z);
 		player->setAccelForce(accelForce, deltaTime);
 		player->setWheelRotation(deltaTime);
 		objectives.update(player->getPosition(), physics.get());
 		Bullet::updateSoundTimer(deltaTime);
 		player->updateWeapon(deltaTime);
-#ifdef _DEBUG
+#ifndef _DEBUG
 		timer += deltaTime;
 
 		if (Input::checkButton(Keys::R_LEFT, States::PRESSED))
@@ -867,16 +867,16 @@ void PlayingGameState::update(float deltaTime)
 	Sound::fadeSoundtrack(soundAggro);
 	
 	//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-	//	ImGui_ImplDX11_NewFrame();
-	//	ImGui_ImplWin32_NewFrame();
-	//	ImGui::NewFrame();
-	//	ImGui_Driving();
-	//	//ImGui_ProcGen();
-	//	//ImGui_AI();
-	//	//ImGui_Particles();
-	//	ImGui_Camera();
-	//	ImGui::Render();
-	//	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+		ImGui_Driving();
+		//ImGui_ProcGen();
+		//ImGui_AI();
+		ImGui_Particles();
+		ImGui_Camera();
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	//#endif // !_DEBUG
 	graphics.presentScene();
 }

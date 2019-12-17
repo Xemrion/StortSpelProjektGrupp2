@@ -8,11 +8,12 @@ struct Particle
 globallycoherent RWStructuredBuffer<Particle> NewSimulationState : register(u0);
 globallycoherent RWStructuredBuffer<Particle> DeadList : register(u1);
 
+
 cbuffer ParticleParameters : register(b0)
 {
-	float4 emitterLocation;//w = totalTime
-	float4 randomVector; 
-	float4 initialDirection;// trailDirection (opposite of carDir)
+    float4 emitterLocation; //w = totalTime
+    float4 randomVector;
+    float4 initialDirection; // trailDirection (opposite of carDir)
 };
 
 

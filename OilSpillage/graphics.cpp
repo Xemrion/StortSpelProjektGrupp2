@@ -984,7 +984,7 @@ void Graphics::addTestParticle(Vector3 pos, Vector4 initialDirection, int nrOfPa
 		randomPos += pos;
 		randomPos += randomPos2;
 		float grey = float(rand()) / RAND_MAX;
-		this->testParticle->addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+		this->testParticle->addParticleToList(lifeTime, randomPos, initialDirection);
 	}
 }
 

@@ -40,12 +40,12 @@ public:
 	void setShading(bool arg);
 	void setSunShadow(bool arg);
 	void setSpotShadow(bool arg);
-	void     setPosition(Vector3);
+	void     setPosition(const Vector3&);
 	void     setGameObjectPos(Vector3);
 	void     move(Vector3 offset);
-	void     addRotation(Vector3);
-	void     setRotation(Vector3);
-	void     setScale(Vector3);
+	void     addRotation(const Vector3&);
+	void     setRotation(const Vector3&);
+	void     setScale(const Vector3&);
 	Texture* getTexture();
 	void     setTexture(Texture*);
 	Texture* getNormalMap();

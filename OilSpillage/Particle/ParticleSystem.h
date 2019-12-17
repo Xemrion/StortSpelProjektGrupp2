@@ -23,6 +23,10 @@ struct ParticleParams
 	Vector4 randomVector;
 	Vector4 initialDirection;
 };
+struct ParticlesAdd
+{
+	ParticleParams arr[32];
+};
 struct ParticleRenderParams
 {
 	Vector4 colors[4];
@@ -124,6 +128,8 @@ private:
 	float sinMovement;
 	IndirDraw indDraw;
 	ParticleParams pParams;
+	ParticlesAdd addArr;
+
 	SimulationParams sP;
 	ParticleSData systemData;
 	bool quad;
@@ -134,7 +140,9 @@ private:
 	std::mutex mx;
 	int indexForTrail;
 	Texture* texture;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
+	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader add
+	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamArr;//For adding a batch of 32
+
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> nrOfParticlesCB;
