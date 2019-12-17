@@ -45,7 +45,7 @@ RoadGenBranchArgs  createChildArgs( RoadGenBranchArgs const &parentArgs,
 
 void  Branch::walk( MapConfig const &config ) {
    auto  STEP_LENGTH = 2; // length of each step in number of tiles
-   auto  MERGE_PROB  = .2f;
+   auto  MERGE_PROB  = .001f;
    auto  steps       = config.roadStepSize;
 // main loop:
    while ( (tilesWalked < tilesToWalk) and (steps --> 0) ) {

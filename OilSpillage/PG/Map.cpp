@@ -240,9 +240,8 @@ void Map::generateZebraCrossings()
 	auto instantiateCrossing = [&]( Vector3 const &pos, F32 deg=.0f ) {
 		crossingTiles.push_back( std::make_unique<GameObject>() );
       auto &obj     =  *crossingTiles.back();
-		obj.mesh      =   graphics.getMeshPointer( "Tiles/Quad_SS" );
-		obj.setTexture(   graphics.getTexturePointer("Tiles/zebra_crossing") );
-		// obj.setNormalMap( graphics.getTexturePointer("Tiles/zebra_crossing_nor") );
+		obj.mesh      =   graphics.getMeshPointer( "Tiles/zebra_crossing" );
+		obj.setTexture(   graphics.getTexturePointer( "Tiles/zebra_crossing" ) );
 		if ( deg > 1.0f )
 			obj.setRotation({ .0f, util::degToRad(deg), .0f });
 		obj.setPosition( pos + Vector3{.0f, zebraOffsetY, .0f} );
@@ -1932,6 +1931,19 @@ void Map::instantiateTilesAsModels() noexcept
 		model.setSunShadow(  noShadowcasting );
 	};
 
+	auto instantiateMeshPart = [&]( std::string_view name, Vector3 const &pos, F32 deg=.0f, F32 yOffset=baseOffsetY, Bool noShadowcasting=false ) {
+		groundTiles.push_back( std::make_unique<GameObject>() );
+      auto &model     =  *groundTiles.back();
+		model.mesh       = graphics.getMeshPointer( String(name).c_str() );
+		model.setMaterial( graphics.getMaterial(    String(name).c_str() ) );
+		model.setRotation({ .0f, util::degToRad(deg+180.0f), .0f });
+		model.setPosition( pos + Vector3{.0f, yOffset, .0f} );
+		model.setColor({ .0f, .0f, .0f, .0f });
+		model.setScale({ tilemap->config.tileSideScaleFactor+.001f, 1.0f, tilemap->config.tileSideScaleFactor+.001f }); // compensating for imprecision
+		model.setSpotShadow( noShadowcasting );
+		model.setSunShadow(  noShadowcasting );
+	};
+
 	F32_Dist genSelection {};
 
 	// generate base textures:
@@ -1993,23 +2005,23 @@ void Map::instantiateTilesAsModels() noexcept
 				// place eventual road lines:
 				U8 maskedMap = e.roadmap.bitmap & maskRoad;
 				if ( maskedMap == pred4Way ) {
-					instantiatePart( "Tiles/road_marker_4way", e.origin, .0f, markerOffsetY, false );
+					instantiateMeshPart( "Tiles/road_marker_4way", e.origin, .0f, markerOffsetY );
 				}
 				if ( maskedMap == predStraight )
-					instantiatePart( "Tiles/road_marker_straight_n", e.origin, .0f, markerOffsetY, false );
+					instantiateMeshPart( "Tiles/road_marker_straight_n", e.origin, .0f, markerOffsetY );
 				else if ( maskedMap == util::cycleLeft( predStraight, 2 ) )
-					instantiatePart( "Tiles/road_marker_straight_n", e.origin, 90.0f, markerOffsetY, false );
+					instantiateMeshPart( "Tiles/road_marker_straight_n", e.origin, 90.0f, markerOffsetY );
 				else for ( auto d=0; d<8; d+=2 ) {
 					if ( maskedMap == util::cycleLeft( pred3Way, d ) ) {
-						instantiatePart( "Tiles/road_marker_3way_n", e.origin, 45.0f*d, markerOffsetY, false );
+						instantiateMeshPart( "Tiles/road_marker_3way_n", e.origin, 45.0f*d, markerOffsetY );
 						break;
 					}
 					if ( maskedMap == util::cycleLeft( predBend, d ) ) {
-						instantiatePart( "Tiles/road_marker_turn_ne", e.origin, (45.0f*d)+90.0f, markerOffsetY, false );
+						instantiateMeshPart( "Tiles/road_marker_turn_ne", e.origin, (45.0f*d)+90.0f, markerOffsetY );
 						break;
 					}
 					if ( maskedMap == util::cycleLeft( predDeadend, d ) ) {
-						instantiatePart( "Tiles/road_marker_deadend_n", e.origin, (45.0f*d)+180.0f, markerOffsetY, false );	
+						instantiateMeshPart( "Tiles/road_marker_deadend_n", e.origin, (45.0f*d)+180.0f, markerOffsetY );	
 						break;
 					}
 				}
@@ -2066,16 +2078,16 @@ void Map::instantiateTilesAsModels() noexcept
 	// sidewalks
 	for ( auto const &e : tileInfo ) {
 		if ( (e.concreteMap.bitmap & maskHole) == predHole )
-				instantiatePart( "Tiles/sidewalk_hole", e.origin, .0f, sidewalkOffsetY );
+				instantiateMeshPart( "Tiles/sidewalk_hole", e.origin, .0f, sidewalkOffsetY );
 		else for ( auto d = 0;  d < 8;  d += 2 ) {
 			if ( (e.concreteMap.bitmap & util::cycleLeft( maskOuterC, d )) == util::cycleLeft(predOuterC,d) )
-				instantiatePart( "Tiles/sidewalk_corner_outer_ne", e.origin, (45.0f*d)+90.0f, sidewalkOffsetY );
+				instantiateMeshPart( "Tiles/sidewalk_corner_outer_ne", e.origin, (45.0f*d)+90.0f, sidewalkOffsetY );
 			if ( (e.concreteMap.bitmap & util::cycleLeft( maskSide,   d )) == util::cycleLeft(predSide,d) )
-				instantiatePart( "Tiles/sidewalk_side_n", e.origin, 45.0f*d, sidewalkOffsetY );
+				instantiateMeshPart( "Tiles/sidewalk_side_n", e.origin, 45.0f*d, sidewalkOffsetY );
 			if ( (e.concreteMap.bitmap & util::cycleLeft( maskInnerC, d )) == util::cycleLeft(predInnerC,d) )
-				instantiatePart( "Tiles/sidewalk_corner_inner_ne", e.origin, (45.0f*d)+90.0f, sidewalkOffsetY );
+				instantiateMeshPart( "Tiles/sidewalk_corner_inner_ne", e.origin, (45.0f*d)+90.0f, sidewalkOffsetY );
 			if ( (e.concreteMap.bitmap & util::cycleLeft( maskU,      d )) == util::cycleLeft(predU,d) )
-				instantiatePart( "Tiles/sidewalk_u_n", e.origin, 45.0f*d, sidewalkOffsetY );
+				instantiateMeshPart( "Tiles/sidewalk_u_n", e.origin, 45.0f*d, sidewalkOffsetY );
 		}
 	}
 
