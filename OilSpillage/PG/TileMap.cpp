@@ -52,29 +52,28 @@ TileMap& TileMap::operator=(TileMap &&other) noexcept
 // y = current Y (may be mutated if successful)
 // d = direction to walk
 // returns true if successful
-Bool  TileMap::walk( U16 &x, U16 &y, Direction d, Tile tile )
+Bool  TileMap::walk( U16 &x, U16 &y, Direction d, Tile tile, U8 steps, bool mayConnect )
 {
-	U16  targetX{ x },
-		targetY{ y };
-	switch (d) {
-	case Direction::north: --targetY; break;
-	case Direction::east:  ++targetX; break;
-	case Direction::south: ++targetY; break;
-	case Direction::west:  --targetX; break;
+	std::vector<V2u>  path( steps );
+	for ( U8 step = 0;  step < steps;  ++step ) {
+		path[step] = (step==0)? V2u{x,y} : path[step-1];
+		switch (d) {
+			case Direction::north: --path[step].y; break;
+			case Direction::east:  ++path[step].x; break;
+			case Direction::south: ++path[step].y; break;
+			case Direction::west:  --path[step].x; break;
+		}
+		if (path[step].x >= width or path[step].y >= height)
+			return false;
+		else if ( mayConnect and tileAt(path[step]) == tile );
+		else if ( tileAt(path[step]) != Tile::ground )
+			return false;
 	}
-
-	if (targetX >= width or targetY >= height)
-		return false;
-
-	auto targetIndex = index(targetX, targetY);
-	if (data[targetIndex] != Tile::ground)
-		return false;
-	else {
-		data[targetIndex] = tile;
-		x = targetX;
-		y = targetY;
-		return true;
-	}
+	for ( auto const &pos : path )
+		tileAt(pos) = tile;
+	x = path.back().x;
+	y = path.back().y;
+	return true;
 }
 
 
@@ -347,7 +346,6 @@ Opt<Vector3> TileMap::getRandomTilePositionInRadius( Vector3 o, F32 r, Tile targ
    }
    return {}; // no hit found
 }
-
 
 // o = origin, r = radius
 Vector<Vector3> TileMap::getAllTilePositionsInRadius( Vector3 o, F32 r, Tile target ) const noexcept

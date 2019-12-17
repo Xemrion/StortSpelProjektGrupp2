@@ -33,7 +33,7 @@ public:
 	TileMap &operator=( TileMap const  & ) noexcept;
 	TileMap &operator=( TileMap       && ) noexcept;
 	F32                 getRoadCoverage() const noexcept;
-	Bool                walk( U16 &tileX, U16 &tileY, Direction, Tile ); // side-effects: mutates tileX/tileY if walk successful
+	Bool                walk( U16 &tileX, U16 &tileY, Direction, Tile, U8 steps = 2, bool mayConnect=true ); // side-effects: mutates tileX/tileY if walk successful
 	Bool                neighbourIsRoad( Direction, U16 tileX, U16 tileY ) const noexcept; // pretends that all out-of-bounds tiles are roads
 	Vector<V2u>         getCardinallyNeighbouringTilePositions( V2u tilePosition ) const noexcept;
 	Vector<Size>        getNeighbouringIndices( V2u tilePosition ) const noexcept;	
