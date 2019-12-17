@@ -895,7 +895,7 @@ void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfPartic
 	randomPos += pos;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleHandler->getParticleSystem("fire")->addParticle(nrOfParticles, lifeTime, randomPos,initialDirection);
+	this->particleHandler->getParticleSystem("fire")->addParticleToList(lifeTime, randomPos, Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f));
 }
 
 void Graphics::addParticle(std::string particleSystem, int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection, float randomPower,Vector3 randomSpace)
