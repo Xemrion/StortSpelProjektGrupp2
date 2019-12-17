@@ -6,9 +6,9 @@ Branch::Branch( RoadGenBranchArgs args ):
    currentY          ( args.startY         ),
    currentDirection  ( args.startDirection )
 {
-	U16 minLength = args.map.config.roadLengthFactorMin * args.map.config.dimensions.x * args.map.config.dimensions.y,
-	    maxLength = args.map.config.roadLengthFactorMax * args.map.config.dimensions.x * args.map.config.dimensions.y;
-	U16_Dist  gen_tiles_to_walk( minLength, maxLength );
+	U16           minLength = args.map.config.roadLengthFactorMin * args.map.config.dimensions.x * args.map.config.dimensions.y,
+	              maxLength = args.map.config.roadLengthFactorMax * args.map.config.dimensions.x * args.map.config.dimensions.y;
+	U16_Dist      gen_tiles_to_walk( minLength, maxLength );
 	tilesToWalk = gen_tiles_to_walk( args.rng );
 }
 
@@ -108,9 +108,10 @@ void  RoadGenerator::scheduleBranch( RoadGenBranchArgs &&args ) {
    branchTree[args.currentDepth].emplace_back(std::move(args));
 }
 
-RoadGenerator::RoadGenerator( TileMap &map ):
-   map ( map  ),
-   rng ( rd() )
+RoadGenerator::RoadGenerator( TileMap &map, Opt<std::function<void()>> maybeCallback ):
+   map           ( map           ),
+   rng           ( rd()          ),
+   maybeCallback ( maybeCallback )
 {
 
    branchTree.reserve( map.config.roadDepthMax );
@@ -173,6 +174,8 @@ void  RoadGenerator::generate( MapConfig const &config ) {
             }
             allDone &= branch.isDone();
          }
+         if ( maybeCallback )
+            maybeCallback.value()();
          #ifdef _DEBUG_W_TERM
             std::system("clear");
             std::cout << map                                 << "\n"

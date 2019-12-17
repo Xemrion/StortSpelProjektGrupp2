@@ -2,7 +2,7 @@
 #include "utils.hpp"
 #include "Map.hpp"
 #include "Profiler.hpp"
-
+#include <iomanip>
 
 std::array<V2i,8> directionalOffsets() noexcept {
 	return { V2i{  0, -1 },    // N
@@ -449,25 +449,43 @@ void Map::eliminateBadSpawnPositions() noexcept
 			tilemap->data[idx] = Tile::building;
 }
 
-Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightList &lights                         ):
-	graphics        ( graphics                                                                                      ),
-	physics         ( physics                                                                                       ),
-	lights          ( lights                                                                                        ),
-	config          ( config                                                                                        ),
-	tilemap         ( nullptr                                                                                       ),
-   roadDistanceMap ( config.dimensions.x * config.dimensions.y, 99999.9f                                           ),
-	buildingIDs     ( config.dimensions.x * config.dimensions.y                                                     ),
-	hospitalTable   ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide ),
-	rng             ( RD()()                                                                                        )
+
+Map::Map( Graphics &graphics, MapConfig const &config, Physics *physics, LightList &lights, Opt<std::function<String(Map const &, bool, Opt<String>)>> maybeMinimapGenerator ):
+	graphics          ( graphics                                                                                      ),
+	physics           ( physics                                                                                       ),
+	lights            ( lights                                                                                        ),
+	config            ( config                                                                                        ),
+	tilemap           ( nullptr                                                                                       ),
+   roadDistanceMap   ( config.dimensions.x * config.dimensions.y, 99999.9f                                           ),
+	buildingIDs       ( config.dimensions.x * config.dimensions.y                                                     ),
+	hospitalTable     ( config.dimensions.x / config.districtCellSide * config.dimensions.y / config.districtCellSide ),
+	rng               ( RD()()                                                                                        )
 {
 	DBG_PROBE(Map::Map);
 
 	if ( config.seed != -1 )  
 		rng.seed( config.seed );
 	skyscraperGenerator = std::make_unique<Skyscraper>();
-	info.environment = {rng};
-	info.width       = config.dimensions.x;
-	info.length      = config.dimensions.y;
+	info.environment    = {rng};
+	info.width          = config.dimensions.x;
+	info.length         = config.dimensions.y;
+
+
+	// hack to allow minimap gen before district gen
+	districtMap = std::make_unique<Voronoi>( rng,
+		                                       config.districtCellSide,
+		                                       config.dimensions.x / config.districtCellSide,
+		                                       config.dimensions.y / config.districtCellSide,
+		                                       Voronoi::ManhattanDistanceTag{});
+	districtLookupTable = Vector<District::Enum>( districtMap->noise.size(), &District::park );
+
+	size_t callCounter = 0;
+	if ( false /* <- set to true to enable demo */ and maybeMinimapGenerator ) maybeDemoCallback = [this, &callCounter, &maybeMinimapGenerator]() {
+		std::ostringstream path;
+		path << "data/demo/" << std::to_string(this->tilemap->config.seed) << "_" << std::setfill('0') << std::setw(4) << callCounter++ << ".tga";
+		maybeMinimapGenerator.value()( *this, false, path.str() );
+	};
+
 
 	// TODO: generate water etc
 	generateRoads();
@@ -518,7 +536,7 @@ void  Map::generateRoads()
 	MapConfig  roadConfig { config };
 	tilemap = std::make_unique<TileMap>( roadConfig );
 	for (;;) { // TODO: add MAX_TRIES?
-		RoadGenerator roadGenerator{ *tilemap };
+		RoadGenerator roadGenerator{ *tilemap, maybeDemoCallback };
 		roadGenerator.generate(roadConfig);
 		if ( auto coverage = tilemap->getRoadCoverage();
 		          coverage < roadConfig.roadMinTotalCoverage
@@ -765,6 +783,7 @@ void  Map::generateBuildings( )
 						tilemap->applyLot( maybeLot.value(), Tile::building );
 						++currentArea;
 						houses.singles.push_back( std::move(house) );
+						if ( maybeDemoCallback ) maybeDemoCallback.value()();
 						break;
 					}
 				}
@@ -809,6 +828,7 @@ void  Map::generateBuildings( )
 							currentArea += lot.getCoverage();
 							tilemap->applyLot(lot, Tile::building );
 							houses.multis.push_back( instantiateMultitileHouse(  lot.nw, MultitileLayout(*maybeLayout.value()), *util::randomElementOf(tilesets,rng) ) );
+							if ( maybeDemoCallback ) maybeDemoCallback.value()();
 						}
 					}
 				}
@@ -831,6 +851,7 @@ void  Map::generateBuildings( )
 							}
 						}
 						houses.multis.push_back( instantiateMultitileHouse( lot.nw, std::move(layout), *util::randomElementOf(tilesets,rng) ) );
+						if ( maybeDemoCallback ) maybeDemoCallback.value()();
 					}
 				}
 			}
@@ -862,6 +883,7 @@ void  Map::generateBuildings( )
 					tilemap->applyLot( maybeLot.value(), Tile::building );
 					houses.singles.push_back( std::move(house) );
 					++currentArea;
+					if ( maybeDemoCallback ) maybeDemoCallback.value()();
 				}
 			}
 		}

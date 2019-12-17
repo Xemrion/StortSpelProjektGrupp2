@@ -145,7 +145,7 @@ public:
 		Size        width,length;
 	};
 
-	Map( Graphics &, MapConfig const &, Physics *, LightList &lights );
+	Map( Graphics &, MapConfig const &, Physics *, LightList &lights, Opt<std::function<String(Map const &, bool, Opt<String>)>> maybeMinimapGenerator={} );
 	~Map() noexcept;
 	Map()                          = delete;
 	Map( Map       && )            = delete;
@@ -155,19 +155,19 @@ public:
 
 	MapConfig const &config;
 
-	V2u                        generateRoadPositionInTileSpace(  RNG & ) const noexcept;
-	Vector3                    generateRoadPositionInWorldSpace( RNG & ) const noexcept;
+	V2u                        generateRoadPositionInTileSpace(  RNG & )        const noexcept;
+	Vector3                    generateRoadPositionInWorldSpace( RNG & )        const noexcept;
 	V2u                        generateNonBuildingPositionInTileSpace(  RNG & ) const noexcept;
-	V2u                        generateGroundPositionInTileSpace(  RNG & ) const noexcept;
+	V2u                        generateGroundPositionInTileSpace(  RNG & )      const noexcept;
 	Vector3                    generateNonBuildingPositionInWorldSpace( RNG & ) const noexcept;
-	Vector3                    generateGroundPositionInWorldSpace( RNG & ) const noexcept;
-	V2u                        getStartPositionInTileSpace()  const noexcept;
-	Vector3                    getStartPositionInWorldSpace() const noexcept;
-	Direction                  getStartDirection() const noexcept;
-	V2u                        getExitPositionInTileSpace()  const noexcept;
-	Vector3                    getExitPositionInWorldSpace() const noexcept;
-	TileMap const &            getTileMap() const noexcept;
-	Voronoi const &            getDistrictMap() const noexcept;
+	Vector3                    generateGroundPositionInWorldSpace( RNG & )      const noexcept;
+	V2u                        getStartPositionInTileSpace()                    const noexcept;
+	Vector3                    getStartPositionInWorldSpace()                   const noexcept;
+	Direction                  getStartDirection()                              const noexcept;
+	V2u                        getExitPositionInTileSpace()                     const noexcept;
+	Vector3                    getExitPositionInWorldSpace()                    const noexcept;
+	TileMap const &            getTileMap()                                     const noexcept;
+	Voronoi const &            getDistrictMap()                                 const noexcept;
 // TODO: refactor out
 	Vector<Opt<V2u>> const &   getHospitalTable() const noexcept;
 	Opt<V2u>                   getNearestFoundHospitalTilePos( Vector3 const &sourceWorldPos, UIPlaying const & ) const noexcept;
@@ -189,7 +189,7 @@ private:
 	void                       generateZebraCrossings();
 	void                       generateStreetlights();
 	Opt<Lot>                   findRandomLot( U16 districtId ) noexcept;
-	Opt<Lot>                   findFixedLot(  U16 districtId, U32 width, U32 length, Vector<Bool> const &&layout ) noexcept;
+	Opt<Lot>                   findFixedLot(  U16 districtId, U32 width, U32 length, Vector<bool> const &&layout ) noexcept;
 	void                       instantiateTilesAsModels() noexcept;
 	MultiTileHouse             instantiateMultitileHouse( V2u const &nw, MultitileLayout &&, HouseTileset const & ) const noexcept;
 	CompositeHouse             instantiateSkyscraper();
@@ -219,4 +219,5 @@ private:
 	RNG                        rng;
 	Border                     border;
 	Info                       info;
+	Opt<std::function<void()>> maybeDemoCallback;
 };

@@ -187,7 +187,8 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
 
-	map = std::make_unique<Map>(graphics, config, physics.get(), *lightList );
+	map = std::make_unique<Map>(graphics, config, physics.get(), *lightList, &createMinimapTexture );
+
 	// Minimap stuff
 	auto tilemap = map->getTileMap();
 	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor / 2, .0f, config.tileSideScaleFactor / 2);
