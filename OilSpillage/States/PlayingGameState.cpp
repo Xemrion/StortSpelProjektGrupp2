@@ -111,24 +111,21 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadTexture("Tiles/desert_nor");
 	graphics.loadTexture("Tiles/road_trans_2file2metro");
 	graphics.loadTexture("Tiles/road_trans_2file2metro_nor");
-	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne");
-	graphics.loadTexture("Tiles/sidewalk_corner_outer_ne_nor");
-	graphics.loadTexture("Tiles/sidewalk_side_n");
-	graphics.loadTexture("Tiles/sidewalk_side_n_nor");
-	graphics.loadTexture("Tiles/sidewalk_corner_inner_ne");
-	graphics.loadTexture("Tiles/sidewalk_corner_inner_ne_nor");
-	graphics.loadTexture("Tiles/sidewalk_u_n");
-	graphics.loadTexture("Tiles/sidewalk_u_n_nor");
-	graphics.loadTexture("Tiles/sidewalk_hole");
-	graphics.loadTexture("Tiles/sidewalk_hole_nor");
-	graphics.loadTexture("Tiles/road_marker_straight_n");
-	graphics.loadTexture("Tiles/road_marker_deadend_n");
-	graphics.loadTexture("Tiles/road_marker_turn_ne");
-	graphics.loadTexture("Tiles/road_marker_3way_n");
-	graphics.loadTexture("Tiles/road_marker_4way");
+
 	graphics.loadTexture("Tiles/concrete");
 	graphics.loadTexture("Tiles/concrete_nor");
-	graphics.loadTexture("Tiles/zebra_crossing");
+
+	graphics.loadModel("Tiles/sidewalk_corner_outer_ne");
+	graphics.loadModel("Tiles/sidewalk_side_n");
+	graphics.loadModel("Tiles/sidewalk_corner_inner_ne");
+	graphics.loadModel("Tiles/sidewalk_u_n");
+	graphics.loadModel("Tiles/sidewalk_hole");
+	graphics.loadModel("Tiles/road_marker_straight_n");
+	graphics.loadModel("Tiles/road_marker_deadend_n");
+	graphics.loadModel("Tiles/road_marker_turn_ne");
+	graphics.loadModel("Tiles/road_marker_3way_n");
+	graphics.loadModel("Tiles/road_marker_4way");
+	graphics.loadModel("Tiles/zebra_crossing");
 
 	graphics.loadTexture("Tiles/road_2file_deadend_n");
 	graphics.loadTexture("Tiles/road_2file_deadend_n_nor");
@@ -157,19 +154,17 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	graphics.loadMaterial("Entities/Roller_Melee");
 	graphics.loadModel("Hospital");
 	//graphics.loadModel("Entities/Roller_Melee");
-	graphics.loadModel("Houses/testHouse");
-	graphics.loadModel("Houses/testHouse2");
-	graphics.loadModel("Houses/testHouse3");
-	graphics.loadModel("Houses/testHouse4");
-	graphics.loadModel("Houses/testHouse5");
-	graphics.loadModel("Houses/testHouse6");
+	//graphics.loadModel("Houses/testHouse");
+	//graphics.loadModel("Houses/testHouse2");
+	//graphics.loadModel("Houses/testHouse3");
+	//graphics.loadModel("Houses/testHouse4");
+	//graphics.loadModel("Houses/testHouse5");
+	//graphics.loadModel("Houses/testHouse6");
 	graphics.loadModel("Houses/destroyedHouse1");
 	graphics.loadModel("Houses/destroyedHouse2");
 	graphics.loadModel("Houses/destroyedHouse3");
 	graphics.loadModel("Houses/destroyedHouse4");
 	graphics.loadModel("Houses/destroyedHouse5");
-	graphics.loadModel("Houses/destroyedHouse6");
-	graphics.loadModel("Houses/destroyedHouse7");
 	graphics.loadMaterial("Houses/houseMaterial");
 	graphics.loadMaterial("Houses/houseMaterial2");
 	graphics.loadMaterial("Houses/houseMaterial3");
@@ -189,7 +184,8 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 	physics = std::make_unique<Physics>();
 	player->init(physics.get());
 
-	map = std::make_unique<Map>(graphics, config, physics.get(), *lightList );
+	map = std::make_unique<Map>(graphics, config, physics.get(), *lightList, &createMinimapTexture );
+
 	// Minimap stuff
 	auto tilemap = map->getTileMap();
 	topLeft = tilemap.convertTilePositionToWorldPosition(0, 0) + Vector3(-config.tileSideScaleFactor / 2, .0f, config.tileSideScaleFactor / 2);

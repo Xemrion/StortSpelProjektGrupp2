@@ -26,7 +26,7 @@ class QuadTree
 	};
 	std::unique_ptr<Node> root;
 public:
-	explicit  QuadTree(DirectX::SimpleMath::Vector2 minBound, DirectX::SimpleMath::Vector2 maxBound, UINT treeDepth);
+	explicit QuadTree(DirectX::SimpleMath::Vector2 minBound, DirectX::SimpleMath::Vector2 maxBound, UINT treeDepth);
 	QuadTree()                            = delete;
 	QuadTree( QuadTree const &)           = delete;
 	QuadTree( QuadTree &&)                = delete;

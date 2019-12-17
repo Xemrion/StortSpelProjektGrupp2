@@ -3,6 +3,7 @@
 #include<wrl/client.h>
 #include<d3dcompiler.h>
 #include"..///DynamicCamera.h"
+#include<mutex>
 using namespace DirectX::SimpleMath;
 struct Particle
 {
@@ -68,6 +69,7 @@ public:
 	void initiateParticles(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
 	bool addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection);
 	bool addParticle(int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection);
+	void addParticleToList(float lifeTime, Vector3 position, Vector4 initialDirection);
 	void updateParticles(float delta, Matrix viewProj);
 	void changeColornSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setSize(float startSize, float endSize);
@@ -127,6 +129,9 @@ private:
 	bool quad;
 	bool onlyAdd;
 	D3D11_BUFFER_UAV_FLAG bufferType;
+
+	std::vector<ParticleParams> addList;
+	std::mutex mx;
 	int indexForTrail;
 	Texture* texture;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader

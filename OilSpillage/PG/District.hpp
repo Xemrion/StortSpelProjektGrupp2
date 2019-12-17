@@ -44,7 +44,7 @@ namespace District {
 		inline static Size nextIndex { 0U };
 	};
 	//                                                road    house     multi    min    max    min      max
-	//                               string name      dist    cover%    tile%    tiles  tiles  floors   floors
+	//                               string name      dist    cover%    ti	le%    tiles  tiles  floors   floors
 	inline Type const residential  { "residential",   6.0f,   .875f,    .8f,     2,     25,    3,        7 },
 	                  park         { "park",          1.0f,   .000f,    .0f,     0,     0,     0,        0 },
 	                  metropolitan { "metropolitan",  4.0f,   .950f,    .0f,     1,     1,     8,       16 },

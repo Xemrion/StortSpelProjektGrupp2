@@ -43,15 +43,15 @@ public:
    RoadGenBranchArgs const args;
 
 private:
-   Bool       isDoneGenerating     { false };
-   F32_Dist   generateSelection    { .0f, 1.0f };
-   U16        tilesToWalk,
-              tilesWalked          { 0 },
-              tilesSinceLastBranch { 0 },
-              tilesSinceLastTurn   { 0 },
-              currentX,
-              currentY;
-   Direction  currentDirection;
+   Bool                        isDoneGenerating     { false };
+   F32_Dist                    generateSelection    { .0f, 1.0f };
+   U16                         tilesToWalk,
+                               tilesWalked          { 0 },
+                               tilesSinceLastBranch { 0 },
+                               tilesSinceLastTurn   { 0 },
+                               currentX,
+                               currentY;
+   Direction                   currentDirection;
 };
 
 
@@ -67,21 +67,18 @@ public:
    // transfers the generation parameters 'args' to the root branch,
    // notifies it of the callback function to use (method  'scheduleBranch')
    // then hands it a reference to the map it's to work on.
-         RoadGenerator( TileMap & );
+         RoadGenerator( TileMap &, Opt<std::function<void()>> maybeCallback={} );
    // generates the tree, one depth at a time, one tile per branch at a time
    void  generate( MapConfig const & );
-   V2u   getStartPosition() const noexcept;
-	void  upscale() noexcept;
 
 private:
    // TODO: increasing depth value starting at 0!
    // schedules a branch at a given depth to be generated
    void  scheduleBranch( RoadGenBranchArgs && );
-   void  cleanIsles() noexcept;
 
-	V2u                     start;
-   TileMap                &map;
-   RD                      rd;
-   RNG                     rng;
-   Vector<Vector<Branch>>  branchTree;
+   TileMap                    &map;
+   RD                          rd;
+   RNG                         rng;
+   Vector<Vector<Branch>>      branchTree;
+   Opt<std::function<void()>>  maybeCallback;
 };
