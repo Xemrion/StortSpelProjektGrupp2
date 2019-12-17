@@ -286,7 +286,7 @@ void Minimap::update(float deltaTime)
 		}
 
 		ID3D11DeviceContext* deviceContext = Game::getGraphics().getDeviceContext();
-		unsigned int rowPitch = (this->textureFogTemp->getWidth() * 4) * sizeof(unsigned char);
+		unsigned int rowPitch = (this->textureFogTemp->getWidth()*this->textureFogTemp->getHeight() * 4) * sizeof(unsigned char);
 		//deviceContext->UpdateSubresource(this->textureFog, 0, NULL, this->pixels, rowPitch, 0);
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
