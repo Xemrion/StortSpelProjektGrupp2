@@ -500,27 +500,7 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 	std::vector<Vector3> pathToPlayer;
 	std::vector<Vector3> pathToPredicted;
 	std::vector<Vector3>* pathToUse;
-	//for (int i = 0; i < groups.size(); i++)
-	//{
-	//	aStar->algorithm(groups[i]->getAveragePos(), targetPos, pathToPlayer);
-	//	aStar->algorithm(groups[i]->getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
-
-	//	if (pathToPlayer.size() < pathToPredicted.size())
-	//	{
-	//		pathToUse = &pathToPlayer;
-	//	}
-	//	else
-	//	{
-	//		pathToUse = &pathToPredicted;
-	//	}
-	//	groups[i]->setPath(*pathToUse);
-	//	for (int j = 0; j < groups[i]->actors.size(); j++)
-	//	{
-	//		groups[i]->actors[j]->setPath(groups[i]->path.data() + groups[i]->path.size() - 1);
-	//		groups[i]->actors[j]->pathSize = groups[i]->path.size() - 1;
-	//	}
-	//}
-	if(actors.size() > 0)
+	if(actors.size() > 0 && groups[currentGroup]->actors.size() > 0)
 	{
 		aStar->algorithm(groups[currentGroup]->getAveragePos(), targetPos, pathToPlayer);
 		aStar->algorithm(groups[currentGroup]->getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
@@ -539,16 +519,15 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 			groups[currentGroup]->actors[j]->setPath(groups[currentGroup]->path.data() + groups[currentGroup]->path.size() - 1);
 			groups[currentGroup]->actors[j]->pathSize = groups[currentGroup]->path.size() - 1;
 		}
-		if (currentGroup == groups.size()-1)
-		{
-			currentGroup = 0;
-		}
-		else
-		{
-			currentGroup++;
-		}
 	}
-	
+	if (currentGroup == groups.size() - 1)
+	{
+		currentGroup = 0;
+	}
+	else
+	{
+		currentGroup++;
+	}
 }
 
 void ActorManager::updateGroups()
