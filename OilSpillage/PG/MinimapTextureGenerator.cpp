@@ -15,7 +15,7 @@ static auto constexpr roadBorder       {  1U  }; // thickness of sidewalk around
 static auto constexpr districtBlendFac { .1f };
 
 #pragma warning( disable : 4715 ) 
-String createMinimapTexture( Map const &map, Bool isDistrictColoured )
+String createMinimapTexture( Map const &map, Bool isDistrictColoured, Opt<String> customPath )
 {
 	auto numDistricts = District::Type::size();
 	Vector<RGBA> districtColors( numDistricts );
@@ -299,7 +299,7 @@ String createMinimapTexture( Map const &map, Bool isDistrictColoured )
 				setPixelIfInBounds( tileIndex(x,y), hospitalPrimaryColor );
    }
 
-   auto path = String("data/textures/map/map.tga");// +mapConfigToFilename(map.config, ".tga");
+   auto path = customPath? customPath.value() : String("data/textures/map/map.tga");// +mapConfigToFilename(map.config, ".tga");
    stbi_write_tga( path.c_str(), static_cast<I32>(TEX_WIDTH), static_cast<I32>(TEX_HEIGHT), 4, pixels.data() );
    return String("map/map");// +mapConfigToFilename(map.config);
 }

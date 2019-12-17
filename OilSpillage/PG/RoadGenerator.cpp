@@ -6,9 +6,9 @@ Branch::Branch( RoadGenBranchArgs args ):
    currentY          ( args.startY         ),
    currentDirection  ( args.startDirection )
 {
-	U16 minLength = args.map.config.roadLengthFactorMin * args.map.config.dimensions.x * args.map.config.dimensions.y,
-	    maxLength = args.map.config.roadLengthFactorMax * args.map.config.dimensions.x * args.map.config.dimensions.y;
-	U16_Dist  gen_tiles_to_walk( minLength, maxLength );
+	U16           minLength = args.map.config.roadLengthFactorMin * args.map.config.dimensions.x * args.map.config.dimensions.y,
+	              maxLength = args.map.config.roadLengthFactorMax * args.map.config.dimensions.x * args.map.config.dimensions.y;
+	U16_Dist      gen_tiles_to_walk( minLength, maxLength );
 	tilesToWalk = gen_tiles_to_walk( args.rng );
 }
 
@@ -44,9 +44,11 @@ RoadGenBranchArgs  createChildArgs( RoadGenBranchArgs const &parentArgs,
 }
 
 void  Branch::walk( MapConfig const &config ) {
-   auto  steps = config.roadStepSize;
+   auto  STEP_LENGTH = 2; // length of each step in number of tiles
+   auto  MERGE_PROB  = .001f;
+   auto  steps       = config.roadStepSize;
 // main loop:
-   while ( (tilesWalked != tilesToWalk) and (steps --> 0) ) {
+   while ( (tilesWalked < tilesToWalk) and (steps --> 0) ) {
       // potential branch:
       Bool  isBranchEligible = ( args.currentDepth < args.map.config.roadDepthMax )
                                  and ( tilesSinceLastBranch >= (U16)config.roadMinTilesBeforeBranch );
@@ -67,7 +69,7 @@ void  Branch::walk( MapConfig const &config ) {
       } else ++tilesSinceLastTurn;
 
       // walk!
-      if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road) ) {
+      if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road, STEP_LENGTH, (generateSelection(args.rng) < MERGE_PROB) ) ) {
          // if we can't walk forward, try turning a random direction first
          Bool  turned_left;
          if ( generateSelection(args.rng) < .5f ) {
@@ -77,12 +79,12 @@ void  Branch::walk( MapConfig const &config ) {
             turned_left      = false;
             currentDirection = turnRight( currentDirection );
          }
-         if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road) ) {
+         if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road, STEP_LENGTH, (generateSelection(args.rng) < MERGE_PROB) ) ) {
             // if we can't walk forward in that direction, try the other
             currentDirection = turnAround(currentDirection);
-            if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road) ) {
+            if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road, STEP_LENGTH), (generateSelection(args.rng) < MERGE_PROB) ) {
                currentDirection = turned_left ? turnRight(currentDirection) : turnLeft(currentDirection);
-               if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road) ) {
+               if ( !args.map.walk(currentX, currentY, currentDirection, Tile::road, STEP_LENGTH, (generateSelection(args.rng) < MERGE_PROB) ) ) {
                   // TODO: join with logging system
                   #ifdef _DEBUG
                      std::cerr << "[RoadGen] WARNING! Branch had nowhere to go\n";
@@ -93,9 +95,9 @@ void  Branch::walk( MapConfig const &config ) {
             }
          }
       }
-      ++tilesWalked;
+      tilesWalked += STEP_LENGTH;
    }
-   if ( tilesWalked == tilesToWalk )
+   if ( tilesWalked >= tilesToWalk )
       isDoneGenerating = true;
 }
 
@@ -106,9 +108,10 @@ void  RoadGenerator::scheduleBranch( RoadGenBranchArgs &&args ) {
    branchTree[args.currentDepth].emplace_back(std::move(args));
 }
 
-RoadGenerator::RoadGenerator( TileMap &map ):
-   map ( map  ),
-   rng ( rd() )
+RoadGenerator::RoadGenerator( TileMap &map, Opt<std::function<void()>> maybeCallback ):
+   map           ( map           ),
+   rng           ( rd()          ),
+   maybeCallback ( maybeCallback )
 {
 
    branchTree.reserve( map.config.roadDepthMax );
@@ -156,7 +159,6 @@ RoadGenerator::RoadGenerator( TileMap &map ):
    scheduleBranch( std::move(args) );
 }
 
-
 // generates the tree, one depth at a time, one tile per branch at a time
 void  RoadGenerator::generate( MapConfig const &config ) {
 #ifdef _DEBUG_W_TERM
@@ -172,6 +174,8 @@ void  RoadGenerator::generate( MapConfig const &config ) {
             }
             allDone &= branch.isDone();
          }
+         if ( maybeCallback )
+            maybeCallback.value()();
          #ifdef _DEBUG_W_TERM
             std::system("clear");
             std::cout << map                                 << "\n"
@@ -186,76 +190,8 @@ void  RoadGenerator::generate( MapConfig const &config ) {
          #endif
       }
    }
-	start.x = branchTree[0][0].args.startX;
-	start.y = branchTree[0][0].args.startY;
-   cleanIsles();
+   //cleanUp();
 }
 
-// clean-up roads:
-void  RoadGenerator::cleanIsles() noexcept {
-   for ( auto y = 1U;  y < map.width-1;  ++y )
-      for ( auto x = 1U;  x < map.height-1;  ++x )
-         if ( map.tileAt( x,   y-1 ) == Tile::road
-          and map.tileAt( x+1, y-1 ) == Tile::road
-          and map.tileAt( x+1, y   ) == Tile::road
-          and map.tileAt( x+1, y+1 ) == Tile::road
-          and map.tileAt( x,   y+1 ) == Tile::road
-          and map.tileAt( x-1, y+1 ) == Tile::road
-          and map.tileAt( x-1, y   ) == Tile::road
-          and map.tileAt( x-1, y-1 ) == Tile::road )
-            { map.tileAt( x, y ) = Tile::ground; }
-}
+//void RoadGenerator::cleanUp() {}
 
-V2u  RoadGenerator::getStartPosition() const noexcept {
-	return start;
-}
-
-void RoadGenerator::upscale() noexcept
-{
-	MapConfig  newConfig   { map.config };
-	newConfig.dimensions = { map.config.dimensions.x*2, map.config.dimensions.y*2 };
-	TileMap    newMap      { newConfig };
-	for ( auto y = 0;  y < map.height;  ++y ) 
-		for ( auto x = 0;  x < map.width;  ++x ) {
-			newMap.data[newMap.index(x*2,y*2)] = map.data[map.index(x,y)];
-			if ( x*2+1 < newMap.width )
-				newMap.data[newMap.index(x*2+1,y*2)]
-					= (map.data[map.index(x,y)] == Tile::road
-						and (x+1 < map.width and map.data[map.index(x+1,y)]==Tile::road))
-					? Tile::road : Tile::ground;
-			if ( y*2+1 < newMap.height )
-				newMap.data[newMap.index(x*2,y*2+1)]
-					= (map.data[map.index(x,y)] == Tile::road
-						and (y+1 < map.height and map.data[map.index(x,y+1)]==Tile::road))
-					? Tile::road : Tile::ground;
-	}
-
-	F32_Dist selection;
-	bool oneEdgeRoadFound = false;
-// generate dead ends along the south side
-	for ( auto x = 0;  x < map.width;  ++x ) {
-		auto y = newMap.height-2;
-		if ( newMap.tileAt(x,y) == Tile::road ) {
-			if ( !oneEdgeRoadFound or selection(rng) < .25f ) {
-				newMap.tileAt(x,y+1) = Tile::road;
-            oneEdgeRoadFound = true;
-            ++x;
-         }
-      }
-	}
-	// generate dead ends along the east side
-	for ( auto y = 0;  y < map.height;  ++y ) {
-		auto x = newMap.width-2;
-		if ( newMap.tileAt(x,y) == Tile::road ) {
-			if ( !oneEdgeRoadFound or selection(rng) < .25f ) {
-				newMap.tileAt(x+1,y) = Tile::road;
-            oneEdgeRoadFound = true;
-            ++y;
-         }
-      }
-	}
-
-	start.x *= 2; // bugged and unused, TODO: remove
-	start.y *= 2; // bugged and unused, TODO: remove
-	map = std::move(newMap);
-}
