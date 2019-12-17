@@ -966,6 +966,12 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 	this->particleSystem2->changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
+void Graphics::clearParticleSystems()
+{
+	this->particleHandler->clearSystems();
+	this->particleTrail->clearSystem();
+}
+
 void Graphics::addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime)
 {
 	this->particleTrail->addParticle(nrOfParticles,lifeTime, pos, initialDirection);

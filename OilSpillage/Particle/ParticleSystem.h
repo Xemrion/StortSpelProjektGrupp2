@@ -90,6 +90,7 @@ public:
 	void setPixelShader(std::string pixelShader);
 	void setBufferType(D3D11_BUFFER_UAV_FLAG flag);
 
+	void clearSystem();
 	void drawAll(DynamicCamera* camera);
 	bool loadSystem();
 	bool saveSystem();

@@ -5,7 +5,7 @@ struct Particle
     float2 time; //.x = time, .y = totalTime
 };
 ConsumeStructuredBuffer<Particle> CurrentSimulationState : register(u0);
-cbuffer ParticleCount : register(b1)
+cbuffer ParticleCount : register(b0)
 {
     uint4 NumParticles;
 };

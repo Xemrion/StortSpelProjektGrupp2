@@ -631,6 +631,7 @@ void ParticleSystem::clearSystem()
 		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &count);
 		deviceContext->CopyStructureCount(this->nrOfParticlesCB.Get(), offset, this->particlesUAV.Get());
 		this->deviceContext->Dispatch(capParticle / 512, 1, 1);
+		this->indexForTrail = 0;
 	}
 
 	
