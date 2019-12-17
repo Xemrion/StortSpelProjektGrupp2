@@ -94,6 +94,14 @@ bool ParticleHandler::saveParticleSystems()
 	return result;
 }
 
+void ParticleHandler::clearSystems()
+{
+	for (auto i = this->particleSystems.begin(); i != this->particleSystems.end(); i++)
+	{
+		i->second->clearSystem();
+	}
+}
+
 void ParticleHandler::renderParticleSystems(DynamicCamera* camera)
 {
 	for (auto i = this->particleSystems.begin(); i != this->particleSystems.end(); i++)

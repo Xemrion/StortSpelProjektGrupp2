@@ -162,6 +162,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ComputeShader> createComputeShader;
 	Microsoft::WRL::ComPtr<ID3D10Blob> createComputeShaderBlob;
 
+	Microsoft::WRL::ComPtr<ID3D11ComputeShader> clearComputeShader;
+	Microsoft::WRL::ComPtr<ID3D10Blob> clearComputeShaderBlob;
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particlesBuffer;//one will be the updated
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particlesUAV;

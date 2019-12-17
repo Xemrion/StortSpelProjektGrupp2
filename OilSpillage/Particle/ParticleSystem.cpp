@@ -107,6 +107,19 @@ void ParticleSystem::initiateParticles(ID3D11Device* device, ID3D11DeviceContext
 	hr = D3DReadFileToBlob(filePath.c_str(), this->computeShaderBlob.GetAddressOf());
 	hr = device->CreateComputeShader(this->computeShaderBlob->GetBufferPointer(), this->computeShaderBlob->GetBufferSize(), NULL, this->computeShader.GetAddressOf());
 
+	if (!onlyAdd)
+	{
+		filePath = shaderfolder + StringToWString("ClearParticlesCS.cso");
+		hr = D3DReadFileToBlob(filePath.c_str(), this->clearComputeShaderBlob.GetAddressOf());
+		hr = device->CreateComputeShader(this->clearComputeShaderBlob->GetBufferPointer(), this->clearComputeShaderBlob->GetBufferSize(), NULL, this->clearComputeShader.GetAddressOf());
+	}
+	else
+	{
+		filePath = shaderfolder + StringToWString("ClearParticlesTrailCS.cso");
+		hr = D3DReadFileToBlob(filePath.c_str(), this->clearComputeShaderBlob.GetAddressOf());
+		hr = device->CreateComputeShader(this->clearComputeShaderBlob->GetBufferPointer(), this->clearComputeShaderBlob->GetBufferSize(), NULL, this->clearComputeShader.GetAddressOf());
+	}
+
 	this->device = device;
 	this->deviceContext = deviceContext;
 	int bufferSize = static_cast<int>(capParticle) * sizeof(Particle);
@@ -388,7 +401,6 @@ void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 
 		ID3D11Buffer* nB = nullptr;
 		UINT null = 0;
-
 		this->deviceContext->CSSetConstantBuffers(2, 1, &nB);
 		this->deviceContext->CSSetConstantBuffers(1, 1, &nB);
 		this->deviceContext->CSSetConstantBuffers(0, 1, &nB);
@@ -590,6 +602,38 @@ void ParticleSystem::setPixelShader(std::string pixelShader)
 void ParticleSystem::setBufferType(D3D11_BUFFER_UAV_FLAG flag)
 {
 	this->bufferType = flag;
+}
+void ParticleSystem::clearSystem()
+{
+	this->deviceContext->CSSetShader(this->clearComputeShader.Get(), nullptr, 0);
+	if (!onlyAdd)
+	{
+		UINT offset = 0;
+
+		UINT count = -1;
+		this->deviceContext->CSSetConstantBuffers(0, 1, this->nrOfParticlesCB.GetAddressOf());
+
+		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV2.GetAddressOf(), &count);
+		deviceContext->CopyStructureCount(this->nrOfParticlesCB.Get(), offset, this->particlesUAV2.Get());
+		this->deviceContext->Dispatch(capParticle / 512, 1, 1);
+
+		deviceContext->CopyStructureCount(this->nrOfParticlesCB.Get(), offset, this->particlesUAV.Get());
+		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &count);
+		this->deviceContext->Dispatch(capParticle / 512, 1, 1);
+	}
+	else
+	{
+		UINT offset = 0;
+
+		UINT count = -1;
+		this->deviceContext->CSSetConstantBuffers(0, 1, this->nrOfParticlesCB.GetAddressOf());
+
+		deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &count);
+		deviceContext->CopyStructureCount(this->nrOfParticlesCB.Get(), offset, this->particlesUAV.Get());
+		this->deviceContext->Dispatch(capParticle / 512, 1, 1);
+	}
+
+	
 }
 void ParticleSystem::drawAll(DynamicCamera* camera)
 {
