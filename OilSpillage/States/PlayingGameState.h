@@ -9,7 +9,7 @@
 #include "../Road Network/RoadNet.h"
 #include "../DynamicCamera.h"
 #include "../PG/Map.hpp"
-#include "../PG/Generic L-System.h"
+//#include "../PG/Generic L-System.h"
 #include "../UI/UserInterface.h"
 #include "../Powerup.h"
 
@@ -89,7 +89,7 @@ private:
 	std::unique_ptr<DynamicCamera>  camera;
 	std::unique_ptr<UserInterface>  menues[MENUCOUNT];
 	std::unique_ptr<RoadNetwork>    testNetwork;
-	std::unique_ptr<Lsystem>		testSystem;
+	//std::unique_ptr<Lsystem>		testSystem; //Replacement for RoadNetwork
 	std::vector<CinematicPos>       points;
 	std::vector<std::unique_ptr<PowerUp>> powerUps;
 	SpotLight                      *playerLight;
