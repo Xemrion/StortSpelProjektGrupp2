@@ -811,12 +811,13 @@ void Graphics::renderShadowmap(DynamicCamera* camera, int culledObjectAmount)
 	}
 
 	quadTreeCullingThread.wait();
+
 	for (GameObject* o : culledObjectsStatic)
 	{
 		AABB boundingBox = o->getAABB();
 		UINT vertexCount = o->mesh->getVertexCount();
-		SimpleMath::Matrix world = o->getTransform().Transpose();
-		shadowMap.setWorld(world);
+		//SimpleMath::Matrix world = o->getTransform().Transpose();
+		shadowMap.setWorld(o->getTransform().Transpose());
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		if (o->getSunShadow())
 		{
@@ -830,6 +831,7 @@ void Graphics::renderShadowmap(DynamicCamera* camera, int culledObjectAmount)
 			deviceContext->Draw(vertexCount, 0);
 		}
 	}
+	
 }
 
 bool Graphics::createShaders()
@@ -917,7 +919,7 @@ void Graphics::addParticle(Vector3 pos, Vector3 initialDirection, int nrOfPartic
 	randomPos += pos;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleHandler->getParticleSystem("fire")->addParticle(nrOfParticles, lifeTime, randomPos,initialDirection);
+	this->particleHandler->getParticleSystem("fire")->addParticleToList(lifeTime, randomPos, Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f));
 }
 
 void Graphics::addParticle(std::string particleSystem, int nrOf, float lifeTime, Vector3 position, Vector4 initialDirection, float randomPower,Vector3 randomSpace)
@@ -931,7 +933,7 @@ void Graphics::addParticle(std::string particleSystem, int nrOf, float lifeTime,
 	randomPos += position;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleHandler->getParticleSystem(particleSystem)->addParticle(nrOf, lifeTime, randomPos, initialDirection);
+	this->particleHandler->getParticleSystem(particleSystem)->addParticleToList(lifeTime, randomPos, initialDirection);
 }
 
 void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime, float randomPower)
@@ -942,7 +944,7 @@ void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParti
 	randomPos += pos;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleSystem2->addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+	this->particleSystem2->addParticleToList(lifeTime, randomPos, Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f));
 }
 
 void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
@@ -973,7 +975,7 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 
 void Graphics::addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime)
 {
-	this->particleTrail->addParticle(1, lifeTime, pos, initialDirection);
+	this->particleTrail->addParticle(nrOfParticles,lifeTime, pos, initialDirection);
 }
 
 void Graphics::changeTrailColor(Vector3 color)

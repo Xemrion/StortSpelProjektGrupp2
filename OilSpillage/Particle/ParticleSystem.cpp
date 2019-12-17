@@ -294,6 +294,16 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 	return true;
 }
 
+void ParticleSystem::addParticleToList(float lifeTime, Vector3 position, Vector4 initialDirection)
+{
+	/*mx.lock();*/
+	pParams.initialDirection = Vector4(initialDirection.x, initialDirection.y, initialDirection.z, initialDirection.w);
+	pParams.emitterLocation = Vector4(position.x, position.y, position.z, lifeTime);
+	pParams.randomVector = Vector4(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, 1.0f);
+	addList.push_back(pParams);
+	/*mx.unlock();*/
+}
+
 bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vector3 initialDirection)
 {
 	if (!isfinite(position.x) || !isfinite(position.y) || !isfinite(position.z))
@@ -356,6 +366,60 @@ bool ParticleSystem::addParticle(int nrOf, float lifeTime, Vector3 position, Vec
 
 void ParticleSystem::updateParticles(float delta, Matrix viewProj)
 {
+	if (this->addList.size() > 0)
+	{
+		UINT initialCount;
+		if (firstAdd == 0)
+		{
+			initialCount = 0;
+			firstAdd = 1;
+		}
+		else
+		{
+			initialCount = -1;
+		}
+
+	
+		ID3D11UnorderedAccessView* n = nullptr;
+		//run create particle compute shader here
+
+		ID3D11Buffer* nB = nullptr;
+		UINT null = 0;
+
+		this->deviceContext->CSSetConstantBuffers(2, 1, &nB);
+		this->deviceContext->CSSetConstantBuffers(1, 1, &nB);
+		this->deviceContext->CSSetConstantBuffers(0, 1, &nB);
+		deviceContext->CSSetConstantBuffers(0, 1, this->particleParamCB.GetAddressOf());
+		if (otherFrame == 1 || onlyAdd)
+		{
+			deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV.GetAddressOf(), &initialCount);
+			if (onlyAdd)
+			{
+				deviceContext->CSSetUnorderedAccessViews(1, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
+			}
+		}
+		else
+		{
+			deviceContext->CSSetUnorderedAccessViews(0, 1, this->particlesUAV2.GetAddressOf(), &initialCount);
+		}
+		deviceContext->CSSetShader(this->createComputeShader.Get(), 0, 0);
+	
+	
+		for (int i = 0; i < this->addList.size(); i++)
+		{
+			pParams = this->addList[i];
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+			HRESULT hr = deviceContext->Map(particleParamCB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+			CopyMemory(mappedResource.pData, &pParams, sizeof(ParticleParams));
+			deviceContext->Unmap(particleParamCB.Get(), 0);
+
+			deviceContext->Dispatch(1, 1, 1);
+		}
+	
+		this->addList.clear();
+		deviceContext->CSSetUnorderedAccessViews(0, 1, &n, &null);
+	}
+	
 	ID3D11UnorderedAccessView* n = nullptr;
 	UINT initialCount = -1;
 	if (!onlyAdd)
