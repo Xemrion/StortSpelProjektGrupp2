@@ -34,6 +34,7 @@ private:
 	void* ptr;
 	const int maxNrOfEnemies = 24;
 	const int spawnCooldown = 2;
+	int currentGroup = 0;
 	float spawnTimer = 0;
 	float soundTimer = 0;
 	int frameCount = 0;
@@ -61,4 +62,5 @@ private:
 	std::vector<Boss*> bosses;
 	TurretHandler turretHandler;
 	AStar* aStar;
+
 };
