@@ -520,7 +520,7 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 	//		groups[i]->actors[j]->pathSize = groups[i]->path.size() - 1;
 	//	}
 	//}
-	if(actors.size() < 0)
+	if(actors.size() > 0)
 	{
 		aStar->algorithm(groups[currentGroup]->getAveragePos(), targetPos, pathToPlayer);
 		aStar->algorithm(groups[currentGroup]->getAveragePos(), predictPlayerPos(targetPos), pathToPredicted);
