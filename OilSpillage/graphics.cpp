@@ -536,8 +536,8 @@ int Graphics::prepareObjects(DynamicCamera* camera)
 {
 	std::atomic<int> objectCount = 0;
 	Frustum frustum = camera->getFrustum();
-	culledObjects.reserve(drawableObjects.size());
-	culledWorldMatrices.reserve(drawableObjects.size());
+	culledObjects.resize(drawableObjects.size());
+	culledWorldMatrices.resize(drawableObjects.size());
 
 	auto cullAndPrepareWorldMatrix = [&](std::unordered_map<GameObject*, GameObject*>::iterator begin, std::unordered_map<GameObject*, GameObject*>::iterator end)
 	{
@@ -557,16 +557,31 @@ int Graphics::prepareObjects(DynamicCamera* camera)
 			}
 		}
 	};
+	int quarterSize = drawableObjects.size() / 4;
+	if (quarterSize > 0)
+	{
+		auto currentStart = drawableObjects.begin();
+		auto currentEnd = std::next(currentStart, quarterSize);
+		auto a = std::async(std::launch::async, cullAndPrepareWorldMatrix, currentStart, currentEnd);
+		currentStart = currentEnd;
+		currentEnd = std::next(currentStart, quarterSize);
+		auto b = std::async(std::launch::async, cullAndPrepareWorldMatrix, currentStart, currentEnd);
+		currentStart = currentEnd;
+		currentEnd = std::next(currentStart, quarterSize);
+		auto c = std::async(std::launch::async, cullAndPrepareWorldMatrix, currentStart, currentEnd);
+		currentStart = currentEnd;
+		currentEnd = std::next(currentStart, quarterSize);
+		auto d = std::async(std::launch::async, cullAndPrepareWorldMatrix, currentStart, drawableObjects.end());
 
-	auto a = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
-	auto b = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
-	auto c = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
-	auto d = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
-
-	a.wait();
-	b.wait();
-	c.wait();
-	d.wait();
+		a.wait();
+		b.wait();
+		c.wait();
+		d.wait();
+	}
+	else
+	{
+		cullAndPrepareWorldMatrix(drawableObjects.begin(), drawableObjects.end());
+	}
 
 	return objectCount;
 }
@@ -574,6 +589,13 @@ int Graphics::prepareObjects(DynamicCamera* camera)
 void Graphics::render(DynamicCamera* camera, float deltaTime)
 {
 	int culledObjectAmount = prepareObjects(camera);
+	//culledObjectAmount = drawableObjects.size();
+	//culledObjects.clear();
+	//for (auto o : drawableObjects)
+	//{
+	//	culledObjects.push_back(o.second);
+	//}
+
 	Frustum frustum = camera->getFrustum();
 
 	float color[4] = {
@@ -1775,7 +1797,7 @@ void Graphics::setUISun(Vector3 direction, Vector4 color)
 }
 
 void Graphics::renderUI(float deltaTime)
-{
+{ 
 	float color[4] = {
 		0,0,0,1
 	};
