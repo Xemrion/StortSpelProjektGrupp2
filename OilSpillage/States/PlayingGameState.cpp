@@ -422,6 +422,22 @@ void  PlayingGameState::ImGui_Driving()
 	ImGui::Text(("Rotation Target: " + std::to_string(player->getRotatorTarget())).c_str());
 	ImGui::Text(("Angle between: " + std::to_string(player->getAngleBetween())).c_str());
 	
+	FogMaterial material;
+	material.color = Vector3(1.0f, 1.0f, 1.0f);
+	material.scale = 5.0f;
+	material.density = 0.5f;
+	material.ambientDensity = 0.05f;
+	material.densityThreshold = 0.15f;
+	material.density = 1.6f;
+	float tempFogDensity = fogDensity;
+	float tempFogSeperation = fogSeperation;
+	graphics.setFogWindSpeed(Vector2(0.001f, 0.001f));
+	ImGui::SliderFloat("Fog seperation: ", &fogSeperation, 0.0f, 10.0f);
+	ImGui::SliderFloat("Fog density: ", &fogDensity, 0.0f, 2.0f);
+	material.density = fogDensity;
+	if (fogDensity != tempFogDensity || fogSeperation != tempFogSeperation) {
+		graphics.setFog(material, 3, fogSeperation);
+	}
 
 
 	Vector3 camPos = camera->getPosition();
@@ -854,18 +870,18 @@ void PlayingGameState::update(float deltaTime)
 
 	Sound::fadeSoundtrack(soundAggro);
 	
-	#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
-		ImGui_ImplDX11_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-		ImGui_Driving();
-		//ImGui_ProcGen();
-		//ImGui_AI();
-		//ImGui_Particles();
-		//ImGui_Camera();
-		ImGui::Render();
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	#endif // !_DEBUG
+	//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	//	ImGui_ImplDX11_NewFrame();
+	//	ImGui_ImplWin32_NewFrame();
+	//	ImGui::NewFrame();
+	//	ImGui_Driving();
+	//	//ImGui_ProcGen();
+	//	//ImGui_AI();
+	//	//ImGui_Particles();
+	//	ImGui_Camera();
+	//	ImGui::Render();
+	//	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	//#endif // !_DEBUG
 	graphics.presentScene();
 }
 

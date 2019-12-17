@@ -96,6 +96,8 @@ private:
 	GameObject*		cameraObject;
 	float			cameraTimer;
 	float			snowTimer;
+	float fogSeperation;
+	float fogDensity;
 
 	ObjectiveHandler objectives;
 	RNG rng{ RD()() };        // gör privat klassmedlem istället
