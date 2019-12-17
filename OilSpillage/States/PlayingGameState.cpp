@@ -11,7 +11,7 @@
 #include "../UI/Menu/UIControls.h"
 #include "../profiling.h"
 
-#define RELEASE_DEBUG
+//#define RELEASE_DEBUG
 
 void PlayingGameState::fillTestParticle()
 {

@@ -141,14 +141,10 @@ bool ShadowMapping::initialize(ID3D11Device* device, ID3D11DeviceContext* device
 
 void ShadowMapping::setWorld(const Matrix& world)
 {
-	
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	Matrix worldTemp = world;
 	HRESULT hr = deviceContext->Map(worldBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, &worldTemp, sizeof(Matrix));
+	CopyMemory(mappedResource.pData, &world, sizeof(Matrix));
 	deviceContext->Unmap(worldBuffer.Get(), 0);
-	
-
 }
 
 void ShadowMapping::setViewProjSun(DynamicCamera *camera, Vector3 sunDir, float farPlaneTest)
