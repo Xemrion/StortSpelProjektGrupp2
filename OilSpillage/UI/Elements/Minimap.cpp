@@ -75,9 +75,9 @@ void Minimap::init()
 	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.SampleDesc.Quality = 0;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.Usage = D3D11_USAGE_DYNAMIC;
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.CPUAccessFlags = 0;
+	textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	textureDesc.MiscFlags = 0;
 
 	// Create an empty texture.
@@ -287,7 +287,13 @@ void Minimap::update(float deltaTime)
 
 		ID3D11DeviceContext* deviceContext = Game::getGraphics().getDeviceContext();
 		unsigned int rowPitch = (this->textureFogTemp->getWidth() * 4) * sizeof(unsigned char);
-		deviceContext->UpdateSubresource(this->textureFog, 0, NULL, this->pixels, rowPitch, 0);
+		//deviceContext->UpdateSubresource(this->textureFog, 0, NULL, this->pixels, rowPitch, 0);
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = deviceContext->Map(this->textureFog, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		CopyMemory(mappedResource.pData, this->pixels, rowPitch);
+		deviceContext->Unmap(this->textureFog, 0);
+
 
 		Vector3 closestPos;
 		if (state->getObjHandler().getObjective(0) != nullptr)

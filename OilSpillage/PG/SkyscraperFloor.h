@@ -15,7 +15,7 @@ public:
 
 	void rotateDeg(float degrees);
 	void rotateRad(float radians);
-	void unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter);
+	bool unionShapes(SkyscraperFloor& toUnion, Vector3 newCenter);
 	Vector3 getAVertex(int vertex) const;
 	Vector3 getCenter() const;
 	int getNrOfEdges() const;

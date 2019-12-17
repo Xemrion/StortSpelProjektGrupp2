@@ -43,23 +43,12 @@ inline bool testPlanePoint(float3 lightPos, float4 plane, float radius)
 	return dist < radius;
 }
 
-inline bool distancePlanePoint(float3 lightPos, float4 plane)
-{
-	return dot(lightPos, plane.xyz);
-}
-
 struct Ray
 {
 	float3 origin;
 	float3 dir;
 	float length;
 };
-
-inline float distancePlaneRay(Ray ray, float4 plane)
-{
-	float d = dot(ray.dir, plane.xyz);
-	return dot(ray.origin, plane.xyz) / max(d, 0.000001 * sign(d));
-}
 
 inline bool testPlaneRay(Ray ray, float4 plane, float radius)
 {
@@ -68,11 +57,11 @@ inline bool testPlaneRay(Ray ray, float4 plane, float radius)
 
 	float minDist = min(d0, d1);
 	float maxDist = max(d0, d1);
-
+	
 	return minDist <= radius && maxDist >= -radius;
 }
 
-void appendLight(uint lightIndex)
+inline void appendLight(uint lightIndex)
 {
 	uint index;
 	InterlockedAdd(lightCount, 1, index);
@@ -107,32 +96,31 @@ void main(uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID)
 		}
 
 		float4 pos = float4(l.pos.xyz, 1.0);
+		float radius = sqrt(l.color.w / 0.05);
 		pos.y = -pos.y;
 		pos = mul(pos, view);
-		float radius = sqrt(l.color.w / 0.05);
 
 		if (l.pos.w == 1.0)
 		{
 			l.directionWidth = mul(float4(l.directionWidth.xyz, 0.0), view);
-			radius *= 2.0;
 			pos.xyz += l.directionWidth.xyz * radius;
 		}
-		else if (l.pos.w == 2.0)
+
+		if (l.pos.w == 2.0)
 		{
 			Ray ray;
 			ray.origin = pos.xyz;
 			ray.dir = normalize(mul(float4(l.directionWidth.xyz, 0.0), view));
 			ray.length = l.directionWidth.w;
-
-			inside = false;
 			radius = sqrt(radius);
 			int intersections = 0;
+
 			intersections += testPlaneRay(ray, groupFrustum.left, radius);
 			intersections += testPlaneRay(ray, groupFrustum.right, radius);
 			intersections += testPlaneRay(ray, groupFrustum.top, radius);
 			intersections += testPlaneRay(ray, groupFrustum.bottom, radius);
 
-			if (intersections == 4) inside = true;
+			inside = intersections == 4;
 		}
 		else
 		{

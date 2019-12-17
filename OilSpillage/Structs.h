@@ -22,7 +22,7 @@ struct AABB
 {
 	DirectX::SimpleMath::Vector3 minPos;
 	DirectX::SimpleMath::Vector3 maxPos;
-	AABB scale(DirectX::SimpleMath::Vector3 scale)
+	const AABB& scale(DirectX::SimpleMath::Vector3 scale)
 	{
 		AABB scaledAABB = { DirectX::SimpleMath::Vector3(minPos.x * scale.x, minPos.y * scale.y, minPos.z * scale.z),
 							DirectX::SimpleMath::Vector3(maxPos.x * scale.x,maxPos.y * scale.y,maxPos.z * scale.z) };

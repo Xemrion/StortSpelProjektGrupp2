@@ -52,12 +52,10 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> theOutput)
 {
 	GSOutput output;
 
-	float3 toCamera = normalize(camPos.xyz - input[0].pos.xyz);
 
 	float3 trailDirection = normalize(input[0].direction.xyz);
 	float3 right = -normalize(cross(trailDirection, float3(0.0f, 1.0f, 0.0f)));
 
-	float3 up = normalize(cross(right, toCamera));
 	float3 vert[4];
 	float time = input[0].time.x;
 	float totalLifeTime = input[0].time.y;

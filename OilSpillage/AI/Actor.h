@@ -38,6 +38,7 @@ protected:
 	bool isHit = false;
 	bool stunned;
 	float stunTimer;
+	float soundTimer;
 	float deltaTime;
 	Vector3 targetPos;
 	Stats stats;
