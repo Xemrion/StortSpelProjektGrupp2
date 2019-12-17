@@ -536,8 +536,8 @@ int Graphics::prepareObjects(DynamicCamera* camera)
 {
 	std::atomic<int> objectCount = 0;
 	Frustum frustum = camera->getFrustum();
-	culledObjects.reserve(drawableObjects.size());
-	culledWorldMatrices.reserve(drawableObjects.size());
+	culledObjects.resize(drawableObjects.size());
+	culledWorldMatrices.resize(drawableObjects.size());
 
 	auto cullAndPrepareWorldMatrix = [&](std::unordered_map<GameObject*, GameObject*>::iterator begin, std::unordered_map<GameObject*, GameObject*>::iterator end)
 	{
@@ -557,16 +557,31 @@ int Graphics::prepareObjects(DynamicCamera* camera)
 			}
 		}
 	};
+	int quarterSize = drawableObjects.size() / 4;
+	if (quarterSize > 0)
+	{
+		auto currentStart = drawableObjects.begin();
+		auto currentEnd = std::next(currentStart, quarterSize);
+		auto a = std::async(std::launch::async, cullAndPrepareWorldMatrix, currentStart, currentEnd);
+		currentStart = currentEnd;
+		currentEnd = std::next(currentStart, quarterSize);
+		auto b = std::async(std::launch::async, cullAndPrepareWorldMatrix, currentStart, currentEnd);
+		currentStart = currentEnd;
+		currentEnd = std::next(currentStart, quarterSize);
+		auto c = std::async(std::launch::async, cullAndPrepareWorldMatrix, currentStart, currentEnd);
+		currentStart = currentEnd;
+		currentEnd = std::next(currentStart, quarterSize);
+		auto d = std::async(std::launch::async, cullAndPrepareWorldMatrix, currentStart, drawableObjects.end());
 
-	auto a = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
-	auto b = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
-	auto c = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
-	auto d = std::async(std::launch::async, cullAndPrepareWorldMatrix, drawableObjects.begin(), drawableObjects.end());
-
-	a.wait();
-	b.wait();
-	c.wait();
-	d.wait();
+		a.wait();
+		b.wait();
+		c.wait();
+		d.wait();
+	}
+	else
+	{
+		cullAndPrepareWorldMatrix(drawableObjects.begin(), drawableObjects.end());
+	}
 
 	return objectCount;
 }
@@ -789,12 +804,13 @@ void Graphics::renderShadowmap(DynamicCamera* camera, int culledObjectAmount)
 	}
 
 	quadTreeCullingThread.wait();
+
 	for (GameObject* o : culledObjectsStatic)
 	{
 		AABB boundingBox = o->getAABB();
 		UINT vertexCount = o->mesh->getVertexCount();
-		SimpleMath::Matrix world = o->getTransform().Transpose();
-		shadowMap.setWorld(world);
+		//SimpleMath::Matrix world = o->getTransform().Transpose();
+		shadowMap.setWorld(o->getTransform().Transpose());
 		deviceContext->IASetVertexBuffers(0, 1, o->mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 		if (o->getSunShadow())
 		{
@@ -808,6 +824,7 @@ void Graphics::renderShadowmap(DynamicCamera* camera, int culledObjectAmount)
 			deviceContext->Draw(vertexCount, 0);
 		}
 	}
+	
 }
 
 bool Graphics::createShaders()
@@ -909,7 +926,7 @@ void Graphics::addParticle(std::string particleSystem, int nrOf, float lifeTime,
 	randomPos += position;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleHandler->getParticleSystem(particleSystem)->addParticle(nrOf, lifeTime, randomPos, initialDirection);
+	this->particleHandler->getParticleSystem(particleSystem)->addParticleToList(lifeTime, randomPos, initialDirection);
 }
 
 void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParticles, float lifeTime, float randomPower)
@@ -920,7 +937,7 @@ void Graphics::addParticle2(Vector3 pos, Vector3 initialDirection, int nrOfParti
 	randomPos += pos;
 	randomPos += randomPos2;
 	float grey = float(rand()) / RAND_MAX;
-	this->particleSystem2->addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+	this->particleSystem2->addParticleToList(lifeTime, randomPos, Vector4(initialDirection.x, initialDirection.y, initialDirection.z, 1.0f));
 }
 
 void Graphics::setParticleColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize)
@@ -951,7 +968,7 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 
 void Graphics::addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime)
 {
-	this->particleTrail->addParticle(1, lifeTime, pos, initialDirection);
+	this->particleTrail->addParticle(nrOfParticles,lifeTime, pos, initialDirection);
 }
 
 void Graphics::changeTrailColor(Vector3 color)
@@ -1775,7 +1792,7 @@ void Graphics::setUISun(Vector3 direction, Vector4 color)
 }
 
 void Graphics::renderUI(float deltaTime)
-{
+{ 
 	float color[4] = {
 		0,0,0,1
 	};

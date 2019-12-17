@@ -103,6 +103,7 @@ void main(uint groupIndex : SV_GroupIndex, uint3 groupID : SV_GroupID)
 		if (l.pos.w == 1.0)
 		{
 			l.directionWidth = mul(float4(l.directionWidth.xyz, 0.0), view);
+			radius *= 1.5;
 			pos.xyz += l.directionWidth.xyz * radius;
 		}
 
