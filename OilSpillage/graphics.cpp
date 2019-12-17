@@ -589,13 +589,6 @@ int Graphics::prepareObjects(DynamicCamera* camera)
 void Graphics::render(DynamicCamera* camera, float deltaTime)
 {
 	int culledObjectAmount = prepareObjects(camera);
-	//culledObjectAmount = drawableObjects.size();
-	//culledObjects.clear();
-	//for (auto o : drawableObjects)
-	//{
-	//	culledObjects.push_back(o.second);
-	//}
-
 	Frustum frustum = camera->getFrustum();
 
 	float color[4] = {
