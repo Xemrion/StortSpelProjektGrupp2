@@ -781,7 +781,7 @@ void Graphics::renderShadowmap(DynamicCamera* camera, int culledObjectAmount)
 			deviceContext->Draw(vertexCount, 0);
 		}
 
-		if (object->getSpotShadow() && spotFrustum.intersect(object->getAABB(), 5.0f, false))
+		if (object->getSpotShadow() && spotFrustum.intersect(object->getAABB(), 10.0f, false))
 		{
 			shadowMap.setDSpot();
 			deviceContext->Draw(vertexCount, 0);

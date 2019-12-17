@@ -231,7 +231,7 @@ PlayingGameState::PlayingGameState(int seed,float time) : graphics(Game::getGrap
 
 	Game::getGraphics().setUISun(Vector3(1.0f, -1.0f, 0.1f), Vector4(0.84, 0.83, 0, 1));
 
-	playerLight = lightList->addLight(SpotLight(player->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 2.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
+	playerLight = lightList->addLight(SpotLight(player->getPosition(), Vector3(0.8f, 0.8f, 0.8f), 8.f, Vector3(0.f, -1.0f, -2.0f), 0.5));
 
 	points = {
 		{
@@ -870,7 +870,7 @@ void PlayingGameState::update(float deltaTime)
 	//	ImGui_ImplDX11_NewFrame();
 	//	ImGui_ImplWin32_NewFrame();
 	//	ImGui::NewFrame();
-	//	ImGui_Driving();
+	//	//ImGui_Driving();
 	//	//ImGui_ProcGen();
 	//	//ImGui_AI();
 	//	//ImGui_Particles();
