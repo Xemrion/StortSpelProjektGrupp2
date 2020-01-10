@@ -62,7 +62,7 @@ void UpgradingGameState::update(float deltaTime)
 	}
 	else
 	{
-		this->theVehicle->getRigidBody()->setAngularVelocity(btVector3(0, deltaTime * 150, 0));
+		this->theVehicle->getRigidBody()->setAngularVelocity(btVector3(0, 0.5f, 0));
 	}
 	
 	this->theVehicle->setWheelRotation(deltaTime);

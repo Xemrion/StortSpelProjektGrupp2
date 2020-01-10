@@ -20,7 +20,7 @@ Actor::Actor(float x, float z)
 }
 Actor::~Actor()
 {
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
 		Game::getGraphics().addParticle("explosion", 1, 1, position, Vector4(0.0f, 0.0f, 0.0f, 10.0f), 0.5f);
@@ -30,7 +30,7 @@ Actor::~Actor()
 	for (int i = 0; i < 24; i++)
 	{
 		Game::getGraphics().addParticle(position, Vector3(0.0f), 1, 3);
-		Game::getGraphics().addParticle2(position, Vector3(0.0f), 1, 3);
+		Game::getGraphics().addParticle(position, Vector3(0.0f), 1, 3);
 	}
 }
 

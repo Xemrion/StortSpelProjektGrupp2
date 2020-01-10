@@ -64,10 +64,18 @@ void ActorManager::update(float dt, const Vector3& targetPos)
 	}
 	teleportActorsToPlayer(targetPos);
 	turretHandler.update(dt, targetPos);
-	if (frameCount % 20 == 0)
+	if (frameCount % 5 == 0)
 	{
+		if (currentGroup >= groups.size() - 1)
+		{
+			currentGroup = 0;
+		}
 		assignPathsToGroups(targetPos);
 		frameCount = 0;
+		if(currentGroup < groups.size() -1)
+		{
+			currentGroup++;
+		}
 	}
 	frameCount++;
 }
@@ -402,7 +410,7 @@ void ActorManager::teleportActorsToPlayer(const Vector3& targetPos)
 					current->getRigidBody()->getWorldTransform().setOrigin(btVector3(newPos.x, current->getPosition().y, newPos.z));
 				}
 
-				if (j % 5 == 0)
+				if (j+1 % 9 == 0)
 				{
 					//newPos = findTeleportPos(targetPos, 50, 100);
 				}
@@ -492,7 +500,15 @@ void ActorManager::spawnEnemies(const Vector3& targetPos)
 
 void ActorManager::leaveGroup(int groupIndex, int where)
 {
-	groups[groupIndex]->actors.erase(groups[groupIndex]->actors.begin() + where);
+	groups[groupIndex]->actors.erase(groups[groupIndex]->actors.begin() + where);;
+	if (groups[groupIndex]->actors.empty())
+	{
+		AIGroup* temp = groups[groupIndex];
+		groups[groupIndex] = groups[groups.size() - 1];
+		groups[groups.size() - 1] = temp;
+		delete groups[groups.size() - 1];
+		groups.pop_back();
+	}
 }
 
 void ActorManager::assignPathsToGroups(const Vector3& targetPos)
@@ -519,14 +535,6 @@ void ActorManager::assignPathsToGroups(const Vector3& targetPos)
 			groups[currentGroup]->actors[j]->setPath(groups[currentGroup]->path.data() + groups[currentGroup]->path.size() - 1);
 			groups[currentGroup]->actors[j]->pathSize = groups[currentGroup]->path.size() - 1;
 		}
-	}
-	if (currentGroup == groups.size() - 1)
-	{
-		currentGroup = 0;
-	}
-	else
-	{
-		currentGroup++;
 	}
 }
 
@@ -623,17 +631,26 @@ void ActorManager::actorDied(int index)
 			grpIndex = i;
 		}
 	}	
-
-	groups[grpIndex]->removeActor(actors[index]);
+	if(grpIndex != -1)
+	{
+		groups[grpIndex]->removeActor(actors[index]);
+	}
 	delete actors[index];
 	actors.erase(actors.begin() + index);
-	if (groups[grpIndex]->actors.empty())
+	if (grpIndex != -1)
 	{
-		AIGroup* temp = groups[grpIndex];
-		groups[grpIndex] = groups[groups.size() -1];
-		groups[groups.size() - 1] = temp;
-		delete groups[groups.size() - 1];
-		groups.pop_back();
+		if (groups[grpIndex]->actors.empty())
+		{
+			AIGroup* temp = groups[grpIndex];
+			groups[grpIndex] = groups[groups.size() - 1];
+			groups[groups.size() - 1] = temp;
+			delete groups[groups.size() - 1];
+			groups.pop_back();
+		}
+	}
+	if (currentGroup >= groups.size() - 1)
+	{
+		currentGroup = 0;
 	}
 }
 
