@@ -765,7 +765,7 @@ void PlayingGameState::update(float deltaTime)
 		objectives.update(player->getPosition(), physics.get());
 		Bullet::updateSoundTimer(deltaTime);
 		player->updateWeapon(deltaTime);
-#ifdef _DEBUG
+#ifndef _DEBUG
 		timer += deltaTime;
 
 		if (Input::checkButton(Keys::R_LEFT, States::PRESSED))
