@@ -866,14 +866,14 @@ void PlayingGameState::update(float deltaTime)
 
 	Sound::fadeSoundtrack(soundAggro);
 	
-	//#if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
+	//if defined(_DEBUG) || defined(RELEASE_DEBUG) //Set RELEASE_DEBUG to false to deactivate imgui in release!
 	//	ImGui_ImplDX11_NewFrame();
 	//	ImGui_ImplWin32_NewFrame();
 	//	ImGui::NewFrame();
 	//	//ImGui_Driving();
 	//	//ImGui_ProcGen();
 	//	//ImGui_AI();
-	//	//ImGui_Particles();
+	//	ImGui_Particles();
 	//	ImGui_Camera();
 	//	ImGui::Render();
 	//	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
