@@ -502,9 +502,9 @@ Map::~Map() noexcept
 {
 	graphics.clearStaticObjects();
 	for ( auto &e : houses.composites ) {
-		physics->deleteRigidBody( e.walls.getRigidBody() );
+		/*physics->deleteRigidBody( e.walls.getRigidBody() );
 		physics->deleteRigidBody( e.windows.getRigidBody() );
-		physics->deleteRigidBody( e.roof.getRigidBody());
+		physics->deleteRigidBody( e.roof.getRigidBody());*/
 		physics->deleteRigidBody( e.area.getRigidBody() );
 		skyscraperGenerator->unloadASkyscraper(e.skyscraperMeshIndex);
 	}

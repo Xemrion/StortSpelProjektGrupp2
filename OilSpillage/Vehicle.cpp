@@ -881,13 +881,19 @@ void Vehicle::updateWeapon(float deltaTime)
 							}
 							else if(temp2->getGadget().type == GadgetType::EMP)
 							{
+								if (empplaced == nullptr)
+								{
+									empplaced = new GameObject(*temp2->getObject());
+									temp2->getGadget().enable = false;
+									temp2->getGadget().currentLifeTime = 0;
+								}
 								if (Input::checkButton(Keys::R_SHOULDER, States::RELEASED) && temp2->getGadget().enable != true) // its alive!
 								{	
-									if (empplaced == nullptr)
+									/*if (empplaced == nullptr)
 									{
 										empplaced = new GameObject(*temp2->getObject());
 										Game::getGraphics().addToDraw(empplaced);
-									}
+									}*/
 									//drop it
 									empplaced->setPosition(this->getPosition());
 									temp2->getGadget().enable = true;
