@@ -263,7 +263,7 @@ void Game::run()
 
 		if (oldState != -1) {
 			graphics.clearDraw();
-			
+			graphics.clearParticleSystems();
 			createCurrentState(); //Init the new state
 			curTime = 0;
 			QueryPerformanceCounter((LARGE_INTEGER*)& curTime);

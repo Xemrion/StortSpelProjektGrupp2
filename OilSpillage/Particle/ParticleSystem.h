@@ -23,6 +23,10 @@ struct ParticleParams
 	Vector4 randomVector;
 	Vector4 initialDirection;
 };
+struct ParticlesAdd
+{
+	ParticleParams arr[32];
+};
 struct ParticleRenderParams
 {
 	Vector4 colors[4];
@@ -86,6 +90,7 @@ public:
 	void setPixelShader(std::string pixelShader);
 	void setBufferType(D3D11_BUFFER_UAV_FLAG flag);
 
+	void clearSystem();
 	void drawAll(DynamicCamera* camera);
 	bool loadSystem();
 	bool saveSystem();
@@ -124,6 +129,8 @@ private:
 	float sinMovement;
 	IndirDraw indDraw;
 	ParticleParams pParams;
+	ParticlesAdd addArr;
+
 	SimulationParams sP;
 	ParticleSData systemData;
 	bool quad;
@@ -134,7 +141,9 @@ private:
 	std::mutex mx;
 	int indexForTrail;
 	Texture* texture;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader
+	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamCB;//For compshader add
+	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamArr;//For adding a batch of 32
+
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleParamRenderCB;//For the draw
 	Microsoft::WRL::ComPtr<ID3D11Buffer> viewProjBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> nrOfParticlesCB;
@@ -154,6 +163,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ComputeShader> createComputeShader;
 	Microsoft::WRL::ComPtr<ID3D10Blob> createComputeShaderBlob;
 
+	Microsoft::WRL::ComPtr<ID3D11ComputeShader> clearComputeShader;
+	Microsoft::WRL::ComPtr<ID3D10Blob> clearComputeShaderBlob;
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particlesBuffer;//one will be the updated
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> particlesUAV;

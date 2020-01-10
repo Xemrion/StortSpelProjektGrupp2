@@ -76,7 +76,7 @@ void GameObject::setSpotShadow(bool arg)
 	this->spotShadow = arg;
 }
 
-void GameObject::setPosition(Vector3 newPos)
+void GameObject::setPosition(const Vector3& newPos)
 {
 	if (this->rigidBody)
 	{
@@ -108,7 +108,7 @@ void GameObject::move(Vector3 addPos)
 	}
 }
 
-void GameObject::addRotation(Vector3 addRotaiton)
+void GameObject::addRotation(const Vector3& addRotaiton)
 {
 	if (this->rigidBody)
 	{
@@ -132,7 +132,7 @@ void GameObject::addRotation(Vector3 addRotaiton)
 	}
 }
 
-void GameObject::setRotation(Vector3 newRotation)
+void GameObject::setRotation(const Vector3& newRotation)
 {
 	if (this->rigidBody)
 	{
@@ -149,7 +149,7 @@ void GameObject::setRotation(Vector3 newRotation)
 	}
 }
 
-void GameObject::setScale(Vector3 newScale)
+void GameObject::setScale(const Vector3& newScale)
 {
 	this->scale = newScale;
 }

@@ -21,6 +21,7 @@ public:
 
 	void renderParticleSystems(DynamicCamera* camera);
 	void updateParticleSystems(float delta, Matrix viewProj);
+	void clearSystems();
 private:
 	std::unordered_map<std::string, ParticleSystem*> particleSystems;
 	std::vector<std::string> names;

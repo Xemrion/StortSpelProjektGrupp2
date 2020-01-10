@@ -175,6 +175,7 @@ public:
 	void setParticle2ColorNSize(Vector4 colors[4], int nrOfColors, float startSize, float endSize);
 	void setVectorField(float vectorFieldSize,float vectorFieldPower);
 	void setVectorField2(float vectorFieldSize,float vectorFieldPower);
+	void clearParticleSystems();
 	Vector3 screenToWorldSpaceUI(Vector2 screenPos);
 
 	void addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles = 2, float lifeTime = 2.0f);

@@ -966,6 +966,12 @@ void Graphics::setVectorField2(float vectorFieldSize, float vectorFieldPower)
 	this->particleSystem2->changeVectorField(vectorFieldPower, vectorFieldSize);
 }
 
+void Graphics::clearParticleSystems()
+{
+	this->particleHandler->clearSystems();
+	this->particleTrail->clearSystem();
+}
+
 void Graphics::addTrail(Vector3 pos, Vector4 initialDirection, int nrOfParticles, float lifeTime)
 {
 	this->particleTrail->addParticle(nrOfParticles,lifeTime, pos, initialDirection);
@@ -999,7 +1005,7 @@ void Graphics::addTestParticle(Vector3 pos, Vector4 initialDirection, int nrOfPa
 		randomPos += pos;
 		randomPos += randomPos2;
 		float grey = float(rand()) / RAND_MAX;
-		this->testParticle->addParticle(nrOfParticles, lifeTime, randomPos, initialDirection);
+		this->testParticle->addParticleToList(lifeTime, randomPos, initialDirection);
 	}
 }
 

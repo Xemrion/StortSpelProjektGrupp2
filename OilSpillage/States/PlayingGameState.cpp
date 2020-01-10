@@ -11,7 +11,7 @@
 #include "../UI/Menu/UIControls.h"
 #include "../profiling.h"
 
-//#define RELEASE_DEBUG
+#define RELEASE_DEBUG
 
 void PlayingGameState::fillTestParticle()
 {
@@ -765,7 +765,7 @@ void PlayingGameState::update(float deltaTime)
 		objectives.update(player->getPosition(), physics.get());
 		Bullet::updateSoundTimer(deltaTime);
 		player->updateWeapon(deltaTime);
-#ifdef _DEBUG
+#ifndef _DEBUG
 		timer += deltaTime;
 
 		if (Input::checkButton(Keys::R_LEFT, States::PRESSED))
